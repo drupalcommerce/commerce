@@ -1,0 +1,7 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines the common features used by the core modules in the Commerce package.
+ */
