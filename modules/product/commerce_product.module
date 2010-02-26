@@ -49,6 +49,10 @@ function commerce_product_entity_info() {
           'label' => t('Full'),
         ),
       ),
+      'creation callback' => '_commerce_product_create',
+      'save callback' => 'commerce_product_save',
+      'deletion callback' => 'commerce_product_delete',
+      'access callback' => 'commerce_product_access',
     ),
   );
 
@@ -246,6 +250,14 @@ function commerce_product_new($type = '') {
 }
 
 /**
+ * Creation callback for entity metadata.
+ */
+function _commerce_product_create($values = array()) {
+  $product = commerce_product_new();
+  return entity_metadata_create_object($values + (array)$product, 'commerce_product');
+}
+
+/**
  * Saves a product.
  *
  * @param $product
@@ -322,6 +334,43 @@ function commerce_product_delete_multiple($product_ids) {
  */
 function commerce_product_path($product) {
   return 'admin/commerce/products/' . $product->product_id . '/edit';
+}
+
+/**
+ * Check product access.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $product
+ *   Optionally a product to check access for or for the create operation the
+ *   product type. If nothing is given access permissions for all products are returned.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the current user.
+ */
+function commerce_product_access($op, $product = NULL, $account = NULL) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  if (user_access('administer products', $account)) {
+    return TRUE;
+  }
+  if ($op == 'view' && user_access('access products', $account)) {
+    return TRUE;
+  }
+  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product, $account)) {
+    return TRUE;
+  }
+  if (isset($product) && ($op == 'update' || $op == 'delete')) {
+    if (user_access('edit any ' . $product->type, $account)) {
+      return TRUE;
+    }
+    // Others either don't have any access or must match the product uid.
+    if ($account->uid && user_access('edit own ' . $product->type, $account) && $product->uid == $account->uid) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 /**

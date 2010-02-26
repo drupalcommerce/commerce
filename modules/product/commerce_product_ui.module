@@ -27,8 +27,8 @@ function commerce_product_ui_menu() {
       'description' => $product_type->description,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('commerce_product_ui_product_form', commerce_product_new($type)),
-      'access callback' => 'commerce_product_ui_product_add_access',
-      'access arguments' => array($type),
+      'access callback' => 'commerce_product_access',
+      'access arguments' => array('create', $type),
       'file' => 'includes/commerce_product_ui.products.inc',
     );
   }
@@ -37,8 +37,8 @@ function commerce_product_ui_menu() {
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_product_ui_product_form', 3),
-    'access callback' => 'commerce_product_ui_product_edit_access',
-    'access arguments' => array(3),
+    'access callback' => 'commerce_product_access',
+    'access arguments' => array('update', 3),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_product_ui.products.inc',
@@ -47,8 +47,8 @@ function commerce_product_ui_menu() {
     'title' => 'Delete a product',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_product_ui_product_delete_form', 3),
-    'access callback' => 'commerce_product_ui_product_edit_access',
-    'access arguments' => array(3),
+    'access callback' => 'commerce_product_access',
+    'access arguments' => array('update', 3),
     'file' => 'includes/commerce_product_ui.products.inc',
   );
 
@@ -111,42 +111,6 @@ function commerce_product_ui_product_add_any_access() {
     if (commerce_product_ui_product_add_access($type)) {
       return TRUE;
     }
-  }
-
-  return FALSE;
-}
-
-/**
- * Access callback: determine the user's ability to create a product.
- *
- * @param $type
- *   The machine-readable name of the type of product the user wants to create.
- * @return
- *   TRUE or FALSE indicating the user's access.
- */
-function commerce_product_ui_product_add_access($type) {
-  return user_access('administer products') || user_access('create ' . $type);
-}
-
-/**
- * Access callback: determine the user's ability to edit or delete a product.
- *
- * @param $product
- *   The loaded product object.
- * @return
- *   TRUE or FALSE indicating the user's access.
- */
-function commerce_product_ui_product_edit_access($product) {
-  global $user;
-
-  // Users with administer products and edit any permissions can always edit.
-  if (user_access('administer products') || user_access('edit any ' . $product->type)) {
-    return TRUE;
-  }
-
-  // Others either don't have any access or must match the product uid.
-  if ($user->uid && user_access('edit own ' . $product->type) && $product->uid == $user->uid) {
-    return TRUE;
   }
 
   return FALSE;
