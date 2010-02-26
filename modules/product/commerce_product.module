@@ -145,14 +145,35 @@ function commerce_product_type_new() {
 
 /**
  * Saves a product type.
+ *
+ * This function will either insert a new product type if $product_type->is_new
+ * is set or attempt to update an existing product type if it is not. It does
+ * not currently support changing the machine-readable name of the product type,
+ * nor is this possible through the form supplied by the Product UI module.
+ *
+ * @param $product_type
+ *   The product type object containing the basic properties as initialized in
+ *     commerce_product_type_new().
+ * @return
+ *   The return value of the call to drupal_write_record() to save the product
+ *     type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
+ *     the type of query performed to save the product type.
  */
 function commerce_product_type_save($product_type) {
   $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : NULL);
   menu_rebuild();
 
-  if (!empty($product_type->is_new)) {
+  // If this is a new product type and the insert did not fail...
+  if (!empty($product_type->is_new) && $op !== FALSE) {
     // Notify the field API that a new bundle has been created.
     field_attach_create_bundle('commerce_product', $product_type->type);
+
+    // Notify other modules that a new product type has been created.
+    module_invoke_all('commerce_product_type_insert', $product_type);
+  }
+  else {
+    // Notify other modules that an existing product type has been updated.
+    module_invoke_all('commerce_product_type_update', $product_type);
   }
 
   return $op;
@@ -160,6 +181,9 @@ function commerce_product_type_save($product_type) {
 
 /**
  * Loads a product type.
+ *
+ * @param $type
+ *   The machine-readable name of the product type.
  */
 function commerce_product_type_load($type) {
   return db_query('SELECT * FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchObject();
@@ -167,14 +191,22 @@ function commerce_product_type_load($type) {
 
 /**
  * Deletes a product type.
+ *
+ * @param $type
+ *   The machine-readable name of the product type.
  */
 function commerce_product_type_delete($type) {
+  $product_type = commerce_product_type_load($type);
+
   db_delete('commerce_product_type')
     ->condition('type', $type)
     ->execute();
 
   // Notify the field API that this bundle has been destroyed.
   field_attach_delete_bundle('commerce_product', $type);
+
+  // Notify other modules that this product type has been deleted.
+  module_invoke_all('commerce_product_type_delete', $product_type);
 }
 
 /**

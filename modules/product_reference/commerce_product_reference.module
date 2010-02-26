@@ -405,30 +405,6 @@ function commerce_product_reference_field_widget_error($element, $error) {
 }
 
 /**
- * Implements hook_commerce_product_type_update().
- *
- * Reflect type name changes to the 'referenceable types' settings: when the
- * name of a type changes, the change needs to be reflected in the
- * "referenceable types" setting for any commerce_product_reference field
- * referencing it.
- *
- * TODO: Implement this hook.
- */
-function commerce_product_reference_commerce_product_type_update($info) {
-  if (!empty($info->old_type) && $info->old_type != $info->type) {
-    $fields = field_info_fields();
-
-    foreach ($fields as $field_name => $field) {
-      if ($field['type'] == 'commerce_product_reference' && isset($field['settings']['referenceable_types'][$info->old_type])) {
-        $field['settings']['referenceable_types'][$info->type] = empty($field['settings']['referenceable_types'][$info->old_type]) ? 0 : $info->type;
-        unset($field['settings']['referenceable_types'][$info->old_type]);
-        field_update_field($field);
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_field_prepare_translation().
  *
  * When preparing a translation, load any translations of existing references.
