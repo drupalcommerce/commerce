@@ -61,6 +61,30 @@ function commerce_product_entity_info() {
 }
 
 /**
+ * Implements hook_field_extra_fields().
+ */
+function commerce_product_field_extra_fields() {
+  $extra = array();
+
+  foreach (commerce_product_types() as $type) {
+    $extra['commerce_product'][$type['type']] = array(
+      'sku' => array(
+        'label' => 'Product SKU',
+        'description' => t('Product module SKU form element'),
+        'weight' => -10,
+      ),
+      'title' => array(
+        'label' => 'Title',
+        'description' => t('Product module title form element'),
+        'weight' => -5,
+      ),
+    );
+  }
+
+  return $extra;
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_product_views_api() {

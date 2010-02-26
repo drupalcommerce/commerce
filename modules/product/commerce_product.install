@@ -8,13 +8,13 @@ function commerce_product_install() {
   // Create the basic product type. It has to be inserted manually with
   // db_insert() thanks to an issue reported at http://drupal.org/node/620298.
   db_insert('commerce_product_type')
-  ->fields(array(
-    'type' => 'product',
-    'name' => t('Product'),
-    'description' => t('A basic product type with no additional fields by default.'),
-    'help' => '',
-  ))
-  ->execute();
+    ->fields(array(
+      'type' => 'product',
+      'name' => t('Product'),
+      'description' => t('A basic product type with no additional fields by default.'),
+      'help' => '',
+    ))
+    ->execute();
 }
 
 /**
