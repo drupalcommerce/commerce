@@ -12,18 +12,6 @@
 function commerce_product_ui_menu() {
   $items = array();
 
-  // Top level "Store" container.
-  $items['admin/commerce'] = array(
-    'title' => 'Store',
-    'description' => 'Administer your store.',
-    'position' => 'right',
-    'weight' => 1,
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('access administration pages'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
-  );
-
   // Note: admin/commerce/products will be created by Views.
 
   // Add a product.
@@ -48,9 +36,19 @@ function commerce_product_ui_menu() {
   }
 
   $items['admin/commerce/products/%commerce_product/edit'] = array(
-    'title' => 'Edit a product',
+    'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_product_ui_product_form', 3),
+    'access callback' => 'commerce_product_ui_product_edit_access',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'commerce_product_ui.products.inc',
+  );
+  $items['admin/commerce/products/%commerce_product/delete'] = array(
+    'title' => 'Delete a product',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_product_delete_form', 3),
     'access callback' => 'commerce_product_ui_product_edit_access',
     'access arguments' => array(3),
     'file' => 'commerce_product_ui.products.inc',
@@ -114,7 +112,7 @@ function commerce_product_ui_product_add_access($product_type) {
 }
 
 /**
- * Access callback: determine the user's ability to edit a product.
+ * Access callback: determine the user's ability to edit or delete a product.
  *
  * @param $product
  *   The loaded product object.

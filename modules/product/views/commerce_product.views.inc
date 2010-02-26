@@ -78,3 +78,15 @@ function commerce_product_views_data() {
 
   return $data;
 }
+
+/**
+ * Implements hook_views_handlers().
+ */
+function commerce_product_views_handlers() {
+  return array(
+    // field handlers
+    'views_handler_field_commerce_product_type',
+    'views_handler_field_commerce_product_link_edit',
+    'views_handler_field_commerce_product_link_delete',
+  );
+}

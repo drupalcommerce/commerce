@@ -102,3 +102,34 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
     $form_state['redirect'] = 'admin/commerce/products';
   }
 }
+
+/**
+ * Confirmation form for deleting a product.
+ */
+function commerce_product_ui_product_delete_form($form, &$form_state, $product) {
+  $form_state['product'] = $product;
+
+  // TODO: Replace the SKU in the description parameter with the product view.
+
+  $form = confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $product->title)),
+    'admin/commerce/products',
+    '<p>' . t('SKU: @sku. Deleting this product cannot be undone.', array('@sku' => $product->product_sku)) . '</p>',
+    t('Delete'),
+    t('Cancel'),
+    'confirm'
+  );
+
+  return $form;
+}
+
+function commerce_product_ui_product_delete_form_submit($form, &$form_state) {
+  $product = $form_state['product'];
+
+  if (commerce_product_delete($product->product_id)) {
+    drupal_set_message(t('%title has been deleted.', array('%title' => $product->title)));
+    watchdog('commerce_product', 'Deleted product %title (SKU: @sku).', array('%title' => $product->title, '@sku' => $product->product_sku), WATCHDOG_NOTICE);
+  }
+
+  $form_state['redirect'] = 'admin/commerce/products';
+}

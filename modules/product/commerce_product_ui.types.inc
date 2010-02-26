@@ -175,7 +175,7 @@ function commerce_product_ui_type_delete_form($form, &$form_state, $product_type
   $form_state['product_type'] = $product_type;
 
   $form = confirm_form($form,
-    t('Are you sure you want to delete the product type %name?', array('%name' => $product_type->name)),
+    t('Are you sure you want to delete the %name product type?', array('%name' => $product_type->name)),
     'admin/commerce/products/types',
     '<p>' . t('This action cannot be undone.') . '</p>',
     t('Delete'),

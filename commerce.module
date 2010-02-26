@@ -5,3 +5,25 @@
  * @file
  * Defines the common features used by the core modules in the Commerce package.
  */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_menu() {
+  $items = array();
+
+  // Top level "Store" container.
+  $items['admin/commerce'] = array(
+    'title' => 'Store',
+    'description' => 'Administer your store.',
+    'position' => 'right',
+    'weight' => 1,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  return $items;
+}
