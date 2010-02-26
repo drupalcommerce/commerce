@@ -2,30 +2,61 @@
 // $Id$
 
 /**
- * Menu callback; display an overview of available types.
+ * Menu callback: display an overview of available types.
  */
 function commerce_product_ui_types_overview() {
+  drupal_add_css(drupal_get_path('module', 'commerce_product_ui') .'/theme/commerce_product_ui.types.css');
+
   $header = array(
     t('Name'),
     t('Operations'),
   );
+
   $rows = array();
+
+  // Loop through all defined product types.
   foreach (commerce_product_types() as $type) {
+    // Build the operation links for the current product type.
     $links = menu_contextual_links('commerce-product-type', 'admin/commerce/products/types', array($type['product_type']));
+
+    // Add the product type's row to the table's rows array.
     $rows[] = array(
-      $type['name'],
-      theme('links', array('links' => $links)),
+      theme('product_type_admin_overview', array('type' => $type)),
+      theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations'))),
     );
   }
+
+  // If no product types are defined...
   if (empty($rows)) {
+    // Add a standard empty row with a link to add a new product type.
     $rows[] = array(
       array(
-        'data' => t('There are no product types yet. <a href="@link">Add a product type</a>.', array('@link' => url('admin/commerce/products/types/add'))),
+        'data' => t('There are no product types yet. <a href="@link">Add product type</a>.', array('@link' => url('admin/commerce/products/types/add'))),
         'colspan' => 2,
       )
     );
   }
+
   return theme('table', array('header' => $header, 'rows' => $rows));
+}
+
+/**
+ * Builds an overview of a product type for display to an administrator.
+ *
+ * @param $variables
+ *   An array of variables used to generate the display; by default includes the
+ *     type key with a value of the product type object.
+ *
+ * @ingroup themeable
+ */
+function theme_product_type_admin_overview($variables) {
+  $type = $variables['type'];
+
+  $output = check_plain($type['name']);
+  $output .= ' <small> (Machine name: ' . check_plain($type['product_type']) . ')</small>';
+  $output .= '<div class="description">' . filter_xss_admin($type['description']) . '</div>';
+
+  return $output;
 }
 
 /**
@@ -43,7 +74,7 @@ function commerce_product_ui_type_form($form, &$form_state, $product_type) {
     '#title' => t('Name'),
     '#type' => 'textfield',
     '#default_value' => $product_type->name,
-    '#description' => t('The human-readable name of this product type.'),
+    '#description' => t('The human-readable name of this product type. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.'),
     '#required' => TRUE,
     '#size' => 32,
     '#field_suffix' => ' <small id="edit-product-type-name-suffix">' . $product_type->product_type . '</small>',
@@ -81,18 +112,31 @@ function commerce_product_ui_type_form($form, &$form_state, $product_type) {
     '#type' => 'textarea',
     '#default_value' => $product_type->description,
     '#rows' => 3,
-    '#description' => t('The description of this product type.'),
+    '#description' => t('Describe this product type. The text will be displayed on the <em>Add new content</em> page.'),
   );
 
-  $form['buttons'] = array();
-  $form['buttons']['#weight'] = 100;
-  $form['buttons']['submit'] = array(
+  $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save'),
+    '#value' => t('Save product type'),
+    '#weight' => 40,
   );
 
   if (!empty($product_type->product_type)) {
-    $form['buttons']['submit']['#suffix'] = t(' or <a href="@url">delete this product type</a>.', array('@url' => url('admin/commerce/products/types/' . $product_type->product_type . '/delete')));
+    $form['actions']['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete product type'),
+      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
+      '#weight' => 45,
+    );
+  }
+  else {
+    $form['actions']['save_continue'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save and add fields'),
+      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
+      '#weight' => 45,
+    );
   }
 
   return $form;
@@ -114,7 +158,13 @@ function commerce_product_ui_type_form_submit($form, &$form_state) {
   commerce_product_type_save($product_type);
 
   drupal_set_message(t('Product type saved.'));
-  $form_state['redirect'] = 'admin/commerce/products/types';
+
+  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
+    $form_state['redirect'] = 'admin/commerce/products/types/' . $product_type->product_type . '/fields';
+  }
+  else {
+    $form_state['redirect'] = 'admin/commerce/products/types';
+  }
 }
 
 /**
@@ -126,7 +176,7 @@ function commerce_product_ui_type_delete_form($form, &$form_state, $product_type
   $form = confirm_form($form,
     t('Are you sure you want to delete the product type %name?', array('%name' => $product_type->name)),
     'admin/commerce/products/types',
-    t('If you have any content left in this field, it will be lost. This action cannot be undone.'),
+    '<p>' . t('This action cannot be undone.') . '</p>',
     t('Delete'),
     t('Cancel'),
     'confirm'

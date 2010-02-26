@@ -2,9 +2,16 @@
 // $Id$
 
 /**
+ * @file
+ */
+
+
+/**
  * Implements hook_menu().
  */
 function commerce_product_ui_menu() {
+  $items = array();
+
   // Top level "Store" container.
   $items['admin/commerce'] = array(
     'title' => 'Store',
@@ -21,7 +28,7 @@ function commerce_product_ui_menu() {
 
   // Add a product.
   $items['admin/commerce/products/add'] = array(
-    'title' => 'Add new product',
+    'title' => 'Add a product',
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('administer products'),
     'file path' => drupal_get_path('module', 'system'),
@@ -80,6 +87,7 @@ function commerce_product_ui_menu() {
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'commerce_product_ui.types.inc',
   );
+
   return $items;
 }
 
@@ -100,13 +108,35 @@ function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_
   if ($root_path == 'admin/commerce/products') {
     $item = menu_get_item('admin/commerce/products/add');
     if ($item['access']) {
-      $item['title'] = t('Add a new product');
+      $item['title'] = t('Add a product');
       $data['actions']['output'][] = array(
         '#theme' => 'menu_local_action',
         '#link' => $item,
       );
     }
   }
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_product_ui_help($path, $arg) {
+  switch ($path) {
+    case 'admin/commerce/products/types/add':
+      return '<p>' . t('Individual product types can have different fields assigned to them.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_product_ui_theme() {
+  return array(
+    'product_type_admin_overview' => array(
+      'variables' => array('type' => NULL),
+      'file' => 'commerce_product_ui.types.inc',
+    ),
+  );
 }
 
 /**

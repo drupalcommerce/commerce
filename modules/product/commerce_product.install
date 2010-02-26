@@ -19,6 +19,8 @@ function commerce_product_uninstall() {
  * Implements hook_schema().
  */
 function commerce_product_schema() {
+  $schema = array();
+
   $schema['commerce_product'] = array(
     'description' => 'The base table for products.',
     'fields' => array(
@@ -41,6 +43,32 @@ function commerce_product_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'title' => array(
+        'description' => 'The title of this product, always treated as non-markup plain text.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this product.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the node was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the node was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+
     ),
     'primary key' => array('product_id'),
     'indexes' => array(
@@ -77,5 +105,6 @@ function commerce_product_schema() {
     ),
     'primary key' => array('product_type'),
   );
+
   return $schema;
 }

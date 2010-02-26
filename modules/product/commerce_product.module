@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ */
+
+
+/**
  * Implements hook_entity_info().
  */
 function commerce_product_entity_info() {
@@ -55,22 +60,32 @@ function commerce_product_permission() {
     'administer products' => array(
       'title' => t('Administer products'),
     ),
+    'administer product types' => array(
+      'title' => t('Administer product types'),
+    ),
+    'create products' => array(
+      'title' => t('Create products'),
+    ),
   );
 }
 
 /**
- * Return the list of product types.
+ * Returns an array of product types.
  */
 function commerce_product_types() {
+  // First check the static cache for a product types array.
   $types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
   if (!isset($types)) {
     $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('product_type', PDO::FETCH_ASSOC);
   }
+
   return $types;
 }
 
 /**
- * Reset the cached list of product types.
+ * Resets the cached list of product types.
  */
 function commerce_product_types_reset() {
   $types = &drupal_static('commerce_product_types');
@@ -78,21 +93,21 @@ function commerce_product_types_reset() {
 }
 
 /**
- * Load a product type.
+ * Loads a product type.
  */
 function commerce_product_type_load($product_type_name) {
   return db_query('SELECT * FROM {commerce_product_type} WHERE product_type = :product_type', array(':product_type' => $product_type_name))->fetchObject();
 }
 
 /**
- * Return a path argument from a product type.
+ * Returns a path argument from a product type.
  */
 function commerce_product_type_to_arg($product_type) {
   return $product_type;
 }
 
 /**
- * Save a product type.
+ * Saves a product type.
  */
 function commerce_product_type_save($product_type) {
   $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'product_type' : NULL);
@@ -107,7 +122,7 @@ function commerce_product_type_save($product_type) {
 }
 
 /**
- * Delete a product type.
+ * Deletes a product type.
  */
 function commerce_product_type_delete($product_type_name) {
   db_delete('commerce_product_type')
@@ -126,22 +141,23 @@ function commerce_product_type_title($product_type) {
 }
 
 /**
- * Load a product.
+ * Loads a product by SKU.
  */
 function commerce_product_load($product_sku) {
-  $products = node_load_multiple(array($product_sku), array());
+  $products = commerce_product_load_multiple(array($product_sku), array());
   return $products ? reset($products) : FALSE;
 }
 
 /**
- * Load several products.
+ * Loads multiple products by SKU.
  *
  * @see entity_load()
  *
  * @param $product_skus
  *   An array of product SKUs.
  * @param $conditions
- *   An array of conditions on the {commerce_product} table in the form 'field' => $value.
+ *   An array of conditions on the {commerce_product} table in the form
+ *     'field' => $value.
  * @param $reset
  *   Whether to reset the internal node_load cache.
  *
@@ -153,7 +169,9 @@ function commerce_product_load_multiple($product_skus = array(), $conditions = a
 }
 
 /**
- * Save a product.
+ * Saves a product.
+ *
+ * @param $product
  *
  * @return
  *   TRUE on success, FALSE otherwise.
@@ -162,16 +180,27 @@ function commerce_product_save($product) {
   $transaction = db_transaction();
 
   try {
+    $product->changed = time();
+
+    // Give modules the opportunity to prepare field data for saving.
     field_attach_presave('commerce_product', $product);
 
+    // If this is a new product...
     if (empty($product->product_id)) {
+      // Set the creation timestamp.
+      $product->created = time();
+
+      // Save the new product and fields.
       drupal_write_record('commerce_product', $product);
       field_attach_insert('commerce_product', $product);
+
       $op = 'insert';
     }
     else {
+      // Save the updated product and fields.
       drupal_write_record('commerce_product', $product, 'product_id');
       field_attach_update('commerce_product', $product);
+
       $op = 'update';
     }
 
@@ -188,7 +217,7 @@ function commerce_product_save($product) {
 }
 
 /**
- * Return the path to a product.
+ * Returns the path to a product.
  */
 function commerce_product_path($product) {
   return 'admin/commerce/products/edit/' . $product->product_sku;
