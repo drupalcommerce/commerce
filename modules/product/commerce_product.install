@@ -2,27 +2,17 @@
 // $Id$
 
 /**
- * Implements hook_install().
+ * Implements hook_modules_installed().
  */
 function commerce_product_install() {
-  drupal_install_schema('commerce_product');
-
   // Create the basic product type.
-  // TODO: Figure out why this isn't working.
-  $product_type = array(
+  db_insert('commerce_product_type')
+  ->fields(array(
     'product_type' => 'product',
     'name' => t('Product'),
-    'description' => t('List a basic product on your site for sale.'),
-    'is_new' => TRUE,
-  );
-  commerce_product_type_save((object) $product_type);
-}
-
-/**
- * Implements hook_uninstall().
- */
-function commerce_product_uninstall() {
-  drupal_uninstall_schema('commerce_product');
+    'description' => t('A basic product type with no additional fields by default.'),
+  ))
+  ->execute();
 }
 
 /**
