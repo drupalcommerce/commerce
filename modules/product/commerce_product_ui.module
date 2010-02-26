@@ -31,7 +31,7 @@ function commerce_product_ui_menu() {
       'page arguments' => array('commerce_product_ui_product_form', (object) array('product_type' => $type['product_type'])),
       'access callback' => 'commerce_product_ui_product_add_access',
       'access arguments' => array($type['product_type']),
-      'file' => 'commerce_product_ui.products.inc',
+      'file' => 'includes/commerce_product_ui.products.inc',
     );
   }
 
@@ -43,7 +43,7 @@ function commerce_product_ui_menu() {
     'access arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    'file' => 'commerce_product_ui.products.inc',
+    'file' => 'includes/commerce_product_ui.products.inc',
   );
   $items['admin/commerce/products/%commerce_product/delete'] = array(
     'title' => 'Delete a product',
@@ -51,7 +51,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array('commerce_product_ui_product_delete_form', 3),
     'access callback' => 'commerce_product_ui_product_edit_access',
     'access arguments' => array(3),
-    'file' => 'commerce_product_ui.products.inc',
+    'file' => 'includes/commerce_product_ui.products.inc',
   );
 
   $items['admin/commerce/products/types'] = array(
@@ -61,7 +61,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array(),
     'access arguments' => array('administer products'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'commerce_product_ui.types.inc',
+    'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/%commerce_product_type'] = array(
     'title callback' => 'commerce_product_type_title',
@@ -70,7 +70,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array('commerce_product_ui_type_form', 4),
     'access arguments' => array('administer product types'),
     'type' => MENU_CALLBACK,
-    'file' => 'commerce_product_ui.types.inc',
+    'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/%commerce_product_type/edit'] = array(
     'title' => 'Edit',
@@ -85,7 +85,7 @@ function commerce_product_ui_menu() {
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 10,
-    'file' => 'commerce_product_ui.types.inc',
+    'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/add'] = array(
     'title' => 'Add product type',
@@ -93,7 +93,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array('commerce_product_ui_type_form', (object) array('product_type' => '', 'name' => '', 'description' => '')),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
-    'file' => 'commerce_product_ui.types.inc',
+    'file' => 'includes/commerce_product_ui.types.inc',
   );
 
   return $items;
