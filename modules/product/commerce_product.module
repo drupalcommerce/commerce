@@ -374,6 +374,29 @@ function commerce_product_access($op, $product = NULL, $account = NULL) {
 }
 
 /**
+ * Callback for getting product properties.
+ * @see commerce_product_entity_property_info()
+ */
+function commerce_product_get_properties($product, array $options, $name) {
+  switch ($name) {
+    case 'creator':
+      return $product->uid;
+    case 'edit-url':
+      return url('admin/commerce/products/' . $product->product_id . '/edit', $options);
+  }
+}
+
+/**
+ * Callback for setting product properties.
+ * @see commerce_product_entity_property_info()
+ */
+function commerce_product_set_properties($product, $name, $value) {
+  if ($name == 'creator') {
+    $product->uid = $value;
+  }
+}
+
+/**
  * Returns output for product autocompletes.
  *
  * The values returned will be keyed by SKU and appear as such in the textfield,
