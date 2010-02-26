@@ -1,0 +1,200 @@
+<?php
+// $Id$
+
+/**
+ * Return a list of available currencies.
+ */
+function commerce_price_available_currencies() {
+  // TODO: open this list, and add a alter hook.
+  return array(
+    'und' => array(
+      'label' => t('Undefined currency'),
+      'symbol' => '¤',
+    ),
+    'eur' => array(
+      'label' => t('Euro'),
+      'symbol' => '€',
+    ),
+    'usd' => array(
+      'label' => t('Dollar (US)'),
+      'symbol' => '$',
+    ),
+  );
+}
+
+/**
+ * Return the list of available currencies, formatted for an option list.
+ */
+function commerce_price_currencies_options() {
+  $options = array();
+  $currencies = commerce_price_available_currencies();
+  foreach ($currencies as $code => $currency) {
+    $options[$code] = $currency['symbol'];
+  }
+  return $options;
+}
+
+/**
+ * Return details about a currency.
+ */
+function commerce_price_currency($currency_code) {
+  $currencies = commerce_price_available_currencies();
+  return isset($currencies[$currency_code]) ? $currencies[$currency_code] : NULL;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function commerce_price_field_info() {
+  return array(
+    'commerce_price' => array(
+      'label' => t('Price'),
+      'description' => t('This field stores prices for products.'),
+      'settings' => array(),
+      'instance_settings' => array(),
+      'default_widget' => 'commerce_price_widget',
+      'default_formatter' => 'commerce_price_default',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function commerce_price_field_widget_info() {
+  return array(
+    'commerce_price_simple' => array(
+      'label' => t('Simple price (without currency)'),
+      'field types' => array('commerce_price'),
+      'settings' => array(
+        'currency' => 'UND',
+      ),
+    ),
+    'commerce_price_full' => array(
+      'label' => t('Price with currency'),
+      'field types' => array('commerce_price'),
+      'settings' => array(
+        'currency' => 'UND',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_price_field_schema($field) {
+  if ($field['type'] == 'commerce_price') {
+    return array(
+      'columns' => array(
+        'price' => array(
+          'description' => 'Base price.',
+          'type' => 'numeric',
+          'precision' => 16,
+          'scale' => 5,
+          'not null' => TRUE,
+        ),
+        'currency' => array(
+          'description' => 'Currency.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+        ),
+      ),
+      'indexes' => array(
+        'currency_price' => array('currency', 'price'),
+      ),
+    );
+  }
+}
+
+/**
+ * Implementation of hook_field_is_empty().
+ */
+function commerce_price_field_is_empty($item, $field) {
+  return !isset($item['price']) || (string)$item['price'] == '';
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function commerce_price_field_formatter_info() {
+  return array(
+    'commerce_price_default' => array(
+      'label' => t('Default'),
+      'field types' => array('commerce_product'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function commerce_price_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if ($display['type'] == 'commerce_price_default') {
+    foreach ($items as $delta => $item) {
+      $currency = commerce_price_currency($item['currency']);
+      // TODO: this should become a theme function.
+      $element[$delta] = array(
+        '#markup' => t('@price @currency', array('@price' => $item['price'], '@currency' => $currency['symbol'])),
+      );
+    }
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function commerce_price_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+
+  $form['currency'] = array(
+    '#type' => 'select',
+    '#title' => t('Default currency'),
+    '#options' => commerce_price_currencies_options(),
+    '#default_value' => $settings['currency'],
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function commerce_price_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
+  $element = $base;
+  $currency_code = $instance['widget']['settings']['currency'];
+  $currency = commerce_price_currency($currency_code);
+
+  switch ($instance['widget']['type']) {
+    case 'commerce_price_simple':
+      $element['price'] = $base + array(
+        '#type' => 'textfield',
+        '#default_value' => isset($items[$delta]['price']) ? $items[$delta]['price'] : NULL,
+        '#field_suffix' => $currency['symbol'],
+        '#size' => 10,
+      );
+      $element['currency'] = array(
+        '#type' => 'value',
+        '#value' => $currency_code,
+      );
+      break;
+    case 'commerce_price_full':
+      $element['price'] = $base + array(
+        '#type' => 'textfield',
+        '#default_value' => isset($items[$delta]['price']) ? $items[$delta]['price'] : NULL,
+        '#size' => 10,
+      );
+      $element['currency'] = array(
+        '#type' => 'select',
+        '#options' => commerce_price_currencies_options(),
+        '#default_value' => isset($items[$delta]['currency']) ? $items[$delta]['currency'] : $currency_code,
+      );
+      break;
+  }
+
+  return $element;
+}
