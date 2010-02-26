@@ -67,7 +67,6 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#description' => t('Supply a title for administrative display.'),
     '#default_value' => $product->title,
     '#maxlength' => 255,
     '#required' => TRUE,
