@@ -1,0 +1,8 @@
+; $Id$
+name = Commerce
+description = Common features for the Drupal Commerce module package.
+package = Commerce
+;dependencies[] =
+files[] = commerce.module
+core = 7.x
+php = 5.2
