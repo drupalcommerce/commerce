@@ -43,7 +43,7 @@ function commerce_product_entity_info() {
 function commerce_product_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'commerce_product') . '/views',
+    'path' => drupal_get_path('module', 'commerce_product') . '/includes/views',
   );
 }
 
