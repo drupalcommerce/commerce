@@ -2,9 +2,9 @@
 // $Id$
 
 /**
- * Field handler to present a product edit link.
+ * Field handler to present a link to delete a product.
  */
-class views_handler_field_commerce_product_link_edit extends views_handler_field_commerce_product_link {
+class views_handler_field_commerce_product_link_delete extends views_handler_field_commerce_product_link {
   function construct() {
     parent::construct();
 
@@ -13,7 +13,7 @@ class views_handler_field_commerce_product_link_edit extends views_handler_field
   }
 
   function render($values) {
-    // Ensure the user has access to edit this product.
+    // Ensure the user has access to delete this node.
     $product = new stdClass();
     $product->product_id = $values->{$this->aliases['product_id']};
     $product->product_type = $values->{$this->aliases['product_type']};
@@ -23,8 +23,8 @@ class views_handler_field_commerce_product_link_edit extends views_handler_field
       return;
     }
 
-    $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
+    $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
 
-    return l($text, 'admin/commerce/products/' . $product->product_id . '/edit', array('query' => drupal_get_destination()));
+    return l($text, 'admin/commerce/products/' . $product->product_id . '/delete', array('query' => drupal_get_destination()));
   }
 }

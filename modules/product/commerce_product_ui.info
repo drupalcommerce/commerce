@@ -2,9 +2,18 @@
 name = Product UI
 description = Exposes a default UI for Products.
 package = Drupal Commerce UI
-files[] = commerce_product_ui.module
 core = 7.x
 dependencies[] = field_ui
-dependencies[] = views
 dependencies[] = commerce
 dependencies[] = commerce_product
+dependencies[] = views
+
+; Base module files
+files[] = commerce_product_ui.module
+
+; Module includes
+files[] = includes/commerce_product_ui.products.inc
+files[] = includes/commerce_product_ui.types.inc
+
+; Views includes
+files[] = includes/views/commerce_product_ui.views_default.inc

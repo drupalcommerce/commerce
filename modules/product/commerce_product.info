@@ -2,7 +2,19 @@
 name = Product
 description = Defines the Product entity and associated features.
 package = Drupal Commerce
-files[] = commerce_product.module
-files[] = commerce_product.install
 dependencies[] = commerce
 core = 7.x
+
+; Base module files
+files[] = commerce_product.module
+files[] = commerce_product.install
+
+; Views include
+files[] = includes/views/commerce_product.views.inc
+
+; Views handlers
+files[] = includes/views/handlers/views_handler_field_commerce_product.inc
+files[] = includes/views/handlers/views_handler_field_commerce_product_link.inc
+files[] = includes/views/handlers/views_handler_field_commerce_product_link_delete.inc
+files[] = includes/views/handlers/views_handler_field_commerce_product_link_edit.inc
+files[] = includes/views/handlers/views_handler_field_commerce_product_type.inc

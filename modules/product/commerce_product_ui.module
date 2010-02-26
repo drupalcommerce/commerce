@@ -5,7 +5,6 @@
  * @file
  */
 
-
 /**
  * Implements hook_menu().
  */
@@ -17,10 +16,9 @@ function commerce_product_ui_menu() {
   // Add a product.
   $items['admin/commerce/products/add'] = array(
     'title' => 'Add a product',
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('administer products'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
+    'page callback' => 'commerce_product_ui_add_page',
+    'access callback' => 'commerce_product_ui_product_add_any_access',
+    'file' => 'includes/commerce_product_ui.products.inc',
   );
   foreach (commerce_product_types() as $type) {
     $items['admin/commerce/products/add/' . $type['product_type']] = array(
@@ -100,6 +98,25 @@ function commerce_product_ui_menu() {
 }
 
 /**
+ * Access callback: determine if the user can create any type of product.
+ */
+function commerce_product_ui_product_add_any_access() {
+  // Grant automatic access to users with administer product types access.
+  if (user_access('administer product types')) {
+    return TRUE;
+  }
+
+  // Check the user's access on a product type basis.
+  foreach (commerce_product_types as $type) {
+    if (commerce_product_ui_product_add_access($type['product_type'])) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
  * Access callback: determine the user's ability to create a product.
  *
  * @param $product_type
@@ -176,9 +193,13 @@ function commerce_product_ui_help($path, $arg) {
  */
 function commerce_product_ui_theme() {
   return array(
+    'product_add_list' => array(
+      'variables' => array('content' => array()),
+      'file' => 'includes/commerce_product_ui.products.inc',
+    ),
     'product_type_admin_overview' => array(
       'variables' => array('type' => NULL),
-      'file' => 'commerce_product_ui.types.inc',
+      'file' => 'includes/commerce_product_ui.types.inc',
     ),
   );
 }
