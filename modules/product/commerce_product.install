@@ -2,7 +2,7 @@
 // $Id$
 
 /**
- * Implements hook_modules_installed().
+ * Implements hook_install().
  */
 function commerce_product_install() {
   // TODO: Create the basic product type. It has to be inserted manually with

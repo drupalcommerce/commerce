@@ -2,7 +2,7 @@
 name = Commerce Commons
 description = Defines common features of the Drupal Commerce module package.
 package = Drupal Commerce
-;dependencies[] =
+dependencies[] = rules
 files[] = commerce.module
 core = 7.x
 php = 5.2

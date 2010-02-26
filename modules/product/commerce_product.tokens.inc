@@ -47,7 +47,7 @@ function commerce_product_token_info() {
   );
 
   return array(
-    'types' => array('commerce_product' => $type),
+    'types' => array('product' => $type),
     'tokens' => array('product' => $product),
   );
 }
@@ -70,7 +70,7 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
 
   $replacements = array();
 
-  if ($type == 'commerce_product' && !empty($data['product'])) {
+  if ($type == 'product' && !empty($data['product'])) {
     $product = $data['product'];
 
     foreach ($tokens as $name => $original) {
