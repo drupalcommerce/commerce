@@ -54,11 +54,11 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
   $form = array();
 
   // Add the default field elements.
-  $form['product_sku'] = array(
+  $form['sku'] = array(
     '#type' => 'textfield',
     '#title' => t('Product SKU'),
     '#description' => t('Supply a unique human readable identifier for this product.'),
-    '#default_value' => isset($product->product_sku) ? $product->product_sku : '',
+    '#default_value' => isset($product->sku) ? $product->sku : '',
     '#required' => TRUE,
     '#weight' => -10,
   );
@@ -104,9 +104,9 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
  */
 function commerce_product_ui_product_form_validate($form, &$form_state) {
   // Ensure the SKU entered is unique.
-  if ($product_id = db_query('SELECT product_id FROM {commerce_product} WHERE product_sku = :product_sku', array(':product_sku' => $form_state['values']['product_sku']))->fetchField()) {
+  if ($product_id = db_query('SELECT product_id FROM {commerce_product} WHERE sku = :sku', array(':sku' => $form_state['values']['sku']))->fetchField()) {
     if (empty($form_state['commerce_product']->product_id) || $product_id != $form_state['commerce_product']->product_id) {
-      form_set_error('product_sku', 'This SKU is already in use and must be unique. Please supply another value.');
+      form_set_error('sku', 'This SKU is already in use and must be unique. Please supply another value.');
     }
   }
 
@@ -126,7 +126,7 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
   $product = &$form_state['commerce_product'];
 
   // Save default parameters back into the $product object.
-  $product->product_sku = $form_state['values']['product_sku'];
+  $product->sku = $form_state['values']['sku'];
   $product->title = $form_state['values']['title'];
 
   // Set the product's uid if it's being created at this time.
@@ -163,7 +163,7 @@ function commerce_product_ui_product_delete_form($form, &$form_state, $product) 
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),
     'admin/commerce/products',
-    '<p>' . t('SKU: @sku. Deleting this product cannot be undone.', array('@sku' => $product->product_sku)) . '</p>',
+    '<p>' . t('SKU: @sku. Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
     t('Delete'),
     t('Cancel'),
     'confirm'
@@ -180,7 +180,7 @@ function commerce_product_ui_product_delete_form_submit($form, &$form_state) {
 
   if (commerce_product_delete($product->product_id)) {
     drupal_set_message(t('%title has been deleted.', array('%title' => $product->title)));
-    watchdog('commerce_product', 'Deleted product %title (SKU: @sku).', array('%title' => $product->title, '@sku' => $product->product_sku), WATCHDOG_NOTICE);
+    watchdog('commerce_product', 'Deleted product %title (SKU: @sku).', array('%title' => $product->title, '@sku' => $product->sku), WATCHDOG_NOTICE);
   }
 
   $form_state['redirect'] = 'admin/commerce/products';

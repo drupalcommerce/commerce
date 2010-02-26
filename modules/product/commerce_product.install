@@ -31,8 +31,8 @@ function commerce_product_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'product_sku' => array(
-        'description' => 'The store identifier for a product.',
+      'sku' => array(
+        'description' => 'The human readable, merchant defined identifier for a product.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
@@ -76,7 +76,7 @@ function commerce_product_schema() {
       'product_type' => array('product_type'),
     ),
     'unique keys' => array(
-      'product_sku' => array('product_sku'),
+      'sku' => array('sku'),
     ),
   );
 

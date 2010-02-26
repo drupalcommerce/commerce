@@ -228,6 +228,10 @@ function commerce_product_token_info() {
     'name' => t('SKU'),
     'description' => t('The human readable product SKU.'),
   );
+  $product['type'] = array(
+    'name' => t('Type'),
+    'description' => t('The human readable name of the product type.'),
+  );
   $product['title'] = array(
     'name' => t('Title'),
     'description' => t('The title of the product.'),
@@ -279,7 +283,7 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
           break;
 
         case 'sku':
-          $replacements[$original] = $sanitize ? check_plain($product->product_sku) : $product->product_sku;
+          $replacements[$original] = $sanitize ? check_plain($product->sku) : $product->sku;
           break;
 
         case 'title':
@@ -316,13 +320,13 @@ function commerce_product_load($product_id) {
 /**
  * Loads a product by SKU.
  */
-function commerce_product_load_by_sku($product_sku) {
-  $products = commerce_product_load_multiple(array(), array('product_sku' => $product_sku));
+function commerce_product_load_by_sku($sku) {
+  $products = commerce_product_load_multiple(array(), array('sku' => $sku));
   return $products ? reset($products) : FALSE;
 }
 
 /**
- * Loads multiple products by ID.
+ * Loads multiple products by ID or based on a set of matching conditions.
  *
  * @see entity_load()
  *
@@ -335,7 +339,7 @@ function commerce_product_load_by_sku($product_sku) {
  *   Whether to reset the internal product loading cache.
  *
  * @return
- *   An array of product objects indexed by product_sku.
+ *   An array of product objects indexed by product_id.
  */
 function commerce_product_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('commerce_product', $product_ids, $conditions, $reset);
@@ -478,7 +482,7 @@ function commerce_product_autocomplete($field_name, $string = '') {
     // Loop through the products and convert them into autocomplete output.
     foreach ($products as $product_id => $data) {
       // Add a class wrapper for a few required CSS overrides.
-      $matches[$prefix . $data['product_sku']] = '<div class="reference-autocomplete">' . $data['rendered'] . '</div>';
+      $matches[$prefix . $data['sku']] = '<div class="reference-autocomplete">' . $data['rendered'] . '</div>';
     }
   }
 
@@ -550,7 +554,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
   // Build the query object with the necessary fields.
   $query = db_select('commerce_product', 'cp');
   $product_id_alias = $query->addField('cp', 'product_id');
-  $product_sku_alias = $query->addField('cp', 'product_sku');
+  $product_sku_alias = $query->addField('cp', 'sku');
   $product_title_alias = $query->addField('cp', 'title');
   $product_type_alias = $query->addField('cp', 'product_type');
 
@@ -570,20 +574,20 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
     // Build a where clause matching on either the SKU or title.
     switch ($match) {
       case 'contains':
-        $where = '(cp.product_sku LIKE :sku_match OR cp.title LIKE :title_match)';
+        $where = '(cp.sku LIKE :sku_match OR cp.title LIKE :title_match)';
         $args['sku_match'] = '%' . $string . '%';
         $args['title_match'] = '%' . $string . '%';
         break;
 
       case 'starts_with':
-        $where = '(cp.product_sku LIKE :sku_match OR cp.title LIKE :title_match)';
+        $where = '(cp.sku LIKE :sku_match OR cp.title LIKE :title_match)';
         $args['sku_match'] = $string . '%';
         $args['title_match'] = $string . '%';
         break;
 
       case 'equals':
       default:
-        $where = '(cp.product_sku = :match OR cp.title = :match)';
+        $where = '(cp.sku = :match OR cp.title = :match)';
         $args['sku_match'] = $string;
         $args['title_match'] = $string;
         break;
@@ -614,10 +618,10 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
 
   foreach ($result->fetchAll() as $product) {
     $matches[$product->product_id] = array(
-      'product_sku' => $product->product_sku,
+      'sku' => $product->sku,
       'product_type' => $product->product_type,
       'title' => $product->title,
-      'rendered' => t('@sku: @title', array('@sku' => $product->product_sku, '@title' => $product->title)),
+      'rendered' => t('@sku: @title', array('@sku' => $product->sku, '@title' => $product->title)),
     );
   }
 

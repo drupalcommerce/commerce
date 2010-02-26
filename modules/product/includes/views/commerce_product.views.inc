@@ -14,7 +14,7 @@ function commerce_product_views_data() {
   $data['commerce_product']['table']['group']  = t('Commerce Product');
 
   $data['commerce_product']['table']['base'] = array(
-    'field' => 'product_sku',
+    'field' => 'sku',
     'title' => t('Commerce Product'),
     'help' => t('Products from the store.'),
   );
@@ -39,7 +39,7 @@ function commerce_product_views_data() {
   );
 
   // Expose the product SKU.
-  $data['commerce_product']['product_sku'] = array(
+  $data['commerce_product']['sku'] = array(
     'title' => t('SKU'),
     'help' => t('The unique human readable identifier of the product.'),
     'field' => array(

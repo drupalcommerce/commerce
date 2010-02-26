@@ -34,15 +34,15 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
-    'product_sku' => 'product_sku',
+    'sku' => 'sku',
     'title' => 'title',
     'product_type' => 'product_type',
     'edit_product' => 'edit_product',
     'delete_product' => 'edit_product',
   );
-  $handler->display->display_options['style_options']['default'] = 'product_sku';
+  $handler->display->display_options['style_options']['default'] = 'sku';
   $handler->display->display_options['style_options']['info'] = array(
-    'product_sku' => array(
+    'sku' => array(
       'sortable' => 1,
       'align' => '',
       'separator' => '',
@@ -69,19 +69,19 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
   /* Field: Commerce Product: SKU */
-  $handler->display->display_options['fields']['product_sku']['id'] = 'product_sku';
-  $handler->display->display_options['fields']['product_sku']['table'] = 'commerce_product';
-  $handler->display->display_options['fields']['product_sku']['field'] = 'product_sku';
-  $handler->display->display_options['fields']['product_sku']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['product_sku']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['product_sku']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['product_sku']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['product_sku']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['product_sku']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['product_sku']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['product_sku']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['product_sku']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['product_sku']['link_to_product'] = 0;
+  $handler->display->display_options['fields']['sku']['id'] = 'sku';
+  $handler->display->display_options['fields']['sku']['table'] = 'commerce_product';
+  $handler->display->display_options['fields']['sku']['field'] = 'sku';
+  $handler->display->display_options['fields']['sku']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['sku']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['sku']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['sku']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['sku']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['sku']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['sku']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['sku']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['sku']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['sku']['link_to_product'] = 0;
   /* Field: Commerce Product: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'commerce_product';
@@ -138,9 +138,9 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['delete_product']['hide_empty'] = 0;
   $handler->display->display_options['fields']['delete_product']['empty_zero'] = 0;
   /* Sort criterion: Commerce Product: SKU */
-  $handler->display->display_options['sorts']['product_sku']['id'] = 'product_sku';
-  $handler->display->display_options['sorts']['product_sku']['table'] = 'commerce_product';
-  $handler->display->display_options['sorts']['product_sku']['field'] = 'product_sku';
+  $handler->display->display_options['sorts']['sku']['id'] = 'sku';
+  $handler->display->display_options['sorts']['sku']['table'] = 'commerce_product';
+  $handler->display->display_options['sorts']['sku']['field'] = 'sku';
 
   /* Display: Admin page */
   $handler = $view->new_display('page', 'Admin page', 'admin_page');

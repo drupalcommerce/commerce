@@ -237,14 +237,14 @@ function _commerce_product_reference_get_product_data($product_ids, $known_produ
   if ($product_ids_query) {
     // Load the specified products.
     $query = db_select('commerce_product', 'cp')
-      ->fields('cp', array('product_id', 'product_sku', 'title'))
+      ->fields('cp', array('product_id', 'sku', 'title'))
       ->condition('cp.product_id', $product_ids);
 
     $data = $query->execute()->fetchAll();
 
     foreach ($data as $product) {
       $products[$product->product_id] = array(
-        'sku' => $product->product_sku,
+        'sku' => $product->sku,
         'title' => $product->title,
       );
     }
@@ -354,7 +354,7 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
     $products = commerce_product_load_multiple($product_ids);
 
     foreach ($product_ids as $product_id) {
-      $skus[] = $products[$product_id]->product_sku;
+      $skus[] = $products[$product_id]->sku;
     }
 
     return $element + array(
@@ -384,7 +384,7 @@ function commerce_product_reference_autocomplete_validate($element, &$form_state
 
     foreach ($typed_skus as $typed_sku) {
       // See if the SKU exists in the valid product types and return the tid.
-      if ($products = commerce_product_load_multiple(array(), array('product_sku' => trim($typed_sku)))) {
+      if ($products = commerce_product_load_multiple(array(), array('sku' => trim($typed_sku)))) {
         $product = array_pop($products);
         $value[] = array('product_id' => $product->product_id);
       }
@@ -473,7 +473,7 @@ function commerce_product_reference_options_list($field) {
   foreach (commerce_product_match_products($field) as $product_id => $data) {
     // Add them to the options list in optgroups by product type.
     $name = check_plain(commerce_product_type_get_name($data['product_type']));
-    $options[$name][$product_id] = t('@sku: @title', array('@sku' => $data['product_sku'], '@title' => $data['title']));
+    $options[$name][$product_id] = t('@sku: @title', array('@sku' => $data['sku'], '@title' => $data['title']));
   }
 
   // Simplify the options list if only one optgroup exists.
