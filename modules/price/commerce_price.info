@@ -1,8 +1,0 @@
-; $Id$
-name = Commerce Price
-description = Defines a base price field for products.
-package = Drupal Commerce
-files[] = commerce_price.module
-files[] = commerce_price.install
-dependencies[] = commerce
-core = 7.x
