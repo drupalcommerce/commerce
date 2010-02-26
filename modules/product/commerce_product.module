@@ -132,6 +132,52 @@ function commerce_product_permission() {
 }
 
 /**
+ * Returns an initialized product type object.
+ */
+function commerce_product_type_new() {
+  return (object) array(
+    'type' => '',
+    'name' => '',
+    'description' => '',
+    'help' => '',
+  );
+}
+
+/**
+ * Saves a product type.
+ */
+function commerce_product_type_save($product_type) {
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : NULL);
+  menu_rebuild();
+
+  if (!empty($product_type->is_new)) {
+    // Notify the field API that a new bundle has been created.
+    field_attach_create_bundle('commerce_product', $product_type->type);
+  }
+
+  return $op;
+}
+
+/**
+ * Loads a product type.
+ */
+function commerce_product_type_load($type) {
+  return db_query('SELECT * FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchObject();
+}
+
+/**
+ * Deletes a product type.
+ */
+function commerce_product_type_delete($type) {
+  db_delete('commerce_product_type')
+    ->condition('type', $type)
+    ->execute();
+
+  // Notify the field API that this bundle has been destroyed.
+  field_attach_delete_bundle('commerce_product', $type);
+}
+
+/**
  * Returns an array of product type objects keyed by type.
  */
 function commerce_product_types() {
@@ -144,6 +190,14 @@ function commerce_product_types() {
   }
 
   return $types;
+}
+
+/**
+ * Resets the cached list of product types.
+ */
+function commerce_product_types_reset() {
+  $types = &drupal_static('commerce_product_types');
+  $types = NULL;
 }
 
 /**
@@ -179,18 +233,10 @@ function commerce_product_type_get_name($type = NULL) {
 }
 
 /**
- * Resets the cached list of product types.
+ * Title callback: return the human-readable product type name.
  */
-function commerce_product_types_reset() {
-  $types = &drupal_static('commerce_product_types');
-  $types = NULL;
-}
-
-/**
- * Loads a product type.
- */
-function commerce_product_type_load($type) {
-  return db_query('SELECT * FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchObject();
+function commerce_product_type_title($product_type) {
+  return $product_type->name;
 }
 
 /**
@@ -201,73 +247,23 @@ function commerce_product_type_to_arg($type) {
 }
 
 /**
- * Saves a product type.
- */
-function commerce_product_type_save($product_type) {
-  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : NULL);
-  menu_rebuild();
-
-  if (!empty($product_type->is_new)) {
-    // Notify the field API that a new bundle has been created.
-    field_attach_create_bundle('commerce_product', $product_type->type);
-  }
-
-  return $op;
-}
-
-/**
- * Deletes a product type.
- */
-function commerce_product_type_delete($type) {
-  db_delete('commerce_product_type')
-    ->condition('type', $type)
-    ->execute();
-
-  // Notify the field API that this bundle has been destroyed.
-  field_attach_delete_bundle('commerce_product', $type);
-}
-
-/**
- * Title callback: return the human-readable product type name.
- */
-function commerce_product_type_title($product_type) {
-  return $product_type->name;
-}
-
-/**
- * Loads a product by ID.
- */
-function commerce_product_load($product_id) {
-  $products = commerce_product_load_multiple(array($product_id), array());
-  return $products ? reset($products) : FALSE;
-}
-
-/**
- * Loads a product by SKU.
- */
-function commerce_product_load_by_sku($sku) {
-  $products = commerce_product_load_multiple(array(), array('sku' => $sku));
-  return $products ? reset($products) : FALSE;
-}
-
-/**
- * Loads multiple products by ID or based on a set of matching conditions.
+ * Returns an initialized product object.
  *
- * @see entity_load()
- *
- * @param $product_ids
- *   An array of product IDs.
- * @param $conditions
- *   An array of conditions on the {commerce_product} table in the form
- *     'field' => $value.
- * @param $reset
- *   Whether to reset the internal product loading cache.
- *
+ * @param $type
+ *   The machine-readable type of the product.
  * @return
- *   An array of product objects indexed by product_id.
+ *   A product object with all default fields initialized.
  */
-function commerce_product_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('commerce_product', $product_ids, $conditions, $reset);
+function commerce_product_new($type = '') {
+  return (object) array(
+    'product_id' => '',
+    'sku' => '',
+    'type' => $type,
+    'title' => '',
+    'uid' => '',
+    'created' => '',
+    'changed' => '',
+  );
 }
 
 /**
@@ -316,6 +312,42 @@ function commerce_product_save($product) {
     $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
     return FALSE;
   }
+}
+
+/**
+ * Loads a product by ID.
+ */
+function commerce_product_load($product_id) {
+  $products = commerce_product_load_multiple(array($product_id), array());
+  return $products ? reset($products) : FALSE;
+}
+
+/**
+ * Loads a product by SKU.
+ */
+function commerce_product_load_by_sku($sku) {
+  $products = commerce_product_load_multiple(array(), array('sku' => $sku));
+  return $products ? reset($products) : FALSE;
+}
+
+/**
+ * Loads multiple products by ID or based on a set of matching conditions.
+ *
+ * @see entity_load()
+ *
+ * @param $product_ids
+ *   An array of product IDs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_product} table in the form
+ *     'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal product loading cache.
+ *
+ * @return
+ *   An array of product objects indexed by product_id.
+ */
+function commerce_product_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_product', $product_ids, $conditions, $reset);
 }
 
 /**

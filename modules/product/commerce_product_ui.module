@@ -26,7 +26,7 @@ function commerce_product_ui_menu() {
       'title callback' => 'check_plain',
       'description' => $product_type->description,
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('commerce_product_ui_product_form', (object) array('type' => $type)),
+      'page arguments' => array('commerce_product_ui_product_form', commerce_product_new($type)),
       'access callback' => 'commerce_product_ui_product_add_access',
       'access arguments' => array($type),
       'file' => 'includes/commerce_product_ui.products.inc',
@@ -88,7 +88,7 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/types/add'] = array(
     'title' => 'Add product type',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_form', (object) array('type' => '', 'name' => '', 'description' => '', 'help' => '')),
+    'page arguments' => array('commerce_product_ui_type_form', commerce_product_type_new()),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'includes/commerce_product_ui.types.inc',
