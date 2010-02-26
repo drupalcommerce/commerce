@@ -76,7 +76,7 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
 
   // Add the field related form elements.
   $form_state['commerce_product'] = $product;
-  field_attach_form('commerce_product', $product, &$form, &$form_state);
+  field_attach_form('commerce_product', $product, $form, $form_state);
 
   $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
   $form['actions']['submit'] = array(
