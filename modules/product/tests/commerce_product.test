@@ -1,12 +1,18 @@
 <?php
 // $Id$
+
 /**
- * Test the product
+ * @file
+ * Unit tests for the commerce product module.
  */
-class CommerceProductTestCase extends DrupalWebTestCase {
+
+/**
+ * Test the product and product type CRUD.
+ */
+class CommerceProductCRUDTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
-      'name' => 'Commerce product api',
+      'name' => 'Commerce product CRUD',
       'description' => 'Tests the commerce product module',
       'group' => 'Drupal Commerce',
     );
@@ -29,21 +35,21 @@ class CommerceProductTestCase extends DrupalWebTestCase {
 
     // Ensure each type exists
     foreach ($default_types as $type => $name) {    
-      $this->assertTRUE(!empty($types_created[$type]), t('Product type %type has been created', array('%type' => $type)), t('Commerce product'));
+      $this->assertTrue(!empty($types_created[$type]), t('Product type %type has been created', array('%type' => $type)));
     }
   }
 
   /**
    * Test the product type crud
    */
-  function testCommerceProductCrud() {
+  function testCommerceProductTypeCrud() {
 
     // Ensure commerce_product_type_new() returns a valid empty product type.
     $new_product_type = commerce_product_type_new();
-    $this->assertTrue(isset($new_product_type->type), t('commerce_product_type_new() created the type element'), t('Commerce product'));
-    $this->assertTrue(isset($new_product_type->name), t('commerce_product_type_new() created the help element'), t('Commerce product'));
-    $this->assertTrue(isset($new_product_type->description), t('commerce_product_type_new() created the help element'), t('Commerce product'));
-    $this->assertTrue(isset($new_product_type->help), t('commerce_product_type_new() created the help element'), t('Commerce product'));
+    $this->assertNotNull($new_product_type->type, t('commerce_product_type_new() created the type element'));
+    $this->assertNotNull($new_product_type->name, t('commerce_product_type_new() created the help element'));
+    $this->assertNotNull($new_product_type->description, t('commerce_product_type_new() created the help element'));
+    $this->assertNotNull($new_product_type->help, t('commerce_product_type_new() created the help element'));
 
     // Define values for testing.
     $type = $this->randomName(20);
@@ -60,17 +66,17 @@ class CommerceProductTestCase extends DrupalWebTestCase {
 
     // Ensure content_product_type_save() returns the proper value when inserting.
     $return = commerce_product_type_save($new_product_type);
-    $this->assertEqual($return, SAVED_NEW, t('commerce_product_type_save() returned SAVED_NEW when saving a new product type'), t('Comemrce product'));
+    $this->assertEqual($return, SAVED_NEW, t('commerce_product_type_save() returned SAVED_NEW when saving a new product type'));
 
     // Load the newly saved content type.
     $saved_product_type = commerce_product_type_load($type);
 
     // Ensure the values that were saved match the values that we created.
-    $this->assertTrue(!empty($saved_product_type), t('commerce_product_type_load() loaded the new product type'), t('Commerce product'));
-    $this->assertEqual($type, $saved_product_type->type, t('The new product type field was properly saved and loaded'), t('Commerce product'));
-    $this->assertEqual($name, $saved_product_type->name, t('The new product type name was properly saved and loaded'), t('Commerce product'));
-    $this->assertEqual($description, $saved_product_type->description, t('The new product description text was properly saved and loaded'), t('Commerce product'));
-    $this->assertEqual($help, $saved_product_type->help, t('The new product help text was properly saved and loaded'), t('Commerce product'));
+    $this->assertTrue($saved_product_type, t('commerce_product_type_load() loaded the new product type'));
+    $this->assertEqual($type, $saved_product_type->type, t('The new product type field was properly saved and loaded'));
+    $this->assertEqual($name, $saved_product_type->name, t('The new product type name was properly saved and loaded'));
+    $this->assertEqual($description, $saved_product_type->description, t('The new product description text was properly saved and loaded'));
+    $this->assertEqual($help, $saved_product_type->help, t('The new product help text was properly saved and loaded'));
 
     // Alter the title, to ensure the update function works.
     $altered_name = $this->randomName(40);
@@ -82,6 +88,13 @@ class CommerceProductTestCase extends DrupalWebTestCase {
 
     // Ensure the altered title was saved to the database, and loaded.
     $saved_product_type = commerce_product_type_load($type);
-    $this->assertEqual($saved_product_type->name, $altered_name, t('commerce_product_type_save() successfully updated the product type name.'), t('Commerce product'));
+    $this->assertEqual($saved_product_type->name, $altered_name, t('commerce_product_type_save() successfully updated the product type name.'));
+  }
+ 
+  /**
+   * Test the product crud
+   */
+  function testCommerceProductCrud() {
+  
   }
 }

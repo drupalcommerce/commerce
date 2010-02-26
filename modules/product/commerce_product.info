@@ -23,3 +23,6 @@ files[] = includes/views/handlers/views_handler_field_commerce_product_link.inc
 files[] = includes/views/handlers/views_handler_field_commerce_product_link_delete.inc
 files[] = includes/views/handlers/views_handler_field_commerce_product_link_edit.inc
 files[] = includes/views/handlers/views_handler_field_commerce_product_type.inc
+
+; Simple tests
+files[] = tests/commerce_product.test
