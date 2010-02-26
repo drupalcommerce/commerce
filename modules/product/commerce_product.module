@@ -31,6 +31,7 @@ function commerce_product_entity_info() {
   $return =  array(
     'commerce_product' => array(
       'label' => t('Product'),
+      'controller class' => 'CommerceProductEntityController',
       'base table' => 'commerce_product',
       'fieldable' => TRUE,
       'path callback' => 'commerce_product_path',
@@ -287,15 +288,7 @@ function commerce_product_type_to_arg($type) {
  *   A product object with all default fields initialized.
  */
 function commerce_product_new($type = '') {
-  return (object) array(
-    'product_id' => '',
-    'sku' => '',
-    'type' => $type,
-    'title' => '',
-    'uid' => '',
-    'created' => '',
-    'changed' => '',
-  );
+  return entity_get_controller('commerce_product')->create($type);
 }
 
 /**
@@ -307,43 +300,7 @@ function commerce_product_new($type = '') {
  *   TRUE on success, FALSE otherwise.
  */
 function commerce_product_save($product) {
-  $transaction = db_transaction();
-
-  try {
-    $product->changed = time();
-
-    // Give modules the opportunity to prepare field data for saving.
-    field_attach_presave('commerce_product', $product);
-
-    // If this is a new product...
-    if (empty($product->product_id)) {
-      // Set the creation timestamp.
-      $product->created = time();
-
-      // Save the new product and fields.
-      drupal_write_record('commerce_product', $product);
-      field_attach_insert('commerce_product', $product);
-
-      $op = 'insert';
-    }
-    else {
-      // Save the updated product and fields.
-      drupal_write_record('commerce_product', $product, 'product_id');
-      field_attach_update('commerce_product', $product);
-
-      $op = 'update';
-    }
-
-    // Ignore slave server temporarily to give time for the
-    // saved product to be propagated to the slave.
-    db_ignore_slave();
-
-    return TRUE;
-  }
-  catch (Exception $e) {
-    $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
-    return FALSE;
-  }
+  return entity_get_controller('commerce_product')->save($product);
 }
 
 /**
@@ -403,39 +360,7 @@ function commerce_product_delete($product_id) {
  *   TRUE on success, FALSE otherwise.
  */
 function commerce_product_delete_multiple($product_ids) {
-  if (!empty($product_ids)) {
-    $products = commerce_product_load_multiple($product_ids, array());
-
-    // TODO: We'll need to ensure products on orders cannot be deleted when we
-    // have orders implemented.
-
-    $transaction = db_transaction();
-
-    try {
-      db_delete('commerce_product')
-        ->condition('product_id', $product_ids, 'IN')
-        ->execute();
-
-      foreach ($products as $product_id => $product) {
-        module_invoke_all('commerce_product_delete', $product);
-        field_attach_delete('commerce_product', $product);
-      }
-
-      // Ignore slave server temporarily to give time for the
-      // saved product to be propagated to the slave.
-      db_ignore_slave();
-    }
-    catch (Exception $e) {
-      $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
-      return FALSE;
-    }
-
-    // Clear the page and block and product_load_multiple caches.
-    cache_clear_all();
-    entity_get_controller('commerce_product')->resetCache();
-  }
-
-  return TRUE;
+  return entity_get_controller('commerce_product')->delete($product_ids);
 }
 
 /**
