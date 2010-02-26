@@ -62,6 +62,9 @@ function commerce_product_permission() {
     'administer product types' => array(
       'title' => t('Administer product types'),
     ),
+    'access products' => array(
+      'title' => t('Access lists of products, primarily for viewing and referencing'),
+    ),
     'create products' => array(
       'title' => t('Create products'),
     ),

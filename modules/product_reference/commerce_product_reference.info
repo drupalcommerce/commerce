@@ -1,0 +1,10 @@
+; $Id$
+name = Product Reference
+description = Defines a product reference field with add to cart formatters.
+package = Drupal Commerce
+dependencies[] = commerce
+core = 7.x
+
+; Base module files
+files[] = commerce_product_reference.module
+;files[] = commerce_price.install
