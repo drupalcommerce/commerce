@@ -76,10 +76,10 @@ function commerce_product_permission() {
       'title' => t('Create %type products', array('%type' => $type['name'])),
     );
     $permissions['edit any ' . $type['product_type']] = array(
-      'title' => t('Edit any %type product', array('%type' => $type['name'])),
+      'title' => t('Edit or delete any %type product', array('%type' => $type['name'])),
     );
     $permissions['edit own ' . $type['product_type']] = array(
-      'title' => t('Edit own %type product', array('%type' => $type['name'])),
+      'title' => t('Edit or delete own %type products', array('%type' => $type['name'])),
     );
   }
 
@@ -231,6 +231,62 @@ function commerce_product_save($product) {
     $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
     return FALSE;
   }
+}
+
+/**
+ * Deletes a product by ID.
+ *
+ * @param $product_id
+ *   The ID of the product to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_product_delete($product_id) {
+  return commerce_product_delete_multiple(array($product_id));
+}
+
+/**
+ * Deletes multiple products by ID.
+ *
+ * @param $product_ids
+ *   An array of product IDs to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_product_delete_multiple($product_ids) {
+  if (!empty($product_ids)) {
+    $products = commerce_product_load_multiple($product_ids, array());
+
+    // TODO: We'll need to ensure products on orders cannot be deleted when we
+    // have orders implemented.
+
+    $transaction = db_transaction();
+
+    try {
+      db_delete('commerce_product')
+        ->condition('product_id', $product_ids, 'IN')
+        ->execute();
+
+      foreach ($products as $product_id => $product) {
+        module_invoke_all('commerce_product_delete', $product);
+        field_attach_delete('commerce_product', $product);
+      }
+
+      // Ignore slave server temporarily to give time for the
+      // saved product to be propagated to the slave.
+      db_ignore_slave();
+    }
+    catch (Exception $e) {
+      $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
+      return FALSE;
+    }
+
+    // Clear the page and block and product_load_multiple caches.
+    cache_clear_all();
+    entity_get_controller('commerce_product')->resetCache();
+  }
+
+  return TRUE;
 }
 
 /**
