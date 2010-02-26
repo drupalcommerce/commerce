@@ -5,7 +5,7 @@
  * Implements hook_modules_installed().
  */
 function commerce_product_install() {
-  // Create the basic product type. It has to be inserted manually with
+  // TODO: Create the basic product type. It has to be inserted manually with
   // db_insert() thanks to an issue reported at http://drupal.org/node/620298.
   db_insert('commerce_product_type')
     ->fields(array(

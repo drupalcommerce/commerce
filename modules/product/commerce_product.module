@@ -261,7 +261,7 @@ function _commerce_product_create($values = array()) {
  * Saves a product.
  *
  * @param $product
- *
+ *  The fully loaded product object to save.
  * @return
  *   TRUE on success, FALSE otherwise.
  */

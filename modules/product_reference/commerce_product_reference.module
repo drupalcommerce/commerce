@@ -154,10 +154,7 @@ function commerce_product_reference_field_formatter_info() {
 function commerce_product_reference_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
   $result = array();
 
-  // @todo Optimisation: use hook_field_formatter_prepare_view() to load
-  // node titles or full nodes in 'multiple' mode.
-
-  // Collect the list of node ids.
+  // Collect the list of product IDs.
   $product_ids = array();
 
   foreach ($items as $delta => $item) {
