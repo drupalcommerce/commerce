@@ -51,9 +51,9 @@ function commerce_product_entity_info() {
     ),
   );
 
-  foreach (commerce_product_types() as $product_type) {
-    $return['commerce_product']['bundles'][$product_type['type']] = array(
-      'label' => $product_type['name'],
+  foreach (commerce_product_type_get_name() as $type => $name) {
+    $return['commerce_product']['bundles'][$type] = array(
+      'label' => $name,
     );
   }
 
@@ -66,8 +66,8 @@ function commerce_product_entity_info() {
 function commerce_product_field_extra_fields() {
   $extra = array();
 
-  foreach (commerce_product_types() as $type) {
-    $extra['commerce_product'][$type['type']] = array(
+  foreach (commerce_product_types() as $type => $product_type) {
+    $extra['commerce_product'][$type] = array(
       'sku' => array(
         'label' => 'Product SKU',
         'description' => t('Product module SKU form element'),
@@ -116,15 +116,15 @@ function commerce_product_permission() {
   // Add product type specific permissions. Note that users with administer
   // products permission should have access to do anything the permissions below
   // grant a user to do.
-  foreach (commerce_product_types() as $product_type) {
-    $permissions['create ' . $product_type['type']] = array(
-      'title' => t('Create %type products', array('%type' => $product_type['name'])),
+  foreach (commerce_product_type_get_name() as $type => $name) {
+    $permissions['create ' . $type] = array(
+      'title' => t('Create %type products', array('%type' => $name)),
     );
-    $permissions['edit any ' . $product_type['type']] = array(
-      'title' => t('Edit or delete any %type product', array('%type' => $product_type['name'])),
+    $permissions['edit any ' . $type] = array(
+      'title' => t('Edit or delete any %type product', array('%type' => $name)),
     );
-    $permissions['edit own ' . $product_type['type']] = array(
-      'title' => t('Edit or delete own %type products', array('%type' => $product_type['name'])),
+    $permissions['edit own ' . $type] = array(
+      'title' => t('Edit or delete own %type products', array('%type' => $name)),
     );
   }
 
@@ -132,7 +132,7 @@ function commerce_product_permission() {
 }
 
 /**
- * Returns an array of product types.
+ * Returns an array of product type objects keyed by type.
  */
 function commerce_product_types() {
   // First check the static cache for a product types array.
@@ -140,7 +140,7 @@ function commerce_product_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($types)) {
-    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
+    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
   }
 
   return $types;
@@ -162,7 +162,7 @@ function commerce_product_type_get_name($type = NULL) {
   // Return a type name if specified and it exists.
   if (!empty($type)) {
     if (isset($product_types[$type])) {
-      return $product_types[$type]['name'];
+      return $product_types[$type]->name;
     }
     else {
       // Return FALSE if it does not exist.
@@ -172,10 +172,10 @@ function commerce_product_type_get_name($type = NULL) {
 
   // Otherwise turn the array values into the type name only.
   foreach ($product_types as $key => $value) {
-    $product_types[$key] = $value['name'];
+    $product_types[$key] = $value->name;
   }
 
-  return $types;
+  return $product_types;
 }
 
 /**
@@ -228,7 +228,7 @@ function commerce_product_type_delete($type) {
 }
 
 /**
- * Title callback: return the product type title.
+ * Title callback: return the human-readable product type name.
  */
 function commerce_product_type_title($product_type) {
   return $product_type->name;
@@ -471,7 +471,7 @@ function commerce_product_match_products($field, $string = '', $match = 'contain
 }
 
 /**
- * Helper function for _commerce_product_match_products().
+ * Helper function for commerce_product_match_products().
  *
  * Returns an array of products matching the specific parameters.
  */

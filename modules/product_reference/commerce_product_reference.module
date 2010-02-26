@@ -50,8 +50,8 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
   $form = array();
 
   // Build an options array of the product types.
-  foreach (commerce_product_types() as $product_type) {
-    $options[$product_type['type']] = check_plain($product_type['name']);
+  foreach (commerce_product_type_get_name() as $type => $name) {
+    $options[$type] = check_plain($name);
   }
 
   $form['referenceable_types'] = array(

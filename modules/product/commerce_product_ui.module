@@ -20,15 +20,15 @@ function commerce_product_ui_menu() {
     'access callback' => 'commerce_product_ui_product_add_any_access',
     'file' => 'includes/commerce_product_ui.products.inc',
   );
-  foreach (commerce_product_types() as $product_type) {
-    $items['admin/commerce/products/add/' . $product_type['type']] = array(
-      'title' => $product_type['name'],
+  foreach (commerce_product_types() as $type => $product_type) {
+    $items['admin/commerce/products/add/' . $type] = array(
+      'title' => $product_type->name,
       'title callback' => 'check_plain',
-      'description' => $product_type['description'],
+      'description' => $product_type->description,
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('commerce_product_ui_product_form', (object) array('type' => $product_type['type'])),
+      'page arguments' => array('commerce_product_ui_product_form', (object) array('type' => $type)),
       'access callback' => 'commerce_product_ui_product_add_access',
-      'access arguments' => array($product_type['type']),
+      'access arguments' => array($type),
       'file' => 'includes/commerce_product_ui.products.inc',
     );
   }
@@ -107,8 +107,8 @@ function commerce_product_ui_product_add_any_access() {
   }
 
   // Check the user's access on a product type basis.
-  foreach (commerce_product_types as $product_type) {
-    if (commerce_product_ui_product_add_access($product_type['type'])) {
+  foreach (commerce_product_types() as $type => $product_type) {
+    if (commerce_product_ui_product_add_access($type)) {
       return TRUE;
     }
   }

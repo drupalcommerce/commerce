@@ -164,7 +164,6 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
 
   // Notify field widgets.
   field_attach_submit('commerce_product', $product, $form, $form_state);
-  // debug($product);
 
   // Save the product.
   commerce_product_save($product);

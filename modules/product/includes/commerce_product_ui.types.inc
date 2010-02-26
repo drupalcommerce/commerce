@@ -15,9 +15,9 @@ function commerce_product_ui_types_overview() {
   $rows = array();
 
   // Loop through all defined product types.
-  foreach (commerce_product_types() as $product_type) {
+  foreach (commerce_product_types() as $type => $product_type) {
     // Build the operation links for the current product type.
-    $links = menu_contextual_links('commerce-product-type', 'admin/commerce/products/types', array($product_type['type']));
+    $links = menu_contextual_links('commerce-product-type', 'admin/commerce/products/types', array($type));
 
     // Add the product type's row to the table's rows array.
     $rows[] = array(
@@ -52,9 +52,9 @@ function commerce_product_ui_types_overview() {
 function theme_product_type_admin_overview($variables) {
   $product_type = $variables['product_type'];
 
-  $output = check_plain($product_type['name']);
-  $output .= ' <small> (Machine name: ' . check_plain($product_type['type']) . ')</small>';
-  $output .= '<div class="description">' . filter_xss_admin($product_type['description']) . '</div>';
+  $output = check_plain($product_type->name);
+  $output .= ' <small> (Machine name: ' . check_plain($product_type->type) . ')</small>';
+  $output .= '<div class="description">' . filter_xss_admin($product_type->description) . '</div>';
 
   return $output;
 }

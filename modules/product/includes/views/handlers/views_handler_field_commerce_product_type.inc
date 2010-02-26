@@ -6,8 +6,7 @@
  */
 class views_handler_field_commerce_product_type extends views_handler_field_commerce_product {
   function render($values) {
-    $product_types = commerce_product_types();
-    $value = $product_types[$values->{$this->field_alias}]['name'];
+    $value = commerce_product_type_get_name($values->{$this->field_alias});
 
     return $this->render_link((check_plain($value)), $values);
   }
