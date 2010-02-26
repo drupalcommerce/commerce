@@ -71,8 +71,8 @@ function commerce_product_ui_type_form($form, &$form_state, $product_type) {
   );
 
   $form['product_type']['name'] = array(
-    '#title' => t('Name'),
     '#type' => 'textfield',
+    '#title' => t('Name'),
     '#default_value' => $product_type->name,
     '#description' => t('The human-readable name of this product type. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.'),
     '#required' => TRUE,
@@ -95,8 +95,8 @@ function commerce_product_ui_type_form($form, &$form_state, $product_type) {
       ),
     );
     $form['product_type']['type'] = array(
-      '#title' => t('Machine name'),
       '#type' => 'textfield',
+      '#title' => t('Machine name'),
       '#default_value' => $product_type->type,
       '#maxlength' => 32,
       '#required' => TRUE,
@@ -108,14 +108,20 @@ function commerce_product_ui_type_form($form, &$form_state, $product_type) {
   }
 
   $form['product_type']['description'] = array(
-    '#title' => t('Description'),
     '#type' => 'textarea',
+    '#title' => t('Description'),
+    '#description' => t('Describe this product type. The text will be displayed on the <em>Add new content</em> page.'),
     '#default_value' => $product_type->description,
     '#rows' => 3,
-    '#description' => t('Describe this product type. The text will be displayed on the <em>Add new content</em> page.'),
   );
 
-  // TODO: Add a help textarea and display that on the product add form.
+  $form['product_type']['help'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Explanation or submission guidelines'),
+    '#description' => t('This text will be displayed at the top of the page when creating or editing products of this type.'),
+    '#default_value' => $product_type->help,
+    '#rows' => 3,
+  );
 
   $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
   $form['actions']['submit'] = array(
