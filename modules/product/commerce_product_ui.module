@@ -131,6 +131,6 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
 function commerce_product_ui_views_api() {
   return array(
     'api' => 2,
-    'path' => drupal_get_path('module', 'commerce_product_ui') . '/views',
+    'path' => drupal_get_path('module', 'commerce_product_ui') . '/includes/views',
   );
 }
