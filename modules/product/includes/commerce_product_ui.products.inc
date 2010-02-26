@@ -110,6 +110,9 @@ function commerce_product_ui_product_form_validate($form, &$form_state) {
     }
   }
 
+  // Ensure the SKU is alphanumeric with only hyphens and underscores.
+  // TODO: Make this a validation API function in commerce_product.module.
+
   // Notify field widgets.
   field_attach_form_validate('commerce_product', $form_state['commerce_product'], $form, $form_state);
 }
@@ -169,6 +172,9 @@ function commerce_product_ui_product_delete_form($form, &$form_state, $product) 
   return $form;
 }
 
+/**
+ * Submit callback for commerce_product_ui_product_delete_form().
+ */
 function commerce_product_ui_product_delete_form_submit($form, &$form_state) {
   $product = $form_state['product'];
 

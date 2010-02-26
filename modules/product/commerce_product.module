@@ -3,7 +3,26 @@
 
 /**
  * @file
+ * Defines the core Commerce product entity, including the entity itself, the
+ * bundle definitions (product types), and various API functions to manage
+ * products and interact with them through forms ad autocompletes.
  */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_product_reference_menu() {
+  $items = array();
+
+  $items['commerce_product/autocomplete'] = array(
+    'title' => 'commerce_product autocomplete',
+    'page callback' => 'commerce_product_autocomplete',
+    'access arguments' => array('access products'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
 
 /**
  * Implements hook_entity_info().
@@ -104,6 +123,37 @@ function commerce_product_types() {
 }
 
 /**
+ * Returns the human readable name of any or all product types.
+ *
+ * @param $type
+ *   Optional parameter specifying the type whose name to return.
+ * @return
+ *   Either an array of all product type names keyed by the machine name or a
+ *     string containing the human readable name for the specified type. If a
+ *     type is specified that does not exist, this function returns FALSE.
+ */
+function commerce_product_type_get_name($type = NULL) {
+  $types = commerce_product_types();
+
+  // Return a type name if specified and it exists.
+  if (!empty($type)) {
+    if (isset($types[$type])) {
+      return $types[$type]['name'];
+    }
+    else {
+      // Return FALSE if it does not exist.
+      return FALSE;
+    }
+  }
+
+  foreach ($types as $key => $value) {
+    $types[$key] = $value['name'];
+  }
+
+  return $types;
+}
+
+/**
  * Resets the cached list of product types.
  */
 function commerce_product_types_reset() {
@@ -160,10 +210,114 @@ function commerce_product_type_title($product_type) {
 }
 
 /**
+ * Implements hook_token_info().
+ */
+function commerce_product_token_info() {
+  $type = array(
+    'name' => t('Products'),
+    'description' => t('Tokens related to individual products.'),
+    'needs-data' => 'product',
+  );
+
+  // Tokens for products.
+  $product['product-id'] = array(
+    'name' => t('Product ID'),
+    'description' => t('The internal numeric ID of the product.'),
+  );
+  $product['sku'] = array(
+    'name' => t('SKU'),
+    'description' => t('The human readable product SKU.'),
+  );
+  $product['title'] = array(
+    'name' => t('Title'),
+    'description' => t('The title of the product.'),
+  );
+  $product['edit-url'] = array(
+    'name' => t('Edit URL'),
+    'description' => t("The URL of the product's edit page."),
+  );
+
+  // Chained tokens for products.
+  $product['created'] = array(
+    'name' => t('Date created'),
+    'description' => t('The date the product was created.'),
+    'type' => 'date',
+  );
+
+  return array(
+    'types' => array('commerce_product' => $type),
+    'tokens' => array('commerce_product' => $product),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function commerce_product_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $url_options = array('absolute' => TRUE);
+
+  if (isset($options['language'])) {
+    $url_options['language'] = $options['language'];
+    $language_code = $options['language']->language;
+  }
+  else {
+    $language_code = NULL;
+  }
+
+  $sanitize = !empty($options['sanitize']);
+
+  $replacements = array();
+
+  if ($type == 'commerce_product' && !empty($data['product'])) {
+    $product = $data['product'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        // Simple key values on the product.
+        case 'product-id':
+          $replacements[$original] = $product->product_id;
+          break;
+
+        case 'sku':
+          $replacements[$original] = $sanitize ? check_plain($product->product_sku) : $product->product_sku;
+          break;
+
+        case 'title':
+          $replacements[$original] = $sanitize ? check_plain($product->title) : $product->title;
+          break;
+
+        case 'edit-url':
+          $replacements[$original] = url('admin/commerce/products/' . $product->product_id . '/edit', $url_options);
+          break;
+
+        // Default values for the chained tokens handled below.
+        case 'created':
+          $replacements[$original] = format_date($product->created, 'medium', '', NULL, $language_code);
+          break;
+      }
+    }
+
+    if ($created_tokens = token_find_with_prefix($tokens, 'created')) {
+      $replacements += token_generate('date', $created_tokens, array('date' => $product_id->created), $options);
+    }
+  }
+
+  return $replacements;
+}
+
+/**
  * Loads a product by ID.
  */
 function commerce_product_load($product_id) {
   $products = commerce_product_load_multiple(array($product_id), array());
+  return $products ? reset($products) : FALSE;
+}
+
+/**
+ * Loads a product by SKU.
+ */
+function commerce_product_load_by_sku($product_sku) {
+  $products = commerce_product_load_multiple(array(), array('product_sku' => $product_sku));
   return $products ? reset($products) : FALSE;
 }
 
@@ -296,4 +450,176 @@ function commerce_product_delete_multiple($product_ids) {
  */
 function commerce_product_path($product) {
   return 'admin/commerce/products/' . $product->product_id . '/edit';
+}
+
+/**
+ * Returns output for product autocompletes.
+ *
+ * The values returned will be keyed by SKU and appear as such in the textfield,
+ * even though the preview in the autocomplete list shows "SKU: Title".
+ */
+function commerce_product_autocomplete($field_name, $string = '') {
+  $field = field_info_field($field_name);
+  $matches = array();
+
+  // The user enters a comma-separated list of tags. We only autocomplete the last tag.
+  $tags_typed = drupal_explode_tags($string);
+  $tag_last = drupal_strtolower(array_pop($tags_typed));
+
+  if (!empty($tag_last)) {
+    $prefix = count($tags_typed) ? implode(', ', $tags_typed) . ', ' : '';
+
+    // Determine the type of autocomplete match to use when searching for products.
+    $match = isset($field['widget']['autocomplete_match']) ? $field['widget']['autocomplete_match'] : 'contains';
+
+    // Get an array of matching products.
+    $products = commerce_product_match_products($field, $tag_last, $match, array(), 10);
+
+    // Loop through the products and convert them into autocomplete output.
+    foreach ($products as $product_id => $data) {
+      // Add a class wrapper for a few required CSS overrides.
+      $matches[$prefix . $data['product_sku']] = '<div class="reference-autocomplete">' . $data['rendered'] . '</div>';
+    }
+  }
+
+  drupal_json_output($matches);
+}
+
+/**
+ * Fetches an array of all products matching the given parameters.
+ *
+ * This info is used in various places (allowed values, autocomplete results,
+ * input validation...). Some of them only need the product_ids, others
+ * product_id + titles, others yet product_id + titles + rendered row (for
+ * display in widgets).
+ *
+ * The array we return contains all the potentially needed information,
+ * and lets calling functions use the parts they actually need.
+ *
+ * @param $field
+ *   The field description.
+ * @param $string
+ *   Optional string to filter SKUs and titles on (used by autocomplete).
+ * @param $match
+ *   Operator to match filtered SKUs and titles against, can be any of:
+ *   'contains', 'equals', 'starts_with'
+ * @param $ids
+ *   Optional product ids to lookup (the $string and $match arguments will be
+ *   ignored).
+ * @param $limit
+ *   If non-zero, limit the size of the result set.
+ *
+ * @return
+ *   An array of valid products in the form:
+ *   array(
+ *     product_id => array(
+ *       'product_sku' => The product SKU,
+ *       'title' => The product title,
+ *       'rendered' => The text to display in widgets (can be HTML)
+ *     ),
+ *     ...
+ *   )
+ */
+function commerce_product_match_products($field, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
+  $results = &drupal_static(__FUNCTION__, array());
+
+  // Create unique id for static cache.
+  $cid = implode(':', array(
+    $field['field_name'],
+    $match,
+    ($string !== '' ? $string : implode('-', $ids)),
+    $limit,
+  ));
+
+  if (!isset($results[$cid])) {
+    $matches = _commerce_product_match_products_standard($field, $string, $match, $ids, $limit);
+
+    // Store the results.
+    $results[$cid] = !empty($matches) ? $matches : array();
+  }
+
+  return $results[$cid];
+}
+
+/**
+ * Helper function for _commerce_product_match_products().
+ *
+ * Returns an array of products matching the specific parameters.
+ */
+function _commerce_product_match_products_standard($field, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
+  // Build the query object with the necessary fields.
+  $query = db_select('commerce_product', 'cp');
+  $product_id_alias = $query->addField('cp', 'product_id');
+  $product_sku_alias = $query->addField('cp', 'product_sku');
+  $product_title_alias = $query->addField('cp', 'title');
+  $product_type_alias = $query->addField('cp', 'product_type');
+
+  // Add a condition to the query to filter by matching product types.
+  if (is_array($field['settings']['referenceable_types']) && !empty($field['settings']['referenceable_types'])) {
+    $types = array_diff(array(0), array_values($field['settings']['referenceable_types']));
+
+    // Only filter by type if some types have been specified.
+    if (!empty($types)) {
+      $query->condition('cp.product_type', $field['settings']['referenceable_types'], 'IN');
+    }
+  }
+
+  if ($string !== '') {
+    $args = array();
+
+    // Build a where clause matching on either the SKU or title.
+    switch ($match) {
+      case 'contains':
+        $where = '(cp.product_sku LIKE :sku_match OR cp.title LIKE :title_match)';
+        $args['sku_match'] = '%' . $string . '%';
+        $args['title_match'] = '%' . $string . '%';
+        break;
+
+      case 'starts_with':
+        $where = '(cp.product_sku LIKE :sku_match OR cp.title LIKE :title_match)';
+        $args['sku_match'] = $string . '%';
+        $args['title_match'] = $string . '%';
+        break;
+
+      case 'equals':
+      default:
+        $where = '(cp.product_sku = :match OR cp.title = :match)';
+        $args['sku_match'] = $string;
+        $args['title_match'] = $string;
+        break;
+    }
+
+    $query->where($where, $args);
+  }
+  elseif ($ids) {
+    // Otherwise add a product_id specific condition if specified.
+    $query->condition($product_id_alias, $ids, 'IN', $ids);
+  }
+
+  // Order the results by SKU, title, and then product type.
+  $query
+    ->orderBy($product_sku_alias)
+    ->orderBy($product_title_alias)
+    ->orderBy($product_type_alias);
+
+  // Add a limit if specified.
+  if ($limit) {
+    $query->range(0, $limit);
+  }
+
+  // Execute the query and build the results array.
+  $result = $query->execute();
+
+  $matches = array();
+
+  foreach ($result->fetchAll() as $product) {
+    $matches[$product->product_id] = array(
+      'product_sku' => $product->product_sku,
+      'product_type' => $product->product_type,
+      'title' => $product->title,
+      'rendered' => t('@sku: @title', array('@sku' => $product->product_sku, '@title' => $product->title)),
+    );
+  }
+
+  return $matches;
 }

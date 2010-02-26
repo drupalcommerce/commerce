@@ -7,22 +7,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function commerce_product_reference_menu() {
-  $items = array();
-
-  $items['commerce_product_reference/autocomplete'] = array(
-    'title' => 'commerce_product_reference autocomplete',
-    'page callback' => 'commerce_product_reference_autocomplete',
-    'access arguments' => array('access products'),
-    'type' => MENU_CALLBACK
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
@@ -30,9 +14,11 @@ function commerce_product_reference_field_info() {
     'commerce_product_reference' => array(
       'label' => t('Product reference'),
       'description' => t('This field stores the ID of a related product as an integer value.'),
-      'settings' => array('referenceable_types' => array()),
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_product_reference_title_link',
+      'settings' => array(
+        'referenceable_types' => array(),
+      ),
     ),
   );
 }
@@ -41,16 +27,17 @@ function commerce_product_reference_field_info() {
  * Implements hook_field_schema().
  */
 function commerce_product_reference_field_schema($field) {
-  $columns = array(
-    'product_id' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-    ),
-  );
   return array(
-    'columns' => $columns,
-    'indexes' => array('product_id' => array('product_id')),
+    'columns' => array(
+      'product_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'product_id' => array('product_id'),
+    ),
   );
 }
 
@@ -62,6 +49,7 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
   $options = array();
   $form = array();
 
+  // Build an options array of the product types.
   foreach (commerce_product_types() as $type) {
     $options[$type['product_type']] = check_plain($type['name']);
   }
@@ -69,6 +57,7 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
   $form['referenceable_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Product types that can be referenced'),
+    '#description' => t('If no types are selected, any type of product may be referenced.'),
     '#options' => $options,
     '#default_value' => is_array($settings['referenceable_types']) ? $settings['referenceable_types'] : array(),
     '#multiple' => TRUE,
@@ -98,7 +87,7 @@ function commerce_product_reference_field_validate($obj_type, $object, $field, $
       else {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_product_id',
-          'message' => t("%name: invalid input.", array('%name' => t($field['widget']['label']))),
+          'message' => t("%name: invalid input.", array('%name' => $instance['label'])),
         );
       }
     }
@@ -106,14 +95,14 @@ function commerce_product_reference_field_validate($obj_type, $object, $field, $
 
   // Prevent performance hog if there are no ids to check.
   if ($ids) {
-    $refs = _commerce_product_reference_potential_references($field, '', NULL, $ids);
+    $refs = commerce_product_match_products($field, '', NULL, $ids);
 
     foreach ($items as $delta => $item) {
       if (is_array($item)) {
         if (!empty($item['product_id']) && !isset($refs[$item['product_id']])) {
           $errors[$field['field_name']][$langcode][$delta][] = array(
             'error' => 'invalid_product_id',
-            'message' => t("%name: this product can't be referenced.", array('%name' => t($field['widget']['label']))),
+            'message' => t("%name: this product can't be referenced.", array('%name' => $instance['label'])),
           );
         }
       }
@@ -169,8 +158,6 @@ function commerce_product_reference_field_formatter_info() {
 
 /**
  * Implements hook_field_formatter_view().
- *
- * TODO: Convert this function.
  */
 function commerce_product_reference_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
   $result = array();
@@ -249,20 +236,30 @@ function _commerce_product_reference_get_product_titles($product_ids, $known_tit
 
 /**
  * Implements hook_field_widget_info().
+ *
+ * Defines widgets available for use with field types as specified in each
+ * widget's $info['field types'] array.
  */
 function commerce_product_reference_field_widget_info() {
-  return array(
-    'commerce_product_reference_autocomplete' => array(
-      'label' => t('Autocomplete text field'),
-      'description' => t('Display the list of referenceable products as a textfield with autocomplete behaviour.'),
-      'field types' => array('commerce_product_reference'),
-      'settings' => array(
-        'autocomplete_match' => 'contains',
-        'size' => 60,
-        'autocomplete_path' => 'commerce_product_reference/autocomplete',
-      ),
+  $widgets = array();
+
+  // Define an autocomplete textfield widget for product referencing that works
+  // like the Term Reference autocomplete widget.
+  $widgets['commerce_product_reference_autocomplete'] = array(
+    'label' => t('Autocomplete text field'),
+    'description' => t('Display the list of referenceable products as a textfield with autocomplete behaviour.'),
+    'field types' => array('commerce_product_reference'),
+    'settings' => array(
+      'autocomplete_match' => 'contains',
+      'size' => 60,
+      'autocomplete_path' => 'commerce_product/autocomplete',
+    ),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
     ),
   );
+
+  return $widgets;
 }
 
 /**
@@ -283,6 +280,7 @@ function commerce_product_reference_field_widget_settings_form($field, $instance
 
   $form = array();
 
+  // Build the settings for the product reference autocomplete widget.
   if ($widget['type'] == 'commerce_product_reference_autocomplete') {
     $form['autocomplete_match'] = array(
       '#type' => 'select',
@@ -308,244 +306,72 @@ function commerce_product_reference_field_widget_settings_form($field, $instance
 
 /**
  * Implements hook_field_widget_form().
+ *
+ * Used to define the form element for custom widgets.
  */
-function commerce_product_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
-  switch ($instance['widget']['type']) {
-    case 'commerce_product_reference_autocomplete':
-      $element['product_id'] = $base + array(
+function commerce_product_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Define the autocomplete textfield for products.
+  if ($instance['widget']['type'] == 'commerce_product_reference_autocomplete') {
+    $product_ids = array();
+    $skus = array();
+
+    // Build an array of product IDs from this field's values.
+    foreach ($items as $item) {
+      $product_ids[] = $item['product_id'];
+    }
+
+    // Load those products and loop through them to extract their SKUs.
+    $products = commerce_product_load_multiple($product_ids);
+
+    foreach ($product_ids as $product_id) {
+      $skus[] = $products[$product_id]->product_sku;
+    }
+
+    return $element + array(
         '#type' => 'textfield',
-        '#default_value' => isset($items[$delta]['product_id']) ? $items[$delta]['product_id'] : NULL,
+        '#default_value' => implode(', ', $skus),
         '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
         '#size' => $instance['widget']['settings']['size'],
         '#element_validate' => array('commerce_product_reference_autocomplete_validate'),
-        '#value_callback' => 'commerce_product_reference_autocomplete_value',
-      );
-      break;
-  }
-
-  return $element;
-}
-
-/**
- * Value callback for a commerce_product_reference autocomplete element.
- *
- * Replace the product id with the product title / SKU.
- */
-function commerce_product_reference_autocomplete_value($element, $input = FALSE, $form_state) {
-  if ($input === FALSE) {
-    // We're building the displayed 'default value': expand the raw product_id
-    // into "product title [SKU: sku]".
-    $product_id = $element['#default_value'];
-
-    if (!empty($product_id)) {
-      $q = db_select('commerce_product', 'cp');
-      $commerce_product_title_alias = $q->addField('cp', 'title');
-      $result = $q->execute();
-      // TODO: If no result (node doesn't exist or no access).
-      $value = $result->fetchField();
-      // TODO: Replace $sku with an actual SKU from the above query.
-      $value .= ' [SKU: ' . $sku . ']';
-
-      return $value;
-    }
+    );
   }
 }
 
 /**
  * Validation callback for a commerce_product_reference autocomplete element.
  *
- * TODO: Convert this function.
+ * TODO: Validate by product type if specified.
  */
-function node_reference_autocomplete_validate($element, &$form_state, $form) {
+function commerce_product_reference_autocomplete_validate($element, &$form_state, $form) {
   $field = $form['#fields'][$element['#field_name']]['field'];
   $instance = $form['#fields'][$element['#field_name']]['instance'];
 
-  $value = $element['#value'];
-  $product_id = NULL;
+  if (!empty($element['#value'])) {
+    // Translate SKUs into product IDs.
+    $typed_skus = drupal_explode_tags($element['#value']);
 
-  if (!empty($value)) {
-    // Check whether we have an explicit "[nid:n]" input.
-    preg_match('/^(?:\s*|(.*) )?\[\s*nid\s*:\s*(\d+)\s*\]$/', $value, $matches);
-    if (!empty($matches)) {
-      // Explicit nid. Check that the 'title' part matches the actual title for
-      // the nid.
-      list(, $title, $nid) = $matches;
-      if (!empty($title)) {
-        $titles = _node_reference_get_node_titles(array($nid));
-        if ($title != $titles[$nid]) {
-          form_error($element, t('%name: title mismatch. Please check your selection.', array('%name' => t($instance['label']))));
-        }
-      }
-    }
-    else {
-      // No explicit nid (the submitted value was not populated by autocomplete
-      // selection). Get the nid of a referencable node from the entered title.
-      $reference = _node_reference_potential_references($field, $value, 'equals', NULL, 1);
-      if ($reference) {
-        // @todo The best thing would be to present the user with an
-        // additional form, allowing the user to choose between valid
-        // candidates with the same title. ATM, we pick the first
-        // matching candidate...
-        $nid = key($reference);
-      }
-      else {
-        form_error($element, t('%name: found no valid post with that title.', array('%name' => t($instance['label']))));
+    $value = array();
+
+    foreach ($typed_skus as $typed_sku) {
+      // See if the SKU exists in the valid product types and return the tid.
+      if ($products = commerce_product_load_multiple(array(), array('product_sku' => trim($typed_sku)))) {
+        $product = array_pop($products);
+        $value[] = array('product_id' => $product->product_id);
       }
     }
   }
+  else {
+    $value = array();
+  }
 
-  // Set the element's value as the node id that was extracted from the entered
-  // input.
-  form_set_value($element, $nid, $form_state);
+  form_set_value($element, $value, $form_state);
 }
 
 /**
  * Implements hook_field_widget_error().
  */
 function commerce_product_reference_field_widget_error($element, $error) {
-  form_error($element['nid'], $error['message']);
-}
-
-/**
- * Fetch an array of all candidate referenced products.
- *
- * This info is used in various places (allowed values, autocomplete results,
- * input validation...). Some of them only need the product_ids, others
- * product_id + titles, others yet product_id + titles + rendered row (for
- * display in widgets).
- *
- * The array we return contains all the potentially needed information,
- * and lets consumers use the parts they actually need.
- *
- * @param $field
- *   The field description.
- * @param $string
- *   Optional string to filter titles on (used by autocomplete).
- * @param $match
- *   Operator to match filtered name against, can be any of:
- *   'contains', 'equals', 'starts_with'
- * @param $ids
- *   Optional product ids to lookup (the $string and $match arguments will be
- *   ignored).
- * @param $limit
- *   If non-zero, limit the size of the result set.
- *
- * @return
- *   An array of valid products in the form:
- *   array(
- *     product_id => array(
- *       'sku' => The product SKU,
- *       'title' => The product title,
- *       'rendered' => The text to display in widgets (can be HTML)
- *     ),
- *     ...
- *   )
- *  @todo Check whether we still need the 'rendered' value (hook_options_list()
- *  does not need it anymore). Should probably be clearer after the 'Views'
- *  mode is ported.
- */
-function _commerce_product_reference_potential_references($field, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
-  $results = &drupal_static(__FUNCTION__, array());
-
-  // Create unique id for static cache.
-  $cid = $field['field_name'] . ':' . $match . ':'
-    . ($string !== '' ? $string : implode('-', $ids))
-    . ':' . $limit;
-
-  if (!isset($results[$cid])) {
-    $references = _commerce_product_reference_potential_references_standard($field, $string, $match, $ids, $limit);
-
-    // Store the results.
-    $results[$cid] = !empty($references) ? $references : array();
-  }
-
-  return $results[$cid];
-}
-
-/**
- * Helper function for _commerce_product_reference_potential_references().
- *
- * List of referenceable products defined by content types.
- */
-function _commerce_product_reference_potential_references_standard($field, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
-  // Avoid useless work
-  if (!count($field['settings']['referenceable_types'])) {
-    return array();
-  }
-
-  $query = db_select('commerce_product', 'cp');
-  $product_id_alias = $query->addField('cp', 'product_id');
-  $product_sku_alias = $query->addField('cp', 'product_sku');
-  $product_title_alias = $query->addField('cp', 'title', 'product_title');
-  $product_type_alias = $query->addField('cp', 'product_type', 'product_type');
-
-  if (is_array($field['settings']['referenceable_types'])) {
-    $query->condition('cp.product_type', $field['settings']['referenceable_types'], 'IN');
-  }
-
-  if ($string !== '') {
-    $args = array();
-    switch ($match) {
-      case 'contains':
-        $title_clause = 'cp.title LIKE :match';
-        $args['match'] = '%' . $string . '%';
-        break;
-
-      case 'starts_with':
-        $title_clause = 'cp.title LIKE :match';
-        $args['match'] = $string . '%';
-        break;
-
-      case 'equals':
-      default: // no match type or incorrect match type: use "="
-        $title_clause = 'cp.title = :match';
-        $args['match'] = $string;
-        break;
-    }
-    $query->where($title_clause, $args);
-  }
-  elseif ($ids) {
-    $query->condition($product_id_alias, $ids, 'IN', $ids);
-  }
-
-  $query
-    ->orderBy($product_title_alias)
-    ->orderBy($product_type_alias);
-
-  if ($limit) {
-    $query->range(0, $limit);
-  }
-
-  $result = $query->execute();
-  $references = array();
-  foreach ($result->fetchAll() as $product) {
-    $references[$product->product_id] = array(
-      'sku' => $product->product_sku,
-      'title' => $product->product_title,
-      'rendered' => check_plain($product->product_title),
-    );
-  }
-
-  return $references;
-}
-
-/**
- * Menu callback for the autocomplete results.
- */
-function commerce_product_reference_autocomplete($field_name, $string = '') {
-  $field = field_info_field($field_name);
-
-  $match = isset($field['widget']['autocomplete_match']) ? $field['widget']['autocomplete_match'] : 'contains';
-  $matches = array();
-
-  $references = _commerce_product_reference_potential_references($field, $string, $match, array(), 10);
-
-  foreach ($references as $id => $row) {
-    // Add a class wrapper for a few required CSS overrides.
-    $matches[$row['sku']] = '<div class="reference-autocomplete">' . $row['rendered'] . '</div>';
-  }
-
-  drupal_json_output($matches);
+  form_error($element, $error['message']);
 }
 
 /**
@@ -611,13 +437,18 @@ function node_reference_field_prepare_translation($obj_type, $object, $field, $i
  * Implements hook_options_list().
  */
 function commerce_product_reference_options_list($field) {
-  $references = _commerce_product_reference_potential_references($field);
-
-  // @todo Support optgroups ? I think this was added in late CCK D6.
   $options = array();
 
-  foreach ($references as $key => $value) {
-    $options[$key] = $value['title'];
+  // Loop through all product matches.
+  foreach (commerce_product_match_products($field) as $product_id => $data) {
+    // Add them to the options list in optgroups by product type.
+    $name = check_plain(commerce_product_type_get_name($data['product_type']));
+    $options[$name][$product_id] = t('@sku: @title', array('@sku' => $data['product_sku'], '@title' => $data['title']));
+  }
+
+  // Simplify the options list if only one optgroup exists.
+  if (count(array_keys($options)) == 1) {
+    $options = $options[array_shift(array_keys($options))];
   }
 
   return $options;
