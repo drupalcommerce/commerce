@@ -57,8 +57,9 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
   $form['sku'] = array(
     '#type' => 'textfield',
     '#title' => t('Product SKU'),
-    '#description' => t('Supply a unique human readable identifier for this product.'),
+    '#description' => t('Supply a unique human readable identifier for this product. Accepts letters, numbers, dashes, underscores, and the product tokens [product:product-id] and [product:type].'),
     '#default_value' => isset($product->sku) ? $product->sku : '',
+    '#maxlength' => 128,
     '#required' => TRUE,
     '#weight' => -10,
   );
@@ -68,6 +69,7 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
     '#title' => t('Title'),
     '#description' => t('Supply a title for administrative display.'),
     '#default_value' => isset($product->title) ? $product->title : '',
+    '#maxlength' => 255,
     '#required' => TRUE,
     '#weight' => -5,
   );
@@ -103,6 +105,32 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
  * Validation callback for commerce_product_ui_form().
  */
 function commerce_product_ui_product_form_validate($form, &$form_state) {
+  // Ensure that only valid tokens were used.
+  $valid_tokens = TRUE;
+
+  foreach (token_scan($form_state['values']['sku']) as $type => $token) {
+    if ($type !== 'product') {
+      $valid_tokens = FALSE;
+    }
+    else {
+      foreach (array_keys($token) as $value) {
+        if (!in_array($value, array('product-id', 'type'))) {
+          $valid_tokens = FALSE;
+        }
+      }
+    }
+  }
+
+  // Register the error if an invalid token was detected.
+  if (!$valid_tokens) {
+    form_set_error('sku', 'Product SKU contains invalid tokens.');
+  }
+
+  // Check the remaining characters of the string for validity by doing a test
+  // replacement of the tokens.
+  // TODO: Perform a regex match for alphanumeric, hyphen, and underscore
+  // characters once the tokens have been stripped out.
+
   // Ensure the SKU entered is unique.
   if ($product_id = db_query('SELECT product_id FROM {commerce_product} WHERE sku = :sku', array(':sku' => $form_state['values']['sku']))->fetchField()) {
     if (empty($form_state['commerce_product']->product_id) || $product_id != $form_state['commerce_product']->product_id) {
@@ -145,7 +173,7 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
   drupal_set_message(t('Product saved.'));
 
   if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/products/add/' . $product->product_type;
+    $form_state['redirect'] = 'admin/commerce/products/add/' . $product->type;
   }
   else {
     $form_state['redirect'] = 'admin/commerce/products';

@@ -8,7 +8,7 @@ class views_handler_field_commerce_product_link_delete extends views_handler_fie
   function construct() {
     parent::construct();
 
-    $this->additional_fields['product_type'] = 'product_type';
+    $this->additional_fields['type'] = 'type';
     $this->additional_fields['uid'] = 'uid';
   }
 
@@ -16,7 +16,7 @@ class views_handler_field_commerce_product_link_delete extends views_handler_fie
     // Ensure the user has access to delete this node.
     $product = new stdClass();
     $product->product_id = $values->{$this->aliases['product_id']};
-    $product->product_type = $values->{$this->aliases['product_type']};
+    $product->type = $values->{$this->aliases['type']};
     $product->uid = $values->{$this->aliases['uid']};
 
     if (!commerce_product_ui_product_edit_access($product)) {

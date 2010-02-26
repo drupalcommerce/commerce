@@ -41,7 +41,7 @@ function commerce_product_views_data() {
   // Expose the product SKU.
   $data['commerce_product']['sku'] = array(
     'title' => t('SKU'),
-    'help' => t('The unique human readable identifier of the product.'),
+    'help' => t('The unique human-readable identifier of the product.'),
     'field' => array(
       'handler' => 'views_handler_field_commerce_product',
       'click sortable' => TRUE,
@@ -58,9 +58,9 @@ function commerce_product_views_data() {
   );
 
   // Expose the product type.
-  $data['commerce_product']['product_type'] = array(
+  $data['commerce_product']['type'] = array(
     'title' => t('Type'),
-    'help' => t('The human readable type of the product.'),
+    'help' => t('The human-readable name of the type of the product.'),
     'field' => array(
       'handler' => 'views_handler_field_commerce_product_type',
       'click sortable' => TRUE,

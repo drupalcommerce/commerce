@@ -9,9 +9,10 @@ function commerce_product_install() {
   // db_insert() thanks to an issue reported at http://drupal.org/node/620298.
   db_insert('commerce_product_type')
   ->fields(array(
-    'product_type' => 'product',
+    'type' => 'product',
     'name' => t('Product'),
     'description' => t('A basic product type with no additional fields by default.'),
+    'help' => '',
   ))
   ->execute();
 }
@@ -32,13 +33,13 @@ function commerce_product_schema() {
         'not null' => TRUE,
       ),
       'sku' => array(
-        'description' => 'The human readable, merchant defined identifier for a product.',
+        'description' => 'The unique, human-readable identifier for a product.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
       ),
-      'product_type' => array(
-        'description' => 'The type of this product.',
+      'type' => array(
+        'description' => 'The {commerce_product_type}.type of this product.',
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
@@ -58,13 +59,13 @@ function commerce_product_schema() {
         'default' => 0,
       ),
       'created' => array(
-        'description' => 'The Unix timestamp when the node was created.',
+        'description' => 'The Unix timestamp when the product was created.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
       'changed' => array(
-        'description' => 'The Unix timestamp when the node was most recently saved.',
+        'description' => 'The Unix timestamp when the product was most recently saved.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -73,7 +74,7 @@ function commerce_product_schema() {
     ),
     'primary key' => array('product_id'),
     'indexes' => array(
-      'product_type' => array('product_type'),
+      'type' => array('type'),
     ),
     'unique keys' => array(
       'sku' => array('sku'),
@@ -81,30 +82,36 @@ function commerce_product_schema() {
   );
 
   $schema['commerce_product_type'] = array(
-    'description' => 'The list of product types defined on the system.',
+    'description' => 'Stores information about all defined {commerce_product} types.',
     'fields' => array(
-      'product_type' => array(
-        'description' => 'The primary identifier for a product type.',
+      'type' => array(
+        'description' => 'The machine-readable name of this type.',
         'type' => 'varchar',
-        'length' => 128,
+        'length' => 32,
         'not null' => TRUE,
         'default' => '',
       ),
       'name' => array(
-        'description' => 'The name of this product type.',
+        'description' => 'The human-readable name of this type.',
         'type' => 'varchar',
-        'length' => 128,
+        'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
       'description' => array(
-        'description' => 'The description of this product type.',
+        'description' => 'A brief description of this type.',
         'type' => 'text',
-        'size' => 'big',
         'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'help' => array(
+        'description' => 'Help information shown to the user when creating a {commerce_product} of this type.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
       ),
     ),
-    'primary key' => array('product_type'),
+    'primary key' => array('type'),
   );
 
   return $schema;

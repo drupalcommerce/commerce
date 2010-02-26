@@ -50,8 +50,8 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
   $form = array();
 
   // Build an options array of the product types.
-  foreach (commerce_product_types() as $type) {
-    $options[$type['product_type']] = check_plain($type['name']);
+  foreach (commerce_product_types() as $product_type) {
+    $options[$product_type['type']] = check_plain($product_type['name']);
   }
 
   $form['referenceable_types'] = array(
@@ -472,7 +472,7 @@ function commerce_product_reference_options_list($field) {
   // Loop through all product matches.
   foreach (commerce_product_match_products($field) as $product_id => $data) {
     // Add them to the options list in optgroups by product type.
-    $name = check_plain(commerce_product_type_get_name($data['product_type']));
+    $name = check_plain(commerce_product_type_get_name($data['type']));
     $options[$name][$product_id] = t('@sku: @title', array('@sku' => $data['sku'], '@title' => $data['title']));
   }
 

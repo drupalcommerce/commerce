@@ -9,6 +9,9 @@ core = 7.x
 files[] = commerce_product.module
 files[] = commerce_product.install
 
+; Module includes
+files[] = includes/commerce_product.tokens.inc
+
 ; Views include
 files[] = includes/views/commerce_product.views.inc
 

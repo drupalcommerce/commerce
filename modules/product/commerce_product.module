@@ -36,10 +36,10 @@ function commerce_product_entity_info() {
       'path callback' => 'commerce_product_path',
       'object keys' => array(
         'id' => 'product_id',
-        'bundle' => 'product_type',
+        'bundle' => 'type',
       ),
       'bundle keys' => array(
-        'bundle' => 'product_type',
+        'bundle' => 'type',
       ),
       'bundles' => array(),
       'load hook' => 'commerce_product_load',
@@ -51,9 +51,9 @@ function commerce_product_entity_info() {
     ),
   );
 
-  foreach (commerce_product_types() as $type) {
-    $return['commerce_product']['bundles'][$type['product_type']] = array(
-      'label' => $type['name'],
+  foreach (commerce_product_types() as $product_type) {
+    $return['commerce_product']['bundles'][$product_type['type']] = array(
+      'label' => $product_type['name'],
     );
   }
 
@@ -92,15 +92,15 @@ function commerce_product_permission() {
   // Add product type specific permissions. Note that users with administer
   // products permission should have access to do anything the permissions below
   // grant a user to do.
-  foreach (commerce_product_types() as $type) {
-    $permissions['create ' . $type['product_type']] = array(
-      'title' => t('Create %type products', array('%type' => $type['name'])),
+  foreach (commerce_product_types() as $product_type) {
+    $permissions['create ' . $product_type['type']] = array(
+      'title' => t('Create %type products', array('%type' => $product_type['name'])),
     );
-    $permissions['edit any ' . $type['product_type']] = array(
-      'title' => t('Edit or delete any %type product', array('%type' => $type['name'])),
+    $permissions['edit any ' . $product_type['type']] = array(
+      'title' => t('Edit or delete any %type product', array('%type' => $product_type['name'])),
     );
-    $permissions['edit own ' . $type['product_type']] = array(
-      'title' => t('Edit or delete own %type products', array('%type' => $type['name'])),
+    $permissions['edit own ' . $product_type['type']] = array(
+      'title' => t('Edit or delete own %type products', array('%type' => $product_type['name'])),
     );
   }
 
@@ -116,7 +116,7 @@ function commerce_product_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($types)) {
-    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('product_type', PDO::FETCH_ASSOC);
+    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
   }
 
   return $types;
@@ -133,12 +133,12 @@ function commerce_product_types() {
  *     type is specified that does not exist, this function returns FALSE.
  */
 function commerce_product_type_get_name($type = NULL) {
-  $types = commerce_product_types();
+  $product_types = commerce_product_types();
 
   // Return a type name if specified and it exists.
   if (!empty($type)) {
-    if (isset($types[$type])) {
-      return $types[$type]['name'];
+    if (isset($product_types[$type])) {
+      return $product_types[$type]['name'];
     }
     else {
       // Return FALSE if it does not exist.
@@ -146,8 +146,9 @@ function commerce_product_type_get_name($type = NULL) {
     }
   }
 
-  foreach ($types as $key => $value) {
-    $types[$key] = $value['name'];
+  // Otherwise turn the array values into the type name only.
+  foreach ($product_types as $key => $value) {
+    $product_types[$key] = $value['name'];
   }
 
   return $types;
@@ -164,27 +165,27 @@ function commerce_product_types_reset() {
 /**
  * Loads a product type.
  */
-function commerce_product_type_load($product_type_name) {
-  return db_query('SELECT * FROM {commerce_product_type} WHERE product_type = :product_type', array(':product_type' => $product_type_name))->fetchObject();
+function commerce_product_type_load($type) {
+  return db_query('SELECT * FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchObject();
 }
 
 /**
  * Returns a path argument from a product type.
  */
-function commerce_product_type_to_arg($product_type) {
-  return $product_type;
+function commerce_product_type_to_arg($type) {
+  return $type;
 }
 
 /**
  * Saves a product type.
  */
 function commerce_product_type_save($product_type) {
-  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'product_type' : NULL);
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : NULL);
   menu_rebuild();
 
   if (!empty($product_type->is_new)) {
     // Notify the field API that a new bundle has been created.
-    field_attach_create_bundle('commerce_product', $product_type->product_type);
+    field_attach_create_bundle('commerce_product', $product_type->type);
   }
 
   return $op;
@@ -193,13 +194,13 @@ function commerce_product_type_save($product_type) {
 /**
  * Deletes a product type.
  */
-function commerce_product_type_delete($product_type_name) {
+function commerce_product_type_delete($type) {
   db_delete('commerce_product_type')
-    ->condition('product_type', $product_type_name)
+    ->condition('type', $type)
     ->execute();
 
   // Notify the field API that this bundle has been destroyed.
-  field_attach_delete_bundle('commerce_product', $product_type_name);
+  field_attach_delete_bundle('commerce_product', $type);
 }
 
 /**
@@ -207,106 +208,6 @@ function commerce_product_type_delete($product_type_name) {
  */
 function commerce_product_type_title($product_type) {
   return $product_type->name;
-}
-
-/**
- * Implements hook_token_info().
- */
-function commerce_product_token_info() {
-  $type = array(
-    'name' => t('Products'),
-    'description' => t('Tokens related to individual products.'),
-    'needs-data' => 'product',
-  );
-
-  // Tokens for products.
-  $product['product-id'] = array(
-    'name' => t('Product ID'),
-    'description' => t('The internal numeric ID of the product.'),
-  );
-  $product['sku'] = array(
-    'name' => t('SKU'),
-    'description' => t('The human readable product SKU.'),
-  );
-  $product['type'] = array(
-    'name' => t('Type'),
-    'description' => t('The human readable name of the product type.'),
-  );
-  $product['title'] = array(
-    'name' => t('Title'),
-    'description' => t('The title of the product.'),
-  );
-  $product['edit-url'] = array(
-    'name' => t('Edit URL'),
-    'description' => t("The URL of the product's edit page."),
-  );
-
-  // Chained tokens for products.
-  $product['created'] = array(
-    'name' => t('Date created'),
-    'description' => t('The date the product was created.'),
-    'type' => 'date',
-  );
-
-  return array(
-    'types' => array('commerce_product' => $type),
-    'tokens' => array('commerce_product' => $product),
-  );
-}
-
-/**
- * Implements hook_tokens().
- */
-function commerce_product_tokens($type, $tokens, array $data = array(), array $options = array()) {
-  $url_options = array('absolute' => TRUE);
-
-  if (isset($options['language'])) {
-    $url_options['language'] = $options['language'];
-    $language_code = $options['language']->language;
-  }
-  else {
-    $language_code = NULL;
-  }
-
-  $sanitize = !empty($options['sanitize']);
-
-  $replacements = array();
-
-  if ($type == 'commerce_product' && !empty($data['product'])) {
-    $product = $data['product'];
-
-    foreach ($tokens as $name => $original) {
-      switch ($name) {
-        // Simple key values on the product.
-        case 'product-id':
-          $replacements[$original] = $product->product_id;
-          break;
-
-        case 'sku':
-          $replacements[$original] = $sanitize ? check_plain($product->sku) : $product->sku;
-          break;
-
-        case 'title':
-          $replacements[$original] = $sanitize ? check_plain($product->title) : $product->title;
-          break;
-
-        case 'edit-url':
-          $replacements[$original] = url('admin/commerce/products/' . $product->product_id . '/edit', $url_options);
-          break;
-
-        // Default values for the chained tokens handled below.
-        case 'created':
-          $replacements[$original] = format_date($product->created, 'medium', '', NULL, $language_code);
-          break;
-      }
-    }
-
-    if ($created_tokens = token_find_with_prefix($tokens, 'created')) {
-      $replacements += token_generate('date', $created_tokens, array('date' => $product_id->created), $options);
-    }
-  }
-
-  return $replacements;
 }
 
 /**
@@ -556,7 +457,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
   $product_id_alias = $query->addField('cp', 'product_id');
   $product_sku_alias = $query->addField('cp', 'sku');
   $product_title_alias = $query->addField('cp', 'title');
-  $product_type_alias = $query->addField('cp', 'product_type');
+  $product_type_alias = $query->addField('cp', 'type');
 
   // Add a condition to the query to filter by matching product types.
   if (is_array($field['settings']['referenceable_types']) && !empty($field['settings']['referenceable_types'])) {
@@ -564,7 +465,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
 
     // Only filter by type if some types have been specified.
     if (!empty($types)) {
-      $query->condition('cp.product_type', $field['settings']['referenceable_types'], 'IN');
+      $query->condition('cp.type', $field['settings']['referenceable_types'], 'IN');
     }
   }
 
@@ -619,7 +520,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
   foreach ($result->fetchAll() as $product) {
     $matches[$product->product_id] = array(
       'sku' => $product->sku,
-      'product_type' => $product->product_type,
+      'type' => $product->type,
       'title' => $product->title,
       'rendered' => t('@sku: @title', array('@sku' => $product->sku, '@title' => $product->title)),
     );

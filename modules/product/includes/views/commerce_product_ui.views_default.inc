@@ -36,7 +36,7 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['style_options']['columns'] = array(
     'sku' => 'sku',
     'title' => 'title',
-    'product_type' => 'product_type',
+    'type' => 'type',
     'edit_product' => 'edit_product',
     'delete_product' => 'edit_product',
   );
@@ -52,7 +52,7 @@ function commerce_product_ui_views_default_views() {
       'align' => '',
       'separator' => '',
     ),
-    'product_type' => array(
+    'type' => array(
       'sortable' => 1,
       'align' => '',
       'separator' => '',
@@ -97,18 +97,18 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['title']['empty_zero'] = 0;
   $handler->display->display_options['fields']['title']['link_to_product'] = 1;
   /* Field: Commerce Product: Type */
-  $handler->display->display_options['fields']['product_type']['id'] = 'product_type';
-  $handler->display->display_options['fields']['product_type']['table'] = 'commerce_product';
-  $handler->display->display_options['fields']['product_type']['field'] = 'product_type';
-  $handler->display->display_options['fields']['product_type']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['product_type']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['product_type']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['product_type']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['product_type']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['product_type']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['product_type']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['product_type']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['product_type']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'commerce_product';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  $handler->display->display_options['fields']['type']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['type']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['type']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['type']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['type']['empty_zero'] = 0;
   /* Field: Commerce Product: Edit link */
   $handler->display->display_options['fields']['edit_product']['id'] = 'edit_product';
   $handler->display->display_options['fields']['edit_product']['table'] = 'commerce_product';

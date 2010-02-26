@@ -20,15 +20,15 @@ function commerce_product_ui_menu() {
     'access callback' => 'commerce_product_ui_product_add_any_access',
     'file' => 'includes/commerce_product_ui.products.inc',
   );
-  foreach (commerce_product_types() as $type) {
-    $items['admin/commerce/products/add/' . $type['product_type']] = array(
-      'title' => $type['name'],
+  foreach (commerce_product_types() as $product_type) {
+    $items['admin/commerce/products/add/' . $product_type['type']] = array(
+      'title' => $product_type['name'],
       'title callback' => 'check_plain',
-      'description' => $type['description'],
+      'description' => $product_type['description'],
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('commerce_product_ui_product_form', (object) array('product_type' => $type['product_type'])),
+      'page arguments' => array('commerce_product_ui_product_form', (object) array('type' => $product_type['type'])),
       'access callback' => 'commerce_product_ui_product_add_access',
-      'access arguments' => array($type['product_type']),
+      'access arguments' => array($product_type['type']),
       'file' => 'includes/commerce_product_ui.products.inc',
     );
   }
@@ -88,7 +88,7 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/types/add'] = array(
     'title' => 'Add product type',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_form', (object) array('product_type' => '', 'name' => '', 'description' => '')),
+    'page arguments' => array('commerce_product_ui_type_form', (object) array('type' => '', 'name' => '', 'description' => '', 'help' => '')),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'includes/commerce_product_ui.types.inc',
@@ -107,8 +107,8 @@ function commerce_product_ui_product_add_any_access() {
   }
 
   // Check the user's access on a product type basis.
-  foreach (commerce_product_types as $type) {
-    if (commerce_product_ui_product_add_access($type['product_type'])) {
+  foreach (commerce_product_types as $product_type) {
+    if (commerce_product_ui_product_add_access($product_type['type'])) {
       return TRUE;
     }
   }
@@ -119,13 +119,13 @@ function commerce_product_ui_product_add_any_access() {
 /**
  * Access callback: determine the user's ability to create a product.
  *
- * @param $product_type
- *   The machine readable product type of the product the user wants to create.
+ * @param $type
+ *   The machine-readable name of the type of product the user wants to create.
  * @return
  *   TRUE or FALSE indicating the user's access.
  */
-function commerce_product_ui_product_add_access($product_type) {
-  return user_access('administer products') || user_access('create ' . $product_type);
+function commerce_product_ui_product_add_access($type) {
+  return user_access('administer products') || user_access('create ' . $type);
 }
 
 /**
@@ -140,12 +140,12 @@ function commerce_product_ui_product_edit_access($product) {
   global $user;
 
   // Users with administer products and edit any permissions can always edit.
-  if (user_access('administer products') || user_access('edit any ' . $product->product_type)) {
+  if (user_access('administer products') || user_access('edit any ' . $product->type)) {
     return TRUE;
   }
 
   // Others either don't have any access or must match the product uid.
-  if ($user->uid && user_access('edit own ' . $product->product_type) && $product->uid == $user->uid) {
+  if ($user->uid && user_access('edit own ' . $product->type) && $product->uid == $user->uid) {
     return TRUE;
   }
 
