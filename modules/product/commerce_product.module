@@ -1,0 +1,195 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_entity_info().
+ */
+function commerce_product_entity_info() {
+  $return =  array(
+    'commerce_product' => array(
+      'label' => t('Product'),
+      'base table' => 'commerce_product',
+      'fieldable' => TRUE,
+      'path callback' => 'commerce_product_path',
+      'object keys' => array(
+        'id' => 'product_id',
+        'bundle' => 'product_type',
+      ),
+      'bundle keys' => array(
+        'bundle' => 'product_type',
+      ),
+      'bundles' => array(),
+      'load hook' => 'commerce_product_load',
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full'),
+        ),
+      ),
+    ),
+  );
+
+  foreach (commerce_product_types() as $type) {
+    $return['commerce_product']['bundles'][$type['product_type']] = array(
+      'label' => $type['name'],
+    );
+  }
+
+  return $return;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_product_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_product') . '/views',
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_product_permission() {
+  return array(
+    'administer products' => array(
+      'title' => t('Administer products'),
+    ),
+  );
+}
+
+/**
+ * Return the list of product types.
+ */
+function commerce_product_types() {
+  $types = &drupal_static(__FUNCTION__);
+  if (!isset($types)) {
+    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('product_type', PDO::FETCH_ASSOC);
+  }
+  return $types;
+}
+
+/**
+ * Reset the cached list of product types.
+ */
+function commerce_product_types_reset() {
+  $types = &drupal_static('commerce_product_types');
+  $types = NULL;
+}
+
+/**
+ * Load a product type.
+ */
+function commerce_product_type_load($product_type_name) {
+  return db_query('SELECT * FROM {commerce_product_type} WHERE product_type = :product_type', array(':product_type' => $product_type_name))->fetchObject();
+}
+
+/**
+ * Return a path argument from a product type.
+ */
+function commerce_product_type_to_arg($product_type) {
+  return $product_type;
+}
+
+/**
+ * Save a product type.
+ */
+function commerce_product_type_save($product_type) {
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'product_type' : NULL);
+  menu_rebuild();
+
+  if (!empty($product_type->is_new)) {
+    // Notify the field API that a new bundle has been created.
+    field_attach_create_bundle('commerce_product', $product_type->product_type);
+  }
+
+  return $op;
+}
+
+/**
+ * Delete a product type.
+ */
+function commerce_product_type_delete($product_type_name) {
+  db_delete('commerce_product_type')
+    ->condition('product_type', $product_type_name)
+    ->execute();
+
+  // Notify the field API that this bundle has been destroyed.
+  field_attach_delete_bundle('commerce_product', $product_type_name);
+}
+
+/**
+ * Title callback: return the product type title.
+ */
+function commerce_product_type_title($product_type) {
+  return $product_type->name;
+}
+
+/**
+ * Load a product.
+ */
+function commerce_product_load($product_sku) {
+  $products = node_load_multiple(array($product_sku), array());
+  return $products ? reset($products) : FALSE;
+}
+
+/**
+ * Load several products.
+ *
+ * @see entity_load()
+ *
+ * @param $product_skus
+ *   An array of product SKUs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_product} table in the form 'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal node_load cache.
+ *
+ * @return
+ *   An array of product objects indexed by product_sku.
+ */
+function commerce_product_load_multiple($product_skus = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_product', $product_skus, $conditions, $reset);
+}
+
+/**
+ * Save a product.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_product_save($product) {
+  $transaction = db_transaction();
+
+  try {
+    field_attach_presave('commerce_product', $product);
+
+    if (empty($product->product_id)) {
+      drupal_write_record('commerce_product', $product);
+      field_attach_insert('commerce_product', $product);
+      $op = 'insert';
+    }
+    else {
+      drupal_write_record('commerce_product', $product, 'product_id');
+      field_attach_update('commerce_product', $product);
+      $op = 'update';
+    }
+
+    // Ignore slave server temporarily to give time for the
+    // saved product to be propagated to the slave.
+    db_ignore_slave();
+
+    return TRUE;
+  }
+  catch (Exception $e) {
+    $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
+    return FALSE;
+  }
+}
+
+/**
+ * Return the path to a product.
+ */
+function commerce_product_path($product) {
+  return 'admin/commerce/products/edit/' . $product->product_sku;
+}

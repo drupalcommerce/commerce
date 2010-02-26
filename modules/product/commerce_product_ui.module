@@ -1,0 +1,136 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_product_ui_menu() {
+  // Top level "Store" container.
+  $items['admin/commerce'] = array(
+    'title' => 'Store',
+    'description' => 'Administer your store.',
+    'position' => 'right',
+    'weight' => 1,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  // Note: admin/commerce/products will be created by Views.
+
+  // Add a product.
+  $items['admin/commerce/products/add'] = array(
+    'title' => 'Add new product',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer products'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+  foreach (commerce_product_types() as $type) {
+    $items['admin/commerce/products/add/' . $type['product_type']] = array(
+      'title' => $type['name'],
+      'title callback' => 'check_plain',
+      'description' => $type['description'],
+      'page callback' => 'commerce_product_ui_create',
+      'page arguments' => array($type['product_type']),
+      'access arguments' => array('administer products'),
+      'file' => 'commerce_product_ui.products.inc',
+    );
+  }
+
+  $items['admin/commerce/products/types'] = array(
+    'title' => 'Product types',
+    'description' => 'Manage products types for your store.',
+    'page callback' => 'commerce_product_ui_types_overview',
+    'page arguments' => array(),
+    'access arguments' => array('administer products'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'commerce_product_ui.types.inc',
+  );
+  $items['admin/commerce/products/types/%commerce_product_type'] = array(
+    'title callback' => 'commerce_product_type_title',
+    'title arguments' => array(4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_type_form', 4),
+    'access arguments' => array('administer product types'),
+    'type' => MENU_CALLBACK,
+    'file' => 'commerce_product_ui.types.inc',
+  );
+  $items['admin/commerce/products/types/%commerce_product_type/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['admin/commerce/products/types/%commerce_product_type/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_type_delete_form', 4),
+    'access arguments' => array('administer product types'),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 10,
+    'file' => 'commerce_product_ui.types.inc',
+  );
+  $items['admin/commerce/products/types/add'] = array(
+    'title' => 'Add product type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_type_form', (object) array('product_type' => '', 'name' => '', 'description' => '')),
+    'access arguments' => array('administer product types'),
+    'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
+    'file' => 'commerce_product_ui.types.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function commerce_product_ui_menu_alter(&$items) {
+  // Transform the field UI tabs into contextual links.
+  $items['admin/commerce/products/types/%commerce_product_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  $items['admin/commerce/products/types/%commerce_product_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'admin/commerce/products/add' on 'admin/commerce/products' page.
+  if ($root_path == 'admin/commerce/products') {
+    $item = menu_get_item('admin/commerce/products/add');
+    if ($item['access']) {
+      $item['title'] = t('Add a new product');
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Expose the admin UI for product fields.
+ */
+function commerce_product_ui_entity_info_alter(&$entity_info) {
+  foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/commerce/products/types/%commerce_product_type',
+      'real path' => 'admin/commerce/products/types/' . $type,
+      'bundle argument' => 4,
+      'access arguments' => array('administer product types'),
+    );
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_product_ui_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_product_ui') . '/views',
+  );
+}

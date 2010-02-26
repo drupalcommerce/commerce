@@ -1,0 +1,8 @@
+; $Id$
+name = Commerce Product
+description = Defines the Product entity and associated features.
+package = Drupal Commerce
+files[] = commerce_product.module
+files[] = commerce_product.install
+dependencies[] = commerce
+core = 7.x
