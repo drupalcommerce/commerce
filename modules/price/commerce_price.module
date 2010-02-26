@@ -54,6 +54,8 @@ function commerce_price_field_info() {
       'instance_settings' => array(),
       'default_widget' => 'commerce_price_widget',
       'default_formatter' => 'commerce_price_default',
+      'property_type' => 'price',
+      'property_callbacks' => array('commerce_price_property_info_callback'),
     ),
   );
 }
@@ -197,4 +199,40 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   }
 
   return $element;
+}
+
+/**
+ * Callback to alter the property info of price fields.
+ *
+ * @see commerce_product_reference_field_info().
+ */
+function commerce_price_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = str_replace('_', '-', $field['field_name']);
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['data info']['properties'] = array(
+    'value' => array(
+      'type' => 'decimal',
+      'label' => t('Price value'),
+      'getter callback' => 'commerce_price_get_price_value',
+    ),
+    'currency' => array(
+      'type' => 'text',
+      'label' => t('Currency'),
+      'options list' => 'commerce_price_currencies_options',
+      'getter callback' => 'entity_metadata_verbatim_get',
+    ),
+  );
+  unset($property['query callback']);
+}
+
+/**
+ * Entity metadata callback for getting the price value of price fields.
+ *
+ * @see commerce_price_property_info_callback().
+ */
+function commerce_price_get_price_value(&$item, array $options, $name) {
+  return $item['price'];
 }
