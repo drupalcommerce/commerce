@@ -138,6 +138,6 @@ class CommerceProductTypes {
    * Resets the cached list of product types.
    */
   public function resetCache() {
-    $this->types = array();
+    $this->types = NULL;
   }
 }
