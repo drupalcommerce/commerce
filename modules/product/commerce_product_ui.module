@@ -61,6 +61,14 @@ function commerce_product_ui_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
+  $items['admin/commerce/products/types/add'] = array(
+    'title' => 'Add product type',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_type_form', commerce_product_type_new()),
+    'access arguments' => array('administer product types'),
+    'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
+    'file' => 'includes/commerce_product_ui.types.inc',
+  );
   $items['admin/commerce/products/types/%commerce_product_type'] = array(
     'title callback' => 'commerce_product_type_title',
     'title arguments' => array(4),
@@ -83,14 +91,6 @@ function commerce_product_ui_menu() {
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 10,
-    'file' => 'includes/commerce_product_ui.types.inc',
-  );
-  $items['admin/commerce/products/types/add'] = array(
-    'title' => 'Add product type',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_form', commerce_product_type_new()),
-    'access arguments' => array('administer product types'),
-    'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
 
@@ -176,6 +176,25 @@ function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_
       );
     }
   }
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function commerce_product_ui_admin_paths() {
+  $paths = array(
+    'admin/commerce/products/add' => TRUE,
+    'admin/commerce/products/add/*' => TRUE,
+    'admin/commerce/products/*/edit' => TRUE,
+    'admin/commerce/products/*/delete' => TRUE,
+    'admin/commerce/products/types' => TRUE,
+    'admin/commerce/products/types/add' => TRUE,
+    'admin/commerce/products/types/*' => TRUE,
+    'admin/commerce/products/types/*/edit' => TRUE,
+    'admin/commerce/products/types/*/delete' => TRUE,
+  );
+
+  return $paths;
 }
 
 /**
