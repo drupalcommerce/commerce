@@ -1,0 +1,87 @@
+<?php
+// $Id$
+/**
+ * Test the product
+ */
+class CommerceProductTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce product api',
+      'description' => 'Tests the commerce product module',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('commerce_product');
+  }
+
+  /**
+   * Ensure base product types have been created.
+   */
+  function testCommerceProductDefaultProducts() {
+    $default_types = array(
+      'product' => 'Product',
+    );
+
+    // Load the default content types
+    $types_created = commerce_product_types();
+
+    // Ensure each type exists
+    foreach ($default_types as $type => $name) {    
+      $this->assertTRUE(!empty($types_created[$type]), t('Product type %type has been created', array('%type' => $type)), t('Commerce product'));
+    }
+  }
+
+  /**
+   * Test the product type crud
+   */
+  function testCommerceProductCrud() {
+
+    // Ensure commerce_product_type_new() returns a valid empty product type.
+    $new_product_type = commerce_product_type_new();
+    $this->assertTrue(isset($new_product_type->type), t('commerce_product_type_new() created the type element'), t('Commerce product'));
+    $this->assertTrue(isset($new_product_type->name), t('commerce_product_type_new() created the help element'), t('Commerce product'));
+    $this->assertTrue(isset($new_product_type->description), t('commerce_product_type_new() created the help element'), t('Commerce product'));
+    $this->assertTrue(isset($new_product_type->help), t('commerce_product_type_new() created the help element'), t('Commerce product'));
+
+    // Define values for testing.
+    $type = $this->randomName(20);
+    $name = $this->randomName(40);
+    $description = $this->randomString(128);
+    $help = $this->randomString(128);
+
+    // Add the values to the new content type.
+    $new_product_type->type = $type;
+    $new_product_type->name = $name;
+    $new_product_type->description = $description;
+    $new_product_type->help = $help;
+    $new_product_type->is_new = TRUE;
+
+    // Ensure content_product_type_save() returns the proper value when inserting.
+    $return = commerce_product_type_save($new_product_type);
+    $this->assertEqual($return, SAVED_NEW, t('commerce_product_type_save() returned SAVED_NEW when saving a new product type'), t('Comemrce product'));
+
+    // Load the newly saved content type.
+    $saved_product_type = commerce_product_type_load($type);
+
+    // Ensure the values that were saved match the values that we created.
+    $this->assertTrue(!empty($saved_product_type), t('commerce_product_type_load() loaded the new product type'), t('Commerce product'));
+    $this->assertEqual($type, $saved_product_type->type, t('The new product type field was properly saved and loaded'), t('Commerce product'));
+    $this->assertEqual($name, $saved_product_type->name, t('The new product type name was properly saved and loaded'), t('Commerce product'));
+    $this->assertEqual($description, $saved_product_type->description, t('The new product description text was properly saved and loaded'), t('Commerce product'));
+    $this->assertEqual($help, $saved_product_type->help, t('The new product help text was properly saved and loaded'), t('Commerce product'));
+
+    // Alter the title, to ensure the update function works.
+    $altered_name = $this->randomName(40);
+    $saved_product_type->name = $altered_name;
+
+    // Ensure content_product_type_save() returns the proper value when updating.
+    $return = commerce_product_type_save($saved_product_type);
+    $this->assertEqual($return, SAVED_UPDATED, t('commerce_product_type_save() returned SAVED_UPDATED when saving a new product type'), t('Comemrce product'));
+
+    // Ensure the altered title was saved to the database, and loaded.
+    $saved_product_type = commerce_product_type_load($type);
+    $this->assertEqual($saved_product_type->name, $altered_name, t('commerce_product_type_save() successfully updated the product type name.'), t('Commerce product'));
+  }
+}
