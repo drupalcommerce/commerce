@@ -52,6 +52,23 @@ function commerce_product_ui_views_default_views() {
       ),
       'relationship' => 'none',
     ),
+    'title' => array(
+      'label' => 'Title',
+      'alter' => array(
+        'alter_text' => 0,
+        'make_link' => 0,
+        'trim' => 0,
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'strip_tags' => 0,
+        'html' => 0,
+      ),
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'id' => 'title',
+      'table' => 'commerce_product',
+      'field' => 'title',
+    ),
   ));
   $handler->override_option('sorts', array(
     'product_sku' => array(

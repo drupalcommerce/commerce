@@ -157,6 +157,7 @@ function commerce_product_ui_type_form_submit($form, &$form_state) {
   $product_type->is_new = !$updated;
   commerce_product_type_save($product_type);
 
+  // Redirect based on the button clicked.
   drupal_set_message(t('Product type saved.'));
 
   if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {

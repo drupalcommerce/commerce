@@ -39,12 +39,22 @@ function commerce_product_ui_menu() {
       'title' => $type['name'],
       'title callback' => 'check_plain',
       'description' => $type['description'],
-      'page callback' => 'commerce_product_ui_create',
-      'page arguments' => array($type['product_type']),
-      'access arguments' => array('administer products'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_product_ui_product_form', (object) array('product_type' => $type['product_type'])),
+      'access callback' => 'commerce_product_ui_product_add_access',
+      'access arguments' => array($type['product_type']),
       'file' => 'commerce_product_ui.products.inc',
     );
   }
+
+  $items['admin/commerce/products/%commerce_product/edit'] = array(
+    'title' => 'Edit a product',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_ui_product_form', 3),
+    'access callback' => 'commerce_product_ui_product_edit_access',
+    'access arguments' => array(3),
+    'file' => 'commerce_product_ui.products.inc',
+  );
 
   $items['admin/commerce/products/types'] = array(
     'title' => 'Product types',
@@ -89,6 +99,42 @@ function commerce_product_ui_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Access callback: determine the user's ability to create a product.
+ *
+ * @param $product_type
+ *   The machine readable product type of the product the user wants to create.
+ * @return
+ *   TRUE or FALSE indicating the user's access.
+ */
+function commerce_product_ui_product_add_access($product_type) {
+  return user_access('administer products') || user_access('create ' . $product_type);
+}
+
+/**
+ * Access callback: determine the user's ability to edit a product.
+ *
+ * @param $product
+ *   The loaded product object.
+ * @return
+ *   TRUE or FALSE indicating the user's access.
+ */
+function commerce_product_ui_product_edit_access($product) {
+  global $user;
+
+  // Users with administer products and edit any permissions can always edit.
+  if (user_access('administer products') || user_access('edit any ' . $product->product_type)) {
+    return TRUE;
+  }
+
+  // Others either don't have any access or must match the product uid.
+  if ($user->uid && user_access('edit own ' . $product->product_type) && $product->uid == $user->uid) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**

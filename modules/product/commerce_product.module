@@ -56,7 +56,7 @@ function commerce_product_views_api() {
  * Implements hook_permission().
  */
 function commerce_product_permission() {
-  return array(
+  $permissions = array(
     'administer products' => array(
       'title' => t('Administer products'),
     ),
@@ -67,6 +67,23 @@ function commerce_product_permission() {
       'title' => t('Create products'),
     ),
   );
+
+  // Add product type specific permissions. Note that users with administer
+  // products permission should have access to do anything the permissions below
+  // grant a user to do.
+  foreach (commerce_product_types() as $type) {
+    $permissions['create ' . $type['product_type']] = array(
+      'title' => t('Create %type products', array('%type' => $type['name'])),
+    );
+    $permissions['edit any ' . $type['product_type']] = array(
+      'title' => t('Edit any %type product', array('%type' => $type['name'])),
+    );
+    $permissions['edit own ' . $type['product_type']] = array(
+      'title' => t('Edit own %type product', array('%type' => $type['name'])),
+    );
+  }
+
+  return $permissions;
 }
 
 /**
@@ -141,31 +158,31 @@ function commerce_product_type_title($product_type) {
 }
 
 /**
- * Loads a product by SKU.
+ * Loads a product by ID.
  */
-function commerce_product_load($product_sku) {
-  $products = commerce_product_load_multiple(array($product_sku), array());
+function commerce_product_load($product_id) {
+  $products = commerce_product_load_multiple(array($product_id), array());
   return $products ? reset($products) : FALSE;
 }
 
 /**
- * Loads multiple products by SKU.
+ * Loads multiple products by ID.
  *
  * @see entity_load()
  *
- * @param $product_skus
- *   An array of product SKUs.
+ * @param $product_ids
+ *   An array of product IDs.
  * @param $conditions
  *   An array of conditions on the {commerce_product} table in the form
  *     'field' => $value.
  * @param $reset
- *   Whether to reset the internal node_load cache.
+ *   Whether to reset the internal product loading cache.
  *
  * @return
  *   An array of product objects indexed by product_sku.
  */
-function commerce_product_load_multiple($product_skus = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('commerce_product', $product_skus, $conditions, $reset);
+function commerce_product_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_product', $product_ids, $conditions, $reset);
 }
 
 /**
@@ -220,5 +237,5 @@ function commerce_product_save($product) {
  * Returns the path to a product.
  */
 function commerce_product_path($product) {
-  return 'admin/commerce/products/edit/' . $product->product_sku;
+  return 'admin/commerce/products/' . $product->product_id . '/edit';
 }
