@@ -567,3 +567,16 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
 
   return $matches;
 }
+
+
+/**
+ * Handler to load the unchanged product variable for rules.
+ * @see commerce_product_rules_variables().
+ */
+function commerce_product_rules_var_unchanged($product) {
+  $unchanged = drupal_static('commerce_product_unchanged');
+  if (!isset($product->product_id) || !isset($unchanged[$product->product_id])) {
+    throw new RulesException("Unable to load the unchanged product variable.");
+  }
+  return $unchanged[$product->product_id];
+}

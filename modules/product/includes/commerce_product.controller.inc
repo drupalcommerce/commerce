@@ -27,9 +27,17 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
     try {
       $product->changed = time();
 
+      // Save a copy of the unchanged product for rules in case of updates.
+      // see commerce_product_rules_var_unchanged().
+      $unchanged = &drupal_static('commerce_product_unchanged', array());
+      if (!empty($product->product_id)) {
+        $unchanged[$product->product_id] = clone commerce_product_load($product->product_id);
+      }
+
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_product', $product);
       module_invoke_all('commerce_product_presave', $product);
+      rules_invoke_event('commerce_product_presave', $product);
 
       // If this is a new product...
       if (empty($product->product_id)) {
@@ -52,6 +60,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
 
       module_invoke_all('commerce_product_' . $op, $product);
       entity_invoke($op, 'commerce_product', $product);
+      rules_invoke_event('commerce_product_' . $op, $product);
 
       // Ignore slave server temporarily to give time for the
       // saved product to be propagated to the slave.
@@ -90,6 +99,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
         foreach ($products as $product_id => $product) {
           module_invoke_all('commerce_product_delete', $product);
           field_attach_delete('commerce_product', $product);
+          rules_invoke_event('commerce_product_delete', $product);
         }
 
         // Ignore slave server temporarily to give time for the
