@@ -19,6 +19,8 @@ function commerce_product_reference_field_info() {
       'settings' => array(
         'referenceable_types' => array(),
       ),
+      'property_type' => 'commerce_product',
+      'property_callbacks' => array('commerce_product_reference_property_info_callback'),
     ),
   );
 }
@@ -458,4 +460,16 @@ function commerce_product_reference_options_list($field) {
   }
 
   return $options;
+}
+
+/**
+ * Callback to alter the property info of the reference fields.
+ *
+ * @see commerce_product_reference_field_info().
+ */
+function commerce_product_reference_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = str_replace('_', '-', $field['field_name']);
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  $property['options list'] = 'entity_metadata_field_options_list';
+  unset($property['query callback']);
 }
