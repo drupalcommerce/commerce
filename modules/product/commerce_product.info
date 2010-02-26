@@ -10,7 +10,8 @@ files[] = commerce_product.module
 files[] = commerce_product.install
 
 ; Module includes
-files[] = commerce_product.controller.inc
+files[] = includes/commerce_product.controller.inc
+files[] = includes/commerce_product.types.inc
 files[] = includes/commerce_product.tokens.inc
 
 ; Views include
