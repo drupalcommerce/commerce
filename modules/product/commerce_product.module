@@ -11,7 +11,7 @@
 /**
  * Implements hook_menu().
  */
-function commerce_product_reference_menu() {
+function commerce_product_menu() {
   $items = array();
 
   $items['commerce_product/autocomplete'] = array(
