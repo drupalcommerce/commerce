@@ -1,0 +1,17 @@
+; $Id$
+name = Cart
+description = Implements the shopping cart system and add to cart features.
+package = Drupal Commerce
+dependencies[] = commerce
+core = 7.x
+
+; Base module files
+files[] = commerce_cart.module
+;files[] = commerce_cart.install
+
+; Views include
+; files[] = includes/views/commerce_cart.views.inc
+
+; Views handlers
+; files[] = includes/views/handlers/views_handler_field_add_to_cart_form.inc
+; files[] = includes/views/handlers/views_handler_field_add_to_cart_link.inc

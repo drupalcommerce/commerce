@@ -1,0 +1,145 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Implements the shopping cart system and add to cart features.
+ */
+
+
+/**
+ * Adds the specified product to a customer's shopping cart.
+ *
+ * @param $customer_uid
+ *   The uid of the user whose cart you are adding the product to.
+ * @param $product_id
+ *   The ID of the product to add to the cart.
+ * @return
+ *   The entire shopping cart order object.
+ */
+function commerce_cart_product_add($customer_uid, $product_id) {
+  // TODO: Create or load the shopping cart order for the specified customer,
+  // add the product appropriately, and return the full order object.
+
+  // return $order;
+}
+
+/**
+ * Builds an Add to Cart form for a set of products.
+ *
+ * @param $product_ids
+ *   An array of product IDs that will be included in the form.
+ * @return
+ *   The form array.
+ */
+function commerce_cart_form($form, &$form_state, $product_ids) {
+  $form = array();
+  global $user;
+
+  // Store the customer uid in the form so other modules can override with a
+  // selection widget if necessary.
+  $form['customer_uid'] = array(
+    '#type' => 'value',
+    '#value' => $user->uid,
+  );
+
+  // Load all the products intended for sale on this form.
+  $products = commerce_product_load_multiple($product_ids);
+
+  // If no products were returned...
+  if (count($products) == 0) {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Product not available'),
+      '#disabled' => TRUE,
+    );
+  }
+  else {
+    $form_state['products'] = $products;
+
+    if (count($products) == 1) {
+      $form['product_id'] = array(
+        '#type' => 'hidden',
+        '#value' => array_shift(array_keys($products)),
+      );
+    }
+    else {
+      $options = array();
+
+      foreach ($products as $product_id => $product) {
+        $options[$product_id] = check_plain($product->title);
+      }
+
+      $form['product_id'] = array(
+        '#type' => 'select',
+        '#options' => $options,
+      );
+    }
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add to cart'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Form submit handler: add the selected product to the cart.
+ */
+function commerce_cart_form_submit($form, &$form_state) {
+  $product_id = $form_state['values']['product_id'];
+  $product = $form_state['products'][$product_id];
+
+  // Add the product to the specified shopping cart.
+  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id);
+
+  drupal_set_message(t('%title added to your cart.', array('%title' => $product->title)));
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function commerce_cart_field_formatter_info() {
+  return array(
+    'commerce_cart_add_to_cart_form' => array(
+      'label' => t('Add to Cart form'),
+      'description' => t('Display an Add to Cart form for the referenced product.'),
+      'field types' => array('commerce_product_reference'),
+    ),
+    /**
+     * TODO: Determine how to best handle cart links through Rules and then
+     * develop the actual formatter_view for this.
+    'commerce_cart_add_to_cart_link' => array(
+      'label' => t('Add to Cart link'),
+      'description' => t('Display an Add to Cart link for the referenced product.'),
+      'field types' => array('commerce_product_reference'),
+    ),
+    **/
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function commerce_cart_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  // Collect the list of product IDs.
+  $product_ids = array();
+
+  foreach ($items as $delta => $item) {
+    $product_ids[$item['product_id']] = $item['product_id'];
+  }
+
+  switch ($display['type']) {
+    case 'commerce_cart_add_to_cart_form':
+      $result[0] = array(
+         '#markup' => drupal_render(drupal_get_form('commerce_cart_form', $product_ids)),
+       );
+      break;
+  }
+
+  return $result;
+}
