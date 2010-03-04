@@ -1,8 +1,9 @@
 ; $Id$
 name = Product UI
-description = Exposes a default UI for Products.
+description = Exposes a default UI for Products through product edit forms and default Views.
 package = Drupal Commerce UI
 core = 7.x
+dependencies[] = contextual
 dependencies[] = field_ui
 dependencies[] = commerce
 dependencies[] = commerce_product
