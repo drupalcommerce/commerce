@@ -8,7 +8,10 @@
 
 /**
  * Implement hook_install().
- */
+ *
+ * TODO: Uncomment this function when core supports creating fields during
+ * install that are defined by the module being installed.
+ *
 function commerce_price_install() {
   // Create a sell_price field.
   $field = array(
@@ -32,3 +35,4 @@ function commerce_price_install() {
   );
   field_create_instance($instance);
 }
+ */

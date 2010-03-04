@@ -1,8 +1,8 @@
 ; $Id$
-name = Commerce Commons
-description = Defines common features of the Drupal Commerce module package.
+name = Commerce
+description = Defines features and settings common to the Commerce modules.
 package = Drupal Commerce
-dependencies[] = rules
-files[] = commerce.module
 core = 7.x
-php = 5.2
+
+; Base module files
+files[] = commerce.module
