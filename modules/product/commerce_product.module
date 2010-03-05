@@ -392,7 +392,86 @@ function commerce_product_path($product) {
 }
 
 /**
- * Check product access.
+ * Performs token replacement on a SKU for valid tokens only.
+ *
+ * TODO: This function currently limits acceptable SKUs to Product ID and type
+ * with no ability to use Tokens for the Fields attached to the product. That
+ * might be fine for a core Token replacement, but we should at least open the
+ * $valid_tokens array up to other modules to enable various Tokens for use.
+ *
+ * @param $sku
+ *   The raw SKU string including any tokens as entered.
+ * @param $product
+ *   A product object used to perform token replacement on the SKU.
+ * @return
+ *   The SKU with tokens replaced or else FALSE if it included invalid tokens.
+ */
+function commerce_product_replace_sku_tokens($sku, $product) {
+  // Build an array of valid SKU tokens.
+  $valid_tokens = array('product-id', 'type');
+
+  // Ensure that only valid tokens were used.
+  $invalid_tokens = FALSE;
+
+  foreach (token_scan($sku) as $type => $token) {
+    if ($type !== 'product') {
+      $invalid_tokens = TRUE;
+    }
+    else {
+      foreach (array_keys($token) as $value) {
+        if (!in_array($value, $valid_tokens)) {
+          $invalid_tokens = TRUE;
+        }
+      }
+    }
+  }
+
+  // Register the error if an invalid token was detected.
+  if ($invalid_tokens) {
+    return FALSE;
+  }
+
+  return $sku;
+}
+
+/**
+ * Validates a SKU string for acceptable characters.
+ *
+ * @param $sku
+ *   The SKU string to validate.
+ * @return
+ *   TRUE or FALSE indicating whether or not the SKU contains valid characters.
+ */
+function commerce_product_validate_sku_characters($sku) {
+  return preg_match('!^[A-Za-z0-9_-]+$!', $sku);
+}
+
+/**
+ * Checks to see if a given SKU already exists for another product.
+ *
+ * @param $sku
+ *   The string to match against existing SKUs.
+ * @param $product_id
+ *   The ID of the product the SKU is for; an empty value represents the SKU is
+ *     meant for a new product.
+ * @return
+ *   TRUE or FALSE indicating whether or not the SKU exists for another product.
+ */
+function commerce_product_validate_sku_unique($sku, $product_id) {
+  // Look for an ID of a product matching the supplied SKU.
+  if ($match_id = db_query('SELECT product_id FROM {commerce_product} WHERE sku = :sku', array(':sku' => $sku))->fetchField()) {
+    // If this SKU is supposed to be for a new product or a product other than
+    // the one that matched...
+    if (empty($product_id) || $match_id != $product_id) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Checks product access for various operations.
  *
  * @param $op
  *   The operation being performed. One of 'view', 'update', 'create' or

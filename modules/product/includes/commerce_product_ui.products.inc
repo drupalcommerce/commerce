@@ -54,10 +54,11 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
   $form = array();
 
   // Add the default field elements.
+  // TODO: Update description to include the acceptable product tokens.
   $form['sku'] = array(
     '#type' => 'textfield',
     '#title' => t('Product SKU'),
-    '#description' => t('Supply a unique human readable identifier for this product. Accepts letters, numbers, dashes, underscores, and the product tokens [product:product-id] and [product:type].'),
+    '#description' => t('Supply a unique identifier for this product using letters, numbers, hypens, and underscores.'),
     '#default_value' => $product->sku,
     '#maxlength' => 128,
     '#required' => TRUE,
@@ -104,44 +105,33 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
  * Validation callback for commerce_product_ui_form().
  */
 function commerce_product_ui_product_form_validate($form, &$form_state) {
-  // Ensure that only valid tokens were used.
-  $valid_tokens = TRUE;
+  $product = $form_state['commerce_product'];
 
-  foreach (token_scan($form_state['values']['sku']) as $type => $token) {
-    if ($type !== 'product') {
-      $valid_tokens = FALSE;
-    }
-    else {
-      foreach (array_keys($token) as $value) {
-        if (!in_array($value, array('product-id', 'type'))) {
-          $valid_tokens = FALSE;
-        }
-      }
-    }
+  // TODO: Resolve workflow issues pertaining to token replacement in SKUs.
+  // Perform token replacement on the entered SKU.
+  // $sku = commerce_product_replace_sku_tokens($form_state['values']['sku'], $product);
+
+  // Until the above is resolved, simply use the SKU as entered with no tokens.
+  $sku = $form_state['values']['sku'];
+
+  // If invalid tokens were specified, throw an error.
+  if ($sku === FALSE) {
+    form_set_error('sku', 'The SKU contains invalid tokens.');
   }
+  else {
+    // Validate the remaining characters of the string.
+    if (!commerce_product_validate_sku_characters($sku)) {
+      form_set_error('sku', t('The SKU must contain only letters, numbers, hyphens, and underscores.'));
+    }
 
-  // Register the error if an invalid token was detected.
-  if (!$valid_tokens) {
-    form_set_error('sku', 'Product SKU contains invalid tokens.');
-  }
-
-  // Check the remaining characters of the string for validity by doing a test
-  // replacement of the tokens.
-  // TODO: Perform a regex match for alphanumeric, hyphen, and underscore
-  // characters once the tokens have been stripped out.
-
-  // Ensure the SKU entered is unique.
-  if ($product_id = db_query('SELECT product_id FROM {commerce_product} WHERE sku = :sku', array(':sku' => $form_state['values']['sku']))->fetchField()) {
-    if (empty($form_state['commerce_product']->product_id) || $product_id != $form_state['commerce_product']->product_id) {
+    // Ensure the proposed SKU is unique.
+    if (!commerce_product_validate_sku_unique($sku, $product->product_id)) {
       form_set_error('sku', 'This SKU is already in use and must be unique. Please supply another value.');
     }
   }
 
-  // Ensure the SKU is alphanumeric with only hyphens and underscores.
-  // TODO: Make this a validation API function in commerce_product.module.
-
-  // Notify field widgets.
-  field_attach_form_validate('commerce_product', $form_state['commerce_product'], $form, $form_state);
+  // Notify field widgets to validate their data.
+  field_attach_form_validate('commerce_product', $product, $form, $form_state);
 }
 
 /**
@@ -184,7 +174,8 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
 function commerce_product_ui_product_delete_form($form, &$form_state, $product) {
   $form_state['product'] = $product;
 
-  // TODO: Replace the SKU in the description parameter with the product view.
+  // TODO: Replace the SKU in the description parameter with the product view
+  // per http://drupal.org/node/733044.
 
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),

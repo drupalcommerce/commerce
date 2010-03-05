@@ -405,7 +405,7 @@ function commerce_product_reference_field_widget_error($element, $error) {
  * Implements hook_field_prepare_translation().
  *
  * When preparing a translation, load any translations of existing references.
- * @todo Core doc: "This hook may or may not survive in Field API".
+ * TODO: Core doc: "This hook may or may not survive in Field API".
  * So it is currently not verified.
  *
 function node_reference_field_prepare_translation($obj_type, $object, $field, $instance, $langcode, &$items) {
