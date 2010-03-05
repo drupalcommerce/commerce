@@ -78,33 +78,33 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
  */
 function commerce_product_reference_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
   // Extract product_ids to check.
-  $ids = array();
+  $product_ids = array();
 
   // First check non-numeric product_id's to avoid losing time with them.
   foreach ($items as $delta => $item) {
     if (is_array($item) && !empty($item['product_id'])) {
       if (is_numeric($item['product_id'])) {
-        $ids[] = $item['product_id'];
+        $product_ids[] = $item['product_id'];
       }
       else {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_product_id',
-          'message' => t("%name: invalid input.", array('%name' => $instance['label'])),
+          'message' => t('%name: you have specified an invalid product for this field.', array('%name' => $instance['label'])),
         );
       }
     }
   }
 
   // Prevent performance hog if there are no ids to check.
-  if ($ids) {
-    $refs = commerce_product_match_products($field, '', NULL, $ids);
+  if ($product_ids) {
+    $refs = commerce_product_match_products($field, '', NULL, $product_ids);
 
     foreach ($items as $delta => $item) {
       if (is_array($item)) {
         if (!empty($item['product_id']) && !isset($refs[$item['product_id']])) {
           $errors[$field['field_name']][$langcode][$delta][] = array(
             'error' => 'invalid_product_id',
-            'message' => t("%name: this product can't be referenced.", array('%name' => $instance['label'])),
+            'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $instance['label'])),
           );
         }
       }
@@ -368,23 +368,20 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
 
 /**
  * Validation callback for a commerce_product_reference autocomplete element.
- *
- * TODO: Validate by product type if specified.
  */
 function commerce_product_reference_autocomplete_validate($element, &$form_state, $form) {
-  $field = $form['#fields'][$element['#field_name']]['field'];
-  $instance = $form['#fields'][$element['#field_name']]['instance'];
-
+  // If a value was entered into the autocomplete...
   if (!empty($element['#value'])) {
     // Translate SKUs into product IDs.
     $typed_skus = drupal_explode_tags($element['#value']);
 
     $value = array();
 
+    // Loop through all the entered SKUs...
     foreach ($typed_skus as $typed_sku) {
-      // See if the SKU exists in the valid product types and return the tid.
-      if ($products = commerce_product_load_multiple(array(), array('sku' => trim($typed_sku)))) {
-        $product = array_pop($products);
+      // To see if the product actually exists...
+      if ($product = commerce_product_load_by_sku(trim($typed_sku))) {
+        // And store its product ID for later validation.
         $value[] = array('product_id' => $product->product_id);
       }
     }
@@ -393,6 +390,7 @@ function commerce_product_reference_autocomplete_validate($element, &$form_state
     $value = array();
   }
 
+  // Update the value of this element so the field can validate the product IDs.
   form_set_value($element, $value, $form_state);
 }
 
