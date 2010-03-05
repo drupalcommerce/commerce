@@ -85,7 +85,7 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
           break;
 
         case 'type':
-          $replacements[$original] = $sanitize ? check_plain($product->type) : $product->type;
+          $replacements[$original] = $sanitize ? check_plain(commerce_product_type_get_name($product->type)) : commerce_product_type_get_name($product->type);
           break;
 
         case 'title':
@@ -104,7 +104,7 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
     }
 
     if ($created_tokens = token_find_with_prefix($tokens, 'created')) {
-      $replacements += token_generate('date', $created_tokens, array('date' => $product_id->created), $options);
+      $replacements += token_generate('date', $created_tokens, array('date' => $product->created), $options);
     }
   }
 

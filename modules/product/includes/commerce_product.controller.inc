@@ -14,12 +14,32 @@
 class CommerceProductEntityController extends DrupalDefaultEntityController {
 
   /**
+   * Create a default product.
+   *
+   * @param $type
+   *   The machine-readable type of the product.
+   * @return
+   *   A product object with all default fields initialized.
+   */
+  public function create($type = '') {
+    return (object) array(
+      'product_id' => '',
+      'sku' => '',
+      'type' => $type,
+      'title' => '',
+      'uid' => '',
+      'created' => '',
+      'changed' => '',
+    );
+  }
+
+  /**
    * Saves a product.
    *
    * @param $product
-   *
+   *   The full product object to save.
    * @return
-   *   TRUE on success, FALSE otherwise.
+   *   The saved product object on success, FALSE on failure.
    */
   public function save($product) {
     $transaction = db_transaction();
@@ -66,7 +86,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       // saved product to be propagated to the slave.
       db_ignore_slave();
 
-      return TRUE;
+      return $product;
     }
     catch (Exception $e) {
       $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
@@ -117,26 +137,5 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
     }
 
     return TRUE;
-  }
-
-  /**
-   * Create a default product.
-   *
-   * @param $type
-   *   The machine-readable type of the product.
-   *
-   * @return
-   *   A product object with all default fields initialized.
-   */
-  public function create($type = '') {
-    return (object) array(
-      'product_id' => '',
-      'sku' => '',
-      'type' => $type,
-      'title' => '',
-      'uid' => '',
-      'created' => '',
-      'changed' => '',
-    );
   }
 }
