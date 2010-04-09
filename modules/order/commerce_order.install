@@ -1,0 +1,77 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_order_schema() {
+  $schema = array();
+
+  $schema['commerce_order'] = array(
+    'description' => 'The base table for orders.',
+    'fields' => array(
+      'order_id' => array(
+        'description' => 'The primary identifier for an order.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_number' => array(
+        'description' => 'The order number displayed to the customer.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'revision_id' => array(
+        'description' => 'The current {commerce_order_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'creator_uid' => array(
+        'description' => 'The {users}.uid that created this order.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'customer_uid' => array(
+        'description' => 'The {users}.uid that placed this order.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'mail' => array(
+        'description' => 'The e-mail address associated with the order.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the order was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the oorder was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+
+    ),
+    'primary key' => array('order_id'),
+    'unique keys' => array(
+      'order_number' => array('order_number'),
+      'revision_id' => array('revision_id'),
+    ),
+    'foreign keys' => array(
+      'revision_id' => array('commerce_order_revision' => 'revision_id'),
+      'creator_uid' => array('users' => 'uid'),
+      'customer_uid' => array('users' => 'uid'),
+    ),
+  );
+
+  return $schema;
+}

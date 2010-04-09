@@ -1,0 +1,373 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines the core Commerce order entity and API functions to manage orders and
+ * interact with them.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function commerce_order_entity_info() {
+  $return = array(
+    'commerce_order' => array(
+      'label' => t('Order'),
+      'controller class' => 'CommerceOrderEntityController',
+      'base table' => 'commerce_order',
+      'fieldable' => TRUE,
+      'object keys' => array(
+        'id' => 'order_id',
+        'revision' => 'revision_id',
+      ),
+      'bundles' => array(
+        'order' => array(
+          'label' => t('Order'),
+        ),
+      ),
+      'load hook' => 'commerce_order_load',
+      'view modes' => array(
+        'customer' => array(
+          'label' => t('Customer'),
+        ),
+        'administrator' => array(
+          'label' => t('Administrator'),
+        ),
+      ),
+      'creation callback' => '_commerce_order_create',
+      'save callback' => 'commerce_order_save',
+      'deletion callback' => 'commerce_order_delete',
+      'access callback' => 'commerce_order_access',
+    ),
+  );
+
+  return $return;
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function commerce_order_field_extra_fields() {
+  $extra = array();
+
+  $extra['commerce_order']['order'] = array(
+    'customer' => array(
+      'label' => 'Customer',
+      'description' => t('Order module Customer information fieldset'),
+      'weight' => -5,
+    ),
+    'creator' => array(
+      'label' => 'Creation information',
+      'description' => t('Order module Creation date / user fieldset'),
+      'weight' => 0,
+    ),
+  );
+
+  return $extra;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_order_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_order') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_order_permission() {
+  $permissions = array(
+    'administer orders' => array(
+      'title' => t('Administer orders'),
+    ),
+    'administer line item types' => array(
+      'title' => t('Administer line item types'),
+    ),
+    'access orders' => array(
+      'title' => t('Access lists of orders, primarily for viewing and referencing'),
+    ),
+    'create orders' => array(
+      'title' => t('Create orders'),
+    ),
+    'edit any order' => array(
+      'title' => t('Edit any order'),
+    ),
+    'edit own orders' => array(
+      'title' => t('Edit own orders'),
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Returns an initialized order object.
+ *
+ * @param $customer_uid
+ *   The uid of the customer the order is for.
+ * @return
+ *   An order object with all default fields initialized.
+ */
+function commerce_order_new($customer_uid = 0) {
+  return entity_get_controller('commerce_order')->create($customer_uid);
+}
+
+/**
+ * Creation callback for the Entity Metadata module.
+ */
+function _commerce_order_create($values = array()) {
+  // Create a new order for the specified customer.
+  $order = commerce_order_new($values['customer_uid']);
+  unset($values['customer_uid']);
+
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  foreach ($values as $name => $value) {
+    $wrapper->$name->set($value);
+  }
+
+  return $wrapper;
+}
+
+/**
+ * Saves an order.
+ *
+ * @param $order
+ *   The full order object to save.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_order_save($order) {
+  return entity_get_controller('commerce_order')->save($order);
+}
+
+/**
+ * Loads an order by ID.
+ */
+function commerce_order_load($order_id) {
+  $orders = commerce_order_load_multiple(array($order_id), array());
+  return $orders ? reset($orders) : FALSE;
+}
+
+/**
+ * Loads an order by number.
+ */
+function commerce_order_load_by_sku($order_number) {
+  $orders = commerce_order_load_multiple(array(), array('order_number' => $order_number));
+  return $orders ? reset($orders) : FALSE;
+}
+
+/**
+ * Loads multiple orders by ID or based on a set of matching conditions.
+ *
+ * @see entity_load()
+ *
+ * @param $order_ids
+ *   An array of order IDs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_order} table in the form
+ *     'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal order loading cache.
+ *
+ * @return
+ *   An array of order objects indexed by order_id.
+ */
+function commerce_order_load_multiple($order_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_order', $order_ids, $conditions, $reset);
+}
+
+/**
+ * Deletes an order by ID.
+ *
+ * @param $order_id
+ *   The ID of the order to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_order_delete($order_id) {
+  return commerce_order_delete_multiple(array($order_id));
+}
+
+/**
+ * Deletes multiple orders by ID.
+ *
+ * @param $order_ids
+ *   An array of order IDs to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_order_delete_multiple($order_ids) {
+  return entity_get_controller('commerce_order')->delete($order_ids);
+}
+
+/**
+ * Performs token replacement on an order number for valid tokens only.
+ *
+ * TODO: This function currently limits acceptable Tokens to Order ID with no
+ * ability to use Tokens for the Fields attached to the order. That might be
+ * fine for a core Token replacement, but we should at least open the
+ * $valid_tokens array up to other modules to enable various Tokens for use.
+ *
+ * @param $order_number
+ *   The raw order number string including any tokens as entered.
+ * @param $order
+ *   An order object used to perform token replacement on the number.
+ * @return
+ *   The number with tokens replaced or FALSE if it included invalid tokens.
+ */
+function commerce_order_replace_number_tokens($order_number, $order) {
+  // Build an array of valid order number tokens.
+  $valid_tokens = array('order-id');
+
+  // Ensure that only valid tokens were used.
+  $invalid_tokens = FALSE;
+
+  foreach (token_scan($order_number) as $type => $token) {
+    if ($type !== 'order') {
+      $invalid_tokens = TRUE;
+    }
+    else {
+      foreach (array_keys($token) as $value) {
+        if (!in_array($value, $valid_tokens)) {
+          $invalid_tokens = TRUE;
+        }
+      }
+    }
+  }
+
+  // Register the error if an invalid token was detected.
+  if ($invalid_tokens) {
+    return FALSE;
+  }
+
+  return $order_number;
+}
+
+/**
+ * Validates an order number string for acceptable characters.
+ *
+ * @param $order_number
+ *   The order number string to validate.
+ * @return
+ *   TRUE or FALSE indicating whether or not the order number contains valid
+ *     characters.
+ */
+function commerce_order_validate_number_characters($order_number) {
+  return preg_match('!^[A-Za-z0-9_-]+$!', $order_number);
+}
+
+/**
+ * Checks to see if a given order number already exists for another order.
+ *
+ * @param $order_number
+ *   The string to match against existing order numbers.
+ * @param $order_id
+ *   The ID of the order the number is for; an empty value represents the number
+ *     is meant for a new order.
+ * @return
+ *   TRUE or FALSE indicating whether or not the number exists for another
+ *     order.
+ */
+function commerce_order_validate_number_unique($order_number, $order_id) {
+  // Look for an ID of an order matching the supplied number.
+  if ($match_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_number = :order_number', array(':order_number' => $order_number))->fetchField()) {
+    // If this number is supposed to be for a new order or an order other than
+    // the one that matched...
+    if (empty($order_id) || $match_id != $order_id) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Checks order access for various operations.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $order
+ *   Optionally an order to check access for.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the current user.
+ */
+function commerce_order_access($op, $order = NULL, $account = NULL) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  if (user_access('administer orders', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'view' && user_access('access orders', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'create' && user_access('create orders', $account)) {
+    return TRUE;
+  }
+
+  if (isset($order) && ($op == 'update' || $op == 'delete')) {
+    if (user_access('edit any order')) {
+      return TRUE;
+    }
+
+    // Others either don't have any access or must match the order uid.
+    if ($account->uid && user_access('edit own orders', $account) && $order->creator_uid == $account->uid) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Callback for getting order properties.
+ * @see commerce_order_entity_property_info()
+ */
+function commerce_order_get_properties($order, array $options, $name) {
+  switch ($name) {
+    case 'creator':
+      return $order->creator_uid;
+    case 'customer':
+      return $order->customer_uid;
+    case 'view-url':
+      return url('order/' . $order->order_id, $options);
+    case 'admin-url':
+      return url('admin/commerce/orders/' . $order->order_id, $options);
+    case 'edit-url':
+      return url('admin/commerce/orders/' . $order->order_id . '/edit', $options);
+  }
+}
+
+/**
+ * Callback for setting order properties.
+ * @see commerce_order_entity_property_info()
+ */
+function commerce_order_set_properties($order, $name, $value) {
+  if ($name == 'creator') {
+    $order->creator_uid = $value;
+  }
+  elseif ($name == 'customer') {
+    $order->customer_uid = $value;
+  }
+}
+
+/**
+ * Handler to load the unchanged order variable for rules.
+ * @see commerce_order_rules_variables().
+ */
+function commerce_order_rules_var_unchanged($order) {
+  $unchanged = drupal_static('commerce_order_unchanged');
+
+  if (isset($order->order_id) && isset($unchanged[$order->order_id])) {
+    return $unchanged[$order->order_id];
+  }
+}

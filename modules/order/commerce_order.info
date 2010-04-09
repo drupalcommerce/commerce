@@ -1,0 +1,26 @@
+; $Id$
+name = Order
+description = Defines the Order and Line Item entities and associated features.
+package = Drupal Commerce
+dependencies[] = rules
+; dependencies[] = commerce_line_item
+core = 7.x
+
+; Base module files
+files[] = commerce_order.module
+files[] = commerce_order.install
+
+; Module includes
+files[] = includes/commerce_order.controller.inc
+
+; Views include
+files[] = includes/views/commerce_order.views.inc
+
+; Views handlers
+files[] = includes/views/handlers/views_handler_field_commerce_order.inc
+files[] = includes/views/handlers/views_handler_field_commerce_order_link.inc
+files[] = includes/views/handlers/views_handler_field_commerce_order_link_delete.inc
+files[] = includes/views/handlers/views_handler_field_commerce_order_link_edit.inc
+
+; Simple tests
+; files[] = tests/commerce_order.test
