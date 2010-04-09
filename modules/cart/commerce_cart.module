@@ -27,7 +27,7 @@ function commerce_cart_order_load($customer_uid = 0) {
     // If a customer uid was specified...
     if ($customer_uid) {
       // Look for an existing shopping cart order.
-      // TODO: Find an order assigned to this user that is in checkout.
+      // TODO: Find an order assigned to this user that is in the cart status.
       $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid ORDER BY order_id ASC', array(':customer_uid' => $customer_uid))->fetchField();
     }
     else {
@@ -104,34 +104,69 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
     $order = commerce_cart_order_new($customer_uid);
   }
 
-  // TODO: Determine if the product already exists on the order and increment
-  // its quantity instead of adding a new line if it does.
+  // Determine if the product already exists on the order and increment its
+  // quantity instead of adding a new line if it does.
+  $line_item_match = NULL;
 
-  // Add the product to the order.
-  // TODO: Create an API function in the line item module for adding a new line
-  // item of any type to an order.
-  $line_item = commerce_line_item_new('product');
-  $line_item->line_item_label = $product->sku;
-  $line_item->quantity = $quantity;
+  // If the order has line items on it...
+  if (!empty($order->line_items)) {
+    $line_item_ids = array();
 
-  // Reference the product.
-  $line_item->product = array(
-    LANGUAGE_NONE => array(
-      array(
-        'product_id' => $product->product_id,
+    // Build an array of the line item IDs.
+    foreach ($order->line_items[LANGUAGE_NONE] as $line_item_reference) {
+      $line_item_ids[] = $line_item_reference['line_item_id'];
+    }
+
+    // Loop through the line items looking for products.
+    foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+      // If this line item matches the product being added...
+      if (empty($line_item_match) &&
+          $line_item->type == 'product' &&
+          $line_item->product[LANGUAGE_NONE][0]['product_id'] == $product_id) {
+        // Exit this loop with the $line_item intact so it gets updated.
+        $line_item_match = clone($line_item);
+      }
+    }
+  }
+
+  // If no matching line item was found...
+  if (empty($line_item_match)) {
+    // Add the product to the order.
+
+    // TODO: Create an API function in the line item module for adding a new line
+    // item of any type to an order.
+    $line_item = commerce_line_item_new('product');
+    $line_item->line_item_label = $product->sku;
+    $line_item->quantity = $quantity;
+
+    // Reference the product.
+    $line_item->product = array(
+      LANGUAGE_NONE => array(
+        array(
+          'product_id' => $product_id,
+        ),
       ),
-    ),
-  );
+    );
 
-  // Save the line item and add it to the order.
-  $line_item = commerce_line_item_save($line_item);
+    // Save the line item and add it to the order.
+    $line_item = commerce_line_item_save($line_item);
 
-  $order->line_items[LANGUAGE_NONE][] = array(
-    'line_item_id' => $line_item->line_item_id,
-  );
+    $order->line_items[LANGUAGE_NONE][] = array(
+      'line_item_id' => $line_item->line_item_id,
+    );
 
-  // Save and return the order.
-  return commerce_order_save($order);
+    // Save the updated order.
+    commerce_order_save($order);
+  }
+  else {
+    // Increment the quantity of the line item and save it.
+    $line_item->quantity += $quantity;
+
+    commerce_line_item_save($line_item);
+  }
+
+  // Return the order.
+  return $order;
 }
 
 /**
@@ -143,7 +178,6 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
  *   The form array.
  */
 function commerce_cart_form($form, &$form_state, $product_ids) {
-  $form = array();
   global $user;
 
   // Store the customer uid in the form so other modules can override with a
