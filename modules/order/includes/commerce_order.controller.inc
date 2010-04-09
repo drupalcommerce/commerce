@@ -20,7 +20,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    * @return
    *   An order object with all default fields initialized.
    */
-  public function create($customer_uid = 0) {
+  public function create($customer_uid = 0, $status = '') {
     return (object) array(
       'order_id' => '',
       'order_number' => '',
@@ -28,6 +28,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       'creator_uid' => '',
       'customer_uid' => $customer_uid,
       'mail' => '',
+      'status' => $status,
       'created' => '',
       'changed' => '',
     );

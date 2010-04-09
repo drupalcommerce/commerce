@@ -83,6 +83,25 @@ function commerce_order_views_data() {
     ),
   );
 
+  // Expose the order status.
+  $data['commerce_order']['status'] = array(
+    'title' => t('Order status'),
+    'help' => t('The workflow status of the order.'),
+    'field' => array(
+      'handler' => 'views_handler_field_commerce_order_status',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Expose the created and changed timestamps.
   $data['commerce_order']['created'] = array(
     'title' => t('Created date'),
@@ -163,6 +182,9 @@ function commerce_order_views_handlers() {
       ),
       'views_handler_field_commerce_order_link_delete' => array(
         'parent' => 'views_handler_field_commerce_order_link',
+      ),
+      'views_handler_field_commerce_order_status' => array(
+        'parent' => 'views_handler_field_commerce_order',
       ),
     ),
   );

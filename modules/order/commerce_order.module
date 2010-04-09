@@ -114,6 +114,69 @@ function commerce_order_permission() {
 }
 
 /**
+ * Implements hook_commerce_order_state_info().
+ */
+function commerce_order_commerce_order_state_info() {
+  $order_states = array();
+
+  $order_states['canceled'] = (object) array(
+    'name' => 'canceled',
+    'title' => t('Canceled'),
+    'description' => t('Orders in this state have been canceled through some user action.'),
+    'weight' => -10,
+    'default_status' => 'canceled',
+  );
+  $order_states['pending'] = (object) array(
+    'name' => 'pending',
+    'title' => t('Pending'),
+    'description' => t('Orders in this state have been created and are awaiting further action.'),
+    'weight' => 0,
+    'default_status' => 'pending',
+  );
+  $order_states['completed'] = (object) array(
+    'name' => 'complete',
+    'title' => t('Completed'),
+    'description' => t('Orders in this state have been completed as far as the customer is concerned.'),
+    'weight' => 10,
+    'default_status' => 'complete',
+  );
+
+  return $order_states;
+}
+
+/**
+ * Implements hook_commerce_order_status_info().
+ */
+function commerce_order_commerce_order_status_info() {
+  $order_statuses = array();
+
+  $order_statuses['canceled'] = (object) array(
+    'name' => 'canceled',
+    'title' => t('Canceled'),
+    'state' => 'canceled',
+    'weight' => 0,
+    'status' => 1,
+  );
+  $order_statuses['pending'] = (object) array(
+    'name' => 'pending',
+    'title' => t('Pending'),
+    'state' => 'pending',
+    'weight' => 0,
+    'status' => 1,
+  );
+  $order_statuses['completed'] = (object) array(
+    'name' => 'completed',
+    'title' => t('Completed'),
+    'state' => 'completed',
+    'weight' => 0,
+    'status' => 1,
+  );
+
+  return $order_statuses;
+}
+
+
+/**
  * Returns an initialized order object.
  *
  * @param $customer_uid
@@ -121,8 +184,14 @@ function commerce_order_permission() {
  * @return
  *   An order object with all default fields initialized.
  */
-function commerce_order_new($customer_uid = 0) {
-  return entity_get_controller('commerce_order')->create($customer_uid);
+function commerce_order_new($customer_uid = 0, $status = '') {
+  // If no status was specified, use the default Pending status.
+  if (empty($status)) {
+    $order_state = commerce_order_state_load('pending');
+    $status = $order_state->default_status;
+  }
+
+  return entity_get_controller('commerce_order')->create($customer_uid, $status);
 }
 
 /**
@@ -337,66 +406,169 @@ function commerce_order_validate_number_unique($order_number, $order_id) {
 }
 
 /**
- * Returns an initialized order status object.
+ * Returns an array of all the order states keyed by name.
  *
- * @return
- *   An order status object with all default fields initialized.
+ * Order states can only be defined by modules but may have settings overridden
+ * that are stored in the database (weight and the default status). When this
+ * function is first called, it will load all the states as defined by
+ * hook_commerce_order_state_info() and update them based on the data in the
+ * database. The final array will be cached for subsequent calls.
  */
-function commerce_order_status_new() {
-  return (object) array(
-    'status_id' => 0,
-    'order_status' => '',
-    'title' => '',
-    'weight' => 0,
-    'disabled' => 0,
-  );
+function commerce_order_states() {
+  // First check the static cache for an order states array.
+  $order_states = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the statuses now.
+  if (empty($order_states)) {
+    $order_states = module_invoke_all('commerce_order_state_info');
+
+    $saved_states = db_query('SELECT * FROM {commerce_order_state}')->fetchAllAssoc('name');
+
+    foreach ((array) $saved_states as $name => $data) {
+      $order_states[$name]->weight = $data->weight;
+      $order_states[$name]->default_status = $data->default_status;
+      $order_states[$name]->saved = TRUE;
+    }
+
+    // Give other modules a chance to alter the order states.
+    drupal_alter('commerce_order_state_info', $order_states);
+
+    uasort($order_states, 'commerce_sort_weight');
+  }
+
+  return $order_states;
 }
 
 /**
- * Saves an order status.
+ * Resets the cached list of order statuses.
+ */
+function commerce_order_states_reset() {
+  $order_statuses = &drupal_static('commerce_order_statuses');
+  $order_statuses = NULL;
+}
+
+/**
+ * Saves the configuration of an order state.
  *
- * @param $order_status
- *   The full order status object to save.
+ * @param $order_state
+ *   The fully loaded order state object.
  * @return
- *   The saved order status object.
+ *   The return value of the call to drupal_write_record() to save the order
+ *     state, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
+ *     the type of query performed to save the order state.
  */
-function commerce_order_status_save($order_status) {
-  drupal_write_record('commerce_order_status', $order_status, !empty($order_status->status_id) ? 'status_id' : NULL);
+function commerce_order_state_save($order_state) {
+  return drupal_write_record('commerce_order_state', $order_state, empty($order_state->saved) ? 'name' : NULL);
 }
 
 /**
- * Loads an order status by ID.
+ * Returns an order state object.
+ *
+ * @param $name
+ *   The machine readable name string of the state to return.
+ * @return
+ *   The fully loaded state object or FALSE if not found.
  */
-function commerce_order_status_load($status_id) {
-  $order_statuses = commerce_order_statuses();
+function commerce_order_state_load($name) {
+  $order_states = commerce_order_states();
 
-  return isset($order_statuses[$status_id]) ? $order_statuses[$status_id] : FALSE;
+  if (isset($order_states[$name])) {
+    return $order_states[$name];
+  }
+
+  return FALSE;
 }
 
 /**
- * Deletes an order status by ID.
+ * Resets an order state by name to its module defined defaults.
  */
-function commerce_order_status_delete($status_id) {
-  $order_status = commerce_order_status_load($status_id);
-
-  db_delete('commerce_order_status')
-    ->condition('status_id', $status_id)
+function commerce_order_state_reset($name) {
+  db_delete('commerce_order_state')
+    ->condition('name', $name)
     ->execute();
-
-  // Notify other modules that this order status has been deleted.
-  module_invoke_all('commerce_order_status_delete', $order_status);
 }
 
 /**
- * Returns an array of order status objects keyed by status_id.
+ * Returns the human readable title of any or all order states.
+ *
+ * @param $name
+ *   Optional parameter specifying the status_id of the order status whose title
+ *     to return.
+ * @return
+ *   Either an array of all order status titles keyed by the status_id or a
+ *     string containing the human readable title for the specified status. If a
+ *     status is specified that does not exist, this function returns FALSE.
  */
-function commerce_order_statuses() {
+function commerce_order_state_get_title($name = NULL) {
+  $order_states = commerce_order_states();
+
+  // Return a state title if specified and it exists.
+  if (!empty($name)) {
+    if (isset($order_states[$name])) {
+      return $order_states[$name]->title;
+    }
+    else {
+      // Return FALSE if it does not exist.
+      return FALSE;
+    }
+  }
+
+  // Otherwise turn the array values into the status title only.
+  foreach ($order_states as $key => $value) {
+    $order_states[$key] = $value->title;
+  }
+
+  return $order_states;
+}
+
+/**
+ * Returns an array of some or all of the order statuses keyed by name.
+ *
+ * Order statuses can only be defined by modules but may have settings
+ * overridden that are stored in the database (weight and status). When this
+ * function is first called, it will load all the statuses as defined by
+ * hook_commerce_order_status_info() and update them based on the data in the
+ * database. The final array will be cached for subsequent calls.
+ *
+ * @param $state
+ *   Optionally specify the name of an order state to limit the returned values
+ *     to that particular state.
+ * @return
+ *   An array containing some or all of the defined order status objects.
+ */
+function commerce_order_statuses($state = '') {
   // First check the static cache for an order statuses array.
   $order_statuses = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch the statuses now.
-  if (!isset($order_statuses)) {
-    $order_statuses = db_query('SELECT * FROM {commerce_order_status}')->fetchAllAssoc('status_id');
+  if (empty($order_statuses)) {
+    $order_statuses = module_invoke_all('commerce_order_status_info');
+
+    $saved_statuses = db_query('SELECT * FROM {commerce_order_status}')->fetchAllAssoc('name');
+
+    foreach ((array) $saved_statuses as $name => $data) {
+      $order_statuses[$name]->weight = $data->weight;
+      $order_statuses[$name]->status = $data->status;
+      $order_statuses[$name]->saved = TRUE;
+    }
+
+    // Give other modules a chance to alter the order statuses.
+    drupal_alter('commerce_order_status_info', $order_statuses);
+
+    uasort($order_statuses, 'commerce_sort_weight');
+  }
+
+  // If an order state was specified, return only those results.
+  if (!empty($state)) {
+    $filtered_statuses = clone($order_statuses);
+
+    foreach ($filtered_statuses as $name => $data) {
+      if ($data->state != $state) {
+        unset($filtered_statuses[$name]);
+      }
+    }
+
+    return $filtered_statuses;
   }
 
   return $order_statuses;
@@ -411,23 +583,64 @@ function commerce_order_statuses_reset() {
 }
 
 /**
+ * Saves the configuration of an order status.
+ *
+ * @param $order_status
+ *   The fully loaded order status object.
+ * @return
+ *   The return value of the call to drupal_write_record() to save the order
+ *     status, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
+ *     the type of query performed to save the order status.
+ */
+function commerce_order_status_save($order_status) {
+  return drupal_write_record('commerce_order_status', $order_status, empty($order_status->saved) ? 'name' : NULL);
+}
+
+/**
+ * Returns an order status object.
+ *
+ * @param $name
+ *   The machine readable name string of the status to return.
+ * @return
+ *   The fully loaded status object or FALSE if not found.
+ */
+function commerce_order_status_load($name) {
+  $order_statuses = commerce_order_statuses();
+
+  if (isset($order_statuses[$name])) {
+    return $order_statuses[$name];
+  }
+
+  return FALSE;
+}
+
+/**
+ * Resets an order status by name to its module defined defaults.
+ */
+function commerce_order_status_reset($name) {
+  db_delete('commerce_order_status')
+    ->condition('name', $name)
+    ->execute();
+}
+
+/**
  * Returns the human readable title of any or all order statuses.
  *
- * @param $status_id
- *   Optional parameter specifying the status_id of the order status whose title
+ * @param $name
+ *   Optional parameter specifying the name of the order status whose title
  *     to return.
  * @return
  *   Either an array of all order status titles keyed by the status_id or a
  *     string containing the human readable title for the specified status. If a
  *     status is specified that does not exist, this function returns FALSE.
  */
-function commerce_order_status_get_title($status_id = NULL) {
+function commerce_order_status_get_title($name = NULL) {
   $order_statuses = commerce_order_statuses();
 
   // Return a status title if specified and it exists.
-  if (!empty($status_id)) {
-    if (isset($order_statuses[$status_id])) {
-      return $order_statuses[$status_id]->title;
+  if (!empty($name)) {
+    if (isset($order_statuses[$name])) {
+      return $order_statuses[$name]->title;
     }
     else {
       // Return FALSE if it does not exist.

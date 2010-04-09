@@ -9,6 +9,41 @@
  * special considerations to associate it with a user and
  */
 
+
+/**
+ * Implements hook_commerce_order_state_info().
+ */
+function commerce_cart_commerce_order_state_info() {
+  $order_states = array();
+
+  $order_states['cart'] = (object) array(
+    'name' => 'cart',
+    'title' => t('Shopping cart'),
+    'description' => t('Orders in this state have not been completed by the customer yet.'),
+    'weight' => -5,
+    'default_status' => 'cart',
+  );
+
+  return $order_states;
+}
+
+/**
+ * Implements hook_commerce_order_status_info().
+ */
+function commerce_cart_commerce_order_status_info() {
+  $order_statuses = array();
+
+  $order_statuses['cart'] = (object) array(
+    'name' => 'cart',
+    'title' => t('Shopping cart'),
+    'state' => 'cart',
+    'weight' => 0,
+    'status' => 2,
+  );
+
+  return $order_statuses;
+}
+
 /**
  * Loads the shopping cart order for the specified user.
  *
@@ -70,10 +105,8 @@ function commerce_cart_orders_reset() {
  *   The newly created shopping cart order object.
  */
 function commerce_cart_order_new($customer_uid = 0) {
-  // Create the new order.
-  $order = commerce_order_new($customer_uid);
-
-  // TODO: Set it to the shopping cart order status.
+  // Create the new order with the customer's uid and the cart order status.
+  $order = commerce_order_new($customer_uid, 'cart');
 
   // Save it so it gets an order ID and return the full object.
   $order = commerce_order_save($order);
