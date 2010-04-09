@@ -5,16 +5,15 @@
  * Implements hook_install().
  */
 function commerce_product_install() {
-  // TODO: Create the basic product type. It has to be inserted manually with
-  // db_insert() thanks to an issue reported at http://drupal.org/node/620298.
-  db_insert('commerce_product_type')
-    ->fields(array(
-      'type' => 'product',
-      'name' => t('Product'),
-      'description' => t('A basic product type with no additional fields by default.'),
-      'help' => '',
-    ))
-    ->execute();
+  // Create the basic product type.
+  $product_type = commerce_product_type_new();
+
+  $product_type->type = 'product';
+  $product_type->name = t('Product');
+  $product_type->description = t('A basic product type with no additional fields by default.');
+  $product_type->is_new = TRUE;
+
+  commerce_product_type_save($product_type);
 }
 
 /**
