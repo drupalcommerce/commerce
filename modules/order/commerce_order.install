@@ -51,6 +51,13 @@ function commerce_order_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
+      'status' => array(
+        'description' => 'The {commerce_order_status}.status_id of this order.',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'created' => array(
         'description' => 'The Unix timestamp when the order was created.',
         'type' => 'int',
@@ -74,6 +81,48 @@ function commerce_order_schema() {
       // 'revision_id' => array('commerce_order_revision' => 'revision_id'),
       'creator_uid' => array('users' => 'uid'),
       'customer_uid' => array('users' => 'uid'),
+    ),
+  );
+
+  $schema['commerce_order_status'] = array(
+    'description' => 'Order status definitions.',
+    'fields' => array(
+      'status_id' => array(
+        'description' => 'The primary identifier for an order status.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_state' => array(
+        'description' => 'The name of the order state to which this status belongs.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'The name of the order state to which this status belongs.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'description' => 'The sorting weight of the status for lists of statuses.',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'disabled' => array(
+        'description' => 'Boolean value indicating whether or not the status is disabled.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('status_id'),
+    'indexes' => array(
+      'order_state' => array('order_state'),
     ),
   );
 

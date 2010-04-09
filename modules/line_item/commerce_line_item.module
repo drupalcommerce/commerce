@@ -593,6 +593,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#value' => $line_item_type,
       );
 
+      // TODO: What would it look like to use the line item type's add form
+      // instead of this custom callback mechanism? Probably better...
+
       // Retrieve the form element callback for this line item type.
       $callback = $line_item_type->add_form_element_callback;
 
