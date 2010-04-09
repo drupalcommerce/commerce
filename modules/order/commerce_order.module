@@ -347,6 +347,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
     $field = array(
       'field_name' => 'line_items',
       'type' => 'commerce_line_item_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'object_types' => array('commerce_order'),
       'translatable' => FALSE,
     );
@@ -359,7 +360,10 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
       'object_type' => 'commerce_order',
       'bundle' => $type,
       'label' => t('Line items'),
-      'widget_type' => 'commerce_line_item_manager',
+      'widget' => array(
+        'type' => 'commerce_line_item_manager',
+        'weight' => -10,
+      ),
       'settings' => array(),
 
       // Define default formatters for the teaser and full view.
