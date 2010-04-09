@@ -55,22 +55,52 @@ class commercePrice {
       return FALSE
     }
   }
-  
+
+  /** 
+   * function getLogByModule() allows a developer to load an array of the 
+   * price modifications from a specified module. i.e. load all of the price
+   * adjustments submitted by the tax module.
+   *
+   * @param $module
+   *   The name of the module.
+   *
+   * @return
+   *   An array of price log events.
+   */
   function getLogByModule($module) {
     $return = array();
-    foreach ($log as $key => $value) {
-      if ($module == $value['module']) {
-        $return[] = $value;
+    if (!empty($module)) {
+      foreach ($log as $key => $value) {
+        if ($module == $value['module']) {
+          $return[] = $value;
+        }
       }
     }
     return $return;
   }
-  
+
+  /**
+   * function getLogByModuleDescription() allows a deveoper to load an array of
+   * price modifications which match a specified module and description.  i.e.
+   * return all of the log entries from that tax system, for the "VAT 19.5%" 
+   * tax rate.
+   *
+   * @param $module
+   *   The name of the module.
+   *
+   * @param $description
+   *   The description to filter by.
+   *
+   * @return
+   *   An array of price log events.
+   */
   function getLogByDescription($module, $description) {
     $return = array();
-    foreach ($log as $key => $value) {
-      if ($module == $value['module'] && $description == $value['description']) {
-        $return[] = $value;
+    if (!empty($module) && !empty($description)) {
+      foreach ($log as $key => $value) {
+        if ($module == $value['module'] && $description == $value['description']) {
+          $return[] = $value;
+        }
       }
     }
     return $return;
