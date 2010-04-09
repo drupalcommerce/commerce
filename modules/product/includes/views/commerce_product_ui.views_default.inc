@@ -24,7 +24,7 @@ function commerce_product_ui_views_default_views() {
 
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
-  $handler->display->display_options['title'] = 'Products';
+  $handler->display->display_options['title'] = 'Store';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer products';
   $handler->display->display_options['cache']['type'] = 'none';

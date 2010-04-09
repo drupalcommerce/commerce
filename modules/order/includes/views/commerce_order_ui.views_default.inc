@@ -24,7 +24,7 @@ function commerce_order_ui_views_default_views() {
 
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
-  $handler->display->display_options['title'] = 'Order';
+  $handler->display->display_options['title'] = 'Store';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer orders';
   $handler->display->display_options['cache']['type'] = 'none';
