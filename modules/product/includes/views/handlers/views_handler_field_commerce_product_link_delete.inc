@@ -13,8 +13,8 @@ class views_handler_field_commerce_product_link_delete extends views_handler_fie
   }
 
   function render($values) {
-    // Ensure the user has access to delete this node.
-    $product = new stdClass();
+    // Ensure the user has access to delete this product.
+    $product = commerce_product_new();
     $product->product_id = $values->{$this->aliases['product_id']};
     $product->type = $values->{$this->aliases['type']};
     $product->uid = $values->{$this->aliases['uid']};

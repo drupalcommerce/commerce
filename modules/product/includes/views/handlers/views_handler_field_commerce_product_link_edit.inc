@@ -14,7 +14,7 @@ class views_handler_field_commerce_product_link_edit extends views_handler_field
 
   function render($values) {
     // Ensure the user has access to edit this product.
-    $product = new stdClass();
+    $product = commerce_product_new();
     $product->product_id = $values->{$this->aliases['product_id']};
     $product->type = $values->{$this->aliases['type']};
     $product->uid = $values->{$this->aliases['uid']};

@@ -35,13 +35,13 @@ function commerce_product_schema() {
       'sku' => array(
         'description' => 'The unique, human-readable identifier for a product.',
         'type' => 'varchar',
-        'length' => 128,
+        'length' => 255,
         'not null' => TRUE,
       ),
       'type' => array(
         'description' => 'The {commerce_product_type}.type of this product.',
         'type' => 'varchar',
-        'length' => 128,
+        'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -79,6 +79,10 @@ function commerce_product_schema() {
     'unique keys' => array(
       'sku' => array('sku'),
     ),
+    'foreign keys' => array(
+      'uid' => array('users' => 'uid'),
+    ),
+
   );
 
   $schema['commerce_product_type'] = array(

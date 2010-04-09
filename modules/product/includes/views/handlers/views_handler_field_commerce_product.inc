@@ -48,7 +48,7 @@ class views_handler_field_commerce_product extends views_handler_field {
   }
 
   /**
-   * Render whatever the data is as a link to the node.
+   * Render whatever the data is as a link to the product.
    *
    * Data should be made XSS safe prior to calling this function.
    */
