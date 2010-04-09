@@ -4,8 +4,77 @@
 /**
  * @file
  * Implements the shopping cart system and add to cart features.
+ *
+ * In Drupal Commerce, the shopping cart is really just an order that makes
+ * special considerations to associate it with a user and
  */
 
+/**
+ * Loads the shopping cart order for the specified user.
+ *
+ * @param $customer_uid
+ *   The uid of the customer whose cart to load. If left 0, attempts to load
+ *     an anonymous order from the session.
+ * @return
+ *   The fully loaded shopping cart order or FALSE if non-existent.
+ */
+function commerce_cart_order_load($customer_uid = 0) {
+  // Loaded orders will be cached keyed by $customer_uid.
+  $cart_orders = &drupal_static(__FUNCTION__);
+
+  // First return the cached order if it has been loaded already.
+  if (!isset($cart_orders[$customer_uid])) {
+    // If a customer uid was specified...
+    if ($customer_uid) {
+      // Look for an existing shopping cart order.
+      // TODO: Find an order assigned to this user that is in checkout.
+      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid ORDER BY order_id ASC', array(':customer_uid' => $customer_uid))->fetchField();
+    }
+    else {
+      // Otherwise look for a shopping cart order ID in the session.
+      if (!empty($_SESSION['commerce_cart_order_id'])) {
+        $order_id = $_SESSION['commerce_cart_order_id'];
+      }
+    }
+
+    // If a valid order ID was found, load the order now.
+    if ($order_id) {
+      $cart_orders[$customer_uid] = commerce_order_load($order_id);
+    }
+    else {
+      $cart_orders[$customer_uid] = FALSE;
+    }
+  }
+
+  return $cart_orders[$customer_uid];
+}
+
+/**
+ * Resets the cached array of shopping cart orders.
+ */
+function commerce_cart_orders_reset() {
+  $cart_orders = &drupal_static('commerce_cart_order_load');
+  $cart_orders = NULL;
+}
+
+/**
+ * Creates a new shopping cart order for the specified user.
+ *
+ * @param $customer_uid
+ *   The uid of the user for whom to create the order. If left 0, the order will
+ *     be created for the current user and associated with his or her session.
+ * @return
+ *   The newly created shopping cart order object.
+ */
+function commerce_cart_order_new($customer_uid = 0) {
+  // Create the new order.
+  $order = commerce_order_new($customer_uid);
+
+  // TODO: Set it to the shopping cart order status.
+
+  // Save it so it gets an order ID and return the full object.
+  return commerce_order_save($order);
+}
 
 /**
  * Adds the specified product to a customer's shopping cart.
@@ -15,13 +84,54 @@
  * @param $product_id
  *   The ID of the product to add to the cart.
  * @return
- *   The entire shopping cart order object.
+ *   The entire shopping cart order object or FALSE on failure.
  */
-function commerce_cart_product_add($customer_uid, $product_id) {
-  // TODO: Create or load the shopping cart order for the specified customer,
-  // add the product appropriately, and return the full order object.
+function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
+  // Load and validate the specified product ID.
+  $product = commerce_product_load($product_id);
 
-  // return $order;
+  // TODO: Add support to products for status; i.e. is the product any longer
+  // available for sale?
+  if (empty($product)) {
+    return FALSE;
+  }
+
+  // First attempt to load the customer's shopping cart order.
+  $order = commerce_cart_order_load($customer_uid);
+
+  // If no order existed, create one now.
+  if (empty($order)) {
+    $order = commerce_cart_order_new($customer_uid);
+  }
+
+  // TODO: Determine if the product already exists on the order and increment
+  // its quantity instead of adding a new line if it does.
+
+  // Add the product to the order.
+  // TODO: Create an API function in the line item module for adding a new line
+  // item of any type to an order.
+  $line_item = commerce_line_item_new('product');
+  $line_item->line_item_label = $product->sku;
+  $line_item->quantity = $quantity;
+
+  // Reference the product.
+  $line_item->product = array(
+    LANGUAGE_NONE => array(
+      array(
+        'product_id' => $product->product_id,
+      ),
+    ),
+  );
+
+  // Save the line item and add it to the order.
+  $line_item = commerce_line_item_save($line_item);
+
+  $order->line_items[LANGUAGE_NONE][] = array(
+    'line_item_id' => $line_item->line_item_id,
+  );
+
+  // Save and return the order.
+  return commerce_order_save($order);
 }
 
 /**
@@ -93,7 +203,8 @@ function commerce_cart_form_submit($form, &$form_state) {
   $product = $form_state['products'][$product_id];
 
   // Add the product to the specified shopping cart.
-  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id);
+  // TODO: Derive the quantity (argument 3) from the add to cart form.
+  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id, 1);
 
   drupal_set_message(t('%title added to your cart.', array('%title' => $product->title)));
 }
