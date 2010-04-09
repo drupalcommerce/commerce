@@ -15,6 +15,7 @@ function commerce_product_reference_field_info() {
     'commerce_product_reference' => array(
       'label' => t('Product reference'),
       'description' => t('This field stores the ID of a related product as an integer value.'),
+      'translatable' => FALSE,
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_product_reference_title_link',
       'settings' => array(
@@ -564,8 +565,14 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
-  // TODO: Use the appropriate language code or just remove the requirement.
-  $line_item->product = array('und' => array(array('product_id' => $product->product_id)));
+  // Add the product reference value to the line item for the right language.
+  $line_item->product = array(
+    $element['#language'] => array(
+      array(
+        'product_id' => $product->product_id,
+      ),
+    ),
+  );
 }
 
 /**
