@@ -5,8 +5,8 @@
  * Return a list of available currencies.
  */
 function commerce_price_available_currencies() {
-  // TODO: open this list, and add a alter hook.
-  return array(
+  // Define base currencies.
+  $currencies = array(
     'und' => array(
       'label' => t('Undefined currency'),
       'symbol' => '¤',
@@ -20,6 +20,11 @@ function commerce_price_available_currencies() {
       'symbol' => '$',
     ),
   );
+
+  // Allow other modules to modify the currency list.
+  drupal_alter('commerce_price_available_currencies', $currencies);
+
+  return $currencies;
 }
 
 /**
