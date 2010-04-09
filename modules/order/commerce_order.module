@@ -58,16 +58,24 @@ function commerce_order_field_extra_fields() {
     'customer' => array(
       'label' => 'Customer',
       'description' => t('Order module Customer information fieldset'),
-      'weight' => -5,
+      'weight' => 15,
     ),
     'creator' => array(
       'label' => 'Creation information',
       'description' => t('Order module Creation date / user fieldset'),
-      'weight' => 0,
+      'weight' => 20,
     ),
   );
 
   return $extra;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function commerce_order_enable() {
+  // Add the line item reference field to the default order type.
+  commerce_order_configure_order_type();
 }
 
 /**
@@ -326,6 +334,48 @@ function commerce_order_validate_number_unique($order_number, $order_id) {
   }
 
   return TRUE;
+}
+
+/**
+ * Ensures the line item field is present on the default order bundle.
+ */
+function commerce_order_configure_order_type($type = 'commerce_order') {
+  $field = field_info_field('line_items');
+  $instance = field_info_instance('commerce_order', 'line_items', $type);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => 'line_items',
+      'type' => 'commerce_line_item_reference',
+      'object_types' => array('commerce_order'),
+      'translatable' => FALSE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => 'line_items',
+      'object_type' => 'commerce_order',
+      'bundle' => $type,
+      'label' => t('Line items'),
+      'widget_type' => 'commerce_line_item_manager',
+      'settings' => array(),
+
+      // Define default formatters for the teaser and full view.
+      'display' => array(
+        'customer' => array(
+          'label' => 'above',
+          'type' => 'commerce_line_item_reference_view',
+        ),
+        'administrator' => array(
+          'label' => 'above',
+          'type' => 'commerce_line_item_reference_view',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
 }
 
 /**
