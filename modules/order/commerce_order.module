@@ -157,7 +157,7 @@ function commerce_order_load($order_id) {
 /**
  * Loads an order by number.
  */
-function commerce_order_load_by_sku($order_number) {
+function commerce_order_load_by_number($order_number) {
   $orders = commerce_order_load_multiple(array(), array('order_number' => $order_number));
   return $orders ? reset($orders) : FALSE;
 }

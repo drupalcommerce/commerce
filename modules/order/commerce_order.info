@@ -1,6 +1,6 @@
 ; $Id$
 name = Order
-description = Defines the Order and Line Item entities and associated features.
+description = Defines the Order entity and associated features.
 package = Drupal Commerce
 dependencies[] = rules
 ; dependencies[] = commerce_line_item
