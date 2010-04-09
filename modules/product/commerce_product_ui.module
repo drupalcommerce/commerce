@@ -59,6 +59,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array(),
     'access arguments' => array('administer products'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/add'] = array(
@@ -147,6 +148,7 @@ function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_
  */
 function commerce_product_ui_admin_paths() {
   $paths = array(
+    'admin/commerce/products' => TRUE,
     'admin/commerce/products/add' => TRUE,
     'admin/commerce/products/add/*' => TRUE,
     'admin/commerce/products/*/edit' => TRUE,

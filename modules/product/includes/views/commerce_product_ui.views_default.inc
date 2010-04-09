@@ -25,13 +25,12 @@ function commerce_product_ui_views_default_views() {
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->display->display_options['title'] = 'Products';
-  $handler->display->display_options['empty'] = 'No products have been created yet.';
-  $handler->display->display_options['items_per_page'] = 50;
-  $handler->display->display_options['use_pager'] = TRUE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer products';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = 50;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'sku' => 'sku',
@@ -68,6 +67,12 @@ function commerce_product_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
+  /* Empty text: Global: Text area */
+  $handler->display->display_options['empty']['text']['id'] = 'area';
+  $handler->display->display_options['empty']['text']['table'] = 'views';
+  $handler->display->display_options['empty']['text']['field'] = 'area';
+  $handler->display->display_options['empty']['text']['empty'] = FALSE;
+  $handler->display->display_options['empty']['text']['content'] = 'No products have been created yet.';
   /* Field: Commerce Product: SKU */
   $handler->display->display_options['fields']['sku']['id'] = 'sku';
   $handler->display->display_options['fields']['sku']['table'] = 'commerce_product';
@@ -147,8 +152,8 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['path'] = 'admin/commerce/products/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Products';
-  $handler->display->display_options['menu']['weight'] = '-1';
-  $handler->display->display_options['tab_options']['type'] = 'normal';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['tab_options']['type'] = 'tab';
   $handler->display->display_options['tab_options']['title'] = 'Products';
   $handler->display->display_options['tab_options']['description'] = 'Manage products from the store.';
   $handler->display->display_options['tab_options']['weight'] = '';

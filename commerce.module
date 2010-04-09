@@ -24,6 +24,24 @@ function commerce_menu() {
     'file path' => drupal_get_path('module', 'system'),
     'file' => 'system.admin.inc',
   );
+  $items['admin/commerce/dashboard'] = array(
+    'title' => 'Dashboard',
+    'description' => 'Display a dashboard of store information.',
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/commerce/config'] = array(
+    'title' => 'Configuration',
+    'description' => 'Configure settings and business rules for your store.',
+    'position' => 'right',
+    'weight' => 10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
 
   return $items;
 }
@@ -34,6 +52,8 @@ function commerce_menu() {
 function commerce_admin_paths() {
   $paths = array(
     'admin/commerce' => TRUE,
+    'admin/commerce/dashboard' => TRUE,
+    'admin/commerce/config' => TRUE,
   );
 
   return $paths;
