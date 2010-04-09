@@ -467,6 +467,7 @@ function commerce_product_reference_commerce_line_item_info() {
       'type' => 'product',
       'name' => t('Product'),
       'description' => t('References a product and displays it with the SKU as the label.'),
+      'configuration_callback' => 'commerce_product_reference_configure_line_item',
       'add_form_element_callback' => 'commerce_product_line_item_add_form',
       'add_form_submit_callback' => 'commerce_product_line_item_add_submit',
       'add_form_submit_value' => t('Add product'),
@@ -476,15 +477,20 @@ function commerce_product_reference_commerce_line_item_info() {
 
 /**
  * Ensures the product line item type contains a product reference field.
+ *
+ * This function is called by the line item module when it is enabled or this
+ * module is enabled. It invokes this function using the configuration_callback
+ * as specified above.
  */
 function commerce_product_reference_configure_line_item() {
-  $field = field_info_field('product_line_item_reference');
-  $instance = field_info_instance('commerce_line_item', 'product_line_item_reference', 'product');
+  $field = field_info_field('product');
+  $instance = field_info_instance('commerce_line_item', 'product', 'product');
 
   if (empty($field)) {
     $field = array(
-      'field_name' => 'product_line_item_reference',
+      'field_name' => 'product',
       'type' => 'commerce_product_reference',
+      'cardinality' => 1,
       'object_types' => array('commerce_line_item'),
       'translatable' => FALSE,
     );
@@ -493,12 +499,16 @@ function commerce_product_reference_configure_line_item() {
 
   if (empty($instance)) {
     $instance = array(
-      'field_name' => 'product_line_item_reference',
+      'field_name' => 'product',
       'object_type' => 'commerce_line_item',
       'bundle' => 'product',
       'label' => t('Product'),
-      'widget_type' => 'commerce_product_reference_autocomplete',
+      'required' => TRUE,
       'settings' => array(),
+
+      'widget' => array(
+        'type' => 'commerce_product_reference_autocomplete',
+      ),
 
       // Define default formatters for the teaser and full view.
       'display' => array(
@@ -554,7 +564,8 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
-  // TODO: Incorporate a product reference field on the product line item type.
+  // TODO: Use the appropriate language code or just remove the requirement.
+  $line_item->product = array('und' => array(array('product_id' => $product->product_id)));
 }
 
 /**

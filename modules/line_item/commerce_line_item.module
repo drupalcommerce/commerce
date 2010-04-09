@@ -93,6 +93,34 @@ function commerce_line_item_views_api() {
 }
 
 /**
+ * Implements hook_enable().
+ */
+function commerce_line_item_enable() {
+  // Loop through and configure all the currently defined line item types.
+  foreach (commerce_line_item_types() as $line_item_type) {
+    commerce_line_item_type_configure($line_item_type);
+  }
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function commerce_line_item_modules_enabled($modules) {
+  // Loop through all the enabled modules.
+  foreach ($modules as $module) {
+    // If the module implements hook_commerce_line_item()...
+    if (module_hook($module, 'commerce_line_item_info')) {
+      $line_item_types = module_invoke($module, 'commerce_line_item_info');
+
+      // Loop through and configure the line item types defined by the module.
+      foreach ($line_item_types as $line_item_type) {
+        commerce_line_item_type_configure($line_item_type);
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function commerce_line_item_permission() {
@@ -173,6 +201,24 @@ function commerce_line_item_type_get_name($type = NULL) {
   }
 
   return $line_item_types;
+}
+
+/**
+ * Configures a line item type by calling its configuration callback.
+ *
+ * @param $line_item_type
+ *   The fully loaded line item type object to configure.
+ */
+function commerce_line_item_type_configure($line_item_type) {
+  // If this line item type specifies a configuration callback...
+  if (!empty($line_item_type->configuration_callback)) {
+    $callback = $line_item_type->configuration_callback;
+
+    // If the function exists, invoke it now.
+    if (function_exists($callback)) {
+      $callback();
+    }
+  }
 }
 
 /**
@@ -584,7 +630,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
  * Returns the line item manager element for display via AJAX.
  */
 function commerce_line_item_manager_refresh($form, $form_state) {
-  return $form['field_line_items'][$form['field_line_items']['#language']];
+  return $form['line_items'][$form['line_items']['#language']];
 }
 
 /**
