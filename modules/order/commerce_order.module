@@ -457,6 +457,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'object_types' => array('commerce_order'),
       'translatable' => FALSE,
+      'locked' => TRUE,
     );
     $field = field_create_field($field);
   }

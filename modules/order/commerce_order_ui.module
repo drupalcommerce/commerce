@@ -180,15 +180,6 @@ function commerce_order_ui_views_api() {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- */
-function commerce_order_ui_form_field_ui_field_overview_form_alter(&$form, &$form_state) {
-  // Disable the delete link for the order line items field.
-  // TODO: Make sure this specifically targets the correct forms.
-  $form['line_items']['delete']['#access'] = FALSE;
-}
-
-/**
  * Sets the breadcrumb for administrative order pages.
  */
 function commerce_order_set_breadcrumb() {
