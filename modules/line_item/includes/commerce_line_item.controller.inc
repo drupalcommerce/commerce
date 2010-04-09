@@ -25,7 +25,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       'line_item_id' => '',
       'type' => $type,
       'line_item_label' => '',
-      'quantity' => 0,
+      'quantity' => 1,
     );
   }
 

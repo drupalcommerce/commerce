@@ -505,19 +505,6 @@ function commerce_product_validate_sku_unique($sku, $product_id) {
 }
 
 /**
- * Implements hook_commerce_line_item_info().
- */
-function commerce_product_commerce_line_item_info() {
-  return array(
-    'product' => (object) array(
-      'type' => 'product',
-      'name' => t('Product'),
-      'description' => t('References a product and displays it with the SKU as the label.'),
-    ),
-  );
-}
-
-/**
  * Callback for getting product properties.
  * @see commerce_product_entity_property_info()
  */

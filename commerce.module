@@ -19,7 +19,7 @@ function commerce_menu() {
     'description' => 'Administer your store.',
     'position' => 'right',
     'weight' => 1,
-    'page callback' => 'system_admin_menu_block_page',
+    'page callback' => 'commerce_dashboard',
     'access arguments' => array('access administration pages'),
     'file path' => drupal_get_path('module', 'system'),
     'file' => 'system.admin.inc',
@@ -35,7 +35,7 @@ function commerce_menu() {
     'description' => 'Configure settings and business rules for your store.',
     'position' => 'right',
     'weight' => 10,
-    'page callback' => 'system_admin_menu_block_page',
+    'page callback' => 'commerce_configuration_overview',
     'access arguments' => array('access administration pages'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
@@ -57,4 +57,29 @@ function commerce_admin_paths() {
   );
 
   return $paths;
+}
+
+/**
+ * Displays the store dashboard tab.
+ */
+function commerce_dashboard() {
+  // Get rid of the normal admin Dashboard breadcrumb.
+  drupal_set_breadcrumb(array(l(t('Home'), '<front>')));
+
+  return system_admin_menu_block_page();
+}
+
+/**
+ * Displays the store configuration overview.
+ */
+function commerce_configuration_overview() {
+  // Get rid of the normal admin Dashboard breadcrumb.
+  $breadcrumb = array(
+    l(t('Home'), '<front>'),
+    l(t('Store'), 'admin/commerce'),
+  );
+
+  drupal_set_breadcrumb($breadcrumb);
+
+  return system_admin_menu_block_page();
 }

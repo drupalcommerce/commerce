@@ -25,7 +25,7 @@ function commerce_order_entity_info() {
         // 'revision' => 'revision_id',
       ),
       'bundles' => array(
-        'order' => array(
+        'commerce_order' => array(
           'label' => t('Order'),
         ),
       ),
@@ -54,7 +54,7 @@ function commerce_order_entity_info() {
 function commerce_order_field_extra_fields() {
   $extra = array();
 
-  $extra['commerce_order']['order'] = array(
+  $extra['commerce_order']['commerce_order'] = array(
     'customer' => array(
       'label' => 'Customer',
       'description' => t('Order module Customer information fieldset'),

@@ -162,7 +162,7 @@ function commerce_order_ui_help($path, $arg) {
  * Expose the order UI for order fields.
  */
 function commerce_order_ui_entity_info_alter(&$entity_info) {
-  $entity_info['commerce_order']['bundles']['order']['admin'] = array(
+  $entity_info['commerce_order']['bundles']['commerce_order']['admin'] = array(
     'path' => 'admin/commerce/config/order',
     'real path' => 'admin/commerce/config/order',
     'access arguments' => array('administer orders'),
@@ -177,4 +177,17 @@ function commerce_order_ui_views_api() {
     'api' => 2,
     'path' => drupal_get_path('module', 'commerce_order_ui') . '/includes/views',
   );
+}
+
+/**
+ * Sets the breadcrumb for administrative order pages.
+ */
+function commerce_order_set_breadcrumb() {
+  $breadcrumb = array(
+    l(t('Home'), '<front>'),
+    l(t('Store'), 'admin/commerce'),
+    l(t('Orders'), 'admin/commerce/orders'),
+  );
+
+  drupal_set_breadcrumb($breadcrumb);
 }

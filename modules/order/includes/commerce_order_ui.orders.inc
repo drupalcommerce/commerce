@@ -22,26 +22,68 @@ function commerce_order_settings_form() {
  * Display a view of an order entity.
  */
 function commerce_order_ui_order_view($mode, $order) {
+  commerce_order_set_breadcrumb();
+
   return '<pre>' . print_r($order, TRUE) . '</pre>';
 }
 
 /**
  * Form callback: create or edit an order.
+ *
+ * @param $order
+ *   The order object to edit through the form.
+ * @param $account
+ *   For new orders, the customer's user account.
+ * @param $breadcrumb
+ *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
+ * @return
+ *   The form array to add or edit an order.
  */
-function commerce_order_ui_order_form($form, &$form_state, $order, $account = NULL) {
+function commerce_order_ui_order_form($form, &$form_state, $order, $account = NULL, $breadcrumb = TRUE) {
+  if ($breadcrumb) {
+    commerce_order_set_breadcrumb();
+  }
+
   $form = array();
 
-  // Add the default field elements.
+  // Set the default customer if necessary.
+  if (empty($order->order_id) && !empty($account)) {
+    $order->customer_uid = $account->uid;
+  }
 
   // Add the field related form elements.
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
 
-  $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
+  // Add the default field elements.
+  $form['customer'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Customer'),
+  );
+  $form['customer']['customer_uid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Customer uid'),
+    '#default_value' => $order->customer_uid,
+  );
+
+  $form['creator'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Creator'),
+  );
+  $form['creator']['creator_uid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Creator uid'),
+    '#default_value' => $order->creator_uid,
+  );
+
+  $form['actions'] = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('form-actions')),
+    '#weight' => 100,
+  );
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save order'),
-    '#suffix' => l('Cancel', 'admin/commerce/orders'),
     '#weight' => 40,
   );
 
@@ -69,9 +111,14 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
 
   $order = &$form_state['commerce_order'];
 
+  $order->customer_uid = $form_state['values']['customer_uid'];
+
   // Set the order's creator uid if it's being created at this time.
-  if (empty($order->order_id)) {
+  if (empty($order->order_id) && empty($form_state['values']['creator_uid'])) {
     $order->creator_uid = $user->uid;
+  }
+  else {
+    $order->creator_uid = $form_state['values']['creator_uid'];
   }
 
   // Notify field widgets.
@@ -80,16 +127,30 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
   // Save the order.
   $order = commerce_order_save($order);
 
-  drupal_set_message(t('Order saved.'));
+  // Apply the redirect based on the clicked button.
+  if ($form_state['clicked_button']['#value'] == t('Save order')) {
+    drupal_set_message(t('Order saved.'));
 
-  // TODO: Determine alternate redirect location if not the edit page.
-  $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/edit';
+    // TODO: Determine alternate redirect location if not the edit page.
+    $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/edit';
+  }
 }
 
 /**
  * Confirmation form for deleting an order.
+ *
+ * @param $order
+ *   The order object to delete through the form.
+ * @param $breadcrumb
+ *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
+ * @return
+ *   The form array to add or edit an order.
  */
-function commerce_order_ui_order_delete_form($form, &$form_state, $order) {
+function commerce_order_ui_order_delete_form($form, &$form_state, $order, $breadcrumb = TRUE) {
+  if ($breadcrumb) {
+    commerce_order_set_breadcrumb();
+  }
+
   $form_state['order'] = $order;
 
   $form = confirm_form($form,

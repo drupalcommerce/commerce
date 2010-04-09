@@ -357,11 +357,11 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
     }
 
     return $element + array(
-        '#type' => 'textfield',
-        '#default_value' => implode(', ', $skus),
-        '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
-        '#size' => $instance['widget']['settings']['size'],
-        '#element_validate' => array('commerce_product_reference_autocomplete_validate'),
+      '#type' => 'textfield',
+      '#default_value' => implode(', ', $skus),
+      '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
+      '#size' => $instance['widget']['settings']['size'],
+      '#element_validate' => array('commerce_product_reference_autocomplete_validate'),
     );
   }
 }
@@ -455,6 +455,66 @@ function commerce_product_reference_options_list($field) {
   }
 
   return $options;
+}
+
+/**
+ * Implements hook_commerce_line_item_info().
+ *
+ * TODO: Move this definition to the Product Reference module, since the line
+ * item will depend on that field.
+ */
+function commerce_product_reference_commerce_line_item_info() {
+  return array(
+    'product' => (object) array(
+      'type' => 'product',
+      'name' => t('Product'),
+      'description' => t('References a product and displays it with the SKU as the label.'),
+      'add_form_element_callback' => 'commerce_product_line_item_add_form',
+      'add_form_submit_callback' => 'commerce_product_line_item_add_submit',
+      'add_form_submit_value' => t('Add product'),
+    ),
+  );
+}
+
+/**
+ * Returns the elements necessary to add a product line item through a line item
+ *   manager widget.
+ */
+function commerce_product_line_item_add_form() {
+  $form = array();
+
+  $form['product_id'] = array(
+    '#type' => 'select',
+    '#title' => t('Product'),
+    '#options' => commerce_product_reference_options_list(array('field_name' => 'line_item_product_selector')),
+  );
+
+  return $form;
+}
+
+/**
+ * Adds the selected product information to a line item added via a line item
+ *   manager widget.
+ *
+ * @param $line_item
+ *   The newly created line item object.
+ * @param $element
+ *   The array representing the widget form element.
+ * @param $form_state
+ *   The present state of the form upon the latest submission.
+ * @param $form
+ *   The actual form array.
+ * @return
+ *   NULL if all is well or an error message if something goes wrong.
+ */
+function commerce_product_line_item_add_submit(&$line_item, $element, &$form_state, $form) {
+  // Load the selected product.
+  $product = commerce_product_load($element['actions']['product_id']['#value']);
+
+  // Set the label to be the product SKU.
+  $line_item->line_item_label = $product->sku;
+
+  // TODO: Incorporate a product reference field on the product line item type.
 }
 
 /**

@@ -72,6 +72,17 @@ function commerce_line_item_field_extra_fields() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_line_item_theme() {
+  return array(
+    'line_item_manager' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_line_item_views_api() {
@@ -79,6 +90,20 @@ function commerce_line_item_views_api() {
     'api' => 2,
     'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views',
   );
+}
+
+/**
+ * Returns a single line item type object.
+ *
+ * @param $type
+ *   The machine-readable name of the line item type.
+ * @return
+ *   The specified line item type object or FALSE if it does not exist.
+ */
+function commerce_line_item_type_info($type) {
+  $line_item_types = commerce_line_item_types();
+
+  return isset($line_item_types[$type]) ? $line_item_types[$type] : FALSE;
 }
 
 /**
@@ -212,7 +237,6 @@ function commerce_line_item_load($line_item_id) {
  *     'field' => $value.
  * @param $reset
  *   Whether to reset the internal line item loading cache.
- *
  * @return
  *   An array of line item objects indexed by line_item_id.
  */
@@ -254,4 +278,433 @@ function commerce_line_item_rules_var_unchanged($line_item) {
   if (isset($line_item->line_item_id) && isset($unchanged[$line_item->line_item_id])) {
     return $unchanged[$line_item->line_item_id];
   }
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function commerce_line_item_field_info() {
+  return array(
+    'commerce_line_item_reference' => array(
+      'label' => t('Line item reference'),
+      'description' => t('This field stores the ID of a related line item as an integer value.'),
+      'default_widget' => 'commerce_line_item_manager',
+      'default_formatter' => 'commerce_line_item_reference_view',
+      'settings' => array(),
+      'property_type' => 'commerce_line_item',
+      'property_callbacks' => array('commerce_line_item_property_info_callback'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_line_item_field_schema($field) {
+  return array(
+    'columns' => array(
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'line_item_id' => array('line_item_id'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ *
+ * Possible error codes:
+ * - 'invalid_line_item_id': line_item_id is not valid for the field (not a
+ *                           valid line item ID).
+ */
+function commerce_line_item_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
+  // Extract line_item_ids to check.
+  $line_item_ids = array();
+
+  // First check non-numeric line_item_id's to avoid losing time with them.
+  foreach ($items as $delta => $item) {
+    if (is_array($item) && !empty($item['line_item_id'])) {
+      if (is_numeric($item['line_item_id'])) {
+        $line_item_ids[] = $item['line_item_id'];
+      }
+      else {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'invalid_line_item_id',
+          'message' => t('%name: you have specified an invalid line item for this field.', array('%name' => $instance['label'])),
+        );
+      }
+    }
+  }
+
+  // Prevent performance hog if there are no ids to check.
+  if ($line_item_ids) {
+    $line_items = commerce_line_item_load_multiple($line_item_ids);
+
+    foreach ($items as $delta => $item) {
+      if (is_array($item)) {
+        if (!empty($item['line_item_id']) && !isset($line_items[$item['line_item_id']])) {
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'invalid_line_item_id',
+            'message' => t('%name: you have specified an invalid line item for this reference field.', array('%name' => $instance['label'])),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function commerce_line_item_field_is_empty($item, $field) {
+  // line_item_id = 0 îs empty too, which is exactly what we want.
+  return empty($item['line_item_id']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function commerce_line_item_field_formatter_info() {
+  return array(
+    'commerce_line_item_reference_view' => array(
+      'label' => t('Line item View'),
+      'description' => t('Display the line items via a default View.'),
+      'field types' => array('commerce_line_item_reference'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function commerce_line_item_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  // Collect the list of line item IDs.
+  $line_item_ids = array();
+
+  foreach ($items as $delta => $item) {
+    $line_item_ids[] = $item['line_item_id'];
+  }
+
+  switch ($display['type']) {
+    case 'commerce_line_item_reference_view':
+      // TODO: Replace with a default table View.
+      foreach ($items as $delta => $item) {
+        $result[$delta] = array(
+          '#markup' => t('Line item @id.', array('@id' => $item['line_item_id'])),
+        );
+      }
+
+      break;
+  }
+
+  return $result;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ * Defines widgets available for use with field types as specified in each
+ * widget's $info['field types'] array.
+ */
+function commerce_line_item_field_widget_info() {
+  $widgets = array();
+
+  // Define the creation / reference widget for line items.
+  $widgets['commerce_line_item_manager'] = array(
+    'label' => t('Line item manager'),
+    'description' => t('Use a complex widget to manager the line items referenced by this object.'),
+    'field types' => array('commerce_line_item_reference'),
+    'settings' => array(),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+    ),
+  );
+
+  return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * Used to define the form element for custom widgets.
+ */
+function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Define the complex line item reference field widget.
+  if ($instance['widget']['type'] == 'commerce_line_item_manager') {
+    $line_item_ids = array();
+
+    // Build an array of line item IDs from this field's values.
+    foreach ($items as $item) {
+      $line_item_ids[] = $item['line_item_id'];
+    }
+
+    // Load the line items for temporary storage in the form array.
+    $line_items = commerce_line_item_load_multiple($line_item_ids);
+
+    // Update the base form element array to use the proper theme and validate
+    // functions and to include header information for the line item table.
+    $element += array(
+      '#theme' => 'line_item_manager',
+      '#element_validate' => array('commerce_line_item_manager_validate'),
+      '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit'), t('Total')),
+      '#empty' => t('No line items found.'),
+      'line_items' => array(),
+    );
+
+    // Add a set of elements to the form for each referenced line item.
+    foreach ($line_items as $line_item_id => $line_item) {
+      // Store the original line item for later comparison.
+      $element['line_items'][$line_item_id]['line_item'] = array(
+        '#type' => 'value',
+        '#value' => $line_item,
+      );
+
+      // This checkbox will be overridden with a clickable delete image.
+      $element['line_items'][$line_item_id]['remove'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => FALSE,
+      );
+
+      // The display title should come from the line item type.
+      $element['line_items'][$line_item_id]['title'] = array(
+        '#markup' => t('Line item @line_item_id (@type)', array('@line_item_id' => $line_item_id, '@type' => $line_item->type)),
+      );
+
+      $element['line_items'][$line_item_id]['line_item_label'] = array(
+        '#markup' => check_plain($line_item->line_item_label),
+      );
+
+      $element['line_items'][$line_item_id]['quantity'] = array(
+        '#type' => 'textfield',
+        '#default_value' => round($line_item->quantity),
+        '#size' => 4,
+      );
+
+      // TODO: Figure out how to embed a Price field widget here.
+      $element['line_items'][$line_item_id]['unit'] = array(
+        '#type' => 'textfield',
+        '#default_value' => '100.00',
+        '#size' => 10,
+        '#field_prefix' => '$',
+      );
+
+      $element['line_items'][$line_item_id]['total'] = array(
+        '#markup' => '$100.00',
+      );
+    }
+
+    // Prepare a default set of action elements to display beneath the manager.
+    $options = commerce_line_item_type_get_name();
+
+    // Only display the line item selector if line item types exist.
+    if (!empty($options)) {
+      $element['actions']['line_item_type'] = array(
+        '#type' => 'select',
+        '#options' => commerce_line_item_type_get_name(),
+        '#prefix' => '<div class="add-line-item">',
+      );
+      $element['actions']['line_item_add'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add line item'),
+        '#ajax' => array(
+          'callback' => 'commerce_line_item_manager_refresh',
+          'wrapper' => 'line-item-manager',
+        ),
+        '#suffix' => '</div>',
+      );
+    }
+
+    // If the the form has been instructed to add a line item...
+    if (!empty($form_state['line_item_add'])) {
+      $element['actions'] = array();
+
+      // Load the info object for the selected line item type.
+      $line_item_type = commerce_line_item_type_info($form_state['line_item_add']);
+
+      // Store the line item info object in the form array.
+      $element['actions']['line_item_type'] = array(
+        '#type' => 'value',
+        '#value' => $line_item_type,
+      );
+
+      // Retrieve the form element callback for this line item type.
+      $callback = $line_item_type->add_form_element_callback;
+
+      // If this type specifies a valid add form callback function...
+      if (function_exists($callback)) {
+        // Load in the appropriate form elements to the actions array.
+        $element['actions'] += $callback();
+      }
+
+      // Add a default save button.
+      $element['actions']['save_line_item'] = array(
+        '#type' => 'submit',
+        '#value' => !empty($line_item_type->add_form_submit_value) ? $line_item_type->add_form_submit_value : t('Save'),
+        '#ajax' => array(
+          'callback' => 'commerce_line_item_manager_refresh',
+          'wrapper' => 'line-item-manager',
+        ),
+      );
+
+      $element['actions']['cancel'] = array(
+        '#type' => 'submit',
+        '#value' => t('Cancel'),
+        '#ajax' => array(
+          'callback' => 'commerce_line_item_manager_refresh',
+          'wrapper' => 'line-item-manager',
+        ),
+      );
+    }
+
+    return $element;
+  }
+}
+
+/**
+ * Returns the line item manager element for display via AJAX.
+ */
+function commerce_line_item_manager_refresh($form, $form_state) {
+  return $form['field_line_items'][$form['field_line_items']['#language']];
+}
+
+/**
+ * Themes the line item manager widget form element.
+ */
+function theme_line_item_manager($variables) {
+  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.manager.css');
+
+  $form = $variables['form'];
+  $rows = array();
+
+  // Add each line item to the table.
+  foreach (element_children($form['line_items']) as $line_item_id) {
+    $row = array(
+      drupal_render($form['line_items'][$line_item_id]['remove']),
+      drupal_render($form['line_items'][$line_item_id]['title']),
+      drupal_render($form['line_items'][$line_item_id]['line_item_label']),
+      drupal_render($form['line_items'][$line_item_id]['quantity']),
+      drupal_render($form['line_items'][$line_item_id]['unit']),
+      drupal_render($form['line_items'][$line_item_id]['total']),
+    );
+
+    $rows[] = $row;
+  }
+
+  // Setup the table's variables array and build the output.
+  $table_variables = array(
+    'caption' => check_plain($form['#title']),
+    'header' => $form['#header'],
+    'rows' => $rows,
+    'empty' => $form['#empty'],
+  );
+
+  // TODO: Remove the <br> when the theme bug is fixed with the throbber.
+  $output = theme('table', $table_variables) . drupal_render($form['actions'])
+          . '<br style="clear: left;" />';
+
+  return '<div id="line-item-manager">' . $output . '</div>';
+}
+
+/**
+ * Validation callback for a commerce_line_item_manager element.
+ *
+ * When the form is submitted, the line item reference field stores the line
+ * item IDs as derived from the $element['line_items'] array and updates any
+ * referenced line items based on the extra form elements.
+ */
+function commerce_line_item_manager_validate($element, &$form_state, $form) {
+  $value = array();
+
+  // Loop through the line items in the manager table.
+  foreach (element_children($element['line_items']) as $line_item_id) {
+    // If the line item has been marked for deletion...
+    if ($element['line_items'][$line_item_id]['remove']['#value']) {
+      // Delete the line item now and don't include it from the $value array.
+      commerce_line_item_delete($line_item_id);
+    }
+    else {
+      // Add the line item ID to the current value of the reference field.
+      $value[] = array('line_item_id' => $line_item_id);
+
+      // Update the line item based on the values in the additional elements.
+      $line_item = clone($element['line_items'][$line_item_id]['line_item']['#value']);
+
+      // Validate the quantity of each line item.
+      if (is_numeric($element['line_items'][$line_item_id]['quantity']['#value'])) {
+        $line_item->quantity = $element['line_items'][$line_item_id]['quantity']['#value'];
+      }
+      else {
+        $name = implode('][', $element['line_items'][$line_item_id]['quantity']['#parents']);
+        form_set_error($name, 'You must specify a positive number for the quantity.');
+      }
+
+      // Only save if values were actually changed.
+      if ($line_item != $element['line_items'][$line_item_id]['line_item']['#value']) {
+        commerce_line_item_save($line_item);
+      }
+    }
+  }
+
+  // If the "Add line item" button was clicked, store the line item type in the
+  // $form_state for the rebuild of the $form array.
+  if ($form_state['clicked_button']['#value'] == t('Add line item')) {
+    $form_state['line_item_add'] = $element['actions']['line_item_type']['#value'];
+  }
+  else {
+    unset($form_state['line_item_add']);
+
+    // If the save button was clicked from the line item type action form...
+    if (array_pop($form_state['clicked_button']['#parents']) == 'save_line_item') {
+      $line_item_type = $element['actions']['line_item_type']['#value'];
+
+      // Create the new line item.
+      $line_item = commerce_line_item_new($line_item_type->type);
+
+      // Retrieve the form submit callback for this line item type.
+      $callback = $line_item_type->add_form_submit_callback;
+
+      // If this type specifies a valid add form callback function...
+      if (function_exists($callback)) {
+        // Allow the callback to alter data onto the line item to be saved and
+        // to return an error message if something goes wrong.
+        $error = $callback($line_item, $element, $form_state, $form);
+      }
+      else {
+        // Assume no error if the callback isn't specified but error if the
+        // callback is invalid.
+        $error = empty($callback) ? FALSE : t('Internal error: could not find the line item add form callback.');
+      }
+
+      // If we didn't end up with any errors...
+      if (empty($error)) {
+        // Save it and add it to the line item reference field's values array.
+        $line_item = commerce_line_item_save($line_item);
+
+        $value[] = array('line_item_id' => $line_item->line_item_id);
+      }
+      else {
+        // Otherwise display the error message; note this is not using
+        // form_set_error() on purpose, because a failed addition of a line item
+        // doesn't affect the rest of the form submission process.
+        drupal_set_message($error, 'error');
+      }
+    }
+  }
+
+  form_set_value($element, $value, $form_state);
+}
+
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function commerce_line_item_field_widget_error($element, $error) {
+  form_error($element, $error['message']);
 }
