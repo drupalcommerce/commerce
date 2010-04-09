@@ -218,22 +218,22 @@ function commerce_product_type_delete($type) {
  */
 function commerce_product_types() {
   // First check the static cache for a product types array.
-  $types = &drupal_static(__FUNCTION__);
+  $product_types = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch the types now.
-  if (!isset($types)) {
-    $types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
+  if (!isset($product_types)) {
+    $product_types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
   }
 
-  return $types;
+  return $product_types;
 }
 
 /**
  * Resets the cached list of product types.
  */
 function commerce_product_types_reset() {
-  $types = &drupal_static('commerce_product_types');
-  $types = NULL;
+  $product_types = &drupal_static('commerce_product_types');
+  $product_types = NULL;
 }
 
 /**
