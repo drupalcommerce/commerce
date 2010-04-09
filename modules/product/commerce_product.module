@@ -5,7 +5,7 @@
  * @file
  * Defines the core Commerce product entity, including the entity itself, the
  * bundle definitions (product types), and various API functions to manage
- * products and interact with them through forms ad autocompletes.
+ * products and interact with them through forms and autocompletes.
  */
 
 /**
@@ -28,13 +28,12 @@ function commerce_product_menu() {
  * Implements hook_entity_info().
  */
 function commerce_product_entity_info() {
-  $return =  array(
+  $return = array(
     'commerce_product' => array(
       'label' => t('Product'),
       'controller class' => 'CommerceProductEntityController',
       'base table' => 'commerce_product',
       'fieldable' => TRUE,
-      'path callback' => 'commerce_product_path',
       'object keys' => array(
         'id' => 'product_id',
         'bundle' => 'type',
@@ -385,16 +384,9 @@ function commerce_product_delete_multiple($product_ids) {
 }
 
 /**
- * Returns the path to a product.
- */
-function commerce_product_path($product) {
-  return 'admin/commerce/products/' . $product->product_id . '/edit';
-}
-
-/**
  * Performs token replacement on a SKU for valid tokens only.
  *
- * TODO: This function currently limits acceptable SKUs to Product ID and type
+ * TODO: This function currently limits acceptable Tokens to Product ID and type
  * with no ability to use Tokens for the Fields attached to the product. That
  * might be fine for a core Token replacement, but we should at least open the
  * $valid_tokens array up to other modules to enable various Tokens for use.

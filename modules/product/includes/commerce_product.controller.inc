@@ -7,9 +7,8 @@
  */
 
 /**
- * The controller class for products contains all the CRUD operations for
- * commerce products. The default loader, provided by core, is used for the
- * loading operation.
+ * The controller class for products contains methods for the product CRUD
+ * operations. The load method is inherited from the default controller.
  */
 class CommerceProductEntityController extends DrupalDefaultEntityController {
 
