@@ -1,0 +1,19 @@
+; $Id$
+name = Line Item UI
+description = Exposes a default UI for Line Items through line item type forms and default Views.
+package = Drupal Commerce UI
+core = 7.x
+dependencies[] = contextual
+dependencies[] = field_ui
+dependencies[] = commerce
+dependencies[] = commerce_line_item
+dependencies[] = views
+
+; Base module files
+files[] = commerce_line_item_ui.module
+
+; Module includes
+files[] = includes/commerce_line_item_ui.types.inc
+
+; Views includes
+; files[] = includes/views/commerce_line_item_ui.views_default.inc

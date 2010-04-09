@@ -6,6 +6,14 @@
  * Defines a field type for referencing products from other entities.
  */
 
+
+/**
+ * Implements hook_enable().
+ */
+function commerce_product_reference_enable() {
+  commerce_product_reference_configure_line_item();
+}
+
 /**
  * Implements hook_field_info().
  */
@@ -459,9 +467,6 @@ function commerce_product_reference_options_list($field) {
 
 /**
  * Implements hook_commerce_line_item_info().
- *
- * TODO: Move this definition to the Product Reference module, since the line
- * item will depend on that field.
  */
 function commerce_product_reference_commerce_line_item_info() {
   return array(
@@ -474,6 +479,48 @@ function commerce_product_reference_commerce_line_item_info() {
       'add_form_submit_value' => t('Add product'),
     ),
   );
+}
+
+/**
+ * Ensures the product line item type contains a product reference field.
+ */
+function commerce_product_reference_configure_line_item() {
+  $field = field_info_field('product_line_item_reference');
+  $instance = field_info_instance('commerce_line_item', 'product_line_item_reference', 'product');
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => 'product_line_item_reference',
+      'type' => 'commerce_product_reference',
+      'object_types' => array('commerce_line_item'),
+      'translatable' => FALSE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => 'product_line_item_reference',
+      'object_type' => 'commerce_line_item',
+      'bundle' => 'product',
+      'label' => t('Product'),
+      'widget_type' => 'commerce_product_reference_autocomplete',
+      'settings' => array(),
+
+      // Define default formatters for the teaser and full view.
+      'display' => array(
+        'full' => array(
+          'label' => 'hidden',
+          // 'type' => 'text_default',
+        ),
+        'teaser' => array(
+          'label' => 'hidden',
+          // 'type' => 'text_summary_or_trimmed',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
 }
 
 /**

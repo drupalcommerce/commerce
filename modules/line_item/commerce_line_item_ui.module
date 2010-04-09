@@ -1,0 +1,82 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_line_item_ui_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/line-items'] = array(
+    'title' => 'Line items',
+    'description' => 'Manage line item types for your store.',
+    'page callback' => 'commerce_line_item_ui_types_overview',
+    'access arguments' => array('administer line item types'),
+    'file' => 'includes/commerce_line_item_ui.types.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function commerce_line_item_ui_menu_alter(&$items) {
+  // Transform the field UI tabs into contextual links.
+  $items['admin/commerce/config/line-items/%commerce_line_item_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  $items['admin/commerce/config/line-items/%commerce_line_item_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function commerce_line_item_ui_admin_paths() {
+  $paths = array(
+    'admin/commerce/config/line-items' => TRUE,
+    'admin/commerce/config/line-items/*' => TRUE,
+  );
+
+  return $paths;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_line_item_ui_theme() {
+  return array(
+    'line_item_type_admin_overview' => array(
+      'variables' => array('type' => NULL),
+      'file' => 'includes/commerce_line_item_ui.types.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Expose the admin UI for line item fields.
+ */
+function commerce_line_item_ui_entity_info_alter(&$entity_info) {
+  foreach ($entity_info['commerce_line_item']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/commerce/config/line-items/%commerce_line_item_type',
+      'real path' => 'admin/commerce/config/line-items/' . $type,
+      'bundle argument' => 4,
+      'access arguments' => array('administer line item types'),
+    );
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ *
+function commerce_line_item_ui_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_line_item_ui') . '/includes/views',
+  );
+}*/
