@@ -3,6 +3,7 @@ name = Order
 description = Defines the Order entity and associated features.
 package = Drupal Commerce
 dependencies[] = rules
+dependencies[] = commerce
 dependencies[] = commerce_line_item
 core = 7.x
 
@@ -21,6 +22,7 @@ files[] = includes/views/handlers/views_handler_field_commerce_order.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_link.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_link_delete.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_link_edit.inc
+files[] = includes/views/handlers/views_handler_field_commerce_order_status.inc
 
 ; Simple tests
 ; files[] = tests/commerce_order.test

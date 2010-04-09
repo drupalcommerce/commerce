@@ -1,6 +1,6 @@
 ; $Id$
 name = Commerce
-description = Defines features and settings common to the Commerce modules.
+description = Defines features and functions common to the Commerce modules.
 package = Drupal Commerce
 core = 7.x
 

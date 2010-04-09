@@ -1,0 +1,85 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines menu items common to the various Drupal Commerce UI modules.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_ui_menu() {
+  $items = array();
+
+  // Top level "Store" container.
+  $items['admin/commerce'] = array(
+    'title' => 'Store',
+    'description' => 'Administer your store.',
+    'position' => 'right',
+    'weight' => 1,
+    'page callback' => 'commerce_ui_dashboard',
+    'access arguments' => array('access administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+  $items['admin/commerce/dashboard'] = array(
+    'title' => 'Dashboard',
+    'description' => 'Display a dashboard of store information.',
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/commerce/config'] = array(
+    'title' => 'Configuration',
+    'description' => 'Configure settings and business rules for your store.',
+    'position' => 'right',
+    'weight' => 10,
+    'page callback' => 'commerce_ui_configuration_overview',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function commerce_ui_admin_paths() {
+  $paths = array(
+    'admin/commerce' => TRUE,
+    'admin/commerce/dashboard' => TRUE,
+    'admin/commerce/config' => TRUE,
+  );
+
+  return $paths;
+}
+
+/**
+ * Displays the store dashboard tab.
+ */
+function commerce_ui_dashboard() {
+  // Get rid of the normal admin Dashboard breadcrumb.
+  drupal_set_breadcrumb(array(l(t('Home'), '<front>')));
+
+  return system_admin_menu_block_page();
+}
+
+/**
+ * Displays the store configuration overview.
+ */
+function commerce_ui_configuration_overview() {
+  // Get rid of the normal admin Dashboard breadcrumb.
+  $breadcrumb = array(
+    l(t('Home'), '<front>'),
+    l(t('Store'), 'admin/commerce'),
+  );
+
+  drupal_set_breadcrumb($breadcrumb);
+
+  return system_admin_menu_block_page();
+}

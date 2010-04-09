@@ -1,0 +1,8 @@
+; $Id$
+name = Commerce UI
+description = Defines menu items common to the various Drupal Commerce UI modules.
+package = Drupal Commerce UI
+core = 7.x
+
+; Base module files
+files[] = commerce_ui.module
