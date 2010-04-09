@@ -2,12 +2,14 @@
 name = Cart
 description = Implements the shopping cart system and add to cart features.
 package = Drupal Commerce
-dependencies[] = commerce
+dependencies[] = commerce_line_item
+dependencies[] = commerce_order
+dependencies[] = commerce_product
+dependencies[] = commerce_product_reference
 core = 7.x
 
 ; Base module files
 files[] = commerce_cart.module
-;files[] = commerce_cart.install
 
 ; Views include
 ; files[] = includes/views/commerce_cart.views.inc
