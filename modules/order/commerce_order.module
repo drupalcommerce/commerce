@@ -88,9 +88,6 @@ function commerce_order_permission() {
     'administer orders' => array(
       'title' => t('Administer orders'),
     ),
-    'administer line item types' => array(
-      'title' => t('Administer line item types'),
-    ),
     'access orders' => array(
       'title' => t('Access lists of orders, primarily for viewing and referencing'),
     ),

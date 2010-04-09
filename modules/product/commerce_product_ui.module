@@ -57,7 +57,6 @@ function commerce_product_ui_menu() {
     'title' => 'Product types',
     'description' => 'Manage products types for your store.',
     'page callback' => 'commerce_product_ui_types_overview',
-    'page arguments' => array(),
     'access arguments' => array('administer products'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
