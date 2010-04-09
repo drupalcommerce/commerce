@@ -27,6 +27,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       'type' => $type,
       'title' => '',
       'uid' => '',
+      'status' => 1,
       'created' => '',
       'changed' => '',
     );

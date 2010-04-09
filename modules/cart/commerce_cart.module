@@ -100,9 +100,8 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
   // Load and validate the specified product ID.
   $product = commerce_product_load($product_id);
 
-  // TODO: Add support to products for status; i.e. is the product any longer
-  // available for sale?
-  if (empty($product)) {
+  // Fail if the product does not exist or is disabled.
+  if (empty($product) || !$product->status) {
     return FALSE;
   }
 

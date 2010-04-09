@@ -78,11 +78,27 @@ function commerce_product_ui_product_form($form, &$form_state, $product) {
   $form_state['commerce_product'] = $product;
   field_attach_form('commerce_product', $product, $form, $form_state);
 
-  $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
+  $form['status'] = array(
+    '#type' => 'radios',
+    '#title' => t('Status'),
+    '#description' => t('Disabled products cannot be added to shopping carts and may be hidden in administrative product lists.'),
+    '#options' => array(
+      '1' => t('Active'),
+      '0' => t('Disabled'),
+    ),
+    '#default_value' => $product->status,
+    '#required' => TRUE,
+    '#weight' => 35,
+  );
+
+  $form['actions'] = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('form-actions')),
+    '#weight' => 40,
+  );
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save product'),
-    '#weight' => 40,
   );
 
   // Add the save and continue button for new products.
@@ -145,6 +161,7 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
   // Save default parameters back into the $product object.
   $product->sku = $form_state['values']['sku'];
   $product->title = $form_state['values']['title'];
+  $product->status = $form_state['values']['status'];
 
   // Set the product's uid if it's being created at this time.
   if (empty($product->product_id)) {

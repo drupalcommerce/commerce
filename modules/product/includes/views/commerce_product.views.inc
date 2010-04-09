@@ -107,6 +107,24 @@ function commerce_product_views_data() {
     ),
   );
 
+  // Expose the product status.
+  $data['commerce_product']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('Whether or not the product is active.'),
+    'field' => array(
+      'handler' => 'views_handler_field_boolean',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_boolean_operator',
+      'label' => t('Active'),
+      'type' => 'yes-no',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   // Expose the created and changed timestamps.
   $data['commerce_product']['created'] = array(
     'title' => t('Created date'),

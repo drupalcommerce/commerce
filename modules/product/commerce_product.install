@@ -57,6 +57,13 @@ function commerce_product_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'status' => array(
+        'description' => 'Boolean indicating whether or not the product appears in lists and may be added to orders.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
       'created' => array(
         'description' => 'The Unix timestamp when the product was created.',
         'type' => 'int',

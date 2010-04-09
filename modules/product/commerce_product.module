@@ -82,6 +82,11 @@ function commerce_product_field_extra_fields() {
         'description' => t('Product module title form element'),
         'weight' => -5,
       ),
+      'status' => array(
+        'label' => 'Status',
+        'description' => t('Product module status form element'),
+        'weight' => 35,
+      ),
     );
   }
 
