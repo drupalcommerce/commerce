@@ -93,6 +93,19 @@ function commerce_line_item_views_api() {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function commerce_line_item_permission() {
+  $permissions = array(
+    'administer line item types' => array(
+      'title' => t('Administer line item types'),
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
  * Returns a single line item type object.
  *
  * @param $type
@@ -100,7 +113,7 @@ function commerce_line_item_views_api() {
  * @return
  *   The specified line item type object or FALSE if it does not exist.
  */
-function commerce_line_item_type_info($type) {
+function commerce_line_item_type_load($type) {
   $line_item_types = commerce_line_item_types();
 
   return isset($line_item_types[$type]) ? $line_item_types[$type] : FALSE;
@@ -526,7 +539,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       $element['actions'] = array();
 
       // Load the info object for the selected line item type.
-      $line_item_type = commerce_line_item_type_info($form_state['line_item_add']);
+      $line_item_type = commerce_line_item_type_load($form_state['line_item_add']);
 
       // Store the line item info object in the form array.
       $element['actions']['line_item_type'] = array(

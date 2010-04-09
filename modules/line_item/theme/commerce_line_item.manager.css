@@ -1,5 +1,13 @@
 /* $Id$ */
 
+#line-item-manager caption {
+  font-size: 100%;
+  font-weight: bold;
+  padding-bottom: 5px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
 .add-line-item .form-type-select {
   float: left;
   padding: 3px 10px 0 0;
