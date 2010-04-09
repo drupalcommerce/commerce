@@ -1,0 +1,20 @@
+; $Id$
+name = Order UI
+description = Exposes a default UI for Orders through order edit forms and default Views.
+package = Drupal Commerce UI
+core = 7.x
+dependencies[] = contextual
+dependencies[] = field_ui
+dependencies[] = commerce
+dependencies[] = commerce_line_item
+dependencies[] = commerce_order
+dependencies[] = views
+
+; Base module files
+files[] = commerce_order_ui.module
+
+; Module includes
+files[] = includes/commerce_order_ui.orders.inc
+
+; Views includes
+files[] = includes/views/commerce_order_ui.views_default.inc

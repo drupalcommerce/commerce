@@ -28,13 +28,14 @@ function commerce_order_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'views_handler_filter_numeric',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
+    // TODO: Provide an argument handler for orders.
     'argument' => array(
-      'handler' => 'views_handler_argument_string',
+      'handler' => 'views_handler_argument_numeric',
     ),
   );
 
@@ -47,13 +48,14 @@ function commerce_order_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'views_handler_filter_numeric',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
+    // TODO: Provide an argument handler for orders.
     'argument' => array(
-      'handler' => 'views_handler_argument_string',
+      'handler' => 'views_handler_argument_numeric',
     ),
   );
 
@@ -113,6 +115,13 @@ function commerce_order_views_data() {
   );
 
   // Expose links to operate on the order.
+  $data['commerce_order']['view_order'] = array(
+    'field' => array(
+      'title' => t('Link'),
+      'help' => t('Provide a simple link to the administrator view of the order.'),
+      'handler' => 'views_handler_field_commerce_order_link',
+    ),
+  );
   $data['commerce_order']['edit_order'] = array(
     'field' => array(
       'title' => t('Edit link'),
@@ -120,7 +129,6 @@ function commerce_order_views_data() {
       'handler' => 'views_handler_field_commerce_order_link_edit',
     ),
   );
-
   $data['commerce_order']['delete_order'] = array(
     'field' => array(
       'title' => t('Delete link'),

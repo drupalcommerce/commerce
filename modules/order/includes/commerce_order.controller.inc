@@ -36,6 +36,8 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
   /**
    * Saves an order.
    *
+   * TODO: Implement order versioning, see http://drupal.org/node/736486.
+   *
    * @param $order
    *   The full order object to save.
    * @return
@@ -67,6 +69,15 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
         // Save the new order and fields.
         drupal_write_record('commerce_order', $order);
         field_attach_insert('commerce_order', $order);
+
+        // Save the order number.
+        // TODO: Provide token support for order number patterns.
+        $order->order_number = $order->order_id;
+
+        db_update('commerce_order')
+          ->fields(array('order_number' => $order->order_number))
+          ->condition('order_id', $order->order_id)
+          ->execute();
 
         $op = 'insert';
       }

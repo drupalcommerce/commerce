@@ -9,6 +9,8 @@
 
 /**
  * Implements hook_entity_info().
+ *
+ * TODO: Implement order versioning, see http://drupal.org/node/736486.
  */
 function commerce_order_entity_info() {
   $return = array(
@@ -16,10 +18,11 @@ function commerce_order_entity_info() {
       'label' => t('Order'),
       'controller class' => 'CommerceOrderEntityController',
       'base table' => 'commerce_order',
+      // 'revision table' => 'commerce_order_revision',
       'fieldable' => TRUE,
       'object keys' => array(
         'id' => 'order_id',
-        'revision' => 'revision_id',
+        // 'revision' => 'revision_id',
       ),
       'bundles' => array(
         'order' => array(
@@ -207,6 +210,47 @@ function commerce_order_delete_multiple($order_ids) {
 }
 
 /**
+ * Checks order access for various operations.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $order
+ *   Optionally an order to check access for.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the current user.
+ */
+function commerce_order_access($op, $order = NULL, $account = NULL) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  if (user_access('administer orders', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'view' && user_access('access orders', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'create' && user_access('create orders', $account)) {
+    return TRUE;
+  }
+
+  if (isset($order) && ($op == 'update' || $op == 'delete')) {
+    if (user_access('edit any order')) {
+      return TRUE;
+    }
+
+    // Others either don't have any access or must match the order uid.
+    if ($account->uid && user_access('edit own orders', $account) && $order->creator_uid == $account->uid) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
  * Performs token replacement on an order number for valid tokens only.
  *
  * TODO: This function currently limits acceptable Tokens to Order ID with no
@@ -285,47 +329,6 @@ function commerce_order_validate_number_unique($order_number, $order_id) {
   }
 
   return TRUE;
-}
-
-/**
- * Checks order access for various operations.
- *
- * @param $op
- *   The operation being performed. One of 'view', 'update', 'create' or
- *   'delete'.
- * @param $order
- *   Optionally an order to check access for.
- * @param $account
- *   The user to check for. Leave it to NULL to check for the current user.
- */
-function commerce_order_access($op, $order = NULL, $account = NULL) {
-  global $user;
-  $account = isset($account) ? $account : $user;
-
-  if (user_access('administer orders', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'view' && user_access('access orders', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'create' && user_access('create orders', $account)) {
-    return TRUE;
-  }
-
-  if (isset($order) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any order')) {
-      return TRUE;
-    }
-
-    // Others either don't have any access or must match the order uid.
-    if ($account->uid && user_access('edit own orders', $account) && $order->creator_uid == $account->uid) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
 }
 
 /**

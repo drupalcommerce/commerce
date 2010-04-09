@@ -1,0 +1,180 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_order_ui_menu() {
+  $items = array();
+
+  // Note: admin/commerce/orders will be created by Views.
+
+  // Create an order.
+  $items['admin/commerce/orders/add'] = array(
+    'title' => 'Create an order',
+    'description' => 'Create a new order.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_ui_order_form', commerce_order_new()),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('create'),
+    'file' => 'includes/commerce_order_ui.orders.inc',
+  );
+  $items['admin/commerce/orders/add/%user'] = array(
+    'title' => 'Create an order',
+    'description' => 'Create a new order for the specified user.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_ui_order_form', commerce_order_new(), 4),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('create'),
+    'file' => 'includes/commerce_order_ui.orders.inc',
+  );
+
+  $items['admin/commerce/orders/%commerce_order'] = array(
+    'title callback' => 'commerce_order_ui_order_title',
+    'title arguments' => array(3),
+    'page callback' => 'commerce_order_ui_order_view',
+    'page arguments' => array('administrator', 3),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_order_ui.orders.inc',
+  );
+  $items['admin/commerce/orders/%commerce_order/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+  $items['admin/commerce/orders/%commerce_order/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_ui_order_form', 3),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('update', 3),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -5,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'file' => 'includes/commerce_order_ui.orders.inc',
+  );
+  $items['admin/commerce/orders/%commerce_order/delete'] = array(
+    'title' => 'Delete an order',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_ui_order_delete_form', 3),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('update', 3),
+    'file' => 'includes/commerce_order_ui.orders.inc',
+  );
+
+  $items['admin/commerce/config/order'] = array(
+    'title' => 'Order settings',
+    'description' => 'Configure general order settings, fields, and displays.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_settings_form'),
+    'access arguments' => array('administer orders'),
+    'file' => 'includes/commerce_order_ui.orders.inc',
+    'weight' => -10,
+  );
+  $items['admin/commerce/config/order/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  return $items;
+}
+
+/**
+ * Menu item title callback: returns the number of an order for its pages.
+ *
+ * @param $order
+ *   The order object as loaded via the URL wildcard.
+ * @return
+ *   A page title of the format "Order ##".
+ */
+function commerce_order_ui_order_title($order) {
+  return t('Order @number', array('@number' => $order->order_number));
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function commerce_order_ui_menu_alter(&$items) {
+  // Transform the field UI tabs into contextual links.
+  $items['admin/commerce/config/order/settings/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  $items['admin/commerce/config/order/settings/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function commerce_order_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'admin/commerce/orders/add' on 'admin/commerce/orders' page.
+  if ($root_path == 'admin/commerce/orders') {
+    $item = menu_get_item('admin/commerce/orders/add');
+    if ($item['access']) {
+      $item['title'] = t('Create an order');
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function commerce_order_ui_admin_paths() {
+  $paths = array(
+    'admin/commerce/orders' => TRUE,
+    'admin/commerce/orders/add' => TRUE,
+    'admin/commerce/orders/add/*' => TRUE,
+    'admin/commerce/orders/*/edit' => TRUE,
+    'admin/commerce/orders/*/delete' => TRUE,
+    'admin/commerce/config/order/settings' => TRUE,
+    'admin/commerce/config/order/settings/*' => TRUE,
+  );
+
+  return $paths;
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_order_ui_help($path, $arg) {
+  // Display a user configurable help text on the order add page.
+  if (strpos($path, 'admin/commerce/orders/add') === 0) {
+    $help = variable_get('commerce_order_help_text', '');
+
+    if (!empty($help)) {
+      return '<p>' . filter_xss_admin($help) . '</p>';
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Expose the order UI for order fields.
+ */
+function commerce_order_ui_entity_info_alter(&$entity_info) {
+  $entity_info['commerce_order']['bundles']['order']['admin'] = array(
+    'path' => 'admin/commerce/config/order',
+    'real path' => 'admin/commerce/config/order',
+    'access arguments' => array('administer orders'),
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_order_ui_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_order_ui') . '/includes/views',
+  );
+}
