@@ -384,6 +384,48 @@ function commerce_product_delete_multiple($product_ids) {
 }
 
 /**
+ * Checks product access for various operations.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $product
+ *   Optionally a product to check access for or for the create operation the
+ *   product type. If nothing is given access permissions for all products are returned.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the current user.
+ */
+function commerce_product_access($op, $product = NULL, $account = NULL) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  if (user_access('administer products', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'view' && user_access('access products', $account)) {
+    return TRUE;
+  }
+
+  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product, $account)) {
+    return TRUE;
+  }
+
+  if (isset($product) && ($op == 'update' || $op == 'delete')) {
+    if (user_access('edit any ' . $product->type, $account)) {
+      return TRUE;
+    }
+
+    // Others either don't have any access or must match the product uid.
+    if ($account->uid && user_access('edit own ' . $product->type, $account) && $product->uid == $account->uid) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
  * Performs token replacement on a SKU for valid tokens only.
  *
  * TODO: This function currently limits acceptable Tokens to Product ID and type
@@ -463,40 +505,16 @@ function commerce_product_validate_sku_unique($sku, $product_id) {
 }
 
 /**
- * Checks product access for various operations.
- *
- * @param $op
- *   The operation being performed. One of 'view', 'update', 'create' or
- *   'delete'.
- * @param $product
- *   Optionally a product to check access for or for the create operation the
- *   product type. If nothing is given access permissions for all products are returned.
- * @param $account
- *   The user to check for. Leave it to NULL to check for the current user.
+ * Implements hook_commerce_line_item_info().
  */
-function commerce_product_access($op, $product = NULL, $account = NULL) {
-  global $user;
-  $account = isset($account) ? $account : $user;
-
-  if (user_access('administer products', $account)) {
-    return TRUE;
-  }
-  if ($op == 'view' && user_access('access products', $account)) {
-    return TRUE;
-  }
-  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product, $account)) {
-    return TRUE;
-  }
-  if (isset($product) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any ' . $product->type, $account)) {
-      return TRUE;
-    }
-    // Others either don't have any access or must match the product uid.
-    if ($account->uid && user_access('edit own ' . $product->type, $account) && $product->uid == $account->uid) {
-      return TRUE;
-    }
-  }
-  return FALSE;
+function commerce_product_commerce_line_item_info() {
+  return array(
+    'product' => (object) array(
+      'type' => 'product',
+      'name' => t('Product'),
+      'description' => t('References a product and displays it with the SKU as the label.'),
+    ),
+  );
 }
 
 /**

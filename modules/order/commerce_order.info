@@ -3,7 +3,7 @@ name = Order
 description = Defines the Order entity and associated features.
 package = Drupal Commerce
 dependencies[] = rules
-; dependencies[] = commerce_line_item
+dependencies[] = commerce_line_item
 core = 7.x
 
 ; Base module files

@@ -1,0 +1,26 @@
+; $Id$
+name = Line Item
+description = Defines the Line Item entity and associated features.
+package = Drupal Commerce
+dependencies[] = rules
+; dependencies[] = commerce_price
+core = 7.x
+
+; Base module files
+files[] = commerce_line_item.module
+files[] = commerce_line_item.install
+
+; Module includes
+files[] = includes/commerce_line_item.controller.inc
+
+; Views include
+files[] = includes/views/commerce_line_item.views.inc
+
+; Views handlers
+; files[] = includes/views/handlers/views_handler_field_commerce_line_item.inc
+; files[] = includes/views/handlers/views_handler_field_commerce_line_item_link.inc
+; files[] = includes/views/handlers/views_handler_field_commerce_line_item_link_delete.inc
+; files[] = includes/views/handlers/views_handler_field_commerce_line_item_link_edit.inc
+
+; Simple tests
+; files[] = tests/commerce_line_item.test

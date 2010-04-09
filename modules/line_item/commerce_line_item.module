@@ -1,0 +1,257 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines the core Commerce line item entity and API functions interact with
+ * line items on orders.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function commerce_line_item_entity_info() {
+  $return = array(
+    'commerce_line_item' => array(
+      'label' => t('Line item'),
+      'controller class' => 'CommerceLineItemEntityController',
+      'base table' => 'commerce_line_item',
+      'fieldable' => TRUE,
+      'object keys' => array(
+        'id' => 'line_item_id',
+        'bundle' => 'type',
+      ),
+      'bundle keys' => array(
+        'bundle' => 'type',
+      ),
+      'bundles' => array(),
+      'load hook' => 'commerce_line_item_load',
+      'view modes' => array(
+        'display' => array(
+          'label' => t('Display'),
+        ),
+      ),
+      'creation callback' => '_commerce_line_item_create',
+      'save callback' => 'commerce_line_item_save',
+      'deletion callback' => 'commerce_line_item_delete',
+      'access callback' => 'commerce_line_item_access',
+    ),
+  );
+
+  foreach (commerce_line_item_type_get_name() as $type => $name) {
+    $return['commerce_line_item']['bundles'][$type] = array(
+      'label' => $name,
+    );
+  }
+
+  return $return;
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function commerce_line_item_field_extra_fields() {
+  $extra = array();
+
+  foreach (commerce_line_item_types() as $type => $line_item_type) {
+    $extra['commerce_line_item'][$type] = array(
+      'label' => array(
+        'label' => 'Line item label',
+        'description' => t('Line item module label form element'),
+        'weight' => -10,
+      ),
+      'quantity' => array(
+        'label' => 'Quantity',
+        'description' => t('Line item module quantity form element'),
+        'weight' => -5,
+      ),
+    );
+  }
+
+  return $extra;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_line_item_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views',
+  );
+}
+
+/**
+ * Returns an array of line item type objects keyed by type.
+ */
+function commerce_line_item_types() {
+  // First check the static cache for a line item types array.
+  $line_item_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($line_item_types)) {
+    $line_item_types = module_invoke_all('commerce_line_item_info');
+    drupal_alter('commerce_line_item_info', $line_item_types);
+  }
+
+  return $line_item_types;
+}
+
+/**
+ * Resets the cached list of line item types.
+ */
+function commerce_line_item_types_reset() {
+  $line_item_types = &drupal_static('commerce_line_item_types');
+  $line_item_types = NULL;
+}
+
+/**
+ * Returns the human readable name of any or all line item types.
+ *
+ * @param $type
+ *   Optional parameter specifying the type whose name to return.
+ * @return
+ *   Either an array of all line item type names keyed by the machine name or a
+ *     string containing the human readable name for the specified type. If a
+ *     type is specified that does not exist, this function returns FALSE.
+ */
+function commerce_line_item_type_get_name($type = NULL) {
+  $line_item_types = commerce_line_item_types();
+
+  // Return a type name if specified and it exists.
+  if (!empty($type)) {
+    if (isset($line_item_types[$type])) {
+      return $line_item_types[$type]->name;
+    }
+    else {
+      // Return FALSE if it does not exist.
+      return FALSE;
+    }
+  }
+
+  // Otherwise turn the array values into the type name only.
+  foreach ($line_item_types as $key => $value) {
+    $line_item_types[$key] = $value->name;
+  }
+
+  return $line_item_types;
+}
+
+/**
+ * Title callback: return the human-readable line item type name.
+ */
+function commerce_line_item_type_title($line_item_type) {
+  return $line_item_type->name;
+}
+
+/**
+ * Returns a path argument from a line item type.
+ */
+function commerce_line_item_type_to_arg($type) {
+  return $type;
+}
+
+/**
+ * Returns an initialized line item object.
+ *
+ * @param $type
+ *   The machine-readable type of the line item.
+ * @return
+ *   A line item object with all default fields initialized.
+ */
+function commerce_line_item_new($type = '') {
+  return entity_get_controller('commerce_line_item')->create($type);
+}
+
+/**
+ * Creation callback for the Entity Metadata module.
+ */
+function _commerce_line_item_create($values = array()) {
+  // Create a new line item of the specified type.
+  $line_item = commerce_line_item_new($values['type']);
+  unset($values['type']);
+
+  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+  foreach ($values as $name => $value) {
+    $wrapper->$name->set($value);
+  }
+
+  return $wrapper;
+}
+
+/**
+ * Saves a line item.
+ *
+ * @param $line_item
+ *   The full line item object to save.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_line_item_save($line_item) {
+  return entity_get_controller('commerce_line_item')->save($line_item);
+}
+
+/**
+ * Loads a line item by ID.
+ */
+function commerce_line_item_load($line_item_id) {
+  $line_items = commerce_line_item_load_multiple(array($line_item_id), array());
+  return $line_items ? reset($line_items) : FALSE;
+}
+
+/**
+ * Loads multiple line items by ID or based on a set of matching conditions.
+ *
+ * @see entity_load()
+ *
+ * @param $line_item_ids
+ *   An array of line item IDs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_line_item} table in the form
+ *     'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal line item loading cache.
+ *
+ * @return
+ *   An array of line item objects indexed by line_item_id.
+ */
+function commerce_line_item_load_multiple($line_item_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_line_item', $line_item_ids, $conditions, $reset);
+}
+
+/**
+ * Deletes a line_item by ID.
+ *
+ * @param $line_item_id
+ *   The ID of the line_item to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_line_item_delete($line_item_id) {
+  return commerce_line_item_delete_multiple(array($line_item_id));
+}
+
+/**
+ * Deletes multiple line items by ID.
+ *
+ * @param $line_item_ids
+ *   An array of line item IDs to delete.
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_line_item_delete_multiple($line_item_ids) {
+  return entity_get_controller('commerce_line_item')->delete($line_item_ids);
+}
+
+/**
+ * Handler to load the unchanged line item variable for rules.
+ * @see commerce_line_item_rules_variables().
+ */
+function commerce_line_item_rules_var_unchanged($line_item) {
+  $unchanged = drupal_static('commerce_line_item_unchanged');
+
+  if (isset($line_item->line_item_id) && isset($unchanged[$line_item->line_item_id])) {
+    return $unchanged[$line_item->line_item_id];
+  }
+}
