@@ -18,6 +18,8 @@ function commerce_product_token_info() {
   );
 
   // Tokens for products.
+  $product = array();
+  
   $product['product-id'] = array(
     'name' => t('Product ID'),
     'description' => t('The internal numeric ID of the product.'),
