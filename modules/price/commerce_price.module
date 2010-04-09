@@ -4,7 +4,7 @@
 /**
  * Return a list of available currencies.
  */
-function commerce_price_available_currencies() {
+function commerce_price_currencies() {
   // Define base currencies.
   $currencies = array(
     'und' => array(

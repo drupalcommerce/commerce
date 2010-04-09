@@ -9,7 +9,7 @@
  * that price changes are recorded.
  */
 
-class commercePrice {
+class CommercePrice {
   // Initialize base variables
   protected $price = 0;
   protected $basePrice = 0;
@@ -39,8 +39,8 @@ class commercePrice {
    * @return
    *   TRUE for success, otherwise FALSE.
    */
-  function modifyPrice($amount = 0, $module = '', $description = '') {
-    if (is_numeric($amount) && !empty($module) && !empty($description)) {
+  function modifyPrice($amount, $module, $description) {
+    if (is_numeric($amount)) {
       $this->log[] = array(
         'module' => $module,
         'description' => $description,
@@ -51,7 +51,7 @@ class commercePrice {
     }
     else {
       // Submit a watchdog error if there is not enough data to change the price.
-      watchdog('error', '%module could not successfully modify the price by %amount for %description', array('%module' => $module, '%amount' => $amount, '%description' => $description));
+      watchdog('error', 'Attempt to modify a price by a non-numeric value. %module - %description - %amount', array('%module' => $module, '%amount' => $amount, '%description' => $description));
       return FALSE
     }
   }
