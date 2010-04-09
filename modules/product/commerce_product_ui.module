@@ -16,6 +16,7 @@ function commerce_product_ui_menu() {
   // Add a product.
   $items['admin/commerce/products/add'] = array(
     'title' => 'Add a product',
+    'description' => 'Add a new product for sale.',
     'page callback' => 'commerce_product_ui_add_page',
     'access callback' => 'commerce_product_ui_product_add_any_access',
     'file' => 'includes/commerce_product_ui.products.inc',
