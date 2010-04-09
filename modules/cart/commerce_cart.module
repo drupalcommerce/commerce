@@ -183,10 +183,13 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
  *
  * @param $product_ids
  *   An array of product IDs that will be included in the form.
+ * @param $quantity
+ *   The default quantity to place in the quantity textfield; leave 0 to default
+ *     to a hidden quantity textfield with a value of 1.
  * @return
  *   The form array.
  */
-function commerce_cart_form($form, &$form_state, $product_ids) {
+function commerce_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
   global $user;
 
   // Store the customer uid in the form so other modules can override with a
@@ -229,6 +232,23 @@ function commerce_cart_form($form, &$form_state, $product_ids) {
       );
     }
 
+    // If a quantity greater than 0 is specified, present a quantity selector as
+    // a textfield with the value as the default.
+    if ($quantity > 0) {
+      $form['quantity'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Quantity'),
+        '#default_value' => $quantity,
+        '#size' => 5,
+      );
+    }
+    else {
+      $form['quantity'] = array(
+        '#type' => 'hidden',
+        '#value' => 1,
+      );
+    }
+
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Add to cart'),
@@ -239,6 +259,15 @@ function commerce_cart_form($form, &$form_state, $product_ids) {
 }
 
 /**
+ * Form validate handler: validate the product and quantity to add to the cart.
+ */
+function commerce_cart_form_validate($form, &$form_state) {
+  if (!is_numeric($form_state['values']['quantity']) || $form_state['values']['quantity'] <= 0) {
+    form_set_error('quantity', t('You must specify a valid quantity to add to the cart.'));
+  }
+}
+
+/**
  * Form submit handler: add the selected product to the cart.
  */
 function commerce_cart_form_submit($form, &$form_state) {
@@ -246,8 +275,7 @@ function commerce_cart_form_submit($form, &$form_state) {
   $product = $form_state['products'][$product_id];
 
   // Add the product to the specified shopping cart.
-  // TODO: Derive the quantity (argument 3) from the add to cart form.
-  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id, 1);
+  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id, $form_state['values']['quantity']);
 
   drupal_set_message(t('%title added to your cart.', array('%title' => $product->title)));
 }
