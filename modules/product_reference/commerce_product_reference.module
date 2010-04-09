@@ -8,13 +8,6 @@
 
 
 /**
- * Implements hook_enable().
- */
-function commerce_product_reference_enable() {
-  commerce_product_reference_configure_line_item();
-}
-
-/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
