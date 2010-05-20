@@ -138,6 +138,7 @@ function commerce_line_item_permission() {
  *
  * @param $type
  *   The machine-readable name of the line item type.
+ *
  * @return
  *   The specified line item type object or FALSE if it does not exist.
  */
@@ -176,6 +177,7 @@ function commerce_line_item_types_reset() {
  *
  * @param $type
  *   Optional parameter specifying the type whose name to return.
+ *
  * @return
  *   Either an array of all line item type names keyed by the machine name or a
  *     string containing the human readable name for the specified type. If a
@@ -285,6 +287,7 @@ function commerce_line_item_type_to_arg($type) {
  *
  * @param $type
  *   The machine-readable type of the line item.
+ *
  * @return
  *   A line item object with all default fields initialized.
  */
@@ -314,6 +317,7 @@ function _commerce_line_item_create($values = array()) {
  *
  * @param $line_item
  *   The full line item object to save.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -341,6 +345,7 @@ function commerce_line_item_load($line_item_id) {
  *     'field' => $value.
  * @param $reset
  *   Whether to reset the internal line item loading cache.
+ *
  * @return
  *   An array of line item objects indexed by line_item_id.
  */
@@ -353,6 +358,7 @@ function commerce_line_item_load_multiple($line_item_ids = array(), $conditions 
  *
  * @param $line_item_id
  *   The ID of the line_item to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -365,6 +371,7 @@ function commerce_line_item_delete($line_item_id) {
  *
  * @param $line_item_ids
  *   An array of line item IDs to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */

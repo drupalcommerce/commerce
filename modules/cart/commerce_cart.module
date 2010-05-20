@@ -154,6 +154,7 @@ function commerce_cart_block_view($delta) {
  * @param $customer_uid
  *   The uid of the customer whose cart to load. If left 0, attempts to load
  *     an anonymous order from the session.
+ *
  * @return
  *   The fully loaded shopping cart order or FALSE if non-existent.
  */
@@ -204,6 +205,7 @@ function commerce_cart_orders_reset() {
  * @param $customer_uid
  *   The uid of the user for whom to create the order. If left 0, the order will
  *     be created for the current user and associated with his or her session.
+ *
  * @return
  *   The newly created shopping cart order object.
  */
@@ -229,6 +231,7 @@ function commerce_cart_order_new($customer_uid = 0) {
  *   The uid of the user whose cart you are adding the product to.
  * @param $product_id
  *   The ID of the product to add to the cart.
+ *
  * @return
  *   The entire shopping cart order object or FALSE on failure.
  */
@@ -331,6 +334,7 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
  * @param $quantity
  *   The default quantity to place in the quantity textfield; leave 0 to default
  *     to a hidden quantity textfield with a value of 1.
+ *
  * @return
  *   The form array.
  */

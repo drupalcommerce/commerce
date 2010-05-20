@@ -36,6 +36,7 @@ function commerce_order_ui_order_view($mode, $order) {
  *   For new orders, the customer's user account.
  * @param $breadcrumb
  *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
+ *
  * @return
  *   The form array to add or edit an order.
  */
@@ -143,6 +144,7 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
  *   The order object to delete through the form.
  * @param $breadcrumb
  *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
+ *
  * @return
  *   The form array to add or edit an order.
  */

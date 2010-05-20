@@ -181,6 +181,7 @@ function commerce_order_commerce_order_status_info() {
  *
  * @param $customer_uid
  *   The uid of the customer the order is for.
+ *
  * @return
  *   An order object with all default fields initialized.
  */
@@ -216,6 +217,7 @@ function _commerce_order_create($values = array()) {
  *
  * @param $order
  *   The full order object to save.
+ *
  * @return
  *   The saved order object on success, FALSE on failure.
  */
@@ -264,6 +266,7 @@ function commerce_order_load_multiple($order_ids = array(), $conditions = array(
  *
  * @param $order_id
  *   The ID of the order to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -276,6 +279,7 @@ function commerce_order_delete($order_id) {
  *
  * @param $order_ids
  *   An array of order IDs to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -336,6 +340,7 @@ function commerce_order_access($op, $order = NULL, $account = NULL) {
  *   The raw order number string including any tokens as entered.
  * @param $order
  *   An order object used to perform token replacement on the number.
+ *
  * @return
  *   The number with tokens replaced or FALSE if it included invalid tokens.
  */
@@ -372,6 +377,7 @@ function commerce_order_replace_number_tokens($order_number, $order) {
  *
  * @param $order_number
  *   The order number string to validate.
+ *
  * @return
  *   TRUE or FALSE indicating whether or not the order number contains valid
  *     characters.
@@ -388,6 +394,7 @@ function commerce_order_validate_number_characters($order_number) {
  * @param $order_id
  *   The ID of the order the number is for; an empty value represents the number
  *     is meant for a new order.
+ *
  * @return
  *   TRUE or FALSE indicating whether or not the number exists for another
  *     order.
@@ -452,6 +459,7 @@ function commerce_order_states_reset() {
  *
  * @param $order_state
  *   The fully loaded order state object.
+ *
  * @return
  *   The return value of the call to drupal_write_record() to save the order
  *     state, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
@@ -466,6 +474,7 @@ function commerce_order_state_save($order_state) {
  *
  * @param $name
  *   The machine readable name string of the state to return.
+ *
  * @return
  *   The fully loaded state object or FALSE if not found.
  */
@@ -494,6 +503,7 @@ function commerce_order_state_reset($name) {
  * @param $name
  *   Optional parameter specifying the status_id of the order status whose title
  *     to return.
+ *
  * @return
  *   Either an array of all order status titles keyed by the status_id or a
  *     string containing the human readable title for the specified status. If a
@@ -533,6 +543,7 @@ function commerce_order_state_get_title($name = NULL) {
  * @param $state
  *   Optionally specify the name of an order state to limit the returned values
  *     to that particular state.
+ *
  * @return
  *   An array containing some or all of the defined order status objects.
  */
@@ -587,6 +598,7 @@ function commerce_order_statuses_reset() {
  *
  * @param $order_status
  *   The fully loaded order status object.
+ *
  * @return
  *   The return value of the call to drupal_write_record() to save the order
  *     status, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
@@ -601,6 +613,7 @@ function commerce_order_status_save($order_status) {
  *
  * @param $name
  *   The machine readable name string of the status to return.
+ *
  * @return
  *   The fully loaded status object or FALSE if not found.
  */
@@ -629,6 +642,7 @@ function commerce_order_status_reset($name) {
  * @param $name
  *   Optional parameter specifying the name of the order status whose title
  *     to return.
+ *
  * @return
  *   Either an array of all order status titles keyed by the status_id or a
  *     string containing the human readable title for the specified status. If a
@@ -663,8 +677,9 @@ function commerce_order_status_get_title($name = NULL) {
  *   The fully loaded order object to update.
  * @param $name
  *   The machine readable name string of the status to update to.
+ *
  * @return
- *   The update order.
+ *   The updated order.
  */
 function commerce_order_status_update($order, $name) {
   $new_order = clone($order);

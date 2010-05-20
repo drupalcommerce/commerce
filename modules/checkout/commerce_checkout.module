@@ -113,6 +113,7 @@ function commerce_checkout_theme() {
  *
  * @param $review
  *   TRUE or FALSE indicating whether or not to include the review page.
+ *
  * @return
  *   An associative array of checkout page objects keyed by the page_id.
  */
@@ -181,6 +182,7 @@ function commerce_checkout_pages($review = TRUE) {
  *
  * @param $page_id
  *   The ID of the page to return.
+ *
  * @return
  *   The fully loaded page object or FALSE if not found.
  */
@@ -203,6 +205,7 @@ function commerce_checkout_page_load($page_id) {
  *   An array of attributes to filter the returned list by; for example, if you
  *     specify 'enabled' => TRUE in the array, then only checkout panes with an
  *     enabled value equal to TRUE would be included.
+ *
  * @return
  *   The array of checkout panes, keyed by pane ID.
  */
@@ -284,6 +287,7 @@ function commerce_checkout_panes($filter = array()) {
  *
  * @param $checkout_pane
  *   The fully loaded checkout pane object.
+ *
  * @return
  *   The return value of the call to drupal_write_record() to save the checkout
  *     pane, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
@@ -298,6 +302,7 @@ function commerce_checkout_pane_save($checkout_pane) {
  *
  * @param $pane_id
  *   The machine readable ID of the checkout pane.
+ *
  * @return
  *   The requested checkout pane object or FALSE if not found.
  */
@@ -345,6 +350,7 @@ function commerce_checkout_pane_reset($pane_id) {
  *   - checkout_form_validate
  *   - checkout_form_submit
  *   - review
+ *
  * @return
  *   A string containing the name of the callback function or FALSE if it could
  *     not be found.
@@ -381,6 +387,7 @@ function commerce_checkout_pane_callback($checkout_pane, $callback) {
  * @param $notify
  *   TRUE or FALSE indicating whether or not to e-mail the new account details
  *     to the user.
+ *
  * @return
  *   The account user object.
  */

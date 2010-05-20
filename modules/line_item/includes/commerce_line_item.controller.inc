@@ -17,6 +17,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *
    * @param $type
    *   The machine-readable type of the line item.
+   *
    * @return
    *   A line item object with all default fields initialized.
    */
@@ -34,6 +35,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *
    * @param $line_item
    *   The full line item object to save.
+   *
    * @return
    *   The saved line item object on success, FALSE on failure.
    */
@@ -93,6 +95,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *
    * @param $line_item_ids
    *   An array of line item IDs to delete.
+   *
    * @return
    *   TRUE on success, FALSE otherwise.
    */

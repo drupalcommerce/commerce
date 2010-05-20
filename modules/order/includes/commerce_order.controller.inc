@@ -17,6 +17,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    *
    * @param $customer_uid
    *   Optionally the uid of the customer for the order.
+   *
    * @return
    *   An order object with all default fields initialized.
    */
@@ -41,6 +42,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    *
    * @param $order
    *   The full order object to save.
+   *
    * @return
    *   The saved order object on success, FALSE on failure.
    */
@@ -111,6 +113,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    *
    * @param $order_ids
    *   An array of order IDs to delete.
+   *
    * @return
    *   TRUE on success, FALSE otherwise.
    */

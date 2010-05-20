@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ */
+
+
+/**
  * Implements hook_field_info().
  */
 function commerce_price_field_info() {

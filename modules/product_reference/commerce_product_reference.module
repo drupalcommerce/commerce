@@ -215,6 +215,7 @@ function commerce_product_reference_field_formatter_view($obj_type, $object, $fi
  *   An array of product data to cache at this time. Should be in the format of
  *     an array keyed by product_id with the value being an array with the keys
  *     'sku' and 'title'.
+ *
  * @return
  *   An array of product data keyed by product_id with the value being an array
  *     with the keys 'sku' and 'title'.
@@ -556,6 +557,7 @@ function commerce_product_line_item_add_form() {
  *   The present state of the form upon the latest submission.
  * @param $form
  *   The actual form array.
+ *
  * @return
  *   NULL if all is well or an error message if something goes wrong.
  */

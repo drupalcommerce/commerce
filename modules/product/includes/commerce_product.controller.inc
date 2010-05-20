@@ -17,6 +17,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *
    * @param $type
    *   The machine-readable type of the product.
+   *
    * @return
    *   A product object with all default fields initialized.
    */
@@ -38,6 +39,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *
    * @param $product
    *   The full product object to save.
+   *
    * @return
    *   The saved product object on success, FALSE on failure.
    */
@@ -99,6 +101,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *
    * @param $product_ids
    *   An array of product IDs to delete.
+   *
    * @return
    *   TRUE on success, FALSE otherwise.
    */

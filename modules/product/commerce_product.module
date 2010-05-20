@@ -163,6 +163,7 @@ function commerce_product_type_new() {
  * @param $product_type
  *   The product type object containing the basic properties as initialized in
  *     commerce_product_type_new().
+ *
  * @return
  *   The return value of the call to drupal_write_record() to save the product
  *     type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
@@ -249,6 +250,7 @@ function commerce_product_types_reset() {
  *
  * @param $type
  *   Optional parameter specifying the type whose name to return.
+ *
  * @return
  *   Either an array of all product type names keyed by the machine name or a
  *     string containing the human readable name for the specified type. If a
@@ -340,6 +342,7 @@ function commerce_product_configure_product_type($type) {
  *
  * @param $type
  *   The machine-readable type of the product.
+ *
  * @return
  *   A product object with all default fields initialized.
  */
@@ -369,6 +372,7 @@ function _commerce_product_create($values = array()) {
  *
  * @param $product
  *   The full product object to save.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -417,6 +421,7 @@ function commerce_product_load_multiple($product_ids = array(), $conditions = ar
  *
  * @param $product_id
  *   The ID of the product to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -429,6 +434,7 @@ function commerce_product_delete($product_id) {
  *
  * @param $product_ids
  *   An array of product IDs to delete.
+ *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
@@ -490,6 +496,7 @@ function commerce_product_access($op, $product = NULL, $account = NULL) {
  *   The raw SKU string including any tokens as entered.
  * @param $product
  *   A product object used to perform token replacement on the SKU.
+ *
  * @return
  *   The SKU with tokens replaced or else FALSE if it included invalid tokens.
  */
@@ -526,6 +533,7 @@ function commerce_product_replace_sku_tokens($sku, $product) {
  *
  * @param $sku
  *   The SKU string to validate.
+ *
  * @return
  *   TRUE or FALSE indicating whether or not the SKU contains valid characters.
  */
@@ -541,6 +549,7 @@ function commerce_product_validate_sku_characters($sku) {
  * @param $product_id
  *   The ID of the product the SKU is for; an empty value represents the SKU is
  *     meant for a new product.
+ *
  * @return
  *   TRUE or FALSE indicating whether or not the SKU exists for another product.
  */
