@@ -74,7 +74,7 @@ function commerce_cart_block_info() {
   $blocks = array();
 
   // Define the basic shopping cart block and hide it on the checkout pages.
-  $blocks['commerce_cart'] = array(
+  $blocks['cart'] = array(
     'info' => t('Shopping cart'),
     'cache' => DRUPAL_NO_CACHE,
     'visibility' => 0,
@@ -91,7 +91,7 @@ function commerce_cart_block_view($delta) {
   global $user;
 
   // Prepare the display of the default Shopping Cart block.
-  if ($delta == 'commerce_cart') {
+  if ($delta == 'cart') {
     // First check for items in the shopping cart.
     $order = commerce_cart_order_load($user->uid);
 
