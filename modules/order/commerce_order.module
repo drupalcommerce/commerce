@@ -571,15 +571,15 @@ function commerce_order_statuses($state = '') {
 
   // If an order state was specified, return only those results.
   if (!empty($state)) {
-    $filtered_statuses = clone($order_statuses);
+    $matching_statuses = clone($order_statuses);
 
-    foreach ($filtered_statuses as $name => $data) {
+    foreach ($matching_statuses as $name => $data) {
       if ($data->state != $state) {
-        unset($filtered_statuses[$name]);
+        unset($matching_statuses[$name]);
       }
     }
 
-    return $filtered_statuses;
+    return $matching_statuses;
   }
 
   return $order_statuses;

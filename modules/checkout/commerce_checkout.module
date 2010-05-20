@@ -200,15 +200,15 @@ function commerce_checkout_page_load($page_id) {
 /**
  * Return a filtered array of checkout pane objects.
  *
- * @param $filter
- *   An array of attributes to filter the returned list by; for example, if you
+ * @param $conditions
+ *   An array of conditions to filter the returned list by; for example, if you
  *     specify 'enabled' => TRUE in the array, then only checkout panes with an
  *     enabled value equal to TRUE would be included.
  *
  * @return
  *   The array of checkout panes, keyed by pane ID.
  */
-function commerce_checkout_panes($filter = array()) {
+function commerce_checkout_panes($conditions = array()) {
   $saved_panes = &drupal_static('saved_checkout_panes');
   $checkout_panes = &drupal_static(__FUNCTION__);
 
@@ -218,10 +218,10 @@ function commerce_checkout_panes($filter = array()) {
   }
 
   // Generate a unique ID for the filter.
-  $filter_id = md5(serialize($filter));
+  $conditions_id = hash('sha256', serialize($conditions));
 
   // If the panes haven't been defined for this filter yet...
-  if (!isset($checkout_panes[$filter_id])) {
+  if (!isset($checkout_panes[$conditions_id])) {
     $temp = array();
 
     // Update the array with the values from the settings form and filter out
@@ -256,7 +256,7 @@ function commerce_checkout_panes($filter = array()) {
         // to the panes array or not.
         $valid = TRUE;
 
-        foreach ($filter as $attribute => $value) {
+        foreach ($conditions as $attribute => $value) {
           // If the current value for the specified attribute on the pane does not
           // match the filter value...
           if ($checkout_pane->{$attribute} != $value) {
@@ -275,10 +275,10 @@ function commerce_checkout_panes($filter = array()) {
     uasort($temp, 'commerce_sort_weight');
 
     // Build the cached panes array using the sorted array of checkout panes.
-    $checkout_panes[$filter_id] = $temp;
+    $checkout_panes[$conditions_id] = $temp;
   }
 
-  return $checkout_panes[$filter_id];
+  return $checkout_panes[$conditions_id];
 }
 
 /**
