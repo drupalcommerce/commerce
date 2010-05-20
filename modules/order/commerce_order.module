@@ -9,8 +9,6 @@
 
 /**
  * Implements hook_entity_info().
- *
- * TODO: Implement order versioning, see http://drupal.org/node/736486.
  */
 function commerce_order_entity_info() {
   $return = array(
@@ -18,11 +16,11 @@ function commerce_order_entity_info() {
       'label' => t('Order'),
       'controller class' => 'CommerceOrderEntityController',
       'base table' => 'commerce_order',
-      // 'revision table' => 'commerce_order_revision',
+      'revision table' => 'commerce_order_revision',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'order_id',
-        // 'revision' => 'revision_id',
+        'revision' => 'revision_id',
       ),
       'bundles' => array(
         'commerce_order' => array(
@@ -216,7 +214,8 @@ function _commerce_order_create($values = array()) {
  * Saves an order.
  *
  * @param $order
- *   The full order object to save.
+ *   The full order object to save. If $order->order_id is empty, a new order
+ *     will be created.
  *
  * @return
  *   The saved order object on success, FALSE on failure.

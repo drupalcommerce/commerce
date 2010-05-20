@@ -81,8 +81,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       entity_invoke($op, 'commerce_line_item', $line_item);
       rules_invoke_event('commerce_line_item_' . $op, $line_item);
 
-      // Ignore slave server temporarily to give time for the
-      // saved line item to be propagated to the slave.
+      // Ignore slave server temporarily to give time for the saved line item to
+      // be propagated to the slave.
       db_ignore_slave();
 
       return $line_item;

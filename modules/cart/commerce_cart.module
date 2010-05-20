@@ -230,11 +230,12 @@ function commerce_cart_orders_reset() {
 function commerce_cart_order_new($customer_uid = 0) {
   // Create the new order with the customer's uid and the cart order status.
   $order = commerce_order_new($customer_uid, 'cart');
+  $order->log = t('Created as a shopping cart order.');
 
   // Save it so it gets an order ID and return the full object.
   $order = commerce_order_save($order);
 
-    // If the user is not logged in, ensure the order ID is stored in the session.
+  // If the user is not logged in, ensure the order ID is stored in the session.
   if (!$customer_uid && empty($_SESSION['commerce_cart_order_id'])) {
     $_SESSION['commerce_cart_order_id'] = $order->order_id;
   }

@@ -3,8 +3,6 @@
 
 /**
  * Implements hook_schema().
- *
- * TODO: Implement order versioning, see http://drupal.org/node/736486.
  */
 function commerce_order_schema() {
   $schema = array();
@@ -24,7 +22,6 @@ function commerce_order_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
-      /**
       'revision_id' => array(
         'description' => 'The current {commerce_order_revision}.revision_id version identifier.',
         'type' => 'int',
@@ -32,7 +29,6 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-       */
       'creator_uid' => array(
         'description' => 'The {users}.uid that created this order.',
         'type' => 'int',
@@ -69,15 +65,90 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-
     ),
     'primary key' => array('order_id'),
     'unique keys' => array(
       'order_number' => array('order_number'),
-      // 'revision_id' => array('revision_id'),
+      'revision_id' => array('revision_id'),
     ),
     'foreign keys' => array(
-      // 'revision_id' => array('commerce_order_revision' => 'revision_id'),
+      'revision_id' => array('commerce_order_revision' => 'revision_id'),
+      'creator_uid' => array('users' => 'uid'),
+      'customer_uid' => array('users' => 'uid'),
+      'status' => array('commerce_order_status' => 'name'),
+    ),
+  );
+
+  $schema['commerce_order_revision'] = array(
+    'description' => 'Saves information about each saved revision of a {commerce_order}.',
+    'fields' => array(
+      'order_id' => array(
+        'description' => 'The {order_id} of the order this revision belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'order_number' => array(
+        'description' => 'The order number displayed to the customer for this revision.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'revision_id' => array(
+        'description' => 'The primary identifier for this revision.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      // TODO: Remove this after the update past alpha4, as the default entity
+      // controller's buildQuery method will no longer be node specific.
+      'uid' => array(
+        'description' => 'The {users}.uid that created this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'creator_uid' => array(
+        'description' => 'The {users}.uid that created this order at this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'customer_uid' => array(
+        'description' => 'The {users}.uid that placed this order saved at this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'mail' => array(
+        'description' => 'The e-mail address associated with the order at this revision.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'The {commerce_order_status}.name of this revision.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'revision_timestamp' => array(
+        'description' => 'The Unix timestamp when this revision was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'order_id' => array('commerce_order' => 'order_id'),
       'creator_uid' => array('users' => 'uid'),
       'customer_uid' => array('users' => 'uid'),
       'status' => array('commerce_order_status' => 'name'),
