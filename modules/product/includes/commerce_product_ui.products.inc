@@ -19,7 +19,7 @@ function commerce_product_ui_add_page() {
 }
 
 /**
- * Display the list of available product types for product creation.
+ * Displays the list of available product types for product creation.
  *
  * @ingroup themeable
  */

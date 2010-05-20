@@ -844,3 +844,77 @@ function commerce_line_item_property_info_callback(&$info, $entity_type, $field,
   $property['options list'] = 'entity_metadata_field_options_list';
   unset($property['query callback']);
 }
+
+/**
+ * Returns the total quantity of line items referenced by a reference field.
+ *
+ * @param $value
+ *   The value array of the field whose line items you want to count.
+ * @param $type
+ *   Optional type string to filter line items by type before counting.
+ * @param $language
+ *   The language within the value array to use; defaults to LANGUAGE_NONE.
+ *
+ * @return
+ *   The total quantity of all the matching line items referenced by the field.
+ */
+function commerce_line_items_quantity($value, $type = '', $language = '') {
+  if (empty($language)) {
+    $language = LANGUAGE_NONE;
+  }
+
+  // Extract the line item IDs for the language.
+  $line_item_ids = array();
+
+  foreach ($value[$language] as $data) {
+    $line_item_ids[] = $data['line_item_id'];
+  }
+
+  // Sum up the quantity of all matching line items.
+  $quantity = 0;
+
+  foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+    if (empty($type) || $line_item->type == $type) {
+      $quantity += $line_item->quantity;
+    }
+  }
+
+  return $quantity;
+}
+
+/**
+ * Returns the total price of line items referenced by a reference field.
+ *
+ * @param $value
+ *   The value array of the field whose line items you want to count.
+ * @param $type
+ *   Optional type string to filter line items by type before counting.
+ * @param $language
+ *   The language within the value array to use; defaults to LANGUAGE_NONE.
+ *
+ * @return
+ *   The total quantity of all the matching line items referenced by the field.
+ */
+function commerce_line_items_total($value, $type = '', $language = '') {
+  if (empty($language)) {
+    $language = LANGUAGE_NONE;
+  }
+
+  // Extract the line item IDs for the language.
+  $line_item_ids = array();
+
+  foreach ($value[$language] as $data) {
+    $line_item_ids[] = $data['line_item_id'];
+  }
+
+  // Sum up the total price of all matching line items.
+  $total = 0;
+
+  foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+    if (empty($type) || $line_item->type == $type) {
+      $total += $line_item->total[$language][0]['price'];
+    }
+  }
+
+  return $total;
+}

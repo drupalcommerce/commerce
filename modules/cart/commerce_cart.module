@@ -74,6 +74,17 @@ function commerce_cart_views_api() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_cart_theme() {
+  return array(
+    'commerce_cart_footer' => array(
+      'variables' => array('quantity_raw' => NULL, 'quantity' => NULL, 'total_raw' => NULL, 'total' => NULL, 'checkout_link' => NULL),
+    ),
+  );
+}
+
+/**
  * Implements hook_block_info().
  */
 function commerce_cart_block_info() {
@@ -121,31 +132,38 @@ function commerce_cart_block_view($delta) {
       $content = commerce_embed_view('commerce_cart', 'defaults', array(implode(',', $line_item_ids)));
 
       // Add total information and a link to checkout.
-
-      // TODO: Replace with an API function to calculate the total Qty. of a
-      // type of line item on an order object.
-      $quantity = 0;
-      $total = 0;
-
-      foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
-        if ($line_item->type == 'product') {
-          $quantity += $line_item->quantity;
-          $total += $line_item->total[LANGUAGE_NONE][0]['price'];
-        }
-      }
-
-      // TODO: Hacky stop-gap... replace with a theme function.
       $currency = commerce_currency_load('USD');
-      $total = t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round($total, 2), 2), '@code' => $currency->code));
 
-      // TODO: Replace with a theme function for the cart footer.
-      $content .= '<div class="cart-footer">'
-                . format_plural($quantity, '1 item', '@count items') . ' | '
-                . $total . '<br />' . l('Checkout', 'checkout') . '</div>';
+      $variables = array(
+        'quantity_raw' => commerce_line_items_quantity($order->line_items, 'product'),
+        'quantity' => format_plural(commerce_line_items_quantity($order->line_items), '1 item', '@count items'),
+        'total_raw' => number_format(round(commerce_line_items_total($order->line_items, 'product'), 2), 2),
+
+        // TODO: Hacky stop-gap... replace with a theme function in Price.
+        'total' => t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round(commerce_line_items_total($order->line_items, 'product'), 2), 2), '@code' => $currency->code)),
+
+        'checkout_link' => l('Checkout', 'checkout'),
+      );
+
+      $content .= theme('commerce_cart_footer', $variables);
+
     }
 
     return array('subject' => t('Shopping cart'), 'content' => $content);
   }
+}
+
+/**
+ * Themes footer information for the shopping cart block.
+ *
+ * TODO: Update to include more extensive markup, including classes on pieces of
+ * information like we did in the Ubercart cart block.
+ *
+ * @ingroup themeable
+ */
+function theme_commerce_cart_footer($variables) {
+  return '<div class="cart-footer">' . $variables['quantity'] . ' | '
+       . $variables['total'] . '<br />' . $variables['checkout_link'] . '</div>';
 }
 
 /**
