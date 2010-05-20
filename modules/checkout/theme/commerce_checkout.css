@@ -1,0 +1,48 @@
+/* $Id$ */
+
+fieldset.checkout-buttons {
+  text-align: right;
+}
+
+fieldset.checkout-buttons .form-button, fieldset.checkout-buttons .form-submit {
+  margin-left: 1em;
+}
+
+table.checkout-review {
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 40%;
+}
+
+fieldset.checkout-buttons.review {
+  width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table.checkout-review .pane-title {
+  font-weight: bold;
+  text-align: center;
+}
+
+table.checkout-review tr.pane-data {
+  vertical-align: top;
+}
+
+table.checkout-review .pane-data-key {
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 3em;
+  width: 50%;
+}
+
+table.checkout-review .pane-data-value {
+  padding-right: 3em;
+}
+
+table.checkout-review .pane-data-full {
+  padding-left: 1em;
+  padding-right: 3em;
+}

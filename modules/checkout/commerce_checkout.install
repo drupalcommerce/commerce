@@ -1,0 +1,66 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_checkout_schema() {
+  $schema = array();
+
+  $schema['commerce_checkout_pane'] = array(
+    'description' => 'Checkout pane configuration data.',
+    'fields' => array(
+      'pane_id' => array(
+        'description' => 'The machine readable name of the order state.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'page' => array(
+        'description' => 'The ID of the checkout page on which this pane appears.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '1',
+      ),
+      'collapsible' => array(
+        'description' => 'Boolean value indicating whether or not the pane should appear collapsed.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'collapsed' => array(
+        'description' => 'Boolean value indicating whether or not the pane should appear collapsed.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'weight' => array(
+        'description' => 'The sorting weight of the status for lists of statuses.',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'enabled' => array(
+        'description' => 'Boolean value indicating whether or not the pane is enabled.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'review' => array(
+        'description' => 'Boolean value indicating whether or not the pane should appear on the checkout review.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'primary key' => array('pane_id'),
+  );
+
+  return $schema;
+}

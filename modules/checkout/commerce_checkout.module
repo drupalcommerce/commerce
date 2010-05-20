@@ -1,0 +1,345 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Enable checkout as a multi-step form with customizable pages and a simple
+ *   checkout pane API.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_checkout_menu() {
+  $items = array();
+
+  $items['checkout'] = array(
+    'title' => 'Checkout',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_checkout_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_checkout.pages.inc',
+  );
+  $items['checkout/complete/%commerce_order'] = array(
+    'title' => 'Checkout complete',
+    'page callback' => 'commerce_checkout_complete',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_checkout.pages.inc',
+  );
+  $items['admin/commerce/config/checkout'] = array(
+    'title' => 'Checkout settings',
+    'description' => 'Configure options pertaining to the checkout workflow.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_checkout_settings_form'),
+    'access arguments' => array('administer checkout'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/commerce_checkout.admin.inc',
+  );
+
+  // Menu items for the checkout form builder.
+  $items['admin/commerce/config/checkout-builder'] = array(
+    'title' => 'Checkout form builder',
+    'description' => 'Build your checkout pages using module defined checkout form elements.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_checkout_builder_form'),
+    'access arguments' => array('administer checkout'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/commerce_checkout.admin.inc',
+  );
+  $items['admin/commerce/config/checkout-builder/configure-pane/%commerce_checkout_pane'] = array(
+    'title' => 'Checkout pane configuration',
+    'description' => 'Configure the settings for a checkout pane.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_checkout_pane_settings_form', 5),
+    'access arguments' => array('administer checkout'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_checkout.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_checkout_permission() {
+  $permissions = array(
+    'administer checkout' => array(
+      'title' => t('Administer checkout'),
+      'description' => t('Configure checkout settings and the checkout form itself.'),
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_checkout_help($path, $arg) {
+  if ($path == 'admin/commerce/config/checkout-builder') {
+    return t('Use the table below to build your checkout form using the available checkout panes defined by modules enabled on your site. You may configure the checkout pane settings using the operations links below. You may also add additional pages to the checkout process using the tab above and edit them using the operations links below.');
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_checkout_theme() {
+  return array(
+    'commerce_checkout_builder_form' => array(
+      'render element' => 'form',
+      'file' => 'includes/commerce_checkout.admin.inc',
+    ),
+    'commerce_checkout_review' => array(
+      'render element' => 'form',
+      'file' => 'includes/commerce_checkout.pages.inc',
+    ),
+  );
+}
+
+/**
+ * Returns an array of checkout pages based on the checkout settings.
+ *
+ * @param $review
+ *   TRUE or FALSE indicating whether or not to include the review page.
+ * @return
+ *   An associative array of checkout page objects keyed by the page_id.
+ */
+function commerce_checkout_pages($review = TRUE) {
+  $checkout_pages = &drupal_static(__FUNCTION__);
+
+  // If the checkout pages haven't been defined yet, do so now.
+  if (empty($checkout_pages)) {
+    $checkout_pages = array();
+
+    for ($i = 1; $i <= variable_get('commerce_checkout_pages', 1); $i++) {
+      $checkout_pages[$i] = (object) array(
+        'page_id' => $i,
+        'title' => t('Checkout'),
+        'help' => '',
+      );
+    }
+
+    // Initialize the back and next buttons.
+    $keys = array_keys($checkout_pages);
+
+    while (count($keys)) {
+      $key = array_shift($keys);
+
+      if (count($keys) == 0) {
+        $checkout_pages[$key]->next_page = FALSE;
+        $checkout_pages[$key]->prev_page = $key - 1;
+        $checkout_pages[$key]->submit_value = variable_get('commerce_checkout_review_page', FALSE) ? t('Review order') : t('Submit order');
+        $checkout_pages[$key]->back_value = t('Back');
+      }
+      elseif ($key == 1) {
+        $checkout_pages[$key]->next_page = $keys[0];
+        $checkout_pages[$key]->prev_page = FALSE;
+        $checkout_pages[$key]->submit_value = t('Continue');
+        $checkout_pages[$key]->back_value = t('Cancel');
+      }
+      else {
+        $checkout_pages[$key]->next_page = $keys[0];
+        $checkout_pages[$key]->prev_page = $key - 1;
+        $checkout_pages[$key]->submit_value = t('Continue');
+        $checkout_pages[$key]->back_value = t('Back');
+      }
+    }
+
+    // Load the review page separately.
+    if ($review && variable_get('commerce_checkout_review_status', TRUE)) {
+      $checkout_pages['review'] = (object) array(
+        'page_id' => 'review',
+        'title' => t('Review order'),
+        'help' => t("Your order is almost complete. Please review the details below and click 'Submit order' if all the information is correct. You may use the 'Back' button to make changes to your order if necessary."),
+        'next_page' => FALSE,
+        'prev_page' => count($checkout_pages),
+        'back' => t('Back'),
+        'continue' => t('Submit order'),
+      );
+    }
+
+    drupal_alter('commerce_checkout_pages', $checkout_pages, $review);
+  }
+
+  return $checkout_pages;
+}
+
+/**
+ * Returns a checkout page object.
+ *
+ * @param $page_id
+ *   The ID of the page to return.
+ * @return
+ *   The fully loaded page object or FALSE if not found.
+ */
+function commerce_checkout_page_load($page_id) {
+  $checkout_pages = commerce_checkout_pages();
+
+  // If a page was specified that does not exist, return FALSE.
+  if (empty($checkout_pages[$page_id])) {
+    return FALSE;
+  }
+
+  // Otherwise, return the specified page.
+  return $checkout_pages[$page_id];
+}
+
+/**
+ * Return a filtered array of checkout pane objects.
+ *
+ * @param $filter
+ *   An array of attributes to filter the returned list by; for example, if you
+ *     specify 'enabled' => TRUE in the array, then only checkout panes with an
+ *     enabled value equal to TRUE would be included.
+ * @return
+ *   The array of checkout panes, keyed by pane ID.
+ */
+function commerce_checkout_panes($filter = array()) {
+  $saved_panes = &drupal_static('saved_checkout_panes');
+  $checkout_panes = &drupal_static(__FUNCTION__);
+
+  // Cache the saved checkout pane data if it hasn't been loaded yet.
+  if (empty($saved_panes)) {
+    $saved_panes = db_query('SELECT * FROM {commerce_checkout_pane}')->fetchAllAssoc('pane_id');
+  }
+
+  // Generate a unique ID for the filter.
+  $filter_id = md5(serialize($filter));
+
+  // If the panes haven't been defined for this filter yet...
+  if (!isset($checkout_panes[$filter_id])) {
+    $temp = array();
+
+    // Update the array with the values from the settings form and filter out
+    // any that don't match the filter criteria.
+    foreach (module_invoke_all('commerce_checkout_pane_info') as $pane_id => $checkout_pane) {
+      $checkout_pane->pane_id = $pane_id;
+
+      // Set some defaults for the checkout pane.
+      $defaults = array(
+        'page' => 1,
+        'collapsible' => FALSE,
+        'collapsed' => FALSE,
+        'weight' => 0,
+        'enabled' => TRUE,
+        'review' => TRUE,
+      );
+      $checkout_pane = (object) array_merge($defaults, (array) $checkout_pane);
+
+      // Update the pane with saved data.
+      if (!empty($saved_panes[$pane_id])) {
+        $checkout_pane = (object) array_merge((array) $saved_panes[$pane_id] + (array) $checkout_pane);
+        $checkout_pane->saved = TRUE;
+      }
+
+      // Allow other modules to alter this checkout pane before filtering it.
+      drupal_alter('commerce_checkout_pane_info', $checkout_pane);
+
+      // Check the pane against the filter array to determine whether to add it
+      // to the panes array or not.
+      $valid = TRUE;
+
+      foreach ($filter as $attribute => $value) {
+        // If the current value for the specified attribute on the pane does not
+        // match the filter value...
+        if ($checkout_pane->{$attribute} != $value) {
+          // Do not add it to the temporary array.
+          $valid = FALSE;
+        }
+      }
+
+      if ($valid) {
+        $temp[] = $checkout_pane;
+      }
+    }
+
+    // Sort the panes by their weight value.
+    uasort($temp, 'commerce_sort_weight');
+
+    // Build the cached panes array using the sorted array of checkout panes.
+    $checkout_panes[$filter_id] = $temp;
+  }
+
+  return $checkout_panes[$filter_id];
+}
+
+/**
+ * Saves a checkout pane's configuration to the database.
+ *
+ * @param $checkout_pane
+ *   The fully loaded checkout pane object.
+ * @return
+ *   The return value of the call to drupal_write_record() to save the checkout
+ *     pane, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
+ *     the type of query performed to save the checkout pane.
+ */
+function commerce_checkout_pane_save($checkout_pane) {
+  return drupal_write_record('commerce_checkout_pane', $checkout_pane, !empty($checkout_pane->saved) ? 'pane_id' : NULL);
+}
+
+/**
+ * Loads the data for a specific checkout pane.
+ *
+ * @param $pane_id
+ *   The machine readable ID of the checkout pane.
+ * @return
+ *   The requested checkout pane object or FALSE if not found.
+ */
+function commerce_checkout_pane_load($pane_id) {
+  // Loads the entire list of panes.
+  $checkout_panes = commerce_checkout_panes();
+
+  // Return FALSE if the pane does not exist.
+  if (empty($checkout_panes[$pane_id])) {
+    return FALSE;
+  }
+
+  return $checkout_panes[$pane_id];
+}
+
+/**
+ * Create a new user account with the specified parameters and notification.
+ *
+ * @param $name
+ *   The new account username.
+ * @param $mail
+ *   The e-mail address associated with the new account.
+ * @param $pass
+ *   The new account password. If left empty, a password will be generated.
+ * @param $status
+ *   TRUE or FALSE indicating the active / blocked status of the account.
+ * @param $notify
+ *   TRUE or FALSE indicating whether or not to e-mail the new account details
+ *     to the user.
+ * @return
+ *   The account user object.
+ */
+function commerce_checkout_create_account($name, $mail, $pass, $status, $notify = FALSE) {
+  // Setup the account fields array and save it as a new user.
+  $fields = array(
+    'name' => $name,
+    'mail' => $mail,
+    'init' => $mail,
+    'pass' => empty($pass) ? user_password(variable_get('commerce_password_length', 8)) : $pass,
+    'roles' => array(),
+    'status' => $status,
+  );
+  $account = user_save('', $fields);
+
+  // Manually set the password so it appears in the e-mail.
+  $account->password = $fields['pass'];
+
+  // Send the customer their account details if enabled.
+  if ($notify) {
+    // Send the e-mail through the user module.
+    drupal_mail('user', 'register_no_approval_required', $mail, NULL, array('account' => $account), commerce_email_from());
+  }
+
+  return $account;
+}
