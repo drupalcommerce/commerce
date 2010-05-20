@@ -19,7 +19,7 @@ function commerce_cart_views_default_views() {
   $view->view_php = '';
   $view->base_table = 'commerce_line_item';
   $view->is_cacheable = FALSE;
-  $view->api_version = '3.0-alpha1';
+  $view->api_version = 3.0-alpha1;
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
@@ -46,7 +46,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['quantity']['empty_zero'] = 0;
   $handler->display->display_options['fields']['quantity']['set_precision'] = 0;
   $handler->display->display_options['fields']['quantity']['precision'] = '0';
-  $handler->display->display_options['fields']['quantity']['suffix'] = ' x ';
+  $handler->display->display_options['fields']['quantity']['suffix'] = ' × ';
   /* Field: Commerce Line Item: Line item label */
   $handler->display->display_options['fields']['line_item_label']['id'] = 'line_item_label';
   $handler->display->display_options['fields']['line_item_label']['table'] = 'commerce_line_item';
@@ -61,6 +61,20 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['line_item_label']['alter']['html'] = 0;
   $handler->display->display_options['fields']['line_item_label']['hide_empty'] = 0;
   $handler->display->display_options['fields']['line_item_label']['empty_zero'] = 0;
+  /* Field: Fields: total */
+  $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
+  $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_total';
+  $handler->display->display_options['fields']['entity_id']['field'] = 'entity_id';
+  $handler->display->display_options['fields']['entity_id']['label'] = '';
+  $handler->display->display_options['fields']['entity_id']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['entity_id']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['entity_id']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['sorts']['line_item_id']['table'] = 'commerce_line_item';
