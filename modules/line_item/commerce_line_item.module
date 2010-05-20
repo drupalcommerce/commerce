@@ -433,7 +433,7 @@ function commerce_line_item_field_schema($field) {
  * - 'invalid_line_item_id': line_item_id is not valid for the field (not a
  *                           valid line item ID).
  */
-function commerce_line_item_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
+function commerce_line_item_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
   // Extract line_item_ids to check.
   $line_item_ids = array();
 
@@ -493,7 +493,7 @@ function commerce_line_item_field_formatter_info() {
 /**
  * Implements hook_field_formatter_view().
  */
-function commerce_line_item_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
+function commerce_line_item_field_formatter_view($entity_type, $object, $field, $instance, $langcode, $items, $display) {
   $result = array();
 
   // Collect the list of line item IDs.

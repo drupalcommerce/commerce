@@ -78,7 +78,7 @@ function commerce_product_reference_field_settings_form($field, $instance, $has_
  * - 'invalid_product_id': product_id is not valid for the field (not a valid
  *                         product id, or the product is not referenceable).
  */
-function commerce_product_reference_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
+function commerce_product_reference_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
   // Extract product_ids to check.
   $product_ids = array();
 
@@ -153,7 +153,7 @@ function commerce_product_reference_field_formatter_info() {
 /**
  * Implements hook_field_formatter_view().
  */
-function commerce_product_reference_field_formatter_view($obj_type, $object, $field, $instance, $langcode, $items, $display) {
+function commerce_product_reference_field_formatter_view($entity_type, $object, $field, $instance, $langcode, $items, $display) {
   $result = array();
 
   // Collect the list of product IDs.
@@ -411,7 +411,7 @@ function commerce_product_reference_field_widget_error($element, $error) {
  * TODO: Core doc: "This hook may or may not survive in Field API".
  * So it is currently not verified.
  *
-function node_reference_field_prepare_translation($obj_type, $object, $field, $instance, $langcode, &$items) {
+function node_reference_field_prepare_translation($entity_type, $object, $field, $instance, $langcode, &$items) {
   $addition = array();
   $addition[$field['field_name']] = array();
   if (isset($object->translation_source->$field['field_name'])
