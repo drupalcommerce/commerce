@@ -502,7 +502,7 @@ function commerce_product_reference_configure_line_item() {
   if (empty($instance)) {
     $instance = array(
       'field_name' => 'product',
-      'object_type' => 'commerce_line_item',
+      'entity_type' => 'commerce_line_item',
       'bundle' => 'product',
       'label' => t('Product'),
       'required' => TRUE,

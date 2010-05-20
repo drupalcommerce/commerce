@@ -34,7 +34,7 @@ function commerce_product_entity_info() {
       'controller class' => 'CommerceProductEntityController',
       'base table' => 'commerce_product',
       'fieldable' => TRUE,
-      'object keys' => array(
+      'entity keys' => array(
         'id' => 'product_id',
         'bundle' => 'type',
       ),
@@ -313,7 +313,7 @@ function commerce_product_configure_product_type($type) {
   if (empty($instance)) {
     $instance = array(
       'field_name' => 'base_price',
-      'object_type' => 'commerce_product',
+      'entity_type' => 'commerce_product',
       'bundle' => $type,
       'label' => t('Base price'),
       'required' => TRUE,

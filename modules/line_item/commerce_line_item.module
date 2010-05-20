@@ -17,7 +17,7 @@ function commerce_line_item_entity_info() {
       'controller class' => 'CommerceLineItemEntityController',
       'base table' => 'commerce_line_item',
       'fieldable' => TRUE,
-      'object keys' => array(
+      'entity keys' => array(
         'id' => 'line_item_id',
         'bundle' => 'type',
       ),
@@ -233,7 +233,7 @@ function commerce_line_item_type_configure($line_item_type) {
     if (empty($instance)) {
       $instance = array(
         'field_name' => $key,
-        'object_type' => 'commerce_line_item',
+        'entity_type' => 'commerce_line_item',
         'bundle' => $line_item_type->type,
         'label' => $label,
         'required' => TRUE,

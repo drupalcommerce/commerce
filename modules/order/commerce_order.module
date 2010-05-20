@@ -20,7 +20,7 @@ function commerce_order_entity_info() {
       'base table' => 'commerce_order',
       // 'revision table' => 'commerce_order_revision',
       'fieldable' => TRUE,
-      'object keys' => array(
+      'entity keys' => array(
         'id' => 'order_id',
         // 'revision' => 'revision_id',
       ),
@@ -678,7 +678,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
   if (empty($instance)) {
     $instance = array(
       'field_name' => 'line_items',
-      'object_type' => 'commerce_order',
+      'entity_type' => 'commerce_order',
       'bundle' => $type,
       'label' => t('Line items'),
       'widget' => array(
