@@ -19,7 +19,7 @@ function commerce_cart_views_default_views() {
   $view->view_php = '';
   $view->base_table = 'commerce_line_item';
   $view->is_cacheable = FALSE;
-  $view->api_version = 3.0-alpha1;
+  $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
