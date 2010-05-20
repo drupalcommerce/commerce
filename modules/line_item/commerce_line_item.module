@@ -211,7 +211,7 @@ function commerce_line_item_type_get_name($type = NULL) {
  */
 function commerce_line_item_type_configure($line_item_type) {
   $i = 0;
-  
+
   // Add the base price field to the line item type.
   // TODO: Make a single function for this in the Price module.
   foreach (array('unit_price' => t('Unit price'), 'total' => t('Total')) as $key => $label) {
@@ -557,7 +557,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
     $element += array(
       '#theme' => 'line_item_manager',
       '#element_validate' => array('commerce_line_item_manager_validate'),
-      '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit'), t('Total')),
+      '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit Price'), t('Total')),
       '#empty' => t('No line items found.'),
       'line_items' => array(),
     );
@@ -592,15 +592,17 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       );
 
       // TODO: Figure out how to embed a Price field widget here.
-      $element['line_items'][$line_item_id]['unit'] = array(
+      $currency = commerce_currency_load('USD');
+
+      $element['line_items'][$line_item_id]['unit_price'] = array(
         '#type' => 'textfield',
-        '#default_value' => '100.00',
+        '#default_value' => number_format(round($line_item->unit_price['und'][0]['price'], 2), 2),
         '#size' => 10,
-        '#field_prefix' => '$',
+        '#field_prefix' => $currency->symbol,
       );
 
       $element['line_items'][$line_item_id]['total'] = array(
-        '#markup' => '$100.00',
+        '#markup' => t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round($line_item->total['und'][0]['price'], 2), 2), '@code' => $currency->code)),
       );
     }
 
@@ -697,7 +699,7 @@ function theme_line_item_manager($variables) {
       drupal_render($form['line_items'][$line_item_id]['title']),
       drupal_render($form['line_items'][$line_item_id]['line_item_label']),
       drupal_render($form['line_items'][$line_item_id]['quantity']),
-      drupal_render($form['line_items'][$line_item_id]['unit']),
+      drupal_render($form['line_items'][$line_item_id]['unit_price']),
       drupal_render($form['line_items'][$line_item_id]['total']),
     );
 
@@ -750,6 +752,15 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       else {
         $name = implode('][', $element['line_items'][$line_item_id]['quantity']['#parents']);
         form_set_error($name, 'You must specify a positive number for the quantity.');
+      }
+
+      // Validate the unit price of each line item.
+      if (is_numeric($element['line_items'][$line_item_id]['unit_price']['#value'])) {
+        $line_item->unit_price['und'][0]['price'] = $element['line_items'][$line_item_id]['unit_price']['#value'];
+      }
+      else {
+        $name = implode('][', $element['line_items'][$line_item_id]['unit_price']['#parents']);
+        form_set_error($name, 'You must specify a positive number for the unit price.');
       }
 
       // Only save if values were actually changed.
