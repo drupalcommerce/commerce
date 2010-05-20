@@ -34,6 +34,28 @@ function commerce_line_item_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
+      'handler' => 'views_handler_argument_commerce_line_item_id',
+      'name field' => 'line_item_label',
+      'numeric' => TRUE,
+      'validate type' => 'line_item_id',
+    ),
+  );
+
+  // Expose the product type.
+  $data['commerce_line_item']['type'] = array(
+    'title' => t('Type'),
+    'help' => t('The human-readable name of the type of the line item.'),
+    'field' => array(
+      'handler' => 'views_handler_field_commerce_line_item_type',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
       'handler' => 'views_handler_argument_string',
     ),
   );
@@ -64,17 +86,18 @@ function commerce_line_item_views_data() {
     'title' => t('Quantity'),
     'help' => t('The quantity of the line item.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
+      'float' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'views_handler_filter_numeric',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'views_handler_argument_string',
+      'handler' => 'views_handler_argument_numeric',
     ),
   );
 
@@ -91,6 +114,9 @@ function commerce_line_item_views_handlers() {
     'info' => array(
       'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views/handlers',
     ),
-    'handlers' => array(),
+    'handlers' => array(
+      'views_handler_argument_commerce_line_item_id',
+      'views_handler_field_commerce_line_item_type',
+    ),
   );
 }
