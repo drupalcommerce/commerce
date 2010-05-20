@@ -6,13 +6,14 @@ dependencies[] = commerce_line_item
 dependencies[] = commerce_order
 dependencies[] = commerce_product
 dependencies[] = commerce_product_reference
+dependencies[] = views
 core = 7.x
 
 ; Base module files
 files[] = commerce_cart.module
 
 ; Views include
-; files[] = includes/views/commerce_cart.views.inc
+files[] = includes/views/commerce_cart.views_default.inc
 
 ; Views handlers
 ; files[] = includes/views/handlers/views_handler_field_add_to_cart_form.inc

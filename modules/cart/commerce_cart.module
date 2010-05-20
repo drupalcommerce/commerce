@@ -45,6 +45,108 @@ function commerce_cart_commerce_order_status_info() {
 }
 
 /**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function commerce_cart_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+
+  $checkout_panes['cart_contents'] = (object) array(
+    'title' => t('Shopping cart contents'),
+  );
+
+  return $checkout_panes;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_cart_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_cart') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function commerce_cart_block_info() {
+  $blocks = array();
+
+  // Define the basic shopping cart block and hide it on the checkout pages.
+  $blocks['commerce_cart'] = array(
+    'info' => t('Shopping cart'),
+    'cache' => DRUPAL_NO_CACHE,
+    'visibility' => 0,
+    'pages' => 'checkout*',
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function commerce_cart_block_view($delta) {
+  global $user;
+
+  // Prepare the display of the default Shopping Cart block.
+  if ($delta == 'commerce_cart') {
+    // First check for items in the shopping cart.
+    $order = commerce_cart_order_load($user->uid);
+
+    // If the cart is empty...
+    if (!$order) {
+      // Display an appropriate message.
+      $content = t('Your shopping cart is empty.');
+    }
+    else {
+      // Extract the line item IDs of products on the order.
+      $line_item_ids = array();
+
+      foreach ($order->line_items[LANGUAGE_NONE] as $data) {
+        $line_item_ids[] = $data['line_item_id'];
+      }
+
+      // Load the cart line item View.
+      $view = views_get_view('commerce_cart');
+
+      // TODO: Possibly use a different display? Not sure if an attachment will
+      // work here... tried without initial success.
+      $view->set_display('defaults');
+
+      // Set the specific line items for this order.
+      $view->set_arguments(array(implode(',', $line_item_ids)));
+
+      // Prepare and execute the View query.
+      $view->pre_execute();
+      $view->execute();
+
+      // Render it into the content variable.
+      $content = $view->render();
+
+      // Add total information and a link to checkout.
+
+      // TODO: Replace with an API function to calculate the total Qty. of a
+      // type of line item on an order object.
+      $quantity = 0;
+
+      foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+        if ($line_item->type == 'product') {
+          $quantity += $line_item->quantity;
+        }
+      }
+
+      // TODO: Replace with a theme function for the cart footer.
+      $content .= format_plural($quantity, '1 item', '@count items') . ' | '
+                . l('Checkout', 'checkout');
+    }
+
+    return array('subject' => t('Shopping cart'), 'content' => $content);
+  }
+}
+
+/**
  * Loads the shopping cart order for the specified user.
  *
  * @param $customer_uid
