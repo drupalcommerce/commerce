@@ -9,23 +9,23 @@
 /**
  * Build the checkout form based on the current step in checkout.
  */
-function commerce_checkout_form(&$form_state = array()) {
-  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
-
+function commerce_checkout_form($form, &$form_state) {
   global $user;
 
-  $form = array('#validate' => array());
+  $form = array(
+    '#validate' => array(),
+  );
+
+  // drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
 
   $form['uid'] = array(
     '#type' => 'hidden',
     '#value' => $user->uid,
   );
 
-  $account = drupal_clone($user);
-
   $form['account'] = array(
     '#type' => 'value',
-    '#value' => $account,
+    '#value' => clone($user),
   );
 
   // Load existing checkout order data if possible.
@@ -33,9 +33,16 @@ function commerce_checkout_form(&$form_state = array()) {
     $order = $form_state['storage']['order'];
   }
   else {
-    // TODO: Check for an order ID and checkout step in the session to recover
-    // in the event of a page refresh.
-    $order = FALSE;
+    $order = commerce_cart_order_load($user->uid);
+  }
+
+  // TODO: If no order is found, send the customer packing.
+  if (!$order) {
+    $form['empty'] = array(
+      '#markup' => t('Add some items to your cart and <em>then</em> try checking out.'),
+    );
+
+    return $form;
   }
 
   $form['order'] = array(
@@ -43,57 +50,29 @@ function commerce_checkout_form(&$form_state = array()) {
     '#value' => $order,
   );
 
-  // Add the current cart data to the form, taking price alterers into account.
-  $context = array(
-    'revision' => 'altered',
-    'location' => 'cart-checkout-item',
-  );
-
-  // TODO: Update this to use the shopping cart order.
-  $contents = commerce_cart_get_contents();
-
-  foreach ($contents as $key => $item) {
-    $price_info = array(
-      'price' => $item->price,
-      'qty' => $item->qty,
-    );
-    $context['subject'] = array('cart_item' => $item);
-    $context['extras'] = array('node' => node_load($item->nid));
-
-    // Get the altered price per unit, as ordered products have a locked-in
-    // price. Price altering rules may change over time, but the amount paid
-    // by the customer does not after the fact.
-    $contents[$key]->price = commerce_price($price_info, $context) / $item->qty;
-  }
-
-  $form['cart_contents'] = array(
-    '#type' => 'value',
-    '#value' => $contents,
-  );
-
   // Load data for the current page in checkout.
-  $number = isset($form_state['values']) ? $form_state['storage']['page_number'] : 1;
-  $page = commerce_checkout_page_load($number);
+  $page_id = isset($form_state['values']) ? $form_state['storage']['page_id'] : 1;
+  $checkout_page = commerce_checkout_page_load($page_id);
 
   // Update the page title if specified.
-  if (!empty($page['title'])) {
-    drupal_set_title(check_plain($page['title']));
+  if (!empty($checkout_page['title'])) {
+    drupal_set_title(check_plain($checkout_page['title']));
   }
 
-  $form['page'] = array(
+  $form['checkout_page'] = array(
     '#type' => 'value',
-    '#value' => $page,
+    '#value' => $checkout_page,
   );
 
   // Add the instructions for the checkout page if specified.
-  $form['instructions'] = array(
-    '#value' => '<div id="checkout-page-'. $number .'-instructions">'. filter_xss($page['instructions']) .'</div>',
+  $form['help'] = array(
+    '#markup' => filter_xss($checkout_page->help),
   );
 
   // If we're on one of the defined checkout form pages...
-  if (is_numeric($number)) {
+  if (is_numeric($page_id)) {
     // Add any enabled checkout panes for this page to the form.
-    foreach (commerce_checkout_pane_list(array('enabled' => TRUE, 'page' => $number)) as $pane_id => $pane) {
+    foreach (commerce_checkout_pane_list(array('enabled' => TRUE, 'page' => $page_id)) as $pane_id => $checkout_pane) {
       if ($callback = commerce_checkout_pane_callback('checkout', $pane_id, 'form')) {
         // Create a fieldset for the pane.
         $form[$pane_id] = array(
