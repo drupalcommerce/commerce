@@ -7,4 +7,3 @@ core = 7.x
 
 ; Base module files
 files[] = commerce_price.module
-files[] = commerce_price.install
