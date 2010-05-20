@@ -124,17 +124,36 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $transaction = db_transaction();
 
       try {
-        db_delete('commerce_order')
-          ->condition('order_id', $order_ids, 'IN')
-          ->execute();
-
-        // TODO: Delete any line items associated with this order.
-
+        // Loop through the orders to delete.
         foreach ($orders as $order_id => $order) {
+          // Find any line item reference fields on this order and delete the
+          // referenced line items.
+          $line_item_ids = array();
+
+          foreach (field_info_instances('commerce_order', 'commerce_order') as $key => $value) {
+            // Only examine line item reference fields using the manager widget.
+            if ($value['widget']['type'] == 'commerce_line_item_manager') {
+              // Add the IDs of the reference line items to the array.
+              foreach ($order->{$key}[LANGUAGE_NONE] as $item) {
+                $line_item_ids[] = $item['line_item_id'];
+              }
+
+              // Delete the line items if any were found.
+              if (!empty($line_item_ids)) {
+                commerce_line_item_delete_multiple($line_item_ids);
+              }
+            }
+          }
+
+          // Alert other modules and systems that the order is being deleted.
           module_invoke_all('commerce_order_delete', $order);
           field_attach_delete('commerce_order', $order);
           rules_invoke_event('commerce_order_delete', $order);
         }
+
+        db_delete('commerce_order')
+          ->condition('order_id', $order_ids, 'IN')
+          ->execute();
 
         // Ignore slave server temporarily to give time for the
         // saved order to be propagated to the slave.
