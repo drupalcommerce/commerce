@@ -224,45 +224,48 @@ function commerce_checkout_panes($filter = array()) {
 
     // Update the array with the values from the settings form and filter out
     // any that don't match the filter criteria.
-    foreach (module_invoke_all('commerce_checkout_pane_info') as $pane_id => $checkout_pane) {
-      $checkout_pane->pane_id = $pane_id;
+    foreach (module_implements('commerce_checkout_pane_info') as $module) {
+      foreach (module_invoke($module, 'commerce_checkout_pane_info') as $pane_id => $checkout_pane) {
+        $checkout_pane->pane_id = $pane_id;
+        $checkout_pane->module = $module;
 
-      // Set some defaults for the checkout pane.
-      $defaults = array(
-        'name' => $checkout_pane->title,
-        'page' => 1,
-        'collapsible' => FALSE,
-        'collapsed' => FALSE,
-        'weight' => 0,
-        'enabled' => TRUE,
-        'review' => TRUE,
-      );
-      $checkout_pane = (object) array_merge($defaults, (array) $checkout_pane);
+        // Set some defaults for the checkout pane.
+        $defaults = array(
+          'name' => $checkout_pane->title,
+          'page' => 1,
+          'collapsible' => FALSE,
+          'collapsed' => FALSE,
+          'weight' => 0,
+          'enabled' => TRUE,
+          'review' => TRUE,
+        );
+        $checkout_pane = (object) array_merge($defaults, (array) $checkout_pane);
 
-      // Update the pane with saved data.
-      if (!empty($saved_panes[$pane_id])) {
-        $checkout_pane = (object) array_merge((array) $saved_panes[$pane_id] + (array) $checkout_pane);
-        $checkout_pane->saved = TRUE;
-      }
-
-      // Allow other modules to alter this checkout pane before filtering it.
-      drupal_alter('commerce_checkout_pane_info', $checkout_pane);
-
-      // Check the pane against the filter array to determine whether to add it
-      // to the panes array or not.
-      $valid = TRUE;
-
-      foreach ($filter as $attribute => $value) {
-        // If the current value for the specified attribute on the pane does not
-        // match the filter value...
-        if ($checkout_pane->{$attribute} != $value) {
-          // Do not add it to the temporary array.
-          $valid = FALSE;
+        // Update the pane with saved data.
+        if (!empty($saved_panes[$pane_id])) {
+          $checkout_pane = (object) array_merge((array) $saved_panes[$pane_id] + (array) $checkout_pane);
+          $checkout_pane->saved = TRUE;
         }
-      }
 
-      if ($valid) {
-        $temp[$pane_id] = $checkout_pane;
+        // Allow other modules to alter this checkout pane before filtering it.
+        drupal_alter('commerce_checkout_pane_info', $checkout_pane);
+
+        // Check the pane against the filter array to determine whether to add it
+        // to the panes array or not.
+        $valid = TRUE;
+
+        foreach ($filter as $attribute => $value) {
+          // If the current value for the specified attribute on the pane does not
+          // match the filter value...
+          if ($checkout_pane->{$attribute} != $value) {
+            // Do not add it to the temporary array.
+            $valid = FALSE;
+          }
+        }
+
+        if ($valid) {
+          $temp[$pane_id] = $checkout_pane;
+        }
       }
     }
 
@@ -327,6 +330,40 @@ function commerce_checkout_pane_reset($pane_id) {
   db_delete('commerce_checkout_pane')
     ->condition('pane_id', $pane_id)
     ->execute();
+}
+
+/**
+ * Returns the specified callback for the given checkout pane if it's available,
+ *   loading the checkout pane include file if specified.
+ *
+ * @param $checkout_pane
+ *   The checkout pane object.
+ * @param $callback
+ *   The callback function to return, one of:
+ *   - settings_form
+ *   - checkout_form
+ *   - checkout_form_validate
+ *   - checkout_form_submit
+ *   - review
+ * @return
+ *   A string containing the name of the callback function or FALSE if it could
+ *     not be found.
+ */
+function commerce_checkout_pane_callback($checkout_pane, $callback) {
+  // Include the checkout pane file if specified.
+  if (!empty($checkout_pane->file)) {
+    $parts = explode('.', $checkout_pane->file);
+
+    module_load_include(array_pop($parts), $checkout_pane->module, implode('.', $parts));
+  }
+
+  // If the specified callback function exists, return it.
+  if (function_exists($checkout_pane->callbacks[$callback])) {
+    return $checkout_pane->callbacks[$callback];
+  }
+
+  // Otherwise return FALSE.
+  return FALSE;
 }
 
 /**

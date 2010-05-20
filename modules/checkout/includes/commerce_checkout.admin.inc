@@ -279,7 +279,7 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
   );
 
   // If a settings form exists for the specified checkout pane...
-  if ($callback = $checkout_pane->callbacks['settings_form']) {
+  if ($callback = commerce_checkout_pane_callback($checkout_pane, 'settings_form')) {
     // Create a fieldset to hold the checkout pane settings.
     $form['settings'] = array(
       '#type' => 'fieldset',

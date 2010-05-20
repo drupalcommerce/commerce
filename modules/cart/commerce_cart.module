@@ -52,6 +52,12 @@ function commerce_cart_commerce_checkout_pane_info() {
 
   $checkout_panes['cart_contents'] = (object) array(
     'title' => t('Shopping cart contents'),
+    'file' => 'includes/commerce_cart.checkout_pane.inc',
+    'callbacks' => array(
+      'settings_form' => 'commerce_cart_contents_pane_settings_form',
+      'checkout_form' => 'commerce_cart_contents_pane_form',
+      'review' => 'commerce_cart_contents_pane_review',
+    ),
   );
 
   return $checkout_panes;
