@@ -132,7 +132,6 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
   if ($form_state['clicked_button']['#value'] == t('Save order')) {
     drupal_set_message(t('Order saved.'));
 
-    // TODO: Determine alternate redirect location if not the edit page.
     $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/edit';
   }
 }

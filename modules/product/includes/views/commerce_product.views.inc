@@ -178,8 +178,6 @@ function commerce_product_views_data() {
 
 /**
  * Implements hook_views_handlers().
- *
- * TODO: Determine if this hook is still even necessary given class autoloading.
  */
 function commerce_product_views_handlers() {
   return array(
