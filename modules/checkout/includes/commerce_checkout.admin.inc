@@ -100,7 +100,7 @@ function commerce_checkout_builder_form() {
 
     // Add the pane's name to the form array.
     $form['page'][$page_id]['panes'][$pane_id]['name'] = array(
-      '#markup' => check_plain($checkout_pane->title),
+      '#markup' => check_plain($checkout_pane->name),
     );
 
     // Add the select field for the pane's checkout page.
@@ -121,7 +121,7 @@ function commerce_checkout_builder_form() {
 
     // Add a configuration link for the pane.
     $form['page'][$page_id]['panes'][$pane_id]['ops'] = array(
-      '#markup' => l(t('configure'), 'admin/commerce/config/checkout-builder/configure-pane/'. $pane_id),
+      '#markup' => l(t('configure'), 'admin/commerce/config/checkout/form/pane/'. $pane_id),
     );
   }
 
@@ -247,8 +247,6 @@ function theme_commerce_checkout_builder_form($variables) {
  * Build the configuration form for a checkout pane.
  */
 function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pane) {
-  drupal_set_title(t("'%pane' checkout pane", array('%pane' => $checkout_pane->title)));
-
   // Build the form array with the bare minimum fields.
   $form = array();
 
@@ -276,13 +274,12 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
   $form['display']['review'] = array(
     '#type' => 'checkbox',
     '#title' => t('Include this pane on the optional checkout review page.'),
-    '#description' => t('The review page may be toggled on the !link form.', array('!link' => l(t('Advanced checkout settings'), 'admin/commerce/config/checkout'))),
+    '#description' => t('The review page can be toggled on the !link form.', array('!link' => l(t('checkout settings'), 'admin/commerce/config/checkout'))),
     '#default_value' => $checkout_pane->review,
   );
 
   // If a settings form exists for the specified checkout pane...
-  /**
-  if ($callback = commerce_checkout_pane_callback('checkout', $pane_id, 'settings')) {
+  if ($callback = $checkout_pane->callbacks['settings_form']) {
     // Create a fieldset to hold the checkout pane settings.
     $form['settings'] = array(
       '#type' => 'fieldset',
@@ -291,9 +288,8 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
     );
 
     // Add the settings from the callback to the form.
-    $form['settings'] += $callback($form_state);
+    $form['settings'] += $callback($checkout_pane);
   }
-   */
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -303,7 +299,7 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Reset to defaults'),
-    '#suffix' => l(t('Cancel'), 'admin/commerce/config/checkout-builder'),
+    '#suffix' => l(t('Cancel'), 'admin/commerce/config/checkout/form'),
     '#submit' => array('commerce_checkout_pane_settings_form_reset_submit'),
   );
 
@@ -315,34 +311,34 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
  */
 function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
   // Load and update the pane with values from the form.
-  $pane = commerce_checkout_pane_load($form_state['values']['pane_id']);
-
-  $pane['title'] = $form_state['values']['title'];
+  $checkout_pane = commerce_checkout_pane_load($form_state['values']['checkout_pane']->pane_id);
 
   // Update the fieldset collapsibility variables.
   switch ($form_state['values']['collapsibility']) {
     case 'collapsible':
-      $pane['collapsible'] = TRUE;
-      unset($pane['collapsed']);
+      $checkout_pane->collapsible = TRUE;
+      $checkout_pane->collapsed = FALSE;
       break;
     case 'collapsed':
-      $pane['collapsible'] = $pane['collapsed'] = TRUE;
+      $checkout_pane->collapsible = TRUE;
+      $checkout_pane->collapsed = TRUE;
       break;
     case 'default':
     default:
-      unset($pane['collapsible'], $pane['collapsed']);
+      $checkout_pane->collapsible = FALSE;
+      $checkout_pane->collapsed = FALSE;
       break;
   }
 
-  // Update the pane's shippability and review page visibility.
-  $pane['shippable'] = $form_state['values']['shippability'];
-  $pane['review'] = $form_state['values']['review'];
+  // Update the pane's review page visibility.
+  $checkout_pane->review = $form_state['values']['review'];
 
   // Save the changes.
-  commerce_checkout_pane_save($pane);
+  commerce_checkout_pane_save($checkout_pane);
 
   // Save this checkout pane's settings as if this was a system settings form.
   if (!empty($form['settings'])) {
+    // TODO: Update this to simply use $form_state['values'] a la system_settings_form_submit().
     foreach (element_children($form['settings']) as $field) {
       variable_set($field, $form_state['values'][$field]);
     }
@@ -351,7 +347,7 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
   drupal_set_message(t('Checkout pane saved.'));
 
   // Redirect to the main checkout form builder page on save.
-  $form_state['redirect'] = 'admin/commerce/config/checkout-builder';
+  $form_state['redirect'] = 'admin/commerce/config/checkout/form';
 }
 
 /**
@@ -359,14 +355,11 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
  */
 function commerce_checkout_pane_settings_form_reset_submit($form, &$form_state) {
   // Reset the display settings for the checkout pane.
-  $pane = commerce_checkout_pane_load($form_state['values']['pane_id']);
-  $pane = array_diff_key($pane, drupal_map_assoc(array('title', 'collapsible', 'collapsed')));
-
-  // Save the changes.
-  commerce_checkout_pane_save($pane);
+  commerce_checkout_pane_reset($form_state['values']['checkout_pane']->pane_id);
 
   // Reset this checkout pane's settings as if this was a system settings form.
   if (!empty($form['settings'])) {
+    // TODO: Update this to simply use $form_state['values'] a la system_settings_form_submit().
     foreach (element_children($form['settings']) as $field) {
       variable_del($field);
     }

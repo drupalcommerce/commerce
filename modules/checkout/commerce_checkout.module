@@ -55,8 +55,9 @@ function commerce_checkout_menu() {
     'weight' => 0,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
-  $items['admin/commerce/config/checkout/form/configure-pane/%commerce_checkout_pane'] = array(
-    'title' => 'Checkout pane configuration',
+  $items['admin/commerce/config/checkout/form/pane/%commerce_checkout_pane'] = array(
+    'title callback' => 'commerce_checkout_pane_settings_title',
+    'title arguments' => array(6),
     'description' => 'Configure the settings for a checkout pane.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_checkout_pane_settings_form', 6),
@@ -228,6 +229,7 @@ function commerce_checkout_panes($filter = array()) {
 
       // Set some defaults for the checkout pane.
       $defaults = array(
+        'name' => $checkout_pane->title,
         'page' => 1,
         'collapsible' => FALSE,
         'collapsed' => FALSE,
@@ -260,7 +262,7 @@ function commerce_checkout_panes($filter = array()) {
       }
 
       if ($valid) {
-        $temp[] = $checkout_pane;
+        $temp[$pane_id] = $checkout_pane;
       }
     }
 
@@ -306,6 +308,25 @@ function commerce_checkout_pane_load($pane_id) {
   }
 
   return $checkout_panes[$pane_id];
+}
+
+/**
+ * Return the title of a checkout pane settings form page.
+ *
+ * @param $checkout_pane
+ *   The checkout pane object represented on the settings form.
+ */
+function commerce_checkout_pane_settings_title($checkout_pane) {
+  return t("'@pane' checkout pane", array('@pane' => $checkout_pane->name));
+}
+
+/**
+ * Resets a checkout pane by pane_id to its module defined defaults.
+ */
+function commerce_checkout_pane_reset($pane_id) {
+  db_delete('commerce_checkout_pane')
+    ->condition('pane_id', $pane_id)
+    ->execute();
 }
 
 /**
