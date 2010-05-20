@@ -237,35 +237,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
       }
       else {
         // Or go ahead and complete the sale.
-        // TODO: Move this to an API function in commerce_checkout.module.
-
-        // Determine what to do for anonymous users completing checkout.
-        if ($order->customer_uid == 0) {
-          $create = variable_get('commerce_checkout_anonymous_account', 2);
-          $notify = variable_get('commerce_checkout_anonymous_notify', 3);
-
-          if ($create > 0) {
-            // TODO: Where do $name and $mail come from?
-            $account = commerce_checkout_create_account($name, $mail, '', $create == 1 ? 0 : 1, $notify >= 2);
-
-            $order->customer_uid = $account->uid;
-            $order = commerce_order_save($order);
-          }
-          else {
-            $account = FALSE;
-          }
-        }
-
-        // Move the order status to the default "Pending" status if it hasn't
-        // already been updated.
-        // TODO: Probably need to revisit this update process.
-        if ($order->status == $form_state['values']['order']->status) {
-          $order_state = commerce_order_state_load('pending');
-          $order = commerce_order_status_update($order, $order_state->default_status);
-        }
-
-        // TODO: Update to use Rules; the third argument should pass the proper account.
-        // ca_pull_trigger('uc_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
+        commerce_checkout_complete($form_state, $order);
 
         // Empty the form storage and proceed to completion.
         $form_state['redirect'] = 'checkout/complete/'. $order->order_id;
@@ -338,6 +310,6 @@ function theme_commerce_checkout_review($variables) {
 /**
  * Displays the checkout completion page for an order.
  */
-function commerce_checkout_complete($order) {
+function commerce_checkout_completion($order) {
   return t('Your order is complete! This is placeholder text for order completion message.');
 }

@@ -23,7 +23,7 @@ function commerce_checkout_menu() {
   );
   $items['checkout/complete/%commerce_order'] = array(
     'title' => 'Checkout complete',
-    'page callback' => 'commerce_checkout_complete',
+    'page callback' => 'commerce_checkout_completion',
     'page arguments' => array(3),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
@@ -373,7 +373,40 @@ function commerce_checkout_pane_callback($checkout_pane, $callback) {
 }
 
 /**
- * Create a new user account with the specified parameters and notification.
+ * Completes the checkout process for the given order.
+ */
+function commerce_checkout_complete(&$form_state, $order) {
+  // Determine what to do for anonymous users completing checkout.
+  if ($order->customer_uid == 0) {
+    $create = variable_get('commerce_checkout_anonymous_account', 2);
+    $notify = variable_get('commerce_checkout_anonymous_notify', 3);
+
+    // TODO: Pull $name and $mail from a customer information checkout pane,
+    // then remove the FALSE from this if statement.
+    if (FALSE && $create > 0) {
+      $account = commerce_checkout_create_account($name, $mail, '', $create == 1 ? 0 : 1, $notify >= 2);
+
+      $order->customer_uid = $account->uid;
+      $order = commerce_order_save($order);
+    }
+    else {
+      $account = FALSE;
+    }
+  }
+
+  // Move the order status to the default "Pending" status if it hasn't
+  // already been updated.
+  if ($order->status == $form_state['values']['order']->status) {
+    $order_state = commerce_order_state_load('pending');
+    $order = commerce_order_status_update($order, $order_state->default_status);
+  }
+
+  // TODO: Update to use Rules; the third argument should pass the proper account.
+  // ca_pull_trigger('uc_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
+}
+
+/**
+ * Creates a new user account with the specified parameters and notification.
  *
  * @param $name
  *   The new account username.
