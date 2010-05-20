@@ -319,6 +319,7 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
       LANGUAGE_NONE => array(
         array(
           'price' => $product->base_price[LANGUAGE_NONE][0]['price'],
+          'currency_code' => $product->base_price[LANGUAGE_NONE][0]['currency_code'],
         )
       )
     );
