@@ -9,14 +9,16 @@
 /**
  * Build the checkout form based on the current step in checkout.
  */
-function commerce_checkout_form($form, &$form_state) {
+function commerce_checkout_form($form, &$form_state, $order = NULL) {
   global $user;
 
   $form = array(
     '#validate' => array(),
   );
 
-  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
+  $form['#attached']['css'] = array(
+    drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css'
+  );
 
   $form['uid'] = array(
     '#type' => 'hidden',
@@ -29,15 +31,12 @@ function commerce_checkout_form($form, &$form_state) {
   );
 
   // Load existing checkout order data if possible.
-  if (!empty($form_state['storage']['order'])) {
-    $order = $form_state['storage']['order'];
-  }
-  else {
+  if (empty($order)) {
     $order = commerce_cart_order_load($user->uid);
   }
 
   // TODO: If no order is found, send the customer packing.
-  if (!$order) {
+  if (empty($order)) {
     $form['empty'] = array(
       '#markup' => t('Add some items to your cart and <em>then</em> try checking out.'),
     );
@@ -51,7 +50,7 @@ function commerce_checkout_form($form, &$form_state) {
   );
 
   // Load data for the current page in checkout.
-  $page_id = isset($form_state['values']) ? $form_state['storage']['page_id'] : 1;
+  $page_id = !empty($form_state['rebuild']) ? $form_state['storage']['page_id'] : 1;
   $checkout_page = commerce_checkout_page_load($page_id);
 
   $form['checkout_page'] = array(
@@ -102,7 +101,7 @@ function commerce_checkout_form($form, &$form_state) {
     );
 
     // Load all the checkout panes enabled for the review page.
-    $panes = commerce_checkout_pane_list(array('enabled' => TRUE, 'review' => TRUE));
+    $panes = commerce_checkout_panes(array('enabled' => TRUE, 'review' => TRUE));
 
     // Find the number of pages.
     $pages = commerce_checkout_page_load();
@@ -137,9 +136,21 @@ function commerce_checkout_form($form, &$form_state) {
 
   // Add the cancel or back button where appropriate.
   if (!$checkout_page->prev_page && !empty($checkout_page->back_value)) {
+    // Add an empty "Back" button value to avoid submission errors.
+    $form['buttons']['back'] = array(
+      '#type' => 'value',
+      '#value' => '',
+    );
+
+    // Store the cancel redirect in the form so modules can modify it easily.
+    $form['cancel_redirect'] = array(
+      '#type' => 'value',
+      '#value' => '<front>',
+    );
+
     $form['buttons']['cancel'] = array(
       '#type' => 'submit',
-      '#value' => $checkout_page->back_value,
+      '#value' => t('Cancel'),
       '#validate' => array(),
       '#submit' => array('commerce_checkout_form_cancel_submit'),
     );
@@ -165,25 +176,22 @@ function commerce_checkout_form($form, &$form_state) {
 function commerce_checkout_form_submit($form, &$form_state) {
   global $user;
 
-  // Initialize the work in progress order object if it does not already exist.
-  // TODO: Update for the new shopping cart order system.
-  if (!$form_state['storage']['order']) {
-    $form_state['storage']['order'] = commerce_order_new($form_state['values']['uid']);
-    $form_state['storage']['order']->products = $form_state['values']['cart_contents'];
-    $form_state['storage']['order']->order_total = commerce_order_get_total($form_state['storage']['order'], TRUE);
-  }
+  // Load a fresh copy of the order stored in the form.
+  $order = commerce_order_load($form_state['values']['order']->order_id);
 
   // Loop through the enabled checkout panes.
-  foreach (commerce_checkout_pane_list(array('enabled' => TRUE, 'page' => $form_state['values']['page']['number'])) as $pane_id => $pane) {
+  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $form_state['values']['checkout_page']->page_id)) as $pane_id => $checkout_pane) {
     // If the pane has defined a checkout form submit handler...
-    if ($callback = commerce_checkout_pane_callback('checkout', $pane_id, 'form_submit')) {
+    if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_submit')) {
       // Give it a chance to process the submitted data.
-      $callback($form, $form_state);
+      $callback($form, $form_state, $order);
     }
   }
 
   // Save the updated order object.
-  commerce_order_save($form_state['storage']['order']);
+  $order = commerce_order_save($order);
+
+  $checkout_page = $form_state['values']['checkout_page'];
 
   // Determine which button was used to submit the form.
   switch($form_state['values']['op']) {
@@ -192,59 +200,58 @@ function commerce_checkout_form_submit($form, &$form_state) {
       // If there is a previous page...
       if ($form_state['values']['page']['prev_page']) {
         // Move the form back to that page.
-        $form_state['storage']['page_number'] = $form_state['values']['page']['prev_page'];
+        $form_state['storage']['page_id'] = $checkout_page->prev_page;
       }
       break;
 
     // Customer clicked the continue button.
     case $form_state['values']['continue']:
       // If there is another checkout page...
-      if ($form_state['values']['page']['next_page']) {
+      if ($checkout_page->next_page) {
         // Move the form forward to that page.
-        $form_state['storage']['page_number'] = $form_state['values']['page']['next_page'];
+        $form_state['storage']['page_id'] = $checkout_page->next_page;
+        $form_state['rebuild'] = TRUE;
       }
-      elseif (variable_get('commerce_checkout_review_status', TRUE) && $form_state['storage']['page_number'] != 'review') {
+      elseif (variable_get('commerce_checkout_review_status', TRUE) && $checkout_page->page_id != 'review') {
         // Otherwise, head to the review page if it's enabled.
-        $form_state['storage']['page_number'] = 'review';
+        $form_state['storage']['page_id'] = 'review';
+        $form_state['rebuild'] = TRUE;
       }
       else {
         // Or go ahead and complete the sale.
-        $order = $form_state['storage']['order'];
+        // TODO: Move this to an API function in commerce_checkout.module.
 
         // Determine what to do for anonymous users completing checkout.
-        if ($order->uid == 0) {
+        if ($order->customer_uid == 0) {
           $create = variable_get('commerce_checkout_anonymous_account', 2);
           $notify = variable_get('commerce_checkout_anonymous_notify', 3);
 
           if ($create > 0) {
+            // TODO: Where do $name and $mail come from?
             $account = commerce_checkout_create_account($name, $mail, '', $create == 1 ? 0 : 1, $notify >= 2);
 
-            $order->uid = $account->uid;
-            commerce_order_save($order);
+            $order->customer_uid = $account->uid;
+            $order = commerce_order_save($order);
           }
           else {
             $account = FALSE;
           }
         }
 
-        // Move an order's status from "In Checkout" to "Pending"
-        /**
-         * TODO: Update to use the new order status API.
-         *
-        $status = db_result(db_query("SELECT order_status FROM {uc_orders} WHERE order_id = %d", $order->order_id));
-        if (uc_order_status_data($status, 'state') == 'in_checkout') {
-          uc_order_update_status($order->order_id, uc_order_state_default('post_checkout'));
+        // Move the order status to the default "Pending" status if it hasn't
+        // already been updated.
+        // TODO: Probably need to revisit this update process.
+        if ($order->status == $form_state['values']['order']->status) {
+          $order_state = commerce_order_state_load('pending');
+          $order = commerce_order_status_update($order, $order_state->default_status);
         }
-         */
 
         // TODO: Update to use Rules; the third argument should pass the proper account.
         // ca_pull_trigger('uc_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
 
-        // Empty the cart and the form storage and proceed to completion.
-        $form_state['redirect'] = 'checkout/complete/'. $form_state['storage']['order']->order_id;
-
+        // Empty the form storage and proceed to completion.
+        $form_state['redirect'] = 'checkout/complete/'. $order->order_id;
         unset($form_state['storage']);
-        // commerce_cart_empty(uc_cart_get_id());
       }
       break;
   }
@@ -259,10 +266,10 @@ function commerce_checkout_form_cancel_submit($form, &$form_state) {
     // commerce_order_comment_save($form_state['values']['order']->order_id, 0, t('Customer cancelled this order from the checkout form.'));
   }
 
-  drupal_set_message(t('Your order has been canceled.'));
+  drupal_set_message(t('Checkout of your current order has been canceled at may be resumed when you are ready.'));
   unset($form_state['storage']);
 
-  $form_state['redirect'] = 'cart';
+  $form_state['redirect'] = $form_state['values']['cancel_redirect'];
 }
 
 /**
