@@ -117,24 +117,8 @@ function commerce_cart_block_view($delta) {
         $line_item_ids[] = $data['line_item_id'];
       }
 
-      // TODO: Ask merlinofchaos if it's sufficient to views_embed_view().
-
-      // Load the cart line item View.
-      $view = views_get_view('commerce_cart');
-
-      // TODO: Possibly use a different display? Not sure if an attachment will
-      // work here... tried without initial success.
-      $view->set_display('defaults');
-
-      // Set the specific line items for this order.
-      $view->set_arguments(array(implode(',', $line_item_ids)));
-
-      // Prepare and execute the View query.
-      $view->pre_execute();
-      $view->execute();
-
-      // Render it into the content variable.
-      $content = $view->render();
+      // Render the shopping cart View into the content variable.
+      $content = commerce_embed_view('commerce_cart', 'defaults', array(implode(',', $line_item_ids)));
 
       // Add total information and a link to checkout.
 
@@ -185,8 +169,7 @@ function commerce_cart_order_load($customer_uid = 0) {
     if ($customer_uid) {
       // Look for the user's most recent shopping cart order, although they
       // should never really have more than one.
-      // TODO: Add a condition to check for the appropriate order status.
-      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid ORDER BY order_id DESC', array(':customer_uid' => $customer_uid))->fetchField();
+      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid AND status = :status ORDER BY order_id DESC', array(':customer_uid' => $customer_uid, ':status' => 'cart'))->fetchField();
     }
     else {
       // Otherwise look for a shopping cart order ID in the session.

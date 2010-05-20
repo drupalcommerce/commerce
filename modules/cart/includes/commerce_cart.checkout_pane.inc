@@ -14,15 +14,24 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
   $form = array();
 
   // Build an options array of Views available for the cart contents pane.
-  // TODO: Update to list all line item View displays grouped by the View.
-  $options = drupal_map_assoc(range(1, 5));
+  $options = array();
+
+ 	// Generate an option list from all user defined and module defined views.
+ 	foreach (views_get_all_views() as $view_id => $view_value) {
+    // Only include line item Views.
+    if ($view_value->base_table == 'commerce_line_item') {
+     	foreach ($view_value->display as $display_id => $display_value) {
+        $options[check_plain($view_id)][$view_id .'|'. $display_id] = check_plain($display_value->display_title);
+      }
+   	}
+ 	}
 
   $form['commerce_cart_contents_pane_view'] = array(
     '#type' => 'select',
     '#title' => t('Cart contents View'),
     '#description' => t('Specify the View to use in the cart contents pane.'),
     '#options' => $options,
-    '#default_value' => variable_get('commerce_cart_contents_pane_view', ''),
+    '#default_value' => variable_get('commerce_cart_contents_pane_view', 'commerce_cart|default'),
   );
 
   return $form;
@@ -35,9 +44,37 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
 function commerce_cart_contents_pane_form($form_state, $checkout_pane, $order) {
   $form = array();
 
+  // Extract the View and display keys from the cart contents pane setting.
+  list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart|default'));
+
+  // Extract the line item IDs of products on the order.
+  $line_item_ids = array();
+
+  foreach ($order->line_items[LANGUAGE_NONE] as $data) {
+    $line_item_ids[] = $data['line_item_id'];
+  }
+
   $form['cart_contents_view'] = array(
-    '#markup' => t('Temporary string, to be replaced by a line item View.'),
+    '#markup' => commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids))),
   );
 
   return $form;
+}
+
+/**
+ * Checkout pane callback: returns the cart contents review data for the
+ *   optional checkout review page.
+ */
+function commerce_cart_contents_pane_review($form_state, $order) {
+  // Extract the View and display keys from the cart contents pane setting.
+  list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart|default'));
+
+  // Extract the line item IDs of products on the order.
+  $line_item_ids = array();
+
+  foreach ($order->line_items[LANGUAGE_NONE] as $data) {
+    $line_item_ids[] = $data['line_item_id'];
+  }
+
+  return commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids)));
 }
