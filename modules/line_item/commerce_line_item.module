@@ -819,7 +819,6 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
   form_set_value($element, $value, $form_state);
 }
 
-
 /**
  * Implements hook_field_widget_error().
  */

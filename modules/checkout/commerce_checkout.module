@@ -165,8 +165,8 @@ function commerce_checkout_pages($review = TRUE) {
         'help' => t("Your order is almost complete. Please review the details below and click 'Submit order' if all the information is correct. You may use the 'Back' button to make changes to your order if necessary."),
         'next_page' => FALSE,
         'prev_page' => count($checkout_pages),
-        'back' => t('Back'),
-        'continue' => t('Submit order'),
+        'back_value' => t('Back'),
+        'submit_value' => t('Submit order'),
       );
     }
 

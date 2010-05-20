@@ -101,20 +101,20 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
     );
 
     // Load all the checkout panes enabled for the review page.
-    $panes = commerce_checkout_panes(array('enabled' => TRUE, 'review' => TRUE));
+    $checkout_panes = commerce_checkout_panes(array('enabled' => TRUE, 'review' => TRUE));
 
     // Find the number of pages.
-    $pages = commerce_checkout_page_load();
+    $checkout_pages = commerce_checkout_pages(FALSE);
 
     // Loop through all the pages...
-    foreach (array_keys($pages) as $review_page) {
+    foreach (array_keys($checkout_pages) as $page_id) {
       // Then loop through all the panes...
-      foreach ($panes as $pane_id => $pane) {
+      foreach ($checkout_panes as $pane_id => $checkout_pane) {
         // And if the pane is on the current page and has a review callback...
-        if ($pane['page'] == $review_page && $callback = commerce_checkout_pane_callback('checkout', $pane_id, 'review')) {
+        if ($checkout_pane->page == $page_id && $callback = commerce_checkout_pane_callback($checkout_pane, 'review')) {
           // Add a row for it in the review data.
           $form['review']['#data'][$pane_id] = array(
-            'title' => !empty($pane['title']) ? check_plain($pane['title']) : $pane['name'],
+            'title' => $checkout_pane->title,
           );
 
           // Get the review data for this pane.
@@ -126,12 +126,12 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
 
   $form['buttons'] = array(
     '#type' => 'fieldset',
-    '#attributes' => array('class' => 'checkout-buttons'),
+    '#attributes' => array('class' => array('checkout-buttons')),
   );
 
   // Add a review class to the buttons fieldset on the review page.
   if ($page_id == 'review') {
-    $form['buttons']['#attributes']['class'] .= ' review';
+    $form['buttons']['#attributes']['class'][] = 'review';
   }
 
   // Add the cancel or back button where appropriate.
@@ -198,7 +198,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
     // Customer clicked the back button.
     case $form_state['values']['back']:
       // If there is a previous page...
-      if ($form_state['values']['page']['prev_page']) {
+      if ($checkout_page->prev_page) {
         // Move the form back to that page.
         $form_state['storage']['page_id'] = $checkout_page->prev_page;
       }
@@ -273,22 +273,21 @@ function commerce_checkout_form_cancel_submit($form, &$form_state) {
 }
 
 /**
- * Theme the optional checkout review page data.
+ * Themes the optional checkout review page data.
  */
-function theme_commerce_checkout_review($element) {
-  // return print_r($element['#data'], TRUE);
-  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
+function theme_commerce_checkout_review($variables) {
+  $form = $variables['form'];
 
   // Turn the review data array into table rows.
   $rows = array();
 
-  foreach ($element['#data'] as $pane_id => $data) {
+  foreach ($form['#data'] as $pane_id => $data) {
     // First add a row for the title.
     $rows[] = array(
       'data' => array(
         array('data' => $data['title'], 'colspan' => 2),
       ),
-      'class' => 'pane-title odd',
+      'class' => array('pane-title', 'odd'),
     );
 
     // Next, add the data for this particular section.
@@ -297,10 +296,10 @@ function theme_commerce_checkout_review($element) {
       foreach ($data['data'] as $key => $value) {
         $rows[] = array(
           'data' => array(
-            array('data' => $key .':', 'class' => 'pane-data-key'),
-            array('data' => $value, 'class' => 'pane-data-value'),
+            array('data' => $key .':', 'class' => array('pane-data-key')),
+            array('data' => $value, 'class' => array('pane-data-value')),
           ),
-          'class' => 'pane-data even',
+          'class' => array('pane-data', 'even'),
         );
       }
     }
@@ -308,14 +307,14 @@ function theme_commerce_checkout_review($element) {
       // Otherwise treat it as a block of text in its own row.
       $rows[] = array(
         'data' => array(
-          array('data' => $data['data'], 'colspan' => 2, 'class' => 'pane-data-full'),
+          array('data' => $data['data'], 'colspan' => 2, 'class' => array('pane-data-full')),
         ),
-        'class' => 'pane-data even',
+        'class' => array('pane-data', 'even'),
       );
     }
   }
 
-  return theme('table', array(), $rows, array('class' => 'checkout-review'));
+  return theme('table', array('rows' => $rows, 'attributes' => array('class' => array('checkout-review'))));
 }
 
 /**
