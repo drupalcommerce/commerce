@@ -7,7 +7,25 @@
 
 
 /**
- * Build the checkout form based on the current step in checkout.
+ * Redirects invalid checkout attempts or displays the checkout form if valid.
+ */
+function commerce_checkout_router() {
+  global $user;
+
+  // Load the shopping cart order.
+  $order = commerce_cart_order_load($user->uid);
+
+  // If no shopping cart order could be found, redirect away from checkout.
+  if (empty($order)) {
+    drupal_set_message(t('Add some items to your cart and then try checking out.'));
+    drupal_goto('<front>');
+  }
+
+  return drupal_get_form('commerce_checkout_form', $order);
+}
+
+/**
+ * Builds the checkout form based on the current step in checkout.
  */
 function commerce_checkout_form($form, &$form_state, $order = NULL) {
   global $user;
@@ -30,15 +48,15 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
     '#value' => clone($user),
   );
 
-  // Load existing checkout order data if possible.
+  // If no order was specified, look for one now.
   if (empty($order)) {
     $order = commerce_cart_order_load($user->uid);
   }
 
-  // TODO: If no order is found, send the customer packing.
+  // If an order can't be found, return a blank form.
   if (empty($order)) {
     $form['empty'] = array(
-      '#markup' => t('Add some items to your cart and <em>then</em> try checking out.'),
+      '#markup' => t('Add some items to your cart and then try checking out.'),
     );
 
     return $form;

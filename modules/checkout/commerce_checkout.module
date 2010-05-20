@@ -16,8 +16,7 @@ function commerce_checkout_menu() {
 
   $items['checkout'] = array(
     'title' => 'Checkout',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_checkout_form'),
+    'page callback' => 'commerce_checkout_router',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.pages.inc',
