@@ -177,6 +177,9 @@ function commerce_product_type_save($product_type) {
     // Notify the field API that a new bundle has been created.
     field_attach_create_bundle('commerce_product', $product_type->type);
 
+    // Add the base_price field to the product type.
+    commerce_product_configure_product_type($product_type->type);
+
     // Notify other modules that a new product type has been created.
     module_invoke_all('commerce_product_type_insert', $product_type);
   }
@@ -285,6 +288,51 @@ function commerce_product_type_title($product_type) {
  */
 function commerce_product_type_to_arg($type) {
   return $type;
+}
+
+/**
+ * Ensures a base price field is present on a product type bundle.
+ */
+function commerce_product_configure_product_type($type) {
+  // TODO: Make a single function for this in the Price module.
+  $field = field_info_field('base_price');
+  $instance = field_info_instance('commerce_product', 'base_price', $type);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => 'base_price',
+      'type' => 'commerce_price',
+      'cardinality' => 1,
+      'object_types' => array('commerce_product'),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => 'base_price',
+      'object_type' => 'commerce_product',
+      'bundle' => $type,
+      'label' => t('Base price'),
+      'required' => TRUE,
+      'widget' => array(
+        'type' => 'commerce_price_simple',
+        'weight' => 0,
+      ),
+      'settings' => array(),
+
+      // Define default formatters for the teaser and full view.
+      'display' => array(
+        'full' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_price_default',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
 }
 
 /**
