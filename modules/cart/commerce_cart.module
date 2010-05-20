@@ -96,7 +96,7 @@ function commerce_cart_block_view($delta) {
     $order = commerce_cart_order_load($user->uid);
 
     // If the cart is empty...
-    if (!$order) {
+    if (!$order || empty($order->line_items)) {
       // Display an appropriate message.
       $content = t('Your shopping cart is empty.');
     }
