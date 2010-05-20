@@ -30,31 +30,36 @@ function commerce_checkout_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.pages.inc',
   );
+
   $items['admin/commerce/config/checkout'] = array(
     'title' => 'Checkout settings',
-    'description' => 'Configure options pertaining to the checkout workflow.',
+    'description' => 'Configure checkout settings and customize the checkout form.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_checkout_settings_form'),
     'access arguments' => array('administer checkout'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
-
-  // Menu items for the checkout form builder.
-  $items['admin/commerce/config/checkout-builder'] = array(
-    'title' => 'Checkout form builder',
+  $items['admin/commerce/config/checkout/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/commerce/config/checkout/form'] = array(
+    'title' => 'Checkout form',
     'description' => 'Build your checkout pages using module defined checkout form elements.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_checkout_builder_form'),
     'access arguments' => array('administer checkout'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
-  $items['admin/commerce/config/checkout-builder/configure-pane/%commerce_checkout_pane'] = array(
+  $items['admin/commerce/config/checkout/form/configure-pane/%commerce_checkout_pane'] = array(
     'title' => 'Checkout pane configuration',
     'description' => 'Configure the settings for a checkout pane.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_checkout_pane_settings_form', 5),
+    'page arguments' => array('commerce_checkout_pane_settings_form', 6),
     'access arguments' => array('administer checkout'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.admin.inc',
