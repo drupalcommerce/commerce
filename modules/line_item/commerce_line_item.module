@@ -825,3 +825,15 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
 function commerce_line_item_field_widget_error($element, $error) {
   form_error($element, $error['message']);
 }
+
+/**
+ * Callback to alter the property info of the reference field.
+ *
+ * @see commerce_line_item_field_info().
+ */
+function commerce_line_item_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = str_replace('_', '-', $field['field_name']);
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  $property['options list'] = 'entity_metadata_field_options_list';
+  unset($property['query callback']);
+}
