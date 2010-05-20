@@ -1,0 +1,10 @@
+/* $Id */
+
+.view-commerce-cart .field-name-total {
+  text-align: right;
+}
+
+.cart-footer {
+  padding-right: 6px;
+  text-align: right;
+}
