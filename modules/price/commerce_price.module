@@ -40,12 +40,12 @@ function commerce_price_field_schema($field) {
           'scale' => 5,
           'not null' => TRUE,
         ),
-        /*'currency_code' => array(
+        'currency_code' => array(
           'description' => 'The currency code for the price.',
           'type' => 'varchar',
           'length' => 32,
           'not null' => TRUE,
-        ),*/
+        ),
       ),
       // TODO: Review this index... what's it for?
       /*'indexes' => array(
@@ -77,7 +77,19 @@ function commerce_price_field_settings_form($field, $instance, $has_data) {
  * Implements hook_field_validate().
  */
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
-  // TODO: Validate prices based on valid amount and enabled currency.
+  if ($field['type'] == 'commerce_price') {
+    // TODO: Validate prices based on valid amount and enabled currency.
+    // drupal_set_message('hook_field_validate()<pre>'. print_r($items, TRUE) .'</pre>');
+  }
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'commerce_price') {
+    // drupal_set_message('hook_field_presave()<pre>'. print_r($items, TRUE) .'</pre>');
+  }
 }
 
 /**
@@ -192,10 +204,16 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   switch ($instance['widget']['type']) {
     case 'commerce_price_simple':
       return $element + array(
-        '#type' => 'textfield',
-        '#default_value' => $default,
-        '#size' => 10,
-        '#field_suffix' => $currency->code,
+        'price' => array(
+          '#type' => 'textfield',
+          '#default_value' => $default,
+          '#size' => 10,
+          '#field_suffix' => $currency->code,
+        ),
+        'currency_code' => array(
+          '#type' => 'value',
+          '#default_value' => $currency->code,
+        ),
       );
 
     case 'commerce_price_full':
@@ -204,10 +222,10 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         '#default_value' => isset($items[$delta]['price']) ? $items[$delta]['price'] : NULL,
         '#size' => 10,
       );
-      $element['currency'] = array(
+      $element['currency_code'] = array(
         '#type' => 'select',
         '#options' => commerce_currency_get_symbol(),
-        '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $currency_code,
+        '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $currency->code,
       );
       break;
   }
