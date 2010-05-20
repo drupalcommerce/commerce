@@ -21,7 +21,7 @@ fieldset.checkout-buttons.review {
   margin-right: auto;
 }
 
-table.checkout-review .pane-title {
+table.checkout-review .pane-title td {
   font-weight: bold;
   text-align: center;
 }

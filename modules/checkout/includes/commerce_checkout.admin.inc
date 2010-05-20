@@ -20,7 +20,7 @@ function commerce_checkout_settings_form() {
     '#type' => 'select',
     '#title' => t('Number of pages'),
     '#options' => drupal_map_assoc(range(1, 10)),
-    '#default' => variable_get('commerce_checkout_pages', 1),
+    '#default_value' => variable_get('commerce_checkout_pages', 1),
   );
   $form['pages']['commerce_checkout_review_status'] = array(
     '#type' => 'checkbox',
