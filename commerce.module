@@ -28,3 +28,79 @@ function commerce_email_from() {
   // TODO: Determine the appropriate default value for this setting.
   return variable_get('site_mail', 'admin@example.com');
 }
+
+/**
+ * Returns a single currency object.
+ *
+ * @param $currency_code
+ *   The code of the currency to return.
+ * @return
+ *   The specified currency object or FALSE if it does not exist.
+ */
+function commerce_currency_load($currency_code) {
+  $currencies = commerce_currencies();
+
+  return isset($currencies[$currency_code]) ? $currencies[$currency_code] : FALSE;
+}
+
+/**
+ * Returns an array of all available currencies.
+ */
+function commerce_currencies() {
+  $currencies = &drupal_static(__FUNCTION__);
+
+  if (empty($currencies)) {
+    // TODO: Expand to include all currencies per http://drupal.org/node/731604.
+    // Define base currencies.
+    $currencies = array(
+      'und' => (object) array(
+        'label' => t('Undefined currency'),
+        'symbol' => '¤',
+      ),
+      'eur' => (object) array(
+        'label' => t('Euro'),
+        'symbol' => '€',
+      ),
+      'usd' => (object) array(
+        'label' => t('Dollar (US)'),
+        'symbol' => '$',
+      ),
+    );
+
+    // Allow other modules to modify the currency list.
+    drupal_alter('commerce_currency_info', $currencies);
+  }
+
+  return $currencies;
+}
+
+/**
+ * Returns the symbol of any or all currencies.
+ *
+ * @param $code
+ *   Optional parameter specifying the code of the currency whose symbol to return.
+ * @return
+ *   Either an array of all currency symbols keyed by the currency code or a
+ *     string containing the symbol for the specified currency. If a currency is
+ *     specified that does not exist, this function returns FALSE.
+ */
+function commerce_currency_get_symbol($currency_code = NULL) {
+  $currencies = commerce_currencies();
+
+  // Return a specific currency symbol if specified.
+  if (!empty($currency_code)) {
+    if (isset($currencies[$currency_code])) {
+      return $currencies[$currency_code]->symbol;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  // Otherwise turn the array values into the type name only.
+  foreach ($currencies as $currency_code => $currency) {
+    $currencies[$currency_code] = $currency->symbol;
+  }
+
+  return $currencies;
+}
