@@ -20,3 +20,11 @@ function commerce_sort_weight($a, $b) {
   }
   return ($a_weight < $b_weight) ? -1 : 1;
 }
+
+/**
+ * Returns the e-mail address from which to send commerce related e-mails.
+ */
+function commerce_email_from() {
+  // TODO: Determine the appropriate default value for this setting.
+  return variable_get('site_mail', 'admin@example.com');
+}
