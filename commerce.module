@@ -53,17 +53,21 @@ function commerce_currencies() {
     // TODO: Expand to include all currencies per http://drupal.org/node/731604.
     // Define base currencies.
     $currencies = array(
-      'und' => (object) array(
-        'label' => t('Undefined currency'),
-        'symbol' => '¤',
-      ),
-      'eur' => (object) array(
-        'label' => t('Euro'),
+      'EUR' => (object) array(
+        'numeric_code' => 978,
+        'code' => 'EUR',
+        'name' => t('Euro'),
         'symbol' => '€',
+        'fraction_name' => t('Cent'),
+        'decimals' => 2,
       ),
-      'usd' => (object) array(
-        'label' => t('Dollar (US)'),
+      'USD' => (object) array (
+        'numeric_code' => 840,
+        'code' => 'USD',
+        'name' => t('United States Dollars'),
         'symbol' => '$',
+        'fraction_name' => t('Cent'),
+        'decimals' => 2,
       ),
     );
 
