@@ -210,6 +210,51 @@ function commerce_line_item_type_get_name($type = NULL) {
  *   The fully loaded line item type object to configure.
  */
 function commerce_line_item_type_configure($line_item_type) {
+  $i = 0;
+  
+  // Add the base price field to the line item type.
+  // TODO: Make a single function for this in the Price module.
+  foreach (array('unit_price' => t('Unit price'), 'total' => t('Total')) as $key => $label) {
+    $field = field_info_field($key);
+    $instance = field_info_instance('commerce_line_item', $key, $line_item_type->type);
+
+    if (empty($field)) {
+      $field = array(
+        'field_name' => $key,
+        'type' => 'commerce_price',
+        'cardinality' => 1,
+        'object_types' => array('commerce_line_item'),
+        'translatable' => FALSE,
+        'locked' => TRUE,
+      );
+      $field = field_create_field($field);
+    }
+
+    if (empty($instance)) {
+      $instance = array(
+        'field_name' => $key,
+        'object_type' => 'commerce_line_item',
+        'bundle' => $line_item_type->type,
+        'label' => $label,
+        'required' => TRUE,
+        'widget' => array(
+          'type' => 'commerce_price_simple',
+          'weight' => $i++,
+        ),
+        'settings' => array(),
+
+        // Define default formatters for the teaser and full view.
+        'display' => array(
+          'full' => array(
+            'label' => 'hidden',
+            'type' => 'commerce_price_default',
+          ),
+        ),
+      );
+      field_create_instance($instance);
+    }
+  }
+
   // If this line item type specifies a configuration callback...
   if (!empty($line_item_type->configuration_callback)) {
     $callback = $line_item_type->configuration_callback;

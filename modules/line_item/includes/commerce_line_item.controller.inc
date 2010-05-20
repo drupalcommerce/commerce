@@ -53,6 +53,9 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       module_invoke_all('commerce_line_item_presave', $line_item);
       rules_invoke_event('commerce_line_item_presave', $line_item);
 
+      // Update the total of the line item based on the quantity and unit price.
+      $line_item->total[LANGUAGE_NONE][0]['price'] = $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['price'];
+
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
         // Save the new line item and fields.
