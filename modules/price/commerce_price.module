@@ -3,6 +3,8 @@
 
 /**
  * @file
+ * Defines the Price field with widgets and formatters used to add prices with
+ *   currency codes to various Commerce entities.
  */
 
 
@@ -47,30 +49,11 @@ function commerce_price_field_schema($field) {
           'not null' => TRUE,
         ),
       ),
-      // TODO: Review this index... what's it for?
-      /*'indexes' => array(
-        'currency_price' => array('currency_code', 'price'),
-      ),*/
+      'indexes' => array(
+        'currency_price' => array('price', 'currency_code'),
+      ),
     );
   }
-}
-
-/**
- * Implements hook_field_settings_form().
- */
-function commerce_price_field_settings_form($field, $instance, $has_data) {
-  /*$settings = $field['settings'];
-  $form = array();
-
-  $form['currency_code'] = array(
-    '#type' => 'select',
-    '#title' => t('Default currency'),
-    '#options' => commerce_currency_get_symbol(),
-    '#default_value' => !empty($settings['currency_code']) ? $settings['currency_code'] : 'USD',
-    '#disabled' => $has_data,
-  );
-
-  return $form;*/
 }
 
 /**
@@ -79,7 +62,6 @@ function commerce_price_field_settings_form($field, $instance, $has_data) {
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
   if ($field['type'] == 'commerce_price') {
     // TODO: Validate prices based on valid amount and enabled currency.
-    // drupal_set_message('hook_field_validate()<pre>'. print_r($items, TRUE) .'</pre>');
   }
 }
 
@@ -88,7 +70,7 @@ function commerce_price_field_validate($entity_type, $entity, $field, $instance,
  */
 function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   if ($field['type'] == 'commerce_price') {
-    // drupal_set_message('hook_field_presave()<pre>'. print_r($items, TRUE) .'</pre>');
+    // TODO: Convert prices to the appropriate integer value.
   }
 }
 
@@ -103,8 +85,6 @@ function commerce_price_field_is_empty($item, $field) {
  * Implements hook_field_formatter_info().
  */
 function commerce_price_field_formatter_info() {
-  // TODO: Additional formatters should be defined to interact with the Price
-  // handler through Rules.
   return array(
     'commerce_price_default' => array(
       'label' => t('Default'),
@@ -143,39 +123,35 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
 function commerce_price_field_widget_info() {
   return array(
     'commerce_price_simple' => array(
-      'label' => t('Simple price (without currency)'),
+      'label' => t('Price textfield'),
       'field types' => array('commerce_price'),
       'settings' => array(
         'currency_code' => 'USD',
       ),
     ),
-    /* 'commerce_price_full' => array(
+    'commerce_price_full' => array(
       'label' => t('Price with currency'),
       'field types' => array('commerce_price'),
       'settings' => array(
         'currency_code' => 'USD',
       ),
-    ),*/
+    ),
   );
 }
 
 /**
- * Implements hook_field_settings_form().
+ * Implements hook_field_widget_settings_form().
  */
 function commerce_price_field_widget_settings_form($field, $instance) {
-  $widget = $instance['widget'];
-  $settings = $widget['settings'];
-
+  $settings = $instance['widget']['settings'];
   $form = array();
 
-  if ($widget['type'] == 'commerce_price_full') {
-    $form['currency_code'] = array(
-      '#type' => 'select',
-      '#title' => t('Default currency'),
-      '#options' => commerce_currency_get_symbol(),
-      '#default_value' => $settings['currency_code'],
-    );
-  }
+  $form['currency_code'] = array(
+    '#type' => 'select',
+    '#title' => ($instance['widget']['type'] == 'commerce_price_simple') ? t('Currency') : t('Default currency'),
+    '#options' => commerce_currency_get_symbol(),
+    '#default_value' => $settings['currency_code'],
+  );
 
   return $form;
 }
@@ -184,10 +160,10 @@ function commerce_price_field_widget_settings_form($field, $instance) {
  * Implements hook_field_widget_form().
  */
 function commerce_price_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $currency_code = $instance['widget']['settings']['currency_code'];
-  $currency = commerce_currency_load('USD');
+  // Load the default currency for this instance.
+  $currency = commerce_currency_load($instance['widget']['settings']['currency_code']);
 
-  // If a price has already been set for this instance...
+  // If a price has already been set for this instance prepare a default value.
   if (isset($items[$delta]['price'])) {
     // Round the default value.
     $default = round($items[$delta]['price'], 2);
@@ -201,20 +177,21 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     $default = NULL;
   }
 
+  // Build the form based on the type of price widget.
   switch ($instance['widget']['type']) {
+    // The simple widget is just a textfield with a non-changeable currency.
     case 'commerce_price_simple':
-      return $element + array(
-        'price' => array(
-          '#type' => 'textfield',
-          '#default_value' => $default,
-          '#size' => 10,
-          '#field_suffix' => $currency->code,
-        ),
-        'currency_code' => array(
-          '#type' => 'value',
-          '#default_value' => $currency->code,
-        ),
+      $element['price'] = array(
+        '#type' => 'textfield',
+        '#default_value' => $default,
+        '#size' => 10,
+        '#field_suffix' => $currency->code,
       );
+      $element['currency_code'] = array(
+        '#type' => 'value',
+        '#default_value' => $currency->code,
+      );
+      break;
 
     case 'commerce_price_full':
       $element['price'] = array(
