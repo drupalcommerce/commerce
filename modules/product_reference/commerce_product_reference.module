@@ -574,6 +574,15 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
       ),
     ),
   );
+
+  // Set the unit price on the line item object.
+  $line_item->unit_price = array(
+    $element['#language'] => array(
+      array(
+        'price' => $product->base_price[$element['#language']][0]['price'],
+      )
+    )
+  );
 }
 
 /**
