@@ -108,6 +108,8 @@ function commerce_cart_block_view($delta) {
         $line_item_ids[] = $data['line_item_id'];
       }
 
+      // TODO: Ask merlinofchaos if it's sufficient to views_embed_view().
+
       // Load the cart line item View.
       $view = views_get_view('commerce_cart');
 
@@ -130,16 +132,23 @@ function commerce_cart_block_view($delta) {
       // TODO: Replace with an API function to calculate the total Qty. of a
       // type of line item on an order object.
       $quantity = 0;
+      $total = 0;
 
       foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
         if ($line_item->type == 'product') {
           $quantity += $line_item->quantity;
+          $total += $line_item->total[LANGUAGE_NONE][0]['price'];
         }
       }
 
+      // TODO: Hacky stop-gap... replace with a theme function.
+      $currency = commerce_currency_load('USD');
+      $total = t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round($total, 2), 2), '@code' => $currency->code));
+
       // TODO: Replace with a theme function for the cart footer.
-      $content .= format_plural($quantity, '1 item', '@count items') . ' | '
-                . l('Checkout', 'checkout');
+      $content .= '<div class="cart-footer">'
+                . format_plural($quantity, '1 item', '@count items') . ' | '
+                . $total . '<br />' . l('Checkout', 'checkout') . '</div>';
     }
 
     return array('subject' => t('Shopping cart'), 'content' => $content);
@@ -290,6 +299,15 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
           'product_id' => $product_id,
         ),
       ),
+    );
+
+    // Set the unit price on the line item object.
+    $line_item->unit_price = array(
+      LANGUAGE_NONE => array(
+        array(
+          'price' => $product->base_price[LANGUAGE_NONE][0]['price'],
+        )
+      )
     );
 
     // Save the line item and add it to the order.
