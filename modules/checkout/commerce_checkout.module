@@ -140,7 +140,7 @@ function commerce_checkout_pages($review = TRUE) {
       if (count($keys) == 0) {
         $checkout_pages[$key]->next_page = FALSE;
         $checkout_pages[$key]->prev_page = $key - 1;
-        $checkout_pages[$key]->submit_value = variable_get('commerce_checkout_review_page', FALSE) ? t('Review order') : t('Submit order');
+        $checkout_pages[$key]->submit_value = variable_get('commerce_checkout_review_status', TRUE) ? t('Review order') : t('Submit order');
         $checkout_pages[$key]->back_value = t('Back');
       }
       elseif ($key == 1) {
@@ -358,7 +358,8 @@ function commerce_checkout_pane_callback($checkout_pane, $callback) {
   }
 
   // If the specified callback function exists, return it.
-  if (function_exists($checkout_pane->callbacks[$callback])) {
+  if (!empty($checkout_pane->callbacks[$callback]) &&
+      function_exists($checkout_pane->callbacks[$callback])) {
     return $checkout_pane->callbacks[$callback];
   }
 

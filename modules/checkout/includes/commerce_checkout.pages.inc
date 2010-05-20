@@ -16,7 +16,7 @@ function commerce_checkout_form($form, &$form_state) {
     '#validate' => array(),
   );
 
-  // drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css');
 
   $form['uid'] = array(
     '#type' => 'hidden',
@@ -54,15 +54,15 @@ function commerce_checkout_form($form, &$form_state) {
   $page_id = isset($form_state['values']) ? $form_state['storage']['page_id'] : 1;
   $checkout_page = commerce_checkout_page_load($page_id);
 
-  // Update the page title if specified.
-  if (!empty($checkout_page['title'])) {
-    drupal_set_title(check_plain($checkout_page['title']));
-  }
-
   $form['checkout_page'] = array(
     '#type' => 'value',
     '#value' => $checkout_page,
   );
+
+  // Update the page title if specified.
+  if (!empty($checkout_page->title)) {
+    drupal_set_title($checkout_page->title);
+  }
 
   // Add the instructions for the checkout page if specified.
   $form['help'] = array(
@@ -72,29 +72,29 @@ function commerce_checkout_form($form, &$form_state) {
   // If we're on one of the defined checkout form pages...
   if (is_numeric($page_id)) {
     // Add any enabled checkout panes for this page to the form.
-    foreach (commerce_checkout_pane_list(array('enabled' => TRUE, 'page' => $page_id)) as $pane_id => $checkout_pane) {
-      if ($callback = commerce_checkout_pane_callback('checkout', $pane_id, 'form')) {
+    foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $page_id)) as $pane_id => $checkout_pane) {
+      if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
         // Create a fieldset for the pane.
         $form[$pane_id] = array(
           '#type' => 'fieldset',
-          '#title' => !empty($pane['title']) ? check_plain($pane['title']) : $pane['name'],
-          '#collapsible' => $pane['collapsible'],
-          '#collapsed' => $pane['collapsed'],
-          '#attributes' => array('class' => $pane_id),
+          '#title' => check_plain($checkout_pane->title),
+          '#collapsible' => $checkout_pane->collapsible,
+          '#collapsed' => $checkout_pane->collapsed,
+          '#attributes' => array('class' => array($pane_id)),
           '#tree' => TRUE,
         );
 
         // Add the form data defined in the pane's form callback.
-        $form[$pane_id] += $callback($form_state, $order);
+        $form[$pane_id] += $callback($form_state, $checkout_pane, $order);
 
         // Add the validate handler for the pane to the form array.
-        if ($callback = commerce_checkout_pane_callback('checkout', $pane_id, 'form_validate')) {
+        if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
           $form['#validate'][] = $callback;
         }
       }
     }
   }
-  elseif ($number == 'review') {
+  elseif ($page_id == 'review') {
     // Otherwise add any enabled checkout panes that are visible on review.
     $form['review'] = array(
       '#theme' => 'commerce_checkout_review',
@@ -131,29 +131,29 @@ function commerce_checkout_form($form, &$form_state) {
   );
 
   // Add a review class to the buttons fieldset on the review page.
-  if ($number == 'review') {
+  if ($page_id == 'review') {
     $form['buttons']['#attributes']['class'] .= ' review';
   }
 
   // Add the cancel or back button where appropriate.
-  if (!$page['prev_page'] && !empty($page['cancel'])) {
+  if (!$checkout_page->prev_page && !empty($checkout_page->back_value)) {
     $form['buttons']['cancel'] = array(
       '#type' => 'submit',
-      '#value' => $page['cancel'],
+      '#value' => $checkout_page->back_value,
       '#validate' => array(),
       '#submit' => array('commerce_checkout_form_cancel_submit'),
     );
   }
-  elseif ($page['prev_page'] && !empty($page['back'])) {
+  elseif ($checkout_page->prev_page && !empty($checkout_page->back_value)) {
     $form['buttons']['back'] = array(
       '#type' => 'submit',
-      '#value' => $page['back'],
+      '#value' => $checkout_page->back_value,
     );
   }
 
   $form['buttons']['continue'] = array(
     '#type' => 'submit',
-    '#value' => $page['continue'],
+    '#value' => $checkout_page->submit_value,
   );
 
   return $form;
