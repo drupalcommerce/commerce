@@ -52,10 +52,13 @@ function commerce_embed_view($view_id, $display_id, $arguments) {
 
 /**
  * Returns the e-mail address from which to send commerce related e-mails.
+ *
+ * Currently this is just using the site's e-mail address, but this may be
+ * updated to use a specific e-mail address when we add a settings form for the
+ * store's physical address and contact information.
  */
 function commerce_email_from() {
-  // TODO: Determine the appropriate default value for this setting.
-  return variable_get('site_mail', 'admin@example.com');
+  return variable_get('site_mail', ini_get('sendmail_from'));
 }
 
 /**
