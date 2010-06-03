@@ -78,21 +78,32 @@ function commerce_email_from() {
  * Returns a single currency object.
  *
  * @param $currency_code
- *   The code of the currency to return.
+ *   The code of the currency to return or NULL to return the default currency.
  *
  * @return
  *   The specified currency object or FALSE if it does not exist.
  */
-function commerce_currency_load($currency_code) {
+function commerce_currency_load($currency_code = NULL) {
   $currencies = commerce_currencies();
+
+  // Check to see if we should return the default currency.
+  if (empty($currency_code)) {
+    $currency_code = variable_get('commerce_default_currency', 'USD');
+  }
 
   return isset($currencies[$currency_code]) ? $currencies[$currency_code] : FALSE;
 }
 
 /**
  * Returns an array of all available currencies.
+ *
+ * @param $enabled
+ *   Boolean indicating whether or not to return only enabled currencies.
+ *
+ * @return
+ *   An array of altered currency objects keyed by the currency code.
  */
-function commerce_currencies() {
+function commerce_currencies($enabled = FALSE) {
   $currencies = &drupal_static(__FUNCTION__);
 
   if (empty($currencies)) {
@@ -119,6 +130,15 @@ function commerce_currencies() {
 
     // Allow other modules to modify the currency list.
     drupal_alter('commerce_currency_info', $currencies);
+  }
+
+  // Return only enabled currencies if specified.
+  if ($enabled) {
+    // Form an array of enabled currencies based on the variable set by the
+    // checkboxes element on the currency settings form.
+    $enabled_currencies = array_diff(array_values(variable_get('commerce_enabled_currencies', array('USD' => 'USD'))), array(0));
+
+    return array_intersect_key($currencies, drupal_map_assoc($enabled_currencies));
   }
 
   return $currencies;

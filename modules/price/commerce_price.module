@@ -143,14 +143,13 @@ function commerce_price_field_widget_info() {
  * Implements hook_field_widget_settings_form().
  */
 function commerce_price_field_widget_settings_form($field, $instance) {
-  $settings = $instance['widget']['settings'];
   $form = array();
 
   $form['currency_code'] = array(
     '#type' => 'select',
     '#title' => ($instance['widget']['type'] == 'commerce_price_simple') ? t('Currency') : t('Default currency'),
     '#options' => commerce_currency_get_symbol(),
-    '#default_value' => $settings['currency_code'],
+    '#default_value' => $instance['widget']['settings']['currency_code'],
   );
 
   return $form;
@@ -160,22 +159,29 @@ function commerce_price_field_widget_settings_form($field, $instance) {
  * Implements hook_field_widget_form().
  */
 function commerce_price_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Use the default currency if the setting is not present.
+  if (empty($instance['widget']['settings']['currency_code'])) {
+    $instance['widget']['settings']['currency_code'] = NULL;
+  }
+
   // Load the default currency for this instance.
-  $currency = commerce_currency_load($instance['widget']['settings']['currency_code']);
+  $default_currency = commerce_currency_load($instance['widget']['settings']['currency_code']);
 
   // If a price has already been set for this instance prepare a default value.
   if (isset($items[$delta]['price'])) {
     // Round the default value.
-    $default = round($items[$delta]['price'], 2);
+    $default_price = round($items[$delta]['price'], 2);
 
     // Run it through number_format() to add the decimal places in if necessary.
-    if (strpos($default, '.') === FALSE || strpos($default, '.') > strlen($default) - 2) {
-      $default = number_format($default, 2);
+    if (strpos($default_price, '.') === FALSE || strpos($default_price, '.') > strlen($default_price) - 2) {
+      $default_price = number_format($default_price, 2);
     }
   }
   else {
-    $default = NULL;
+    $default_price = NULL;
   }
+
+  $element['#attached']['css'][] = drupal_get_path('module', 'commerce_price') . '/theme/commerce_price.css';
 
   // Build the form based on the type of price widget.
   switch ($instance['widget']['type']) {
@@ -183,26 +189,43 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     case 'commerce_price_simple':
       $element['price'] = array(
         '#type' => 'textfield',
-        '#default_value' => $default,
+        '#title' => $element['#title'],
+        '#default_value' => $default_price,
         '#size' => 10,
-        '#field_suffix' => $currency->code,
+        '#field_suffix' => $default_currency->code,
       );
       $element['currency_code'] = array(
         '#type' => 'value',
-        '#default_value' => $currency->code,
+        '#default_value' => $default_currency->code,
       );
       break;
 
+    // The full widget is a textfield with a currency select list.
     case 'commerce_price_full':
       $element['price'] = array(
         '#type' => 'textfield',
-        '#default_value' => isset($items[$delta]['price']) ? $items[$delta]['price'] : NULL,
+        '#title' => $element['#title'],
+        '#default_value' => $default_price,
         '#size' => 10,
+        '#prefix' => '<div class="commerce-price-full">',
       );
+
+      // Build a currency options list from all enabled currencies.
+      $options = array();
+
+      foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
+        $options[$currency_code] = check_plain($currency->code);
+
+        if (!empty($currency->symbol)) {
+          $options[$currency_code] .= ' - ' . check_plain($currency->symbol);
+        }
+      }
+
       $element['currency_code'] = array(
         '#type' => 'select',
-        '#options' => commerce_currency_get_symbol(),
-        '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $currency->code,
+        '#options' => $options,
+        '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $default_currency->code,
+        '#suffix' => '</div>',
       );
       break;
   }

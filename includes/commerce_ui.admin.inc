@@ -32,5 +32,30 @@ function commerce_currency_settings_form() {
     '#default_value' => variable_get('commerce_default_currency', 'USD'),
   );
 
+  $form['enabled_currencies'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Enabled currencies'),
+    '#description' => t('Only enabled currencies will be visible to users when entering prices. The default currency will always be enabled.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['enabled_currencies']['commerce_enabled_currencies'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('commerce_enabled_currencies', array('USD' => 'USD')),
+  );
+
+  $form['#validate'][] = 'commerce_currency_settings_form_validate';
+
   return system_settings_form($form);
+}
+
+/**
+ * Form validate handler for the currency settings form.
+ */
+function commerce_currency_settings_form_validate($form, &$form_state) {
+  // Ensure the default currency is always enabled.
+  $default = $form_state['values']['commerce_default_currency'];
+  $form_state['values']['commerce_enabled_currencies'][$default] = $default;
 }
