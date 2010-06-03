@@ -23,6 +23,7 @@ files[] = includes/views/handlers/views_handler_field_commerce_order_link.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_link_delete.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_link_edit.inc
 files[] = includes/views/handlers/views_handler_field_commerce_order_status.inc
+files[] = includes/views/handlers/views_handler_argument_order_id.inc
 
 ; Simple tests
 ; files[] = tests/commerce_order.test

@@ -33,9 +33,11 @@ function commerce_order_views_data() {
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
-    // TODO: Provide an argument handler for orders.
     'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
+      'handler' => 'views_handler_argument_order_id',
+      'name field' => 'order_number',
+      'numeric' => TRUE,
+      'validate type' => 'order_id',
     ),
   );
 
@@ -184,6 +186,9 @@ function commerce_order_views_handlers() {
       'views_handler_field_commerce_order_status' => array(
         'parent' => 'views_handler_field_commerce_order',
       ),
+
+      // Argument handlers
+      'views_handler_argument_order_id',
     ),
   );
 }
