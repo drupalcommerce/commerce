@@ -883,7 +883,7 @@ function commerce_line_items_quantity($value, $type = '', $language = '') {
 }
 
 /**
- * Returns the total price of line items referenced by a reference field.
+ * Returns the total price and currency  of line items referenced by a field.
  *
  * @param $value
  *   The value array of the field whose line items you want to count.
@@ -893,7 +893,8 @@ function commerce_line_items_quantity($value, $type = '', $language = '') {
  *   The language within the value array to use; defaults to LANGUAGE_NONE.
  *
  * @return
- *   The total quantity of all the matching line items referenced by the field.
+ *   An associative array of containing the total 'price' and 'currency_code' of
+ *     the referenced line items.
  */
 function commerce_line_items_total($value, $type = '', $language = '') {
   if (empty($language)) {
@@ -909,12 +910,24 @@ function commerce_line_items_total($value, $type = '', $language = '') {
 
   // Sum up the total price of all matching line items.
   $total = 0;
+  $currency_code = '';
 
   foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
     if (empty($type) || $line_item->type == $type) {
+      // Set the initial currency code.
+      if (empty($currency_code)) {
+        $currency_code = $line_item->total[$language][0]['currency_code'];
+      }
+      else {
+        // Check to see if the line items or of a mixed currency.
+        if ($currency_code != $line_item->total[$language][0]['currency_code']) {
+          // TODO: Figure out what to do then!
+        }
+      }
+
       $total += $line_item->total[$language][0]['price'];
     }
   }
 
-  return $total;
+  return array('price' => $total, 'currency_code' => $currency_code);
 }
