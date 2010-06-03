@@ -99,7 +99,7 @@ function commerce_price_create_instance($name, $entity_type, $bundle, $label, $w
       'field_name' => $name,
       'type' => 'commerce_price',
       'cardinality' => 1,
-      'object_types' => array($entity_type),
+      'entity_types' => array($entity_type),
       'translatable' => FALSE,
       'locked' => TRUE,
     );

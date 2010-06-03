@@ -732,7 +732,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
       'field_name' => 'line_items',
       'type' => 'commerce_line_item_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-      'object_types' => array('commerce_order'),
+      'entity_types' => array('commerce_order'),
       'translatable' => FALSE,
       'locked' => TRUE,
     );

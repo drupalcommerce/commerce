@@ -492,7 +492,7 @@ function commerce_product_reference_configure_line_item() {
       'field_name' => 'product',
       'type' => 'commerce_product_reference',
       'cardinality' => 1,
-      'object_types' => array('commerce_line_item'),
+      'entity_types' => array('commerce_line_item'),
       'translatable' => FALSE,
       'locked' => 1,
     );
