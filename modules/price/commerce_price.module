@@ -88,6 +88,50 @@ function commerce_price_field_is_empty($item, $field) {
 }
 
 /**
+ * Creates a required, locked instance of a price field on the specified bundle.
+ */
+function commerce_price_create_instance($name, $entity_type, $bundle, $label, $weight = 0) {
+  $field = field_info_field($name);
+  $instance = field_info_instance($entity_type, $name, $bundle);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $name,
+      'type' => 'commerce_price',
+      'cardinality' => 1,
+      'object_types' => array($entity_type),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'label' => $label,
+      'required' => TRUE,
+      'widget' => array(
+        'type' => 'commerce_price_simple',
+        'weight' => $weight,
+      ),
+      'settings' => array(),
+
+      // Define default formatters for the teaser and full view.
+      'display' => array(
+        'full' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_price_default',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
  * Implements hook_field_formatter_info().
  */
 function commerce_price_field_formatter_info() {
