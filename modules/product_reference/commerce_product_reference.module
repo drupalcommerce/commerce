@@ -408,8 +408,6 @@ function commerce_product_reference_field_widget_error($element, $error) {
  * Implements hook_field_prepare_translation().
  *
  * When preparing a translation, load any translations of existing references.
- * TODO: Core doc: "This hook may or may not survive in Field API".
- * So it is currently not verified.
  *
 function node_reference_field_prepare_translation($entity_type, $object, $field, $instance, $langcode, &$items) {
   $addition = array();
@@ -470,6 +468,7 @@ function commerce_product_reference_commerce_line_item_info() {
       'name' => t('Product'),
       'description' => t('References a product and displays it with the SKU as the label.'),
       'configuration_callback' => 'commerce_product_reference_configure_line_item',
+      'title_callback' => 'commerce_product_line_item_title',
       'add_form_element_callback' => 'commerce_product_line_item_add_form',
       'add_form_submit_callback' => 'commerce_product_line_item_add_submit',
       'add_form_submit_value' => t('Add product'),
@@ -530,6 +529,16 @@ function commerce_product_reference_configure_line_item() {
 }
 
 /**
+ * Returns an appropriate title for this line item.
+ */
+function commerce_product_line_item_title($line_item) {
+  // Currently, just return the product's title.  However, in the future replace
+  // this with the product preview build mode.
+  $product = commerce_product_load($line_item->product[LANGUAGE_NONE][0]['product_id']);
+  return check_plain($product->title);
+}
+
+/**
  * Returns the elements necessary to add a product line item through a line item
  *   manager widget.
  */
@@ -582,8 +591,9 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
     $element['#language'] => array(
       array(
         'price' => $product->base_price[$element['#language']][0]['price'],
-      )
-    )
+        'currency_code' => $product->base_price[$element['#language']][0]['currency_code'],
+      ),
+    ),
   );
 }
 

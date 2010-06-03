@@ -584,8 +584,11 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       );
 
       // The display title should come from the line item type.
+      $line_item_type = commerce_line_item_type_load($line_item->type);
+      $title_callback = $line_item_type->title_callback;
+
       $element['line_items'][$line_item_id]['title'] = array(
-        '#markup' => t('Line item @line_item_id (@type)', array('@line_item_id' => $line_item_id, '@type' => $line_item->type)),
+        '#markup' => $title_callback($line_item),
       );
 
       $element['line_items'][$line_item_id]['line_item_label'] = array(
@@ -598,18 +601,17 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#size' => 4,
       );
 
-      // TODO: Figure out how to embed a Price field widget here.
-      $currency = commerce_currency_load('USD');
+      // Retrieve the widget form for just the unit price.
+      $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'unit_price'));
 
-      $element['line_items'][$line_item_id]['unit_price'] = array(
-        '#type' => 'textfield',
-        '#default_value' => number_format(round($line_item->unit_price['und'][0]['price'], 2), 2),
-        '#size' => 10,
-        '#field_prefix' => $currency->symbol,
-      );
+      // Unset the title and description and add it to the line item form.
+      unset($widget_form['unit_price']['und'][0]['price']['#title']);
+      unset($widget_form['unit_price']['und'][0]['price']['#description']);
+
+      $element['line_items'][$line_item_id]['unit_price'] = $widget_form['unit_price'];
 
       $element['line_items'][$line_item_id]['total'] = array(
-        '#markup' => t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round($line_item->total['und'][0]['price'], 2), 2), '@code' => $currency->code)),
+        '#markup' => commerce_currency_format($line_item->total['und'][0]['price'], $line_item->total['und'][0]['currency_code'], $line_item),
       );
     }
 
@@ -759,9 +761,9 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         form_set_error($name, 'You must specify a positive number for the quantity.');
       }
 
-      // Validate the unit price of each line item.
-      if (is_numeric($element['line_items'][$line_item_id]['unit_price']['#value'])) {
-        $line_item->unit_price['und'][0]['price'] = $element['line_items'][$line_item_id]['unit_price']['#value'];
+      // TODO: Validate the unit price of each line item.
+      if (TRUE) {
+        $line_item->unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['unit_price'];
       }
       else {
         $name = implode('][', $element['line_items'][$line_item_id]['unit_price']['#parents']);
