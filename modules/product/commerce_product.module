@@ -44,7 +44,7 @@ function commerce_product_entity_info() {
       'bundles' => array(),
       'load hook' => 'commerce_product_load',
       'view modes' => array(
-        'admin' => array(
+        'full' => array(
           'label' => t('Admin display'),
         ),
         'node_teaser' => array(
@@ -305,7 +305,7 @@ function commerce_product_type_to_arg($type) {
  * Ensures a base price field is present on a product type bundle.
  */
 function commerce_product_configure_product_type($type) {
-  commerce_price_create_instance('base_price', 'commerce_product', $type, t('Base price'));
+  commerce_price_create_instance('base_price', 'commerce_product', $type, t('Price'));
 }
 
 /**

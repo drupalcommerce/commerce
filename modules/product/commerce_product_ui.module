@@ -198,7 +198,7 @@ function commerce_product_ui_theme() {
 /**
  * Implements hook_entity_info_alter().
  *
- * Expose the admin UI for product fields.
+ * Exposes the admin UI for product fields.
  */
 function commerce_product_ui_entity_info_alter(&$entity_info) {
   foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
@@ -218,7 +218,7 @@ function commerce_product_ui_field_ui_view_modes_tabs($entity_type) {
   if ($entity_type == 'commerce_product') {
     $modes = array(
       'basic' => array(
-        'view modes' => array('admin'),
+        'view modes' => array('full'),
       ),
       'node' => array(
         'title' => t('Node'),

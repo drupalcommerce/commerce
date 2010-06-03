@@ -22,13 +22,16 @@ function commerce_product_reference_field_extra_fields() {
     foreach ($field['bundles']['node'] as $bundle_name) {
       // Attach "extra fields" to the bundle representing fields on products
       // that may be visible on the bundle.
-      $extra['node'][$bundle_name] = array(
-        'base_price' => array(
-          'label' => t('Base price'),
-          'description' => t('Base price of referenced products.'),
-          'weight' => 0,
-        ),
-      );
+
+      foreach (field_info_instances('commerce_product') as $product_bundle_name => $product_fields) {
+        foreach ($product_fields as $product_field_name => $product_field) {
+          $extra['node'][$bundle_name]['product:' . $product_field_name] = array(
+            'label' => t('Product: @label', array('@label' => $product_field['label'])),
+            'description' => t('Field from a referenced product.'),
+            'weight' => $product_field['weight'],
+          );
+        }
+      }
     }
   }
 
@@ -50,8 +53,13 @@ function commerce_product_reference_node_view(&$node, $build_mode = 'full') {
       if ($field['cardinality'] == 1) {
         // If the referenced product exists...
         if ($product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][0]['product_id'])) {
-          // Add fields from the product into this node for display.
-          $node->content['base_price'] = field_view_field('commerce_product', $product, 'base_price', 'node_' . $build_mode);
+          // drupal_set_message('<pre>'. print_r(field_info_instances('commerce_product'), TRUE) .'</pre>');
+
+          // Loop through the fields on the referenced product's type.
+          foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
+            // Add the fields into the node for display.
+            $node->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, 'node_' . $build_mode);
+          }
         }
       }
     }
@@ -525,6 +533,32 @@ function commerce_product_reference_commerce_line_item_info() {
       'add_form_submit_value' => t('Add product'),
     ),
   );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Adds the line item view mode to the product.
+ */
+function commerce_product_reference_entity_info_alter(&$entity_info) {
+  $entity_info['commerce_product']['view modes']['line_item'] = array(
+    'label' => t('Line item'),
+  );
+}
+
+/**
+ * Implements hook_field_ui_view_modes_tabs().
+ */
+function commerce_product_reference_field_ui_view_modes_tabs($entity_type) {
+  if ($entity_type == 'commerce_product') {
+    $modes = array(
+      'basic' => array(
+        'view modes' => array('line_item'),
+      ),
+    );
+
+    return $modes;
+  }
 }
 
 /**
