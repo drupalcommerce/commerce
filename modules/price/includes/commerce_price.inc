@@ -3,14 +3,16 @@
 
 /**
  * @file
- * The commerce price object is responsible for tracking all modififications
- * to a price. The current live price can be read from $object->price, however
- * the price can only be changed through the modifyPrice() method. This ensures
- * that price changes are recorded.
+ * Contains the CommercePrice object used for tracking modifications to prices.
+ *
+ * The CommercePrice object is responsible for tracking all modififications to a
+ * price. The current live price can be read from $object->price, however the
+ * price can only be changed through the modifyPrice() method. This ensures that
+ * price changes are recorded.
  */
 
 class CommercePrice {
-  // Initialize base variables
+  // Initialize base variables.
   protected $price = 0;
   protected $basePrice = 0;
   protected $currency = 'usd';
@@ -20,15 +22,16 @@ class CommercePrice {
     if (is_numeric($amount)) {
       $this->basePrice = $amount;
     }
+
     if (empty($currency)) {
       $this->currency = 'usd';
     }
-    $this->modifyPrice($this->$basePrice, 'commercePrice', t('Base price'));
+
+    $this->modifyPrice($this->$basePrice, 'commerce_price', t('Base price'));
   }
 
   /**
-   * function modify_price() is a method to allow users to adjust the current
-   * price.
+   * Modifies a price up or down and logs the adjustment.
    *
    * @param $amount
    *   The amount of the adjustment.
