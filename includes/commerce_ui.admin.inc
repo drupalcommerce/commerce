@@ -32,6 +32,8 @@ function commerce_currency_settings_form() {
     '#default_value' => variable_get('commerce_default_currency', 'USD'),
   );
 
+  // Place the enabled currencies checkboxes in a fieldset so the full list
+  // doesn't spam the administrator when viewing the page.
   $form['enabled_currencies'] = array(
     '#type' => 'fieldset',
     '#title' => t('Enabled currencies'),

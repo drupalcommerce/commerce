@@ -107,26 +107,45 @@ function commerce_currencies($enabled = FALSE) {
   $currencies = &drupal_static(__FUNCTION__);
 
   if (empty($currencies)) {
+    // Establish some default values for currencies.
+    $defaults = array(
+      'symbol' => '',
+      'fraction_name' => '',
+      'decimals' => 2,
+      'thousands_separator' => ',',
+      'decimal_separator' => '.',
+      'symbol_placement' => '',
+      'code_placement' => '',
+      'format_callback' => '',
+    );
+
     // TODO: Expand to include all currencies per http://drupal.org/node/731604.
     // Define base currencies.
     $currencies = array(
-      'EUR' => (object) array(
+      'EUR' => array(
         'numeric_code' => 978,
         'code' => 'EUR',
         'name' => t('Euro'),
         'symbol' => '€',
         'fraction_name' => t('Cent'),
-        'decimals' => 2,
+        'decimal_separator' => ',',
+        'thousands_separator' => ' ',
+        'symbol_placement' => 'after',
       ),
-      'USD' => (object) array (
+      'USD' => array (
         'numeric_code' => 840,
         'code' => 'USD',
         'name' => t('United States Dollars'),
         'symbol' => '$',
         'fraction_name' => t('Cent'),
-        'decimals' => 2,
+        'symbol_placement' => 'before',
       ),
     );
+
+    // Add default values if they don't exist and convert to objects.
+    foreach ($currencies as $currency_code => $currency) {
+      $currencies[$currency_code] = (object) array_merge($defaults, $currency);
+    }
 
     // Allow other modules to modify the currency list.
     drupal_alter('commerce_currency_info', $currencies);
@@ -174,4 +193,41 @@ function commerce_currency_get_symbol($currency_code = NULL) {
   }
 
   return $currencies;
+}
+
+/**
+ * Formats a price for a particular currency.
+ *
+ * @param $price
+ *   A numeric price value.
+ * @param $currency_code
+ *   The three character code of the currency.
+ * @param $object
+ *   When present, the object to which the price is attached.
+ *
+ * @return
+ *   A fully formatted currency.
+ */
+function commerce_currency_format($price, $currency_code, $object = NULL) {
+  // First load the full currency object.
+  $currency = commerce_currency_load($currency_code);
+
+  // Invoke the custom format callback if specified.
+  if (!empty($currency->format_callback)) {
+    return $currency->format_callback($price, $currency, $entity);
+  }
+
+  // Format the price as a number.
+  $price = number_format(round($price, $currency->decimals), $currency->decimals, $currency->decimal_separator, $currency->thousands_separator);
+
+  // Establish the replacement values to format this price for its currency.
+  $replacements = array(
+    '@code_before' => $currency->code_placement == 'before' ? $currency->code : '',
+    '@symbol_before' => $currency->symbol_placement == 'before' ? $currency->symbol : '',
+    '@price' => $price,
+    '@symbol_after' => $currency->symbol_placement == 'after' ? $currency->symbol : '',
+    '@code_after' => $currency->code_placement == 'after' ? $currency->code : '',
+  );
+
+  return t('@code_before @symbol_before@price @symbol_after @code_after', $replacements);
 }

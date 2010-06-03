@@ -99,15 +99,12 @@ function commerce_price_field_formatter_info() {
 function commerce_price_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
 
-  // TODO: Pull the currency from the price field data.
-  $currency = commerce_currency_load('USD');
-
   switch ($display['type']) {
     case 'commerce_price_default':
       foreach ($items as $delta => $item) {
         // TODO: This should become a theme function.
         $element[$delta] = array(
-          '#markup' => t('@symbol@price @code', array('@symbol' => $currency->symbol, '@price' => number_format(round($item['price'], 2), 2), '@code' => $currency->code)),
+          '#markup' => commerce_currency_format($item['price'], $item['currency_code'], $object),
         );
       }
 
