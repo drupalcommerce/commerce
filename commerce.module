@@ -21,6 +21,34 @@ function commerce_permission() {
 }
 
 /**
+ * Finds all fields of a particular field type.
+ *
+ * @param $field_type
+ *   The type of field to search for.
+ * @param $entity_type
+ *   Optional entity type to restrict the search to.
+ *
+ * @return
+ *   An array of the matching fields keyed by the field name.
+ */
+function commerce_info_fields($field_type, $entity_type = NULL) {
+  $fields = array();
+
+  // Loop through the fields looking for any product reference fields.
+  foreach (field_info_fields() as $field_name => $field) {
+    if ($field['type'] == $field_type) {
+      // Add this field to the return array if no entity type was specified or
+      // if the specified type exists in the field's bundles array.
+      if (empty($entity_type) || in_array($entity_type, array_keys($field['bundles']))) {
+        $fields[$field_name] = $field;
+      }
+    }
+  }
+
+  return $fields;
+}
+
+/**
  * Sorts an array of objects by weight through uasort().
  *
  * For sorting arrays of associative arrays, use drupal_sort_weight().

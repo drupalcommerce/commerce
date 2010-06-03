@@ -44,8 +44,17 @@ function commerce_product_entity_info() {
       'bundles' => array(),
       'load hook' => 'commerce_product_load',
       'view modes' => array(
-        'full' => array(
-          'label' => t('Full'),
+        'admin' => array(
+          'label' => t('Admin display'),
+        ),
+        'node_teaser' => array(
+          'label' => t('Teaser'),
+        ),
+        'node_full' => array(
+          'label' => t('Full content'),
+        ),
+        'node_rss' => array(
+          'label' => t('RSS'),
         ),
       ),
       'creation callback' => '_commerce_product_create',

@@ -8,6 +8,57 @@
 
 
 /**
+ * Implements hook_field_extra_fields().
+ *
+ * This implementation will define "extra fields" on node bundles with product
+ * reference fields to correspond with availabled fields on products. These
+ * fields will then also be present in the node view.
+ */
+function commerce_product_reference_field_extra_fields() {
+  $extra = array();
+
+  // Loop through the product reference fields attached to node bundles.
+  foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
+    foreach ($field['bundles']['node'] as $bundle_name) {
+      // Attach "extra fields" to the bundle representing fields on products
+      // that may be visible on the bundle.
+      $extra['node'][$bundle_name] = array(
+        'base_price' => array(
+          'label' => t('Base price'),
+          'description' => t('Base price of referenced products.'),
+          'weight' => 0,
+        ),
+      );
+    }
+  }
+
+  return $extra;
+}
+
+/**
+ * Implements hook_node_view().
+ *
+ * This implementation adds product fields to the content array of a node on
+ * display if the product contains a non-empty product reference field.
+ */
+function commerce_product_reference_node_view(&$node, $build_mode = 'full') {
+  // Loop through product reference fields to see if any exist on this node
+  // type's bundle.
+  foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
+    if (in_array($node->type, $field['bundles']['node'])) {
+      // Handle the field differently for single value references.
+      if ($field['cardinality'] == 1) {
+        // If the referenced product exists...
+        if ($product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][0]['product_id'])) {
+          // Add fields from the product into this node for display.
+          $node->content['base_price'] = field_view_field('commerce_product', $product, 'base_price', 'node_' . $build_mode);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
