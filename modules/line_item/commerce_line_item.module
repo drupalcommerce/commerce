@@ -721,9 +721,7 @@ function theme_line_item_manager($variables) {
     'empty' => $form['#empty'],
   );
 
-  // TODO: Remove the <br> when the theme bug is fixed with the throbber.
-  $output = theme('table', $table_variables) . drupal_render($form['actions'])
-          . '<br style="clear: left;" />';
+  $output = theme('table', $table_variables) . drupal_render($form['actions']);
 
   return '<div id="line-item-manager">' . $output . '</div>';
 }
