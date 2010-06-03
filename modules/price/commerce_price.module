@@ -60,8 +60,14 @@ function commerce_price_field_schema($field) {
  * Implements hook_field_validate().
  */
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
-  if ($field['type'] == 'commerce_price') {
-    // TODO: Validate prices based on valid amount and enabled currency.
+  // Ensure only numeric values are entered in price fields.
+  foreach ($items as $delta => $item) {
+    if (!empty($item['price']) && !is_numeric($item['price'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'price_numeric',
+        'message' => t('%name: you must enter a numeric value for the price.', array('%name' => check_plain($instance['label']))),
+      );
+    }
   }
 }
 
@@ -228,6 +234,13 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   }
 
   return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function commerce_price_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element['price'], $error['message']);
 }
 
 /**
