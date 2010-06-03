@@ -723,13 +723,15 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         form_set_error($name, 'You must specify a positive number for the quantity.');
       }
 
-      // TODO: Validate the unit price of each line item.
-      if (TRUE) {
-        $line_item->unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['unit_price'];
+      // Manually validate the unit price of each line item.
+      $unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['unit_price'];
+
+      if (is_numeric($unit_price[$element['#language']][0]['price'])) {
+        $line_item->unit_price = $unit_price;
       }
       else {
-        $name = implode('][', $element['line_items'][$line_item_id]['unit_price']['#parents']);
-        form_set_error($name, 'You must specify a positive number for the unit price.');
+        $name = implode('][', array_merge($element['line_items'][$line_item_id]['unit_price']['#parents'], array($element['#language'], 0, 'price')));
+        form_set_error($name, 'You must enter a numeric value for the unit price.');
       }
 
       // Only save if values were actually changed.
