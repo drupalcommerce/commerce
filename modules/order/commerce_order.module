@@ -696,56 +696,6 @@ function commerce_order_status_update($order, $name) {
 }
 
 /**
- * Updates the status of an order to the specified status.
- *
- * @param $order
- *   The fully loaded order object to update.
- * @param $name
- *   The machine readable name string of the status to update to.
- * @return
- *   The update order.
- */
-function commerce_order_status_update($order, $name) {
-  $new_order = clone($order);
-
-  // Do not update the status if the order is already at it.
-  if ($new_order->status != $name) {
-    $new_order->status = $name;
-
-    // TODO: Alert modules via a hook / Rules that the order was updated.
-
-    $new_order = commerce_order_save($new_order);
-  }
-
-  return $new_order;
-}
-
-/**
- * Updates the status of an order to the specified status.
- *
- * @param $order
- *   The fully loaded order object to update.
- * @param $name
- *   The machine readable name string of the status to update to.
- * @return
- *   The update order.
- */
-function commerce_order_status_update($order, $name) {
-  $new_order = clone($order);
-
-  // Do not update the status if the order is already at it.
-  if ($new_order->status != $name) {
-    $new_order->status = $name;
-
-    // TODO: Alert modules via a hook / Rules that the order was updated.
-
-    $new_order = commerce_order_save($new_order);
-  }
-
-  return $new_order;
-}
-
-/**
  * Ensures the line item field is present on the default order bundle.
  */
 function commerce_order_configure_order_type($type = 'commerce_order') {
