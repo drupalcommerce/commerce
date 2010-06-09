@@ -53,8 +53,6 @@ function commerce_product_reference_node_view(&$node, $build_mode = 'full') {
       if ($field['cardinality'] == 1) {
         // If the referenced product exists...
         if ($product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][0]['product_id'])) {
-          // drupal_set_message('<pre>'. print_r(field_info_instances('commerce_product'), TRUE) .'</pre>');
-
           // Loop through the fields on the referenced product's type.
           foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
             // Add the fields into the node for display.
@@ -558,6 +556,40 @@ function commerce_product_reference_field_ui_view_modes_tabs($entity_type) {
     );
 
     return $modes;
+  }
+}
+
+/**
+ * Implements hook_field_views_data_alter().
+ *
+ * This is a Views hook implemented to enable adding relationships for
+ * referenced products.
+ */
+function commerce_product_reference_field_views_data_alter(&$data, $field, $module) {
+  // If the field is a product reference field...
+  if ($field['type'] == 'commerce_product_reference') {
+    $table = array_shift(array_keys($data));
+
+    // Add the relationship data to the proper product_id column.
+    foreach (array_keys($data[$table]) as $key) {
+      if (strpos($key, '_product_id') == strlen($key) - 11) {
+        // First indicate this field's table joins to the commerce_product table.
+        $data[$table]['table']['join']['commerce_product'] = array(
+          'left_field' => 'product_id',
+          'field' => $key,
+        );
+
+        // Then add the relationship data to the field itself.
+        $data[$table][$key]['relationship'] = array(
+          'title' => t('Referenced product'),
+          'help' => t('The product referenced through this field.'),
+          'base' => 'commerce_product',
+          'base field' => 'product_id',
+          'handler' => 'views_handler_relationship',
+          'label' => t('Product'),
+        );
+      }
+    }
   }
 }
 

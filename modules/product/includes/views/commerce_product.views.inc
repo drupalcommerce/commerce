@@ -14,7 +14,7 @@ function commerce_product_views_data() {
   $data['commerce_product']['table']['group']  = t('Commerce Product');
 
   $data['commerce_product']['table']['base'] = array(
-    'field' => 'sku',
+    'field' => 'product_id',
     'title' => t('Commerce Product'),
     'help' => t('Products from the store.'),
   );
