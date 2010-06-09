@@ -9,7 +9,7 @@
 /**
  * Argument handler to accept an order_id.
  */
-class views_handler_argument_order_id extends views_handler_argument_numeric {
+class commerce_order_handler_argument_commerce_order_order_id extends views_handler_argument_numeric {
   /**
    * Override the behavior of title(). Get the number of the order.
    */

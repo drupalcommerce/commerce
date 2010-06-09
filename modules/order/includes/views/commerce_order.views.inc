@@ -24,7 +24,7 @@ function commerce_order_views_data() {
     'title' => t('Order ID'),
     'help' => t('The unique internal identifier of the order.'),
     'field' => array(
-      'handler' => 'views_handler_field_commerce_order',
+      'handler' => 'commerce_order_handler_field_commerce_order_order',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -34,7 +34,7 @@ function commerce_order_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'views_handler_argument_order_id',
+      'handler' => 'commerce_order_handler_argument_commerce_order_order_id',
       'name field' => 'order_number',
       'numeric' => TRUE,
       'validate type' => 'order_id',
@@ -46,7 +46,7 @@ function commerce_order_views_data() {
     'title' => t('Order number'),
     'help' => t('The unique customer facing number of the order.'),
     'field' => array(
-      'handler' => 'views_handler_field_commerce_order',
+      'handler' => 'commerce_order_handler_field_commerce_order_order',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -90,7 +90,7 @@ function commerce_order_views_data() {
     'title' => t('Order status'),
     'help' => t('The workflow status of the order.'),
     'field' => array(
-      'handler' => 'views_handler_field_commerce_order_status',
+      'handler' => 'commerce_order_handler_field_commerce_order_status',      
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -140,21 +140,21 @@ function commerce_order_views_data() {
     'field' => array(
       'title' => t('Link'),
       'help' => t('Provide a simple link to the administrator view of the order.'),
-      'handler' => 'views_handler_field_commerce_order_link',
+      'handler' => 'commerce_order_handler_field_order_link',
     ),
   );
   $data['commerce_order']['edit_order'] = array(
     'field' => array(
       'title' => t('Edit link'),
       'help' => t('Provide a simple link to edit the order.'),
-      'handler' => 'views_handler_field_commerce_order_link_edit',
+      'handler' => 'commerce_order_handler_field_order_link_edit',
     ),
   );
   $data['commerce_order']['delete_order'] = array(
     'field' => array(
       'title' => t('Delete link'),
       'help' => t('Provide a simple link to delete the order.'),
-      'handler' => 'views_handler_field_commerce_order_link_delete',
+      'handler' => 'commerce_order_handler_field_order_link_delete',      
     ),
   );
 
@@ -171,24 +171,24 @@ function commerce_order_views_handlers() {
     ),
     'handlers' => array(
       // Field handlers
-      'views_handler_field_commerce_order' => array(
+      'commerce_order_handler_field_commerce_order_order' => array(
         'parent' => 'views_handler_field',
       ),
-      'views_handler_field_commerce_order_link' => array(
+      'commerce_order_handler_field_commerce_order_status' => array(
+        'parent' => 'commerce_order_handler_field_commerce_order_order',
+      ),      
+      'commerce_order_handler_field_order_link' => array(
         'parent' => 'views_handler_field',
       ),
-      'views_handler_field_commerce_order_link_edit' => array(
-        'parent' => 'views_handler_field_commerce_order_link',
+      'commerce_order_handler_field_order_link_edit' => array(
+        'parent' => 'commerce_order_handler_field_order_link',
       ),
-      'views_handler_field_commerce_order_link_delete' => array(
-        'parent' => 'views_handler_field_commerce_order_link',
-      ),
-      'views_handler_field_commerce_order_status' => array(
-        'parent' => 'views_handler_field_commerce_order',
+      'commerce_order_handler_field_order_link_delete' => array(
+        'parent' => 'commerce_order_handler_field_order_link',
       ),
 
       // Argument handlers
-      'views_handler_argument_order_id',
+      'commerce_order_handler_argument_commerce_order_order_id',
     ),
   );
 }

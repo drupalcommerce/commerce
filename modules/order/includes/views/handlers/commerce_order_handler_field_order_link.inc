@@ -4,7 +4,7 @@
 /**
  * Field handler to present a link to an order.
  */
-class views_handler_field_commerce_order_link extends views_handler_field {
+class commerce_order_handler_field_order_link extends views_handler_field {
   function construct() {
     parent::construct();
 

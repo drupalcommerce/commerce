@@ -9,7 +9,7 @@
 /**
  * Field handler to provide simple renderer that allows linking to a product.
  */
-class views_handler_field_commerce_product extends views_handler_field {
+class commerce_product_handler_field_commerce_product_product extends views_handler_field {
   function init(&$view, $options) {
     parent::init($view, $options);
 

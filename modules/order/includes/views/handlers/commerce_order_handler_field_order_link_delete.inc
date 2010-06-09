@@ -4,7 +4,7 @@
 /**
  * Field handler to present a link to delete an order.
  */
-class views_handler_field_commerce_order_link_delete extends views_handler_field_commerce_order_link {
+class commerce_order_handler_field_order_link_delete extends commerce_order_handler_field_order_link {
   function construct() {
     parent::construct();
 
