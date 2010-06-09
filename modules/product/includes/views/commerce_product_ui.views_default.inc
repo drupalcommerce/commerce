@@ -19,12 +19,12 @@ function commerce_product_ui_views_default_views() {
   $view->view_php = '';
   $view->base_table = 'commerce_product';
   $view->is_cacheable = FALSE;
-  $view->api_version = '3.0-alpha1';
+  $view->api_version = 3.0-alpha1;
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
-  $handler->display->display_options['title'] = 'Store';
+  $handler->display->display_options['title'] = 'Products';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer products';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -165,12 +165,13 @@ function commerce_product_ui_views_default_views() {
   $handler = $view->new_display('page', 'Admin page', 'admin_page');
   $handler->display->display_options['path'] = 'admin/commerce/products/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Products';
-  $handler->display->display_options['menu']['weight'] = '0';
-  $handler->display->display_options['tab_options']['type'] = 'tab';
+  $handler->display->display_options['menu']['title'] = 'List';
+  $handler->display->display_options['menu']['weight'] = '-10';
+  $handler->display->display_options['tab_options']['type'] = 'normal';
   $handler->display->display_options['tab_options']['title'] = 'Products';
-  $handler->display->display_options['tab_options']['description'] = 'Manage products from the store.';
+  $handler->display->display_options['tab_options']['description'] = 'Manage products and product types in the store.';
   $handler->display->display_options['tab_options']['weight'] = '';
+  $handler->display->display_options['tab_options']['name'] = 'management';
 
   $views[$view->name] = $view;
 

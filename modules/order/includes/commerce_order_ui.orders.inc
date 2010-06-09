@@ -19,10 +19,10 @@ function commerce_order_settings_form() {
 }
 
 /**
- * Display a view of an order entity.
+ * Displays a view of an order entity.
  */
 function commerce_order_ui_order_view($mode, $order) {
-  commerce_order_set_breadcrumb();
+  commerce_order_ui_set_breadcrumb();
 
   return '<pre>' . print_r($order, TRUE) . '</pre>';
 }
@@ -42,14 +42,18 @@ function commerce_order_ui_order_view($mode, $order) {
  */
 function commerce_order_ui_order_form($form, &$form_state, $order, $account = NULL, $breadcrumb = TRUE) {
   if ($breadcrumb) {
-    commerce_order_set_breadcrumb();
+    commerce_order_ui_set_breadcrumb();
   }
 
   $form = array();
 
-  // Set the default customer if necessary.
-  if (empty($order->order_id) && !empty($account)) {
-    $order->customer_uid = $account->uid;
+  // Set the page title and a default customer if necessary.
+  if (empty($order->order_id)) {
+    drupal_set_title(t('Create an order'));
+
+    if (!empty($account)) {
+      $order->customer_uid = $account->uid;
+    }
   }
 
   // Add the field related form elements.
@@ -149,7 +153,7 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
  */
 function commerce_order_ui_order_delete_form($form, &$form_state, $order, $breadcrumb = TRUE) {
   if ($breadcrumb) {
-    commerce_order_set_breadcrumb();
+    commerce_order_ui_set_breadcrumb();
   }
 
   $form_state['order'] = $order;

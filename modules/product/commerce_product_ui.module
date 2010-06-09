@@ -19,12 +19,14 @@ function commerce_product_ui_menu() {
     'description' => 'Add a new product for sale.',
     'page callback' => 'commerce_product_ui_add_page',
     'access callback' => 'commerce_product_ui_product_add_any_access',
+    'type' => MENU_LOCAL_ACTION,
+    'weight' => 10,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
   foreach (commerce_product_types() as $type => $product_type) {
     $items['admin/commerce/products/add/' . $type] = array(
-      'title' => $product_type->name,
-      'title callback' => 'check_plain',
+      'title' => 'Create @name',
+      'title arguments' => array('@name' => $product_type->name),
       'description' => $product_type->description,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('commerce_product_ui_product_form', commerce_product_new($type)),
@@ -34,6 +36,22 @@ function commerce_product_ui_menu() {
     );
   }
 
+  $items['admin/commerce/products/%commerce_product'] = array(
+    'title callback' => 'commerce_product_ui_product_title',
+    'title arguments' => array(3),
+    'page callback' => 'commerce_product_ui_product_view',
+    'page arguments' => array('administrator', 3),
+    'access callback' => 'commerce_product_access',
+    'access arguments' => array('view', 3),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_product_ui.products.inc',
+  );
+  $items['admin/commerce/products/%commerce_order/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
   $items['admin/commerce/products/%commerce_product/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
@@ -41,6 +59,7 @@ function commerce_product_ui_menu() {
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
@@ -50,6 +69,7 @@ function commerce_product_ui_menu() {
     'page arguments' => array('commerce_product_ui_product_delete_form', 3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),
+    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
 
@@ -59,7 +79,7 @@ function commerce_product_ui_menu() {
     'page callback' => 'commerce_product_ui_types_overview',
     'access arguments' => array('administer products'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 10,
+    'weight' => 0,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/add'] = array(
@@ -99,6 +119,18 @@ function commerce_product_ui_menu() {
 }
 
 /**
+ * Menu item title callback: returns the SKU of a product for its pages.
+ *
+ * @param $product
+ *   The product object as loaded via the URL wildcard.
+ * @return
+ *   A page title of the format "Product: [SKU]".
+ */
+function commerce_product_ui_product_title($product) {
+  return t('Product: @sku', array('@sku' => $product->sku));
+}
+
+/**
  * Access callback: determine if the user can create any type of product.
  */
 function commerce_product_ui_product_add_any_access() {
@@ -127,30 +159,16 @@ function commerce_product_ui_menu_alter(&$items) {
 }
 
 /**
- * Implements hook_menu_local_tasks_alter().
- */
-function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  // Add action link to 'admin/commerce/products/add' on 'admin/commerce/products' page.
-  if ($root_path == 'admin/commerce/products') {
-    $item = menu_get_item('admin/commerce/products/add');
-    if ($item['access']) {
-      $item['title'] = t('Add a product');
-      $data['actions']['output'][] = array(
-        '#theme' => 'menu_local_action',
-        '#link' => $item,
-      );
-    }
-  }
-}
-
-/**
  * Implements hook_admin_paths().
  */
 function commerce_product_ui_admin_paths() {
   $paths = array(
     'admin/commerce/products' => TRUE,
+    'admin/commerce/products/list' => TRUE,
     'admin/commerce/products/add' => TRUE,
     'admin/commerce/products/add/*' => TRUE,
+    'admin/commerce/products/*' => TRUE,
+    'admin/commerce/products/*/view' => TRUE,
     'admin/commerce/products/*/edit' => TRUE,
     'admin/commerce/products/*/delete' => TRUE,
     'admin/commerce/products/types' => TRUE,
@@ -158,6 +176,8 @@ function commerce_product_ui_admin_paths() {
     'admin/commerce/products/types/*' => TRUE,
     'admin/commerce/products/types/*/edit' => TRUE,
     'admin/commerce/products/types/*/delete' => TRUE,
+    'admin/commerce/products/types/*/fields' => TRUE,
+    'admin/commerce/products/types/*/display' => TRUE,
   );
 
   return $paths;
@@ -238,4 +258,18 @@ function commerce_product_ui_views_api() {
     'api' => 2,
     'path' => drupal_get_path('module', 'commerce_product_ui') . '/includes/views',
   );
+}
+
+/**
+ * Sets the breadcrumb for administrative product pages.
+ */
+function commerce_product_ui_set_breadcrumb() {
+  $breadcrumb = array(
+    l(t('Home'), '<front>'),
+    l(t('Dashboard'), 'admin'),
+    l(t('Store'), 'admin/commerce'),
+    l(t('Products'), 'admin/commerce/products'),
+  );
+
+  drupal_set_breadcrumb($breadcrumb);
 }

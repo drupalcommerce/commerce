@@ -2,6 +2,15 @@
 // $Id$
 
 /**
+ * Displays a view of a product entity.
+ */
+function commerce_product_ui_product_view($mode, $product) {
+  commerce_product_ui_set_breadcrumb();
+
+  return '<pre>' . print_r($product, TRUE) . '</pre>';
+}
+
+/**
  * Menu callback: display a list of product types that the user can create.
  */
 function commerce_product_ui_add_page() {
@@ -50,7 +59,11 @@ function theme_product_add_list($variables) {
 /**
  * Form callback: create or edit a product.
  */
-function commerce_product_ui_product_form($form, &$form_state, $product) {
+function commerce_product_ui_product_form($form, &$form_state, $product, $breadcrumb = TRUE) {
+  if ($breadcrumb) {
+    commerce_product_ui_set_breadcrumb();
+  }
+
   $form = array();
 
   // Add the default field elements.
@@ -188,7 +201,11 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
 /**
  * Confirmation form for deleting a product.
  */
-function commerce_product_ui_product_delete_form($form, &$form_state, $product) {
+function commerce_product_ui_product_delete_form($form, &$form_state, $product, $breadcrumb = TRUE) {
+  if ($breadcrumb) {
+    commerce_product_ui_set_breadcrumb();
+  }
+
   $form_state['product'] = $product;
 
   // TODO: Replace the SKU in the description parameter with the product view

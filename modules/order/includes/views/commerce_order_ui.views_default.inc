@@ -24,7 +24,7 @@ function commerce_order_ui_views_default_views() {
 
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
-  $handler->display->display_options['title'] = 'Store';
+  $handler->display->display_options['title'] = 'Orders';
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer orders';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -177,12 +177,13 @@ function commerce_order_ui_views_default_views() {
   $handler = $view->new_display('page', 'Admin page', 'admin_page');
   $handler->display->display_options['path'] = 'admin/commerce/orders/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Orders';
-  $handler->display->display_options['menu']['weight'] = '-5';
-  $handler->display->display_options['tab_options']['type'] = 'tab';
+  $handler->display->display_options['menu']['title'] = 'List';
+  $handler->display->display_options['menu']['weight'] = '-10';
+  $handler->display->display_options['tab_options']['type'] = 'normal';
   $handler->display->display_options['tab_options']['title'] = 'Orders';
   $handler->display->display_options['tab_options']['description'] = 'Manage orders in the store.';
   $handler->display->display_options['tab_options']['weight'] = '';
+  $handler->display->display_options['tab_options']['name'] = 'management';
 
   $views[$view->name] = $view;
 
