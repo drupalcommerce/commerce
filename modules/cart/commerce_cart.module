@@ -247,6 +247,8 @@ function commerce_cart_order_new($customer_uid = 0) {
  *   The uid of the user whose cart you are adding the product to.
  * @param $product_id
  *   The ID of the product to add to the cart.
+ * @param $quantity
+ *   The quantity of this product to add to the cart.
  *
  * @return
  *   The entire shopping cart order object or FALSE on failure.
