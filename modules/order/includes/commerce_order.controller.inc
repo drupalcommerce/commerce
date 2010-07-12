@@ -161,6 +161,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
 
       // Clear internal properties.
       unset($order->is_new);
+      $this->resetCache();
 
       // Ignore slave server temporarily to give time for the saved order to be
       // propagated to the slave.
