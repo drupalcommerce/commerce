@@ -68,9 +68,22 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
     '#markup' => filter_xss($checkout_page->help),
   );
 
+  // Restore form errors.
+  if (!empty($form_state['storage']['errors'])) {
+    $form_errors = &drupal_static('form_set_error', array());
+    $form_errors = $form_state['storage']['errors'];
+  }
+
   // Add any enabled checkout panes for this page to the form.
   foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page->page_id)) as $pane_id => $checkout_pane) {
     if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
+      // Display error messages before the form.
+      if (!empty($form_state['storage']['messages'][$pane_id])) {
+        $form[$pane_id . '_errors'] = array(
+          '#markup' =>  $form_state['storage']['messages'][$pane_id],
+        );
+      }
+
       // Create a fieldset for the pane.
       $form[$pane_id] = array(
         '#type' => 'fieldset',
@@ -82,12 +95,8 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       );
 
       // Add the form data defined in the pane's form callback.
-      $form[$pane_id] += $callback($form_state, $checkout_pane, $order);
-
-      // Add the validate handler for the pane to the form array.
-      if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
-        $form['#validate'][] = $callback;
-      }
+      $pane_values = isset($form_state['values'][$pane_id]) ? $form_state['values'][$pane_id] : array();
+      $form[$pane_id] += $callback($pane_values, $checkout_pane, $order);
     }
   }
 
@@ -145,6 +154,11 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
 /**
  * Submit handler for the continue and back buttons of the checkout form.
+ *
+ * This function calls the validation function of each pane, followed by
+ * the submit function if the validation succeeded. As long as one pane
+ * fails validation, we then ask for the form to be rebuilt. Once all the panes
+ * are happy, we move on to the next page.
  */
 function commerce_checkout_form_submit($form, &$form_state) {
   global $user;
@@ -154,17 +168,50 @@ function commerce_checkout_form_submit($form, &$form_state) {
   // Load a fresh copy of the order stored in the form.
   $order = commerce_order_load($form_state['values']['order']->order_id);
 
+  // Catch and clear already pushed messages.
+  $previous_messages = drupal_get_messages();
+
   // Loop through the enabled checkout panes for the current page.
+  $form_validate = TRUE;
   foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page->page_id)) as $pane_id => $checkout_pane) {
-    // If the pane has defined a checkout form submit handler...
-    if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_submit')) {
+    $validate = TRUE;
+
+    // If the pane has defined a checkout form validate handler...
+    if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
       // Give it a chance to process the submitted data.
-      $callback($form, $form_state, $order);
+      $validate = $callback($form[$pane_id], @$form_state['values'][$pane_id], $order);
     }
+
+    // Catch and clear panes' messages.
+    $pane_messages = drupal_get_messages();
+
+    // Submit the pane if it validated.
+    if ($validate && $callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_submit')) {
+      $callback($form[$pane_id], $form_state['values'][$pane_id], $order);
+    }
+
+    // Generate status messages and theme them.
+    $_SESSION['messages'] = array_merge_recursive($pane_messages, drupal_get_messages());
+    $form_state['storage']['messages'][$pane_id] = theme('status_messages');
+
+    // A failed pane makes the form fail.
+    $form_validate &= $validate;
   }
+
+  // Restore messages and form errors.
+  $_SESSION['messages'] = $previous_messages;
+  $form_errors = &drupal_static('form_set_error', array());
+  $form_state['storage']['errors'] = $form_errors;
+  $form_errors = array();
 
   // Save the updated order object.
   $order = commerce_order_save($order);
+
+  if (!$form_validate) {
+    // Rebuild the form if one pane failed validation.
+    $form_state['rebuild'] = TRUE;
+    return;
+  }
 
   // Determine which button was used to submit the form.
   switch($form_state['values']['op']) {
