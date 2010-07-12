@@ -65,6 +65,13 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
+      ),
     ),
     'primary key' => array('order_id'),
     'unique keys' => array(
@@ -136,6 +143,13 @@ function commerce_order_schema() {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of additional data.',
       ),
     ),
     'primary key' => array('revision_id'),
