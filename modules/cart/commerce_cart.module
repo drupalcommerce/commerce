@@ -102,6 +102,32 @@ function commerce_cart_block_info() {
 }
 
 /**
+ * Implements hook_user_login().
+ */
+function commerce_cart_user_login(&$edit, $account) {
+  // Merge any items in the anonymous cart with the authenticated user's cart.
+
+  // Get the anonymous cart.
+  $anonymous_order = commerce_cart_order_load();
+
+  // If the anonymous user had any items in the cart, add them to the logged in
+  // user's cart and wipe the anonymous cart.
+  if (count($anonymous_order->line_items[LANGUAGE_NONE]) > 0) {
+
+    // Add each of anonymous cart items to the authenticated user's cart.
+    foreach ($anonymous_order->line_items[LANGUAGE_NONE] as $line_item_reference) {
+      $line_item_id = $line_item_reference['line_item_id'];
+      $line_item = commerce_line_item_load($line_item_id);
+      commerce_cart_product_add($account->uid, $line_item->product[LANGUAGE_NONE][0]['product_id'], $line_item->quantity);
+    }
+
+    // Delete the anonymous order from the database and clear the reference.
+    commerce_order_delete($anonymous_order->order_id);
+    unset($_SESSION['commerce_cart_order_id']);
+  }
+}
+
+/**
  * Implements hook_block_view().
  */
 function commerce_cart_block_view($delta) {
