@@ -81,7 +81,7 @@ function commerce_cart_theme() {
     'commerce_cart_block' => array(
       'variables' => array('quantity_raw' => NULL, 'quantity_label' => NULL, 'quantity' => NULL, 'total_raw' => NULL, 'total' => NULL, 'checkout_link' => NULL),
       'path' => drupal_get_path('module', 'commerce_cart') . '/theme',
-      'template' => 'commerce_cart_block',
+      'template' => 'commerce-cart-block',
     ),
   );
 }
