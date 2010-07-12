@@ -156,7 +156,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $function('commerce_order', $order);
 
       module_invoke_all('commerce_order_' . $op, $order);
-      module_invoke_all('entity_' . $op, 'commerce_order', $order);
+      module_invoke_all('entity_' . $op, $order, 'commerce_order');
       rules_invoke_event('commerce_order_' . $op, $order);
 
       // Clear internal properties.

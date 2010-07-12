@@ -78,7 +78,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       }
 
       module_invoke_all('commerce_line_item_' . $op, $line_item);
-      module_invoke_all('entity_' . $op, 'commerce_line_item', $line_item);
+      module_invoke_all('entity_' . $op, $line_item, 'commerce_line_item');
       rules_invoke_event('commerce_line_item_' . $op, $line_item);
 
       // Ignore slave server temporarily to give time for the saved line item to
