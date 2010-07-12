@@ -24,7 +24,7 @@ function commerce_product_views_data() {
     'title' => t('Product ID'),
     'help' => t('The unique internal identifier of the product.'),
     'field' => array(
-      'handler' => 'commerce_product_handler_field_commerce_product_product',
+      'handler' => 'commerce_product_handler_field_product',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -43,7 +43,7 @@ function commerce_product_views_data() {
     'title' => t('SKU'),
     'help' => t('The unique human-readable identifier of the product.'),
     'field' => array(
-      'handler' => 'commerce_product_handler_field_commerce_product_product',
+      'handler' => 'commerce_product_handler_field_product',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -62,7 +62,7 @@ function commerce_product_views_data() {
     'title' => t('Type'),
     'help' => t('The human-readable name of the type of the product.'),
     'field' => array(
-      'handler' => 'commerce_product_handler_field_commerce_product_type',
+      'handler' => 'commerce_product_handler_field_product_product_type',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -81,7 +81,7 @@ function commerce_product_views_data() {
     'title' => t('Title'),
     'help' => t('The title of the product used for administrative display.'),
     'field' => array(
-      'handler' => 'commerce_product_handler_field_commerce_product_product',
+      'handler' => 'commerce_product_handler_field_product',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -192,11 +192,11 @@ function commerce_product_views_handlers() {
     ),
     'handlers' => array(
       // Field handlers
-      'commerce_product_handler_field_commerce_product_product' => array(
+      'commerce_product_handler_field_product' => array(
         'parent' => 'views_handler_field',
       ),
-      'commerce_product_handler_field_commerce_product_type' => array(
-        'parent' => 'commerce_product_handler_field_commerce_product_product',
+      'commerce_product_handler_field_product_product_type' => array(
+        'parent' => 'commerce_product_handler_field_product',
       ),
       'commerce_product_handler_field_product_link' => array(
         'parent' => 'views_handler_field',

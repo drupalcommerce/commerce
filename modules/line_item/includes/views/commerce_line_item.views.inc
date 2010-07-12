@@ -34,7 +34,7 @@ function commerce_line_item_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'views_handler_argument_commerce_line_item_id',
+      'handler' => 'commerce_line_item_handler_argument_line_item_line_item_id',
       'name field' => 'line_item_label',
       'numeric' => TRUE,
       'validate type' => 'line_item_id',
@@ -46,7 +46,7 @@ function commerce_line_item_views_data() {
     'title' => t('Type'),
     'help' => t('The human-readable name of the type of the line item.'),
     'field' => array(
-      'handler' => 'views_handler_field_commerce_line_item_type',
+      'handler' => 'commerce_line_item_handler_field_line_item_line_item_type',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -113,8 +113,8 @@ function commerce_line_item_views_handlers() {
       'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views/handlers',
     ),
     'handlers' => array(
-      'views_handler_argument_commerce_line_item_id',
-      'views_handler_field_commerce_line_item_type',
+      'commerce_line_item_handler_argument_line_item_line_item_id',
+      'commerce_line_item_handler_field_line_item_line_item_type',
     ),
   );
 }

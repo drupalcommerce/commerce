@@ -18,12 +18,12 @@ files[] = includes/commerce_order.controller.inc
 files[] = includes/views/commerce_order.views.inc
 
 ; Views handlers
-files[] = includes/views/handlers/commerce_order_handler_field_commerce_order_order.inc
+files[] = includes/views/handlers/commerce_order_handler_argument_order_order_id.inc
+files[] = includes/views/handlers/commerce_order_handler_field_order.inc
+files[] = includes/views/handlers/commerce_order_handler_field_order_status.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_delete.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_edit.inc
-files[] = includes/views/handlers/commerce_order_handler_field_commerce_order_status.inc
-files[] = includes/views/handlers/commerce_order_handler_argument_commerce_order_order_id.inc
 
 ; Simple tests
 ; files[] = tests/commerce_order.test

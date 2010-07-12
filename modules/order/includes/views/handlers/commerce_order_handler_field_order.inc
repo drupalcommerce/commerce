@@ -9,7 +9,7 @@
 /**
  * Field handler to provide simple renderer that allows linking to an order.
  */
-class commerce_order_handler_field_commerce_order_order extends views_handler_field {
+class commerce_order_handler_field_order extends views_handler_field {
   function init(&$view, $options) {
     parent::init($view, $options);
 

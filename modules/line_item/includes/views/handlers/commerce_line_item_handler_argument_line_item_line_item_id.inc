@@ -9,7 +9,7 @@
 /**
  * Argument handler to accept a line item id.
  */
-class views_handler_argument_commerce_line_item_id extends views_handler_argument_numeric {
+class commerce_line_item_handler_argument_line_item_line_item_id extends views_handler_argument_numeric {
   /**
    * Override the behavior of title(). Get the title of the node.
    */

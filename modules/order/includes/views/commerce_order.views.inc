@@ -24,7 +24,7 @@ function commerce_order_views_data() {
     'title' => t('Order ID'),
     'help' => t('The unique internal identifier of the order.'),
     'field' => array(
-      'handler' => 'commerce_order_handler_field_commerce_order_order',
+      'handler' => 'commerce_order_handler_field_order',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -34,7 +34,7 @@ function commerce_order_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'commerce_order_handler_argument_commerce_order_order_id',
+      'handler' => 'commerce_order_handler_argument_order_order_id',
       'name field' => 'order_number',
       'numeric' => TRUE,
       'validate type' => 'order_id',
@@ -46,7 +46,7 @@ function commerce_order_views_data() {
     'title' => t('Order number'),
     'help' => t('The unique customer facing number of the order.'),
     'field' => array(
-      'handler' => 'commerce_order_handler_field_commerce_order_order',
+      'handler' => 'commerce_order_handler_field_order',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -90,7 +90,7 @@ function commerce_order_views_data() {
     'title' => t('Order status'),
     'help' => t('The workflow status of the order.'),
     'field' => array(
-      'handler' => 'commerce_order_handler_field_commerce_order_status',      
+      'handler' => 'commerce_order_handler_field_order_status',      
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -171,11 +171,11 @@ function commerce_order_views_handlers() {
     ),
     'handlers' => array(
       // Field handlers
-      'commerce_order_handler_field_commerce_order_order' => array(
+      'commerce_order_handler_field_order' => array(
         'parent' => 'views_handler_field',
       ),
-      'commerce_order_handler_field_commerce_order_status' => array(
-        'parent' => 'commerce_order_handler_field_commerce_order_order',
+      'commerce_order_handler_field_order_status' => array(
+        'parent' => 'commerce_order_handler_field_order',
       ),      
       'commerce_order_handler_field_order_link' => array(
         'parent' => 'views_handler_field',
@@ -188,7 +188,7 @@ function commerce_order_views_handlers() {
       ),
 
       // Argument handlers
-      'commerce_order_handler_argument_commerce_order_order_id',
+      'commerce_order_handler_argument_order_order_id',
     ),
   );
 }
