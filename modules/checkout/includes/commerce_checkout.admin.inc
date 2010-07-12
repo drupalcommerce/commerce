@@ -74,6 +74,7 @@ function commerce_checkout_builder_form() {
 
   // Loop through all the checkout panes on the site.
   $panes = commerce_checkout_panes();
+
   foreach ($panes as $pane_id => $checkout_pane) {
     // Determine a checkout pane's current checkout page.
     $page_id = $checkout_pane->enabled ? $checkout_pane->page : 'disabled';

@@ -108,21 +108,18 @@ function commerce_checkout_theme() {
 }
 
 /**
- * Returns an array of checkout pages based on the checkout settings.
- *
- * @param $review
- *   TRUE or FALSE indicating whether or not to include the review page.
+ * Returns an array of checkout pages defined by enabled modules.
  *
  * @return
  *   An associative array of checkout page objects keyed by the page_id.
  */
-function commerce_checkout_pages($review = TRUE) {
+function commerce_checkout_pages() {
   $checkout_pages = &drupal_static(__FUNCTION__);
 
   // If the checkout pages haven't been defined yet, do so now.
   if (empty($checkout_pages)) {
     $checkout_pages = module_invoke_all('commerce_checkout_page_info');
-    drupal_alter('commerce_checkout_page_info', $checkout_pages, $review);
+    drupal_alter('commerce_checkout_page_info', $checkout_pages);
 
     $count = 0;
     foreach ($checkout_pages as $page_id => $checkout_page) {
@@ -132,12 +129,16 @@ function commerce_checkout_pages($review = TRUE) {
         'help' => '',
         'back_value' => t('Back'),
         'submit_value' => t('Continue'),
-        'weight' => $count++ / count($checkout_pages),
         'prev_page' => NULL,
         'next_page' => NULL,
       );
 
       $checkout_pages[$page_id] = (object) ((array) $checkout_page + $defaults);
+
+      // Set a weight that preserves the order of 0 weighted pages.
+      if (empty($checkout_page->weight)) {
+        $checkout_pages[$page_id]->weight = $count++ / count($checkout_pages);
+      }
     }
 
     uasort($checkout_pages, 'commerce_sort_weight');
@@ -145,11 +146,13 @@ function commerce_checkout_pages($review = TRUE) {
     // Initialize the previous and next pages.
     $previous_page = NULL;
     $checkout_page = NULL;
+
     foreach ($checkout_pages as $checkout_page) {
       if ($previous_page) {
         $checkout_page->prev_page = $previous_page->page_id;
         $previous_page->next_page = $checkout_page->page_id;
       }
+
       $previous_page = $checkout_page;
     }
   }
@@ -182,15 +185,21 @@ function commerce_checkout_page_load($page_id) {
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_checkout_commerce_checkout_page_info() {
+  $pages = array();
+
+  // Define a primary checkout page as the first step.
   $pages['checkout'] = (object) array(
     'title' => t('Checkout'),
     'weight' => 0,
   );
+
+  // Define a page for reviewing the data entered during checkout.
   $pages['review'] = (object) array(
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
     'weight' => 10,
   );
+
   return $pages;
 }
 
@@ -214,6 +223,7 @@ function commerce_checkout_panes($conditions = array()) {
 
     // Load panes defined by modules.
     $checkout_panes = array();
+
     foreach (module_implements('commerce_checkout_pane_info') as $module) {
       foreach (module_invoke($module, 'commerce_checkout_pane_info') as $pane_id => $checkout_pane) {
         $checkout_pane->pane_id = $pane_id;
@@ -272,6 +282,7 @@ function commerce_checkout_panes($conditions = array()) {
         $return[$pane_id] = $checkout_pane;
       }
     }
+    
     return $return;
   }
   else {
