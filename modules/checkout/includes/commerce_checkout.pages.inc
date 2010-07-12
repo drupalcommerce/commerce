@@ -179,6 +179,9 @@ function commerce_checkout_form_submit($form, &$form_state) {
         else {
           $form_state['redirect'] = 'checkout/' . $order->order_id;
         }
+
+        // Otherwise update the order status for the checkout step.
+        $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->prev_page);
       }
       break;
 
@@ -194,6 +197,9 @@ function commerce_checkout_form_submit($form, &$form_state) {
 
         // Move the form forward to that page.
         $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->next_page;
+
+        // Update the order status for the checkout step.
+        $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
       }
       break;
   }
