@@ -29,10 +29,10 @@
 </div>
 <div class="cart-footer">
   <div class="cart-quantity">
-    <span class="cart-quantity-raw"><?php print $quantity_raw; ?></span> <?php print $quantity_label; ?>
+    <span class="cart-quantity-raw"><?php print $quantity_raw; ?></span> <span class="cart-quantity-label"><?php print $quantity_label; ?></span>
   </div>
   <div class="cart-total">
-    <label><?php print $total_label; ?></label> <span class="cart-total-raw"><?php print $total; ?></span>
+    <spam class="cart-total-label"><?php print $total_label; ?></span> <span class="cart-total-raw"><?php print $total; ?></span>
   </div>
   <?php print $cart_links; ?>
 </div>
