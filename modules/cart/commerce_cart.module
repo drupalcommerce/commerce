@@ -58,6 +58,7 @@ function commerce_cart_commerce_checkout_pane_info() {
       'checkout_form' => 'commerce_cart_contents_pane_form',
       'review' => 'commerce_cart_contents_pane_review',
     ),
+    'page' => 'checkout',
   );
 
   return $checkout_panes;

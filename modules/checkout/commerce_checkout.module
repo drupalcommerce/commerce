@@ -179,6 +179,22 @@ function commerce_checkout_page_load($page_id) {
 }
 
 /**
+ * Implements hook_commerce_checkout_page_info().
+ */
+function commerce_checkout_commerce_checkout_page_info() {
+  $pages['checkout'] = (object) array(
+    'title' => t('Checkout'),
+    'weight' => 0,
+  );
+  $pages['review'] = (object) array(
+    'title' => t('Review order'),
+    'help' => t('Review your order before continuing.'),
+    'weight' => 10,
+  );
+  return $pages;
+}
+
+/**
  * Return a filtered array of checkout pane objects.
  *
  * @param $conditions
@@ -219,7 +235,7 @@ function commerce_checkout_panes($conditions = array()) {
       // Set some defaults for the checkout pane.
       $defaults = array(
         'name' => $checkout_pane->title,
-        'page' => 1,
+        'page' => 'checkout',
         'collapsible' => FALSE,
         'collapsed' => FALSE,
         'weight' => 0,
