@@ -113,8 +113,6 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
           ->condition('line_item_id', $line_item_ids, 'IN')
           ->execute();
 
-        // TODO: Delete any references to this line item.
-
         foreach ($line_items as $line_item_id => $line_item) {
           module_invoke_all('commerce_line_item_delete', $line_item);
           field_attach_delete('commerce_line_item', $line_item);
