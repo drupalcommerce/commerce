@@ -212,6 +212,21 @@ function commerce_product_ui_theme() {
       'variables' => array('type' => NULL),
       'file' => 'includes/commerce_product_ui.types.inc',
     ),
+    'commerce_product_sku' => array(
+      'variables' => array('sku' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
+      'template' => 'commerce-product-sku',
+    ),
+    'commerce_product_title' => array(
+      'variables' => array('title' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
+      'template' => 'commerce-product-title',
+    ),
+    'commerce_product_status' => array(
+      'variables' => array('status' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
+      'template' => 'commerce-product-status',
+    ),
   );
 }
 
@@ -272,4 +287,86 @@ function commerce_product_ui_set_breadcrumb() {
   );
 
   drupal_set_breadcrumb($breadcrumb);
+}
+
+/**
+ * Generate an array for rendering the given product.
+ *
+ * @param $product
+ *   A fully loaded product object.
+ * @param $view_mode
+ *   The view mode for displaying the product, 'full', 'node_full',
+ *     'node_teaser', or 'node_rss'.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function commerce_product_ui_product_view($product, $view_mode = 'full', $breadcrumb = TRUE) {
+  // Set the breadcrumb for the appropriate view mode if specified.
+  if ($breadcrumb) {
+    commerce_product_ui_set_breadcrumb();
+  }
+
+  // Populate $product->content with a render() array.
+  commerce_product_ui_build_content($product, $view_mode);
+
+  // Remove the content array from the product to avoid duplicate rendering.
+  $build = $product->content;
+  unset($product->content);
+
+  $build += array(
+    '#product' => $product,
+    '#view_mode' => $view_mode,
+  );
+
+  // Allow modules to modify the final build array.
+  drupal_alter('commerce_product_view', $build);
+
+  return $build;
+}
+
+/**
+ * Builds a structured array representing the product's content.
+ *
+ * @param $product
+ *   The fully loaded product object being built for display.
+ * @param $view_mode
+ *   The view mode for displaying the product, 'full', 'node_full',
+ *     'node_teaser', or 'node_rss'.
+ */
+function commerce_product_ui_build_content(&$product, $view_mode = 'full') {
+  // Remove previously built content, if it exists.
+  $product->content = array();
+
+  // Prepare a resuable array representing the CSS file to attach to the view.
+  $attached = array(
+    'css' => array(drupal_get_path('module', 'commerce_product_ui') . '/theme/commerce_product.css'),
+  );
+
+  // Add the default fields inherent to the product entity.
+  $product->content['sku'] = array(
+    '#markup' => theme('commerce_product_sku', array('sku' => check_plain($product->sku), 'label' => t('SKU:'), 'product' => $product)),
+    '#attached' => $attached,
+  );
+
+  // Only display the title and status on the full page view.
+  if ($view_mode == 'full') {
+    $product->content['title'] = array(
+      '#markup' => theme('commerce_product_title', array('title' => check_plain($product->title), 'label' => t('Title:'), 'product' => $product)),
+      '#attached' => $attached,
+    );
+
+    $product->content['status'] = array(
+      '#markup' => theme('commerce_product_status', array('status' => $product->status ? t('Active') : t('Disabled'), 'label' => t('Status:'), 'product' => $product)),
+      '#attached' => $attached,
+    );
+  }
+
+  // Build fields content.
+  field_attach_prepare_view('commerce_product', array($product->product_id => $product), $view_mode);
+  entity_prepare_view('commerce_product', array($product->product_id => $product));
+  $product->content += field_attach_view('commerce_product', $product, $view_mode);
+
+  // Allow modules to make their own additions to the product content.
+  module_invoke_all('commerce_product_view', $product, $view_mode);
 }

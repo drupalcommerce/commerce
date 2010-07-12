@@ -1,0 +1,5 @@
+/* $Id$ */
+
+.sku-label, .title-label, .status-label {
+  font-weight: bold;
+}
