@@ -11,6 +11,11 @@
  * Redirects invalid checkout attempts or displays the checkout form if valid.
  */
 function commerce_checkout_router($order, $checkout_page = NULL) {
+  // If there are no line items on the order, redirect away.
+  if (commerce_line_items_quantity($order->line_items, 'product') == 0) {
+    drupal_goto(variable_get('commerce_checkout_empty_redirect', '<front>'));
+  }
+
   // If no checkout page is specified, default to the first one.
   if (empty($checkout_page)) {
     $checkout_page = reset(commerce_checkout_pages());

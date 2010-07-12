@@ -823,6 +823,11 @@ function commerce_line_item_property_info_callback(&$info, $entity_type, $field,
  *   The total quantity of all the matching line items referenced by the field.
  */
 function commerce_line_items_quantity($value, $type = '', $language = '') {
+  // Return 0 if the $value array is empty.
+  if (empty($value)) {
+    return 0;
+  }
+
   if (empty($language)) {
     $language = LANGUAGE_NONE;
   }
@@ -830,7 +835,7 @@ function commerce_line_items_quantity($value, $type = '', $language = '') {
   // Extract the line item IDs for the language.
   $line_item_ids = array();
 
-  foreach ($value[$language] as $data) {
+  foreach ((array) $value[$language] as $data) {
     $line_item_ids[] = $data['line_item_id'];
   }
 

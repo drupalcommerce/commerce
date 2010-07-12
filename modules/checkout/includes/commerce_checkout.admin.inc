@@ -10,6 +10,8 @@
  * Builds the admin settings form.
  */
 function commerce_checkout_settings_form() {
+  global $base_url;
+
   $form = array();
 
   $form['anonymous'] = array(
@@ -46,18 +48,14 @@ function commerce_checkout_settings_form() {
     '#default_value' => variable_get('commerce_checkout_anonymous_login', FALSE),
   );
 
-  global $base_url;
-  $form['redirection'] = array(
-      '#type'  => 'fieldset',
-      '#title' => t('Redirection Settings'),
+  $form['commerce_checkout_empty_redirect'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Empty order redirect destination'),
+    '#default_value' => variable_get('commerce_checkout_empty_redirect', ''),
+    '#field_prefix' => $base_url . '/',
+    '#description' => t('Customers will be redirected to this URL if they try to access checkout with an empty order.'),
   );
-  $form['redirection']['commerce_checkout_empty_cart_redirect'] = array(
-      '#type'  => 'textfield',
-      '#title' => t('Redirect destination from checkout, when cart is empty.'),
-      '#default_value' => variable_get('commerce_checkout_empty_cart_redirect', NULL),
-      '#field_prefix' => $base_url .'/',
-      '#description' => t("Valid values are alias urls or internal drupal paths, examples: <em>product/purple-sweater</em> or <em>node/12</em>"),
-  );
+
   return system_settings_form($form);
 }
 
