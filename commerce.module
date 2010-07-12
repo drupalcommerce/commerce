@@ -13,7 +13,9 @@
 function commerce_permission() {
   $permissions = array(
     'configure store' => array(
-      'title' => t('Configure global store settings'),
+      'title' => t('Configure store settings'),
+      'description' => t('Allows users to update store currency and contact settings.'),
+      'restrict access' => TRUE,
     ),
   );
 

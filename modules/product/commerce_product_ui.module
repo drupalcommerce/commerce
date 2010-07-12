@@ -76,7 +76,7 @@ function commerce_product_ui_menu() {
     'title' => 'Product types',
     'description' => 'Manage products types for your store.',
     'page callback' => 'commerce_product_ui_types_overview',
-    'access arguments' => array('administer products'),
+    'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
     'file' => 'includes/commerce_product_ui.types.inc',
@@ -133,8 +133,8 @@ function commerce_product_ui_product_title($product) {
  * Access callback: determine if the user can create any type of product.
  */
 function commerce_product_ui_product_add_any_access() {
-  // Grant automatic access to users with administer product types access.
-  if (user_access('administer product types')) {
+  // Grant automatic access to users with administer products permission.
+  if (user_access('administer products')) {
     return TRUE;
   }
 

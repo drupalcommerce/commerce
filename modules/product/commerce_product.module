@@ -119,15 +119,17 @@ function commerce_product_permission() {
   $permissions = array(
     'administer products' => array(
       'title' => t('Administer products'),
+      'description' => t('Allows users to perform any action on products of any type.'),
+      'restrict access' => TRUE,
     ),
     'administer product types' => array(
       'title' => t('Administer product types'),
+      'description' => t('Allows users to add product types and configure their fields.'),
+      'restrict access' => TRUE,
     ),
     'access products' => array(
-      'title' => t('Access lists of products, primarily for viewing and referencing'),
-    ),
-    'create products' => array(
-      'title' => t('Create products'),
+      'title' => t('Access products'),
+      'description' => t('Allows users to view lists of products in the Store admin and reference lists.'),
     ),
   );
 
