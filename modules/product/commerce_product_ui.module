@@ -39,28 +39,20 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/%commerce_product'] = array(
     'title callback' => 'commerce_product_ui_product_title',
     'title arguments' => array(3),
-    'page callback' => 'commerce_product_ui_product_view',
-    'page arguments' => array(3),
-    'access callback' => 'commerce_product_access',
-    'access arguments' => array('view', 3),
-    'type' => MENU_CALLBACK,
-  );
-  $items['admin/commerce/products/%commerce_product/view'] = array(
-    'title' => 'View',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-  );
-  $items['admin/commerce/products/%commerce_product/edit'] = array(
-    'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_product_ui_product_form', 3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),
-    'type' => MENU_LOCAL_TASK,
     'weight' => 0,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_product_ui.products.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/commerce/products/%commerce_product/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
   $items['admin/commerce/products/%commerce_product/delete'] = array(
     'title' => 'Delete a product',
@@ -286,42 +278,6 @@ function commerce_product_ui_set_breadcrumb() {
   );
 
   drupal_set_breadcrumb($breadcrumb);
-}
-
-/**
- * Generate an array for rendering the given product.
- *
- * @param $product
- *   A fully loaded product object.
- * @param $view_mode
- *   The view mode for displaying the product, 'full', 'node_full',
- *     'node_teaser', or 'node_rss'.
- *
- * @return
- *   An array as expected by drupal_render().
- */
-function commerce_product_ui_product_view($product, $view_mode = 'full', $breadcrumb = TRUE) {
-  // Set the breadcrumb for the appropriate view mode if specified.
-  if ($breadcrumb) {
-    commerce_product_ui_set_breadcrumb();
-  }
-
-  // Populate $product->content with a render() array.
-  commerce_product_ui_build_content($product, $view_mode);
-
-  // Remove the content array from the product to avoid duplicate rendering.
-  $build = $product->content;
-  unset($product->content);
-
-  $build += array(
-    '#product' => $product,
-    '#view_mode' => $view_mode,
-  );
-
-  // Allow modules to modify the final build array.
-  drupal_alter('commerce_product_view', $build);
-
-  return $build;
 }
 
 /**
