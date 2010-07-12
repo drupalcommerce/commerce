@@ -32,7 +32,7 @@
     <span class="cart-quantity-raw"><?php print $quantity_raw; ?></span> <span class="cart-quantity-label"><?php print $quantity_label; ?></span>
   </div>
   <div class="cart-total">
-    <spam class="cart-total-label"><?php print $total_label; ?></span> <span class="cart-total-raw"><?php print $total; ?></span>
+    <span class="cart-total-label"><?php print $total_label; ?></span> <span class="cart-total-raw"><?php print $total; ?></span>
   </div>
   <?php print $cart_links; ?>
 </div>
