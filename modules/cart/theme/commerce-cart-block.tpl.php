@@ -18,7 +18,6 @@
  *
  * Helper variables:
  * - $order: The full order object for the shopping cart.
- * - $line_item_ids: Array of line item IDs included in the contents View.
  *
  * @see template_preprocess()
  * @see template_process()

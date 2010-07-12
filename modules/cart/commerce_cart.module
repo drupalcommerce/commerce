@@ -191,7 +191,6 @@ function commerce_cart_block_view($delta) {
       // Build the variables array to send to the cart block template.
       $variables = array(
         'order' => $order,
-        'line_item_ids' => $line_item_ids,
         'contents_view' => commerce_embed_view('commerce_cart', 'defaults', $order->order_id),
         'quantity_raw' => $quantity,
         'quantity_label' => format_plural($quantity, 'item', 'items'),
