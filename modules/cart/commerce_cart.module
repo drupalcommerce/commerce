@@ -11,6 +11,25 @@
 
 
 /**
+ * Implements hook_menu().
+ */
+function commerce_cart_menu() {
+  $items = array();
+
+  // TODO: Replace access control with something more pertinent to checkout
+  // besides 'access content'.
+  $items['checkout'] = array(
+    'title' => 'Checkout',
+    'page callback' => 'commerce_cart_checkout_router',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_cart.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_commerce_order_state_info().
  */
 function commerce_cart_commerce_order_state_info() {

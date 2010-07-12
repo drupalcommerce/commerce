@@ -2,6 +2,7 @@
 // $Id$
 
 /**
+ * @file
  * The page and form callbacks for use in the checkout form.
  */
 
