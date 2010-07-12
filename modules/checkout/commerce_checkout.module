@@ -121,56 +121,37 @@ function commerce_checkout_pages($review = TRUE) {
 
   // If the checkout pages haven't been defined yet, do so now.
   if (empty($checkout_pages)) {
-    $checkout_pages = array();
+    $checkout_pages = module_invoke_all('commerce_checkout_page_info');
+    drupal_alter('commerce_checkout_page_info', $checkout_pages, $review);
 
-    for ($i = 1; $i <= variable_get('commerce_checkout_pages', 1); $i++) {
-      $checkout_pages[$i] = (object) array(
-        'page_id' => $i,
-        'title' => t('Checkout'),
+    $count = 0;
+    foreach ($checkout_pages as $page_id => $checkout_page) {
+      $defaults = array(
+        'page_id' => $page_id,
+        'title' => '',
         'help' => '',
-      );
-    }
-
-    // Initialize the back and next buttons.
-    $keys = array_keys($checkout_pages);
-
-    while (count($keys)) {
-      $key = array_shift($keys);
-
-      if (count($keys) == 0) {
-        $checkout_pages[$key]->next_page = FALSE;
-        $checkout_pages[$key]->prev_page = $key - 1;
-        $checkout_pages[$key]->submit_value = variable_get('commerce_checkout_review_status', TRUE) ? t('Review order') : t('Submit order');
-        $checkout_pages[$key]->back_value = t('Back');
-      }
-      elseif ($key == 1) {
-        $checkout_pages[$key]->next_page = $keys[0];
-        $checkout_pages[$key]->prev_page = FALSE;
-        $checkout_pages[$key]->submit_value = t('Continue');
-        $checkout_pages[$key]->back_value = t('Cancel');
-      }
-      else {
-        $checkout_pages[$key]->next_page = $keys[0];
-        $checkout_pages[$key]->prev_page = $key - 1;
-        $checkout_pages[$key]->submit_value = t('Continue');
-        $checkout_pages[$key]->back_value = t('Back');
-      }
-    }
-
-    // Load the review page separately.
-    if ($review && variable_get('commerce_checkout_review_status', TRUE)) {
-      $checkout_pages['review'] = (object) array(
-        'page_id' => 'review',
-        'title' => t('Review order'),
-        'help' => t("Your order is almost complete. Please review the details below and click 'Submit order' if all the information is correct. You may use the 'Back' button to make changes to your order if necessary."),
-        'next_page' => FALSE,
-        'prev_page' => count($checkout_pages),
         'back_value' => t('Back'),
-        'submit_value' => t('Submit order'),
+        'submit_value' => t('Continue'),
+        'weight' => $count++ / count($checkout_pages),
+        'prev_page' => NULL,
+        'next_page' => NULL,
       );
+
+      $checkout_pages[$page_id] = (object) ((array) $checkout_page + $defaults);
     }
 
-    drupal_alter('commerce_checkout_pages', $checkout_pages, $review);
+    uasort($checkout_pages, 'commerce_sort_weight');
+
+    // Initialize the previous and next pages.
+    $previous_page = NULL;
+    $checkout_page = NULL;
+    foreach ($checkout_pages as $checkout_page) {
+      if ($previous_page) {
+        $checkout_page->prev_page = $previous_page->page_id;
+        $previous_page->next_page = $checkout_page->page_id;
+      }
+      $previous_page = $checkout_page;
+    }
   }
 
   return $checkout_pages;

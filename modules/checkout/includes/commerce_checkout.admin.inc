@@ -12,22 +12,6 @@
 function commerce_checkout_settings_form() {
   $form = array();
 
-  $form['pages'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Checkout pages'),
-  );
-  $form['pages']['commerce_checkout_pages'] = array(
-    '#type' => 'select',
-    '#title' => t('Number of pages'),
-    '#options' => drupal_map_assoc(range(1, 10)),
-    '#default_value' => variable_get('commerce_checkout_pages', 1),
-  );
-  $form['pages']['commerce_checkout_review_status'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Display a review page as the last page of the checkout form.'),
-    '#default_value' => variable_get('commerce_checkout_review_status', TRUE),
-  );
-
   $form['anonymous'] = array(
     '#type' => 'fieldset',
     '#title' => t('Anonymous checkout settings'),
@@ -89,13 +73,15 @@ function commerce_checkout_builder_form() {
   }
 
   // Loop through all the checkout panes on the site.
-  foreach (commerce_checkout_panes() as $pane_id => $checkout_pane) {
+  $panes = commerce_checkout_panes();
+  foreach ($panes as $pane_id => $checkout_pane) {
     // Determine a checkout pane's current checkout page.
     $page_id = $checkout_pane->enabled ? $checkout_pane->page : 'disabled';
 
     // If the page no longer exists, place the pane on the first page.
     if (empty($checkout_pages[$page_id])) {
-      $page_id = 1;
+      reset($checkout_pages);
+      $page_id = key($checkout_pages);
     }
 
     // Add the pane's name to the form array.
@@ -197,14 +183,14 @@ function theme_commerce_checkout_builder_form($variables) {
   $rows = array();
 
   // Loop through each page array in the form.
-  foreach (array_keys($form['checkout_pages']['#value']) as $page_id) {
+  foreach ($form['checkout_pages']['#value'] as $page_id => $checkout_page) {
     // Initialize the tabledrag for this page.
     drupal_add_tabledrag('panes', 'match', 'sibling', 'checkout-pane-page', 'checkout-pane-page-'. $page_id);
     drupal_add_tabledrag('panes', 'order', 'sibling', 'checkout-pane-weight', 'checkout-pane-weight-'. $page_id);
 
     // Add a non-draggable header row for each checkout page.
     $row = array(
-      array('data' => is_numeric($page_id) ? t('Page @page', array('@page' => $page_id)) : t('Disabled'), 'colspan' => 4),
+      array('data' => $checkout_page->title, 'colspan' => 4),
     );
 
     $rows[] = array('data' => $row, 'class' => array('page-header'));
@@ -216,7 +202,7 @@ function theme_commerce_checkout_builder_form($variables) {
     // placeholder for pages that do not have any panes.
     $rows[] = array(
       'data' => array(
-        array('data' => (is_numeric($page_id) ? t('No panes on this page.') : t('No disabled panes.')), 'colspan' => 4),
+        array('data' => $page_id != 'disabled' ? t('No panes on this page.') : t('No disabled panes.'), 'colspan' => 4),
       ),
       'class' => array('page-message page-'. $page_id .'-message', $class),
     );

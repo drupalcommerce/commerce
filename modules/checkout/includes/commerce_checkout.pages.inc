@@ -72,8 +72,9 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
   );
 
   // Load data for the current page in checkout.
-  $page_id = !empty($form_state['rebuild']) ? $form_state['storage']['page_id'] : 1;
-  $checkout_page = commerce_checkout_page_load($page_id);
+  $checkout_pages = commerce_checkout_pages();
+  $page_id = !empty($form_state['rebuild']) ? $form_state['storage']['page_id'] : key($checkout_pages);
+  $checkout_page = $checkout_pages[$page_id];
 
   $form['checkout_page'] = array(
     '#type' => 'value',
@@ -90,58 +91,25 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
     '#markup' => filter_xss($checkout_page->help),
   );
 
-  // If we're on one of the defined checkout form pages...
-  if (is_numeric($page_id)) {
-    // Add any enabled checkout panes for this page to the form.
-    foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $page_id)) as $pane_id => $checkout_pane) {
-      if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
-        // Create a fieldset for the pane.
-        $form[$pane_id] = array(
-          '#type' => 'fieldset',
-          '#title' => check_plain($checkout_pane->title),
-          '#collapsible' => $checkout_pane->collapsible,
-          '#collapsed' => $checkout_pane->collapsed,
-          '#attributes' => array('class' => array($pane_id)),
-          '#tree' => TRUE,
-        );
+  // Add any enabled checkout panes for this page to the form.
+  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $page_id)) as $pane_id => $checkout_pane) {
+    if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
+      // Create a fieldset for the pane.
+      $form[$pane_id] = array(
+        '#type' => 'fieldset',
+        '#title' => check_plain($checkout_pane->title),
+        '#collapsible' => $checkout_pane->collapsible,
+        '#collapsed' => $checkout_pane->collapsed,
+        '#attributes' => array('class' => array($pane_id)),
+        '#tree' => TRUE,
+      );
 
-        // Add the form data defined in the pane's form callback.
-        $form[$pane_id] += $callback($form_state, $checkout_pane, $order);
+      // Add the form data defined in the pane's form callback.
+      $form[$pane_id] += $callback($form_state, $checkout_pane, $order);
 
-        // Add the validate handler for the pane to the form array.
-        if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
-          $form['#validate'][] = $callback;
-        }
-      }
-    }
-  }
-  elseif ($page_id == 'review') {
-    // Otherwise add any enabled checkout panes that are visible on review.
-    $form['review'] = array(
-      '#theme' => 'commerce_checkout_review',
-      '#data' => array(),
-    );
-
-    // Load all the checkout panes enabled for the review page.
-    $checkout_panes = commerce_checkout_panes(array('enabled' => TRUE, 'review' => TRUE));
-
-    // Find the number of pages.
-    $checkout_pages = commerce_checkout_pages(FALSE);
-
-    // Loop through all the pages...
-    foreach (array_keys($checkout_pages) as $page_id) {
-      // Then loop through all the panes...
-      foreach ($checkout_panes as $pane_id => $checkout_pane) {
-        // And if the pane is on the current page and has a review callback...
-        if ($checkout_pane->page == $page_id && $callback = commerce_checkout_pane_callback($checkout_pane, 'review')) {
-          // Add a row for it in the review data.
-          $form['review']['#data'][$pane_id] = array(
-            'title' => $checkout_pane->title,
-          );
-
-          // Get the review data for this pane.
-          $form['review']['#data'][$pane_id]['data'] = $callback($form_state, $order);
-        }
+      // Add the validate handler for the pane to the form array.
+      if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
+        $form['#validate'][] = $callback;
       }
     }
   }
@@ -232,11 +200,6 @@ function commerce_checkout_form_submit($form, &$form_state) {
       if ($checkout_page->next_page) {
         // Move the form forward to that page.
         $form_state['storage']['page_id'] = $checkout_page->next_page;
-        $form_state['rebuild'] = TRUE;
-      }
-      elseif (variable_get('commerce_checkout_review_status', TRUE) && $checkout_page->page_id != 'review') {
-        // Otherwise, head to the review page if it's enabled.
-        $form_state['storage']['page_id'] = 'review';
         $form_state['rebuild'] = TRUE;
       }
       else {
