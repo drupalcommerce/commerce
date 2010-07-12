@@ -28,7 +28,7 @@ function commerce_product_reference_field_extra_fields() {
           $extra['node'][$bundle_name]['product:' . $product_field_name] = array(
             'label' => t('Product: @label', array('@label' => $product_field['label'])),
             'description' => t('Field from a referenced product.'),
-            'weight' => $product_field['weight'],
+            'weight' => $product_field['widget']['weight'],
           );
         }
       }

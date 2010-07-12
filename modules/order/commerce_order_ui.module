@@ -78,7 +78,6 @@ function commerce_order_ui_menu() {
     'page arguments' => array('commerce_order_settings_form'),
     'access arguments' => array('administer orders'),
     'file' => 'includes/commerce_order_ui.orders.inc',
-    'weight' => -10,
   );
   $items['admin/commerce/config/order/settings'] = array(
     'title' => 'Settings',

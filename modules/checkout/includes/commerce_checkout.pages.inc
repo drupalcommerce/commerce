@@ -49,11 +49,15 @@ function commerce_checkout_form($form, &$form_state, $order = NULL) {
   );
 
   // If no order was specified, look for one now.
+  // TODO: Order should not be an optional argument to this function; business
+  // logic should not exist in this callback. There should not be a dependency
+  // on Cart here or in the router.
   if (empty($order)) {
     $order = commerce_cart_order_load($user->uid);
   }
 
   // If an order can't be found, return a blank form.
+  // TODO: Also redundant. :-/
   if (empty($order)) {
     $form['empty'] = array(
       '#markup' => t('Add some items to your cart and then try checking out.'),
