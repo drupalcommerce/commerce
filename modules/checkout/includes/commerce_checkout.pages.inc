@@ -87,19 +87,19 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         );
       }
 
-      // Create a fieldset for the pane.
-      $form[$pane_id] = array(
-        '#type' => 'fieldset',
-        '#title' => check_plain($checkout_pane->title),
-        '#collapsible' => $checkout_pane->collapsible,
-        '#collapsed' => $checkout_pane->collapsed,
-        '#attributes' => array('class' => array($pane_id)),
-        '#tree' => TRUE,
-      );
-
-      // Add the form data defined in the pane's form callback.
+      // Create a fieldset for the pane and add the form data defined in the
+      // pane's form callback.
       $pane_values = isset($form_state['values'][$pane_id]) ? $form_state['values'][$pane_id] : array();
-      $form[$pane_id] += $callback($pane_values, $checkout_pane, $order);
+      if ($pane_form = $callback($pane_values, $checkout_pane, $order)) {
+        $form[$pane_id] = $pane_form + array(
+          '#type' => 'fieldset',
+          '#title' => check_plain($checkout_pane->title),
+          '#collapsible' => $checkout_pane->collapsible,
+          '#collapsed' => $checkout_pane->collapsed,
+          '#attributes' => array('class' => array($pane_id)),
+          '#tree' => TRUE,
+        );
+      }
     }
   }
 
