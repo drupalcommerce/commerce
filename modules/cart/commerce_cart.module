@@ -195,7 +195,7 @@ function commerce_cart_block_view($delta) {
         'quantity_raw' => $quantity,
         'quantity_label' => format_plural($quantity, 'item', 'items'),
         'quantity' => format_plural($quantity, '1 item', '@count items'),
-        'total_raw' => number_format(round(commerce_line_items_total($order->line_items, 'product'), 2), 2),
+        'total_raw' => number_format(round($total['price'], 2), 2),
         'total_label' => t('Total:'),
         'total' => commerce_currency_format($total['price'], $total['currency_code'], $order),
         'cart_links' => theme('links', array('links' => $cart_links)),
