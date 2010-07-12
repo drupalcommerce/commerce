@@ -171,6 +171,7 @@ function commerce_checkout_commerce_order_status_info() {
       'name' => 'checkout_' . $page_id,
       'title' => t('Checkout: @page', array('@page' => $checkout_page->name)),
       'state' => 'checkout',
+      'cart' => $checkout_page->status_cart,
       'weight' => $checkout_page->weight,
       'status' => 1,
     );
@@ -200,7 +201,7 @@ function commerce_checkout_pages() {
         'name' => $checkout_page->title,
         'title' => '',
         'help' => '',
-        'order_status' => TRUE,
+        'status_cart' => TRUE,
         'buttons' => TRUE,
         'back_value' => t('Back'),
         'submit_value' => t('Continue'),
@@ -281,6 +282,7 @@ function commerce_checkout_commerce_checkout_page_info() {
     'name' => t('Complete'),
     'title' => t('Checkout complete'),
     'weight' => 20,
+    'status_cart' => FALSE,
     'buttons' => FALSE,
   );
 
@@ -296,7 +298,7 @@ function commerce_checkout_commerce_checkout_page_info() {
  *     enabled value equal to TRUE would be included.
  *
  * @return
- *   The array of checkout panes, keyed by pane ID.
+ *   The array of checkout pane objects, keyed by pane ID.
  */
 function commerce_checkout_panes($conditions = array()) {
   $checkout_panes = &drupal_static(__FUNCTION__);
@@ -345,33 +347,33 @@ function commerce_checkout_panes($conditions = array()) {
     uasort($checkout_panes, 'commerce_sort_weight');
   }
 
+  // Apply conditions to the returned panes if specified.
   if (!empty($conditions)) {
-    $return = array();
+    $matching_panes = array();
 
     foreach ($checkout_panes as $pane_id => $checkout_pane) {
-      // Check the pane against the filter array to determine whether to add it
-      // to the panes array or not.
+      // Check the pane against the conditions array to determine whether to add
+      // it to the return array or not.
       $valid = TRUE;
 
-      foreach ($conditions as $attribute => $value) {
-        // If the current value for the specified attribute on the pane does not
+      foreach ($conditions as $property => $value) {
+        // If the current value for the specified property on the pane does not
         // match the filter value...
-        if ($checkout_pane->{$attribute} != $value) {
+        if ($checkout_pane->{$property} != $value) {
           // Do not add it to the temporary array.
           $valid = FALSE;
         }
       }
 
       if ($valid) {
-        $return[$pane_id] = $checkout_pane;
+        $matching_panes[$pane_id] = $checkout_pane;
       }
     }
 
-    return $return;
+    return $matching_panes;
   }
-  else {
-    return $checkout_panes;
-  }
+
+  return $checkout_panes;
 }
 
 /**

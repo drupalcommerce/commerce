@@ -539,19 +539,20 @@ function commerce_order_state_get_title($name = NULL) {
  * hook_commerce_order_status_info() and update them based on the data in the
  * database. The final array will be cached for subsequent calls.
  *
- * @param $state
- *   Optionally specify the name of an order state to limit the returned values
- *     to that particular state.
+ * @param $conditions
+ *   An array of conditions to filter the returned list by; for example, if you
+ *     specify 'state' => 'cart' in the array, then only order statuses in the
+ *     cart state would be included.
  *
  * @return
- *   An array containing some or all of the defined order status objects.
+ *   The array of order status objects, keyed by status name.
  */
-function commerce_order_statuses($state = '') {
+function commerce_order_statuses($conditions = array()) {
   // First check the static cache for an order statuses array.
   $order_statuses = &drupal_static(__FUNCTION__);
 
   // If it did not exist, fetch the statuses now.
-  if (empty($order_statuses)) {
+  if (!isset($order_statuses)) {
     $order_statuses = module_invoke_all('commerce_order_status_info');
 
     $saved_statuses = db_query('SELECT * FROM {commerce_order_status}')->fetchAllAssoc('name');
@@ -562,19 +563,45 @@ function commerce_order_statuses($state = '') {
       $order_statuses[$name]->saved = TRUE;
     }
 
+    // Merge in defaults.
+    foreach ($order_statuses as $name => $order_status) {
+      // Set some defaults for the checkout pane.
+      $defaults = array(
+        'cart' => FALSE,
+        'weight' => 0,
+        'status' => 1,
+      );
+      $order_status = (object) array_merge($defaults, (array) $order_status);
+
+      $order_statuses[$name] = $order_status;
+    }
+
     // Give other modules a chance to alter the order statuses.
     drupal_alter('commerce_order_status_info', $order_statuses);
 
     uasort($order_statuses, 'commerce_sort_weight');
   }
 
-  // If an order state was specified, return only those results.
-  if (!empty($state)) {
-    $matching_statuses = clone($order_statuses);
+  // Apply conditions to the returned statuses if specified.
+  if (!empty($conditions)) {
+    $matching_statuses = array();
 
-    foreach ($matching_statuses as $name => $data) {
-      if ($data->state != $state) {
-        unset($matching_statuses[$name]);
+    foreach ($order_statuses as $name => $order_status) {
+      // Check the status against the conditions array to determine whether to
+      // add it to the return array or not.
+      $valid = TRUE;
+
+      foreach ($conditions as $property => $value) {
+        // If the current value for the specified property on the pane does not
+        // match the filter value...
+        if ($order_status->{$property} != $value) {
+          // Do not add it to the temporary array.
+          $valid = FALSE;
+        }
+      }
+
+      if ($valid) {
+        $matching_statuses[$name] = $order_status;
       }
     }
 
