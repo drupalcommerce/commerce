@@ -5,13 +5,12 @@
  * Payment pane: form callback.
  */
 function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
-  $form = array();
-
   // Invoke the payment methods event that will populate the order with
   // available payment methods.
   $order->payment_methods = array();
   rules_invoke_event('commerce_payment_methods', $order);
 
+  // Generate the list of payment method options.
   $payment_method_options = array();
   if (!empty($order->payment_methods)) {
     foreach ($order->payment_methods as $payment_method) {
@@ -22,14 +21,18 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
     }
   }
 
+  // Display the payment method selection form.
   if ($payment_method_options) {
     $form['payment_method'] = array(
       '#type' => 'radios',
       '#options' => $payment_method_options,
     );
 
-    if (isset($order->payment_method)) {
-      $form['payment_method']['#default_value'] = $order->payment_method;
+    if (isset($order->data['payment_method'])) {
+      $form['payment_method']['#default_value'] = $order->data['payment_method'];
+    }
+    else if (isset($pane_values['payment_method'])) {
+      $form['payment_method']['#default_value'] = $pane_values['payment_method'];
     }
     else {
       // Select the first element.
@@ -38,19 +41,73 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
     }
   }
 
-  return $form;
-}
+  // Display the payment-method form.
+  $current_payment_method = $order->payment_methods[$form['payment_method']['#default_value']];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['submit_form'])) {
+    $form['payment'] = $callback($current_payment_method, $pane_values, $checkout_pane, $order);
+  }
 
-/**
- * Payment pane: validation callback.
- */
-function commerce_payment_pane_form_validate($form, &$form_state, $order) {
-  $order->payment_method = $form_state['values']['commerce_payment']['payment_method'];
+  return $form;
 }
 
 /**
  * Payment pane: submit callback.
  */
-function commerce_payment_pane_form_submit($form, &$form_state, $order) {
-  $order->payment_method = $form_state['values']['commerce_payment']['payment_method'];
+function commerce_payment_pane_form_submit($pane_form, $pane_values, $order) {
+  $order->data['payment_method'] = $pane_values['payment_method'];
+}
+
+/**
+ * Payment redirect pane: form callback.
+ */
+function commerce_payment_redirect_pane_form($pane_values, $checkout_pane, $order) {
+  // Simply pass the control to the payment method.
+  $current_payment_method = $order->payment_methods[$order->payment_method];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['redirect_form'])) {
+    $form = $callback($current_payment_method, $pane_values, $checkout_pane, $order);
+  }
+  return $form;
+}
+
+/**
+ * Utility function: return a payment redirect page for POST.
+ *
+ * @param $action
+ *   The destination URL the values should be posted to.
+ * @param $values
+ *   An associative array of values that will be posted to the destination URL.
+ * @return
+ *   A renderable array.
+ */
+function commerce_payment_post_redirect_form($action, array $values = array()) {
+  $form = array(
+    '#type' => 'form',
+    '#action' => $action,
+    '#method' => 'POST',
+    '#id' => '',
+    '#attributes' => array(),
+  );
+  foreach ($values as $key => $value) {
+    $form[$value] = array(
+      '#type' => 'hidden',
+      '#name' => $key,
+      '#value' => $value,
+      '#id' => '',
+      '#attributes' => array(),
+    );
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#id' => '',
+    '#value' => t('Process to payment'),
+  );
+
+  return array(
+    'form' => array(
+      '#type' => 'markup',
+      '#markup' => drupal_render($form),
+    ),
+  );
 }
