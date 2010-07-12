@@ -16,12 +16,9 @@ class commerce_product_handler_field_commerce_product_product extends views_hand
     if (!empty($this->options['link_to_product'])) {
       $this->additional_fields['product_id'] = 'product_id';
 
-      // TODO: Decide whether or not product titles need to be translatable.
-      /**
       if (module_exists('translation')) {
         $this->additional_fields['language'] = array('table' => 'commerce_product', 'field' => 'language');
       }
-      **/
     }
   }
 

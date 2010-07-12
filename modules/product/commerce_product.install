@@ -44,6 +44,13 @@ function commerce_product_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'language' => array(
+        'description' => 'The {languages}.language of this product.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'title' => array(
         'description' => 'The title of this product, always treated as non-markup plain text.',
         'type' => 'varchar',
