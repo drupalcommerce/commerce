@@ -55,7 +55,8 @@ function commerce_checkout_settings_form() {
       '#type'  => 'textfield',
       '#title' => t('Redirect destination from checkout, when cart is empty.'),
       '#default_value' => variable_get('commerce_checkout_empty_cart_redirect', NULL),
-      '#description' => t("This will be relative to your site location <em>@url</em> <br />Valid values are alias urls or actual drupal urls, examples: <em>product/purple-sweater</em> or <em>node/12</em><br />Leave blank or set to <em>&lt;front&gt;</em> to redirect to site home page.", array("@url" => $base_url ."/")),
+      '#field_prefix' => $base_url .'/',
+      '#description' => t("Valid values are alias urls or internal drupal paths, examples: <em>product/purple-sweater</em> or <em>node/12</em>"),
   );
   return system_settings_form($form);
 }
