@@ -143,6 +143,43 @@ function commerce_checkout_forms($form_id, $args) {
 }
 
 /**
+ * Implements hook_commerce_order_state_info().
+ */
+function commerce_checkout_commerce_order_state_info() {
+  $order_states = array();
+
+  $order_states['checkout'] = (object) array(
+    'name' => 'checkout',
+    'title' => t('Checkout'),
+    'description' => t('Orders in this state have begun but not completed the checkout process.'),
+    'weight' => -3,
+    'default_status' => 'checkout_checkout',
+  );
+
+  return $order_states;
+}
+
+/**
+ * Implements hook_commerce_order_status_info().
+ */
+function commerce_checkout_commerce_order_status_info() {
+  $order_statuses = array();
+
+  // Create an order status to correspond with every checkout page.
+  foreach (commerce_checkout_pages() as $page_id => $checkout_page) {
+    $order_statuses['checkout_' . $page_id] = (object) array(
+      'name' => 'checkout_' . $page_id,
+      'title' => t('Checkout: @page', array('@page' => $checkout_page->name)),
+      'state' => 'checkout',
+      'weight' => $checkout_page->weight,
+      'status' => 1,
+    );
+  }
+
+  return $order_statuses;
+}
+
+/**
  * Returns an array of checkout pages defined by enabled modules.
  *
  * @return
@@ -160,8 +197,10 @@ function commerce_checkout_pages() {
     foreach ($checkout_pages as $page_id => $checkout_page) {
       $defaults = array(
         'page_id' => $page_id,
+        'name' => $checkout_page->title,
         'title' => '',
         'help' => '',
+        'order_status' => TRUE,
         'buttons' => TRUE,
         'back_value' => t('Back'),
         'submit_value' => t('Continue'),
@@ -231,6 +270,7 @@ function commerce_checkout_commerce_checkout_page_info() {
 
   // Define a page for reviewing the data entered during checkout.
   $pages['review'] = (object) array(
+    'name' => t('Review'),
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
     'weight' => 10,
@@ -238,6 +278,7 @@ function commerce_checkout_commerce_checkout_page_info() {
 
   // Define a page for checkout completion with no submit buttons on it.
   $pages['complete'] = (object) array(
+    'name' => t('Complete'),
     'title' => t('Checkout complete'),
     'weight' => 20,
     'buttons' => FALSE,
@@ -408,6 +449,7 @@ function commerce_checkout_pane_reset($pane_id) {
  */
 function commerce_checkout_pane_callback($checkout_pane, $callback) {
   // Include the checkout pane file if specified.
+  // TODO: consider switching to a hook_hook_info() approach instead.
   if (!empty($checkout_pane->file)) {
     $parts = explode('.', $checkout_pane->file);
 

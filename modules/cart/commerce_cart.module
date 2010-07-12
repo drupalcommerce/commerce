@@ -57,7 +57,7 @@ function commerce_cart_commerce_order_status_info() {
     'title' => t('Shopping cart'),
     'state' => 'cart',
     'weight' => 0,
-    'status' => 2,
+    'status' => 1,
   );
 
   return $order_statuses;
