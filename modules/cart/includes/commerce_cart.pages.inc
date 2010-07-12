@@ -21,7 +21,8 @@ function commerce_cart_checkout_router() {
 	// empty shopping cart page.
   if (empty($order)) {
     drupal_set_message(t('Add some items to your cart and then try checking out.'));
-    drupal_goto('<front>');
+    $redirect_location = variable_get('commerce_checkout_empty_cart_redirect', '<front>');
+    drupal_goto($redirect_location);
   }
 
   drupal_goto('checkout/' . $order->order_id);
