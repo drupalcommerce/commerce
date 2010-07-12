@@ -500,15 +500,6 @@ function commerce_cart_field_formatter_info() {
       'description' => t('Display an Add to Cart form for the referenced product.'),
       'field types' => array('commerce_product_reference'),
     ),
-    /**
-     * TODO: Determine how to best handle cart links through Rules and then
-     * develop the actual formatter_view for this.
-    'commerce_cart_add_to_cart_link' => array(
-      'label' => t('Add to Cart link'),
-      'description' => t('Display an Add to Cart link for the referenced product.'),
-      'field types' => array('commerce_product_reference'),
-    ),
-    **/
   );
 }
 
