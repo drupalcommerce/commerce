@@ -2,12 +2,67 @@
 // $Id$
 
 /**
- * Displays a view of a product entity.
+ * @file
  */
-function commerce_product_ui_product_view($mode, $product) {
-  commerce_product_ui_set_breadcrumb();
 
-  return '<pre>' . print_r($product, TRUE) . '</pre>';
+
+/**
+ * Generate an array for rendering the given product.
+ *
+ * @param $product
+ *   A fully loaded product object.
+ * @param $view_mode
+ *   The view mode for displaying the product, 'full', 'node_full',
+ *     'node_teaser', or 'node_rss'.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function commerce_product_ui_product_view($product, $view_mode = 'full', $breadcrumb = TRUE) {
+  // Set the breadcrumb for the appropriate view mode if specified.
+  if ($breadcrumb) {
+    commerce_product_ui_set_breadcrumb();
+  }
+
+  // Populate $product->content with a render() array.
+  commerce_product_ui_build_content($product, $view_mode);
+
+  // Remove the content array from the product to avoid duplicate rendering.
+  $build = $product->content;
+  unset($product->content);
+
+  $build += array(
+    '#theme' => 'commerce_product',
+    '#product' => $product,
+    '#view_mode' => $view_mode,
+  );
+
+  // Allow modules to modify the final build array.
+  drupal_alter('commerce_product_view', $build);
+
+  return $build;
+}
+
+/**
+ * Builds a structured array representing the product's content.
+ *
+ * @param $product
+ *   The fully loaded product object being built for display.
+ * @param $view_mode
+ *   The view mode for displaying the product, 'full', 'node_full',
+ *     'node_teaser', or 'node_rss'.
+ */
+function commerce_product_ui_build_content(&$product, $view_mode = 'full') {
+  // Remove previously built content, if it exists.
+  $product->content = array();
+
+  // Build fields content.
+  field_attach_prepare_view('commerce_product', array($product->product_id => $product), $view_mode);
+  entity_prepare_view('commerce_product', array($product->product_id => $product));
+  $product->content += field_attach_view('commerce_product', $product, $view_mode);
+
+  // Allow modules to make their own additions to the product content.
+  module_invoke_all('commerce_product_view', $product, $view_mode);
 }
 
 /**
@@ -193,7 +248,7 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
   if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
     $form_state['redirect'] = 'admin/commerce/products/add/' . $product->type;
   }
-  else {
+  elseif (arg(2) == 'products' && arg(3) == 'add') {
     $form_state['redirect'] = 'admin/commerce/products';
   }
 }

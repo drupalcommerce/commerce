@@ -40,13 +40,13 @@ function commerce_product_ui_menu() {
     'title callback' => 'commerce_product_ui_product_title',
     'title arguments' => array(3),
     'page callback' => 'commerce_product_ui_product_view',
-    'page arguments' => array('administrator', 3),
+    'page arguments' => array(3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('view', 3),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
-  $items['admin/commerce/products/%commerce_order/view'] = array(
+  $items['admin/commerce/products/%commerce_product/view'] = array(
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,

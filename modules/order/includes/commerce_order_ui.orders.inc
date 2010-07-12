@@ -1,6 +1,10 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ */
+
 
 /**
  * Form callback: edit the global order settings.
@@ -63,7 +67,7 @@ function commerce_order_ui_order_view($order, $view_mode = 'administrator', $bre
  *   The view mode for displaying the order, 'administrator' or 'customer'.
  */
 function commerce_order_ui_build_content(&$order, $view_mode = 'administrator') {
-  // Remove previously built content, if exists.
+  // Remove previously built content, if it exists.
   $order->content = array();
 
   // Build fields content.
