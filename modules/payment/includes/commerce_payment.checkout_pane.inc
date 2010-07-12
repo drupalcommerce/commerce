@@ -21,6 +21,12 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
     }
   }
 
+  // Store the payment methods in the form for validation purposes.
+  $form['payment_methods'] = array(
+    '#type' => 'value',
+    '#value' => $order->payment_methods,
+  );
+
   // Display the payment method selection form.
   if ($payment_method_options) {
     $form['payment_method'] = array(
@@ -52,23 +58,81 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
 }
 
 /**
+ * Payment pane: validation callback.
+ */
+function commerce_payment_pane_form_validate($pane_form, $pane_values, $order) {
+  if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
+    // Always rebuild the pane if the method changed.
+    // TODO: do not rebuild if the payment method doesn't have a form callback.
+    return FALSE;
+  }
+
+  // Delegate validation to the payment method callback.
+  $current_payment_method = $pane_values['payment_methods'][$pane_values['payment_method']];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['submit_form_validate'])) {
+    return $callback($current_payment_method, $pane_form['payment'], $pane_values['payment'], $order);
+  }
+
+  // Nothing to validate.
+  return TRUE;
+}
+
+/**
  * Payment pane: submit callback.
  */
 function commerce_payment_pane_form_submit($pane_form, $pane_values, $order) {
   $order->data['payment_method'] = $pane_values['payment_method'];
+
+  // Delegate submit to the payment method callback.
+  $current_payment_method = $pane_values['payment_methods'][$pane_values['payment_method']];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['submit_form_submit'])) {
+    return $callback($current_payment_method, $pane_form['payment'], $pane_values['payment'], $order);
+  }
 }
 
 /**
  * Payment redirect pane: form callback.
  */
 function commerce_payment_redirect_pane_form($pane_values, $checkout_pane, $order) {
-  // Simply pass the control to the payment method.
+  // Delegate to the payment method.
   $current_payment_method = $order->payment_methods[$order->payment_method];
   $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
   if (function_exists($callback = $payment_method_info['callbacks']['redirect_form'])) {
     $form = $callback($current_payment_method, $pane_values, $checkout_pane, $order);
   }
   return $form;
+}
+
+/**
+ * Payment redirect pane: validate callback.
+ */
+function commerce_payment_redirect_pane_form_validate($pane_values, $checkout_pane, $order) {
+  // Delegate to the payment method.
+  $current_payment_method = $order->payment_methods[$order->payment_method];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['redirect_form_validate'])) {
+    return $callback($current_payment_method, $pane_values, $checkout_pane, $order);
+  }
+  else {
+    return TRUE;
+  }
+}
+
+/**
+ * Payment redirect pane: submit callback.
+ */
+function commerce_payment_redirect_pane_form_submit($pane_values, $checkout_pane, $order) {
+  // Simply pass the control to the payment method.
+  $current_payment_method = $order->payment_methods[$order->payment_method];
+  $payment_method_info = commerce_payment_method($current_payment_method['method_id']);
+  if (function_exists($callback = $payment_method_info['callbacks']['redirect_form_submit'])) {
+    $form = $callback($current_payment_method, $pane_values, $checkout_pane, $order);
+  }
+  else {
+    return TRUE;
+  }
 }
 
 /**

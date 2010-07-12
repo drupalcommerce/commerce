@@ -17,11 +17,42 @@ function commerce_payment_null_commerce_payment_method_info() {
   return $methods;
 }
 
-function _commerce_payment_null_settings($settings = NULL) {
+/**
+ * Settings callback for the payment method.
+ */
+function commerce_payment_null_settings($settings = NULL) {
   $form['test'] = array(
     '#type' => 'textfield',
     '#title' => t('Test of field'),
     '#default_value' => isset($settings['test']) ? $settings['test'] : '',
   );
   return $form;
+}
+
+/**
+ * Checkout form callback for the payment method.
+ */
+function commerce_payment_null_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
+  // Merge in values from the order.
+  if (isset($order->data['commerce_payment_null'])) {
+    $pane_values += $order->data['commerce_payment_null'];
+  }
+  // Merge in default values.
+  $pane_values += array(
+    'name' => '',
+  );
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#default_value' => $pane_values['name'],
+  );
+  return $form;
+}
+
+/**
+ * Submission form callback for the payment method.
+ */
+function commerce_payment_null_submit_form_submit($payment_method, $pane_form, $pane_values, $order) {
+  $order->data['commerce_payment_null'] = $pane_values;
 }
