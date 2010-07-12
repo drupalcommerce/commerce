@@ -157,6 +157,13 @@ function commerce_product_views_data() {
   );
 
   // Expose links to operate on the product.
+  $data['commerce_product']['view_product'] = array(
+    'field' => array(
+      'title' => t('Link'),
+      'help' => t('Provide a simple link to the administrator view of the product.'),
+      'handler' => 'commerce_product_handler_field_product_link',
+    ),
+  );
   $data['commerce_product']['edit_product'] = array(
     'field' => array(
       'title' => t('Edit link'),
@@ -164,7 +171,6 @@ function commerce_product_views_data() {
       'handler' => 'commerce_product_handler_field_product_link_edit',
     ),
   );
-
   $data['commerce_product']['delete_product'] = array(
     'field' => array(
       'title' => t('Delete link'),
