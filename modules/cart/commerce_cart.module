@@ -328,36 +328,10 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
 
   // If no matching line item was found...
   if (empty($line_item_match)) {
-    // Add the product to the order.
+    // Create the new product line item.
+    $line_item = commerce_product_line_item_new($product, $quantity);
 
-    // TODO: Create an API function in the line item module for adding a new line
-    // item of any type to an order.
-    $line_item = commerce_line_item_new('product');
-    $line_item->line_item_label = $product->sku;
-    $line_item->quantity = $quantity;
-
-    // Reference the product.
-    $line_item->product = array(
-      LANGUAGE_NONE => array(
-        array(
-          'product_id' => $product_id,
-        ),
-      ),
-    );
-
-    // Set the unit price on the line item object.
-    $line_item->unit_price = array(
-      LANGUAGE_NONE => array(
-        array(
-          'price' => $product->base_price[LANGUAGE_NONE][0]['price'],
-          'currency_code' => $product->base_price[LANGUAGE_NONE][0]['currency_code'],
-        )
-      )
-    );
-
-    // Save the line item and add it to the order.
-    $line_item = commerce_line_item_save($line_item);
-
+    // Add it to the order's line item reference value.
     $order->line_items[LANGUAGE_NONE][] = array(
       'line_item_id' => $line_item->line_item_id,
     );

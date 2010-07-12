@@ -691,12 +691,58 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
   // Load the selected product.
   $product = commerce_product_load($element['actions']['product_id']['#value']);
 
+  // Populate the line item with the product data.
+  commerce_product_line_item_populate($line_item, $product, NULL, $element['#language']);
+}
+
+/**
+ * Creates a new product line item populated with the proper product values.
+ *
+ * @param $product
+ *   The fully loaded product referenced by the line item.
+ * @param $quantity
+ *   The quantity to set for the product.
+ * @param $language
+ *   Optionally specify the language for the line item.
+ *
+ * @return
+ *   The fully loaded line item populated with the product data as specified.
+ */
+function commerce_product_line_item_new($product, $quantity = 1, $language = LANGUAGE_NONE) {
+  // Create the new line item.
+  $line_item = commerce_line_item_new('product');
+
+  // Populate it with the product information.
+  commerce_product_line_item_populate($line_item, $product, $quantity, $language);
+
+  // Return the saved line item.
+  return commerce_line_item_save($line_item);
+}
+
+/**
+ * Populates an existing product line item with the product and quantity data.
+ *
+ * @param &$line_item
+ *   The fully loaded line item.
+ * @param $product
+ *   The fully loaded product referenced by the line item.
+ * @param $quantity
+ *   The quantity to set for the line item or NULL to leave it unchanged.
+ * @param $language
+ *   Optionally specify the language for the line item.
+ */
+function commerce_product_line_item_populate(&$line_item, $product, $quantity = NULL, $language = LANGUAGE_NONE) {
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
+  // Only update the quantity value if one is specified.
+  if (!empty($quantity)) {
+    $line_item->quantity = $quantity;
+  }
+
   // Add the product reference value to the line item for the right language.
   $line_item->product = array(
-    $element['#language'] => array(
+    $language => array(
       array(
         'product_id' => $product->product_id,
       ),
@@ -705,12 +751,12 @@ function commerce_product_line_item_add_submit(&$line_item, $element, &$form_sta
 
   // Set the unit price on the line item object.
   $line_item->unit_price = array(
-    $element['#language'] => array(
+    $language => array(
       array(
-        'price' => $product->base_price[$element['#language']][0]['price'],
-        'currency_code' => $product->base_price[$element['#language']][0]['currency_code'],
-      ),
-    ),
+        'price' => $product->base_price[$language][0]['price'],
+        'currency_code' => $product->base_price[$language][0]['currency_code'],
+      )
+    )
   );
 }
 

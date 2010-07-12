@@ -3,7 +3,7 @@ name = Line Item
 description = Defines the Line Item entity and associated features.
 package = Drupal Commerce
 dependencies[] = rules
-; dependencies[] = commerce_price
+dependencies[] = commerce_price
 core = 7.x
 
 ; Base module files
