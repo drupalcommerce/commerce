@@ -1,0 +1,150 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Tests for basic Payment features.
+ */
+
+class CommercePaymentTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Payment',
+      'description' => 'Basic payment tests.',
+      'group' => 'Drupal Commerce - Payment',
+    );
+  }
+
+  /**
+   * The name of the payment method to test.
+   */
+  var $paymentMethod = 'null';
+
+  /**
+   * Utility method: create a product node type.
+   */
+  protected function createProductNodeType() {
+    // Create a node type to display this product on the front-office.
+    $type = array(
+      'type' => 'product',
+      'name' => t('Product'),
+      'base' => 'node_content',
+      'description' => '',
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    );
+
+    $type = $this->drupalCreateContentType($type);
+
+    // Add a product reference field there.
+    $field = array(
+      'field_name' => 'field_product',
+      'type' => 'commerce_product_reference',
+      'entity_types' => array('node'),
+      'translatable' => TRUE,
+      'settings' => array(
+        'referenceable_types' => array(
+          'product' => 'product',
+        ),
+      ),
+    );
+    $field = field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'field_product',
+      'entity_type' => 'node',
+      'bundle' => $type->type,
+      'label' => 'Product',
+      'widget_type' => 'commerce_product_reference_autocomplete',
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_cart_add_to_cart_form',
+        ),
+      ),
+    );
+    $instance = field_create_instance($instance);
+
+    return $type;
+  }
+
+  /**
+   * Utility method: create a test order.
+   */
+  protected function createTestOrder() {
+    $test_product = commerce_product_new('product');
+    // Create a test product.
+    $test_product->type = 'product';
+    $test_product->sku = 'TEST-SKU';
+    $test_product->title = 'Test product';
+    $test_product->base_price = array(
+      LANGUAGE_NONE => array(
+        array(
+          'price' => 10,
+          'currency_code' => 'USD',
+        ),
+      ),
+    );
+    $status = commerce_product_save($test_product);
+
+    $node = $this->drupalCreateNode(array(
+      'type' => 'product',
+      'title' => 'Product test',
+      'field_product' => array(
+        LANGUAGE_NONE => array(
+          array('product_id' => $test_product->product_id),
+        ),
+      ),
+    ));
+
+    // Submit the add to cart form.
+    $this->drupalPost('node/' . $node->nid, array(), t('Add to cart'));
+  }
+
+  /**
+   * Utility method: submit the checkout form with payment.
+   */
+  protected function checkoutWithPayment() {
+    // On the checkout page.
+    $this->drupalGet('checkout');
+    $this->drupalPost(NULL, array(), t('Continue'));
+
+    // On the review page.
+    $this->drupalPost(NULL, array(), t('Continue'));
+
+    // Order complete.
+    $this->assertText(t('Checkout complete'));
+  }
+
+  public function setUp() {
+    parent::setUp(array(
+      'commerce',
+      'commerce_product',
+      'commerce_product_ui',
+      'commerce_product_reference',
+      'commerce_price',
+      'commerce_ui',
+      'commerce_order',
+      'commerce_line_item',
+      'commerce_cart',
+      'commerce_checkout',
+      'commerce_payment',
+    ));
+
+    $this->createProductNodeType();
+
+    $this->adminUser = $this->drupalCreateUser(array('administer products', 'create product content'));
+    $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * Test basic payment workflow.
+   */
+  public function testBasicPayment() {
+    $this->createTestOrder();
+
+    $this->checkoutWithPayment();
+  }
+}
+

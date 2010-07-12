@@ -1,0 +1,11 @@
+; $Id$
+name = Test payment gateways
+description = Implement test payment gateways for Drupal Commerce.
+package = Drupal Commerce - Payment
+dependencies[] = commerce
+dependencies[] = commerce_payment
+core = 7.x
+hidden = TRUE
+
+; Base module files
+files[] = commerce_payment_test.module

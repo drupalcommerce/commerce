@@ -1,0 +1,39 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Default Payment UI for Drupal Commerce.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_payment_ui_menu() {
+  $items['admin/commerce/orders/%commerce_order/payment'] = array(
+    'title' => 'Payment',
+    'page callback' => 'commerce_payment_ui_page',
+    'page arguments' => array(3),
+    'access callback' => 'commerce_order_access',
+    'access arguments' => array('payment', 3),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  // Administrative area.
+  $items['admin/commerce/config/payment'] = array(
+    'title' => 'Payment settings',
+    'page callback' => 'commerce_payment_ui_admin_page',
+    'page arguments' => array(),
+    'access arguments' => array('administer payment'),
+    'file' => 'includes/commerce_payment_ui.admin.inc'
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback; display the payment administration tab.
+ */
+function commerce_payment_ui_page($order) {
+  return '';
+}

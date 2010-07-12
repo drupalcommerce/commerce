@@ -1,0 +1,99 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_commerce_checkout_page_info().
+ */
+function commerce_payment_commerce_checkout_page_info() {
+  $pages['payment'] = (object) array(
+    'title' => t('Payment'),
+    'help' => t('Off-site payment pseudo-page.'),
+    'locked' => TRUE,
+    'weight' => 20,
+  );
+  return $pages;
+}
+
+/**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function commerce_payment_commerce_checkout_pane_info() {
+  $panes['commerce_payment'] = (object) array(
+    'title' => t('Payment'),
+    'page' => 'checkout',
+    'locked' => TRUE,
+    'file' => 'includes/commerce_payment.checkout_pane.inc',
+    'callbacks' => array(
+      'settings_form' => 'commerce_payment_pane_settings_form',
+      'checkout_form' => 'commerce_payment_pane_form',
+      'checkout_form_validate' => 'commerce_payment_pane_form_validate',
+      'checkout_form_submit' => 'commerce_payment_pane_form_submit',
+      'review' => 'commerce_payment_pane_review',
+    ),
+    'weight' => 10,
+  );
+  $panes['commerce_payment_redirect'] = (object) array(
+    'title' => t('Off-site payment redirect'),
+    'page' => 'payment',
+    'locked' => TRUE,
+    'file' => 'includes/commerce_payment.checkout_pane.inc',
+    'callbacks' => array(
+      'settings_form' => 'commerce_payment_redirect_pane_settings_form',
+      'checkout_form' => 'commerce_payment_redirect_pane_form',
+      'checkout_form_submit' => 'commerce_payment_redirect_pane_form_submit',
+      'review' => 'commerce_payment_redirect_pane_review',
+    ),
+  );
+  return $panes;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_payment_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_payment') . '/includes/views',
+  );
+}
+
+/**
+ * Load all the available payment methods.
+ */
+function commerce_payment_methods() {
+  $methods = &drupal_static(__FUNCTION__);
+
+  if (!isset($methods)) {
+    $methods = module_invoke_all('commerce_payment_method_info');
+    drupal_alter('commerce_payment_method_info', $methods);
+
+    foreach ($methods as $method_id => &$method) {
+      $method['method_id'] = $method_id;
+
+      // Merge in defaults.
+      $method += array(
+        'base' => $method['method_id'],
+        'title' => '',
+        'description' => '',
+        'callbacks' => array(),
+      );
+
+      // Merge in default callbacks.
+      foreach (array('settings', 'submit', 'capture', 'refund') as $callback) {
+        if (!isset($method['callbacks'][$callback])) {
+          $method['callbacks'][$callback] = $method['base'] . '_' . $callback;
+        }
+      }
+    }
+  }
+
+  return $methods;
+}
+
+/**
+ * Load a single payment method.
+ */
+function commerce_payment_method($method_id) {
+  $payment_methods = commerce_payment_methods();
+  return isset($payment_methods[$method_id]) ? $payment_methods[$method_id] : NULL;
+}

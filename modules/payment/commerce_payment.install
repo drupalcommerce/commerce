@@ -1,0 +1,83 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Installation functions for Drupal Commerce Payment.
+ */
+
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_payment_schema() {
+  $schema['commerce_payment_transaction'] = array(
+    'description' => 'Payment transactions for orders.',
+    'fields' => array(
+      'transaction_id' => array(
+        'description' => 'The primary identifier for a transaction.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when this transaction was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'payment_method' => array(
+        'description' => 'The payment method for this transaction.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'remote_id' => array(
+        'description' => 'The remote identifier for this transaction.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'message' => array(
+        'description' => 'The human-readable message associated to this transaction.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'message_variables' => array(
+        'description' => 'The variables associated with the human-readable message.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'amount' => array(
+        'description' => 'The amount of this transaction.',
+        'type' => 'numeric',
+        'precision' => 16,
+        'scale' => 5,
+        'not null' => TRUE,
+      ),
+      'currency_code' => array(
+        'description' => 'The currency code for the price.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'The status of this transaction (success, failure).',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+      ),
+      'payload' => array(
+        'description' => 'The payment-gateway specific payload associated with this transaction.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('transaction_id'),
+  );
+
+  return $schema;
+}

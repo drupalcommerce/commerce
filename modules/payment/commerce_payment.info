@@ -1,0 +1,18 @@
+; $Id$
+name = Payment
+description = Implement core payment features for Drupal commerce.
+package = Drupal Commerce
+dependencies[] = commerce
+dependencies[] = commerce_order
+core = 7.x
+
+; Base module files
+files[] = commerce_payment.module
+files[] = commerce_payment.install
+
+; Tests
+files[] = tests/commerce_payment.payment.test
+
+; Views handlers
+files[] = includes/views/handlers/commerce_payment_handler_area_total.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_status.inc

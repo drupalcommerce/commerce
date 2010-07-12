@@ -1,0 +1,27 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Provides a NULL payment method for Drupal Commerce.
+ */
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_payment_null_commerce_payment_method_info() {
+  $methods['commerce_payment_null'] = array(
+    'title' => t('No payment'),
+    'description' => t('No payment necessary.'),
+  );
+  return $methods;
+}
+
+function _commerce_payment_null_settings($settings = NULL) {
+  $form['test'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Test of field'),
+    '#default_value' => isset($settings['test']) ? $settings['test'] : '',
+  );
+  return $form;
+}
