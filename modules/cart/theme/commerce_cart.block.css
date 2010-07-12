@@ -7,3 +7,19 @@
 .cart-footer {
   text-align: right;
 }
+
+.cart-footer .cart-quantity {
+  float: left;
+}
+
+.cart-footer .cart-total label {
+  font-weight: bold;
+}
+
+.cart-footer .links {
+  clear: left;
+}
+
+.cart-footer .links li.last {
+  padding-right: 0;
+}
