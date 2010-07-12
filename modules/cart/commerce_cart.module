@@ -114,10 +114,12 @@ function commerce_cart_user_login(&$edit, $account) {
   // user's cart and wipe the anonymous cart.
   if (count($anonymous_order->line_items[LANGUAGE_NONE]) > 0) {
 
-    // Add each of anonymous cart items to the authenticated user's cart.
+    // Add each of the anonymous cart items to the authenticated user's cart.
+    $line_item_ids = array();
     foreach ($anonymous_order->line_items[LANGUAGE_NONE] as $line_item_reference) {
-      $line_item_id = $line_item_reference['line_item_id'];
-      $line_item = commerce_line_item_load($line_item_id);
+      $line_item_ids[] = $line_item_reference['line_item_id'];
+    }
+    foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
       commerce_cart_product_add($account->uid, $line_item->product[LANGUAGE_NONE][0]['product_id'], $line_item->quantity);
     }
 
