@@ -5,12 +5,15 @@
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_payment_commerce_checkout_page_info() {
+  $pages = array();
+
   $pages['payment'] = (object) array(
     'title' => t('Payment'),
     'help' => t('Off-site payment pseudo-page.'),
     'locked' => TRUE,
     'weight' => 20,
   );
+
   return $pages;
 }
 
@@ -18,9 +21,11 @@ function commerce_payment_commerce_checkout_page_info() {
  * Implements hook_commerce_checkout_pane_info().
  */
 function commerce_payment_commerce_checkout_pane_info() {
+  $panes = array();
+
   $panes['commerce_payment'] = (object) array(
     'title' => t('Payment'),
-    'page' => 'checkout',
+    'page' => 'review',
     'locked' => TRUE,
     'file' => 'includes/commerce_payment.checkout_pane.inc',
     'callbacks' => array(
@@ -32,6 +37,7 @@ function commerce_payment_commerce_checkout_pane_info() {
     ),
     'weight' => 10,
   );
+
   $panes['commerce_payment_redirect'] = (object) array(
     'title' => t('Off-site payment redirect'),
     'page' => 'payment',
@@ -44,6 +50,7 @@ function commerce_payment_commerce_checkout_pane_info() {
       'review' => 'commerce_payment_redirect_pane_review',
     ),
   );
+
   return $panes;
 }
 

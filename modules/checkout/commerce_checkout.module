@@ -181,6 +181,57 @@ function commerce_checkout_commerce_order_status_info() {
 }
 
 /**
+ * Implements hook_commerce_checkout_page_info().
+ */
+function commerce_checkout_commerce_checkout_page_info() {
+  $checkout_pages = array();
+
+  // Define a primary checkout page as the first step.
+  $checkout_pages['checkout'] = (object) array(
+    'title' => t('Checkout'),
+    'weight' => 0,
+  );
+
+  // Define a page for reviewing the data entered during checkout.
+  $checkout_pages['review'] = (object) array(
+    'name' => t('Review'),
+    'title' => t('Review order'),
+    'help' => t('Review your order before continuing.'),
+    'weight' => 10,
+  );
+
+  // Define a page for checkout completion with no submit buttons on it.
+  $checkout_pages['complete'] = (object) array(
+    'name' => t('Complete'),
+    'title' => t('Checkout complete'),
+    'weight' => 50,
+    'status_cart' => FALSE,
+    'buttons' => FALSE,
+  );
+
+  return $checkout_pages;
+}
+
+/**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function commerce_checkout_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+
+  $checkout_panes['checkout_review'] = (object) array(
+    'title' => t('Review '),
+    'file' => 'includes/commerce_checkout.checkout_pane.inc',
+    'callbacks' => array(
+      'checkout_form' => 'commerce_checkout_review_pane_form',
+    ),
+    'page' => 'review',
+    'weight' => 0,
+  );
+
+  return $checkout_panes;
+}
+
+/**
  * Returns an array of checkout pages defined by enabled modules.
  *
  * @return
@@ -255,38 +306,6 @@ function commerce_checkout_page_load($page_id) {
 
   // Otherwise, return the specified page.
   return $checkout_pages[$page_id];
-}
-
-/**
- * Implements hook_commerce_checkout_page_info().
- */
-function commerce_checkout_commerce_checkout_page_info() {
-  $pages = array();
-
-  // Define a primary checkout page as the first step.
-  $pages['checkout'] = (object) array(
-    'title' => t('Checkout'),
-    'weight' => 0,
-  );
-
-  // Define a page for reviewing the data entered during checkout.
-  $pages['review'] = (object) array(
-    'name' => t('Review'),
-    'title' => t('Review order'),
-    'help' => t('Review your order before continuing.'),
-    'weight' => 10,
-  );
-
-  // Define a page for checkout completion with no submit buttons on it.
-  $pages['complete'] = (object) array(
-    'name' => t('Complete'),
-    'title' => t('Checkout complete'),
-    'weight' => 20,
-    'status_cart' => FALSE,
-    'buttons' => FALSE,
-  );
-
-  return $pages;
 }
 
 /**

@@ -57,7 +57,7 @@ function commerce_checkout_builder_form() {
   $form = array();
 
   // Load an array of all available checkout pages.
-  $checkout_pages = commerce_checkout_pages(FALSE);
+  $checkout_pages = commerce_checkout_pages();
 
   // Add a "disabled" pseudo-page.
   $checkout_pages['disabled'] = (object) array('page_id' => 'disabled', 'title' => t('Disabled'));

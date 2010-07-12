@@ -21,7 +21,7 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
       }
     }
   }
-  
+
   if ($payment_method_options) {
     $form['payment_method'] = array(
       '#type' => 'radios',
