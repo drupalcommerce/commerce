@@ -29,11 +29,11 @@ function commerce_order_entity_info() {
       ),
       'load hook' => 'commerce_order_load',
       'view modes' => array(
-        'customer' => array(
-          'label' => t('Customer'),
-        ),
         'administrator' => array(
           'label' => t('Administrator'),
+        ),
+        'customer' => array(
+          'label' => t('Customer'),
         ),
       ),
       'creation callback' => '_commerce_order_create',

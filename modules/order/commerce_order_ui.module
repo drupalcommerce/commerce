@@ -40,7 +40,7 @@ function commerce_order_ui_menu() {
     'title callback' => 'commerce_order_ui_order_title',
     'title arguments' => array(3),
     'page callback' => 'commerce_order_ui_order_view',
-    'page arguments' => array('administrator', 3),
+    'page arguments' => array(3),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('view', 3),
     'type' => MENU_CALLBACK,
@@ -171,15 +171,23 @@ function commerce_order_ui_views_api() {
 }
 
 /**
- * Sets the breadcrumb for administrative order pages.
+ * Sets the breadcrumb for order pages.
+ *
+ * @param $view_mode
+ *   The view mode for the current order page, 'administrator' or 'customer'.
  */
-function commerce_order_ui_set_breadcrumb() {
-  $breadcrumb = array(
-    l(t('Home'), '<front>'),
-    l(t('Dashboard'), 'admin'),
-    l(t('Store'), 'admin/commerce'),
-    l(t('Orders'), 'admin/commerce/orders'),
-  );
+function commerce_order_ui_set_breadcrumb($view_mode = 'administrator') {
+  $breadcrumb = array();
+
+  // Create the breadcrumb array based on the view mode.
+  if ($view_mode == 'administrator') {
+    $breadcrumb = array(
+      l(t('Home'), '<front>'),
+      l(t('Dashboard'), 'admin'),
+      l(t('Store'), 'admin/commerce'),
+      l(t('Orders'), 'admin/commerce/orders'),
+    );
+  }
 
   drupal_set_breadcrumb($breadcrumb);
 }

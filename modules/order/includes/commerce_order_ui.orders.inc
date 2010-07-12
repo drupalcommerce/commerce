@@ -19,12 +19,60 @@ function commerce_order_settings_form() {
 }
 
 /**
- * Displays a view of an order entity.
+ * Generate an array for rendering the given order.
+ *
+ * @param $order
+ *   A fully loaded order object.
+ * @param $view_mode
+ *   The view mode for displaying the order, 'administrator' or 'customer'.
+ *
+ * @return
+ *   An array as expected by drupal_render().
  */
-function commerce_order_ui_order_view($mode, $order) {
-  commerce_order_ui_set_breadcrumb();
+function commerce_order_ui_order_view($order, $view_mode = 'administrator', $breadcrumb = TRUE) {
+  // Set the breadcrumb for the appropriate view mode if specified.
+  if ($breadcrumb) {
+    commerce_order_ui_set_breadcrumb();
+  }
 
-  return '<pre>' . print_r($order, TRUE) . '</pre>';
+  // Populate $order->content with a render() array.
+  commerce_order_ui_build_content($order, $view_mode);
+
+  // Remove the content array from the order to avoid duplicate rendering.
+  $build = $order->content;
+  unset($order->content);
+
+  $build += array(
+    '#theme' => 'commerce_order',
+    '#order' => $order,
+    '#view_mode' => $view_mode,
+  );
+
+  // Allow modules to modify the final build array.
+  drupal_alter('commerce_order_view', $build);
+
+  return $build;
+}
+
+/**
+ * Builds a structured array representing the order's content.
+ *
+ * @param $order
+ *   The fully loaded order object being built for display.
+ * @param $view_mode
+ *   The view mode for displaying the order, 'administrator' or 'customer'.
+ */
+function commerce_order_ui_build_content(&$order, $view_mode = 'administrator') {
+  // Remove previously built content, if exists.
+  $order->content = array();
+
+  // Build fields content.
+  field_attach_prepare_view('commerce_order', array($order->order_id => $order), $view_mode);
+  entity_prepare_view('commerce_order', array($order->order_id => $order));
+  $order->content += field_attach_view('commerce_order', $order, $view_mode);
+
+  // Allow modules to make their own additions to the order content.
+  module_invoke_all('commerce_order_view', $order, $view_mode);
 }
 
 /**
