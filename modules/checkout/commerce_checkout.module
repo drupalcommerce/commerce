@@ -14,9 +14,20 @@
 function commerce_checkout_menu() {
   $items = array();
 
-  $items['checkout'] = array(
+  // TODO: Add some sort of access control beyond 'access content' permission so
+  // customers don't checkout other customers' orders.
+  $items['checkout/%commerce_order'] = array(
     'title' => 'Checkout',
     'page callback' => 'commerce_checkout_router',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_checkout.pages.inc',
+  );
+  $items['checkout/%commerce_order/%commerce_checkout_page'] = array(
+    'title' => 'Checkout',
+    'page callback' => 'commerce_checkout_router',
+    'page arguments' => array(1, 2),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.pages.inc',
@@ -108,6 +119,30 @@ function commerce_checkout_theme() {
 }
 
 /**
+ * Implements hook_forms().
+ *
+ * To provide distinct form IDs for add to cart forms, the product IDs
+ * referenced by the form are appended to the base ID, commerce_cart_form. When
+ * such a form is built or submitted, this function will validate the form ID
+ * and return the proper callback function to use for the given $form_id.
+ */
+function commerce_checkout_forms($form_id, $args) {
+  $forms = array();
+
+  // All checkout page forms should be built using the same function.
+  if (strpos($form_id, 'commerce_checkout_form_') === 0) {
+    // Ensure the checkout page is valid.
+    if (commerce_checkout_page_load(substr($form_id, 23))) {
+      $forms[$form_id] = array(
+        'callback' => 'commerce_checkout_form',
+      );
+    }
+  }
+
+  return $forms;
+}
+
+/**
  * Returns an array of checkout pages defined by enabled modules.
  *
  * @return
@@ -127,6 +162,7 @@ function commerce_checkout_pages() {
         'page_id' => $page_id,
         'title' => '',
         'help' => '',
+        'buttons' => TRUE,
         'back_value' => t('Back'),
         'submit_value' => t('Continue'),
         'prev_page' => NULL,
@@ -198,6 +234,13 @@ function commerce_checkout_commerce_checkout_page_info() {
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
     'weight' => 10,
+  );
+
+  // Define a page for checkout completion with no submit buttons on it.
+  $pages['complete'] = (object) array(
+    'title' => t('Checkout complete'),
+    'weight' => 20,
+    'buttons' => FALSE,
   );
 
   return $pages;
@@ -282,7 +325,7 @@ function commerce_checkout_panes($conditions = array()) {
         $return[$pane_id] = $checkout_pane;
       }
     }
-    
+
     return $return;
   }
   else {

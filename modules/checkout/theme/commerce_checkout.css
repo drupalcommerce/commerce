@@ -8,6 +8,10 @@ fieldset.checkout-buttons .form-button, fieldset.checkout-buttons .form-submit {
   margin-left: 1em;
 }
 
+fieldset.checkout-buttons .checkout-cancel, fieldset.checkout-buttons .checkout-back {
+  float: left;
+}
+
 table.checkout-review {
   width: auto;
   margin-left: auto;
