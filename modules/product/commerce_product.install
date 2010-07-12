@@ -10,7 +10,7 @@ function commerce_product_install() {
 
   $product_type->type = 'product';
   $product_type->name = t('Product');
-  $product_type->description = t('A basic product type with no additional fields by default.');
+  $product_type->description = t('A basic product type.');
   $product_type->is_new = TRUE;
 
   commerce_product_type_save($product_type);
