@@ -81,7 +81,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       }
 
       module_invoke_all('commerce_product_' . $op, $product);
-      entity_invoke($op, 'commerce_product', $product);
+      module_invoke_all('entity_' . $op, 'commerce_product', $product);
       rules_invoke_event('commerce_product_' . $op, $product);
 
       // Ignore slave server temporarily to give time for the
