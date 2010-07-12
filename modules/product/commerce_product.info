@@ -18,7 +18,7 @@ files[] = includes/views/commerce_product.views.inc
 
 ; Views handlers
 files[] = includes/views/handlers/commerce_product_handler_field_product.inc
-files[] = includes/views/handlers/commerce_product_handler_field_product_product_type.inc
+files[] = includes/views/handlers/commerce_product_handler_field_product_type.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_link.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_delete.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_edit.inc

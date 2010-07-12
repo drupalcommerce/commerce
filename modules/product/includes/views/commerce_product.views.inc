@@ -62,7 +62,7 @@ function commerce_product_views_data() {
     'title' => t('Type'),
     'help' => t('The human-readable name of the type of the product.'),
     'field' => array(
-      'handler' => 'commerce_product_handler_field_product_product_type',
+      'handler' => 'commerce_product_handler_field_product_type',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -195,7 +195,7 @@ function commerce_product_views_handlers() {
       'commerce_product_handler_field_product' => array(
         'parent' => 'views_handler_field',
       ),
-      'commerce_product_handler_field_product_product_type' => array(
+      'commerce_product_handler_field_product_type' => array(
         'parent' => 'commerce_product_handler_field_product',
       ),
       'commerce_product_handler_field_product_link' => array(

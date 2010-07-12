@@ -46,7 +46,7 @@ function commerce_line_item_views_data() {
     'title' => t('Type'),
     'help' => t('The human-readable name of the type of the line item.'),
     'field' => array(
-      'handler' => 'commerce_line_item_handler_field_line_item_line_item_type',
+      'handler' => 'commerce_line_item_handler_field_line_item_type',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -114,7 +114,7 @@ function commerce_line_item_views_handlers() {
     ),
     'handlers' => array(
       'commerce_line_item_handler_argument_line_item_line_item_id',
-      'commerce_line_item_handler_field_line_item_line_item_type',
+      'commerce_line_item_handler_field_line_item_type',
     ),
   );
 }
