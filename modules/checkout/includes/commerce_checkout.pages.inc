@@ -42,6 +42,9 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form['#attached']['css'] = array(
     drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css'
   );
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'commerce_checkout') . '/commerce_checkout.js',
+  );
 
   $form['uid'] = array(
     '#type' => 'hidden',

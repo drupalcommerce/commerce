@@ -50,3 +50,8 @@ table.checkout-review .pane-data-full {
   padding-left: 1em;
   padding-right: 1em;
 }
+
+.checkout-processing {
+  padding-right: 18px !important;
+  background: url(../images/status-active.gif) right center no-repeat;
+}
