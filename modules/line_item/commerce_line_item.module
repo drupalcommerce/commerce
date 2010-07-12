@@ -895,3 +895,37 @@ function commerce_line_items_total($value, $type = '', $language = '') {
 
   return array('price' => $total, 'currency_code' => $currency_code);
 }
+
+/**
+ * Implements hook_field_views_data_alter().
+ *
+ * This is a Views hook implemented to enable adding relationships for
+ * referenced line items.
+ */
+function commerce_line_item_field_views_data_alter(&$data, $field, $module) {
+  // If the field is a line item reference field...
+  if ($field['type'] == 'commerce_line_item_reference') {
+    $table = array_shift(array_keys($data));
+
+    // Add the relationship data to the proper line_item_id column.
+    foreach (array_keys($data[$table]) as $key) {
+      if (strpos($key, '_line_item_id') == strlen($key) - 13) {
+        // First indicate this field's table joins to the commerce_line_item table.
+        $data[$table]['table']['join']['commerce_line_item'] = array(
+          'left_field' => 'line_item_id',
+          'field' => $key,
+        );
+
+        // Then add the relationship data to the field itself.
+        $data[$table][$key]['relationship'] = array(
+          'title' => t('Referenced line item'),
+          'help' => t('The line item referenced through this field.'),
+          'base' => 'commerce_line_item',
+          'base field' => 'line_item_id',
+          'handler' => 'views_handler_relationship',
+          'label' => t('Line Item'),
+        );
+      }
+    }
+  }
+}

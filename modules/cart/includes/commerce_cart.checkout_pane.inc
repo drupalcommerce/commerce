@@ -47,15 +47,8 @@ function commerce_cart_contents_pane_form($form_state, $checkout_pane, $order) {
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart|default'));
 
-  // Extract the line item IDs of products on the order.
-  $line_item_ids = array();
-
-  foreach ($order->line_items[LANGUAGE_NONE] as $data) {
-    $line_item_ids[] = $data['line_item_id'];
-  }
-
   $form['cart_contents_view'] = array(
-    '#markup' => commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids))),
+    '#markup' => commerce_embed_view($view_id, $display_id, $order->order_id),
   );
 
   return $form;
@@ -69,12 +62,5 @@ function commerce_cart_contents_pane_review($form_state, $order) {
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart|default'));
 
-  // Extract the line item IDs of products on the order.
-  $line_item_ids = array();
-
-  foreach ($order->line_items[LANGUAGE_NONE] as $data) {
-    $line_item_ids[] = $data['line_item_id'];
-  }
-
-  return commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids)));
+  return commerce_embed_view($view_id, $display_id, $order->order_id);
 }

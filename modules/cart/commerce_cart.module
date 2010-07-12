@@ -173,13 +173,6 @@ function commerce_cart_block_view($delta) {
       // Add the cart block CSS.
       drupal_add_css(drupal_get_path('module', 'commerce_cart') .'/theme/commerce_cart.block.css');
 
-      // Extract the line item IDs of products on the order.
-      $line_item_ids = array();
-
-      foreach ($order->line_items[LANGUAGE_NONE] as $data) {
-        $line_item_ids[] = $data['line_item_id'];
-      }
-
       // Add total information and a link to checkout.
       $quantity = commerce_line_items_quantity($order->line_items, 'product');
       $total = commerce_line_items_total($order->line_items, 'product');
@@ -199,7 +192,7 @@ function commerce_cart_block_view($delta) {
       $variables = array(
         'order' => $order,
         'line_item_ids' => $line_item_ids,
-        'contents_view' => commerce_embed_view('commerce_cart', 'defaults', array(implode(',', $line_item_ids))),
+        'contents_view' => commerce_embed_view('commerce_cart', 'defaults', $order->order_id),
         'quantity_raw' => $quantity,
         'quantity_label' => format_plural($quantity, 'item', 'items'),
         'quantity' => format_plural($quantity, '1 item', '@count items'),
