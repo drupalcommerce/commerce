@@ -401,11 +401,11 @@ function commerce_product_load_multiple($product_ids = array(), $conditions = ar
 * @return
 * An array as expected by drupal_render().
 */
-function commerce_product_view_product($product, $view_mode = 'full', $breadcrumb = TRUE) {
+function commerce_product_build_content($product, $view_mode = 'full', $breadcrumb = TRUE) {
   // Remove previously built content, if it exists.
   $product->content = array();
 
-  // Prepare a resuable array representing the CSS file to attach to the view.
+  // Prepare a reusable array representing the CSS file to attach to the view.
   $attached = array(
     'css' => array(drupal_get_path('module', 'commerce_product_ui') . '/theme/commerce_product.css'),
   );
