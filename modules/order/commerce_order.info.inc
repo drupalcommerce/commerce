@@ -54,7 +54,7 @@ function commerce_order_entity_property_info() {
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer orders',
   );
-  $properties['creator_uid'] = array(
+  $properties['creator-uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the order creator."),
@@ -73,7 +73,7 @@ function commerce_order_entity_property_info() {
     'required' => TRUE,
     'clear' => array('creator_uid'),
   );
-  $properties['customer_uid'] = array(
+  $properties['customer-uid'] = array(
     'label' => t("Customer ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the order customer."),
