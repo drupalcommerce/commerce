@@ -226,7 +226,7 @@ function commerce_product_type_delete($type) {
     ->condition('type', $type)
     ->execute();
 
-  // Rebuild the menu
+  // Rebuild the menu to get rid of this type's product add menu item.
   menu_rebuild();
 
   // Notify the field API that this bundle has been destroyed.
