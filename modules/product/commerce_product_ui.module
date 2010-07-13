@@ -11,7 +11,7 @@
 function commerce_product_ui_menu() {
   $items = array();
 
-  // Note: admin/commerce/products will be created by Views.
+  // Note: admin/commerce/products is defined by a default View.
 
   // Add a product.
   $items['admin/commerce/products/add'] = array(
@@ -28,7 +28,7 @@ function commerce_product_ui_menu() {
       'title' => 'Create @name',
       'title arguments' => array('@name' => $product_type->name),
       'description' => $product_type->description,
-      'page callback' => 'commerce_product_ui_product_form',
+      'page callback' => 'commerce_product_ui_product_form_wrapper',
       'page arguments' => array(commerce_product_new($type)),
       'access callback' => 'commerce_product_access',
       'access arguments' => array('create', $type),
@@ -39,7 +39,7 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/%commerce_product'] = array(
     'title callback' => 'commerce_product_ui_product_title',
     'title arguments' => array(3),
-    'page callback' => 'commerce_product_ui_product_form',
+    'page callback' => 'commerce_product_ui_product_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),
@@ -56,7 +56,7 @@ function commerce_product_ui_menu() {
   );
   $items['admin/commerce/products/%commerce_product/delete'] = array(
     'title' => 'Delete a product',
-    'page callback' => 'commerce_product_ui_product_delete_form',
+    'page callback' => 'commerce_product_ui_product_delete_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),

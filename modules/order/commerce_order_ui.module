@@ -11,13 +11,13 @@
 function commerce_order_ui_menu() {
   $items = array();
 
-  // Note: admin/commerce/orders will be created by Views.
+  // Note: admin/commerce/orders is defined by a default View.
 
   // Create an order.
   $items['admin/commerce/orders/add'] = array(
     'title' => 'Create an order',
     'description' => 'Create a new order.',
-    'page callback' => 'commerce_order_ui_order_form',
+    'page callback' => 'commerce_order_ui_order_form_wrapper',
     'page arguments' => array(commerce_order_new()),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
@@ -28,7 +28,7 @@ function commerce_order_ui_menu() {
   $items['admin/commerce/orders/add/%user'] = array(
     'title' => 'Create an order',
     'description' => 'Create a new order for the specified user.',
-    'page callback' => 'commerce_order_ui_order_form',
+    'page callback' => 'commerce_order_ui_order_form_wrapper',
     'page arguments' => array(commerce_order_new(), 4),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
@@ -53,7 +53,7 @@ function commerce_order_ui_menu() {
   );
   $items['admin/commerce/orders/%commerce_order/edit'] = array(
     'title' => 'Edit',
-    'page callback' => 'commerce_order_ui_order_form',
+    'page callback' => 'commerce_order_ui_order_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('update', 3),
@@ -64,7 +64,7 @@ function commerce_order_ui_menu() {
   );
   $items['admin/commerce/orders/%commerce_order/delete'] = array(
     'title' => 'Delete an order',
-    'page callback' => 'commerce_order_ui_order_delete_form',
+    'page callback' => 'commerce_order_ui_order_delete_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('update', 3),

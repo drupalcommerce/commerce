@@ -55,22 +55,36 @@ function theme_product_add_list($variables) {
 
 /**
  * Form callback wrapper: create or edit a product.
+ *
+ * @param $product
+ *   The product object being edited by this form.
+ *
+ * @see commerce_product_product_form()
  */
-function commerce_product_ui_product_form($product, $breadcrumb = TRUE) {
-  if ($breadcrumb) {
-    commerce_product_ui_set_breadcrumb();
-  }
+function commerce_product_ui_product_form_wrapper($product) {
+  // Add the breadcrumb for the form's location.
+  commerce_product_ui_set_breadcrumb();
+
+  // Include the forms file from the Product module.
   module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
+
   return drupal_get_form('commerce_product_product_form', $product);
 }
 
 /**
- * Confirmation form wrapper for deleting a product.
+ * Form callback wrapper: confirmation form for deleting a product.
+ *
+ * @param $product
+ *   The product object being deleted by this form.
+ *
+ * @see commerce_product_product_delete_form()
  */
-function commerce_product_ui_product_delete_form($product, $breadcrumb = TRUE) {
-  if ($breadcrumb) {
-    commerce_product_ui_set_breadcrumb();
-  }
+function commerce_product_ui_product_delete_form_wrapper($product) {
+  // Add the breadcrumb for the form's location.
+  commerce_product_ui_set_breadcrumb();
+
+  // Include the forms file from the Product module.
   module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
+
   return drupal_get_form('commerce_product_product_delete_form', $product);
 }

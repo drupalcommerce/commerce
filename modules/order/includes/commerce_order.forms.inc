@@ -1,18 +1,24 @@
 <?php
+// $Id$
 
 /**
- * Form callback wrapper: create or edit an order.
+ * @file
+ * Forms for creating / editing and deleting orders.
+ */
+
+
+/**
+ * Form callback: create or edit an order.
  *
  * @param $order
  *   The order object to edit through the form.
- *
- * @return
- *   The form array to add or edit an order.
  */
 function commerce_order_order_form($form, &$form_state, $order) {
-  //Manually set the build_info file, otherwise the calling function's file will be here which will make field_attach_form() not function properly.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') .'/includes/commerce_order.forms.inc';
   $form = array();
+
+  // Ensure this include file is loaded when the form is rebuilt from the cache.
+  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
+
   // Add the field related form elements.
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
@@ -53,7 +59,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
 }
 
 /**
- * Validation callback for commerce_order_ui_form().
+ * Validation callback for commerce_order_order_form().
  */
 function commerce_order_order_form_validate($form, &$form_state) {
   $order = $form_state['commerce_order'];
@@ -66,7 +72,7 @@ function commerce_order_order_form_validate($form, &$form_state) {
 }
 
 /**
- * Submit callback for commerce_order_ui_form().
+ * Submit callback for commerce_order_order_form().
  */
 function commerce_order_order_form_submit($form, &$form_state) {
   global $user;
@@ -98,13 +104,15 @@ function commerce_order_order_form_submit($form, &$form_state) {
 }
 
 /**
- * Confirmation form for deleting an order.
+ * Form callback: confirmation form for deleting an order.
  *
  * @param $order
  *   The order object to delete through the form.
  *
  * @return
  *   The form array to add or edit an order.
+ *
+ * @see confirm_form()
  */
 function commerce_order_order_delete_form($form, &$form_state, $order) {
   $form_state['order'] = $order;
@@ -122,7 +130,7 @@ function commerce_order_order_delete_form($form, &$form_state, $order) {
 }
 
 /**
- * Submit callback for commerce_order_ui_order_delete_form().
+ * Submit callback for commerce_order_order_delete_form().
  */
 function commerce_order_order_delete_form_submit($form, &$form_state) {
   $order = $form_state['order'];

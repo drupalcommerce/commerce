@@ -1,10 +1,24 @@
 <?php
+// $Id$
+
+/**
+ * @file
+ * Forms for creating / editing and deleting products.
+ */
+
 
 /**
  * Form callback: create or edit a product.
+ *
+ * @param $product
+ *   The product object to edit or for a create form an empty product object
+ *     with only a product type defined.
  */
 function commerce_product_product_form($form, &$form_state, $product) {
   $form = array();
+
+  // Ensure this include file is loaded when the form is rebuilt from the cache.
+  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
   // Add the default field elements.
   // TODO: Update description to include the acceptable product tokens.
@@ -71,7 +85,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
 }
 
 /**
- * Validation callback for commerce_product_ui_form().
+ * Validation callback for commerce_product_product_form().
  */
 function commerce_product_product_form_validate($form, &$form_state) {
   $product = $form_state['commerce_product'];
@@ -104,7 +118,7 @@ function commerce_product_product_form_validate($form, &$form_state) {
 }
 
 /**
- * Submit callback for commerce_product_ui_form().
+ * Submit callback for commerce_product_product_form().
  */
 function commerce_product_product_form_submit($form, &$form_state) {
   global $user;
@@ -138,6 +152,14 @@ function commerce_product_product_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Form callback: confirmation form for deleting a product.
+ *
+ * @param $product
+ *   The product object to be deleted.
+ *
+ * @see confirm_form()
+ */
 function commerce_product_product_delete_form($form, &$form_state, $product) {
   $form_state['product'] = $product;
 

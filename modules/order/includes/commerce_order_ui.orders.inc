@@ -29,16 +29,12 @@ function commerce_order_settings_form() {
  *   The order object to edit through the form.
  * @param $account
  *   For new orders, the customer's user account.
- * @param $breadcrumb
- *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
  *
- * @return
- *   The form html to add or edit an order.
+ * @see commerce_order_order_form()
  */
-function commerce_order_ui_order_form($order, $account = NULL, $breadcrumb = TRUE) {
-  if ($breadcrumb) {
-    commerce_order_ui_set_breadcrumb();
-  }
+function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
+  // Add the breadcrumb for the form's location.
+  commerce_order_ui_set_breadcrumb();
 
   // Set the page title and a default customer if necessary.
   if (empty($order->order_id)) {
@@ -48,25 +44,27 @@ function commerce_order_ui_order_form($order, $account = NULL, $breadcrumb = TRU
       $order->customer_uid = $account->uid;
     }
   }
+
+  // Include the forms file from the Order module.
   module_load_include('inc', 'commerce_order', 'includes/commerce_order.forms');
+
   return drupal_get_form('commerce_order_order_form', $order);
 }
 
 /**
- * Confirmation form for deleting an order.
+ * Form callback wrapper: confirmation form for deleting an order.
  *
  * @param $order
  *   The order object to delete through the form.
- * @param $breadcrumb
- *   TRUE or FALSE indicating whether or not to set the order breadcrumb.
  *
- * @return
- *   The form html to add or edit an order.
+ * @see commerce_order_order_delete_form()
  */
-function commerce_order_ui_order_delete_form($order, $breadcrumb = TRUE) {
-  if ($breadcrumb) {
-    commerce_order_ui_set_breadcrumb();
-  }
+function commerce_order_ui_order_delete_form_wrapper($order) {
+  // Add the breadcrumb for the form's location.
+  commerce_order_ui_set_breadcrumb();
+
+  // Include the forms file from the Order module.
   module_load_include('inc', 'commerce_order', 'includes/commerce_order.forms');
+
   return drupal_get_form('commerce_order_order_delete_form', $order);
 }
