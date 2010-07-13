@@ -179,11 +179,15 @@ function commerce_order_ui_field_ui_view_modes_tabs($entity_type) {
 function commerce_order_ui_forms($form_id, $args) {
   $forms = array();
 
-  if ($form_id == 'commerce_order_ui_order_form') {
-    $forms['commerce_order_ui_order_form'] = array(
-      'callback' => 'commerce_order_order_form',
-    );
-  }
+  // Define a wrapper ID for the order add / edit form.
+  $forms['commerce_order_ui_order_form'] = array(
+    'callback' => 'commerce_order_order_form',
+  );
+
+  // Define a wrapper ID for the order delete confirmation form.
+  $forms['commerce_order_ui_order_delete_form'] = array(
+    'callback' => 'commerce_order_order_delete_form',
+  );
 
   return $forms;
 }
@@ -193,7 +197,9 @@ function commerce_order_ui_forms($form_id, $args) {
  *
  * The Order UI module instantiates the Order add/edit form at particular paths
  * in the Commerce IA. It uses its own form ID to do so, and we alter the form
- * here to add in appropriate redirection and an additional button.
+ * here to add in appropriate redirection.
+ *
+ * @see commerce_order_ui_order_form()
  */
 function commerce_order_ui_form_commerce_order_ui_order_form_alter(&$form, &$form_state) {
   // Add a submit handler to the save button to add a redirect.
@@ -212,6 +218,30 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
 
     $form_state['redirect'] = 'admin/commerce/orders/' . $form_state['commerce_order']->order_id . '/edit';
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Order UI module instantiates the Order delete form at a particular path
+ * in the Commerce IA. It uses its own form ID to do so, and we alter the form
+ * here to add in appropriate redirection.
+ *
+ * @see commerce_order_ui_order_delete_form()
+ */
+function commerce_order_ui_form_commerce_order_ui_order_delete_form_alter(&$form, &$form_state) {
+  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/orders');
+
+  $form['#submit'][] = 'commerce_order_ui_order_delete_form_submit';
+}
+
+/**
+ * Submit callback for commerce_order_ui_order_delete_form().
+ *
+ * @see commerce_order_ui_form_commerce_order_ui_order_delete_form_alter()
+ */
+function commerce_order_ui_order_delete_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/commerce/orders';
 }
 
 /**

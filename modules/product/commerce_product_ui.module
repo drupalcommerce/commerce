@@ -222,16 +222,55 @@ function commerce_product_ui_theme() {
 }
 
 /**
+ * Implements hook_entity_info_alter().
+ *
+ * Exposes the admin UI for product fields.
+ */
+function commerce_product_ui_entity_info_alter(&$entity_info) {
+  foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
+    $bundle['admin'] = array(
+      'path' => 'admin/commerce/products/types/%commerce_product_type',
+      'real path' => 'admin/commerce/products/types/' . $type,
+      'bundle argument' => 4,
+      'access arguments' => array('administer product types'),
+    );
+  }
+}
+
+/**
+ * Implements hook_field_ui_view_modes_tabs().
+ */
+function commerce_product_ui_field_ui_view_modes_tabs($entity_type) {
+  if ($entity_type == 'commerce_product') {
+    $modes = array(
+      'basic' => array(
+        'view modes' => array('full'),
+      ),
+      'node' => array(
+        'title' => t('Node'),
+        'view modes' => array('node_teaser', 'node_full', 'node_rss'),
+      ),
+    );
+
+    return $modes;
+  }
+}
+
+/**
  * Implements hook_forms().
  */
 function commerce_product_ui_forms($form_id, $args) {
   $forms = array();
 
-  if ($form_id == 'commerce_product_ui_product_form') {
-    $forms['commerce_product_ui_product_form'] = array(
-      'callback' => 'commerce_product_product_form',
-    );
-  }
+  // Define a wrapper ID for the product add / edit form.
+  $forms['commerce_product_ui_product_form'] = array(
+    'callback' => 'commerce_product_product_form',
+  );
+
+  // Define a wrapper ID for the product delete confirmation form.
+  $forms['commerce_product_ui_product_delete_form'] = array(
+    'callback' => 'commerce_product_product_delete_form',
+  );
 
   return $forms;
 }
@@ -242,6 +281,8 @@ function commerce_product_ui_forms($form_id, $args) {
  * The Product UI module instantiates the Product add/edit form at particular
  * paths in the Commerce IA. It uses its own form ID to do so, and we alter the
  * form here to add in appropriate redirection and an additional button.
+ *
+ * @see commerce_product_ui_product_form()
  */
 function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form, &$form_state) {
   // Add a submit handler to the save button to add a redirect.
@@ -278,38 +319,27 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
 }
 
 /**
- * Implements hook_entity_info_alter().
+ * Implements hook_form_FORM_ID_alter().
  *
- * Exposes the admin UI for product fields.
+ * The Product UI module instantiates the Product delete form at a particular
+ * path in the Commerce IA. It uses its own form ID to do so, and we alter the
+ * form here to add in appropriate redirection.
+ *
+ * @see commerce_product_ui_product_delete_form()
  */
-function commerce_product_ui_entity_info_alter(&$entity_info) {
-  foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
-    $bundle['admin'] = array(
-      'path' => 'admin/commerce/products/types/%commerce_product_type',
-      'real path' => 'admin/commerce/products/types/' . $type,
-      'bundle argument' => 4,
-      'access arguments' => array('administer product types'),
-    );
-  }
+function commerce_product_ui_form_commerce_product_ui_product_delete_form_alter(&$form, &$form_state) {
+  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/products');
+
+  $form['#submit'][] = 'commerce_product_ui_product_delete_form_submit';
 }
 
 /**
- * Implements hook_field_ui_view_modes_tabs().
+ * Submit callback for commerce_product_ui_product_delete_form().
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_delete_form_alter()
  */
-function commerce_product_ui_field_ui_view_modes_tabs($entity_type) {
-  if ($entity_type == 'commerce_product') {
-    $modes = array(
-      'basic' => array(
-        'view modes' => array('full'),
-      ),
-      'node' => array(
-        'title' => t('Node'),
-        'view modes' => array('node_teaser', 'node_full', 'node_rss'),
-      ),
-    );
-
-    return $modes;
-  }
+function commerce_product_ui_product_delete_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/commerce/products';
 }
 
 /**

@@ -124,9 +124,14 @@ function commerce_order_order_form_submit($form, &$form_state) {
 function commerce_order_order_delete_form($form, &$form_state, $order) {
   $form_state['order'] = $order;
 
+  // Ensure this include file is loaded when the form is rebuilt from the cache.
+  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
+
+  $form['#submit'][] = 'commerce_order_order_delete_form_submit';
+
   $form = confirm_form($form,
     t('Are you sure you want to delete order @number?', array('@number' => $order->order_number)),
-    'admin/commerce/orders',
+    '',
     '<p>' . t('Deleting this order cannot be undone.') . '</p>',
     t('Delete'),
     t('Cancel'),
@@ -146,6 +151,7 @@ function commerce_order_order_delete_form_submit($form, &$form_state) {
     drupal_set_message(t('Order @number has been deleted.', array('@number' => $order->order_number)));
     watchdog('commerce_order', 'Deleted order @number.', array('@number' => $order->order_number), WATCHDOG_NOTICE);
   }
-
-  $form_state['redirect'] = 'admin/commerce/orders';
+  else {
+    drupal_set_message(t('Order @number could not be deleted.', array('@number' => $order-->order_number)), 'error');
+  }
 }

@@ -157,12 +157,17 @@ function commerce_product_product_form_submit($form, &$form_state) {
 function commerce_product_product_delete_form($form, &$form_state, $product) {
   $form_state['product'] = $product;
 
+  // Ensure this include file is loaded when the form is rebuilt from the cache.
+  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
+
+  $form['#submit'][] = 'commerce_product_product_delete_form_submit';
+
   // TODO: Replace the SKU in the description parameter with the product view
   // per http://drupal.org/node/733044.
 
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),
-    'admin/commerce/products',
+    '',
     '<p>' . t('SKU: @sku. Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
     t('Delete'),
     t('Cancel'),
@@ -182,6 +187,7 @@ function commerce_product_product_delete_form_submit($form, &$form_state) {
     drupal_set_message(t('%title has been deleted.', array('%title' => $product->title)));
     watchdog('commerce_product', 'Deleted product %title (SKU: @sku).', array('%title' => $product->title, '@sku' => $product->sku), WATCHDOG_NOTICE);
   }
-
-  $form_state['redirect'] = 'admin/commerce/products';
+  else {
+    drupal_set_message(t('%title could not be deleted.', array('%title' => $product->title)), 'error');
+  }
 }
