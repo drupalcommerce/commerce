@@ -49,11 +49,25 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#attributes' => array('class' => array('form-actions')),
     '#weight' => 100,
   );
+
+  // We add the form's #submit array to this button along with the actual submit
+  // handler to preserve any submit handlers added by a form callback_wrapper.
+  $submit = array();
+
+  if (!empty($form['#submit'])) {
+    $submit += $form['#submit'];
+  }
+
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save order'),
+    '#submit' => $submit + array('commerce_order_order_form_submit'),
     '#weight' => 40,
   );
+
+  // We append the validate handler to #validate in case a form callback_wrapper
+  // is used to add validate handlers earlier.
+  $form['#validate'][] = 'commerce_order_order_form_validate';
 
   return $form;
 }
@@ -94,13 +108,6 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   // Save the order.
   $order = commerce_order_save($order);
-
-  // Apply the redirect based on the clicked button.
-  if ($form_state['clicked_button']['#value'] == t('Save order')) {
-    drupal_set_message(t('Order saved.'));
-
-    $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/edit';
-  }
 }
 
 /**

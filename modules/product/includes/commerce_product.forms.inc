@@ -63,23 +63,24 @@ function commerce_product_product_form($form, &$form_state, $product) {
     '#attributes' => array('class' => array('form-actions')),
     '#weight' => 40,
   );
+
+  // We add the form's #submit array to this button along with the actual submit
+  // handler to preserve any submit handlers added by a form callback_wrapper.
+  $submit = array();
+
+  if (!empty($form['#submit'])) {
+    $submit += $form['#submit'];
+  }
+
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save product'),
+    '#submit' => $submit + array('commerce_product_product_form_submit'),
   );
 
-  // Add the save and continue button for new products.
-  if (empty($product->product_id)) {
-    $form['actions']['save_continue'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save and add another'),
-      '#suffix' => l('Cancel', 'admin/commerce/products'),
-      '#weight' => 45,
-    );
-  }
-  else {
-    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/products');
-  }
+  // We append the validate handler to #validate in case a form callback_wrapper
+  // is used to add validate handlers earlier.
+  $form['#validate'][] = 'commerce_product_product_form_validate';
 
   return $form;
 }
@@ -143,13 +144,6 @@ function commerce_product_product_form_submit($form, &$form_state) {
 
   // Redirect based on the button clicked.
   drupal_set_message(t('Product saved.'));
-
-  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/products/add/' . $product->type;
-  }
-  elseif (arg(2) == 'products' && arg(3) == 'add') {
-    $form_state['redirect'] = 'admin/commerce/products';
-  }
 }
 
 /**

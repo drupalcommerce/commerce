@@ -222,6 +222,62 @@ function commerce_product_ui_theme() {
 }
 
 /**
+ * Implements hook_forms().
+ */
+function commerce_product_ui_forms($form_id, $args) {
+  $forms = array();
+
+  if ($form_id == 'commerce_product_ui_product_form') {
+    $forms['commerce_product_ui_product_form'] = array(
+      'callback' => 'commerce_product_product_form',
+    );
+  }
+
+  return $forms;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Product UI module instantiates the Product add/edit form at particular
+ * paths in the Commerce IA. It uses its own form ID to do so, and we alter the
+ * form here to add in appropriate redirection and an additional button.
+ */
+function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form, &$form_state) {
+  // Add a submit handler to the save button to add a redirect.
+  $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_form_submit';
+
+  // Add the save and continue button for new products.
+  if (empty($form_state['commerce_product']->product_id)) {
+    $form['actions']['save_continue'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save and add another'),
+      '#submit' => $form['actions']['submit']['#submit'],
+      '#suffix' => l('Cancel', 'admin/commerce/products'),
+      '#weight' => 45,
+    );
+  }
+  else {
+    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/products');
+  }
+}
+
+/**
+ * Submit callback for commerce_product_ui_product_form().
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_form_alter()
+ */
+function commerce_product_ui_product_form_submit($form, &$form_state) {
+  // Set the redirect based on the button clicked.
+  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
+    $form_state['redirect'] = 'admin/commerce/products/add/' . $form_state['commerce_product']->type;
+  }
+  elseif (arg(2) == 'products' && arg(3) == 'add') {
+    $form_state['redirect'] = 'admin/commerce/products';
+  }
+}
+
+/**
  * Implements hook_entity_info_alter().
  *
  * Exposes the admin UI for product fields.
