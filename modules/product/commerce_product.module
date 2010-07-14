@@ -307,6 +307,24 @@ function commerce_product_type_to_arg($type) {
 }
 
 /**
+ * Checks to see if a given product type already exists.
+ *
+ * @param $type
+ *   The string to match against existing types.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not the product type exists.
+ */
+function commerce_product_type_validate_type_unique($type) {
+  // Look for a match of the type.
+  if ($match_id = db_query('SELECT type FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchField()) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
  * Ensures a base price field is present on a product type bundle.
  */
 function commerce_product_configure_product_type($type) {

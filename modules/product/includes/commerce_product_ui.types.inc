@@ -60,147 +60,37 @@ function theme_product_type_admin_overview($variables) {
 }
 
 /**
- * Form callback: create or edit a product type.
+ * Form callback wrapper: create or edit a product type.
+ *
+ * @param $product_type
+ *   The product type object being edited by this form.
+ *
+ * @see commerce_product_product_type_form()
  */
-function commerce_product_ui_type_form($form, &$form_state, $product_type) {
-  // Store the initial product type in the form state.
-  $form_state['product_type'] = $product_type;
+function commerce_product_ui_product_type_form_wrapper($product_type) {
+  // Add the breadcrumb for the form's location.
+  commerce_product_ui_set_breadcrumb(TRUE);
 
-  $form['product_type'] = array(
-    '#tree' => TRUE,
-  );
+  // Include the forms file from the Product module.
+  module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
 
-  $form['product_type']['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#default_value' => $product_type->name,
-    '#description' => t('The human-readable name of this product type. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.'),
-    '#required' => TRUE,
-    '#size' => 32,
-    '#field_suffix' => ' <small id="edit-product-type-name-suffix">' . $product_type->type . '</small>',
-  );
-
-  if (empty($product_type->type)) {
-    $js_settings = array(
-      'type' => 'setting',
-      'data' => array(
-        'machineReadableValue' => array(
-          'product-type-name' => array(
-            'text' => t('Machine name'),
-            'target' => 'product-type-type',
-            'searchPattern' => '[^a-z0-9]+',
-            'replaceToken' => '_',
-          ),
-        ),
-      ),
-    );
-    $form['product_type']['type'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Machine name'),
-      '#default_value' => $product_type->type,
-      '#maxlength' => 32,
-      '#required' => TRUE,
-      '#description' => t('The machine-readable name of this product type. This name must contain only lowercase letters, numbers, and underscores, it must be unique.'),
-      '#attached' => array(
-        'js' => array(drupal_get_path('module', 'system') . '/system.js', $js_settings),
-      ),
-    );
-  }
-
-  $form['product_type']['description'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Description'),
-    '#description' => t('Describe this product type. The text will be displayed on the <em>Add new content</em> page.'),
-    '#default_value' => $product_type->description,
-    '#rows' => 3,
-  );
-
-  $form['product_type']['help'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Explanation or submission guidelines'),
-    '#description' => t('This text will be displayed at the top of the page when creating or editing products of this type.'),
-    '#default_value' => $product_type->help,
-    '#rows' => 3,
-  );
-
-  $form['actions'] = array('#type' => 'container', '#attributes' => array('class' => array('form-actions')));
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save product type'),
-    '#weight' => 40,
-  );
-
-  if (!empty($product_type->type)) {
-    $form['actions']['delete'] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete product type'),
-      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
-      '#weight' => 45,
-    );
-  }
-  else {
-    $form['actions']['save_continue'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save and add fields'),
-      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
-      '#weight' => 45,
-    );
-  }
-
-  return $form;
+  return drupal_get_form('commerce_product_ui_product_type_form', $product_type);
 }
 
 /**
- * Form submit handler: save a product type.
+ * Form callback wrapper: confirmation form for deleting a product type.
+ *
+ * @param $product_type
+ *   The product type object being deleted by this form.
+ *
+ * @see commerce_product_product_type_delete_form()
  */
-function commerce_product_ui_type_form_submit($form, &$form_state) {
-  $product_type = $form_state['product_type'];
-  $updated = !empty($product_type->type);
+function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
+  // Add the breadcrumb for the form's location.
+  commerce_product_ui_set_breadcrumb(TRUE);
 
-  foreach ($form_state['values']['product_type'] as $key => $value) {
-    $product_type->$key = $value;
-  }
+  // Include the forms file from the Product module.
+  module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
 
-  // Write the product type to the database.
-  $product_type->is_new = !$updated;
-  commerce_product_type_save($product_type);
-
-  // Redirect based on the button clicked.
-  drupal_set_message(t('Product type saved.'));
-
-  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/products/types/' . $product_type->type . '/fields';
-  }
-  else {
-    $form_state['redirect'] = 'admin/commerce/products/types';
-  }
-}
-
-/**
- * Confirmation form for deleting a product type.
- */
-function commerce_product_ui_type_delete_form($form, &$form_state, $product_type) {
-  $form_state['product_type'] = $product_type;
-
-  $form = confirm_form($form,
-    t('Are you sure you want to delete the %name product type?', array('%name' => $product_type->name)),
-    'admin/commerce/products/types',
-    '<p>' . t('This action cannot be undone.') . '</p>',
-    t('Delete'),
-    t('Cancel'),
-    'confirm'
-  );
-
-  return $form;
-}
-
-function commerce_product_ui_type_delete_form_submit($form, &$form_state) {
-  $product_type = $form_state['product_type'];
-
-  commerce_product_type_delete($product_type->type);
-
-  drupal_set_message(t('The product type %name has been deleted.', array('%name' => $product_type->name)));
-  watchdog('commerce_product', 'Deleted product type %name.', array('%name' => $product_type->name), WATCHDOG_NOTICE);
-
-  $form_state['redirect'] = 'admin/commerce/products/types';
+  return drupal_get_form('commerce_product_ui_product_type_delete_form', $product_type);
 }

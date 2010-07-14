@@ -75,8 +75,8 @@ function commerce_product_ui_menu() {
   );
   $items['admin/commerce/products/types/add'] = array(
     'title' => 'Add product type',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_form', commerce_product_type_new()),
+    'page callback' => 'commerce_product_ui_product_type_form_wrapper',
+    'page arguments' => array(commerce_product_type_new()),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'includes/commerce_product_ui.types.inc',
@@ -84,8 +84,8 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/types/%commerce_product_type'] = array(
     'title callback' => 'commerce_product_type_title',
     'title arguments' => array(4),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_form', 4),
+    'page callback' => 'commerce_product_ui_product_type_form_wrapper',
+    'page arguments' => array(4),
     'access arguments' => array('administer product types'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_product_ui.types.inc',
@@ -97,8 +97,8 @@ function commerce_product_ui_menu() {
   );
   $items['admin/commerce/products/types/%commerce_product_type/delete'] = array(
     'title' => 'Delete',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_ui_type_delete_form', 4),
+    'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
+    'page arguments' => array(4),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
@@ -237,6 +237,16 @@ function commerce_product_ui_field_ui_view_modes_tabs($entity_type) {
 function commerce_product_ui_forms($form_id, $args) {
   $forms = array();
 
+  // Define a wrapper ID for the product type add / edit form.
+  $forms['commerce_product_ui_product_type_form'] = array(
+    'callback' => 'commerce_product_product_type_form',
+  );
+
+  // Define a wrapper ID for the product type delete confirmation form.
+  $forms['commerce_product_ui_product_type_delete_form'] = array(
+    'callback' => 'commerce_product_product_type_delete_form',
+  );
+
   // Define a wrapper ID for the product add / edit form.
   $forms['commerce_product_ui_product_form'] = array(
     'callback' => 'commerce_product_product_form',
@@ -251,10 +261,102 @@ function commerce_product_ui_forms($form_id, $args) {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function commerce_product_ui_form_alter(&$form, &$form_state, $form_id) {
+  // On field administration forms for product entities add a breadcrumb.
+  if (in_array($form_id, array('field_ui_field_overview_form', 'field_ui_display_overview_form'))) {
+    if ($form['#entity_type'] == 'commerce_product') {
+      commerce_product_ui_set_breadcrumb(TRUE);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Product UI module instantiates the product type add/edit form at
+ * particular paths in the Commerce IA. It uses its own form ID to do so and
+ * alters the form here to add in appropriate redirection and buttons.
+ *
+ * @see commerce_product_ui_product_type_form()
+ */
+function commerce_product_ui_form_commerce_product_ui_product_type_form_alter(&$form, &$form_state) {
+  // Add a submit handler to the save button to add a redirect.
+  $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_type_form_submit';
+
+  if (!empty($form_state['product_type']->type)) {
+    $form['actions']['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete product type'),
+      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
+      '#submit' => array('commerce_product_ui_product_type_form_delete_submit'),
+      '#weight' => 45,
+    );
+  }
+  else {
+    $form['actions']['save_continue'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save and add fields'),
+      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
+      '#submit' => array('commerce_product_product_type_form_submit', 'commerce_product_ui_product_type_form_submit'),
+      '#weight' => 45,
+    );
+  }
+}
+
+/**
+ * Submit callback for delete button on commerce_product_ui_product_type_form().
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_type_form_alter()
+ */
+function commerce_product_ui_product_type_form_delete_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type .'/delete';
+}
+
+/**
+ * Submit callback for commerce_product_ui_product_type_form().
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_type_form_alter()
+ */
+function commerce_product_ui_product_type_form_submit($form, &$form_state) {
+  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
+    $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type . '/fields';
+  }
+  else {
+    $form_state['redirect'] = 'admin/commerce/products/types';
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Product UI module instantiates the product type delete form at a
+ * particular path in the Commerce IA. It uses its own form ID to do so and
+ * alters the form here to add in appropriate redirection.
+ *
+ * @see commerce_product_ui_product_type_delete_form()
+ */
+function commerce_product_ui_form_commerce_product_ui_product_type_delete_form_alter(&$form, &$form_state) {
+  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/products/types');
+
+  $form['#submit'][] = 'commerce_product_ui_product_type_delete_form_submit';
+}
+
+/**
+ * Submit callback for commerce_product_ui_product_type_delete_form().
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_type_delete_form_alter()
+ */
+function commerce_product_ui_product_type_delete_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/commerce/products/types';
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * The Product UI module instantiates the Product add/edit form at particular
- * paths in the Commerce IA. It uses its own form ID to do so, and we alter the
+ * paths in the Commerce IA. It uses its own form ID to do so and alters the
  * form here to add in appropriate redirection and an additional button.
  *
  * @see commerce_product_ui_product_form()
@@ -297,7 +399,7 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
  * Implements hook_form_FORM_ID_alter().
  *
  * The Product UI module instantiates the Product delete form at a particular
- * path in the Commerce IA. It uses its own form ID to do so, and we alter the
+ * path in the Commerce IA. It uses its own form ID to do so and alters the
  * form here to add in appropriate redirection.
  *
  * @see commerce_product_ui_product_delete_form()
@@ -329,14 +431,22 @@ function commerce_product_ui_views_api() {
 
 /**
  * Sets the breadcrumb for administrative product pages.
+ *
+ * @param $product_types
+ *   TRUE or FALSE indicating whether or not the breadcrumb should include the
+ *     product types administrative page.
  */
-function commerce_product_ui_set_breadcrumb() {
+function commerce_product_ui_set_breadcrumb($product_types = FALSE) {
   $breadcrumb = array(
     l(t('Home'), '<front>'),
     l(t('Dashboard'), 'admin'),
     l(t('Store'), 'admin/commerce'),
     l(t('Products'), 'admin/commerce/products'),
   );
+
+  if ($product_types) {
+    $breadcrumb[] = l(t('Product types'), 'admin/commerce/products/types');
+  }
 
   drupal_set_breadcrumb($breadcrumb);
 }
