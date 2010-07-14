@@ -14,8 +14,6 @@
  *   The order object to edit through the form.
  */
 function commerce_order_order_form($form, &$form_state, $order) {
-  $form = array();
-
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
 

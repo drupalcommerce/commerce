@@ -9,10 +9,8 @@
 /**
  * Builds the admin settings form.
  */
-function commerce_checkout_settings_form() {
+function commerce_checkout_settings_form($form, &$form_state) {
   global $base_url;
-
-  $form = array();
 
   $form['anonymous'] = array(
     '#type' => 'fieldset',
@@ -63,9 +61,7 @@ function commerce_checkout_settings_form() {
  * Build the checkout form builder, adding in data for the checkout pages and
  *   the appropriate fields to enable tabledrag on the checkout panes.
  */
-function commerce_checkout_builder_form() {
-  $form = array();
-
+function commerce_checkout_builder_form($form, &$form_state) {
   // Load an array of all available checkout pages.
   $checkout_pages = commerce_checkout_pages();
 
@@ -245,8 +241,6 @@ function theme_commerce_checkout_builder_form($variables) {
  */
 function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pane) {
   // Build the form array with the bare minimum fields.
-  $form = array();
-
   $form['checkout_pane'] = array(
     '#type' => 'value',
     '#value' => $checkout_pane,

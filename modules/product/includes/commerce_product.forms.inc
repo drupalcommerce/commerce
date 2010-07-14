@@ -15,8 +15,6 @@
  *     with only a product type defined.
  */
 function commerce_product_product_form($form, &$form_state, $product) {
-  $form = array();
-
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 

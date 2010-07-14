@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Page callbacks and form builder functions for administrating products.
+ * Page callbacks and form builder functions for administering products.
  */
 
 

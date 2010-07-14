@@ -10,9 +10,7 @@
 /**
  * Builds the currency settings form.
  */
-function commerce_currency_settings_form() {
-  $form = array();
-
+function commerce_currency_settings_form($form, &$form_state) {
   // Build a currency options list from all defined currencies.
   $options = array();
 

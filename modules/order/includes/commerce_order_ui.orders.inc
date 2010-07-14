@@ -3,15 +3,14 @@
 
 /**
  * @file
+ * Page callbacks and form builder functions for administering orders.
  */
 
 
 /**
  * Form callback: edit the global order settings.
  */
-function commerce_order_settings_form() {
-  $form = array();
-
+function commerce_order_settings_form($form, &$form_state) {
   $form['commerce_order_help_text'] = array(
     '#type' => 'textarea',
     '#title' => t('Order creation help text'),

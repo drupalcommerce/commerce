@@ -5,6 +5,8 @@
  * Payment pane: form callback.
  */
 function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
+  $form = array();
+
   // Invoke the payment methods event that will populate the order with
   // available payment methods.
   $order->payment_methods = array();
