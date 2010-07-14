@@ -264,7 +264,7 @@ function commerce_product_ui_forms($form_id, $args) {
  * Implements hook_form_alter().
  */
 function commerce_product_ui_form_alter(&$form, &$form_state, $form_id) {
-  // On field administration forms for product entities add a breadcrumb.
+  // On field administration forms for product types add a breadcrumb.
   if (in_array($form_id, array('field_ui_field_overview_form', 'field_ui_display_overview_form'))) {
     if ($form['#entity_type'] == 'commerce_product') {
       commerce_product_ui_set_breadcrumb(TRUE);
