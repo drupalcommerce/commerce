@@ -33,18 +33,6 @@ function commerce_line_item_ui_menu_alter(&$items) {
 }
 
 /**
- * Implements hook_admin_paths().
- */
-function commerce_line_item_ui_admin_paths() {
-  $paths = array(
-    'admin/commerce/config/line-items' => TRUE,
-    'admin/commerce/config/line-items/*' => TRUE,
-  );
-
-  return $paths;
-}
-
-/**
  * Implements hook_theme().
  */
 function commerce_line_item_ui_theme() {

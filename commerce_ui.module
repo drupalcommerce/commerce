@@ -44,16 +44,3 @@ function commerce_ui_menu() {
 
   return $items;
 }
-
-/**
- * Implements hook_admin_paths().
- */
-function commerce_ui_admin_paths() {
-  $paths = array(
-    'admin/commerce' => TRUE,
-    'admin/commerce/config' => TRUE,
-    'admin/commerce/config/currency' => TRUE,
-  );
-
-  return $paths;
-}
