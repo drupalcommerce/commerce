@@ -65,6 +65,38 @@ function commerce_sort_weight($a, $b) {
 }
 
 /**
+ * Returns the callback for a form ID as defined by hook_forms().
+ *
+ * @param $form_id
+ *   The form ID to find the callback for.
+ * @return
+ *   A string containing the form's callback function name.
+ *
+ * @see drupal_retrieve_form()
+ * @see hook_forms()
+ */
+function commerce_form_callback($form_id, $form_state) {
+  // If a function named after the $form_id does not exist, look for its
+  // definition in hook_forms().
+  if (!function_exists($form_id)) {
+    $forms = &drupal_static(__FUNCTION__);
+
+    // In cases where many form_ids need to share a central builder function,
+    // such as the product editing form, modules can implement hook_forms(). It
+    // maps one or more form_ids to the correct constructor functions.
+    if (!isset($forms) || !isset($forms[$form_id])) {
+      $forms = module_invoke_all('forms', $form_id, $form_state['build_info']['args']);
+    }
+
+    if (isset($forms[$form_id]['callback'])) {
+      $callback = $form_definition['callback'];
+    }
+  }
+
+  return $form_id;
+}
+
+/**
  * Renders a View for display in some other element.
  *
  * @param $view_key
