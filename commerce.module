@@ -89,7 +89,7 @@ function commerce_form_callback($form_id, $form_state) {
     }
 
     if (isset($forms[$form_id]['callback'])) {
-      $callback = $form_definition['callback'];
+      return $forms[$form_id]['callback'];
     }
   }
 

@@ -11,6 +11,7 @@
  * Form callback: edit the global order settings.
  */
 function commerce_order_settings_form($form, &$form_state) {
+  drupal_set_message(commerce_form_callback('commerce_product_ui_product_form', $form_state));
   $form['commerce_order_help_text'] = array(
     '#type' => 'textarea',
     '#title' => t('Order creation help text'),
