@@ -546,21 +546,6 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Implements hook_field_ui_view_modes_tabs().
- */
-function commerce_product_reference_field_ui_view_modes_tabs($entity_type) {
-  if ($entity_type == 'commerce_product') {
-    $modes = array(
-      'basic' => array(
-        'view modes' => array('line_item'),
-      ),
-    );
-
-    return $modes;
-  }
-}
-
-/**
  * Implements hook_field_views_data_alter().
  *
  * This is a Views hook implemented to enable adding relationships for

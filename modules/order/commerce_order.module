@@ -49,21 +49,6 @@ function commerce_order_entity_info() {
 }
 
 /**
- * Implements hook_field_ui_view_modes_tabs().
- */
-function commerce_order_field_ui_view_modes_tabs($entity_type) {
-  if ($entity_type == 'commerce_order') {
-    $modes = array(
-      'basic' => array(
-        'view modes' => array('administrator', 'customer'),
-      ),
-    );
-
-    return $modes;
-  }
-}
-
-/**
  * Implements hook_field_extra_fields().
  */
 function commerce_order_field_extra_fields() {
