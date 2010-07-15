@@ -46,15 +46,19 @@ function commerce_product_entity_info() {
       'view modes' => array(
         'full' => array(
           'label' => t('Admin display'),
+          'custom settings' => FALSE,
         ),
         'node_teaser' => array(
           'label' => t('Teaser'),
+          'custom settings' => TRUE,
         ),
         'node_full' => array(
           'label' => t('Full content'),
+          'custom settings' => FALSE,
         ),
         'node_rss' => array(
           'label' => t('RSS'),
+          'custom settings' => FALSE,
         ),
       ),
       'creation callback' => '_commerce_product_create',
@@ -71,6 +75,25 @@ function commerce_product_entity_info() {
   }
 
   return $return;
+}
+
+/**
+ * Implements hook_field_ui_view_modes_tabs().
+ */
+function commerce_product_field_ui_view_modes_tabs($entity_type) {
+  if ($entity_type == 'commerce_product') {
+    $modes = array(
+      'basic' => array(
+        'view modes' => array('full'),
+      ),
+      'node' => array(
+        'title' => t('Node'),
+        'view modes' => array('node_teaser', 'node_full', 'node_rss'),
+      ),
+    );
+
+    return $modes;
+  }
 }
 
 /**

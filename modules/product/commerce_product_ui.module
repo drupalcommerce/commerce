@@ -213,25 +213,6 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Implements hook_field_ui_view_modes_tabs().
- */
-function commerce_product_ui_field_ui_view_modes_tabs($entity_type) {
-  if ($entity_type == 'commerce_product') {
-    $modes = array(
-      'basic' => array(
-        'view modes' => array('full'),
-      ),
-      'node' => array(
-        'title' => t('Node'),
-        'view modes' => array('node_teaser', 'node_full', 'node_rss'),
-      ),
-    );
-
-    return $modes;
-  }
-}
-
-/**
  * Implements hook_forms().
  */
 function commerce_product_ui_forms($form_id, $args) {

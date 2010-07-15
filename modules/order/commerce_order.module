@@ -31,9 +31,11 @@ function commerce_order_entity_info() {
       'view modes' => array(
         'administrator' => array(
           'label' => t('Administrator'),
+          'custom settings' => FALSE,
         ),
         'customer' => array(
           'label' => t('Customer'),
+          'custom settings' => FALSE,
         ),
       ),
       'creation callback' => '_commerce_order_create',
@@ -44,6 +46,21 @@ function commerce_order_entity_info() {
   );
 
   return $return;
+}
+
+/**
+ * Implements hook_field_ui_view_modes_tabs().
+ */
+function commerce_order_field_ui_view_modes_tabs($entity_type) {
+  if ($entity_type == 'commerce_order') {
+    $modes = array(
+      'basic' => array(
+        'view modes' => array('administrator', 'customer'),
+      ),
+    );
+
+    return $modes;
+  }
 }
 
 /**

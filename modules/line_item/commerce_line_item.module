@@ -29,6 +29,7 @@ function commerce_line_item_entity_info() {
       'view modes' => array(
         'display' => array(
           'label' => t('Display'),
+          'custom settings' => FALSE,
         ),
       ),
       'creation callback' => '_commerce_line_item_create',

@@ -541,6 +541,7 @@ function commerce_product_reference_commerce_line_item_info() {
 function commerce_product_reference_entity_info_alter(&$entity_info) {
   $entity_info['commerce_product']['view modes']['line_item'] = array(
     'label' => t('Line item'),
+    'custom settings' => TRUE,
   );
 }
 
