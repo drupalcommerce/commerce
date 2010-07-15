@@ -70,15 +70,17 @@ function commerce_order_field_extra_fields() {
   $extra = array();
 
   $extra['commerce_order']['commerce_order'] = array(
-    'customer' => array(
-      'label' => 'Customer',
-      'description' => t('Order module Customer information fieldset'),
-      'weight' => 15,
-    ),
-    'creator' => array(
-      'label' => 'Creation information',
-      'description' => t('Order module Creation date / user fieldset'),
-      'weight' => 20,
+    'form' => array(
+      'customer' => array(
+        'label' => t('Customer'),
+        'description' => t('Order module Customer information fieldset'),
+        'weight' => 15,
+      ),
+      'creator' => array(
+        'label' => t('Creation information'),
+        'description' => t('Order module Creation date / user fieldset'),
+        'weight' => 20,
+      ),
     ),
   );
 

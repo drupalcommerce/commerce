@@ -56,15 +56,29 @@ function commerce_line_item_field_extra_fields() {
 
   foreach (commerce_line_item_types() as $type => $line_item_type) {
     $extra['commerce_line_item'][$type] = array(
-      'label' => array(
-        'label' => 'Line item label',
-        'description' => t('Line item module label form element'),
-        'weight' => -10,
+      'form' => array(
+        'label' => array(
+          'label' => t('Line item label'),
+          'description' => t('Line item module label form element'),
+          'weight' => -10,
+        ),
+        'quantity' => array(
+          'label' => t('Quantity'),
+          'description' => t('Line item module quantity form element'),
+          'weight' => -5,
+        ),
       ),
-      'quantity' => array(
-        'label' => 'Quantity',
-        'description' => t('Line item module quantity form element'),
-        'weight' => -5,
+      'display' => array(
+        'label' => array(
+          'label' => t('Line item label'),
+          'description' => t('Short descriptive label for the line item'),
+          'weight' => -10,
+        ),
+        'quantity' => array(
+          'label' => t('Quantity'),
+          'description' => t('Quantity associated with this line item'),
+          'weight' => -5,
+        ),
       ),
     );
   }

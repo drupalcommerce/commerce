@@ -104,20 +104,39 @@ function commerce_product_field_extra_fields() {
 
   foreach (commerce_product_types() as $type => $product_type) {
     $extra['commerce_product'][$type] = array(
-      'sku' => array(
-        'label' => 'Product SKU',
-        'description' => t('Product module SKU form element'),
-        'weight' => -10,
+      'form' => array(
+        'sku' => array(
+          'label' => 'Product SKU',
+          'description' => t('Product module SKU form element'),
+          'weight' => -10,
+        ),
+        'title' => array(
+          'label' => 'Title',
+          'description' => t('Product module title form element'),
+          'weight' => -5,
+        ),
+        'status' => array(
+          'label' => 'Status',
+          'description' => t('Product module status form element'),
+          'weight' => 35,
+        ),
       ),
-      'title' => array(
-        'label' => 'Title',
-        'description' => t('Product module title form element'),
-        'weight' => -5,
-      ),
-      'status' => array(
-        'label' => 'Status',
-        'description' => t('Product module status form element'),
-        'weight' => 35,
+      'display' => array(
+        'sku' => array(
+          'label' => 'Product SKU',
+          'description' => t('The human readable identifier of the product'),
+          'weight' => -10,
+        ),
+        'title' => array(
+          'label' => 'Title',
+          'description' => t('Full product title'),
+          'weight' => -5,
+        ),
+        'status' => array(
+          'label' => 'Status',
+          'description' => t("The product's active vs. disabled status"),
+          'weight' => 35,
+        ),
       ),
     );
   }
