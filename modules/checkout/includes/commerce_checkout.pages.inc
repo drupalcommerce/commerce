@@ -261,7 +261,7 @@ function commerce_checkout_form_cancel_submit($form, &$form_state) {
     // commerce_order_comment_save($form_state['values']['order']->order_id, 0, t('Customer cancelled this order from the checkout form.'));
   }
 
-  drupal_set_message(t('Checkout of your current order has been canceled at may be resumed when you are ready.'));
+  drupal_set_message(t('Checkout of your current order has been canceled and may be resumed when you are ready.'));
 
   $form_state['redirect'] = $form_state['values']['cancel_redirect'];
 }
