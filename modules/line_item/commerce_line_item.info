@@ -17,6 +17,7 @@ files[] = includes/commerce_line_item.controller.inc
 files[] = includes/views/commerce_line_item.views.inc
 files[] = includes/views/handlers/commerce_line_item_handler_argument_line_item_line_item_id.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_type.inc
+files[] = includes/views/handlers/commerce_line_item_handler_filter_line_item_type.inc
 
 ; Simple tests
 ; files[] = tests/commerce_line_item.test
