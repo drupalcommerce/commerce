@@ -50,7 +50,7 @@ function commerce_line_item_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'commerce_line_item_handler_filter_item_type',
+      'handler' => 'commerce_line_item_handler_filter_line_item_type',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
