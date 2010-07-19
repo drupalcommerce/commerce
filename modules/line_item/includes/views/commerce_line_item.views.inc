@@ -103,18 +103,3 @@ function commerce_line_item_views_data() {
 
   return $data;
 }
-
-/**
- * Implements hook_views_handlers().
- */
-function commerce_line_item_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views/handlers',
-    ),
-    'handlers' => array(
-      'commerce_line_item_handler_argument_line_item_line_item_id',
-      'commerce_line_item_handler_field_line_item_type',
-    ),
-  );
-}

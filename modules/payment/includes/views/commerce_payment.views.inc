@@ -178,24 +178,3 @@ function commerce_payment_views_data() {
 
   return $data;
 }
-
-/**
- * Implements hook_views_handlers().
- */
-function commerce_payment_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'commerce_payment') . '/includes/views/handlers',
-    ),
-    'handlers' => array(
-      // Field handlers
-      'commerce_payment_handler_field_status' => array(
-        'parent' => 'views_handler_field',
-      ),
-      // Footer handlers.
-      'commerce_payment_handler_area_total' => array(
-        'parent' => 'views_handler_area',
-      ),
-    ),
-  );
-}
