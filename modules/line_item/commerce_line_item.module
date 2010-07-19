@@ -142,6 +142,8 @@ function commerce_line_item_permission() {
   $permissions = array(
     'administer line item types' => array(
       'title' => t('Administer line item types'),
+      'description' => t('View and configure fields attached to module defined line item types.'),
+      'restrict access' => TRUE,
     ),
   );
 

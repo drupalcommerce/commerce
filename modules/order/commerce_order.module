@@ -97,18 +97,23 @@ function commerce_order_permission() {
   $permissions = array(
     'administer orders' => array(
       'title' => t('Administer orders'),
+      'restrict access' => TRUE,
     ),
     'access orders' => array(
       'title' => t('Access lists of orders, primarily for viewing and referencing'),
+      'restrict access' => TRUE,
     ),
     'create orders' => array(
       'title' => t('Create orders'),
+      'restrict access' => TRUE,
     ),
     'edit any order' => array(
       'title' => t('Edit any order'),
+      'restrict access' => TRUE,
     ),
     'edit own orders' => array(
       'title' => t('Edit own orders'),
+      'restrict access' => TRUE,
     ),
   );
 

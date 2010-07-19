@@ -87,6 +87,11 @@ function commerce_checkout_permission() {
     'administer checkout' => array(
       'title' => t('Administer checkout'),
       'description' => t('Configure checkout settings and the checkout form itself.'),
+      'restrict access' => TRUE,
+    ),
+    'access checkout' => array(
+      'title' => t('Access checkout'),
+      'description' => t('Complete a purchase through the checkout form.'),
     ),
   );
 
