@@ -60,7 +60,10 @@ function commerce_payment_pane_form($pane_values, $checkout_pane, $order) {
     $payment_method = commerce_payment_method_load($form['payment_method']['#default_value']);
 
     if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
-      $form['payment'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
+      $form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
+    }
+    else {
+      $form['payment_details'] = array();
     }
   }
 
@@ -84,10 +87,10 @@ function commerce_payment_pane_form_validate($pane_form, $pane_values, $order) {
   }
 
   // Delegate validation to the payment method callback.
-  $payment_method = commerce_payment_method_load($pane_values['payment_methods']);
+  $payment_method = commerce_payment_method_load($pane_values['payment_method']);
 
   if (function_exists($callback = $payment_method->callbacks['submit_form_validate'])) {
-    return $callback($payment_method, $pane_form['payment'], $pane_values['payment'], $order);
+    return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order);
   }
 
   // Nothing to validate.
@@ -104,7 +107,7 @@ function commerce_payment_pane_form_submit($pane_form, $pane_values, $order) {
   $payment_method = commerce_payment_method_load($pane_values['payment_method']);
 
   if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
-    return $callback($payment_method, $pane_form['payment'], $pane_values['payment'], $order);
+    return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order);
   }
 }
 

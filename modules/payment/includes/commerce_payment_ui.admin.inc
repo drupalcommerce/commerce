@@ -2,6 +2,12 @@
 // $Id$
 
 /**
+ * @file
+ * Administrative page callbacks for the Payment UI module.
+ */
+
+
+/**
  * Builds the payment settings page using the Rules UI overview table filtered
  *   to display payment method rules.
  */
@@ -22,7 +28,7 @@ function commerce_payment_ui_admin_page() {
 
   $content['disabled']['title']['#markup'] = '<h3>' . t('Disabled payment rules') . '</h3>';
 
-  $conditions = array('event' => 'commerce_payment_methods', 'plugin' => 'reaction rule', 'active' => FALSE);
+  $conditions['active'] = FALSE;
   $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions);
   $content['disabled']['rules']['#empty'] = t('There are no disabled payment methods.');
 
