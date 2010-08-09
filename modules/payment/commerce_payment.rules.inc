@@ -92,7 +92,7 @@ function commerce_payment_rules_data_info() {
 /**
  * UI for textual data.
  */
-class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectInputForm {
+class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectInputFormInterface {
   public static function getDefaultMode() {
     return 'input';
   }
