@@ -30,7 +30,7 @@
 function hook_commerce_payment_method_info() {
   $method['shiny_gateway'] = array(
     'title' => t('Shiny gateway'),
-    'description' => t('Secure alliance payment via the Shiny gateway.')
+    'description' => t('Secure alliance payment via the Shiny gateway.'),
     'default settings' => array(
       'owner name' => 'Malcolm Reynolds',
       'class code' => '03-K64',
