@@ -126,8 +126,9 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'commerce_line_item';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['relationship'] = 'line_items_line_item_id';
-  $handler->display->display_options['filters']['type']['value'] = 'product';
-  $handler->display->display_options['filters']['type']['case'] = 1;
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'product' => 'product',
+  );
 
   $views[$view->name] = $view;
 
