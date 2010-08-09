@@ -12,7 +12,7 @@
  */
 function commerce_payment_schema() {
   $schema['commerce_payment_transaction'] = array(
-    'description' => 'Payment transactions for orders.',
+    'description' => 'Transaction information for every attempted payment.',
     'fields' => array(
       'transaction_id' => array(
         'description' => 'The primary identifier for a transaction.',

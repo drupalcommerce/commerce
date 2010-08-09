@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Defines the payment system and checkout integration.
+ */
+
+/**
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_payment_commerce_checkout_page_info() {
@@ -65,30 +70,34 @@ function commerce_payment_views_api() {
 }
 
 /**
- * Load all the available payment methods.
+ * Returns an array of payment methods defined by enabled modules.
+ *
+ * @return
+ *   An associative array of payment method objects keyed by the method_id.
  */
 function commerce_payment_methods() {
   $payment_methods = &drupal_static(__FUNCTION__);
 
+  // If the payment methods haven't been defined yet, do so now.
   if (!isset($payment_methods)) {
     $payment_methods = module_invoke_all('commerce_payment_method_info');
     drupal_alter('commerce_payment_method_info', $payment_methods);
 
     foreach ($payment_methods as $method_id => &$payment_method) {
-      $payment_method['method_id'] = $method_id;
-
-      // Merge in defaults.
-      $payment_method += array(
-        'base' => $payment_method['method_id'],
+      $defaults = array(
+        'method_id' => $method_id,
+        'base' => $method_id,
         'title' => '',
         'description' => '',
         'callbacks' => array(),
       );
 
+      $payment_methods[$method_id] = (object) ((array) $payment_method + $defaults);
+
       // Merge in default callbacks.
       foreach (array('settings', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
-        if (!isset($payment_method['callbacks'][$callback])) {
-          $payment_method['callbacks'][$callback] = $payment_method['base'] . '_' . $callback;
+        if (!isset($payment_method->callbacks[$callback])) {
+          $payment_method->callbacks[$callback] = $payment_method->base . '_' . $callback;
         }
       }
     }
@@ -98,9 +107,15 @@ function commerce_payment_methods() {
 }
 
 /**
- * Loads a single payment method.
+ * Returns a payment method object.
+ *
+ * @param $method_id
+ *   The ID of the payment method to return.
+ *
+ * @return
+ *   The fully loaded payment method object or FALSE if not found.
  */
-function commerce_payment_method($method_id) {
+function commerce_payment_method_load($method_id) {
   $payment_methods = commerce_payment_methods();
-  return isset($payment_methods[$method_id]) ? $payment_methods[$method_id] : NULL;
+  return isset($payment_methods[$method_id]) ? $payment_methods[$method_id] : FALSE;
 }
