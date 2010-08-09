@@ -3,8 +3,9 @@
 
 /**
  * @file
- * Provides a NULL payment method for Drupal Commerce.
+ * Provides a NULL payment method for Drupal Commerce; used for testing.
  */
+
 
 /**
  * Implements hook_commerce_payment_method_info().
@@ -21,7 +22,7 @@ function commerce_payment_null_commerce_payment_method_info() {
 }
 
 /**
- * Settings callback for the payment method.
+ * Payment method callback: settings form.
  */
 function commerce_payment_null_settings($settings = NULL) {
   $form = array();
@@ -36,7 +37,7 @@ function commerce_payment_null_settings($settings = NULL) {
 }
 
 /**
- * Checkout form callback for the payment method.
+ * Payment method callback: checkout form.
  */
 function commerce_payment_null_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
   $form = array();
@@ -61,7 +62,24 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
 }
 
 /**
- * Submission form callback for the payment method.
+ * Payment method callback: checkout form validation.
+ */
+function commerce_payment_null_submit_form_validate($payment_method, $pane_form, $pane_values, $order) {
+  // Throw an error if a name was not provided. Note that we can't use #required
+  // on the form element because of the current nature of the checkout form's
+  // back button. See: http://drupal.org/node/875220
+  if (empty($pane_values['name'])) {
+    form_set_error('name', t('You must enter a name.'));
+
+    // Even though the form error is enough to stop the submission of the form,
+    // it's not enough to stop it from a Commerce standpoint because of the
+    // combined validation / submission going on per-pane in the checkout form.
+    return FALSE;
+  }
+}
+
+/**
+ * Payment method callback: checkout form submission.
  */
 function commerce_payment_null_submit_form_submit($payment_method, $pane_form, $pane_values, $order) {
   $order->data['commerce_payment_null'] = $pane_values;
