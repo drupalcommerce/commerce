@@ -126,10 +126,10 @@ function commerce_checkout_theme() {
 /**
  * Implements hook_forms().
  *
- * To provide distinct form IDs for add to cart forms, the product IDs
- * referenced by the form are appended to the base ID, commerce_cart_form. When
- * such a form is built or submitted, this function will validate the form ID
- * and return the proper callback function to use for the given $form_id.
+ * Each page of the checkout form is actually a unique form as opposed to a
+ * single multistep form. To accommodate this, we map any form ID beginning with
+ * commerce_checkout_form_ to the same form builder assuming the remainder of
+ * the form ID matches a valid checkout page ID.
  */
 function commerce_checkout_forms($form_id, $args) {
   $forms = array();
