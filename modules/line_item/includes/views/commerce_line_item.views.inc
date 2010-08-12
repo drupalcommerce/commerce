@@ -101,5 +101,36 @@ function commerce_line_item_views_data() {
     ),
   );
 
+  // Expose the created and changed timestamps.
+  $data['commerce_line_item']['created'] = array(
+    'title' => t('Created date'),
+    'help' => t('The date the line item was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  $data['commerce_line_item']['changed'] = array(
+    'title' => t('Updated date'),
+    'help' => t('The date the line item was last updated.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
   return $data;
 }

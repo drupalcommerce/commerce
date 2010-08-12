@@ -37,6 +37,18 @@ function commerce_line_item_schema() {
         'precision' => 10,
         'scale' => 2,
       ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the line item was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the line item was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('line_item_id'),
   );

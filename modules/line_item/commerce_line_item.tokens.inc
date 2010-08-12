@@ -33,6 +33,18 @@ function commerce_line_item_token_info() {
     'description' => t('The quantity of the line item.'),
   );
 
+  // Chained tokens for products.
+  $line_item['created'] = array(
+    'name' => t('Date created'),
+    'description' => t('The date the line item was created.'),
+    'type' => 'date',
+  );
+  $line_item['changed'] = array(
+    'name' => t('Date updated'),
+    'description' => t('The date the line item was last updated.'),
+    'type' => 'date',
+  );
+
   return array(
     'types' => array('line_item' => $type),
     'tokens' => array('line_item' => $line_item),
@@ -78,6 +90,16 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
         case 'quantity':
           $replacements[$original] = $sanitize ? check_plain($line_item->quantity) : $line_item->quantity;
           break;
+
+        // Default values for the chained tokens handled below.
+        case 'created':
+          $replacements[$original] = format_date($line_item->created, 'medium', '', NULL, $language_code);
+          break;
+
+        case 'changed':
+          $replacements[$original] = format_date($line_item->changed, 'medium', '', NULL, $language_code);
+          break;
+
       }
     }
   }

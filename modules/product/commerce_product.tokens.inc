@@ -19,7 +19,7 @@ function commerce_product_token_info() {
 
   // Tokens for products.
   $product = array();
-  
+
   $product['product-id'] = array(
     'name' => t('Product ID'),
     'description' => t('The internal numeric ID of the product.'),
@@ -45,6 +45,11 @@ function commerce_product_token_info() {
   $product['created'] = array(
     'name' => t('Date created'),
     'description' => t('The date the product was created.'),
+    'type' => 'date',
+  );
+  $product['changed'] = array(
+    'name' => t('Date updated'),
+    'description' => t('The date the product was last updated.'),
     'type' => 'date',
   );
 
@@ -101,6 +106,10 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
         // Default values for the chained tokens handled below.
         case 'created':
           $replacements[$original] = format_date($product->created, 'medium', '', NULL, $language_code);
+          break;
+
+        case 'changed':
+          $replacements[$original] = format_date($product->changed, 'medium', '', NULL, $language_code);
           break;
       }
     }

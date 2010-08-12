@@ -27,6 +27,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       'type' => $type,
       'line_item_label' => '',
       'quantity' => 1,
+      'created' => '',
+      'changed' => '',
     );
   }
 
@@ -43,6 +45,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
     $transaction = db_transaction();
 
     try {
+      $line_item->changed = time();
+
       // Save a copy of the unchanged line item for rules in case of updates.
       // see commerce_line_item_rules_var_unchanged().
       $unchanged = &drupal_static('commerce_line_item_unchanged', array());
@@ -63,6 +67,9 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
 
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
+        // Set the creation timestamp.
+        $line_item->created = time();
+
         // Save the new line item and fields.
         drupal_write_record('commerce_line_item', $line_item);
         field_attach_insert('commerce_line_item', $line_item);

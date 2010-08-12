@@ -83,7 +83,6 @@ function commerce_product_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-
     ),
     'primary key' => array('product_id'),
     'indexes' => array(
