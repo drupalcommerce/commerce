@@ -11,7 +11,7 @@
  * Checkout pane callback: returns a pane allowing the customer to review the
  *   details of the order.
  */
-function commerce_checkout_review_pane_form($pane_values, $checkout_pane, $order) {
+function commerce_checkout_review_pane_checkout_form($pane_values, $checkout_pane, $order) {
   $form = array();
 
   // Otherwise add any enabled checkout panes that are visible on review.

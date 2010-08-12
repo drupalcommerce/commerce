@@ -226,9 +226,7 @@ function commerce_checkout_commerce_checkout_pane_info() {
   $checkout_panes['checkout_review'] = (object) array(
     'title' => t('Review '),
     'file' => 'includes/commerce_checkout.checkout_pane.inc',
-    'callbacks' => array(
-      'checkout_form' => 'commerce_checkout_review_pane_form',
-    ),
+    'base' => 'commerce_checkout_review_pane',
     'page' => 'review',
     'weight' => 0,
   );
@@ -363,6 +361,7 @@ function commerce_checkout_panes($conditions = array()) {
 
       // Set some defaults for the checkout pane.
       $defaults = array(
+        'base' => $pane_id,
         'name' => $checkout_pane->title,
         'page' => 'checkout',
         'collapsible' => FALSE,
@@ -370,8 +369,16 @@ function commerce_checkout_panes($conditions = array()) {
         'weight' => 0,
         'enabled' => TRUE,
         'review' => TRUE,
+        'callbacks' => array(),
       );
       $checkout_pane = (object) array_merge($defaults, (array) $checkout_pane);
+
+      // Merge in default callbacks.
+      foreach (array('settings_form', 'checkout_form', 'checkout_form_validate', 'checkout_form_submit', 'review') as $callback) {
+        if (!isset($checkout_pane->callbacks[$callback])) {
+          $checkout_pane->callbacks[$callback] = $checkout_pane->base . '_' . $callback;
+        }
+      }
 
       $checkout_panes[$pane_id] = $checkout_pane;
     }

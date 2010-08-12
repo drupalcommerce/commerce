@@ -41,7 +41,7 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
  * Checkout pane callback: returns the cart contents View for inclusion in the
  *   checkout form.
  */
-function commerce_cart_contents_pane_form($pane_values, $checkout_pane, $order) {
+function commerce_cart_contents_pane_checkout_form($pane_values, $checkout_pane, $order) {
   $form = array();
 
   // Extract the View and display keys from the cart contents pane setting.

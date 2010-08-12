@@ -33,13 +33,7 @@ function commerce_payment_commerce_checkout_pane_info() {
     'page' => 'review',
     'locked' => TRUE,
     'file' => 'includes/commerce_payment.checkout_pane.inc',
-    'callbacks' => array(
-      'settings_form' => 'commerce_payment_pane_settings_form',
-      'checkout_form' => 'commerce_payment_pane_form',
-      'checkout_form_validate' => 'commerce_payment_pane_form_validate',
-      'checkout_form_submit' => 'commerce_payment_pane_form_submit',
-      'review' => 'commerce_payment_pane_review',
-    ),
+    'base' => 'commerce_payment_pane',
     'weight' => 10,
   );
 
@@ -48,12 +42,7 @@ function commerce_payment_commerce_checkout_pane_info() {
     'page' => 'payment',
     'locked' => TRUE,
     'file' => 'includes/commerce_payment.checkout_pane.inc',
-    'callbacks' => array(
-      'settings_form' => 'commerce_payment_redirect_pane_settings_form',
-      'checkout_form' => 'commerce_payment_redirect_pane_form',
-      'checkout_form_submit' => 'commerce_payment_redirect_pane_form_submit',
-      'review' => 'commerce_payment_redirect_pane_review',
-    ),
+    'base' => 'commerce_payment_redirect_pane',
   );
 
   return $checkout_panes;
