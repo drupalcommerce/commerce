@@ -615,15 +615,9 @@ function commerce_product_reference_configure_line_item() {
         'type' => 'commerce_product_reference_autocomplete',
       ),
 
-      // Define default formatters for the teaser and full view.
       'display' => array(
-        'full' => array(
+        'display' => array(
           'label' => 'hidden',
-          // 'type' => 'text_default',
-        ),
-        'teaser' => array(
-          'label' => 'hidden',
-          // 'type' => 'text_summary_or_trimmed',
         ),
       ),
     );

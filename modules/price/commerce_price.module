@@ -113,20 +113,25 @@ function commerce_price_create_instance($name, $entity_type, $bundle, $label, $w
       'bundle' => $bundle,
       'label' => $label,
       'required' => TRUE,
+      'settings' => array(),
+
       'widget' => array(
         'type' => 'commerce_price_simple',
         'weight' => $weight,
       ),
-      'settings' => array(),
 
-      // Define default formatters for the teaser and full view.
-      'display' => array(
-        'full' => array(
-          'label' => 'hidden',
-          'type' => 'commerce_price_default',
-        ),
-      ),
+      'display' => array(),
     );
+
+    $entity_info = entity_get_info($entity_type);
+
+    foreach ($entity_info['view modes'] as $view_mode => $data) {
+      $instance['display'][$view_mode] = array(
+        'label' => 'hidden',
+        'type' => 'commerce_price_default',
+      );
+    }
+
     field_create_instance($instance);
   }
 }
