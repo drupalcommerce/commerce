@@ -224,9 +224,12 @@ function commerce_cart_order_load($customer_uid = 0) {
 
     // If a customer uid was specified...
     if ($customer_uid) {
+      // Create an array of valid shopping cart order statuses.
+      $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
       // Look for the user's most recent shopping cart order, although they
       // should never really have more than one.
-      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid AND status = :status ORDER BY order_id DESC', array(':customer_uid' => $customer_uid, ':status' => 'cart'))->fetchField();
+      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':customer_uid' => $customer_uid, ':status_ids' => $status_ids))->fetchField();
     }
     else {
       // Otherwise look for a shopping cart order ID in the session.

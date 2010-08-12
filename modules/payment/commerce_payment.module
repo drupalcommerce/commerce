@@ -15,6 +15,7 @@ function commerce_payment_commerce_checkout_page_info() {
   $checkout_pages['payment'] = (object) array(
     'title' => t('Payment'),
     'help' => t('Off-site payment pseudo-page.'),
+    'status_cart' => FALSE,
     'locked' => TRUE,
     'weight' => 20,
   );
