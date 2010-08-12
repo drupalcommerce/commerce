@@ -150,6 +150,22 @@ function commerce_product_ui_menu_alter(&$items) {
 }
 
 /**
+ * Implements hook_admin_menu_map().
+ */
+function commerce_product_ui_admin_menu_map() {
+  // Add awareness to the administration menu of the various product types so
+  // they are included in the dropdown menu.
+  $map['admin/commerce/products/types/%commerce_product_type'] = array(
+    'parent' => 'admin/commerce/products/types',
+    'arguments' => array(
+      array('%commerce_product_type' => array_keys(commerce_product_types())),
+    ),
+  );
+
+  return $map;
+}
+
+/**
  * Implements hook_help().
  */
 function commerce_product_ui_help($path, $arg) {
