@@ -44,7 +44,7 @@ function commerce_product_reference_field_extra_fields() {
  * This implementation adds product fields to the content array of a node on
  * display if the product contains a non-empty product reference field.
  */
-function commerce_product_reference_node_view(&$node, $build_mode = 'full') {
+function commerce_product_reference_node_view($node, $build_mode = 'full') {
   // Loop through product reference fields to see if any exist on this node
   // type's bundle.
   foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
