@@ -95,6 +95,9 @@ function commerce_cart_views_api() {
  */
 function commerce_cart_theme() {
   return array(
+    'commerce_cart_empty_block' => array(
+      'variables' => array(),
+    ),
     'commerce_cart_block' => array(
       'variables' => array('order' => NULL, 'contents_view' => NULL),
       'path' => drupal_get_path('module', 'commerce_cart') . '/theme',
@@ -163,7 +166,7 @@ function commerce_cart_block_view($delta) {
     // If the cart is empty...
     if (!$order || empty($order->line_items)) {
       // Display an appropriate message.
-      $content = t('Your shopping cart is empty.');
+      $content = theme('commerce_cart_empty_block');
     }
     else {
       // Add the cart block CSS.
@@ -180,6 +183,13 @@ function commerce_cart_block_view($delta) {
 
     return array('subject' => t('Shopping cart'), 'content' => $content);
   }
+}
+
+/**
+ * Themes an empty shopping cart block's contents.
+ */
+function theme_commerce_cart_empty_block() {
+  return '<div class="cart-empty">' . t('Your shopping cart is empty.') . '</div>';
 }
 
 /**
