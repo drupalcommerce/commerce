@@ -125,15 +125,31 @@ function commerce_order_ui_help($path, $arg) {
 
 /**
  * Implements hook_entity_info_alter().
- *
- * Expose the order UI for order fields.
  */
 function commerce_order_ui_entity_info_alter(&$entity_info) {
+  // Add a URI callback to the order entity.
+  $entity_info['commerce_order']['uri callback'] = 'commerce_order_ui_uri';
+
+  // Expose the order UI for order fields.
   $entity_info['commerce_order']['bundles']['commerce_order']['admin'] = array(
     'path' => 'admin/commerce/config/order',
     'real path' => 'admin/commerce/config/order',
     'access arguments' => array('administer orders'),
   );
+}
+
+/**
+ * Entity uri callback: points to the admin view page of the given order.
+ */
+function commerce_order_ui_uri($order) {
+  // Only return a value if the user has permission to view the order.
+  if (commerce_order_access('view', $order)) {
+    return array(
+      'path' => 'admin/commerce/orders/' . $order->order_id,
+    );
+  }
+
+  return NULL;
 }
 
 /**

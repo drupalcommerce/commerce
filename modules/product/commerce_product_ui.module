@@ -214,10 +214,12 @@ function commerce_product_ui_theme() {
 
 /**
  * Implements hook_entity_info_alter().
- *
- * Exposes the admin UI for product fields.
  */
 function commerce_product_ui_entity_info_alter(&$entity_info) {
+  // Add a URI callback to the product entity.
+  $entity_info['commerce_product']['uri callback'] = 'commerce_product_ui_uri';
+
+  // Expose the admin UI for product fields.
   foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
       'path' => 'admin/commerce/products/types/%commerce_product_type',
@@ -226,6 +228,20 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
       'access arguments' => array('administer product types'),
     );
   }
+}
+
+/**
+ * Entity uri callback: points to the edit form of the given product.
+ */
+function commerce_product_ui_uri($product) {
+  // Only return a value if the user has permission to view the product.
+  if (commerce_product_access('view', $product)) {
+    return array(
+      'path' => 'admin/commerce/products/' . $product->product_id,
+    );
+  }
+
+  return NULL;
 }
 
 /**
