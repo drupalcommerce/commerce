@@ -96,7 +96,7 @@ function commerce_cart_views_api() {
 function commerce_cart_theme() {
   return array(
     'commerce_cart_block' => array(
-      'variables' => array('quantity_raw' => NULL, 'quantity_label' => NULL, 'quantity' => NULL, 'total_raw' => NULL, 'total' => NULL, 'checkout_link' => NULL),
+      'variables' => array('order' => NULL, 'contents_view' => NULL),
       'path' => drupal_get_path('module', 'commerce_cart') . '/theme',
       'template' => 'commerce-cart-block',
     ),
@@ -169,32 +169,10 @@ function commerce_cart_block_view($delta) {
       // Add the cart block CSS.
       drupal_add_css(drupal_get_path('module', 'commerce_cart') .'/theme/commerce_cart.block.css');
 
-      // Add total information and a link to checkout.
-      $quantity = commerce_line_items_quantity($order->line_items, 'product');
-      $total = commerce_line_items_total($order->line_items, 'product');
-
-      $cart_links = array();
-
-      // Only add the checkout link if checkout is enabled.
-      if (module_exists('commerce_checkout')) {
-        $cart_links['cart-block-checkout'] = array(
-          'title' => t('Checkout'),
-          'href' => 'checkout',
-          'attributes' => array('rel' => 'nofollow'),
-        );
-      }
-
       // Build the variables array to send to the cart block template.
       $variables = array(
         'order' => $order,
         'contents_view' => commerce_embed_view('commerce_cart', 'defaults', $order->order_id),
-        'quantity_raw' => $quantity,
-        'quantity_label' => format_plural($quantity, 'item', 'items'),
-        'quantity' => format_plural($quantity, '1 item', '@count items'),
-        'total_raw' => number_format(round($total['price'], 2), 2),
-        'total_label' => t('Total:'),
-        'total' => commerce_currency_format($total['price'], $total['currency_code'], $order),
-        'cart_links' => theme('links', array('links' => $cart_links)),
       );
 
       $content = theme('commerce_cart_block', $variables);

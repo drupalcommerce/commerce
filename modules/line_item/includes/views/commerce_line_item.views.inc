@@ -132,5 +132,14 @@ function commerce_line_item_views_data() {
     ),
   );
 
+  // Define a handler for an area used to summarize a set of line items.
+  $data['commerce_line_item']['line_item_summary'] = array(
+    'title' => t('Line item summary'),
+    'help' => t('Summarize the line items in a View with an optional link to checkout.'),
+    'area' => array(
+      'handler' => 'commerce_line_item_handler_area_line_item_summary',
+    ),
+  );
+
   return $data;
 }

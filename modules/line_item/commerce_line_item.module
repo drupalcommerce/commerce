@@ -94,6 +94,11 @@ function commerce_line_item_theme() {
     'line_item_manager' => array(
       'render element' => 'form',
     ),
+    'commerce_line_item_summary' => array(
+      'variables' => array('quantity_raw' => NULL, 'quantity_label' => NULL, 'quantity' => NULL, 'total_raw' => NULL, 'total' => NULL, 'links' => NULL, 'view' => NULL),
+      'path' => drupal_get_path('module', 'commerce_line_item') . '/theme',
+      'template' => 'commerce-line-item-summary',
+    ),
   );
 }
 

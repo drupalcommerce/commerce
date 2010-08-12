@@ -4,22 +4,22 @@
   text-align: right;
 }
 
-.cart-footer {
+.view-commerce-cart .line-item-summary {
   text-align: right;
 }
 
-.cart-footer .cart-quantity {
+.view-commerce-cart .line-item-summary .line-item-quantity {
   float: left;
 }
 
-.cart-footer .cart-total-label {
+.view-commerce-cart .line-item-summary .line-item-total-label {
   font-weight: bold;
 }
 
-.cart-footer .links {
+.view-commerce-cart .line-item-summary .links {
   clear: left;
 }
 
-.cart-footer .links li.last {
+.view-commerce-cart .line-item-summary .links li.last {
   padding-right: 0;
 }
