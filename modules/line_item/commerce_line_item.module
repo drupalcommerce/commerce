@@ -91,7 +91,7 @@ function commerce_line_item_field_extra_fields() {
  */
 function commerce_line_item_theme() {
   return array(
-    'line_item_manager' => array(
+    'commerce_line_item_manager' => array(
       'render element' => 'form',
     ),
     'commerce_line_item_summary' => array(
@@ -546,7 +546,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
     // Update the base form element array to use the proper theme and validate
     // functions and to include header information for the line item table.
     $element += array(
-      '#theme' => 'line_item_manager',
+      '#theme' => 'commerce_line_item_manager',
       '#element_validate' => array('commerce_line_item_manager_validate'),
       '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit Price'), t('Total')),
       '#empty' => t('No line items found.'),
@@ -679,7 +679,7 @@ function commerce_line_item_manager_refresh($form, $form_state) {
 /**
  * Themes the line item manager widget form element.
  */
-function theme_line_item_manager($variables) {
+function theme_commerce_line_item_manager($variables) {
   drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.manager.css');
 
   $form = $variables['form'];
