@@ -45,7 +45,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
     $transaction = db_transaction();
 
     try {
-      $line_item->changed = time();
+      $line_item->changed = REQUEST_TIME;
 
       // Save a copy of the unchanged line item for rules in case of updates.
       // see commerce_line_item_rules_var_unchanged().
@@ -68,7 +68,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
         // Set the creation timestamp.
-        $line_item->created = time();
+        $line_item->created = REQUEST_TIME;
 
         // Save the new line item and fields.
         drupal_write_record('commerce_line_item', $line_item);

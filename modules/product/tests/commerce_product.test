@@ -310,7 +310,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
       case 'duration':
         return 1;
       case 'date':
-        return time();
+        return REQUEST_TIME;
       case 'boolean':
         return TRUE;
       case 'text':
