@@ -11,14 +11,21 @@
  * Redirects invalid checkout attempts or displays the checkout form if valid.
  */
 function commerce_checkout_router($order, $checkout_page = NULL) {
-  // If there are no line items on the order, redirect away.
-  if (commerce_line_items_quantity($order->line_items, 'product') == 0) {
-    drupal_goto(variable_get('commerce_checkout_empty_redirect', '<front>'));
-  }
-
   // If no checkout page is specified, default to the first one.
   if (empty($checkout_page)) {
     $checkout_page = reset(commerce_checkout_pages());
+  }
+
+  // If the user does not have access to checkout the order, return a 404. We
+  // could return a 403, but then the user would know they've identified a
+  // potentially valid checkout URL.
+  if (!commerce_checkout_access($order, $checkout_page)) {
+    return drupal_not_found();
+  }
+
+  // If there are no line items on the order, redirect away.
+  if (commerce_line_items_quantity($order->line_items, 'product') == 0) {
+    drupal_goto(variable_get('commerce_checkout_empty_redirect', '<front>'));
   }
 
   // Update the page title if specified.
