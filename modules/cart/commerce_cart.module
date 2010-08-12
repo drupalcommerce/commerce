@@ -371,27 +371,25 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
  *
  * @see commerce_cart_forms().
  */
-function commerce_cart_form_id($product_ids, $qty = 0) {
-  return 'commerce_cart_form_' . implode('_', $product_ids);
+function commerce_cart_add_to_cart_form_id($product_ids, $qty = 0) {
+  return 'commerce_cart_add_to_cart_form_' . implode('_', $product_ids);
 }
 
 /**
  * Implements hook_forms().
  *
  * To provide distinct form IDs for add to cart forms, the product IDs
- * referenced by the form are appended to the base ID, commerce_cart_form. When
- * such a form is built or submitted, this function will validate the form ID
- * and return the proper callback function to use for the given $form_id.
+ * referenced by the form are appended to the base ID,
+ * commerce_cart_add_to_cart_form. When such a form is built or submitted, this
+ * function will return the proper callback function to use for the given form.
  */
 function commerce_cart_forms($form_id, $args) {
   $forms = array();
 
   // Construct a valid cart form ID from the arguments.
-  if (strpos($form_id, 'commerce_cart_form') === 0) {
-    $valid_id = commerce_cart_form_id($args[0]);
-
-    $forms[$valid_id] = array(
-      'callback' => 'commerce_cart_form',
+  if (strpos($form_id, 'commerce_cart_add_to_cart_form_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'commerce_cart_add_to_cart_form',
     );
   }
 
@@ -410,7 +408,7 @@ function commerce_cart_forms($form_id, $args) {
  * @return
  *   The form array.
  */
-function commerce_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
+function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
   global $user;
 
   // Store the customer uid in the form so other modules can override with a
@@ -478,8 +476,8 @@ function commerce_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
 
   // Add the handlers manually since we're using hook_forms() to associate this
   // form with form IDs based on the $product_ids.
-  $form['#validate'][] = 'commerce_cart_form_validate';
-  $form['#submit'][] = 'commerce_cart_form_submit';
+  $form['#validate'][] = 'commerce_cart_add_to_cart_form_validate';
+  $form['#submit'][] = 'commerce_cart_add_to_cart_form_submit';
 
   return $form;
 }
@@ -487,7 +485,7 @@ function commerce_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
 /**
  * Form validate handler: validate the product and quantity to add to the cart.
  */
-function commerce_cart_form_validate($form, &$form_state) {
+function commerce_cart_add_to_cart_form_validate($form, &$form_state) {
   if (!is_numeric($form_state['values']['quantity']) || $form_state['values']['quantity'] <= 0) {
     form_set_error('quantity', t('You must specify a valid quantity to add to the cart.'));
   }
@@ -496,7 +494,7 @@ function commerce_cart_form_validate($form, &$form_state) {
 /**
  * Form submit handler: add the selected product to the cart.
  */
-function commerce_cart_form_submit($form, &$form_state) {
+function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   $product_id = $form_state['values']['product_id'];
   $product = $form_state['products'][$product_id];
 
@@ -535,7 +533,7 @@ function commerce_cart_field_formatter_view($entity_type, $object, $field, $inst
   switch ($display['type']) {
     case 'commerce_cart_add_to_cart_form':
       $result[0] = array(
-         '#markup' => drupal_render(drupal_get_form(commerce_cart_form_id($product_ids), $product_ids)),
+         '#markup' => drupal_render(drupal_get_form(commerce_cart_add_to_cart_form_id($product_ids), $product_ids)),
        );
       break;
   }
