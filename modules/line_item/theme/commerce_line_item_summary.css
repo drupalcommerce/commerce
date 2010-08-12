@@ -1,0 +1,21 @@
+/* $Id$ */
+
+.line-item-summary {
+  text-align: right;
+}
+
+.line-item-summary .line-item-quantity {
+  float: left;
+}
+
+.line-item-summary .line-item-total-label {
+  font-weight: bold;
+}
+
+.line-item-summary .links {
+  clear: left;
+}
+
+.line-item-summary .links li.last {
+  padding-right: 0;
+}
