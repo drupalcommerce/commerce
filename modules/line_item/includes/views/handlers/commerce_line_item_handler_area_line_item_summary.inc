@@ -9,11 +9,41 @@
  * of line items summarized and which links to include.
  */
 class commerce_line_item_handler_area_line_item_summary extends views_handler_area {
+
+  function option_definition() {
+    $options = parent::option_definition();
+
+    // Undefine the empty option.
+    unset($options['empty']);
+
+    // Define an option to control the links displayed in the summary.
+    $options['links'] = array('default' => array('checkout' => 0));
+
+    return $options;
+  }
+
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
-    // Never display the summary if the View is empty.
+    // Don't display a form element for the undefined empty option.
     unset($form['empty']);
+
+    // Add checkboxes for the summary links if any are available.
+    $options = array();
+
+    if (module_exists('commerce_checkout')) {
+      $options['checkout'] = t('Checkout');
+    }
+
+    if (!empty($options)) {
+      $form['links'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Links'),
+        '#description' => t('Select the links you want to appear beneath the summary.'),
+        '#options' => $options,
+        '#default_value' => $this->options['links'],
+      );
+    }
   }
 
   function render($empty = FALSE) {
@@ -35,7 +65,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       $links = array();
 
       // Only add the checkout link if checkout is enabled.
-      if (module_exists('commerce_checkout')) {
+      if (module_exists('commerce_checkout') && $this->options['links']['checkout'] === 'checkout') {
         $links['line-item-summary-checkout'] = array(
           'title' => t('Checkout'),
           'href' => 'checkout',

@@ -103,6 +103,13 @@ function commerce_line_item_theme() {
 }
 
 /**
+ * Adds the necessary CSS for the line item summary template.
+ */
+function template_preprocess_commerce_line_item_summary(&$variables) {
+  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item_summary.css');
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_line_item_views_api() {
