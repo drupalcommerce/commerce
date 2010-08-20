@@ -67,7 +67,7 @@ function commerce_line_item_ui_form_alter(&$form, &$form_state, $form_id) {
   // On field administration forms for line item types set the title.
   if (in_array($form_id, array('field_ui_field_overview_form', 'field_ui_display_overview_form'))) {
     if ($form['#entity_type'] == 'commerce_line_item') {
-      // Load the product type being modified for this form.
+      // Load the line item type being modified for this form.
       $line_item_type = commerce_line_item_type_load($form['#bundle']);
 
       drupal_set_title(check_plain($line_item_type->name));
