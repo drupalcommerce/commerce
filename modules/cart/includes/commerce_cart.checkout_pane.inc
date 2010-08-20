@@ -48,7 +48,7 @@ function commerce_cart_contents_pane_checkout_form($form, &$form_state, $checkou
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 
   $pane_form['cart_contents_view'] = array(
-    '#markup' => commerce_embed_view($view_id, $display_id, $order->order_id),
+    '#markup' => commerce_embed_view($view_id, $display_id, array($order->order_id)),
   );
 
   return $pane_form;
@@ -62,5 +62,5 @@ function commerce_cart_contents_pane_review($form, $form_state, $checkout_pane, 
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 
-  return commerce_embed_view($view_id, $display_id, $order->order_id);
+  return commerce_embed_view($view_id, $display_id, array($order->order_id));
 }
