@@ -229,7 +229,13 @@ function commerce_checkout_commerce_checkout_pane_info() {
     'file' => 'includes/commerce_checkout.checkout_pane.inc',
     'base' => 'commerce_checkout_review_pane',
     'page' => 'review',
-    'weight' => 0,
+  );
+
+  $checkout_panes['checkout_completion_message'] = (object) array(
+    'title' => t('Completion message'),
+    'file' => 'includes/commerce_checkout.checkout_pane.inc',
+    'base' => 'commerce_checkout_completion_message_pane',
+    'page' => 'complete',
   );
 
   return $checkout_panes;

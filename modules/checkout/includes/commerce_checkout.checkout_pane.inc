@@ -47,3 +47,20 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
 
 	return $pane_form;
 }
+
+/**
+ * Checkout pane callback: presents a completion message on the complete page.
+ */
+function commerce_checkout_completion_message_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = array();
+
+  $pane_form['message'] = array(
+    '#markup' => '<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $order->order_number)) . '</div>',
+  );
+
+  $pane_form['link'] = array(
+    '#markup' => '<div class="checkout-completion-link">' . l(t('Return to the front page.'), '<front>') . '</div>',
+  );
+
+  return $pane_form;
+}
