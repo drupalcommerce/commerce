@@ -11,11 +11,11 @@
  * Checkout pane callback: returns a pane allowing the customer to review the
  *   details of the order.
  */
-function commerce_checkout_review_pane_checkout_form($pane_values, $checkout_pane, $order) {
-  $form = array();
+function commerce_checkout_review_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = array();
 
   // Otherwise add any enabled checkout panes that are visible on review.
-  $form['review'] = array(
+  $pane_form['review'] = array(
     '#theme' => 'commerce_checkout_review',
     '#data' => array(),
 	);
@@ -35,15 +35,15 @@ function commerce_checkout_review_pane_checkout_form($pane_values, $checkout_pan
 		  // If the pane is on the review callback...
       if ($callback = commerce_checkout_pane_callback($checkout_pane_local, 'review')) {
         // Add a row for it in the review data.
-        $form['review']['#data'][$pane_id] = array(
+        $pane_form['review']['#data'][$pane_id] = array(
           'title' => $checkout_pane_local->title,
         );
 
         // Get the review data for this pane.
-        $form['review']['#data'][$pane_id]['data'] = $callback($pane_values, $order);
+        $pane_form['review']['#data'][$pane_id]['data'] = $callback($form, $form_state, $checkout_pane_local, $order);
       }
     }
 	}
 
-	return $form;
+	return $pane_form;
 }

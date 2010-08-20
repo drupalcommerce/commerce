@@ -225,7 +225,7 @@ function commerce_checkout_commerce_checkout_pane_info() {
   $checkout_panes = array();
 
   $checkout_panes['checkout_review'] = (object) array(
-    'title' => t('Review '),
+    'title' => t('Review'),
     'file' => 'includes/commerce_checkout.checkout_pane.inc',
     'base' => 'commerce_checkout_review_pane',
     'page' => 'review',

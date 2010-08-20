@@ -122,9 +122,9 @@ function commerce_customer_permission() {
 function commerce_customer_commerce_customer_profile_info() {
   $profile_types = array();
 
-  $profile_types['billing_profile'] = (object) array(
-    'type' => 'billing_profile',
-    'name' => t('Billing profile'),
+  $profile_types['billing'] = (object) array(
+    'type' => 'billing',
+    'name' => t('Billing information'),
     'description' => t('The profile used to collect billing information on the checkout and order forms.'),
     'help' => '',
   );
@@ -133,14 +133,23 @@ function commerce_customer_commerce_customer_profile_info() {
 }
 
 /**
- * Loads a customer profile type.
- *
- * @param $type
- *   The machine-readable name of the customer profile type.
+ * Implements hook_commerce_checkout_pane_info().
  */
-function commerce_customer_profile_type_load($type) {
-  $profile_types = commerce_customer_profile_types();
-  return !empty($profile_types[$type]) ? $profile_types[$type] : FALSE;
+function commerce_customer_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+  $weight = 5;
+
+  foreach (commerce_customer_profile_types() as $type => $profile_type) {
+    $checkout_panes['customer_profile_' . $type] = (object) array(
+      'title' => $profile_type->name,
+      'file' => 'includes/commerce_customer.checkout_pane.inc',
+      'base' => 'commerce_customer_profile_pane',
+      'page' => 'checkout',
+      'weight' => $weight++,
+    );
+  }
+
+  return $checkout_panes;
 }
 
 /**
@@ -169,11 +178,14 @@ function commerce_customer_profile_types() {
 }
 
 /**
- * Resets the cached list of customer profile types.
+ * Loads a customer profile type.
+ *
+ * @param $type
+ *   The machine-readable name of the customer profile type.
  */
-function commerce_customer_profile_types_reset() {
-  $profile_types = &drupal_static('commerce_customer_profile_types');
-  $profile_types = NULL;
+function commerce_customer_profile_type_load($type) {
+  $profile_types = commerce_customer_profile_types();
+  return !empty($profile_types[$type]) ? $profile_types[$type] : FALSE;
 }
 
 /**
@@ -409,12 +421,12 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
  * Ensures the address field is present on the specified customer profile bundle.
  */
 function commerce_customer_configure_customer_profile_type($type) {
-  $field = field_info_field('address');
-  $instance = field_info_instance('commerce_customer_profile', 'address', $type);
+  $field = field_info_field($type . '_address');
+  $instance = field_info_instance('commerce_customer_profile', $type . '_address', $type);
 
   if (empty($field)) {
     $field = array(
-      'field_name' => 'address',
+      'field_name' => $type . '_address',
       'type' => 'addressfield',
       'cardinality' => 1,
       'entity_types' => array('commerce_customer_profile'),
@@ -426,7 +438,7 @@ function commerce_customer_configure_customer_profile_type($type) {
 
   if (empty($instance)) {
     $instance = array(
-      'field_name' => 'address',
+      'field_name' => $type . '_address',
       'entity_type' => 'commerce_customer_profile',
       'bundle' => $type,
       'label' => t('Address'),
@@ -438,6 +450,10 @@ function commerce_customer_configure_customer_profile_type($type) {
 
       // Define default formatters for the teaser and full view.
       'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'addressfield_default',
+        ),
         'customer' => array(
           'label' => 'hidden',
           'type' => 'addressfield_default',

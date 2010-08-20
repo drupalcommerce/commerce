@@ -41,24 +41,24 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
  * Checkout pane callback: returns the cart contents View for inclusion in the
  *   checkout form.
  */
-function commerce_cart_contents_pane_checkout_form($pane_values, $checkout_pane, $order) {
-  $form = array();
+function commerce_cart_contents_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = array();
 
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 
-  $form['cart_contents_view'] = array(
+  $pane_form['cart_contents_view'] = array(
     '#markup' => commerce_embed_view($view_id, $display_id, $order->order_id),
   );
 
-  return $form;
+  return $pane_form;
 }
 
 /**
  * Checkout pane callback: returns the cart contents review data for the
- *   optional checkout review page.
+ *   Review checkout pane.
  */
-function commerce_cart_contents_pane_review($form_state, $order) {
+function commerce_cart_contents_pane_review($form, $form_state, $checkout_pane, $order) {
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 

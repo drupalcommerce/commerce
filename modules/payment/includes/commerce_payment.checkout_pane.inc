@@ -10,8 +10,8 @@
 /**
  * Payment pane: form callback.
  */
-function commerce_payment_pane_checkout_form($pane_values, $checkout_pane, $order) {
-  $form = array();
+function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = array();
 
   // Invoke the payment methods event that will populate the order with
   // an array of method IDs for available payment methods.
@@ -29,11 +29,11 @@ function commerce_payment_pane_checkout_form($pane_values, $checkout_pane, $orde
 
   // If no payment methods were found, return the empty form.
   if (empty($options)) {
-    return $form;
+    return $pane_form;
   }
 
   // Store the payment methods in the form for validation purposes.
-  $form['payment_methods'] = array(
+  $pane_form['payment_methods'] = array(
     '#type' => 'value',
     '#value' => $order->payment_methods,
   );
@@ -41,13 +41,15 @@ function commerce_payment_pane_checkout_form($pane_values, $checkout_pane, $orde
   // If at least one payment option is available...
   if (!empty($options)) {
     // Add a radio select widget to specify the payment method.
-    $form['payment_method'] = array(
+    $pane_form['payment_method'] = array(
       '#type' => 'radios',
       '#options' => $options,
     );
 
     // Find the default payment method using either the preselected value stored
     // in the order / checkout pane or the first available method.
+    $pane_values = !empty($form_state['values']) ? $form_state['values'][$checkout_pane->pane_id] : array();
+
     if (isset($order->data['payment_method']) && isset($options[$order->data['payment_method']])) {
       $default_value = $order->data['payment_method'];
     }
@@ -59,26 +61,29 @@ function commerce_payment_pane_checkout_form($pane_values, $checkout_pane, $orde
     }
 
     // Set the default value for the payment method radios.
-    $form['payment_method']['#default_value'] = $default_value;
+    $pane_form['payment_method']['#default_value'] = $default_value;
 
     // Add the payment method specific form elements.
-    $payment_method = commerce_payment_method_load($form['payment_method']['#default_value']);
+    $payment_method = commerce_payment_method_load($pane_form['payment_method']['#default_value']);
 
     if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
-      $form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
+      $pane_form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
     }
     else {
-      $form['payment_details'] = array();
+      $pane_form['payment_details'] = array();
     }
   }
 
-  return $form;
+  return $pane_form;
 }
 
 /**
  * Payment pane: validation callback.
  */
-function commerce_payment_pane_checkout_form_validate($pane_form, $pane_values, $order) {
+function commerce_payment_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = $form[$checkout_pane->pane_id];
+  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+
   // If the selected payment method was changed...
   if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
     // And the newly selected method has a valid form callback...
@@ -110,7 +115,10 @@ function commerce_payment_pane_checkout_form_validate($pane_form, $pane_values, 
 /**
  * Payment pane: submit callback.
  */
-function commerce_payment_pane_checkout_form_submit($pane_form, $pane_values, $order) {
+function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
+  $pane_form = $form[$checkout_pane->pane_id];
+  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+
   $order->data['payment_method'] = $pane_values['payment_method'];
 
   // Delegate submit to the payment method callback.
@@ -124,7 +132,7 @@ function commerce_payment_pane_checkout_form_submit($pane_form, $pane_values, $o
 /**
  * Payment redirect pane: form callback.
  */
-function commerce_payment_redirect_pane_checkout_form($pane_values, $checkout_pane, $order) {
+function commerce_payment_redirect_pane_checkout_form(&$form_state, $pane_values, $checkout_pane, $order) {
   $form = array();
 
   // Delegate to the payment method if it can be loaded.
@@ -142,7 +150,7 @@ function commerce_payment_redirect_pane_checkout_form($pane_values, $checkout_pa
 /**
  * Payment redirect pane: validate callback.
  */
-function commerce_payment_redirect_pane_checkout_form_validate($pane_values, $checkout_pane, $order) {
+function commerce_payment_redirect_pane_checkout_form_validate($pane_form, &$form_state, $pane_values, $checkout_pane, $order) {
   // Delegate to the payment method.
   $current_payment_method = $order->payment_methods[$order->payment_method];
   $payment_method = commerce_payment_method_load($current_payment_method['method_id']);

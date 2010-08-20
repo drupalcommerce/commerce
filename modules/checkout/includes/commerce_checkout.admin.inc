@@ -264,8 +264,7 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
   );
   $form['display']['review'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Include this pane on the optional checkout review page.'),
-    '#description' => t('The review page can be toggled on the !link form.', array('!link' => l(t('checkout settings'), 'admin/commerce/config/checkout'))),
+    '#title' => t('Include this pane on the Review checkout pane.'),
     '#default_value' => $checkout_pane->review,
   );
 
