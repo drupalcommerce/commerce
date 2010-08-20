@@ -199,7 +199,7 @@ function commerce_product_type_new() {
  *     the type of query performed to save the product type.
  */
 function commerce_product_type_save($product_type) {
-  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : NULL);
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : array());
   menu_rebuild();
 
   // If this is a new product type and the insert did not fail...

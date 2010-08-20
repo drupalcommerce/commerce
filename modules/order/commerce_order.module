@@ -514,7 +514,7 @@ function commerce_order_states_reset() {
  *     the type of query performed to save the order state.
  */
 function commerce_order_state_save($order_state) {
-  return drupal_write_record('commerce_order_state', $order_state, empty($order_state->saved) ? 'name' : NULL);
+  return drupal_write_record('commerce_order_state', $order_state, empty($order_state->saved) ? 'name' : array());
 }
 
 /**
@@ -680,7 +680,7 @@ function commerce_order_statuses_reset() {
  *     the type of query performed to save the order status.
  */
 function commerce_order_status_save($order_status) {
-  return drupal_write_record('commerce_order_status', $order_status, empty($order_status->saved) ? 'name' : NULL);
+  return drupal_write_record('commerce_order_status', $order_status, empty($order_status->saved) ? 'name' : array());
 }
 
 /**

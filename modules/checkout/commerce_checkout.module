@@ -429,7 +429,7 @@ function commerce_checkout_panes($conditions = array()) {
  *     the type of query performed to save the checkout pane.
  */
 function commerce_checkout_pane_save($checkout_pane) {
-  return drupal_write_record('commerce_checkout_pane', $checkout_pane, !empty($checkout_pane->saved) ? 'pane_id' : NULL);
+  return drupal_write_record('commerce_checkout_pane', $checkout_pane, !empty($checkout_pane->saved) ? 'pane_id' : array());
 }
 
 /**
