@@ -1,0 +1,26 @@
+; $Id$
+name = Customer
+description = Defines the Customer entity with Addressfield integration.
+package = Drupal Commerce
+dependencies[] = addressfield
+core = 7.x
+
+; Base module files
+files[] = commerce_customer.module
+files[] = commerce_customer.install
+
+; Module includes
+files[] = includes/commerce_customer_profile.controller.inc
+
+; Views include
+files[] = includes/views/commerce_customer.views.inc
+
+; Views handlers
+files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile.inc
+files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link.inc
+files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link_delete.inc
+files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link_edit.inc
+files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_type.inc
+
+; Simple tests
+; files[] = tests/commerce_customer.test

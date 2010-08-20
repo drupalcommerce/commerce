@@ -1,0 +1,20 @@
+; $Id$
+name = Customer UI
+description = Exposes a default UI for Customers through profile edit forms and default Views.
+package = Drupal Commerce UI
+core = 7.x
+dependencies[] = contextual
+dependencies[] = field_ui
+dependencies[] = commerce_ui
+dependencies[] = commerce_customer
+dependencies[] = views
+
+; Base module files
+files[] = commerce_customer_ui.module
+
+; Module includes
+files[] = includes/commerce_customer_ui.profiles.inc
+files[] = includes/commerce_customer_ui.profile_types.inc
+
+; Views includes
+files[] = includes/views/commerce_customer_ui.views_default.inc

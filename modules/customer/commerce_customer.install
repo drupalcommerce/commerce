@@ -1,0 +1,117 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_customer_schema() {
+  $schema = array();
+
+  $schema['commerce_customer_profile'] = array(
+    'description' => 'The base table for customer profiles.',
+    'fields' => array(
+      'profile_id' => array(
+        'description' => 'The primary identifier for a customer profile.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'revision_id' => array(
+        'description' => 'The current {commerce_customer_profile_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'type' => array(
+        'description' => 'The {commerce_customer_profile_type}.type of this profile.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that this profile belongs to.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the profile is active or not.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the profile was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the profile was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('profile_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+    ),
+    'foreign keys' => array(
+      'revision_id' => array('commerce_customer_profile_revision' => 'revision_id'),
+      'uid' => array('users' => 'uid'),
+    ),
+  );
+
+  $schema['commerce_customer_profile_revision'] = array(
+    'description' => 'Saves information about each saved revision of a {commerce_customer_profile}.',
+    'fields' => array(
+      'profile_id' => array(
+        'description' => 'The {commerce_customer_profile}.customer_id of the profile this revision belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'revision_id' => array(
+        'description' => 'The primary identifier for this revision.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this profile at this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the profile is active or not.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'revision_timestamp' => array(
+        'description' => 'The Unix timestamp when this revision was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'profile_id' => array('commerce_customer_profile' => 'profile_id'),
+      'uid' => array('users' => 'uid'),
+    ),
+  );
+
+  return $schema;
+}

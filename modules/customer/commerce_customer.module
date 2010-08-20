@@ -1,0 +1,486 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines the customer profile entity and API functions to manage customers and
+ * interact with them.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function commerce_customer_entity_info() {
+  $return = array(
+    'commerce_customer_profile' => array(
+      'label' => t('Customer profile'),
+      'controller class' => 'CommerceCustomerProfileEntityController',
+      'base table' => 'commerce_customer_profile',
+      'revision table' => 'commerce_customer_profile_revision',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'profile_id',
+        'revision' => 'revision_id',
+        'bundle' => 'type',
+      ),
+      'bundle keys' => array(
+        'bundle' => 'type',
+      ),
+      'bundles' => array(),
+      'load hook' => 'commerce_customer_profile_load',
+      'view modes' => array(
+        'administrator' => array(
+          'label' => t('Administrator'),
+          'custom settings' => FALSE,
+        ),
+        'customer' => array(
+          'label' => t('Customer'),
+          'custom settings' => FALSE,
+        ),
+      ),
+
+      'creation callback' => '_commerce_customer_profile_create',
+      'save callback' => 'commerce_customer_profile_save',
+      'deletion callback' => 'commerce_customer_profile_delete',
+      'access callback' => 'commerce_customer_profile_access',
+    ),
+  );
+
+  foreach (commerce_customer_profile_type_get_name() as $type => $name) {
+    $return['commerce_customer_profile']['bundles'][$type] = array(
+      'label' => $name,
+    );
+  }
+
+  return $return;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function commerce_customer_enable() {
+  // Add the address field to the default customer profile type.
+  $entity_info = entity_get_info('commerce_customer_profile');
+
+  foreach ($entity_info['bundles'] as $type => $data) {
+    commerce_customer_configure_customer_profile_type($type);
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_customer_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_customer') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_customer_permission() {
+  $permissions = array(
+    'administer customer profiles' => array(
+      'title' => t('Administer customer profiles'),
+      'description' => t('Allows users to perform any action on customer profiles of any type.'),
+      'restrict access' => TRUE,
+    ),
+    'administer customer profile types' => array(
+      'title' => t('Administer customer profile types'),
+      'description' => t('Allows users to add customer profile types and configure their fields.'),
+      'restrict access' => TRUE,
+    ),
+    'access customer profiles' => array(
+      'title' => t('Access customer profiles'),
+      'description' => t('Allows users to view lists of customer profiles in the Store admin and reference lists.'),
+    ),
+  );
+
+  // Add profile type specific permissions. Note that users with administer
+  // customer profiles permission should have access to do anything the
+  //  permissions below grant a user to do.
+  foreach (commerce_customer_profile_type_get_name() as $type => $name) {
+    $permissions['create ' . $type . ' customer profiles'] = array(
+      'title' => t('Create %type customer profiles', array('%type' => $name)),
+    );
+    $permissions['edit any ' . $type . ' customer profile'] = array(
+      'title' => t('Edit or delete any %type customer profile', array('%type' => $name)),
+    );
+    $permissions['edit own ' . $type . ' customer profiles'] = array(
+      'title' => t('Edit or delete own %type customer profiles', array('%type' => $name)),
+    );
+  }
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_commerce_customer_profile_info().
+ */
+function commerce_customer_commerce_customer_profile_info() {
+  $profile_types = array();
+
+  $profile_types['billing_profile'] = (object) array(
+    'type' => 'billing_profile',
+    'name' => t('Billing profile'),
+    'description' => t('The profile used to collect billing information on the checkout and order forms.'),
+    'help' => '',
+  );
+
+  return $profile_types;
+}
+
+/**
+ * Loads a customer profile type.
+ *
+ * @param $type
+ *   The machine-readable name of the customer profile type.
+ */
+function commerce_customer_profile_type_load($type) {
+  $profile_types = commerce_customer_profile_types();
+  return !empty($profile_types[$type]) ? $profile_types[$type] : FALSE;
+}
+
+/**
+ * Returns an array of customer profile type objects keyed by type.
+ */
+function commerce_customer_profile_types() {
+  // First check the static cache for a profile types array.
+  $profile_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($profile_types)) {
+    // Find profile types defined by hook_commerce_customer_profile_info().
+    foreach (module_implements('commerce_customer_profile_info') as $module) {
+      foreach (module_invoke($module, 'commerce_customer_profile_info') as $type => $profile_type) {
+        // Set the module each profile type is defined by.
+        $profile_type->module = $module;
+        $profile_types[$type] = $profile_type;
+      }
+    }
+
+    // Last allow the info to be altered by other modules.
+    drupal_alter('commerce_customer_profile_info', $profile_types);
+  }
+
+  return $profile_types;
+}
+
+/**
+ * Resets the cached list of customer profile types.
+ */
+function commerce_customer_profile_types_reset() {
+  $profile_types = &drupal_static('commerce_customer_profile_types');
+  $profile_types = NULL;
+}
+
+/**
+ * Returns the human readable name of any or all customer profile types.
+ *
+ * @param $type
+ *   Optional parameter specifying the type whose name to return.
+ *
+ * @return
+ *   Either an array of all profile type names keyed by the machine name or a
+ *     string containing the human readable name for the specified type. If a
+ *     type is specified that does not exist, this function returns FALSE.
+ */
+function commerce_customer_profile_type_get_name($type = NULL) {
+  $profile_types = commerce_customer_profile_types();
+
+  // Return a type name if specified and it exists.
+  if (!empty($type)) {
+    if (isset($profile_types[$type])) {
+      return $profile_types[$type]->name;
+    }
+    else {
+      // Return FALSE if it does not exist.
+      return FALSE;
+    }
+  }
+
+  // Otherwise turn the array values into the type name only.
+  foreach ($profile_types as $key => $value) {
+    $profile_types[$key] = $value->name;
+  }
+
+  return $profile_types;
+}
+
+/**
+ * Title callback: return the human-readable customer profile type name.
+ */
+function commerce_customer_profile_type_title($profile_type) {
+  return $profile_type->name;
+}
+
+/**
+ * Returns a path argument from a customer profile type.
+ */
+function commerce_customer_profile_type_to_arg($type) {
+  return $type;
+}
+
+/**
+ * Returns an initialized customer profile object.
+ *
+ * @param $type
+ *   The type of customer profile to create.
+ * @param $uid
+ *   The uid of the user the customer profile is for.
+ *
+ * @return
+ *   A customer profile object with all default fields initialized.
+ */
+function commerce_customer_profile_new($type = '', $uid = 0) {
+  return entity_get_controller('commerce_customer_profile')->create($type, $uid);
+}
+
+/**
+ * Creation callback for the Entity Metadata module.
+ */
+function _commerce_customer_profile_create($values = array()) {
+  // Create a new customer profile for the specified user.
+  $profile = commerce_customer_profile_new($values['type'], $values['uid']);
+  unset($values['type'], $values['uid']);
+
+  $wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
+
+  foreach ($values as $name => $value) {
+    $wrapper->$name->set($value);
+  }
+
+  return $wrapper;
+}
+
+/**
+ * Saves a customer profile.
+ *
+ * @param $profile
+ *   The full customer profile object to save. If $profile->profile_id is empty,
+ *     a new customer profile will be created.
+ *
+ * @return
+ *   The saved customer profile object on success, FALSE on failure.
+ */
+function commerce_customer_profile_save($profile) {
+  return entity_get_controller('commerce_customer_profile')->save($profile);
+}
+
+/**
+ * Loads a customer profile by ID.
+ */
+function commerce_customer_profile_load($profile_id) {
+  $profiles = commerce_customer_profile_load_multiple(array($profile_id), array());
+  return $profiles ? reset($profiles) : FALSE;
+}
+
+/**
+ * Loads multiple customer profiles by ID or based on a set of conditions.
+ *
+ * @see entity_load()
+ *
+ * @param $profile_ids
+ *   An array of customer profile IDs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_customer_profile} table in the form
+ *     'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal customer profile loading cache.
+ *
+ * @return
+ *   An array of customer profile objects indexed by profile_id.
+ */
+function commerce_customer_profile_load_multiple($profile_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_customer_profile', $profile_ids, $conditions, $reset);
+}
+
+/**
+ * Generate an array for rendering the given customer profile.
+ *
+ * @param $profile
+ *   A fully loaded customer profile object.
+ * @param $view_mode
+ *   The view mode for displaying the profile, 'administrator' or 'customer'.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function commerce_customer_profile_build_content($profile, $view_mode = 'administrator') {
+  // Populate $profile->content with a render() array.
+  // Remove previously built content, if it exists.
+  $profile->content = array();
+
+  // Build fields content.
+  field_attach_prepare_view('commerce_customer_profile', array($profile->profile_id => $profile), $view_mode);
+  entity_prepare_view('commerce_customer_profile', array($profile->profile_id => $profile));
+  $profile->content += field_attach_view('commerce_customer_profile', $profile, $view_mode);
+
+  // Allow modules to make their own additions to the customer profile content.
+  module_invoke_all('commerce_customer_profile_view', $profile, $view_mode);
+
+  // Remove the content array from the profile to avoid duplicate rendering.
+  $build = $profile->content;
+  unset($profile->content);
+
+  $build += array(
+    '#theme' => 'commerce_customer_profile',
+    '#profile' => $profile,
+    '#view_mode' => $view_mode,
+  );
+
+  // Allow modules to modify the final build array.
+  drupal_alter('commerce_customer_profile_view', $build);
+
+  return $build;
+}
+
+/**
+ * Deletes a customer profile by ID.
+ *
+ * @param $profile_id
+ *   The ID of the customer profile to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_customer_profile_delete($profile_id) {
+  return commerce_customer_profile_delete_multiple(array($profile_id));
+}
+
+/**
+ * Deletes multiple customer profiles by ID.
+ *
+ * @param $profile_ids
+ *   An array of customer profile IDs to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_customer_profile_delete_multiple($profile_ids) {
+  return entity_get_controller('commerce_customer_profile')->delete($profile_ids);
+}
+
+/**
+ * Checks customer profile access for various operations.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $profile
+ *   Optionally a profile to check access for or for the create operation the
+ *   profile type. If nothing is given access permissions for all profiles are returned.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the current user.
+ */
+function commerce_customer_profile_access($op, $profile = NULL, $account = NULL) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  if (user_access('administer customer profiles', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'view' && user_access('access customer profiles', $account)) {
+    return TRUE;
+  }
+
+  if (isset($profile) && is_string($profile) && $op == 'create' && user_access('create ' . $profile . ' customer profiles', $account)) {
+    return TRUE;
+  }
+
+  if (isset($profile) && ($op == 'update' || $op == 'delete')) {
+    if (user_access('edit any ' . $profile->type . ' customer profile', $account)) {
+      return TRUE;
+    }
+
+    // Others either don't have any access or must match the profile uid.
+    if ($account->uid && user_access('edit own ' . $profile->type . ' customer profiles', $account) && $profile->uid == $account->uid) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Ensures the address field is present on the specified customer profile bundle.
+ */
+function commerce_customer_configure_customer_profile_type($type) {
+  $field = field_info_field('address');
+  $instance = field_info_instance('commerce_customer_profile', 'address', $type);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => 'address',
+      'type' => 'addressfield',
+      'cardinality' => 1,
+      'entity_types' => array('commerce_customer_profile'),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => 'address',
+      'entity_type' => 'commerce_customer_profile',
+      'bundle' => $type,
+      'label' => t('Address'),
+      'widget' => array(
+        'type' => 'addressfield_standard',
+        'weight' => -10,
+      ),
+      'settings' => array(),
+
+      // Define default formatters for the teaser and full view.
+      'display' => array(
+        'customer' => array(
+          'label' => 'hidden',
+          'type' => 'addressfield_default',
+        ),
+        'administrator' => array(
+          'label' => 'hidden',
+          'type' => 'addressfield_default',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Callback for getting customer profile properties.
+ * @see commerce_customer_entity_property_info()
+ */
+function commerce_customer_profile_get_properties($profile, array $options, $name) {
+  switch ($name) {
+    case 'user':
+      return $profile->uid;
+  }
+}
+
+/**
+ * Callback for setting customer profile properties.
+ * @see commerce_customer_entity_property_info()
+ */
+function commerce_customer_profile_set_properties($profile, $name, $value) {
+  if ($name == 'user') {
+    $profile->uid = $value;
+  }
+}
+
+/**
+ * Handler to load the unchanged customer profile variable for rules.
+ * @see commerce_customer_rules_variables().
+ */
+function commerce_customer_profile_rules_var_unchanged($profile) {
+  $unchanged = drupal_static('commerce_customer_profile_unchanged');
+
+  if (isset($profile->profile_id) && isset($unchanged[$profile->profile_id])) {
+    return $unchanged[$profile->profile_id];
+  }
+}
