@@ -127,8 +127,10 @@ function commerce_payment_pane_checkout_form_submit($pane_form, $pane_values, $o
 function commerce_payment_redirect_pane_checkout_form($pane_values, $checkout_pane, $order) {
   $form = array();
 
-  // Delegate to the payment method.
-  $payment_method = commerce_payment_method_load($order->data['payment_method']);
+  // Delegate to the payment method if it can be loaded.
+  if (!$payment_method = commerce_payment_method_load($order->data['payment_method'])) {
+    return $form;
+  }
 
   if (function_exists($callback = $payment_method->callbacks['redirect_form'])) {
     $form = $callback($payment_method, $pane_values, $checkout_pane, $order);
