@@ -25,6 +25,6 @@ class commerce_customer_handler_field_customer_profile_link_delete extends comme
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
 
-    return l($text, 'admin/commerce/customers/profiles/' . $profile->profileid . '/delete', array('query' => drupal_get_destination()));
+    return l($text, 'admin/commerce/customer-profiles/' . $profile->profileid . '/delete', array('query' => drupal_get_destination()));
   }
 }

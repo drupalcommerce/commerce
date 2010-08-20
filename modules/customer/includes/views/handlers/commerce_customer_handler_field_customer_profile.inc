@@ -52,7 +52,7 @@ class commerce_customer_handler_field_customer_profile extends views_handler_fie
   function render_link($data, $values) {
     if (!empty($this->options['link_to_profile']) && $data !== NULL && $data !== '') {
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/commerce/customers/profiles/' . $values->{$this->aliases['profile_id']};
+      $this->options['alter']['path'] = 'admin/commerce/customer-profiles/' . $values->{$this->aliases['profile_id']};
 
       if (isset($this->aliases['language'])) {
         $languages = language_list();

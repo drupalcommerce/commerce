@@ -25,6 +25,6 @@ class commerce_customer_handler_field_customer_profile_link_edit extends commerc
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
 
-    return l($text, 'admin/commerce/customers/profiles/' . $profile->profile_id . '/edit', array('query' => drupal_get_destination()));
+    return l($text, 'admin/commerce/customer-profiles/' . $profile->profile_id . '/edit', array('query' => drupal_get_destination()));
   }
 }
