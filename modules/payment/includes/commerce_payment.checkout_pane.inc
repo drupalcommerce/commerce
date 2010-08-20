@@ -27,6 +27,11 @@ function commerce_payment_pane_checkout_form($pane_values, $checkout_pane, $orde
     }
   }
 
+  // If no payment methods were found, return the empty form.
+  if (empty($options)) {
+    return $form;
+  }
+
   // Store the payment methods in the form for validation purposes.
   $form['payment_methods'] = array(
     '#type' => 'value',
