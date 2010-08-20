@@ -60,7 +60,7 @@ function commerce_order_schema() {
         'default' => 0,
       ),
       'changed' => array(
-        'description' => 'The Unix timestamp when the oorder was most recently saved.',
+        'description' => 'The Unix timestamp when the order was most recently saved.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -90,7 +90,7 @@ function commerce_order_schema() {
     'description' => 'Saves information about each saved revision of a {commerce_order}.',
     'fields' => array(
       'order_id' => array(
-        'description' => 'The {order_id} of the order this revision belongs to.',
+        'description' => 'The {commerce_order}.order_id of the order this revision belongs to.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,

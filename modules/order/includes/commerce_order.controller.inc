@@ -56,7 +56,7 @@ class CommerceOrderEntityController extends EntityAPIController {
     try {
       global $user;
 
-      // Determine if we will be inserting a new node.
+      // Determine if we will be inserting a new order.
       $order->is_new = empty($order->order_id);
 
       // Set the timestamp fields.
@@ -99,7 +99,7 @@ class CommerceOrderEntityController extends EntityAPIController {
       }
 
       // When saving a new order revision, unset any existing $order->revision_id
-      // to ensure a new revision will actually be created andstore the old
+      // to ensure a new revision will actually be created and store the old
       // revision ID in a separate property for order hook implementations.
       if (!$order->is_new && !empty($order->revision) && $order->revision_id) {
         $order->old_revision_id = $order->revision_id;
@@ -204,7 +204,7 @@ class CommerceOrderEntityController extends EntityAPIController {
 
     // Reset the order's creator_uid to the original value.
     $order->creator_uid = $temp_uid;
- }
+  }
 
   /**
    * Deletes multiple orders by ID.
