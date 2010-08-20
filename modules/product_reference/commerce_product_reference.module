@@ -597,7 +597,7 @@ function commerce_product_reference_configure_line_item() {
       'cardinality' => 1,
       'entity_types' => array('commerce_line_item'),
       'translatable' => FALSE,
-      'locked' => 1,
+      'locked' => TRUE,
     );
     $field = field_create_field($field);
   }

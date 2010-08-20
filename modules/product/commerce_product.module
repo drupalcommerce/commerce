@@ -113,11 +113,6 @@ function commerce_product_field_extra_fields() {
           'description' => t('Full product title'),
           'weight' => -5,
         ),
-        'status' => array(
-          'label' => 'Status',
-          'description' => t("The product's active vs. disabled status"),
-          'weight' => 35,
-        ),
       ),
     );
   }
