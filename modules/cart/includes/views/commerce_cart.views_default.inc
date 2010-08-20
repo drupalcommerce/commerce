@@ -49,7 +49,7 @@ function commerce_cart_views_default_views() {
     ),
     'entity_id' => array(
       'sortable' => 0,
-      'align' => '',
+      'align' => 'views-align-right',
       'separator' => '',
     ),
   );
@@ -178,7 +178,7 @@ function commerce_cart_views_default_views() {
     ),
     'entity_id' => array(
       'sortable' => 0,
-      'align' => '',
+      'align' => 'views-align-right',
       'separator' => '',
     ),
   );

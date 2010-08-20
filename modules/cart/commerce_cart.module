@@ -169,9 +169,6 @@ function commerce_cart_block_view($delta) {
       $content = theme('commerce_cart_empty_block');
     }
     else {
-      // Add the cart block CSS.
-      drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
-
       // Build the variables array to send to the cart block template.
       $variables = array(
         'order' => $order,
