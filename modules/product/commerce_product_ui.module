@@ -132,7 +132,7 @@ function commerce_product_ui_product_add_any_access() {
 
   // Check the user's access on a product type basis.
   foreach (commerce_product_types() as $type => $product_type) {
-    if (commerce_product_ui_product_add_access($type)) {
+    if (commerce_product_access('create', $type)) {
       return TRUE;
     }
   }

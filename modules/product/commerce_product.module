@@ -160,13 +160,13 @@ function commerce_product_permission() {
   // products permission should have access to do anything the permissions below
   // grant a user to do.
   foreach (commerce_product_type_get_name() as $type => $name) {
-    $permissions['create ' . $type] = array(
+    $permissions['create ' . $type . ' products'] = array(
       'title' => t('Create %type products', array('%type' => $name)),
     );
-    $permissions['edit any ' . $type] = array(
+    $permissions['edit any ' . $type . ' product'] = array(
       'title' => t('Edit or delete any %type product', array('%type' => $name)),
     );
-    $permissions['edit own ' . $type] = array(
+    $permissions['edit own ' . $type . ' products'] = array(
       'title' => t('Edit or delete own %type products', array('%type' => $name)),
     );
   }
@@ -546,17 +546,17 @@ function commerce_product_access($op, $product = NULL, $account = NULL) {
     return TRUE;
   }
 
-  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product, $account)) {
+  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product . ' products', $account)) {
     return TRUE;
   }
 
   if (isset($product) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any ' . $product->type, $account)) {
+    if (user_access('edit any ' . $product->type . ' product', $account)) {
       return TRUE;
     }
 
     // Others either don't have any access or must match the product uid.
-    if ($account->uid && user_access('edit own ' . $product->type, $account) && $product->uid == $account->uid) {
+    if ($account->uid && user_access('edit own ' . $product->type . ' products', $account) && $product->uid == $account->uid) {
       return TRUE;
     }
   }
