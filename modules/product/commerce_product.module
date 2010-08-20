@@ -768,7 +768,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
 
   // Add a condition to the query to filter by matching product types.
   if (is_array($field['settings']['referenceable_types']) && !empty($field['settings']['referenceable_types'])) {
-    $types = array_diff(array_values($field['settings']['referenceable_types']), array(0));
+    $types = array_diff(array_values($field['settings']['referenceable_types']), array(0, NULL));
 
     // Only filter by type if some types have been specified.
     if (!empty($types)) {
