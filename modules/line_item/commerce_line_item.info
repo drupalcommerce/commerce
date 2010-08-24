@@ -15,6 +15,7 @@ files[] = includes/commerce_line_item.controller.inc
 
 ; Views include
 files[] = includes/views/commerce_line_item.views.inc
+files[] = includes/views/commerce_line_item.views_default.inc
 files[] = includes/views/handlers/commerce_line_item_handler_area_line_item_summary.inc
 files[] = includes/views/handlers/commerce_line_item_handler_argument_line_item_line_item_id.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_type.inc

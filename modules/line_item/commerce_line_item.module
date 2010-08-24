@@ -573,12 +573,9 @@ function commerce_line_item_field_formatter_view($entity_type, $object, $field, 
 
   switch ($display['type']) {
     case 'commerce_line_item_reference_view':
-      // TODO: Replace with a default table View.
-      foreach ($items as $delta => $item) {
-        $result[$delta] = array(
-          '#markup' => t('Line item @id.', array('@id' => $item['line_item_id'])),
-        );
-      }
+      $result[0] = array(
+        '#markup' => commerce_embed_view('line_item_table', 'defaults', array(implode(',', $line_item_ids))),
+      );
 
       break;
   }
