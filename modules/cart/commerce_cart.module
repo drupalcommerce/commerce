@@ -16,6 +16,14 @@
 function commerce_cart_menu() {
   $items = array();
 
+  $items['cart'] = array(
+    'title' => t('Shopping cart'),
+    'page callback' => array('commerce_cart_view'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_cart.pages.inc',
+  );
+
   // TODO: Replace access control with something more pertinent to checkout
   // besides 'access content'.
   $items['checkout'] = array(
@@ -98,10 +106,16 @@ function commerce_cart_theme() {
     'commerce_cart_empty_block' => array(
       'variables' => array(),
     ),
+    'commerce_cart_empty_page' => array(
+      'variables' => array(),
+    ),
     'commerce_cart_block' => array(
       'variables' => array('order' => NULL, 'contents_view' => NULL),
       'path' => drupal_get_path('module', 'commerce_cart') . '/theme',
       'template' => 'commerce-cart-block',
+    ),
+    'commerce_cart_form_product_table' => array(
+      'render element' => 'form',
     ),
   );
 }
@@ -186,7 +200,14 @@ function commerce_cart_block_view($delta) {
  * Themes an empty shopping cart block's contents.
  */
 function theme_commerce_cart_empty_block() {
-  return '<div class="cart-empty">' . t('Your shopping cart is empty.') . '</div>';
+  return '<div class="cart-empty-block">' . t('Your shopping cart is empty.') . '</div>';
+}
+
+/**
+ * Themes an empty shopping cart page.
+ */
+function theme_commerce_cart_empty_page() {
+  return '<div class="cart-empty-page">' . t('Your shopping cart is empty.') . '</div>';
 }
 
 /**
@@ -486,7 +507,7 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   // Add the product to the specified shopping cart.
   commerce_cart_product_add($form_state['values']['customer_uid'], $product_id, $form_state['values']['quantity']);
 
-  drupal_set_message(t('%title added to your cart.', array('%title' => $product->title)));
+  drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
 }
 
 /**

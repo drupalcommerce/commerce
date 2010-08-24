@@ -17,7 +17,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
     unset($options['empty']);
 
     // Define an option to control the links displayed in the summary.
-    $options['links'] = array('default' => array('checkout' => 0));
+    $options['links'] = array('default' => array('view_cart' => 0, 'checkout' => 0));
 
     return $options;
   }
@@ -30,6 +30,10 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
 
     // Add checkboxes for the summary links if any are available.
     $options = array();
+
+    if (module_exists('commerce_cart')) {
+      $options['view_cart'] = t('View cart');
+    }
 
     if (module_exists('commerce_checkout')) {
       $options['checkout'] = t('Checkout');
@@ -63,6 +67,15 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       $total = commerce_line_items_total($line_item_ids);
 
       $links = array();
+
+      // Only add the view cart link if the cart is enabled.
+      if (module_exists('commerce_cart') && $this->options['links']['view_cart'] === 'view_cart') {
+        $links['line-item-summary-view-cart'] = array(
+          'title' => t('View cart'),
+          'href' => 'cart',
+          'attributes' => array('rel' => 'nofollow'),
+        );
+      }
 
       // Only add the checkout link if checkout is enabled.
       if (module_exists('commerce_checkout') && $this->options['links']['checkout'] === 'checkout') {
