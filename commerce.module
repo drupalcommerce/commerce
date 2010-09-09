@@ -65,6 +65,30 @@ function commerce_sort_weight($a, $b) {
 }
 
 /**
+ * Makes any required form elements in a form unrequired.
+ *
+ * @param $form
+ *   The form array to search for required elements.
+ */
+function commerce_unrequire_form_elements(&$form) {
+  array_walk_recursive($form, '_commerce_unrequire_element');
+}
+
+/**
+ * array_walk_recursive callback: makes an individual element unrequired.
+ *
+ * @param &$value
+ *   The value of the form array being walked.
+ * @param $key
+ *   The key of the form array corresponding to the present value.
+ */
+function _commerce_unrequire_element(&$value, $key) {
+  if ($key === '#required') {
+    $value = FALSE;
+  }
+}
+
+/**
  * Returns the callback for a form ID as defined by hook_forms().
  *
  * @param $form_id
