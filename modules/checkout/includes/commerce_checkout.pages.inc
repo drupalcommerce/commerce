@@ -50,11 +50,6 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'commerce_checkout') . '/commerce_checkout.js';
 
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => $user->uid,
-  );
-
   $form['account'] = array(
     '#type' => 'value',
     '#value' => clone($user),
@@ -72,7 +67,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
   // Add any instructions for the checkout page.
   $form['help'] = array(
-    '#markup' => filter_xss($checkout_page->help),
+    '#markup' => '<div class="checkout-help">' . filter_xss($checkout_page->help) . '</div>',
   );
 
   // Restore form errors.
