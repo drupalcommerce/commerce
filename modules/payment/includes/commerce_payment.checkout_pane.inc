@@ -44,17 +44,21 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     $pane_form['payment_method'] = array(
       '#type' => 'radios',
       '#options' => $options,
+      '#ajax' => array(
+        'callback' => 'commerce_payment_pane_checkout_form_details_refresh',
+        'wrapper' => 'payment-details',
+      ),
     );
 
     // Find the default payment method using either the preselected value stored
     // in the order / checkout pane or the first available method.
     $pane_values = !empty($form_state['values']) ? $form_state['values'][$checkout_pane->pane_id] : array();
 
-    if (isset($order->data['payment_method']) && isset($options[$order->data['payment_method']])) {
-      $default_value = $order->data['payment_method'];
-    }
-    elseif (isset($pane_values['payment_method']) && isset($options[$pane_values['payment_method']])) {
+    if (isset($pane_values['payment_method']) && isset($options[$pane_values['payment_method']])) {
       $default_value = $pane_values['payment_method'];
+    }
+    elseif (isset($order->data['payment_method']) && isset($options[$order->data['payment_method']])) {
+      $default_value = $order->data['payment_method'];
     }
     else {
       $default_value = array_shift(array_keys($options));
@@ -72,9 +76,19 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     else {
       $pane_form['payment_details'] = array();
     }
+
+    $pane_form['payment_details']['#prefix'] = '<div id="payment-details">';
+    $pane_form['payment_details']['#suffix'] = '</div>';
   }
 
   return $pane_form;
+}
+
+/**
+ * Returns the payment details element for display via AJAX.
+ */
+function commerce_payment_pane_checkout_form_details_refresh($form, $form_state) {
+  return $form['commerce_payment']['payment_details'];
 }
 
 /**
@@ -132,19 +146,89 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
 /**
  * Payment redirect pane: form callback.
  */
-function commerce_payment_redirect_pane_checkout_form(&$form_state, $pane_values, $checkout_pane, $order) {
-  $form = array();
+function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $checkout_pane, $order) {
+  // First load the order's specified payment method.
+  $payment_method = commerce_payment_method_load($order->data['payment_method']);
 
-  // Delegate to the payment method if it can be loaded.
-  if (!$payment_method = commerce_payment_method_load($order->data['payment_method'])) {
-    return $form;
+  // If the payment method doesn't exist or does not require a redirect...
+  if (!$payment_method || !$payment_method->offsite) {
+    // Advance the customer to the next step of the checkout process.
+    $next_page = $form['checkout_page']['#value']->next_page;
+
+    $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+
+    drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
   }
 
+  // If the user came to the cancel URL...
+  if (arg(3) == 'back' && arg(4) == $order->data['payment_redirect_key']) {
+    // Send the customer to the previous step of the checkout process.
+    $prev_page = $form['checkout_page']['#value']->prev_page;
+
+    $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
+
+    drupal_goto('checkout/' . $order->order_id . '/' . $prev_page);
+  }
+
+  // If the user came to the return URL...
+  if (arg(3) == 'return' && arg(4) == $order->data['payment_redirect_key']) {
+    // Check for a validate handler on return.
+    $callback = $payment_method->callbacks['redirect_form_validate'];
+
+    // If there is no validate handler or if there is and it passess...
+    if (!function_exists($callback) || $callback($order, $payment_method)) {
+      // Perform any submit functions if necessary.
+      if (function_exists($callback = $payment_method->callbacks['redirect_form_submit'])) {
+        $callback($order, $payment_method);
+      }
+
+      // Send the customer on to the next checkout page.
+      $next_page = $form['checkout_page']['#value']->next_page;
+
+      $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+
+      drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
+    }
+    else {
+      // Otherwise display the failure message and send the customer back.
+      drupal_set_message(t('Payment failed at the payment server. Please review your information and try again.'), 'error');
+
+      $prev_page = $form['checkout_page']['#value']->prev_page;
+
+      $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
+
+      drupal_goto('checkout/' . $order->order_id . '/' . $prev_page);
+    }
+  }
+
+  // If the function to build the redirect form exists...
   if (function_exists($callback = $payment_method->callbacks['redirect_form'])) {
-    $form = $callback($payment_method, $pane_values, $checkout_pane, $order);
-  }
+    // Generate a key to use in the return URL from the redirected service.
+    $order->data['payment_redirect_key'] = drupal_hash_base64(time());
+    commerce_order_save($order);
 
-  return $form;
+    // TODO: Get the settings for the method from its action settings. This
+    // should be happening upstream based on the actual Rule used and the actual
+    // action used... perhaps saving $order->payment_methods from above.
+    $rule = rules_config_load('commerce_payment_' . $payment_method->method_id);
+
+    foreach ($rule->actions() as $key => $action) {
+      if ($action->getElementName() == 'commerce_payment_enable_' . $payment_method->method_id) {
+        $payment_method->settings = $action->settings['payment_method']['settings'];
+      }
+    }
+
+    // Merge the new form into the current form array, preserving the help text
+    // if it exists. We also add a wrapper so the form can be easily submitted.
+    $form += drupal_get_form($callback, $order, $payment_method);
+
+    $form['#prefix'] = '<div class="payment-redirect-form">';
+    $form['#suffix'] = '</div>';
+  }
+  else {
+    // Alert the administrator that the module does not provide a required form.
+    drupal_set_message(t('The %title payment method indicates it is offsite but does not define the necessary form to process the redirect.', array('%title' => $payment_method->title)), 'error');
+  }
 }
 
 /**
@@ -209,7 +293,7 @@ function commerce_payment_post_redirect_form($action, array $values = array()) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#id' => '',
-    '#value' => t('Process to payment'),
+    '#value' => t('Proceed to payment'),
   );
 
   return array(

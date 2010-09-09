@@ -67,8 +67,10 @@ function commerce_payment_rules_action_info() {
 /**
  * Generic execution callback for the payment method.
  */
-function commerce_payment_enable_method($order, $method_id) {
-  $order->payment_methods[] = $method_id;
+function commerce_payment_enable_method($order, $payment_method) {
+  // TODO: Possibly actually return the array instead of the scalar to use the
+  // settings throughout the checkout process.
+  $order->payment_methods[] = is_array($payment_method) ? $payment_method['method_id'] : $payment_method;
 }
 
 /**

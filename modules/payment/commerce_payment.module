@@ -14,9 +14,10 @@ function commerce_payment_commerce_checkout_page_info() {
 
   $checkout_pages['payment'] = (object) array(
     'title' => t('Payment'),
-    'help' => t('Off-site payment pseudo-page.'),
+    'help' => t('Use the button below to proceed to the payment server.'),
     'status_cart' => FALSE,
     'locked' => TRUE,
+    'buttons' => FALSE,
     'weight' => 20,
   );
 
@@ -79,6 +80,7 @@ function commerce_payment_methods() {
         'base' => $method_id,
         'title' => '',
         'description' => '',
+        'offsite' => FALSE,
         'callbacks' => array(),
       );
 
