@@ -79,6 +79,9 @@ function commerce_cart_form($form, &$form_state, $order) {
     '#theme' => 'commerce_cart_form_product_table',
     '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit Price'), t('Total')),
     '#empty' => t('No products found.'),
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'commerce_cart') . '/commerce_cart.js'),
+    ),
   );
 
   foreach ($line_items as $line_item_id => $line_item) {
@@ -90,6 +93,7 @@ function commerce_cart_form($form, &$form_state, $order) {
 
       $form['line_items'][$line_item_id]['remove'] = array(
         '#type' => 'checkbox',
+        '#attributes' => array('class' => array('onclick-submit')),
       );
 
       $form['line_items'][$line_item_id]['title'] = array(
