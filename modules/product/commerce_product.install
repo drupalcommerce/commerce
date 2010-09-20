@@ -92,7 +92,10 @@ function commerce_product_schema() {
       'sku' => array('sku'),
     ),
     'foreign keys' => array(
-      'uid' => array('users' => 'uid'),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
     ),
 
   );

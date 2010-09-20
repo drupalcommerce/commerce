@@ -60,8 +60,14 @@ function commerce_customer_schema() {
       'revision_id' => array('revision_id'),
     ),
     'foreign keys' => array(
-      'revision_id' => array('commerce_customer_profile_revision' => 'revision_id'),
-      'uid' => array('users' => 'uid'),
+      'customer_profile_revision' => array(
+        'table' => 'commerce_customer_profile_revision',
+        'columns'=> array('revision_id' => 'revision_id'),
+      ),
+      'owner' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
     ),
   );
 
@@ -108,8 +114,14 @@ function commerce_customer_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'profile_id' => array('commerce_customer_profile' => 'profile_id'),
-      'uid' => array('users' => 'uid'),
+      'customer_profile' => array(
+        'table' => 'commerce_customer_profile',
+        'columns'=> array('profile_id' => 'profile_id'),
+      ),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
     ),
   );
 

@@ -79,10 +79,22 @@ function commerce_order_schema() {
       'revision_id' => array('revision_id'),
     ),
     'foreign keys' => array(
-      'revision_id' => array('commerce_order_revision' => 'revision_id'),
-      'creator_uid' => array('users' => 'uid'),
-      'customer_uid' => array('users' => 'uid'),
-      'status' => array('commerce_order_status' => 'name'),
+      'current_revision' => array(
+        'table' => 'commerce_order_revision',
+        'columns'=> array('revision_id' => 'revision_id'),
+      ),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('creator_uid' => 'uid'),
+      ),
+      'customer' => array(
+        'table' => 'users',
+        'columns' => array('customer_uid' => 'uid'),
+      ),
+      'status' => array(
+        'table' => 'commerce_order_status',
+        'columns' => array('status' => 'name'),
+      ),
     ),
   );
 
@@ -154,10 +166,22 @@ function commerce_order_schema() {
     ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
-      'order_id' => array('commerce_order' => 'order_id'),
-      'creator_uid' => array('users' => 'uid'),
-      'customer_uid' => array('users' => 'uid'),
-      'status' => array('commerce_order_status' => 'name'),
+      'order' => array(
+        'table' => 'commerce_order',
+        'columns'=> array('order_id' => 'order_id'),
+      ),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('creator_uid' => 'uid'),
+      ),
+      'customer' => array(
+        'table' => 'users',
+        'columns' => array('customer_uid' => 'uid'),
+      ),
+      'status' => array(
+        'table' => 'commerce_order_status',
+        'columns' => array('status' => 'name'),
+      ),
     ),
   );
 
@@ -186,7 +210,10 @@ function commerce_order_schema() {
     ),
     'primary key' => array('name'),
     'foreign keys' => array(
-      'default_status' => array('commerce_order_status' => 'name'),
+      'default_status' => array(
+        'table' => 'commerce_order_status',
+        'columns' => array('default_status' => 'name'),
+      ),
     ),
   );
 
