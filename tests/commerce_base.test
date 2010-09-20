@@ -12,14 +12,13 @@
  */
 abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
-
   /**
    * Helper function to determine which modules should be enabled. Should be
    * used in place of standard parent::setUp('moduleA', 'moduleB') call.
    *
    * @param $set
    *  Which set of modules to load. Can be one of:
-   *    'full': (default) All Commerce modules, including UI and payment modules.
+   *    'all': (default) All Commerce modules, including UI and payment modules.
    *    'ui': All API and UI modules.
    *    'api': Just API modules (includes commerce_ui since checkout depends on it).
    *    'dependencies': Common dependencies required by many Commerce API and UI
@@ -27,7 +26,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @param $other_modules
    *  Array of modules to include in addition to the sets loaded by $set
    */
-  protected function setUpHelper($set = 'full', array $other_modules = array()) {
+  protected function setUpHelper($set = 'all', array $other_modules = array()) {
 
     $dependencies = array(
       // API
@@ -72,7 +71,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
     // Cascade down the list and add sets
     switch ($set) {
-      case 'full':
+      case 'all':
         $modules = array_merge($payment, $modules);
       case 'ui':
         $modules = array_merge($ui, $modules);
@@ -239,6 +238,114 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     }
   }
 
+  /**
+   * Create a dummy product display content type.
+   *
+   * @param $type
+   *  Machine name of the content type to create. Also used for human readable
+   *  name to keep things simple.
+   * @param $attach_product_reference_field
+   *  If TRUE, automatically add a product reference field to the new content
+   *  type.
+   * @param $field_name
+   *  Only used if $attach_product_reference_field is TRUE. Sets the name for
+   *  the field instance to attach. Creates the field if it doesn't exist.
+   * @return
+   *  An object for the content type.
+   * @see attachProductReferenceField()
+   */
+  public function createDummyProductDisplayContentType($type = 'product_display', $attach_product_reference_field = TRUE, $field_name = 'field_product') {
+    // TODO: Add check to make sure this content type doesn't already exist.
+    $content_type = array(
+      'type' => $type,
+      'name' => $type, // Dont use a human readable name here to keep it simple
+      'base' => 'node_content',
+      'description' => 'Use <em>product displays</em> to display products for sale to your customers.',
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    );
+    $content_type = node_type_set_defaults($content_type);
+    node_type_save($content_type);
+    node_add_body_field($content_type);
+    $this->pass("Created content type: $type");
+
+
+    if ($attach_product_reference_field) {
+      // Maybe $instance should be returned as well
+      $instance = $this->attachProductReferenceField($type, $field_name);
+    }
+
+    return $content_type;
+  }
+
+  /**
+   * Attach a product reference field to a given content type. Creates the field
+   * if the given name doesn't already exist. Automatically sets the display
+   * formatters to be the "add to cart form" for the teaser and full modes.
+   *
+   * @param $content_type
+   *  Name of the content type that should have a field instance attached.
+   * @param $field_name
+   *  Only used if $attach_product_reference_field is TRUE. Sets the name for
+   *  the field instance to attach. Creates the field if it doesn't exist.
+   * @return
+   *  An object containing the field instance that was created.
+   * @see createDummyProductDisplayContentType()
+   */
+  public function attachProductReferenceField($content_type = 'product_display', $field_name = 'field_product') {
+    // Check if the field has already been created.
+    $field_info = field_info_field($field_name);
+    if (empty($field_info)) {
+      // Add a product reference field to the product display node type
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'commerce_product_reference',
+        'cardinality' => 1,
+        'translatable' => FALSE,
+      );
+      field_create_field($field);
+      $this->pass("New field created: $field_name");
+    } else {
+      debug("NOTE: attachProductReferenceField attempting to create field <code>$field_name</code> that already exists. This is fine and this message is just for your information.");
+    }
+
+    // Check that this instance doesn't already exist
+    $instance = field_info_instance('node', $field_name, $content_type);
+    if (empty($insance)) {
+      // Add an instance of the field to the given content type
+      $instance = array(
+        'field_name' => $field_name,
+        'entity_type' => 'node',
+        'label' => 'Product',
+        'bundle' => $content_type,
+        'description' => 'Choose a product to display for sale.',
+        'required' => TRUE,
+
+        'widget' => array(
+          'type' => 'options_select',
+        ),
+
+        'display' => array(
+          'full' => array(
+            'label' => 'hidden',
+            'type' => 'commerce_cart_add_to_cart_form',
+          ),
+          'teaser' => array(
+            'label' => 'hidden',
+            'type' => 'commerce_cart_add_to_cart_form',
+          ),
+        ),
+      );
+      field_create_instance($instance);
+      $this->pass("Create field instance of field <code>$field_name</code> on content type <code>$content_type</code>");
+    } else {
+      $this->fail("Test Develoepr: You attempted to create a field that already exists. Field: $field_name -- Content Type: $content_type");
+    }
+
+    return $instance;
+  }
+
   // =============== Helper functions ===============
 
   /**
@@ -246,6 +353,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *
    * @param $module_name
    *  Array of module names to check (without the .module extension)
+   * @return
+   *  TRUE if all of the modules are enabled.
    */
   protected function modulesUp($module_names) {
     if (is_string($module_names)) {
@@ -260,15 +369,79 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Wraps the debug() output in a <pre> tag when printing arrays
+   * Adds <pre> around a print_r of a var and returns it for use in a debug()
+   * call. NOTE: It returns it instead of calling debug() itself so the debug
+   * call will show the proper line that called it.
+   * Usage: debug($this->pre_r($var));
    */
-  public function debugr($var) {
-    if (is_array($var) || is_object($var)) {
-      debug('<pre>'. var_export($var, TRUE) .'</pre>');
-    } else {
-      debug($var);
+  public function pre_r($var) {
+    return '<pre>'. print_r($var, TRUE) .'</pre>';
+  }
+}
+
+
+/**
+ * Sandbox for trying new things with tests. Eases development so only one test
+ * has to run at a time. Move everything to CommerceBaseTesterTestCase after it
+ * is functioning here.
+ */
+class CommerceSandboxTestCase extends CommerceBaseTestCase {
+  protected $site_admin;
+
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Commerce sandbox tests'),
+      'description' => t('Sandbox for trying new things with tests. Eases development so only one test has to run at a time.'),
+      'group' => t('Drupal Commerce'),
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen.
+   */
+  public function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+    cache_clear_all(); // Just in case
+  }
+
+  /**
+   * Sandbox for test development
+   */
+  public function testTestTest() {
+    // Create dummy product display nodes (and their corresponding product
+    //  entities)
+    foreach (array('01' => st('One'), '02' => st('Two'), '03' => st('Three')) as $key => $value) {
+      // Create the new product.
+      $product = commerce_product_new('product');
+      $product->sku = st('PROD-@num', array('@num' => $key));
+      $product->title = st('Product @num', array('@num' => $value));
+      $product->uid = 1;
+      $product->base_price[LANGUAGE_NONE][0]['price'] = $key * 10;
+      $product->base_price[LANGUAGE_NONE][0]['currency_code'] = 'USD';
+      $product = commerce_product_save($product);
+
+      // Create a product node for it.
+      $node = (object) array('type' => 'product');
+      node_object_prepare($node);
+      $node->uid = 1;
+      $node->title = $product->title;
+      $node->field_product[LANGUAGE_NONE][]['product_id'] = $product->product_id;
+      node_save($node);
     }
   }
+
+  /**
+   * Another sandbox!
+   */
+  public function testTestTest2() {
+  }
+
 }
 
 
@@ -296,7 +469,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
    * setUp() performs any pre-requisite tasks that need to happen.
    */
   public function setUp() {
-    $modules = parent::setUpHelper('full');
+    $modules = parent::setUpHelper('all');
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
@@ -371,7 +544,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalGet('admin/commerce/products/types');
-    $this->assertTest($product_type->title, 'Dummy product type found on admin/commerce/products/types');
+    $this->assertText($product_type->name, 'Dummy product type name found on admin/commerce/products/types');
   }
 
   /**
@@ -396,43 +569,23 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
     $this->drupalGet('admin/commerce/products/add/product');
   }
-}
-
-/**
- * Sandbox for trying new things with tests. Eases development so only one test
- * has to run at a time.
- */
-class CommerceSandboxTestCase extends CommerceBaseTestCase {
-  protected $site_admin;
 
   /**
-   * getInfo() returns properties that are displayed in the test selection form.
+   * Test the creation of a product_display content type and add a product
+   * reference field to the content typ.
    */
-  public static function getInfo() {
-    return array(
-      'name' => t('Commerce sandbox tests'),
-      'description' => t('Sandbox for trying new things with tests. Eases development so only one test has to run at a time.'),
-      'group' => t('Drupal Commerce'),
-    );
+  public function testTestCreateDummyProductDisplayAndRefField() {
+    $this->createDummyProductDisplayContentType();
+
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('node/add/product-display');
+    $this->assertText('product_display', 'product_display content type successfully created and accessible.');
+    //$this->assertOptionSelected('edit-field-product-und', '_none', 'Dummy Product Display reference field shows up on node add page');
+    $this->assertFieldById('edit-field-product-und', '', 'Product reference field found on Dummy Product Display.');
+
+    // Try to add the same field a second time and see if any errors pop up.
+    //  If uncommented, this will product an error. Basically, this should be
+    //  turned into an assertion that checks for the presence of the field.
+    //$this->attachProductReferenceField('product_display', 'field_product');
   }
-
-  /**
-   * setUp() performs any pre-requisite tasks that need to happen.
-   */
-  public function setUp() {
-    $modules = parent::setUpHelper('full');
-    parent::setUp($modules);
-
-    $this->site_admin = $this->createSiteAdmin();
-    cache_clear_all(); // Just in case
-  }
-
-  /**
-   * Sandbox for test development
-   */
-  public function testTestTest() {
-    
-
-  }
-
 }
