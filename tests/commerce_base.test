@@ -189,7 +189,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  A product type if successful.
    *  FALSE if the appropraite modules were not available
    */
-  public function createDummyProductType($type = 'dummy_product_type', $name = 'Dummy Product Type', $description = '', $help = '', $append_random = TRUE) {
+  public function createDummyProductType($type = 'product_type', $name = 'Product Type', $description = '', $help = '', $append_random = TRUE) {
     if (module_exists('commerce_product')) {
       if ($append_random) {
         $type = $type .'_'. $this->randomName(20 - strlen($type) - 1);
@@ -366,8 +366,10 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     // Make a test product type
     $product_type = $this->createDummyProductType();
     $this->debugr($product_type);
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+    $this->drupalGet('admin/commerce/products/types');
     */
-    
 
   }
 }
