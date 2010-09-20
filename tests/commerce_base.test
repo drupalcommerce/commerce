@@ -224,7 +224,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  A product type with most of it's basic fields set random values.
    *  FALSE if the appropraite modules were not available.
    */
-  public function createDummyProduct($type_given = 'product', $sku = '', $title = '', $uid = 1, $price = -1, $currency_code = 'USD') {
+  public function createDummyProduct($sku = '', $title = '', $price = -1, $currency_code = 'USD', $uid = 1, $type_given = 'product') {
     if (module_exists('commerce_product')) {
       $new_product = commerce_product_new($type_given);
       $new_product->sku = empty($sku) ? $this->randomName(10) : $sku;
@@ -330,7 +330,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
           ),
 
           'display' => array(
-            'full' => array(
+            'default' => array(
               'label' => 'hidden',
               'type' => 'commerce_cart_add_to_cart_form',
             ),
@@ -382,6 +382,31 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     } else {
       $this->fail('Cannot use use createProductNode because the product module is not enabled.');
     }
+  }
+
+  /**
+     * Create a full product node without worrying about the earlier steps in
+     * the process.
+     *
+     * @param $count
+     *  Number of product nodes to create. Each one will have a new product
+     *  entity associated with it. SKUs will be like PROD-n. Titles will be
+     *  like 'Product #n'. Price will be 10*n. Counting begins at 1.
+     * @return
+     *  An array of product node objects.
+     */
+  public function createDummyProductNodeBatch($count) {
+    $this->createDummyProductDisplayContentType();
+    $product_nodes = array();
+    for ($i=1; $i<$count; $i++) {
+      $sku = "PROD-$i";
+      $title = "Product #$i";
+      $price = $i*10;
+      $product = $this->createDummyProduct($sku, $title, $price);
+      $product_node = $this->createDummyProductNode($product->product_id, $title);
+      $product_nodes[$i] = $product_node;
+    }
+    return $product_nodes;
   }
 
   // =============== Helper functions ===============
@@ -453,8 +478,7 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    */
   public function testTestTest() {
 
-    // Inentionally break to test greasemonkey script
-    //$this->functionTHATdoesNOTexist();
+
   }
 
 }
@@ -605,8 +629,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   }
 
   /**
-   * Creates a dummy product node (also creates a product display content type
-   * and a dummy product entity).
+   * Test the createDummyProductNode function.
    */
   public function testTestCreateDummyProductNode() {
     // Create a dummy product display content type
@@ -616,11 +639,22 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     //  entities)
     $sku = 'PROD-01';
     $product_name = 'Product One';
-    $product = $this->createDummyProduct('product', $sku, $product_name);
+    $product = $this->createDummyProduct($sku, $product_name);
     $product_node = $this->createDummyProductNode($product->product_id, $product_name);
 
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('node/1');
     $this->assertText($product_name, "Product <code>$product_name</code> created successfully");
+  }
+
+  /**
+   * Test the createDummyProductNodeBatch function.
+   */
+  public function testTestCreateDummyProductNodeBatch() {
+    $product_nodes = $this->createDummyProductNodeBatch(3);
+    $this->drupalLogin($this->site_admin);
+    $product_node = $product_nodes[1];
+    $this->drupalGet("node/{$product_node->nid}");
+    $this->assertText($product_node->title, "Product <em>{$product_node->title}</em> node page exists!");
   }
 }
