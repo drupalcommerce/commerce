@@ -227,7 +227,7 @@ function _commerce_order_create($values = array()) {
  *     will be created.
  *
  * @return
- *   The saved order object on success, FALSE on failure.
+ *   The saved order object.
  */
 function commerce_order_save($order) {
   return entity_get_controller('commerce_order')->save($order);

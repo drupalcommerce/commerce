@@ -275,7 +275,7 @@ function _commerce_customer_profile_create($values = array()) {
  *     a new customer profile will be created.
  *
  * @return
- *   The saved customer profile object on success, FALSE on failure.
+ *   The saved customer profile object.
  */
 function commerce_customer_profile_save($profile) {
   return entity_get_controller('commerce_customer_profile')->save($profile);

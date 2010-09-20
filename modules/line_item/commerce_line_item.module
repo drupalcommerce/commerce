@@ -387,7 +387,7 @@ function _commerce_line_item_create($values = array()) {
  *   The full line item object to save.
  *
  * @return
- *   TRUE on success, FALSE otherwise.
+ *   The saved line item object.
  */
 function commerce_line_item_save($line_item) {
   return entity_get_controller('commerce_line_item')->save($line_item);

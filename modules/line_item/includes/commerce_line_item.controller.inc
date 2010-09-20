@@ -39,7 +39,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *   The full line item object to save.
    *
    * @return
-   *   The saved line item object on success, FALSE on failure.
+   *   The saved line item object.
    */
   public function save($line_item) {
     $transaction = db_transaction();
@@ -95,8 +95,9 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       return $line_item;
     }
     catch (Exception $e) {
-      $transaction->rollback('commerce line item', $e->getMessage(), array(), WATCHDOG_ERROR);
-      return FALSE;
+      $transaction->rollback();
+      watchdog_exception('commerce_line_item', $e);
+      throw $e;
     }
   }
 
@@ -131,8 +132,9 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
         db_ignore_slave();
       }
       catch (Exception $e) {
-        $transaction->rollback('commerce line item', $e->getMessage(), array(), WATCHDOG_ERROR);
-        return FALSE;
+        $transaction->rollback();
+        watchdog_exception('commerce_line_item', $e);
+        throw $e;
       }
 
       // Clear the page and block and line_item_load_multiple caches.

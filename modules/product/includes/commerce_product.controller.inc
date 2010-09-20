@@ -41,7 +41,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *   The full product object to save.
    *
    * @return
-   *   The saved product object on success, FALSE on failure.
+   *   The saved product object.
    */
   public function save($product) {
     $transaction = db_transaction();
@@ -91,8 +91,9 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       return $product;
     }
     catch (Exception $e) {
-      $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
-      return FALSE;
+      $transaction->rollback();
+      watchdog_exception('commerce_product', $e);
+      throw $e;
     }
   }
 
@@ -130,8 +131,9 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
         db_ignore_slave();
       }
       catch (Exception $e) {
-        $transaction->rollback('commerce product', $e->getMessage(), array(), WATCHDOG_ERROR);
-        return FALSE;
+        $transaction->rollback();
+        watchdog_exception('commerce_product', $e);
+        throw $e;
       }
 
       // Clear the page and block and product_load_multiple caches.

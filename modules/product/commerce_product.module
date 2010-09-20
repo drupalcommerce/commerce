@@ -386,7 +386,7 @@ function _commerce_product_create($values = array()) {
  *   The full product object to save.
  *
  * @return
- *   TRUE on success, FALSE otherwise.
+ *   The saved product object.
  */
 function commerce_product_save($product) {
   return entity_get_controller('commerce_product')->save($product);
