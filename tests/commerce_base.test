@@ -273,8 +273,10 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
 
 /**
- * Test class to test the CommerceBaseTestCase functions. Testing a test.
- * Somewhat meta to be doing this.
+ * Test class to test the CommerceBaseTestCase functions. All testTestFoo
+ * functions have "testTest" in the name to indicate that they are verifying
+ * that a test is working. Somewhat "meta" to do this, but it eases test
+ * development.
  */
 class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   protected $site_admin;
@@ -285,7 +287,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
       'name' => t('Commerce base class module'),
-      'description' => t('Tests the functionality of the base test class.'),
+      'description' => t('Tests the functionality of the base test class. Essentially, these are meta-tests.'),
       'group' => t('Drupal Commerce'),
     );
   }
@@ -298,6 +300,13 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
+    cache_clear_all(); // Just in case
+  }
+
+  /**
+   * Sandbox for test development
+   */
+  public function testTestTest() {
   }
 
   /**
@@ -308,18 +317,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('admin/modules');
 
-    $module_ids = $this->getModuleIDs();
-    foreach ($module_ids as $module_id) {
-      $this->assertFieldChecked($module_id);
-    }
-  }
-
-  /**
-   * Returns the complete list of Commerce modules (and dependencies) as they
-   * appear in ID fields on the modules page.
-   */
-  protected function getModuleIDs() {
-    return array(
+    $module_ids = array(
       'edit-modules-drupal-commerce-commerce-cart-enable',
       'edit-modules-drupal-commerce-commerce-checkout-enable',
       'edit-modules-drupal-commerce-commerce-enable',
@@ -348,13 +346,61 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
 
       'edit-modules-views-views-enable',
     );
+    foreach ($module_ids as $module_id) {
+      $this->assertFieldChecked($module_id);
+    }
+  }
+
+  /**
+   * Test that Store Admin role actually gets set up.
+   */
+  public function testTestStoreAdmin() {
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('admin/people/permissions');
+    // This will break if it isn't the second role created
+    $this->assertFieldChecked('edit-5-configure-store');
+  }
+
+  /**
+   * Make a test product type
+   */
+  public function testTestCreateDummyProductType() {
+    $product_type = $this->createDummyProductType();
+    debug($product_type);
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+    $this->drupalGet('admin/commerce/products/types');
+    $this->assertTest($product_type->title, 'Dummy product type found on admin/commerce/products/types');
+  }
+
+  /**
+   * Make a test product
+   */
+  public function testTestCreateDummyProduct() {
+    //cache_clear_all();
+    $this->drupalLogin($this->site_admin);
+    // Silly hack to workaround a current bug in views that prevents users from
+    //  seeing the admin/commerce/products page.
+    $this->drupalPost('admin/modules', array(), 'Save configuration');
+
+    $product = $this->createDummyProduct();
+    debug($product);
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+    //$super_admin = $this->createUserWithPermissionHeper(array('site admin', 'store admin'));
+    //$this->drupalLogin($super_admin);
+    $this->drupalGet('admin/commerce/products');
+    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products');
+    $this->drupalGet('admin/commerce/products/list');
+    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
+    $this->drupalGet('admin/commerce/products/add/product');
   }
 }
 
 /**
- * Test class during to ensure that the tests themselves are functioning
- * properly. All testTestFoo functions have "testTest" in the name to indicate
- * that they are verifying that a test is working.
+ * Sandbox for trying new things with tests. Eases development so only one test
+ * has to run at a time.
  */
 class CommerceSandboxTestCase extends CommerceBaseTestCase {
   protected $site_admin;
@@ -365,7 +411,7 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
       'name' => t('Commerce sandbox tests'),
-      'description' => t('Tests to use during test development to ensure the tests themselves are functioning properly.'),
+      'description' => t('Sandbox for trying new things with tests. Eases development so only one test has to run at a time.'),
       'group' => t('Drupal Commerce'),
     );
   }
@@ -385,54 +431,8 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
-    //$this->_testTestStoreAdmin();
-    //$this->_testTestCreateDummyProductType();
-    //$this->_testTestCreateDummyProduct();
+    
 
-  }
-
-  /**
-   * Test that Store Admin role actually gets set up.
-   */
-  function _testTestStoreAdmin() {
-    $store_admin = $this->createStoreAdmin();
-    $this->drupalLogin($store_admin);
-    $this->drupalLogin($this->site_admin);
-    $this->drupalGet('admin/people/permissions');
-  }
-
-  /**
-   * Make a test product type
-   */
-  public function _testTestCreateDummyProductType() {
-    $product_type = $this->createDummyProductType();
-    debug($product_type);
-    $store_admin = $this->createStoreAdmin();
-    $this->drupalLogin($store_admin);
-    $this->drupalGet('admin/commerce/products/types');
-  }
-
-  /**
-   * Make a test product
-   */
-  public function _testTestCreateDummyProduct() {
-    //cache_clear_all();
-    $this->drupalLogin($this->site_admin);
-    // Silly hack to workaround a current bug in views that prevents users from
-    //  seeing the admin/commerce/products page.
-    $this->drupalPost('admin/modules', array(), 'Save configuration');
-
-    $product = $this->createDummyProduct();
-    debug($product);
-    $store_admin = $this->createStoreAdmin();
-    $this->drupalLogin($store_admin);
-    //$super_admin = $this->createUserWithPermissionHeper(array('site admin', 'store admin'));
-    //$this->drupalLogin($super_admin);
-    $this->drupalGet('admin/commerce/products');
-    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products');
-    $this->drupalGet('admin/commerce/products/list');
-    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
-    $this->drupalGet('admin/commerce/products/add/product');
   }
 
 }
