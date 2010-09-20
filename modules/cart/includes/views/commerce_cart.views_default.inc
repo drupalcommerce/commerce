@@ -144,7 +144,7 @@ function commerce_cart_views_default_views() {
   // use during checkout.
   $view = new view;
   $view->name = 'commerce_cart_summary';
-  $view->description = 'Cart summary displayed at the url checkout/2.';
+  $view->description = 'Cart line item summary displayed during checkout.';
   $view->tag = '';
   $view->view_php = '';
   $view->base_table = 'commerce_order';
