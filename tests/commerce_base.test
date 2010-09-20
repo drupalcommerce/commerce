@@ -28,37 +28,40 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  Array of modules to include in addition to the sets loaded by $set
    */
   protected function setUpHelper($set = 'full', array $other_modules = array()) {
+
     $dependencies = array(
       // API
       'entity',
       'entity_metadata',
       'rules',
       'addressfield',
+      //'rules_admin',
       // UI
       'views',
+      //'views_ui',
       'field',
       'field_ui',
       'field_sql_storage',
     );
     $api = array(
       'commerce',
-      'commerce_price',
       'commerce_product',
+      'commerce_price',
+      'commerce_customer',
       'commerce_line_item',
       'commerce_order',
-      'commerce_payment',
       'commerce_ui', 'commerce_checkout',
       'commerce_product_reference',
+      'commerce_payment',
       'commerce_cart',
-      'commerce_customer',
     );
     $ui = array(
       //'commerce_ui' // Already added in $api due to checkout module
-      'commerce_product_ui',
       'commerce_line_item_ui',
       'commerce_order_ui',
-      'commerce_payment_ui',
+      'commerce_product_ui',
       'commerce_customer_ui',
+      'commerce_payment_ui',
     );
     $payment = array(
       'commerce_payment_null',
@@ -186,8 +189,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * Creates a dummy product type for use with other tests.
    *
    * @return
-   *  A product type if successful.
-   *  FALSE if the appropraite modules were not available
+   *  A product type.
+   *  FALSE if the appropraite modules were not available.
    */
   public function createDummyProductType($type = 'product_type', $name = 'Product Type', $description = '', $help = '', $append_random = TRUE) {
     if (module_exists('commerce_product')) {
@@ -214,6 +217,31 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Creates a dummy product for use with other tests.
+   *
+   * @param $type_given
+   *  Optional. The product type to base this product on. Defaults to 'product'.
+   * @return
+   *  A product type with most of it's basic fields set random values.
+   *  FALSE if the appropraite modules were not available.
+   */
+  public function createDummyProduct($type_given = 'product') {
+    if (module_exists('commerce_product')) {
+      $new_product = commerce_product_new($type_given);
+      $new_product->sku = $sku = $this->randomName(10);
+      $new_product->type = $type = $type_given;
+      $new_product->title = $title = $this->randomName(10);
+      $new_product->uid = $uid = 1;
+      $save_result = commerce_product_save($new_product);
+      return $new_product;
+    } else {
+      return FALSE;
+    }
+  }
+
+  // =============== Helper functions ===============
+
+  /**
    * Checks if a group of modules is enabled.
    *
    * @param $module_name
@@ -236,7 +264,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    */
   public function debugr($var) {
     if (is_array($var) || is_object($var)) {
-      debug('<var>'. var_export($var, TRUE) .'</pre>');
+      debug('<pre>'. var_export($var, TRUE) .'</pre>');
     } else {
       debug($var);
     }
@@ -348,6 +376,14 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
+    cache_clear_all(); // Just in case
+  }
+
+  protected function  manuallyEnableModules($modules) {
+    foreach ($modules as $module) {
+      debug($module);
+      module_enable(array($module));
+    }
   }
 
   /**
@@ -369,6 +405,28 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalGet('admin/commerce/products/types');
+    */
+
+    /*
+    // Make a test product
+    //cache_clear_all();
+    $this->drupalLogin($this->site_admin);
+    $this->drupalPost('admin/modules', array(), 'Save configuration');
+    $this->drupalGet('admin/people/permissions');
+    //cache_clear_all();
+    $this->drupalGet('admin/people/permissions');
+
+    $product = $this->createDummyProduct();
+    debug($product);
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+    //$super_admin = $this->createUserWithPermissionHeper(array('site admin', 'store admin'));
+    //$this->drupalLogin($super_admin);
+    $this->drupalGet('admin/commerce/products');
+    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products');
+    $this->drupalGet('admin/commerce/products/list');
+    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
+    $this->drupalGet('admin/commerce/products/add/product');
     */
 
   }

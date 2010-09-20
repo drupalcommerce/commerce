@@ -421,6 +421,11 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
  * Ensures the address field is present on the specified customer profile bundle.
  */
 function commerce_customer_configure_customer_profile_type($type) {
+  // If a field type we know should exist isn't found, clear the Field cache.
+  if (!field_info_field_types('addressfield')) {
+    cache_clear_all('field_info_types:', 'cache_field', TRUE);
+  }
+
   $field = field_info_field($type . '_address');
   $instance = field_info_instance('commerce_customer_profile', $type . '_address', $type);
 

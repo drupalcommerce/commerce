@@ -587,6 +587,11 @@ function commerce_product_reference_field_views_data_alter(&$data, $field, $modu
  * as specified above.
  */
 function commerce_product_reference_configure_line_item() {
+  // If a field type we know should exist isn't found, clear the Field cache.
+  if (!field_info_field_types('commerce_product_reference')) {
+    cache_clear_all('field_info_types:', 'cache_field', TRUE);
+  }
+
   $field = field_info_field('product');
   $instance = field_info_instance('commerce_line_item', 'product', 'product');
 
