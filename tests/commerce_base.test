@@ -224,13 +224,15 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  A product type with most of it's basic fields set random values.
    *  FALSE if the appropraite modules were not available.
    */
-  public function createDummyProduct($type_given = 'product') {
+  public function createDummyProduct($type_given = 'product', $sku = '', $title = '', $uid = 1, $price = -1, $currency_code = 'USD') {
     if (module_exists('commerce_product')) {
       $new_product = commerce_product_new($type_given);
-      $new_product->sku = $sku = $this->randomName(10);
-      $new_product->type = $type = $type_given;
-      $new_product->title = $title = $this->randomName(10);
-      $new_product->uid = $uid = 1;
+      $new_product->sku = empty($sku) ? $this->randomName(10) : $sku;
+      $new_product->type = $type_given;
+      $new_product->title = empty($title) ? $this->randomName(10) : $title;
+      $new_product->uid = $uid;
+      $new_product->base_price[LANGUAGE_NONE][0]['price'] = ($price < 0) ? rand(2, 500) : $price;
+      $new_product->base_price[LANGUAGE_NONE][0]['currency_code'] = 'USD';
       $save_result = commerce_product_save($new_product);
       return $new_product;
     } else {
@@ -294,56 +296,92 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @see createDummyProductDisplayContentType()
    */
   public function attachProductReferenceField($content_type = 'product_display', $field_name = 'field_product') {
-    // Check if the field has already been created.
-    $field_info = field_info_field($field_name);
-    if (empty($field_info)) {
-      // Add a product reference field to the product display node type
-      $field = array(
-        'field_name' => $field_name,
-        'type' => 'commerce_product_reference',
-        'cardinality' => 1,
-        'translatable' => FALSE,
-      );
-      field_create_field($field);
-      $this->pass("New field created: $field_name");
-    } else {
-      debug("NOTE: attachProductReferenceField attempting to create field <code>$field_name</code> that already exists. This is fine and this message is just for your information.");
-    }
+    if (module_exists('commerce_product')) {
+      // Check if the field has already been created.
+      $field_info = field_info_field($field_name);
+      if (empty($field_info)) {
+        // Add a product reference field to the product display node type
+        $field = array(
+          'field_name' => $field_name,
+          'type' => 'commerce_product_reference',
+          'cardinality' => 1,
+          'translatable' => FALSE,
+        );
+        field_create_field($field);
+        $this->pass("New field created: $field_name");
+      } else {
+        debug("NOTE: attachProductReferenceField attempting to create field <code>$field_name</code> that already exists. This is fine and this message is just for your information.");
+      }
 
-    // Check that this instance doesn't already exist
-    $instance = field_info_instance('node', $field_name, $content_type);
-    if (empty($insance)) {
-      // Add an instance of the field to the given content type
-      $instance = array(
-        'field_name' => $field_name,
-        'entity_type' => 'node',
-        'label' => 'Product',
-        'bundle' => $content_type,
-        'description' => 'Choose a product to display for sale.',
-        'required' => TRUE,
+      // Check that this instance doesn't already exist
+      $instance = field_info_instance('node', $field_name, $content_type);
+      if (empty($insance)) {
+        // Add an instance of the field to the given content type
+        $instance = array(
+          'field_name' => $field_name,
+          'entity_type' => 'node',
+          'label' => 'Product',
+          'bundle' => $content_type,
+          'description' => 'Choose a product to display for sale.',
+          'required' => TRUE,
 
-        'widget' => array(
-          'type' => 'options_select',
-        ),
-
-        'display' => array(
-          'full' => array(
-            'label' => 'hidden',
-            'type' => 'commerce_cart_add_to_cart_form',
+          'widget' => array(
+            'type' => 'options_select',
           ),
-          'teaser' => array(
-            'label' => 'hidden',
-            'type' => 'commerce_cart_add_to_cart_form',
-          ),
-        ),
-      );
-      field_create_instance($instance);
-      $this->pass("Create field instance of field <code>$field_name</code> on content type <code>$content_type</code>");
-    } else {
-      $this->fail("Test Develoepr: You attempted to create a field that already exists. Field: $field_name -- Content Type: $content_type");
-    }
 
-    return $instance;
+          'display' => array(
+            'full' => array(
+              'label' => 'hidden',
+              'type' => 'commerce_cart_add_to_cart_form',
+            ),
+            'teaser' => array(
+              'label' => 'hidden',
+              'type' => 'commerce_cart_add_to_cart_form',
+            ),
+          ),
+        );
+        field_create_instance($instance);
+        $this->pass("Create field instance of field <code>$field_name</code> on content type <code>$content_type</code>");
+      } else {
+        $this->fail("Test Develoepr: You attempted to create a field that already exists. Field: $field_name -- Content Type: $content_type");
+      }
+      return $instance;
+    } else {
+      $this->fail('Cannot create product reference field because Product module is not enabled.');
+    }
+  }
+
+  /**
+   * Creates a product display node with an associated product.
+   *
+   * @param $product_id
+   *  Product ID to use for the product reference field.
+   * @param $title
+   *  Optional title for the product node. Will default to a random name.
+   * @param $product_display_content_type
+   *  Machine name for the product display content type to use for creating the
+   *  node. Defaults to 'product_display'.
+   * @param $product_ref_field_name
+   *  Machine name for the product reference field on this product display
+   *  content type. Defaults to 'field_product'.
+   * @return
+   *  The newly saved $node object.
+   */
+  public function createDummyProductNode($product_id, $title = '', $product_display_content_type = 'product_display', $product_ref_field_name = 'field_product') {
+    if (module_exists('commerce_product')) {
+      if (empty($title)) {
+        $title = $this->randomString(10);
+      }
+      $node = (object) array('type' => $product_display_content_type);
+      node_object_prepare($node);
+      $node->uid = 1;
+      $node->title = $title;
+      $node->{$product_ref_field_name}[LANGUAGE_NONE][]['product_id'] = $product_id;
+      node_save($node);
+      return $node;
+    } else {
+      $this->fail('Cannot use use createProductNode because the product module is not enabled.');
+    }
   }
 
   // =============== Helper functions ===============
@@ -414,32 +452,9 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
-    // Create dummy product display nodes (and their corresponding product
-    //  entities)
-    foreach (array('01' => st('One'), '02' => st('Two'), '03' => st('Three')) as $key => $value) {
-      // Create the new product.
-      $product = commerce_product_new('product');
-      $product->sku = st('PROD-@num', array('@num' => $key));
-      $product->title = st('Product @num', array('@num' => $value));
-      $product->uid = 1;
-      $product->base_price[LANGUAGE_NONE][0]['price'] = $key * 10;
-      $product->base_price[LANGUAGE_NONE][0]['currency_code'] = 'USD';
-      $product = commerce_product_save($product);
 
-      // Create a product node for it.
-      $node = (object) array('type' => 'product');
-      node_object_prepare($node);
-      $node->uid = 1;
-      $node->title = $product->title;
-      $node->field_product[LANGUAGE_NONE][]['product_id'] = $product->product_id;
-      node_save($node);
-    }
-  }
-
-  /**
-   * Another sandbox!
-   */
-  public function testTestTest2() {
+    // Inentionally break to test greasemonkey script
+    //$this->functionTHATdoesNOTexist();
   }
 
 }
@@ -587,5 +602,25 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     //  If uncommented, this will product an error. Basically, this should be
     //  turned into an assertion that checks for the presence of the field.
     //$this->attachProductReferenceField('product_display', 'field_product');
+  }
+
+  /**
+   * Creates a dummy product node (also creates a product display content type
+   * and a dummy product entity).
+   */
+  public function testTestCreateDummyProductNode() {
+    // Create a dummy product display content type
+    $this->createDummyProductDisplayContentType();
+
+    // Create dummy product display nodes (and their corresponding product
+    //  entities)
+    $sku = 'PROD-01';
+    $product_name = 'Product One';
+    $product = $this->createDummyProduct('product', $sku, $product_name);
+    $product_node = $this->createDummyProductNode($product->product_id, $product_name);
+
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('node/1');
+    $this->assertText($product_name, "Product <code>$product_name</code> created successfully");
   }
 }
