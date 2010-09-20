@@ -10,7 +10,7 @@
  * Tests for commerce.module
  */
 class CommerceTestCase extends CommerceBaseTestCase {
-  protected $admin;
+  protected $site_admin;
 
   /**
    * getInfo() returns properties that are displayed in the test selection form.
@@ -30,7 +30,7 @@ class CommerceTestCase extends CommerceBaseTestCase {
     $modules = parent::setUpHelper('full');
     parent::setUp($modules);
 
-    $this->admin = $this->createSiteAdmin();
+    $this->site_admin = $this->createSiteAdmin();
   }
 
   /**
@@ -38,7 +38,7 @@ class CommerceTestCase extends CommerceBaseTestCase {
    * enabled in the test environment.
    */
   public function testModulesEnabled() {
-    $this->drupalLogin($this->admin);
+    $this->drupalLogin($this->site_admin);
     $this->drupalGet('admin/modules');
 
     $module_ids = $this->getModuleIDs();
@@ -81,6 +81,20 @@ class CommerceTestCase extends CommerceBaseTestCase {
 
       'edit-modules-views-views-enable',
     );
+  }
+
+  /**
+   * Sandbox for test development
+   */
+  public function testTestTest() {
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+
+
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('admin/people/permissions');
+
+
   }
 
 }

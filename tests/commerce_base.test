@@ -93,8 +93,9 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  Can be a single string (from the following) or can be an array containing
    *  multiple values that should be merged:
    *    'site admin': Admin permissions for Drupal core modules
+   *    'store admin': All commerce "administer X" permissions
    */
-  protected function permissionHelper($sets) {
+  protected function permissionBuilder($sets) {
     if (is_string($sets)) {
       $sets = array($sets);
     }
@@ -123,6 +124,16 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer permissions',
       'administer users',
     );
+    $store_admin = array(
+      'administer checkout',
+      'configure store',
+      'administer customer profiles',
+      'administer customer profile types',
+      'administer line item types',
+      'administer orders',
+      'administer products',
+      'administer product types',
+    );
 
     $final_permissions = array();
 
@@ -130,6 +141,10 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       switch ($set) {
         case 'site admin':
           $final_permissions = array_merge($final_permissions, $site_admin);
+          break;
+        case 'store admin':
+          $final_permissions = array_merge($final_permissions, $store_admin);
+          break;
       }
     }
 
@@ -137,12 +152,32 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Wrapper to easily create users from arrays returned by permissionBuilder().
+   *
+   * @param $set
+   *  See permissionBuilder() function
+   * @return
+   *  A user with the permissions returned from permissionBuilder().
+   */
+  protected function createUserWithPermissionHeper($set) {
+    $permissions = $this->permissionBuilder($set);
+    $user = $this->drupalCreateUser($permissions);
+    return $user;
+  }
+
+  /**
    * Returns a site administrator user. Only has permissions for administering
    * modules in Drupal core.
    */
   protected function createSiteAdmin() {
-    $admin_permissions = $this->permissionHelper('site admin');
-    $admin = $this->drupalCreateUser($admin_permissions);
-    return $admin;
+    return $this->createUserWithPermissionHeper('site admin');
+  }
+
+  /**
+   * Creates a store administrator user. Only has permissions for administering
+   * Commerce modules
+   */
+  protected function createStoreAdmin() {
+    return $this->createUserWithPermissionHeper('store admin');
   }
 }
