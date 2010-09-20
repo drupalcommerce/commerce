@@ -1,0 +1,94 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines abstract base test class for the Commerce module tests.
+ */
+
+/**
+ * Abstract class for Commerce testing. All Commerce tests should extend this
+ * class.
+ */
+abstract class CommerceBaseTestCase extends DrupalWebTestCase {
+
+  /**
+   * Sets up the environment required by all Commerce tests.
+   */
+  protected function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Helper function to determine which modules should be enabled. Should be
+   * used in place of standard parent::setUp('moduleA', 'moduleB') call.
+   *
+   * @param $set
+   *  Which set of modules to load. Can be one of:
+   *    'full': (default) All Commerce modules, including UI and payment modules.
+   *    'ui': All API and UI modules.
+   *    'api': Just API modules (includes commerce_ui since checkout depends on it).
+   *    'dependencies': Common dependencies required by many Commerce API and UI
+   *      modules.
+   * @param $other_modules
+   *  Array of modules to include in addition to the sets loaded by $set
+   */
+  protected function setUpHelper($set = 'full', array $other_modules = array()) {
+    $dependencies = array(
+      // API
+      'rules',
+      'entity',
+      'entity_metadata',
+      'addressfield',
+      // UI
+      'views',
+      'field',
+      'field_ui',
+      'field_sql_storage',
+    );
+    $api = array(
+      'commerce',
+      'commerce_price',
+      'commerce_product',
+      'commerce_line_item',
+      'commerce_order',
+      'commerce_payment',
+      'commerce_ui', 'commerce_checkout',
+      'commerce_product_reference',
+      'commerce_cart',
+      'commerce_customer',
+    );
+    $ui = array(
+      //'commerce_ui' // Already added in $api due to checkout module
+      'commerce_product_ui',
+      'commerce_line_item_ui',
+      'commerce_order_ui',
+      'commerce_payment_ui',
+      'commerce_customer_ui',
+    );
+    $payment = array(
+      'commerce_payment_null',
+    );
+
+    // Final module list
+    $modules = array();
+
+    // Cascade down the list and add sets
+    switch ($set) {
+      case 'full':
+        $modules = array_merge($payment, $modules);
+      case 'ui':
+        $modules = array_merge($ui, $modules);
+      case 'api':
+        $modules = array_merge($api, $modules);
+      case 'dependencies':
+        $modules = array_merge($dependencies, $modules);
+        break;
+    }
+
+    // Bring in modules specified by caller
+    $modules = array_merge($modules, $other_modules);
+
+    return $modules;
+  }
+}

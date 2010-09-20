@@ -6,3 +6,6 @@ core = 7.x
 
 ; Base module files
 files[] = commerce.module
+; Tests
+files[] = tests/commerce_base.test
+files[] = tests/commerce.test
