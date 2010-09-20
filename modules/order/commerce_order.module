@@ -775,11 +775,6 @@ function commerce_order_status_update($order, $name) {
  * Ensures the line item field is present on the default order bundle.
  */
 function commerce_order_configure_order_type($type = 'commerce_order') {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_line_item_reference')) {
-    cache_clear_all('field_info_types:', 'cache_field', TRUE);
-  }
-
   $field = field_info_field('line_items');
   $instance = field_info_instance('commerce_order', 'line_items', $type);
 
