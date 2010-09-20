@@ -181,3 +181,96 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     return $this->createUserWithPermissionHeper('store admin');
   }
 }
+
+
+/**
+ * Test class to test the CommerceBaseTestCase functions
+ */
+class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
+  protected $site_admin;
+
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Commerce base class module'),
+      'description' => t('Tests the functionality of the base test class.'),
+      'group' => t('Drupal Commerce'),
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen.
+   */
+  public function setUp() {
+    $modules = parent::setUpHelper('full');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+  }
+
+  /**
+   * Ensure that all of the Commerce modules (and their dependencies) are
+   * enabled in the test environment.
+   */
+  public function testModulesEnabled() {
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('admin/modules');
+
+    $module_ids = $this->getModuleIDs();
+    foreach ($module_ids as $module_id) {
+      $this->assertFieldChecked($module_id);
+    }
+  }
+
+  /**
+   * Returns the complete list of Commerce modules (and dependencies) as they
+   * appear in ID fields on the modules page.
+   */
+  protected function getModuleIDs() {
+    return array(
+      'edit-modules-drupal-commerce-commerce-cart-enable',
+      'edit-modules-drupal-commerce-commerce-checkout-enable',
+      'edit-modules-drupal-commerce-commerce-enable',
+      'edit-modules-drupal-commerce-commerce-customer-enable',
+      'edit-modules-drupal-commerce-commerce-line-item-enable',
+      'edit-modules-drupal-commerce-commerce-order-enable',
+      'edit-modules-drupal-commerce-commerce-payment-enable',
+      'edit-modules-drupal-commerce-commerce-price-enable',
+      'edit-modules-drupal-commerce-commerce-product-enable',
+      'edit-modules-drupal-commerce-commerce-product-reference-enable',
+
+      'edit-modules-drupal-commerce-payment-commerce-payment-null-enable',
+
+      'edit-modules-drupal-commerce-ui-commerce-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-customer-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-line-item-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-order-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-payment-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-product-ui-enable',
+
+      'edit-modules-other-addressfield-enable',
+      'edit-modules-other-entity-enable',
+      'edit-modules-other-entity-metadata-enable',
+
+      'edit-modules-rules-rules-enable',
+
+      'edit-modules-views-views-enable',
+    );
+  }
+
+  /**
+   * Sandbox for test development
+   */
+  public function testTestTest() {
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+
+
+    $this->drupalLogin($this->site_admin);
+    $this->drupalGet('admin/people/permissions');
+
+
+  }
+}
