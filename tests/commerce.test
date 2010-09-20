@@ -10,8 +10,6 @@
  * Tests for commerce.module
  */
 class CommerceTestCase extends CommerceBaseTestCase {
-  protected $site_admin;
-
   /**
    * getInfo() returns properties that are displayed in the test selection form.
    */

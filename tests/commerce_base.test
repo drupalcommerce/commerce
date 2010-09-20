@@ -174,17 +174,79 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Creates a store administrator user. Only has permissions for administering
-   * Commerce modules
+   * Returns a store administrator user. Only has permissions for administering
+   * Commerce modules.
    */
   protected function createStoreAdmin() {
     return $this->createUserWithPermissionHeper('store admin');
+  }
+
+
+  /**
+   * Creates a dummy product type for use with other tests.
+   *
+   * @return
+   *  A product type if successful.
+   *  FALSE if the appropraite modules were not available
+   */
+  public function createDummyProductType($type = 'dummy_product_type', $name = 'Dummy Product Type', $description = '', $help = '', $append_random = TRUE) {
+    if (module_exists('commerce_product')) {
+      if ($append_random) {
+        $type = $type .'_'. $this->randomName(20 - strlen($type) - 1);
+        $name = $name .' '. $this->randomName(40 - strlen($name) - 1);
+        $description = $description .' '. $this->randomString(128);
+        $help = $help .' '. $this->randomString(128);
+      }
+      $new_product_type = commerce_product_type_new();
+      $new_product_type->type = $type;
+      $new_product_type->name = $name;
+      $new_product_type->description = $description;
+      $new_product_type->help = $help;
+      $new_product_type->is_new = TRUE;
+      $save_result = commerce_product_type_save($new_product_type);
+      if ($save_result === FALSE) {
+        return FALSE;
+      }
+      return $new_product_type;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Checks if a group of modules is enabled.
+   *
+   * @param $module_name
+   *  Array of module names to check (without the .module extension)
+   */
+  protected function modulesUp($module_names) {
+    if (is_string($module_names)) {
+      $module_names = array($module_names);
+    }
+    foreach ($module_names as $module_name) {
+      if (!module_exists($module_name)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Wraps the debug() output in a <pre> tag when printing arrays
+   */
+  public function debugr($var) {
+    if (is_array($var) || is_object($var)) {
+      debug('<var>'. var_export($var, TRUE) .'</pre>');
+    } else {
+      debug($var);
+    }
   }
 }
 
 
 /**
- * Test class to test the CommerceBaseTestCase functions
+ * Test class to test the CommerceBaseTestCase functions. Testing a test.
+ * Somewhat meta to be doing this.
  */
 class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   protected $site_admin;
@@ -259,18 +321,53 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-views-views-enable',
     );
   }
+}
+
+/**
+ * Test class during development
+ */
+class CommerceSandboxTestCase extends CommerceBaseTestCase {
+  protected $site_admin;
+
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Commerce sandbox tests'),
+      'description' => t('Tests the test of the base test test test. ;)'),
+      'group' => t('Drupal Commerce'),
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen.
+   */
+  public function setUp() {
+    $modules = parent::setUpHelper('full');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+  }
 
   /**
    * Sandbox for test development
    */
   public function testTestTest() {
+    /*
+    // Test is Store Admin role actually gets set up
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
-
-
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('admin/people/permissions');
+    */
 
+    /*
+    // Make a test product type
+    $product_type = $this->createDummyProductType();
+    $this->debugr($product_type);
+    */
+    
 
   }
 }
