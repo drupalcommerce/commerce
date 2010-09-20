@@ -12,12 +12,6 @@
  */
 abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
-  /**
-   * Sets up the environment required by all Commerce tests.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
 
   /**
    * Helper function to determine which modules should be enabled. Should be
@@ -36,9 +30,9 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   protected function setUpHelper($set = 'full', array $other_modules = array()) {
     $dependencies = array(
       // API
-      'rules',
       'entity',
       'entity_metadata',
+      'rules',
       'addressfield',
       // UI
       'views',

@@ -11,6 +11,9 @@
  */
 class CommerceTestCase extends CommerceBaseTestCase {
 
+  /**
+   * getInfo() returns properties that are displayed in the test selection form
+   */
   public static function getInfo() {
     return array(
       'name' => t('Commerce module'),
@@ -19,13 +22,55 @@ class CommerceTestCase extends CommerceBaseTestCase {
     );
   }
 
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen
+   */
   public function setUp() {
-    parent::setUp();
+    $modules = parent::setUpHelper('full');
+    parent::setUp($modules);
+
+    $this->createRoles();
+  }
+
+  /**
+   * Helper function to create roles 
+   */
+  protected function createRoles() {
+
+  }
+
+  /**
+   * Ensure that all of the modules are enabled
+   */
+  public function testModulesEnabled() {
+
   }
 
   public function testTest() {
-    parent::setUpHelper('full');
+
     $this->pass('always pass!');
+
+
+    $admin_permissions = array(
+      //'administer comments and comment settings',
+      'administer content types',
+      'administer modules',
+      'administer site configuration',
+      'administer themes',
+      'administer software updates',
+      'administer actions',
+      //'use the administration pages and help',
+      //'view site reports',
+      'administer permissions',
+      'administer users',
+      //'administer views',
+      //'access all views',
+    );
+
+    $admin = $this->drupalCreateUser($admin_permissions);
+    $this->drupalLogin($admin);
+    $this->drupalGet('admin/modules');
+
   }
 
 }
