@@ -14,7 +14,7 @@ function commerce_cart_views_default_views() {
   // Shopping cart view for the block and checkout pane.
   $view = new view;
   $view->name = 'commerce_cart_block';
-  $view->description = '';
+  $view->description = 'Display a list of line items addded to cart.';
   $view->tag = '';
   $view->view_php = '';
   $view->base_table = 'commerce_order';
@@ -144,7 +144,7 @@ function commerce_cart_views_default_views() {
   // use during checkout.
   $view = new view;
   $view->name = 'commerce_cart_summary';
-  $view->description = '';
+  $view->description = 'Cart summary displayed at the url checkout/2.';
   $view->tag = '';
   $view->view_php = '';
   $view->base_table = 'commerce_order';

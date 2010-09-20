@@ -13,8 +13,8 @@ function commerce_order_ui_views_default_views() {
 
   // Order admin list at admin/commerce/orders.
   $view = new view;
-  $view->name = 'Orders';
-  $view->description = '';
+  $view->name = 'commerce_orders';
+  $view->description = 'Display a list of orders for the store admin.';
   $view->tag = '';
   $view->view_php = '';
   $view->base_table = 'commerce_order';

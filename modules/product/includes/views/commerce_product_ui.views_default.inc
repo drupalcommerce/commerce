@@ -13,8 +13,8 @@ function commerce_product_ui_views_default_views() {
 
   // Products admin list at admin/commerce/products.
   $view = new view;
-  $view->name = 'Products';
-  $view->description = '';
+  $view->name = 'commerce_products';
+  $view->description = 'Display a list of products for store admin.';
   $view->tag = '';
   $view->view_php = '';
   $view->base_table = 'commerce_product';

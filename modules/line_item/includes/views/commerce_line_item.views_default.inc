@@ -13,7 +13,7 @@ function commerce_line_item_views_default_views() {
 
   // Line item view for the order view page.
   $view = new view;
-  $view->name = 'line_item_table';
+  $view->name = 'commerce_line_item_table';
   $view->description = 'Display a set of line items in a table.';
   $view->tag = '';
   $view->view_php = '';
