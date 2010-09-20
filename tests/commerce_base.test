@@ -85,4 +85,64 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
     return $modules;
   }
+
+  /**
+   * Helper function to get different combinations of permission sets.
+   *
+   * @param $set
+   *  Can be a single string (from the following) or can be an array containing
+   *  multiple values that should be merged:
+   *    'site admin': Admin permissions for Drupal core modules
+   */
+  protected function permissionHelper($sets) {
+    if (is_string($sets)) {
+      $sets = array($sets);
+    }
+    $site_admin = array(
+      'administer blocks',
+      'administer comments',
+      'access dashboard',
+      'administer filters',
+      'administer image styles',
+      'administer menu',
+      'administer content types',
+      'administer nodes',
+      'bypass node access',
+      'administer url aliases',
+      'administer search',
+      'administer modules',
+      'administer site configuration',
+      'administer themes',
+      'administer software updates',
+      'administer actions',
+      'access administration pages',
+      'access site in maintenance mode',
+      'access site reports',
+      'block IP addresses',
+      'administer taxonomy',
+      'administer permissions',
+      'administer users',
+    );
+
+    $final_permissions = array();
+
+    foreach ($sets as $set) {
+      switch ($set) {
+        case 'site admin':
+          $final_permissions = array_merge($final_permissions, $site_admin);
+      }
+    }
+
+    return $final_permissions;
+  }
+
+  /**
+   * Returns a site administrator user. Only has permissions for administering
+   * modules in Drupal core.
+   */
+  protected function createSiteAdmin() {
+    $admin_permissions = $this->permissionHelper('site admin');
+    $admin = $this->drupalCreateUser($admin_permissions);
+    return $admin;
+  }
 }

@@ -10,9 +10,10 @@
  * Tests for commerce.module
  */
 class CommerceTestCase extends CommerceBaseTestCase {
+  protected $admin;
 
   /**
-   * getInfo() returns properties that are displayed in the test selection form
+   * getInfo() returns properties that are displayed in the test selection form.
    */
   public static function getInfo() {
     return array(
@@ -23,54 +24,63 @@ class CommerceTestCase extends CommerceBaseTestCase {
   }
 
   /**
-   * setUp() performs any pre-requisite tasks that need to happen
+   * setUp() performs any pre-requisite tasks that need to happen.
    */
   public function setUp() {
     $modules = parent::setUpHelper('full');
     parent::setUp($modules);
 
-    $this->createRoles();
+    $this->admin = $this->createSiteAdmin();
   }
 
   /**
-   * Helper function to create roles 
-   */
-  protected function createRoles() {
-
-  }
-
-  /**
-   * Ensure that all of the modules are enabled
+   * Ensure that all of the Commerce modules (and their dependencies) are
+   * enabled in the test environment.
    */
   public function testModulesEnabled() {
-
-  }
-
-  public function testTest() {
-
-    $this->pass('always pass!');
-
-
-    $admin_permissions = array(
-      //'administer comments and comment settings',
-      'administer content types',
-      'administer modules',
-      'administer site configuration',
-      'administer themes',
-      'administer software updates',
-      'administer actions',
-      //'use the administration pages and help',
-      //'view site reports',
-      'administer permissions',
-      'administer users',
-      //'administer views',
-      //'access all views',
-    );
-
-    $admin = $this->drupalCreateUser($admin_permissions);
-    $this->drupalLogin($admin);
+    $this->drupalLogin($this->admin);
     $this->drupalGet('admin/modules');
 
+    $module_ids = $this->getModuleIDs();
+    foreach ($module_ids as $module_id) {
+      $this->assertFieldChecked($module_id);
+    }
+  }
+
+  /**
+   * Returns the complete list of Commerce modules (and dependencies) as they
+   * appear in ID fields on the modules page.
+   */
+  protected function getModuleIDs() {
+    return array(
+      'edit-modules-drupal-commerce-commerce-cart-enable',
+      'edit-modules-drupal-commerce-commerce-checkout-enable',
+      'edit-modules-drupal-commerce-commerce-enable',
+      'edit-modules-drupal-commerce-commerce-customer-enable',
+      'edit-modules-drupal-commerce-commerce-line-item-enable',
+      'edit-modules-drupal-commerce-commerce-order-enable',
+      'edit-modules-drupal-commerce-commerce-payment-enable',
+      'edit-modules-drupal-commerce-commerce-price-enable',
+      'edit-modules-drupal-commerce-commerce-product-enable',
+      'edit-modules-drupal-commerce-commerce-product-reference-enable',
+
+      'edit-modules-drupal-commerce-payment-commerce-payment-null-enable',
+
+      'edit-modules-drupal-commerce-ui-commerce-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-customer-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-line-item-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-order-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-payment-ui-enable',
+      'edit-modules-drupal-commerce-ui-commerce-product-ui-enable',
+
+      'edit-modules-other-addressfield-enable',
+      'edit-modules-other-entity-enable',
+      'edit-modules-other-entity-metadata-enable',
+
+      'edit-modules-rules-rules-enable',
+
+      'edit-modules-views-views-enable',
+    );
   }
 
 }
