@@ -352,7 +352,9 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
 }
 
 /**
- * Test class during development
+ * Test class during to ensure that the tests themselves are functioning
+ * properly. All testTestFoo functions have "testTest" in the name to indicate
+ * that they are verifying that a test is working.
  */
 class CommerceSandboxTestCase extends CommerceBaseTestCase {
   protected $site_admin;
@@ -363,7 +365,7 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
       'name' => t('Commerce sandbox tests'),
-      'description' => t('Tests the test of the base test test test. ;)'),
+      'description' => t('Tests to use during test development to ensure the tests themselves are functioning properly.'),
       'group' => t('Drupal Commerce'),
     );
   }
@@ -390,25 +392,37 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
-    /*
-    // Test is Store Admin role actually gets set up
+    //$this->_testTestStoreAdmin();
+    //$this->_testTestCreateDummyProductType();
+    //$this->_testTestCreateDummyProduct();
+
+  }
+
+  /**
+   * Test that Store Admin role actually gets set up.
+   */
+  function _testTestStoreAdmin() {
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('admin/people/permissions');
-    */
+  }
 
-    /*
-    // Make a test product type
+  /**
+   * Make a test product type
+   */
+  public function _testTestCreateDummyProductType() {
     $product_type = $this->createDummyProductType();
-    $this->debugr($product_type);
+    debug($product_type);
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalGet('admin/commerce/products/types');
-    */
+  }
 
-    /*
-    // Make a test product
+  /**
+   * Make a test product
+   */
+  public function _testTestCreateDummyProduct() {
     //cache_clear_all();
     $this->drupalLogin($this->site_admin);
     $this->drupalPost('admin/modules', array(), 'Save configuration');
@@ -427,7 +441,6 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     $this->drupalGet('admin/commerce/products/list');
     $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
     $this->drupalGet('admin/commerce/products/add/product');
-    */
-
   }
+
 }
