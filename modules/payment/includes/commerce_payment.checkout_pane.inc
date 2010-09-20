@@ -21,9 +21,10 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   // Generate an array of payment method options for the checkout form.
   $options = array();
 
-  foreach ((array) $order->payment_methods as $method_id) {
-    if ($payment_method = commerce_payment_method_load($method_id)) {
-      $options[$method_id] = $payment_method->title;
+  foreach ((array) $order->payment_methods as $instance_id => $method_info) {
+    // Ensure we've received a valid payment method.
+    if ($payment_method = commerce_payment_method_load($method_info['method_id'])) {
+      $options[$instance_id] = $payment_method->title;
     }
   }
 
@@ -68,7 +69,9 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     $pane_form['payment_method']['#default_value'] = $default_value;
 
     // Add the payment method specific form elements.
-    $payment_method = commerce_payment_method_load($pane_form['payment_method']['#default_value']);
+    $method_info = $order->payment_methods[$pane_form['payment_method']['#default_value']];
+    $payment_method = commerce_payment_method_load($method_info['method_id']);
+    $payment_method->settings = $method_info['settings'];
 
     if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
       $pane_form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
@@ -101,7 +104,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
   // If the selected payment method was changed...
   if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
     // And the newly selected method has a valid form callback...
-    if ($payment_method = commerce_payment_method_load($pane_values['payment_method'])) {
+    if ($payment_method = commerce_payment_method_instance_load($pane_values['payment_method'])) {
       if (function_exists($payment_method->callbacks['submit_form'])) {
         // Fail validation so the form is rebuilt to include the payment method
         // specific form elements.
@@ -111,7 +114,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
   }
 
   // Delegate validation to the payment method callback.
-  $payment_method = commerce_payment_method_load($pane_values['payment_method']);
+  $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
   if (function_exists($callback = $payment_method->callbacks['submit_form_validate'])) {
     $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order);
@@ -136,7 +139,7 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
   $order->data['payment_method'] = $pane_values['payment_method'];
 
   // Delegate submit to the payment method callback.
-  $payment_method = commerce_payment_method_load($pane_values['payment_method']);
+  $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
   if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
     return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order);
@@ -147,8 +150,8 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
  * Payment redirect pane: form callback.
  */
 function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $checkout_pane, $order) {
-  // First load the order's specified payment method.
-  $payment_method = commerce_payment_method_load($order->data['payment_method']);
+  // First load the order's specified payment method instance.
+  $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
 
   // If the payment method doesn't exist or does not require a redirect...
   if (!$payment_method || !$payment_method->offsite) {
@@ -206,17 +209,6 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
     // Generate a key to use in the return URL from the redirected service.
     $order->data['payment_redirect_key'] = drupal_hash_base64(time());
     commerce_order_save($order);
-
-    // TODO: Get the settings for the method from its action settings. This
-    // should be happening upstream based on the actual Rule used and the actual
-    // action used... perhaps saving $order->payment_methods from above.
-    $rule = rules_config_load('commerce_payment_' . $payment_method->method_id);
-
-    foreach ($rule->actions() as $key => $action) {
-      if ($action->getElementName() == 'commerce_payment_enable_' . $payment_method->method_id) {
-        $payment_method->settings = $action->settings['payment_method']['settings'];
-      }
-    }
 
     // Merge the new form into the current form array, preserving the help text
     // if it exists. We also add a wrapper so the form can be easily submitted.

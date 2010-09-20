@@ -111,3 +111,41 @@ function commerce_payment_method_load($method_id) {
   $payment_methods = commerce_payment_methods();
   return isset($payment_methods[$method_id]) ? $payment_methods[$method_id] : FALSE;
 }
+
+/**
+ * Returns a payment method instance object which includes the settings specific
+ *   to the context of the instance.
+ *
+ * @param $instance_id
+ *   A payment method instance ID in the form of a pipe delimited string
+ *     containing the method_id and the enabling Rule's name.
+ *
+ * @return
+ *   The payment method instance object which is identical to the payment method
+ *     object with the addition of the settings array.
+ */
+function commerce_payment_method_instance_load($instance_id) {
+  // Explode the method key into its component parts.
+  list($method_id, $rule_name) = explode('|', $instance_id);
+
+  // First load the payment method and add the instance ID.
+  $payment_method = commerce_payment_method_load($method_id);
+  $payment_method->instance_id = $instance_id;
+
+  // Then load the Rule configuration that enables the method.
+  $rule = rules_config_load($rule_name);
+
+  // Iterate over its actions to find one with the matching element ID and pull
+  // its settings into the payment method object.
+  $payment_method->settings = array();
+
+  foreach ($rule->actions() as $action) {
+    if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
+      if (is_array($action->settings['payment_method']) && !empty($action->settings['payment_method']['settings'])) {
+        $payment_method->settings = $action->settings['payment_method']['settings'];
+      }
+    }
+  }
+
+  return $payment_method;
+}

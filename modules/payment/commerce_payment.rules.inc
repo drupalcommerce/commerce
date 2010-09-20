@@ -67,10 +67,34 @@ function commerce_payment_rules_action_info() {
 /**
  * Generic execution callback for the payment method.
  */
-function commerce_payment_enable_method($order, $payment_method) {
-  // TODO: Possibly actually return the array instead of the scalar to use the
-  // settings throughout the checkout process.
-  $order->payment_methods[] = is_array($payment_method) ? $payment_method['method_id'] : $payment_method;
+function commerce_payment_enable_method($order, $payment_method, $action_settings, $rule_state, $action, $callback_type) {
+  // Find the Rule that contains this action.
+  $rule = $action->parentElement();
+
+  while ($rule->getPluginName() != 'reaction rule') {
+    $rule = $rule->parentElement();
+  }
+
+  // Initialize variables for the payment method ID and settings.
+  if (is_array($payment_method)) {
+    $method_id = $payment_method['method_id'];
+    $settings = $payment_method['settings'];
+  }
+  else {
+    $method_id = $payment_method;
+    $settings = array();
+  }
+
+  // Create a unique key for the instance of the payment method represented by
+  // this action.
+  $method_key = $method_id . '|' . $rule->name;
+
+  // Set the payment method to the order along with its settings and context.
+  $order->payment_methods[$method_key] = array(
+    'method_id' => $method_id,
+    'settings' => $settings,
+    'rule_name' => $rule->name,
+  );
 }
 
 /**
@@ -92,7 +116,7 @@ function commerce_payment_rules_data_info() {
 }
 
 /**
- * UI for textual data.
+ * Adds a payment method settings form to the enabling action.
  */
 class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectInputFormInterface {
   public static function getDefaultMode() {
@@ -104,11 +128,16 @@ class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectI
     if ($payment_method = commerce_payment_method_load($info['payment_method'])) {
       $form[$name]['method_id'] = array('#type' => 'value', '#value' => $info['payment_method']);
 
+      // If the payment method has a settings callback...
       if (function_exists($payment_method->callbacks['settings'])) {
+        // Prepare an array of payment method settings defaults.
         $method_settings = !empty($settings[$name]) ? $settings[$name]['settings'] : array();
+
+        // Add the settings form elements to the action form.
         $form[$name]['settings'] = $payment_method->callbacks['settings']($method_settings);
       }
       else {
+        // Otherwise add an appropriate message.
         $form[$name]['settings']['no_settings']['#markup'] = t('No settings for this payment method.');
       }
     }
