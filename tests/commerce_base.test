@@ -381,13 +381,6 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     cache_clear_all(); // Just in case
   }
 
-  protected function  manuallyEnableModules($modules) {
-    foreach ($modules as $module) {
-      debug($module);
-      module_enable(array($module));
-    }
-  }
-
   /**
    * Sandbox for test development
    */
@@ -425,10 +418,9 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
   public function _testTestCreateDummyProduct() {
     //cache_clear_all();
     $this->drupalLogin($this->site_admin);
+    // Silly hack to workaround a current bug in views that prevents users from
+    //  seeing the admin/commerce/products page.
     $this->drupalPost('admin/modules', array(), 'Save configuration');
-    $this->drupalGet('admin/people/permissions');
-    //cache_clear_all();
-    $this->drupalGet('admin/people/permissions');
 
     $product = $this->createDummyProduct();
     debug($product);
