@@ -22,21 +22,6 @@ function commerce_payment_null_commerce_payment_method_info() {
 }
 
 /**
- * Payment method callback: settings form.
- */
-function commerce_payment_null_settings($settings = NULL) {
-  $form = array();
-
-  $form['test'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Test of field'),
-    '#default_value' => isset($settings['test']) ? $settings['test'] : '',
-  );
-
-  return $form;
-}
-
-/**
  * Payment method callback: checkout form.
  */
 function commerce_payment_null_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
