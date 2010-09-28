@@ -31,8 +31,8 @@ class commerce_payment_handler_field_amount extends views_handler_field {
     parent::options_form($form, $form_state);
 
     $form['display_format'] = array(
-      '#title' => t('Display format'),
       '#type' => 'select',
+      '#title' => t('Display format'),
       '#options' => array(
         'formatted' => t('Currency formatted amount'),
         'raw' => t('Raw amount'),

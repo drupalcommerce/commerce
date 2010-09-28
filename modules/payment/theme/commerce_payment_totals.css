@@ -9,3 +9,7 @@
   background-color: #D3E9F4;
   font-weight: bold;
 }
+
+.add-payment .form-item-payment-method {
+  display: inline;
+}
