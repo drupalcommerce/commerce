@@ -230,6 +230,14 @@ function commerce_payment_views_data() {
     ),
   );
 
+  $data['commerce_payment_transaction']['delete_transaction'] = array(
+    'field' => array(
+      'title' => t('Delete link'),
+      'help' => t('Provide a simple link to delete the payment transaction.'),
+      'handler' => 'commerce_payment_handler_field_payment_transaction_link_delete',
+    ),
+  );
+
   $data['commerce_payment_transaction']['totals'] = array(
     'title' => t('Totals'),
     'help' => t('Display transaction total and order balance information for all transactions in the View.'),

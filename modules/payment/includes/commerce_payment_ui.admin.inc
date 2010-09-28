@@ -44,3 +44,23 @@ function commerce_payment_ui_admin_page() {
 
   return $content;
 }
+
+/**
+ * Form callback wrapper: confirmation form for deleting a payment transaction.
+ *
+ * @param $order
+ *   The order object containing the transaction being deleted by the form.
+ * @param $transaction
+ *   The actual payment transaction that will be deleted.
+ *
+ * @see commerce_payment_payment_transaction_delete_form()
+ */
+function commerce_payment_ui_payment_transaction_delete_form_wrapper($order, $transaction) {
+  // Add the breadcrumb for the form's location.
+  commerce_order_ui_set_breadcrumb();
+
+  // Include the forms file from the Payment module.
+  module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.forms');
+
+  return drupal_get_form('commerce_payment_ui_payment_transaction_delete_form', $order, $transaction);
+}

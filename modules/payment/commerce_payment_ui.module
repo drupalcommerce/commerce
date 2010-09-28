@@ -12,7 +12,7 @@
 function commerce_payment_ui_menu() {
   $items = array();
 
-  // Payment tab on orders
+  // Payment tab on orders.
   $items['admin/commerce/orders/%commerce_order/payment'] = array(
     'title' => 'Payment',
     'page callback' => 'commerce_payment_ui_order_tab',
@@ -23,7 +23,17 @@ function commerce_payment_ui_menu() {
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
-  // Administrative area
+  // Payment transaction operations links.
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/delete'] = array(
+    'title' => 'Delete a payment transaction',
+    'page callback' => 'commerce_payment_ui_payment_transaction_delete_form_wrapper',
+    'page arguments' => array(3, 5),
+    'access arguments' => array('administer payments'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_payment_ui.admin.inc',
+  );
+
+  // Payment method Rules administration page.
   $items['admin/commerce/config/payment'] = array(
     'title' => 'Payment settings',
     'page callback' => 'commerce_payment_ui_admin_page',
@@ -42,4 +52,42 @@ function commerce_payment_ui_views_api() {
     'api' => 2,
     'path' => drupal_get_path('module', 'commerce_payment_ui') . '/includes/views',
   );
+}
+
+/**
+ * Implements hook_forms().
+ */
+function commerce_payment_ui_forms($form_id, $args) {
+  $forms = array();
+
+  // Define a wrapper ID for the payment transaction delete confirmation form.
+  $forms['commerce_payment_ui_payment_transaction_delete_form'] = array(
+    'callback' => 'commerce_payment_payment_transaction_delete_form',
+  );
+
+  return $forms;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Payment UI module instantiates the payment transaction delete form at a
+ * particular path in the Commerce IA. It uses its own form ID to do so and
+ * alters the form here to add in appropriate redirection.
+ *
+ * @see commerce_payment_ui_payment_transaction_delete_form()
+ */
+function commerce_payment_ui_form_commerce_payment_ui_payment_transaction_delete_form_alter(&$form, &$form_state) {
+  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment');
+
+  $form['#submit'][] = 'commerce_payment_ui_payment_transaction_delete_form_submit';
+}
+
+/**
+ * Submit callback for commerce_payment_ui_payment_transaction_delete_form().
+ *
+ * @see commerce_payment_ui_form_commerce_payment_ui_payment_transaction_delete_form_alter()
+ */
+function commerce_payment_ui_payment_transaction_delete_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment';
 }
