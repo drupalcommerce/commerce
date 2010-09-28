@@ -509,9 +509,11 @@ function commerce_customer_field_info() {
     'commerce_customer_profile_reference' => array(
       'label' => t('Customer profile reference'),
       'description' => t('This field stores the ID of a related customer profile as an integer value.'),
-      'default_widget' => 'commerce_customer_profile_manager',
+      'default_widget' => 'options_select',
       'default_formatter' => 'commerce_customer_profile_reference_view',
-      'settings' => array(),
+      'settings' => array(
+        'referenceable_types' => array(),
+      ),
       'property_type' => 'commerce_customer_profile',
       'property_callbacks' => array('commerce_customer_profile_property_info_callback'),
     ),
@@ -522,18 +524,49 @@ function commerce_customer_field_info() {
  * Implements hook_field_schema().
  */
 function commerce_customer_field_schema($field) {
-  return array(
-    'columns' => array(
-      'profile_id' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    return array(
+      'columns' => array(
+        'profile_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ),
       ),
-    ),
-    'indexes' => array(
-      'profile_id' => array('profile_id'),
-    ),
-  );
+      'indexes' => array(
+        'profile_id' => array('profile_id'),
+      ),
+    );
+  }
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function commerce_customer_field_settings_form($field, $instance, $has_data) {
+  $settings = $field['settings'];
+  $form = array();
+
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    $options = array();
+
+    // Build an options array of the customer profile types.
+    foreach (commerce_customer_profile_type_get_name() as $type => $name) {
+      $options[$type] = check_plain($name);
+    }
+
+    $form['referenceable_types'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Customer profile types that can be referenced'),
+      '#description' => t('If no types are selected, any type of customer profile may be referenced.'),
+      '#options' => $options,
+      '#default_value' => is_array($settings['referenceable_types']) ? $settings['referenceable_types'] : array(),
+      '#multiple' => TRUE,
+      '#disabled' => $has_data,
+    );
+  }
+
+  return $form;
 }
 
 /**
@@ -544,35 +577,37 @@ function commerce_customer_field_schema($field) {
  *                           valid line item ID).
  */
 function commerce_customer_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
-  // Extract profile_ids to check.
-  $profile_ids = array();
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    // Extract profile_ids to check.
+    $profile_ids = array();
 
-  // First check non-numeric profile_id's to avoid losing time with them.
-  foreach ($items as $delta => $item) {
-    if (is_array($item) && !empty($item['profile_id'])) {
-      if (is_numeric($item['profile_id'])) {
-        $profile_ids[] = $item['profile_id'];
-      }
-      else {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'invalid_profile_id',
-          'message' => t('%name: you have specified an invalid customer profile for this field.', array('%name' => $instance['label'])),
-        );
-      }
-    }
-  }
-
-  // Prevent performance hog if there are no ids to check.
-  if ($profile_ids) {
-    $profiles = commerce_customer_profile_load_multiple($profile_ids);
-
+    // First check non-numeric profile_id's to avoid losing time with them.
     foreach ($items as $delta => $item) {
-      if (is_array($item)) {
-        if (!empty($item['profile_id']) && !isset($profiles[$item['profile_id']])) {
+      if (is_array($item) && !empty($item['profile_id'])) {
+        if (is_numeric($item['profile_id'])) {
+          $profile_ids[] = $item['profile_id'];
+        }
+        else {
           $errors[$field['field_name']][$langcode][$delta][] = array(
             'error' => 'invalid_profile_id',
             'message' => t('%name: you have specified an invalid customer profile for this reference field.', array('%name' => $instance['label'])),
           );
+        }
+      }
+    }
+
+    // Prevent performance hog if there are no ids to check.
+    if ($profile_ids) {
+      $profiles = commerce_customer_profile_load_multiple($profile_ids);
+
+      foreach ($items as $delta => $item) {
+        if (is_array($item)) {
+          if (!empty($item['profile_id']) && !isset($profiles[$item['profile_id']])) {
+            $errors[$field['field_name']][$langcode][$delta][] = array(
+              'error' => 'invalid_profile_id',
+              'message' => t('%name: you have specified an invalid customer profile for this reference field.', array('%name' => $instance['label'])),
+            );
+          }
         }
       }
     }
@@ -583,8 +618,10 @@ function commerce_customer_field_validate($entity_type, $object, $field, $instan
  * Implements hook_field_is_empty().
  */
 function commerce_customer_field_is_empty($item, $field) {
-  // profile_id = 0 îs empty too, which is exactly what we want.
-  return empty($item['profile_id']);
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    // profile_id = 0 îs empty too, which is exactly what we want.
+    return empty($item['profile_id']);
+  }
 }
 
 /**
@@ -616,7 +653,7 @@ function commerce_customer_field_formatter_view($entity_type, $object, $field, $
   switch ($display['type']) {
     case 'commerce_customer_profile_reference_display':
       foreach ($items as $delta => $item) {
-        $profile = commerce_customer_profile_load($item['line_item_id']);
+        $profile = commerce_customer_profile_load($item['profile_id']);
 
         if ($profile) {
           $result[$delta] = array(
@@ -652,6 +689,34 @@ function commerce_customer_field_widget_info() {
   );
 
   return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function commerce_customer_field_widget_info_alter(&$info) {
+  $info['options_select']['field types'][] = 'commerce_customer_profile_reference';
+}
+
+/**
+ * Implements hook_options_list().
+ */
+function commerce_customer_options_list($field) {
+  $options = array();
+
+  // Loop through all customer matches.
+  foreach (commerce_customer_match_customer_profiles($field) as $profile_id => $data) {
+    // Add them to the options list in optgroups by customer profile type.
+    $name = check_plain(commerce_customer_profile_type_get_name($data['type']));
+    $options[$name][$profile_id] = t('@profile: User @user', array('@profile' => $profile_id, '@user' => $data['uid']));
+  }
+
+  // Simplify the options list if only one optgroup exists.
+  if (count(array_keys($options)) == 1) {
+    $options = $options[array_shift(array_keys($options))];
+  }
+
+  return $options;
 }
 
 /**
@@ -754,4 +819,105 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
  */
 function commerce_customer_field_widget_error($element, $error) {
   form_error($element, $error['message']);
+}
+
+/**
+ * Fetches an array of all customer profiles matching the given parameters.
+ *
+ * This info is used in various places (allowed values, autocomplete results,
+ * input validation...). Some of them only need the profile_ids, others
+ * profile_id + titles, others yet profile_id + titles + rendered row (for
+ * display in widgets).
+ *
+ * The array we return contains all the potentially needed information,
+ * and lets calling functions use the parts they actually need.
+ *
+ * @param $field
+ *   The field description.
+ * @param $ids
+ *   Optional product ids to lookup.
+ * @param $limit
+ *   If non-zero, limit the size of the result set.
+ *
+ * @return
+ *   An array of valid profiles in the form:
+ *   array(
+ *     profile_id => array(
+ *       'uid' => The user ID,
+ *       'rendered' => The text to display in widgets (can be HTML)
+ *     ),
+ *     ...
+ *   )
+ */
+function commerce_customer_match_customer_profiles($field, $ids = array(), $limit = NULL) {
+  $results = &drupal_static(__FUNCTION__, array());
+
+  // Create unique id for static cache.
+  $cid = implode(':', array(
+    $field['field_name'],
+    implode('-', $ids),
+    $limit,
+  ));
+
+  if (!isset($results[$cid])) {
+    $matches = _commerce_customer_match_customer_profiles_standard($field, $ids, $limit);
+
+    // Store the results.
+    $results[$cid] = !empty($matches) ? $matches : array();
+  }
+
+  return $results[$cid];
+}
+
+/**
+ * Helper function for commerce_customer_match_customer_profiles().
+ *
+ * Returns an array of products matching the specific parameters.
+ */
+function _commerce_customer_match_customer_profiles_standard($field, $ids = array(), $limit = NULL) {
+  // Build the query object with the necessary fields.
+  $query = db_select('commerce_customer_profile', 'cp');
+  $profile_id_alias = $query->addField('cp', 'profile_id');
+  $profile_uid_alias = $query->addField('cp', 'uid');
+  $profile_type_alias = $query->addField('cp', 'type');
+
+  // Add a condition to the query to filter by matching profile types.
+  if (is_array($field['settings']['referenceable_types']) && !empty($field['settings']['referenceable_types'])) {
+    $types = array_diff(array_values($field['settings']['referenceable_types']), array(0, NULL));
+
+    // Only filter by type if some types have been specified.
+    if (!empty($types)) {
+      $query->condition('cp.type', $types, 'IN');
+    }
+  }
+
+  if ($ids) {
+    // Otherwise add a profile_id specific condition if specified.
+    $query->condition($product_id_alias, $ids, 'IN', $ids);
+  }
+
+  // Order the results by ID and then profile type.
+  $query
+    ->orderBy($profile_id_alias)
+    ->orderBy($profile_type_alias);
+
+  // Add a limit if specified.
+  if ($limit) {
+    $query->range(0, $limit);
+  }
+
+  // Execute the query and build the results array.
+  $result = $query->execute();
+
+  $matches = array();
+
+  foreach ($result->fetchAll() as $profile) {
+    $matches[$profile->profile_id] = array(
+      'uid' => $profile->uid,
+      'type' => $profile->type,
+      'rendered' => t('Profile @profile_id', array('@profile_id' => $profile->profile_id)),
+    );
+  }
+
+  return $matches;
 }
