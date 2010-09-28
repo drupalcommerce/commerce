@@ -51,6 +51,26 @@ function commerce_payment_entity_info() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_payment_theme() {
+  return array(
+    'commerce_payment_totals' => array(
+      'variables' => array('rows' => array(), 'form' => NULL, 'totals' => array(), 'view' => NULL),
+      'path' => drupal_get_path('module', 'commerce_payment') . '/theme',
+      'template' => 'commerce-payment-totals',
+    ),
+  );
+}
+
+/**
+ * Adds the necessary CSS for the line item summary template.
+ */
+function template_preprocess_commerce_payment_totals(&$variables) {
+  drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment_totals.css');
+}
+
+/**
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_payment_commerce_checkout_page_info() {

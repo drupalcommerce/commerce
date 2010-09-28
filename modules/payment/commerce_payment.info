@@ -13,9 +13,14 @@ files[] = commerce_payment.install
 ; Module includes
 files[] = includes/commerce_payment_transaction.controller.inc
 
+; Views include
+files[] = includes/views/commerce_payment.views.inc
+files[] = includes/views/handlers/commerce_payment_handler_area_totals.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_amount.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_currency_code.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_message.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_payment_method.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_status.inc
+
 ; Tests
 files[] = tests/commerce_payment.payment.test
-
-; Views handlers
-files[] = includes/views/handlers/commerce_payment_handler_area_total.inc
-files[] = includes/views/handlers/commerce_payment_handler_field_status.inc

@@ -1,0 +1,11 @@
+/* $Id$ */
+
+.payment-totals-table {
+  width: 33%;
+  float: right;
+}
+
+.payment-totals-table tr.order-balance {
+  background-color: #D3E9F4;
+  font-weight: bold;
+}

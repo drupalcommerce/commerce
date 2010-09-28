@@ -38,19 +38,31 @@ function commerce_payment_views_data() {
     ),
   );
 
-  // Expose the created timestamp.
-  $data['commerce_payment_transaction']['created'] = array(
-    'title' => t('Created date'),
-    'help' => t('The date the transaction was created.'),
+  // Expose the order ID.
+  $data['commerce_payment_transaction']['order_id'] = array(
+    'title' => t('Order ID'),
+    'help' => t('The unique internal identifier of the associated order.'),
     'field' => array(
-      'handler' => 'views_handler_field_date',
+      'handler' => 'commerce_order_handler_field_order',
       'click sortable' => TRUE,
     ),
-    'sort' => array(
-      'handler' => 'views_handler_sort_date',
-    ),
     'filter' => array(
-      'handler' => 'views_handler_filter_date',
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'commerce_order_handler_argument_order_order_id',
+      'name field' => 'order_number',
+      'numeric' => TRUE,
+      'validate type' => 'order_id',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'commerce_order',
+      'field' => 'order_id',
+      'label' => t('Order'),
     ),
   );
 
@@ -59,7 +71,7 @@ function commerce_payment_views_data() {
     'title' => t('Payment method'),
     'help' => t('The payment method of the transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'commerce_payment_handler_field_payment_method',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -73,10 +85,10 @@ function commerce_payment_views_data() {
     ),
   );
 
-  // Expose the transaction remote ID.
+  // Expose the transaction's remote ID.
   $data['commerce_payment_transaction']['remote_id'] = array(
     'title' => t('Remote identifier'),
-    'help' => t('The remote identifier of this transaction.'),
+    'help' => t('The remote identifier of this transaction at the payment provider.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -97,7 +109,7 @@ function commerce_payment_views_data() {
     'title' => t('Amount'),
     'help' => t('The amount of the transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
+      'handler' => 'commerce_payment_handler_field_amount',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -116,7 +128,7 @@ function commerce_payment_views_data() {
     'title' => t('Currency'),
     'help' => t('The currency of the transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'commerce_payment_handler_field_currency_code',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -135,7 +147,7 @@ function commerce_payment_views_data() {
     'title' => t('Message'),
     'help' => t('The message associated with the transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'commerce_payment_handler_field_message',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -168,11 +180,42 @@ function commerce_payment_views_data() {
     ),
   );
 
-  $data['commerce_payment_transaction']['total'] = array(
-    'title' => t('Total'),
-    'help' => t('Display the total.'),
+  // Expose the created and changed timestamps.
+  $data['commerce_payment_transaction']['created'] = array(
+    'title' => t('Created date'),
+    'help' => t('The date the transaction was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed'] = array(
+    'title' => t('Changed date'),
+    'help' => t('The date the transaction was last changed.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['totals'] = array(
+    'title' => t('Totals'),
+    'help' => t('Display transaction total and order balance information for all transactions in the View.'),
     'area' => array(
-      'handler' => 'commerce_payment_handler_area_total',
+      'handler' => 'commerce_payment_handler_area_totals',
     ),
   );
 
