@@ -6,6 +6,7 @@
  * Defines the payment system and checkout integration.
  */
 
+
 /**
  * Implements hook_commerce_checkout_page_info().
  */
@@ -85,6 +86,24 @@ function commerce_payment_methods() {
       );
 
       $payment_methods[$method_id] = (object) ((array) $payment_method + $defaults);
+
+      // Default the display title to the title if necessary.  The display title
+      // is used in instances where the payment method has an official name used
+      // as the title (i.e. PayPal WPS) but a different method of display on
+      // selection forms (like some text and a set of images).
+      if (empty($payment_methods[$method_id]->display_title)) {
+        $payment_methods[$method_id]->display_title = $payment_methods[$method_id]->title;
+      }
+
+      // Default the short title to the title if necessary.  Like the display
+      // title, the short title is an alternate way of displaying the title to
+      // the user consisting of plain text but with unnecessary information
+      // stripped off.  The payment method title might be PayPal WPS as it
+      // distinguishes itself from other PayPal payment services, but you would
+      // only want to display PayPal to the customer as their means of payment.
+      if (empty($payment_methods[$method_id]->short_title)) {
+        $payment_methods[$method_id]->short_title = $payment_methods[$method_id]->title;
+      }
 
       // Merge in default callbacks.
       foreach (array('settings', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {

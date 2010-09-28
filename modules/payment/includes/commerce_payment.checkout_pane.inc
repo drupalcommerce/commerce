@@ -24,7 +24,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   foreach ((array) $order->payment_methods as $instance_id => $method_info) {
     // Ensure we've received a valid payment method.
     if ($payment_method = commerce_payment_method_load($method_info['method_id'])) {
-      $options[$instance_id] = $payment_method->title;
+      $options[$instance_id] = $payment_method->display_title;
     }
   }
 
