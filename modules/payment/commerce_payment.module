@@ -85,14 +85,14 @@ function commerce_payment_methods() {
         'callbacks' => array(),
       );
 
-      $payment_methods[$method_id] = (object) ((array) $payment_method + $defaults);
+      $payment_method = (object) ((array) $payment_method + $defaults);
 
       // Default the display title to the title if necessary.  The display title
       // is used in instances where the payment method has an official name used
       // as the title (i.e. PayPal WPS) but a different method of display on
       // selection forms (like some text and a set of images).
-      if (empty($payment_methods[$method_id]->display_title)) {
-        $payment_methods[$method_id]->display_title = $payment_methods[$method_id]->title;
+      if (empty($payment_method->display_title)) {
+        $payment_method->display_title = $payment_method->title;
       }
 
       // Default the short title to the title if necessary.  Like the display
@@ -102,7 +102,7 @@ function commerce_payment_methods() {
       // distinguishes itself from other PayPal payment services, but you would
       // only want to display PayPal to the customer as their means of payment.
       if (empty($payment_methods[$method_id]->short_title)) {
-        $payment_methods[$method_id]->short_title = $payment_methods[$method_id]->title;
+        $payment_method->short_title = $payment_method->title;
       }
 
       // Merge in default callbacks.

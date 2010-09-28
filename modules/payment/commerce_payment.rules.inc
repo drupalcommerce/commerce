@@ -78,7 +78,7 @@ function commerce_payment_enable_method($order, $payment_method, $action_setting
   // Initialize variables for the payment method ID and settings.
   if (is_array($payment_method)) {
     $method_id = $payment_method['method_id'];
-    $settings = $payment_method['settings'];
+    $settings = !empty($payment_method['settings']) ? $payment_method['settings'] : array();
   }
   else {
     $method_id = $payment_method;
