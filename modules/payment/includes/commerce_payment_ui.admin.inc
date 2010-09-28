@@ -8,6 +8,13 @@
 
 
 /**
+ * Displays the payment transaction View in an order's payment tab.
+ */
+function commerce_payment_ui_order_tab($order) {
+  return commerce_embed_view('commerce_payment_order', 'defaults', array($order->order_id));
+}
+
+/**
  * Builds the payment settings page using the Rules UI overview table filtered
  *   to display payment method rules.
  */

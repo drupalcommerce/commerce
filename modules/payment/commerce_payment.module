@@ -51,6 +51,19 @@ function commerce_payment_entity_info() {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function commerce_payment_permission() {
+  return array(
+    'administer payments' => array(
+      'title' => t('Administer payments'),
+      'description' => t('Allows users to perform any payment action for any order.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_payment_theme() {

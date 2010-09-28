@@ -10,30 +10,36 @@
  * Implements hook_menu().
  */
 function commerce_payment_ui_menu() {
+  $items = array();
+
+  // Payment tab on orders
   $items['admin/commerce/orders/%commerce_order/payment'] = array(
     'title' => 'Payment',
-    'page callback' => 'commerce_payment_ui_page',
+    'page callback' => 'commerce_payment_ui_order_tab',
     'page arguments' => array(3),
-    'access callback' => 'commerce_order_access',
-    'access arguments' => array('payment', 3),
+    'access arguments' => array('administer payments'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
-  // Administrative area.
+  // Administrative area
   $items['admin/commerce/config/payment'] = array(
     'title' => 'Payment settings',
     'page callback' => 'commerce_payment_ui_admin_page',
-    'page arguments' => array(),
-    'access arguments' => array('administer payment'),
-    'file' => 'includes/commerce_payment_ui.admin.inc'
+    'access arguments' => array('administer payments'),
+    'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
   return $items;
 }
 
 /**
- * Page callback; display the payment administration tab.
+ * Implements hook_views_api().
  */
-function commerce_payment_ui_page($order) {
-  return '';
+function commerce_payment_ui_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'commerce_payment_ui') . '/includes/views',
+  );
 }
