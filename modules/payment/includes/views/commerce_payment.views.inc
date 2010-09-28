@@ -87,7 +87,7 @@ function commerce_payment_views_data() {
 
   // Expose the transaction's remote ID.
   $data['commerce_payment_transaction']['remote_id'] = array(
-    'title' => t('Remote identifier'),
+    'title' => t('Remote ID'),
     'help' => t('The remote identifier of this transaction at the payment provider.'),
     'field' => array(
       'handler' => 'views_handler_field',
