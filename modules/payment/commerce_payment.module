@@ -7,6 +7,20 @@
  */
 
 
+// Local payment transaction status definitions:
+
+// Pending is used when a transaction has been initialized but is still awaiting
+// resolution; e.g. a CC authorization awaiting capture or an e-check payment
+// pending at the payment provider.
+define('COMMERCE_PAYMENT_STATUS_PENDING', 'pending');
+
+// Success is used when a transaction has completed resulting in money being
+// transferred from the customer to the store or vice versa.
+define('COMMERCE_PAYMENT_STATUS_SUCCESS', 'success');
+
+// Failure is used when a transaction cannot be completed or is rejected.
+define('COMMERCE_PAYMENT_STATUS_FAILURE', 'failure');
+
 /**
  * Implements of hook_entity_info().
  */
@@ -68,6 +82,12 @@ function commerce_payment_permission() {
  */
 function commerce_payment_theme() {
   return array(
+    'commerce_payment_transaction_status_text' => array(
+      'variables' => array('text' => NULL, 'status' => NULL),
+    ),
+    'commerce_payment_transaction_status_icon' => array(
+      'variables' => array('status' => NULL),
+    ),
     'commerce_payment_totals' => array(
       'variables' => array('rows' => array(), 'form' => NULL, 'totals' => array(), 'view' => NULL),
       'path' => drupal_get_path('module', 'commerce_payment') . '/theme',
@@ -243,6 +263,82 @@ function commerce_payment_method_instance_load($instance_id) {
   }
 
   return $payment_method;
+}
+
+/**
+ * Returns an array of transaction payment status objects for the defined
+ *   payment statuses.
+ *
+ * This function invokes hook_commerce_payment_transaction_status_info() so
+ * other payment modules can define statuses if necessary. However, it doesn't
+ * allow for altering so that existing payment methods cannot be unset. It still
+ * does perform an array merge in such a way that the properties for the three
+ * core statuses defined by this module may be overridden if the same keys are
+ * used in another module's implementation of the info hook.
+ */
+function commerce_payment_transaction_statuses() {
+  $statuses = &drupal_static(__FUNCTION__);
+
+  // If the statuses haven't been defined yet, do so now.
+  if (!isset($statuses)) {
+    $statuses = module_invoke_all('commerce_payment_transaction_status_info');
+
+    $statuses += array(
+      COMMERCE_PAYMENT_STATUS_PENDING => (object) array(
+        'status' => COMMERCE_PAYMENT_STATUS_PENDING,
+        'title' => t('Pending'),
+        'icon' => '',
+        'total' => FALSE,
+      ),
+      COMMERCE_PAYMENT_STATUS_SUCCESS => (object) array(
+        'status' => COMMERCE_PAYMENT_STATUS_SUCCESS,
+        'title' => t('Success'),
+        'icon' => drupal_get_path('module', 'commerce_payment') . '/theme/icon-success.png',
+        'total' => TRUE,
+      ),
+      COMMERCE_PAYMENT_STATUS_FAILURE => (object) array(
+        'status' => COMMERCE_PAYMENT_STATUS_FAILURE,
+        'title' => t('Failure'),
+        'icon' => drupal_get_path('module', 'commerce_payment') . '/theme/icon-failure.png',
+        'total' => FALSE,
+      ),
+    );
+  }
+
+  return $statuses;
+}
+
+/**
+ * Themes the icon representing a payment transaction status.
+ */
+function theme_commerce_payment_transaction_status_icon($variables) {
+  $status = $variables['status'];
+
+  return '<img src="' . url($status->icon, array('absolute' => TRUE)) . '" class="' . drupal_html_class($status->status) . '" title="' . $status->title . '" alt="' . $status->title . '" />';
+}
+
+/**
+ * Themes a text value related to a payment transaction status.
+ */
+function theme_commerce_payment_transaction_status_text($variables) {
+  $status = $variables['status'];
+
+  return '<span class="' . drupal_html_class($status->status) . '">' . $variables['text'] . '</span>';
+}
+
+/**
+ * Returns the payment transaction status object for the specified status.
+ *
+ * @param $status
+ *   The transaction status string.
+ *
+ * @return
+ *   An object containing the transaction status information or FALSE if the
+ *     requested status is not found.
+ */
+function commerce_payment_transaction_status_load($status) {
+  $statuses = commerce_payment_transaction_statuses();
+  return !empty($statuses[$status]) ? $statuses[$status] : FALSE;
 }
 
 /**

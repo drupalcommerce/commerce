@@ -38,14 +38,19 @@ class commerce_payment_handler_area_totals extends views_handler_area {
 
   function render($empty = FALSE) {
     // Calculate a total of successful payments for each currency.
+    $statuses = commerce_payment_transaction_statuses();
     $totals = array();
 
     foreach ($this->view->result as $result) {
-      if ($result->commerce_payment_transaction_status == 'success') {
+      // If the payment transaction status indicates it should include the
+      // current transaction in the total...
+      if ($statuses[$result->commerce_payment_transaction_status]->total) {
+        // Add the transaction to its currency's running total if it exists...
         if (isset($totals[$result->commerce_payment_transaction_currency_code])) {
           $totals[$result->commerce_payment_transaction_currency_code] += $result->commerce_payment_transaction_amount;
         }
         else {
+          // Or begin a new running total for the currency.
           $totals[$result->commerce_payment_transaction_currency_code] = $result->commerce_payment_transaction_amount;
         }
       }
@@ -53,8 +58,19 @@ class commerce_payment_handler_area_totals extends views_handler_area {
 
     $rows = array();
 
-    // If there's only a single currency total...
-    if (count($totals) == 1) {
+    if (count($totals) == 0) {
+      // Add a row for the remaining balance on the order.
+      $rows[] = array(
+        'data' => array(
+          array('data' => t('Order balance'), 'class' => array('label')),
+          // TODO: Provide an API function to caluclate an order's remaining balance.
+          array('data' => '-', 'class' => array('balance')),
+        ),
+        'class' => array('order-balance'),
+      );
+    }
+    elseif (count($totals) == 1) {
+      // Otherwise if there's only a single currency total...
       $currency_code = array_shift(array_keys($totals));
 
       // Add a row for the total amount paid.

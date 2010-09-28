@@ -75,9 +75,15 @@ function commerce_payment_schema() {
         'not null' => TRUE,
       ),
       'status' => array(
-        'description' => 'The status of this transaction (success, failure).',
+        'description' => 'The status of this transaction (pending, success, or failure).',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'remote_status' => array(
+        'description' => 'The status of the transaction at the payment provider.',
+        'type' => 'varchar',
+        'length' => '128',
         'not null' => TRUE,
       ),
       'payload' => array(
@@ -167,9 +173,15 @@ function commerce_payment_schema() {
         'not null' => TRUE,
       ),
       'status' => array(
-        'description' => 'The status of this transaction (success, failure).',
+        'description' => 'The status of this transaction (pending, success, or failure).',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => '128',
+        'not null' => TRUE,
+      ),
+      'remote_status' => array(
+        'description' => 'The status of the transaction at the payment provider.',
+        'type' => 'varchar',
+        'length' => '128',
         'not null' => TRUE,
       ),
       'log' => array(

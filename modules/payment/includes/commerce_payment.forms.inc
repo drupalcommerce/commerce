@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Defines forms for creating payment transactions.
+ * Defines forms for creating and administering payment transactions.
  */
 
 

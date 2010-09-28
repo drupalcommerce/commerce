@@ -34,6 +34,7 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       'amount' => 0,
       'currency_code' => '',
       'status' => '',
+      'remote_status' => '',
       'payload' => array(),
       'created' => '',
       'changed' => '',

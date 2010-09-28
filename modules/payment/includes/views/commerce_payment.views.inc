@@ -180,6 +180,25 @@ function commerce_payment_views_data() {
     ),
   );
 
+  // Expose the transaction's remote status.
+  $data['commerce_payment_transaction']['remote_status'] = array(
+    'title' => t('Remote status'),
+    'help' => t('The status of this transaction at the payment provider.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Expose the created and changed timestamps.
   $data['commerce_payment_transaction']['created'] = array(
     'title' => t('Created date'),
