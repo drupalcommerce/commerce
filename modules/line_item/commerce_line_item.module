@@ -574,7 +574,7 @@ function commerce_line_item_field_formatter_view($entity_type, $object, $field, 
   switch ($display['type']) {
     case 'commerce_line_item_reference_view':
       $result[0] = array(
-        '#markup' => commerce_embed_view('line_item_table', 'defaults', array(implode(',', $line_item_ids))),
+        '#markup' => commerce_embed_view('commerce_line_item_table', 'defaults', array(implode(',', $line_item_ids))),
       );
 
       break;
