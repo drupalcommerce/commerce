@@ -822,6 +822,18 @@ function commerce_customer_field_widget_error($element, $error) {
 }
 
 /**
+ * Callback to alter the property info of the reference field.
+ *
+ * @see commerce_customer_field_info().
+ */
+function commerce_customer_profile_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = str_replace('_', '-', $field['field_name']);
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  $property['options list'] = 'entity_metadata_field_options_list';
+  unset($property['query callback']);
+}
+
+/**
  * Fetches an array of all customer profiles matching the given parameters.
  *
  * This info is used in various places (allowed values, autocomplete results,
