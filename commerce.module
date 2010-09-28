@@ -303,6 +303,15 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
     return $currency->format_callback($price, $currency, $entity);
   }
 
+  // Separate the negative symbol from the number itself.
+  if ($price < 0) {
+    $negative = TRUE;
+    $price = abs($price);
+  }
+  else {
+    $negative = FALSE;
+  }
+
   // Format the price as a number.
   $price = number_format(round($price, $currency->decimals), $currency->decimals, $currency->decimal_separator, $currency->thousands_separator);
 
@@ -313,7 +322,8 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
     '@price' => $price,
     '@symbol_after' => $currency->symbol_placement == 'after' ? $currency->symbol : '',
     '@code_after' => $currency->code_placement == 'after' ? $currency->code : '',
+    '@negative' => $negative ? '-' : '',
   );
 
-  return t('@code_before @symbol_before@price @symbol_after @code_after', $replacements);
+  return t('@code_before @negative@symbol_before@price @symbol_after @code_after', $replacements);
 }
