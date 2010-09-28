@@ -59,6 +59,7 @@ function commerce_payment_schema() {
         'type' => 'blob',
         'size' => 'big',
         'not null' => TRUE,
+        'serialize' => TRUE,
       ),
       'amount' => array(
         'description' => 'The amount of this transaction.',
@@ -84,6 +85,7 @@ function commerce_payment_schema() {
         'type' => 'blob',
         'size' => 'big',
         'not null' => TRUE,
+        'serialize' => TRUE,
       ),
       'created' => array(
         'description' => 'The Unix timestamp when this transaction was created.',
