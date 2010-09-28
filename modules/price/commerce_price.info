@@ -3,7 +3,9 @@ name = Price
 description = Defines the price field and a price alteration system.
 package = Drupal Commerce
 dependencies[] = commerce
+dependencies[] = rules
 core = 7.x
 
 ; Base module files
 files[] = commerce_price.module
+files[] = includes/commerce_price.inc

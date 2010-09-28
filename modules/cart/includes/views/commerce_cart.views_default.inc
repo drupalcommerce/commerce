@@ -116,6 +116,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
   $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id']['type'] = 'commerce_price_formatted_amount';
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['sorts']['line_item_id']['table'] = 'commerce_line_item';
@@ -245,6 +246,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
   $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id']['type'] = 'commerce_price_formatted_amount';
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['sorts']['line_item_id']['table'] = 'commerce_line_item';

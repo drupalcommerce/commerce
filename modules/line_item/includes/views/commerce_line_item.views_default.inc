@@ -150,6 +150,7 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['fields']['entity_id_1']['alter']['html'] = 0;
   $handler->display->display_options['fields']['entity_id_1']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id_1']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['type'] = 'commerce_price_formatted_amount';
   /* Field: Fields: total */
   $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_total';
@@ -165,6 +166,7 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
   $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id']['type'] = 'commerce_price_formatted_amount';
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['sorts']['line_item_id']['table'] = 'commerce_line_item';

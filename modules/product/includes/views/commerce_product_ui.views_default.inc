@@ -134,6 +134,7 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
   $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id']['type'] = 'commerce_price_formatted_amount';
   /* Field: Commerce Product: Edit link */
   $handler->display->display_options['fields']['edit_product']['id'] = 'edit_product';
   $handler->display->display_options['fields']['edit_product']['table'] = 'commerce_product';

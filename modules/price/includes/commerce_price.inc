@@ -14,41 +14,57 @@
 class CommercePrice {
   // Initialize base variables.
   protected $price = 0;
-  protected $basePrice = 0;
-  protected $currency = 'usd';
+  protected $base_price = 0;
+  protected $currency_code = '';
+  protected $base_currency_code = '';
   protected $log = array();
 
-  function __constructor($amount = 0, $currency = NULL) {
-    if (is_numeric($amount)) {
-      $this->basePrice = $amount;
+  function __construct($price = 0, $currency_code = NULL) {
+    if (is_numeric($price)) {
+      $this->base_price = $price;
     }
 
-    if (empty($currency)) {
-      $this->currency = 'usd';
+    if (empty($currency_code)) {
+      $currency_code = variable_get('commerce_default_currency', 'USD');
     }
 
-    $this->modifyPrice($this->$basePrice, 'commerce_price', t('Base price'));
+    $this->base_currency_code = $currency_code;
+
+    $this->modifyPrice('commerce_price', t('Base price'), $this->base_price, $this->base_currency_code);
   }
 
   /**
    * Modifies a price up or down and logs the adjustment.
    *
-   * @param $amount
-   *   The amount of the adjustment.
    * @param $module
    *   The name of the module adjusting the price.  i.e. commerce_tax.
+   * @param $description
+   *   A short description of the nature of the adjustment.
+   * @param $amount
+   *   The amount of the adjustment.
+   * @param $currency_code
+   *   Optionally set or update the currency code for the price.
    *
    * @return
    *   TRUE for success, otherwise FALSE.
    */
-  function modifyPrice($amount, $module, $description) {
+  function modifyPrice($module, $description, $amount, $currency_code = NULL) {
     if (is_numeric($amount)) {
-      $this->log[] = array(
+      $this->price += $amount;
+
+      $log = array(
         'module' => $module,
         'description' => $description,
         'amount' => $amount,
       );
-      $this->price += $amount;
+
+      if (!empty($currency_code)) {
+        $this->currency_code = $currency_code;
+        $log['currency_code'] = $currency_code;
+      }
+
+      $this->log[] = $log;
+
       return TRUE;
     }
     else {
@@ -56,6 +72,34 @@ class CommercePrice {
       watchdog('error', 'Attempt to modify a price by a non-numeric value. %module - %description - %amount', array('%module' => $module, '%amount' => $amount, '%description' => $description));
       return FALSE;
     }
+  }
+
+  /**
+   * Returns the current price value.
+   */
+  function getPrice() {
+    return $this->price;
+  }
+
+  /**
+   * Returns the base price value.
+   */
+  function getBasePrice() {
+    return $this->base_price;
+  }
+
+  /**
+   * Returns the current currency code.
+   */
+  function getCurrencyCode() {
+    return $this->currency_code;
+  }
+
+  /**
+   * Returns the basecurrency code.
+   */
+  function getBaseCurrencyCode() {
+    return $this->base_currency_code;
   }
 
   /**
