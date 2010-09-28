@@ -28,7 +28,7 @@ class commerce_payment_handler_field_status extends views_handler_field {
         'title' => t('Status title'),
         'raw' => t('Raw status'),
       ),
-      '#default_value' => $this->options['disply_style'],
+      '#default_value' => $this->options['display_style'],
     );
   }
 
