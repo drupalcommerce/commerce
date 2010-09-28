@@ -97,7 +97,6 @@ function commerce_product_schema() {
         'columns' => array('uid' => 'uid'),
       ),
     ),
-
   );
 
   $schema['commerce_product_type'] = array(

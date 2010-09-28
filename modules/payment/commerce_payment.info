@@ -10,6 +10,9 @@ core = 7.x
 files[] = commerce_payment.module
 files[] = commerce_payment.install
 
+; Module includes
+files[] = includes/commerce_payment_transaction.controller.inc
+
 ; Tests
 files[] = tests/commerce_payment.payment.test
 

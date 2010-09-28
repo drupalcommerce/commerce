@@ -8,6 +8,49 @@
 
 
 /**
+ * Implements of hook_entity_info().
+ */
+function commerce_payment_entity_info() {
+  $return = array(
+    'commerce_payment_transaction' => array(
+      'label' => t('Payment transaction'),
+      'controller class' => 'CommercePaymentTransactionEntityController',
+      'base table' => 'commerce_payment_transaction',
+      'revision table' => 'commerce_payment_transaction_revision',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'transaction_id',
+        'revision' => 'revision_id',
+        'bundle' => 'payment_method',
+      ),
+      'bundle keys' => array(
+        'bundle' => 'payment_method',
+      ),
+      'bundles' => array(),
+      'load hook' => 'commerce_payment_transaction_load',
+      'view modes' => array(
+        'display' => array(
+          'label' => t('Display'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'creation callback' => '_commerce_payment_transaction_create',
+      'save callback' => 'commerce_payment_transaction_save',
+      'deletion callback' => 'commerce_payment_transaction_delete',
+      'access callback' => 'commerce_payment_transaction_access',
+    ),
+  );
+
+  foreach (commerce_payment_methods() as $method_id => $payment_method) {
+    $return['commerce_payment_transaction']['bundles'][$method_id] = array(
+      'label' => $payment_method->title,
+    );
+  }
+
+  return $return;
+}
+
+/**
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_payment_commerce_checkout_page_info() {
@@ -167,4 +210,114 @@ function commerce_payment_method_instance_load($instance_id) {
   }
 
   return $payment_method;
+}
+
+/**
+ * Returns an initialized payment transaction object.
+ *
+ * @param $method_id
+ *   The method_id of the payment method for the transaction.
+ *
+ * @return
+ *   A transaction object with all default fields initialized.
+ */
+function commerce_payment_transaction_new($method_id = '') {
+  return entity_get_controller('commerce_payment_transaction')->create($method_id);
+}
+
+/**
+ * Creation callback for the Entity Metadata module.
+ */
+function _commerce_payment_transaction_create($values = array()) {
+  // Create a new transaction of the specified type.
+  $transaction = commerce_payment_transaction_new($values['method_id']);
+  unset($values['method_id']);
+
+  $wrapper = entity_metadata_wrapper('commerce_payment_transaction', $transaction);
+
+  foreach ($values as $name => $value) {
+    $wrapper->$name->set($value);
+  }
+
+  return $wrapper;
+}
+
+/**
+ * Saves a payment transaction.
+ *
+ * @param $transaction
+ *   The full transaction object to save.
+ *
+ * @return
+ *   The saved transaction object.
+ */
+function commerce_payment_transaction_save($transaction) {
+  return entity_get_controller('commerce_payment_transaction')->save($transaction);
+}
+
+/**
+ * Loads a payment transaction by ID.
+ */
+function commerce_payment_transaction_load($transaction_id) {
+  $transactions = commerce_payment_transaction_load_multiple(array($transaction_id), array());
+  return $transactions ? reset($transactions) : FALSE;
+}
+
+/**
+ * Loads multiple payment transaction by ID or based on a set of matching conditions.
+ *
+ * @see entity_load()
+ *
+ * @param $transaction_ids
+ *   An array of transaction IDs.
+ * @param $conditions
+ *   An array of conditions on the {commerce_payment_transaction} table in the
+ *     form 'field' => $value.
+ * @param $reset
+ *   Whether to reset the internal transaction loading cache.
+ *
+ * @return
+ *   An array of transaction objects indexed by transaction_id.
+ */
+function commerce_payment_transaction_load_multiple($transaction_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('commerce_payment_transaction', $transaction_ids, $conditions, $reset);
+}
+
+/**
+ * Deletes a payment transaction by ID.
+ *
+ * @param $transaction_id
+ *   The ID of the transaction to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_payment_transaction_delete($transaction_id) {
+  return commerce_payment_transaction_delete_multiple(array($transaction_id));
+}
+
+/**
+ * Deletes multiple payment transactions by ID.
+ *
+ * @param $transaction_ids
+ *   An array of transaction IDs to delete.
+ *
+ * @return
+ *   TRUE on success, FALSE otherwise.
+ */
+function commerce_payment_transaction_delete_multiple($transaction_ids) {
+  return entity_get_controller('commerce_payment_transaction')->delete($transaction_ids);
+}
+
+/**
+ * Handler to load the unchanged line item variable for rules.
+ *
+ * @see commerce_payment_rules_variables().
+ */
+function commerce_payment_transaction_rules_var_unchanged($transaction) {
+  $unchanged = drupal_static('commerce_payment_transaction_unchanged');
+
+  if (isset($transaction->transaction_id) && isset($unchanged[$transaction->transaction_id])) {
+    return $unchanged[$transaction->transaction_id];
+  }
 }

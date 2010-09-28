@@ -422,10 +422,10 @@ function commerce_line_item_load_multiple($line_item_ids = array(), $conditions 
 }
 
 /**
- * Deletes a line_item by ID.
+ * Deletes a line item by ID.
  *
  * @param $line_item_id
- *   The ID of the line_item to delete.
+ *   The ID of the line item to delete.
  *
  * @return
  *   TRUE on success, FALSE otherwise.

@@ -11,6 +11,8 @@
  * Implements hook_schema().
  */
 function commerce_payment_schema() {
+  $schema = array();
+
   $schema['commerce_payment_transaction'] = array(
     'description' => 'Transaction information for every attempted payment.',
     'fields' => array(
@@ -20,14 +22,22 @@ function commerce_payment_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'created' => array(
-        'description' => 'The Unix timestamp when this transaction was created.',
+      'revision_id' => array(
+        'description' => 'The current {commerce_payment_transaction_revision}.revision_id version identifier.',
         'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'order_id' => array(
+        'description' => 'The {commerce_order}.order_id of the order this payment is for.',
+        'type' => 'int',
+        'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
       'payment_method' => array(
-        'description' => 'The payment method for this transaction.',
+        'description' => 'The payment method method_id for this transaction.',
         'type' => 'varchar',
         'length' => 64,
         'not null' => TRUE,
@@ -75,8 +85,111 @@ function commerce_payment_schema() {
         'size' => 'big',
         'not null' => TRUE,
       ),
+      'created' => array(
+        'description' => 'The Unix timestamp when this transaction was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when this transaction was last changed.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('transaction_id'),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+    ),
+    'indexes' => array(
+      'payment_method' => array('payment_method'),
+    ),
+    'foreign keys' => array(
+      'payment_transaction_revision' => array(
+        'table' => 'commerce_payment_transaction_revision',
+        'columns'=> array('revision_id' => 'revision_id'),
+      ),
+      'order_id' => array(
+        'table' => 'commerce_order',
+        'columns'=> array('order_id' => 'order_id'),
+      ),
+    ),
+  );
+
+  $schema['commerce_payment_transaction_revision'] = array(
+    'description' => 'Saves information about each saved revision of a {commerce_payment_transaction}.',
+    'fields' => array(
+      'transaction_id' => array(
+        'description' => 'The primary identifier for a transaction.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'revision_id' => array(
+        'description' => 'The current {commerce_payment_transaction_revision}.revision_id version identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'remote_id' => array(
+        'description' => 'The remote identifier for this transaction.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'message' => array(
+        'description' => 'The human-readable message associated to this transaction.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'message_variables' => array(
+        'description' => 'The variables associated with the human-readable message.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'amount' => array(
+        'description' => 'The amount of this transaction.',
+        'type' => 'numeric',
+        'precision' => 16,
+        'scale' => 5,
+        'not null' => TRUE,
+      ),
+      'currency_code' => array(
+        'description' => 'The currency code for the price.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'description' => 'The status of this transaction (success, failure).',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => TRUE,
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this version.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'revision_timestamp' => array(
+        'description' => 'The Unix timestamp when this revision was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'payment_transaction' => array(
+        'table' => 'commerce_payment_transaction',
+        'columns'=> array('transaction_id' => 'transaction_id'),
+      ),
+    ),
   );
 
   return $schema;
