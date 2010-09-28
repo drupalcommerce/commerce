@@ -3,6 +3,7 @@ name = Customer
 description = Defines the Customer entity with Addressfield integration.
 package = Drupal Commerce
 dependencies[] = addressfield
+dependencies[] = commerce
 core = 7.x
 
 ; Base module files

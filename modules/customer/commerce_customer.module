@@ -500,3 +500,258 @@ function commerce_customer_profile_rules_var_unchanged($profile) {
     return $unchanged[$profile->profile_id];
   }
 }
+
+/**
+ * Implements hook_field_info().
+ */
+function commerce_customer_field_info() {
+  return array(
+    'commerce_customer_profile_reference' => array(
+      'label' => t('Customer profile reference'),
+      'description' => t('This field stores the ID of a related customer profile as an integer value.'),
+      'default_widget' => 'commerce_customer_profile_manager',
+      'default_formatter' => 'commerce_customer_profile_reference_view',
+      'settings' => array(),
+      'property_type' => 'commerce_customer_profile',
+      'property_callbacks' => array('commerce_customer_profile_property_info_callback'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_customer_field_schema($field) {
+  return array(
+    'columns' => array(
+      'profile_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'profile_id' => array('profile_id'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ *
+ * Possible error codes:
+ * - 'invalid_profile_id': profile_id is not valid for the field (not a
+ *                           valid line item ID).
+ */
+function commerce_customer_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
+  // Extract profile_ids to check.
+  $profile_ids = array();
+
+  // First check non-numeric profile_id's to avoid losing time with them.
+  foreach ($items as $delta => $item) {
+    if (is_array($item) && !empty($item['profile_id'])) {
+      if (is_numeric($item['profile_id'])) {
+        $profile_ids[] = $item['profile_id'];
+      }
+      else {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'invalid_profile_id',
+          'message' => t('%name: you have specified an invalid customer profile for this field.', array('%name' => $instance['label'])),
+        );
+      }
+    }
+  }
+
+  // Prevent performance hog if there are no ids to check.
+  if ($profile_ids) {
+    $profiles = commerce_customer_profile_load_multiple($profile_ids);
+
+    foreach ($items as $delta => $item) {
+      if (is_array($item)) {
+        if (!empty($item['profile_id']) && !isset($profiles[$item['profile_id']])) {
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'invalid_profile_id',
+            'message' => t('%name: you have specified an invalid customer profile for this reference field.', array('%name' => $instance['label'])),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function commerce_customer_field_is_empty($item, $field) {
+  // profile_id = 0 îs empty too, which is exactly what we want.
+  return empty($item['profile_id']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function commerce_customer_field_formatter_info() {
+  return array(
+    'commerce_customer_profile_reference_display' => array(
+      'label' => t('Customer profile display'),
+      'description' => t('Display the customer profile.'),
+      'field types' => array('commerce_customer_profile_reference'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function commerce_customer_field_formatter_view($entity_type, $object, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  // Collect the list of customer profile IDs.
+  $profile_ids = array();
+
+  foreach ($items as $delta => $item) {
+    $profile_ids[] = $item['profile_id'];
+  }
+
+  switch ($display['type']) {
+    case 'commerce_customer_profile_reference_display':
+      foreach ($items as $delta => $item) {
+        $profile = commerce_customer_profile_load($item['line_item_id']);
+
+        if ($profile) {
+          $result[$delta] = array(
+            '#markup' => drupal_render(commerce_customer_profile_build_content($profile, 'customer')),
+          );
+        }
+      }
+
+      break;
+  }
+
+  return $result;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ * Defines widgets available for use with field types as specified in each
+ * widget's $info['field types'] array.
+ */
+function commerce_customer_field_widget_info() {
+  $widgets = array();
+
+  // Define the creation / reference widget for line items.
+  $widgets['commerce_customer_profile_manager'] = array(
+    'label' => t('Customer profile manager'),
+    'description' => t('Use a complex widget to edit the profile referenced by this object.'),
+    'field types' => array('commerce_customer_profile_reference'),
+    'settings' => array(),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+    ),
+  );
+
+  return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * Used to define the form element for custom widgets.
+ */
+function commerce_customer_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Define the complex customer profile reference field widget.
+  if ($instance['widget']['type'] == 'commerce_customer_profile_manager') {
+    $profile_ids = array();
+
+    // Build an array of customer profile IDs from this field's values.
+    foreach ($items as $item) {
+      $profile_ids[] = $item['profile_id'];
+    }
+
+    // Load the profiles for temporary storage in the form array.
+    $profiles = commerce_customer_profile_load_multiple($profile_ids);
+
+    if (empty($profiles)) {
+      $profiles[0] = commerce_customer_profile_new('billing');
+    }
+
+    // Update the base form element array to use the proper theme and validate
+    // functions and to include header information for the line item table.
+    $element += array(
+      '#element_validate' => array('commerce_customer_profile_manager_validate'),
+      'profiles' => array(),
+    );
+
+    // Add a set of elements to the form for each referenced profile.
+    foreach ($profiles as $profile_id => $profile) {
+      // Store the original customer profile for later comparison.
+      $element['profiles'][$profile_id]['profile'] = array(
+        '#type' => 'value',
+        '#value' => $profile,
+      );
+
+      field_attach_form('commerce_customer_profile', $profile, $element, $form_state);
+
+      // This checkbox will be overridden with a clickable delete image.
+      if ($profile->profile_id) {
+        $element['profiles'][$profile_id]['remove'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Delete this profile'),
+          '#default_value' => FALSE,
+        );
+      }
+    }
+
+    commerce_unrequire_form_elements($element);
+
+    return $element;
+  }
+}
+
+/**
+ * Validation callback for a commerce_customer_profile_manager element.
+ *
+ * When the form is submitted, the profile reference field stores the profile
+ * IDs as derived from the $element['profiles'] array and updates any
+ * referenced profiles based on the extra form elements.
+ */
+function commerce_customer_profile_manager_validate($element, &$form_state, $form) {
+  $value = array();
+
+  // Loop through the profiles in the manager table.
+  foreach (element_children($element['profiles']) as $profile_id) {
+    // If the line item has been marked for deletion...
+    if ($profile_id && $element['profiles'][$profile_id]['remove']['#value']) {
+      // Delete the profile now and don't include it from the $value array.
+      commerce_customer_profile_delete($profile_id);
+    }
+    else {
+      // Add the profile ID to the current value of the reference field.
+      $value[] = array('profile_id' => $profile_id);
+
+      // Update the profile based on the values in the additional elements.
+      $profile = clone($element['profiles'][$profile_id]['profile']['#value']);
+
+      // Notify field widgets to validate their data.
+      field_attach_form_validate('commerce_customer_profile', $profile, $element, $form_state);
+
+      // Notify field widgets.
+      field_attach_submit('commerce_customer_profile', $profile, $element, $form_state);
+
+      // Only save if values were actually changed.
+      if ($profile != $element['profiles'][$profile_id]['profile']['#value']) {
+        commerce_customer_profile_save($profile);
+      }
+    }
+  }
+
+  form_set_value($element, $value, $form_state);
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function commerce_customer_field_widget_error($element, $error) {
+  form_error($element, $error['message']);
+}
