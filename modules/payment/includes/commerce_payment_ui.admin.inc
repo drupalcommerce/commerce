@@ -11,6 +11,9 @@
  * Displays the payment transaction View in an order's payment tab.
  */
 function commerce_payment_ui_order_tab($order) {
+  // Set the breadcrumb and display the payments View.
+  commerce_order_ui_set_breadcrumb();
+
   return commerce_embed_view('commerce_payment_order', 'defaults', array($order->order_id));
 }
 
