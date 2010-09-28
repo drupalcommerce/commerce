@@ -15,6 +15,7 @@
  * Helper variables:
  * - $totals: An array of transaction totals keyed by currency code.
  * - $view: The View the line item summary is attached to.
+ * - $order: If present, the order represented by the totals.
  *
  * @see template_preprocess()
  * @see template_process()

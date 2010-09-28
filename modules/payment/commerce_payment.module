@@ -450,3 +450,52 @@ function commerce_payment_transaction_rules_var_unchanged($transaction) {
     return $unchanged[$transaction->transaction_id];
   }
 }
+
+/**
+ * Calculates the balance of an order by subtracting the total of all successful
+ *   transactions from the total of all the line items on the order.
+ *
+ * @param $order
+ *   The fully loaded order object whose balance should be calculated.
+ * @param $totals
+ *   Optionally submit an array of transaction totals keyed by currency code
+ *     with the amount as the value.
+ *
+ * @return
+ *   An array containing the amount and currency code representing the balance
+ *     of the order or FALSE if it is impossible to calculate.
+ */
+function commerce_payment_order_balance($order, $totals = array()) {
+  $order_total = commerce_line_items_total($order->line_items);
+
+  // Calculate the transaction totals if not supplied.
+  if (empty($totals)) {
+    $statuses = commerce_payment_transaction_statuses();
+
+    foreach (commerce_payment_transaction_load_multiple(array(), array('order_id' => $order->order_id)) as $transaction) {
+      // If the payment transaction status indicates it should include the
+      // current transaction in the total...
+      if ($statuses[$transaction->status]->total) {
+        // Add the transaction to its currency's running total if it exists...
+        if (isset($totals[$transaction->currency_code])) {
+          $totals[$transaction->currency_code] += $transaction->amount;
+        }
+        else {
+          // Or begin a new running total for the currency.
+          $totals[$transaction->currency_code] = $transaction->amount;
+        }
+      }
+    }
+  }
+
+  // Only return a balance if the totals array contains a single matching currency.
+  if (count($totals) == 1 && isset($totals[$order_total['currency_code']])) {
+    return array('amount' => $order_total['price'] - $totals[$order_total['currency_code']], 'currency_code' => $order_total['currency_code']);
+  }
+  elseif (empty($totals)) {
+    return array('amount' => $order_total['price'], 'currency_code' => $order_total['currency_code']);
+  }
+  else {
+    return FALSE;
+  }
+}

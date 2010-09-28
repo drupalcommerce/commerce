@@ -35,6 +35,10 @@ class commerce_payment_handler_field_status extends views_handler_field {
   function render($values) {
     $status = commerce_payment_transaction_status_load($values->{$this->field_alias});
 
+    if (!$status) {
+      return '?';
+    }
+
     $variables = array(
       'status' => $status,
     );

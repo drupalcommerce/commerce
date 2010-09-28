@@ -37,10 +37,25 @@ class commerce_payment_handler_area_totals extends views_handler_area {
   }
 
   function render($empty = FALSE) {
+    // Load an order object for the View if a single order argument is present.
+    if (in_array('order_id', array_keys($this->view->argument)) &&
+      !in_array('order_id_1', array_keys($this->view->argument)) &&
+      !empty($this->view->args[$this->view->argument['order_id']->position])) {
+
+      // Load the specified order.
+      $order = commerce_order_load($this->view->args[$this->view->argument['order_id']->position]);
+    }
+    else {
+      // Otherwise indicate a valid order is not present.
+      $order = FALSE;
+    }
+
     // Calculate a total of successful payments for each currency.
     $statuses = commerce_payment_transaction_statuses();
     $totals = array();
 
+    // TODO: This loop uses hardcoded field aliases because $this->aliases isn't
+    // set for area handlers. This should be worked around or fixed in Views.
     foreach ($this->view->result as $result) {
       // If the payment transaction status indicates it should include the
       // current transaction in the total...
@@ -60,14 +75,17 @@ class commerce_payment_handler_area_totals extends views_handler_area {
 
     if (count($totals) == 0) {
       // Add a row for the remaining balance on the order.
-      $rows[] = array(
-        'data' => array(
-          array('data' => t('Order balance'), 'class' => array('label')),
-          // TODO: Provide an API function to caluclate an order's remaining balance.
-          array('data' => '-', 'class' => array('balance')),
-        ),
-        'class' => array('order-balance'),
-      );
+      if ($order) {
+        $balance = commerce_payment_order_balance($order, $totals);
+
+        $rows[] = array(
+          'data' => array(
+            array('data' => t('Order balance'), 'class' => array('label')),
+            array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
+          ),
+          'class' => array('order-balance'),
+        );
+      }
     }
     elseif (count($totals) == 1) {
       // Otherwise if there's only a single currency total...
@@ -83,14 +101,17 @@ class commerce_payment_handler_area_totals extends views_handler_area {
       );
 
       // Add a row for the remaining balance on the order.
-      $rows[] = array(
-        'data' => array(
-          array('data' => t('Order balance'), 'class' => array('label')),
-          // TODO: Provide an API function to caluclate an order's remaining balance.
-          array('data' => '-', 'class' => array('balance')),
-        ),
-        'class' => array('order-balance'),
-      );
+      if ($order) {
+        $balance = commerce_payment_order_balance($order, $totals);
+
+        $rows[] = array(
+          'data' => array(
+            array('data' => t('Order balance'), 'class' => array('label')),
+            array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
+          ),
+          'class' => array('order-balance'),
+        );
+      }
     }
     else {
       foreach ($totals as $currency_code => $amount) {
@@ -104,19 +125,12 @@ class commerce_payment_handler_area_totals extends views_handler_area {
       }
     }
 
-    // Build and render the form to add a payment if the View contains a
-    // single order argument.
-    if ($this->options['add_payment_form'] &&
-      in_array('order_id', array_keys($this->view->argument)) &&
-      !in_array('order_id_1', array_keys($this->view->argument)) &&
-      !empty($this->view->args[$this->view->argument['order_id']->position])) {
+    // Build and render the form to add a payment if the View contains a valid
+    // order argument.
+    if ($this->options['add_payment_form'] && $order) {
+      module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.forms');
 
-      // Load the specified order and add the form if the order exists.
-      if ($order = commerce_order_load($this->view->args[$this->view->argument['order_id']->position])) {
-        module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.forms');
-
-        $form = drupal_render(drupal_get_form('commerce_payment_order_transaction_add_form', $order));
-      }
+      $form = drupal_render(drupal_get_form('commerce_payment_order_transaction_add_form', $order));
     }
     else {
       $form = NULL;
@@ -128,6 +142,7 @@ class commerce_payment_handler_area_totals extends views_handler_area {
       'form' => $form,
       'view' => $this->view,
       'totals' => $totals,
+      'order' => $order,
     );
 
     return theme('commerce_payment_totals', $variables);

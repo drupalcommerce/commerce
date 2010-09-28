@@ -10,6 +10,11 @@
   font-weight: bold;
 }
 
+.payment-totals-table .total,
+.payment-totals-table .balance {
+  text-align: right;
+}
+
 .add-payment .form-item-payment-method {
   display: inline;
 }
