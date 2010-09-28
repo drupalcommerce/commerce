@@ -18,3 +18,7 @@
 .add-payment .form-item-payment-method {
   display: inline;
 }
+
+.views-field-operations .links.operations {
+  text-transform: lowercase;
+}

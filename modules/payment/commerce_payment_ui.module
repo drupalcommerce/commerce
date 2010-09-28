@@ -24,12 +24,22 @@ function commerce_payment_ui_menu() {
   );
 
   // Payment transaction operations links.
-  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/delete'] = array(
-    'title' => 'Delete a payment transaction',
-    'page callback' => 'commerce_payment_ui_payment_transaction_delete_form_wrapper',
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction'] = array(
+    'title' => 'View a payment transaction',
+    'page callback' => 'commerce_payment_ui_payment_transaction_view',
     'page arguments' => array(3, 5),
     'access arguments' => array('administer payments'),
     'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_payment_ui.admin.inc',
+  );
+
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'commerce_payment_ui_payment_transaction_delete_form_wrapper',
+    'page arguments' => array(3, 5),
+    'access arguments' => array('administer payments'),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 

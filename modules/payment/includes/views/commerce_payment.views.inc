@@ -238,6 +238,14 @@ function commerce_payment_views_data() {
     ),
   );
 
+  $data['commerce_payment_transaction']['operations'] = array(
+    'field' => array(
+      'title' => t('Operations links'),
+      'help' => t('Display all the available operations links for the transaction.'),
+      'handler' => 'commerce_payment_handler_field_payment_transaction_operations',
+    ),
+  );
+
   $data['commerce_payment_transaction']['totals'] = array(
     'title' => t('Totals'),
     'help' => t('Display transaction total and order balance information for all transactions in the View.'),

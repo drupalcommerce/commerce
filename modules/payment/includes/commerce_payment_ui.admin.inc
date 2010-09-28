@@ -46,6 +46,14 @@ function commerce_payment_ui_admin_page() {
 }
 
 /**
+ * Displays the full details of a payment transaction.
+ */
+function commerce_payment_ui_payment_transaction_view($order, $transaction) {
+  // TODO: Display the current transaction data with a revision log beneath.
+  return '<pre>'. print_r($transaction, TRUE) .'</pre>';
+}
+
+/**
  * Form callback wrapper: confirmation form for deleting a payment transaction.
  *
  * @param $order

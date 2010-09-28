@@ -175,6 +175,21 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['amount']['alter']['html'] = 0;
   $handler->display->display_options['fields']['amount']['hide_empty'] = 0;
   $handler->display->display_options['fields']['amount']['empty_zero'] = 0;
+  /* Field: Commerce Payment Transaction: Operations links */
+  $handler->display->display_options['fields']['operations']['id'] = 'operations';
+  $handler->display->display_options['fields']['operations']['table'] = 'commerce_payment_transaction';
+  $handler->display->display_options['fields']['operations']['field'] = 'operations';
+  $handler->display->display_options['fields']['operations']['label'] = 'Operations';
+  $handler->display->display_options['fields']['operations']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
   /* Argument: Commerce Order: Order ID */
   $handler->display->display_options['arguments']['order_id']['id'] = 'order_id';
   $handler->display->display_options['arguments']['order_id']['table'] = 'commerce_order';

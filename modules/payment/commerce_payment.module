@@ -100,7 +100,7 @@ function commerce_payment_theme() {
  * Adds the necessary CSS for the line item summary template.
  */
 function template_preprocess_commerce_payment_totals(&$variables) {
-  drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment_totals.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment_views.css');
 }
 
 /**
