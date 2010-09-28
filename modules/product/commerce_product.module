@@ -716,8 +716,8 @@ function commerce_product_autocomplete($field_name, $string = '') {
  *   Operator to match filtered SKUs and titles against, can be any of:
  *   'contains', 'equals', 'starts_with'
  * @param $ids
- *   Optional product ids to lookup (the $string and $match arguments will be
- *   ignored).
+ *   Optional product ids to lookup (used when $string and $match arguments are
+ *   not given).
  * @param $limit
  *   If non-zero, limit the size of the result set.
  *

@@ -151,7 +151,7 @@ function commerce_product_reference_field_validate($entity_type, $object, $field
       else {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_product_id',
-          'message' => t('%name: you have specified an invalid product for this field.', array('%name' => $instance['label'])),
+          'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $instance['label'])),
         );
       }
     }

@@ -5,6 +5,7 @@ package = Drupal Commerce
 dependencies[] = commerce_line_item
 dependencies[] = commerce_price
 dependencies[] = commerce_product
+dependencies[] = options
 core = 7.x
 
 ; Base module files
