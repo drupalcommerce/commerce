@@ -224,38 +224,6 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
 }
 
 /**
- * Payment redirect pane: validate callback.
- */
-function commerce_payment_redirect_pane_checkout_form_validate($pane_form, &$form_state, $pane_values, $checkout_pane, $order) {
-  // Delegate to the payment method.
-  $current_payment_method = $order->payment_methods[$order->payment_method];
-  $payment_method = commerce_payment_method_load($current_payment_method['method_id']);
-
-  if (function_exists($callback = $payment_method->callbacks['redirect_form_validate'])) {
-    return $callback($current_payment_method, $pane_values, $checkout_pane, $order);
-  }
-  else {
-    return TRUE;
-  }
-}
-
-/**
- * Payment redirect pane: submit callback.
- */
-function commerce_payment_redirect_pane_checkout_form_submit($pane_values, $checkout_pane, $order) {
-  // Simply pass the control to the payment method.
-  $current_payment_method = $order->payment_methods[$order->payment_method];
-  $payment_method = commerce_payment_method_load($current_payment_method['method_id']);
-
-  if (function_exists($callback = $payment_method->callbacks['redirect_form_submit'])) {
-    $callback($current_payment_method, $pane_values, $checkout_pane, $order);
-  }
-  else {
-    return TRUE;
-  }
-}
-
-/**
  * Utility function: return a payment redirect page for POST.
  *
  * @param $action
