@@ -138,11 +138,14 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
 
   $order->data['payment_method'] = $pane_values['payment_method'];
 
-  // Delegate submit to the payment method callback.
-  $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
+  // If we can calculate a single order total for the order...
+  if ($balance = commerce_payment_order_balance($order)) {
+    // Delegate submit to the payment method callback.
+    $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
-  if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
-    return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order);
+    if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
+      return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance);
+    }
   }
 }
 

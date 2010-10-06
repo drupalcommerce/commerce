@@ -190,13 +190,15 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
     $payment_method = $form_state['payment_method'];
     $order = $form_state['order'];
 
-    // Build the basic transaction object.
-    $transaction = commerce_payment_transaction_new($payment_method->method_id, $form_state['order']->order_id);
-    $transaction->amount = $form_state['values']['amount'];
-    $transaction->currency_code = $form_state['values']['currency_code'];
-    $transaction->status = COMMERCE_PAYMENT_STATUS_PENDING;
+    // Delegate submit to the payment method callback.
+    if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
+      $charge = array(
+        'amount' => $form_state['values']['amount'],
+        'currency_code' => $form_state['values']['currency_code'],
+      );
 
-    commerce_payment_transaction_save($transaction);
+      $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order, $charge);
+    }
 
     drupal_set_message(t('Payment transaction created.'));
   }

@@ -39,7 +39,13 @@ function commerce_payment_schema() {
       'payment_method' => array(
         'description' => 'The payment method method_id for this transaction.',
         'type' => 'varchar',
-        'length' => 64,
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'instance_id' => array(
+        'description' => 'The payment method instance ID for this transaction.',
+        'type' => 'varchar',
+        'length' => 255,
         'not null' => TRUE,
       ),
       'remote_id' => array(
@@ -158,6 +164,7 @@ function commerce_payment_schema() {
         'type' => 'blob',
         'size' => 'big',
         'not null' => TRUE,
+        'serialize' => TRUE,
       ),
       'amount' => array(
         'description' => 'The amount of this transaction.',

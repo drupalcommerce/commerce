@@ -43,8 +43,8 @@ function commerce_payment_entity_info() {
       'bundles' => array(),
       'load hook' => 'commerce_payment_transaction_load',
       'view modes' => array(
-        'display' => array(
-          'label' => t('Display'),
+        'administrator' => array(
+          'label' => t('Administrator'),
           'custom settings' => FALSE,
         ),
       ),
@@ -467,6 +467,88 @@ function commerce_payment_transaction_rules_var_unchanged($transaction) {
   if (isset($transaction->transaction_id) && isset($unchanged[$transaction->transaction_id])) {
     return $unchanged[$transaction->transaction_id];
   }
+}
+
+/**
+ * Generate an array for rendering the given payment transaction.
+ *
+ * @param $transaction
+ *   A fully loaded transaction object.
+ * @param $view_mode
+ *   The view mode for displaying the order, 'administrator' being the only one
+ *     available by default.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function commerce_payment_transaction_build_content($order, $transaction, $view_mode = 'administrator') {
+  // Populate $transaction->content with a render() array.
+  // Remove previously built content, if it exists.
+  $transaction->content = array();
+
+  // Add the default fields inherent to the transaction entity.
+  if (!empty($transaction->instance_id) && $payment_method = commerce_payment_method_instance_load($transaction->instance_id)) {
+    list($method_id, $rule_name) = explode('|', $payment_method->instance_id);
+    $title = l(check_plain($payment_method->title), 'admin/config/workflow/rules/config/' . $rule_name);
+  }
+  else {
+    $payment_method = commerce_payment_method_load($transaction->payment_method);
+    $title = check_plain($payment_method->title);
+  }
+
+  $statuses = commerce_payment_transaction_statuses();
+
+  $rows = array(
+    array(t('Transaction ID'), $transaction->transaction_id),
+    array(t('Order'), l(check_plain($order->order_number), 'admin/commerce/orders/' . $order->order_id)),
+    array(t('Payment method'), $title),
+    array(t('Remote ID'), check_plain($transaction->remote_id)),
+    array(t('Message'), t($transaction->message, unserialize($transaction->message_variables))),
+    array(t('Amount'), commerce_currency_format($transaction->amount, $transaction->currency_code)),
+    array(t('Status'), check_plain($statuses[$transaction->status]->title)),
+    array(t('Remote status'), check_plain($transaction->remote_status)),
+    array(t('Created'), format_date($transaction->created)),
+  );
+
+  if ($transaction->changed > $transaction->created) {
+    $rows[] = array(t('Last changed'), format_date($transaction->changed));
+  }
+
+  if (user_access('administer payments')) {
+    $payload = unserialize($transaction->payload);
+
+    if (!empty($payload)) {
+      $rows[] = array(t('Payload'), '<pre>' . check_plain(print_r($payload, TRUE)) . '</pre>');
+    }
+  }
+
+  $transaction->content['transaction_table'] = array(
+    '#markup' => theme('table', array('rows' => $rows)),
+  );
+
+  // Build fields content.
+  field_attach_prepare_view('commerce_payment_transaction', array($transaction->transaction_id => $transaction), $view_mode);
+  entity_prepare_view('commerce_payment_transaction', array($transaction->transaction_id => $transaction));
+  $transaction->content += field_attach_view('commerce_payment_transaction', $transaction, $view_mode);
+
+  // Allow modules to make their own additions to the transaction content.
+  module_invoke_all('commerce_transaction_view', $transaction, $view_mode);
+
+  // Remove the content array from the transaction to avoid duplicate rendering.
+  $build = $transaction->content;
+  unset($transaction->content);
+
+  $build += array(
+    '#theme' => 'commerce_payment_transaction',
+    '#order' => $order,
+    '#transaction' => $transaction,
+    '#view_mode' => $view_mode,
+  );
+
+  // Allow modules to modify the final build array.
+  drupal_alter('commerce_payment_transaction_view', $build);
+
+  return $build;
 }
 
 /**

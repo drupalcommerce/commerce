@@ -30,6 +30,7 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       'revision_id' => '',
       'order_id' => $order_id,
       'payment_method' => $method_id,
+      'instance_id' => '',
       'remote_id' => '',
       'message' => '',
       'message_variables' => array(),

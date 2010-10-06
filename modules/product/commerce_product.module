@@ -429,17 +429,17 @@ function commerce_product_load_multiple($product_ids = array(), $conditions = ar
 }
 
 /**
-* Generate an array for rendering the given product.
-*
-* @param $product
-* A fully loaded product object.
-* @param $view_mode
-* The view mode for displaying the product, 'full', 'node_full',
-* 'node_teaser', or 'node_rss'.
-*
-* @return
-* An array as expected by drupal_render().
-*/
+ * Generate an array for rendering the given product.
+ *
+ * @param $product
+ *   A fully loaded product object.
+ * @param $view_mode
+ *   The view mode for displaying the product, 'full', 'node_full',
+ *     'node_teaser', or 'node_rss'.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
 function commerce_product_build_content($product, $view_mode = 'full', $breadcrumb = TRUE) {
   // Remove previously built content, if it exists.
   $product->content = array();

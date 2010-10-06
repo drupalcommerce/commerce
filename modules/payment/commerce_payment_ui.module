@@ -25,11 +25,23 @@ function commerce_payment_ui_menu() {
 
   // Payment transaction operations links.
   $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction'] = array(
-    'title' => 'View a payment transaction',
+    'title callback' => 'commerce_payment_ui_payment_transaction_title',
+    'title arguments' => array(5),
     'page callback' => 'commerce_payment_ui_payment_transaction_view',
-    'page arguments' => array(3, 5),
+    'page arguments' => array(3, 5, 'administrator'),
     'access arguments' => array('administer payments'),
     'type' => MENU_CALLBACK,
+    'file' => 'includes/commerce_payment_ui.admin.inc',
+  );
+
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/view'] = array(
+    'title' => 'View',
+    'page callback' => 'commerce_payment_ui_payment_transaction_view',
+    'page arguments' => array(3, 5, 'administrator'),
+    'access arguments' => array('administer payments'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 0,
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
@@ -40,6 +52,7 @@ function commerce_payment_ui_menu() {
     'access arguments' => array('administer payments'),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
+    'weight' => 10,
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
@@ -52,6 +65,18 @@ function commerce_payment_ui_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Menu item title callback: returns the transaction ID for its pages.
+ *
+ * @param $transaction
+ *   The transaction object as loaded via the URL wildcard.
+ * @return
+ *   A page title of the format "Transaction ##".
+ */
+function commerce_payment_ui_payment_transaction_title($transaction) {
+  return t('Transaction @transaction_id', array('@transaction_id' => $transaction->transaction_id));
 }
 
 /**
@@ -112,4 +137,29 @@ function commerce_payment_ui_form_commerce_payment_ui_payment_transaction_delete
  */
 function commerce_payment_ui_payment_transaction_delete_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment';
+}
+
+/**
+ * Sets the breadcrumb for transaction pages.
+ *
+ * @param $order
+ *   The order object the transaction is for.
+ * @param $view_mode
+ *   The view mode for the current order page, 'administrator' only for now.
+ */
+function commerce_payment_ui_set_order_breadcrumb($order, $view_mode = 'administrator') {
+  $breadcrumb = array();
+
+  // Create the breadcrumb array based on the view mode.
+  if ($view_mode == 'administrator') {
+    $breadcrumb = array(
+      l(t('Home'), '<front>'),
+      l(t('Dashboard'), 'admin'),
+      l(t('Store'), 'admin/commerce'),
+      l(t('Orders'), 'admin/commerce/orders'),
+      l(t('Order @order-number', array('@order-number' => $order->order_number)), 'admin/commerce/orders/' . $order->order_id . '/payment'),
+    );
+  }
+
+  drupal_set_breadcrumb($breadcrumb);
 }
