@@ -177,6 +177,7 @@ function commerce_payment_methods() {
         'base' => $method_id,
         'title' => '',
         'description' => '',
+        'terminal' => TRUE,
         'offsite' => FALSE,
         'callbacks' => array(),
       );

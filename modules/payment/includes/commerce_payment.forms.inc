@@ -21,15 +21,9 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
   // Store the initial order in the form state.
   $form_state['order'] = $order;
 
-  // Build an options array of all available payment methods.
-  $options = array();
-
-  foreach (commerce_payment_methods() as $method_id => $payment_method) {
-    $options[$method_id] = check_plain($payment_method->title);
-  }
-
-  // If a payment method has already been selected...
-  if (!empty($form_state['payment_method'])) {
+  // If a payment method has already been selected or the terminal failed
+  // validation...
+  if (!empty($form_state['payment_method']) || !empty($form_state['transaction'])) {
     $payment_method = $form_state['payment_method'];
 
     // Look for a transaction in progress to use for defaults.
@@ -81,6 +75,18 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
       '#suffix' => '</div>',
     );
 
+    // Find the values already submitted for the payment terminal.
+    $terminal_values = !empty($form_state['values']['payment_details']) ? $form_state['values']['payment_details'] : array();
+
+    if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
+      $form['payment_terminal']['payment_details'] = $callback($payment_method, $terminal_values, NULL, $order);
+    }
+    else {
+      $form['payment_terminal']['payment_details'] = array();
+    }
+
+    $form['payment_terminal']['payment_details']['#tree'] = TRUE;
+
     $form['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Save'),
@@ -88,6 +94,17 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
   }
   else {
     // Otherwise present the payment method selection form.
+
+    // Build an options array of all available payment methods that can setup
+    // transactions using the local terminal.
+    $options = array();
+
+    foreach (commerce_payment_methods() as $method_id => $payment_method) {
+      if ($payment_method->terminal) {
+        $options[$method_id] = check_plain($payment_method->title);
+      }
+    }
+
     $form['payment_method'] = array(
       '#type' => 'select',
       '#options' => $options,
@@ -115,6 +132,26 @@ function commerce_payment_order_transaction_add_form_add_refresh($form, $form_st
   return $form;
 }
 
+/**
+ * Validation callback for commerce_payment_order_transaction_add_form().
+ */
+function commerce_payment_order_transaction_add_form_validate($form, &$form_state) {
+  // If the button used to submit was not the "Add payment" button, give the
+  // payment method a chance to validate the input.
+  if ($form_state['values']['op'] != t('Add payment')) {
+    $payment_method = $form_state['payment_method'];
+    $order = $form_state['order'];
+
+    // Find out if the payment details are valid before attempting to process.
+    if (function_exists($callback = $payment_method->callbacks['submit_form_validate'])) {
+      $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order);
+    }
+  }
+}
+
+/**
+ * Submit callback for commerce_payment_order_transaction_add_form().
+ */
 function commerce_payment_order_transaction_add_form_submit($form, &$form_state) {
   // If the "Add payment" button was clicked...
   if ($form_state['values']['op'] == t('Add payment')) {
@@ -123,25 +160,18 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
     $form_state['rebuild'] = TRUE;
   }
   else {
+    $payment_method = $form_state['payment_method'];
+    $order = $form_state['order'];
+
     // Build the basic transaction object.
-    $transaction = commerce_payment_transaction_new($form_state['payment_method']->method_id, $form_state['order']->order_id);
+    $transaction = commerce_payment_transaction_new($payment_method->method_id, $form_state['order']->order_id);
     $transaction->amount = $form_state['values']['amount'];
     $transaction->currency_code = $form_state['values']['currency_code'];
     $transaction->status = COMMERCE_PAYMENT_STATUS_PENDING;
 
-    // If the payment terminal passes validation...
-    // TODO: Pass the transaction and form data on to the payment method's
-    // callback for processing the payment.
-    if (TRUE) {
-      commerce_payment_transaction_save($transaction);
+    commerce_payment_transaction_save($transaction);
 
-      drupal_set_message(t('Payment transaction created.'));
-    }
-    else {
-      // Store the transaction in the form state and rebuild the form.
-      $form_state['transaction'] = $transaction;
-      $form_state['rebuild'] = TRUE;
-    }
+    drupal_set_message(t('Payment transaction created.'));
   }
 }
 
