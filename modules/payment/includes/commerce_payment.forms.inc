@@ -21,13 +21,9 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
   // Store the initial order in the form state.
   $form_state['order'] = $order;
 
-  // If a payment method has already been selected or the terminal failed
-  // validation...
-  if (!empty($form_state['payment_method']) || !empty($form_state['transaction'])) {
+  // If a payment method has already been selected...
+  if (!empty($form_state['payment_method'])) {
     $payment_method = $form_state['payment_method'];
-
-    // Look for a transaction in progress to use for defaults.
-    $transaction = !empty($form_state['transaction']) ? $form_state['transaction'] : FALSE;
 
     $form['payment_terminal'] = array(
       '#type' => 'fieldset',
@@ -36,11 +32,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     );
 
     // Establish defaults for the amount if possible.
-    if ($transaction) {
-      $default_amount = $transaction->amount;
-      $default_currency_code = $transaction->currency_code;
-    }
-    elseif ($balance = commerce_payment_order_balance($order)) {
+    if ($balance = commerce_payment_order_balance($order)) {
       $default_amount = $balance['amount'] > 0 ? $balance['amount'] : '';
       $default_currency_code = $balance['currency_code'];
     }
