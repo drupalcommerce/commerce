@@ -229,6 +229,23 @@ function commerce_payment_method_load($method_id) {
 }
 
 /**
+ * Returns a payment method instance ID given a payment method ID and the Rule
+ *   containing an enabling action with settings.
+ *
+ * @param $method_id
+ *   The ID of the payment method.
+ * @param $rule
+ *   The Rules configuration object used to provide settings for the method.
+ *
+ * @return
+ *   A string used as the payment method instance ID.
+ */
+function commerce_payment_method_instance_id($method_id, $rule) {
+  $parts = array($method_id, $rule->name);
+  return implode('|', $parts);
+}
+
+/**
  * Returns a payment method instance object which includes the settings specific
  *   to the context of the instance.
  *

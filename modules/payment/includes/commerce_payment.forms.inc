@@ -94,14 +94,49 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
   }
   else {
     // Otherwise present the payment method selection form.
+    $event = rules_get_cache('event_commerce_payment_methods');
 
     // Build an options array of all available payment methods that can setup
-    // transactions using the local terminal.
+    // transactions using the local terminal. If there is more than one instance
+    // of any payment method available on site, list them in optgroups using the
+    // payment method title.
+    $instances = array();
     $options = array();
+    $optgroups = FALSE;
 
     foreach (commerce_payment_methods() as $method_id => $payment_method) {
+      // Only check payment methods that should appear on the terminal.
       if ($payment_method->terminal) {
-        $options[$method_id] = check_plain($payment_method->title);
+        // Look for a Rule enabling this payment method.
+        foreach ($event->getIterator() as $rule) {
+          foreach ($rule->actions() as $action) {
+            // If an action is found, add its instance to the options array.
+            if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
+              $instances[check_plain($payment_method->title)][] = array(
+                'instance_id' => commerce_payment_method_instance_id($method_id, $rule),
+                'label' => check_plain($rule->label()),
+              );
+
+              // If this is the second instance for this payment method, turn
+              // on optgroups.
+              if (count($instances[check_plain($payment_method->title)]) > 1) {
+                $optgroups = TRUE;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Build an options array based on whether or not optgroups are necessary.
+    foreach ($instances as $optgroup => $values) {
+      foreach ($values as $value) {
+        if ($optgroups) {
+          $options[$optgroup][$value['instance_id']] = $value['label'];
+        }
+        else {
+          $options[$value['instance_id']] = $value['label'];
+        }
       }
     }
 
@@ -156,7 +191,7 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
   // If the "Add payment" button was clicked...
   if ($form_state['values']['op'] == t('Add payment')) {
     // Store the payment method in the form state and rebuild the form.
-    $form_state['payment_method'] = commerce_payment_method_load($form_state['values']['payment_method']);
+    $form_state['payment_method'] = commerce_payment_method_instance_load($form_state['values']['payment_method']);
     $form_state['rebuild'] = TRUE;
   }
   else {

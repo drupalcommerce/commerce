@@ -87,10 +87,10 @@ function commerce_payment_enable_method($order, $payment_method, $action_setting
 
   // Create a unique key for the instance of the payment method represented by
   // this action.
-  $method_key = $method_id . '|' . $rule->name;
+  $instance_id = commerce_payment_method_instance_id($method_id, $rule);
 
   // Set the payment method to the order along with its settings and context.
-  $order->payment_methods[$method_key] = array(
+  $order->payment_methods[$instance_id] = array(
     'method_id' => $method_id,
     'settings' => $settings,
     'rule_name' => $rule->name,
