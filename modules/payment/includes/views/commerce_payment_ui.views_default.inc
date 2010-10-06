@@ -72,6 +72,10 @@ function commerce_payment_ui_views_default_views() {
       'align' => 'views-align-right',
       'separator' => '',
     ),
+    'operations' => array(
+      'align' => 'views-align-left',
+      'separator' => '',
+    ),
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
@@ -144,6 +148,7 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['remote_id']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['remote_id']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['remote_id']['empty'] = '-';
   $handler->display->display_options['fields']['remote_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['remote_id']['empty_zero'] = 0;
   /* Field: Commerce Payment Transaction: Message */
@@ -159,6 +164,7 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['message']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['message']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['message']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['message']['empty'] = '-';
   $handler->display->display_options['fields']['message']['hide_empty'] = 0;
   $handler->display->display_options['fields']['message']['empty_zero'] = 0;
   /* Field: Commerce Payment Transaction: Amount */
