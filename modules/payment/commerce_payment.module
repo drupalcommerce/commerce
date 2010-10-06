@@ -350,7 +350,7 @@ function commerce_payment_transaction_status_load($status) {
  * @return
  *   A transaction object with all default fields initialized.
  */
-function commerce_payment_transaction_new($method_id = '') {
+function commerce_payment_transaction_new($method_id = '', $order_id = 0) {
   return entity_get_controller('commerce_payment_transaction')->create($method_id);
 }
 

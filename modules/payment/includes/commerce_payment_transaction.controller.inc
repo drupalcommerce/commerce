@@ -18,15 +18,17 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
    *
    * @param $method_id
    *   The ID of the payment method for the transaction.
+   * @param $order_id
+   *   The ID of the order the transaction is for.
    *
    * @return
    *   A payment transaction object with all default fields initialized.
    */
-  public function create($method_id = '') {
+  public function create($method_id = '', $order_id = 0) {
     return (object) array(
       'transaction_id' => '',
       'revision_id' => '',
-      'order_id' => 0,
+      'order_id' => $order_id,
       'payment_method' => $method_id,
       'remote_id' => '',
       'message' => '',
