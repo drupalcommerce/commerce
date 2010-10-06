@@ -179,7 +179,6 @@ function commerce_checkout_commerce_order_status_info() {
       'checkout_page' => $page_id,
       'cart' => $checkout_page->status_cart,
       'weight' => $checkout_page->weight,
-      'status' => 1,
     );
   }
 

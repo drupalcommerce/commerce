@@ -161,22 +161,18 @@ function commerce_order_commerce_order_status_info() {
     'name' => 'canceled',
     'title' => t('Canceled'),
     'state' => 'canceled',
-    'weight' => 0,
-    'status' => 1,
   );
+
   $order_statuses['pending'] = (object) array(
     'name' => 'pending',
     'title' => t('Pending'),
     'state' => 'pending',
-    'weight' => 0,
-    'status' => 1,
   );
+
   $order_statuses['completed'] = (object) array(
     'name' => 'completed',
     'title' => t('Completed'),
     'state' => 'completed',
-    'weight' => 0,
-    'status' => 1,
   );
 
   return $order_statuses;
@@ -618,7 +614,7 @@ function commerce_order_statuses($conditions = array()) {
       $defaults = array(
         'cart' => FALSE,
         'weight' => 0,
-        'status' => 1,
+        'status' => TRUE,
       );
       $order_status = (object) array_merge($defaults, (array) $order_status);
 

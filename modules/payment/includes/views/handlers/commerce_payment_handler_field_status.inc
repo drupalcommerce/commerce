@@ -33,14 +33,14 @@ class commerce_payment_handler_field_status extends views_handler_field {
   }
 
   function render($values) {
-    $status = commerce_payment_transaction_status_load($values->{$this->field_alias});
+    $transaction_status = commerce_payment_transaction_status_load($values->{$this->field_alias});
 
-    if (!$status) {
+    if (!$transaction_status) {
       return '?';
     }
 
     $variables = array(
-      'status' => $status,
+      'transaction_status' => $transaction_status,
     );
 
     switch ($this->options['display_style']) {
@@ -48,10 +48,10 @@ class commerce_payment_handler_field_status extends views_handler_field {
         return theme('commerce_payment_transaction_status_icon', $variables);
 
       case 'title':
-        return theme('commerce_payment_transaction_status_text', $variables + array('text' => check_plain($status->title)));
+        return theme('commerce_payment_transaction_status_text', $variables + array('text' => check_plain($transaction_status->title)));
 
       case 'raw':
-        return theme('commerce_payment_transaction_status_text', $variables + array('text' => check_plain($status->status)));
+        return theme('commerce_payment_transaction_status_text', $variables + array('text' => check_plain($transaction_status->status)));
     }
   }
 }
