@@ -196,7 +196,7 @@ function commerce_currencies($enabled = FALSE) {
     // Establish some default values for currencies.
     $defaults = array(
       'symbol' => '',
-      'fraction_name' => '',
+      'minor_unit' => '',
       'decimals' => 2,
       'thousands_separator' => ',',
       'decimal_separator' => '.',
@@ -209,21 +209,23 @@ function commerce_currencies($enabled = FALSE) {
     // Define base currencies.
     $currencies = array(
       'EUR' => array(
-        'numeric_code' => 978,
         'code' => 'EUR',
+        'numeric_code' => '978',
         'name' => t('Euro'),
         'symbol' => '€',
-        'fraction_name' => t('Cent'),
+        'major_unit' => t('Euro'),
+        'minor_unit' => t('Cent'),
         'decimal_separator' => ',',
         'thousands_separator' => ' ',
         'symbol_placement' => 'after',
       ),
       'USD' => array (
-        'numeric_code' => 840,
         'code' => 'USD',
+        'numeric_code' => '840',
         'name' => t('United States Dollars'),
         'symbol' => '$',
-        'fraction_name' => t('Cent'),
+        'major_unit' => t('Dollar'),
+        'minor_unit' => t('Cent'),
         'symbol_placement' => 'before',
       ),
     );
