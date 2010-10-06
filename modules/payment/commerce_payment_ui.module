@@ -65,6 +65,18 @@ function commerce_payment_ui_views_api() {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds a Cancel link to the Save button for the payment terminal form that is
+ * part of the View used as the order Payment tab.
+ */
+function commerce_payment_ui_form_commerce_payment_order_transaction_add_form_alter(&$form, &$form_state) {
+  if (!empty($form_state['payment_method'])) {
+    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment');
+  }
+}
+
+/**
  * Implements hook_forms().
  */
 function commerce_payment_ui_forms($form_id, $args) {

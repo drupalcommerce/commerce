@@ -231,6 +231,8 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
   // If a price has already been set for this instance prepare a default value.
   if (isset($items[$delta]['price'])) {
+    // TODO: Adjust rounding to be currency specific.
+
     // Round the default value.
     $default_price = round($items[$delta]['price'], 2);
 

@@ -59,7 +59,7 @@ class commerce_payment_handler_area_totals extends views_handler_area {
     foreach ($this->view->result as $result) {
       // If the payment transaction status indicates it should include the
       // current transaction in the total...
-      if ($statuses[$result->commerce_payment_transaction_status]->total) {
+      if (!empty($statuses[$result->commerce_payment_transaction_status]) && $statuses[$result->commerce_payment_transaction_status]->total) {
         // Add the transaction to its currency's running total if it exists...
         if (isset($totals[$result->commerce_payment_transaction_currency_code])) {
           $totals[$result->commerce_payment_transaction_currency_code] += $result->commerce_payment_transaction_amount;

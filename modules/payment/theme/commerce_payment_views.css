@@ -22,3 +22,11 @@
 .views-field-operations .links.operations {
   text-transform: lowercase;
 }
+
+.payment-terminal {
+  clear: right;
+}
+
+.payment-terminal-amount div {
+  display: inline;
+}
