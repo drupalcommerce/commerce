@@ -71,7 +71,7 @@ function commerce_cart_form($form, &$form_state, $order) {
 
   // The display title should come from the line item type.
   $product_line_item_type = commerce_line_item_type_load('product');
-  $title_callback = $product_line_item_type->title_callback;
+  $title_callback = commerce_line_item_type_callback($product_line_item_type, 'title');
 
   // Build the actual form with rows for product line items.
   $form['line_items'] = array(
@@ -95,7 +95,7 @@ function commerce_cart_form($form, &$form_state, $order) {
       );
 
       $form['line_items'][$line_item_id]['title'] = array(
-        '#markup' => $title_callback($line_item),
+        '#markup' => $title_callback ? $title_callback($line_item) : '',
       );
 
       $form['line_items'][$line_item_id]['line_item_label'] = array(

@@ -527,11 +527,11 @@ function commerce_product_reference_commerce_line_item_info() {
       'type' => 'product',
       'name' => t('Product'),
       'description' => t('References a product and displays it with the SKU as the label.'),
-      'configuration_callback' => 'commerce_product_reference_configure_line_item',
-      'title_callback' => 'commerce_product_line_item_title',
-      'add_form_element_callback' => 'commerce_product_line_item_add_form',
-      'add_form_submit_callback' => 'commerce_product_line_item_add_submit',
       'add_form_submit_value' => t('Add product'),
+      'base' => 'commerce_product_line_item',
+      'callbacks' => array(
+        'configuration' => 'commerce_product_reference_configure_line_item',
+      ),
     ),
   );
 }
@@ -670,7 +670,7 @@ function commerce_product_line_item_add_form() {
  * @return
  *   NULL if all is well or an error message if something goes wrong.
  */
-function commerce_product_line_item_add_submit(&$line_item, $element, &$form_state, $form) {
+function commerce_product_line_item_add_form_submit(&$line_item, $element, &$form_state, $form) {
   // Load the selected product.
   $product = commerce_product_load($element['actions']['product_id']['#value']);
 
