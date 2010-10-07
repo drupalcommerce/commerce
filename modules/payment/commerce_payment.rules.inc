@@ -109,7 +109,7 @@ function commerce_payment_capture($order, $amount) {
  */
 function commerce_payment_rules_data_info() {
   $data['commerce_payment_settings'] = array(
-    'label' => t('payment settings'),
+    'label' => t('Payment settings'),
     'ui class' => 'RulesDataUIPaymentSettings',
   );
   return $data;

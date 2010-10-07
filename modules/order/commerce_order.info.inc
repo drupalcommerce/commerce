@@ -46,6 +46,9 @@ function commerce_order_entity_property_info() {
     'getter callback' => 'commerce_order_get_properties',
     'type' => 'uri',
   );
+  /**
+   * TODO: Find out why this is buggy.
+   *
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the order was created.'),
@@ -53,7 +56,7 @@ function commerce_order_entity_property_info() {
     'setter callback' => 'entity_metadata_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer orders',
-  );
+  );*/
   $properties['creator-uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',
