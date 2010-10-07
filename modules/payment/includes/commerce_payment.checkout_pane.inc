@@ -73,7 +73,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     $payment_method = commerce_payment_method_load($method_info['method_id']);
     $payment_method->settings = $method_info['settings'];
 
-    if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form')) {
       $pane_form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
     }
     else {
@@ -105,7 +105,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
   if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
     // And the newly selected method has a valid form callback...
     if ($payment_method = commerce_payment_method_instance_load($pane_values['payment_method'])) {
-      if (function_exists($payment_method->callbacks['submit_form'])) {
+      if (commerce_payment_method_callback($payment_method, 'submit_form')) {
         // Fail validation so the form is rebuilt to include the payment method
         // specific form elements.
         return FALSE;
@@ -116,7 +116,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
   // Delegate validation to the payment method callback.
   $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
-  if (function_exists($callback = $payment_method->callbacks['submit_form_validate'])) {
+  if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
     $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane->pane_id, 'payment_details'));
 
     // To prevent payment method validation routines from having to return TRUE
@@ -143,7 +143,7 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
     // Delegate submit to the payment method callback.
     $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
-    if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_submit')) {
       return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance);
     }
   }
@@ -179,12 +179,12 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   // If the user came to the return URL...
   if (arg(3) == 'return' && arg(4) == $order->data['payment_redirect_key']) {
     // Check for a validate handler on return.
-    $callback = $payment_method->callbacks['redirect_form_validate'];
+    $validate_callback = commerce_payment_method_callback($payment_method, 'redirect_form_validate');
 
     // If there is no validate handler or if there is and it passess...
-    if (!function_exists($callback) || $callback($order, $payment_method)) {
+    if (!$validate_callback || $validate_callback($order, $payment_method)) {
       // Perform any submit functions if necessary.
-      if (function_exists($callback = $payment_method->callbacks['redirect_form_submit'])) {
+      if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form_submit')) {
         $callback($order, $payment_method);
       }
 
@@ -208,7 +208,7 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   }
 
   // If the function to build the redirect form exists...
-  if (function_exists($callback = $payment_method->callbacks['redirect_form'])) {
+  if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form')) {
     // Generate a key to use in the return URL from the redirected service.
     $order->data['payment_redirect_key'] = drupal_hash_base64(time());
     commerce_order_save($order);

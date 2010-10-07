@@ -70,7 +70,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     // Find the values already submitted for the payment terminal.
     $terminal_values = !empty($form_state['values']['payment_details']) ? $form_state['values']['payment_details'] : array();
 
-    if (function_exists($callback = $payment_method->callbacks['submit_form'])) {
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form')) {
       $form['payment_terminal']['payment_details'] = $callback($payment_method, $terminal_values, NULL, $order);
     }
     else {
@@ -170,7 +170,7 @@ function commerce_payment_order_transaction_add_form_validate($form, &$form_stat
     $order = $form_state['order'];
 
     // Find out if the payment details are valid before attempting to process.
-    if (function_exists($callback = $payment_method->callbacks['submit_form_validate'])) {
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
       $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order, array('payment_details'));
     }
   }
@@ -191,7 +191,7 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
     $order = $form_state['order'];
 
     // Delegate submit to the payment method callback.
-    if (function_exists($callback = $payment_method->callbacks['submit_form_submit'])) {
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_submit')) {
       $charge = array(
         'amount' => $form_state['values']['amount'],
         'currency_code' => $form_state['values']['currency_code'],

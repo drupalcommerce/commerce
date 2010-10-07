@@ -203,7 +203,7 @@ function commerce_payment_methods() {
       }
 
       // Merge in default callbacks.
-      foreach (array('settings', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
+      foreach (array('settings_form', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
         if (!isset($payment_method->callbacks[$callback])) {
           $payment_method->callbacks[$callback] = $payment_method->base . '_' . $callback;
         }
@@ -226,6 +226,36 @@ function commerce_payment_methods() {
 function commerce_payment_method_load($method_id) {
   $payment_methods = commerce_payment_methods();
   return isset($payment_methods[$method_id]) ? $payment_methods[$method_id] : FALSE;
+}
+
+/**
+ * Returns the specified callback for the given payment method if it exists.
+ *
+ * @param $payment_method
+ *   The payment method object.
+ * @param $callback
+ *   The callback function to return, one of:
+ *   - settings_form
+ *   - submit_form
+ *   - submit_form_validate
+ *   - submit_form_submit
+ *   - redirect_form
+ *   - redirect_form_validate
+ *   - redirect_form_submit
+ *
+ * @return
+ *   A string containing the name of the callback function or FALSE if it could
+ *     not be found.
+ */
+function commerce_payment_method_callback($payment_method, $callback) {
+  // If the specified callback function exists, return it.
+  if (!empty($payment_method->callbacks[$callback]) &&
+      function_exists($payment_method->callbacks[$callback])) {
+    return $payment_method->callbacks[$callback];
+  }
+
+  // Otherwise return FALSE.
+  return FALSE;
 }
 
 /**
