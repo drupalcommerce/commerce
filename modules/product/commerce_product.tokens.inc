@@ -114,8 +114,10 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
       }
     }
 
-    if ($created_tokens = token_find_with_prefix($tokens, 'created')) {
-      $replacements += token_generate('date', $created_tokens, array('date' => $product->created), $options);
+    foreach (array('created', 'changed') as $date) {
+      if ($created_tokens = token_find_with_prefix($tokens, $date)) {
+        $replacements += token_generate('date', $created_tokens, array('date' => $product->{$date}), $options);
+      }
     }
   }
 

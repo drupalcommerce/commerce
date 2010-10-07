@@ -32,11 +32,20 @@ function commerce_order_token_info() {
     'name' => t('Edit URL'),
     'description' => t("The URL of the order's edit page."),
   );
+  $order['order-status'] = array(
+    'name' => t('Order status'),
+    'description' => t('The current status of the order.'),
+  );
 
   // Chained tokens for orders.
   $order['created'] = array(
     'name' => t('Date created'),
     'description' => t('The date the order was created.'),
+    'type' => 'date',
+  );
+  $order['changed'] = array(
+    'name' => t('Date changed'),
+    'description' => t('The date the order was last updated.'),
     'type' => 'date',
   );
 
@@ -82,15 +91,25 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
           $replacements[$original] = url('admin/commerce/orders/' . $order->order_id . '/edit', $url_options);
           break;
 
+        case 'order-status':
+          $replacements[$original] = $sanitize ? check_plain(commerce_order_status_get_title($order->status)) : commerce_order_status_get_title($order->status);
+          break;
+
         // Default values for the chained tokens handled below.
         case 'created':
           $replacements[$original] = format_date($order->created, 'medium', '', NULL, $language_code);
           break;
+
+        case 'changed':
+          $replacements[$original] = format_date($order->changed, 'medium', '', NULL, $language_code);
+          break;
       }
     }
 
-    if ($created_tokens = token_find_with_prefix($tokens, 'created')) {
-      $replacements += token_generate('date', $created_tokens, array('date' => $order->created), $options);
+    foreach (array('created', 'changed') as $date) {
+      if ($created_tokens = token_find_with_prefix($tokens, $date)) {
+        $replacements += token_generate('date', $created_tokens, array('date' => $order->{$date}), $options);
+      }
     }
   }
 
