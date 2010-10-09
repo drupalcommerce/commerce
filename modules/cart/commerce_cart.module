@@ -20,7 +20,6 @@ function commerce_cart_menu() {
     'title' => t('Shopping cart'),
     'page callback' => array('commerce_cart_view'),
     'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_cart.pages.inc',
   );
 

@@ -21,7 +21,6 @@ function commerce_order_ui_menu() {
     'page arguments' => array(commerce_order_new()),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
-    'type' => MENU_LOCAL_ACTION,
     'weight' => 10,
     'file' => 'includes/commerce_order_ui.orders.inc',
   );
@@ -32,7 +31,6 @@ function commerce_order_ui_menu() {
     'page arguments' => array(commerce_order_new(), 4),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_order_ui.orders.inc',
   );
 
@@ -43,7 +41,6 @@ function commerce_order_ui_menu() {
     'page arguments' => array(3),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('view', 3),
-    'type' => MENU_CALLBACK,
   );
   $items['admin/commerce/orders/%commerce_order/view'] = array(
     'title' => 'View',
@@ -107,6 +104,22 @@ function commerce_order_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
   $items['admin/commerce/config/order/settings/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
   $items['admin/commerce/config/order/settings/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function commerce_order_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link 'admin/commerce/orders/add' on 'admin/commerce/orders'.
+  if ($root_path == 'admin/commerce/orders') {
+    $item = menu_get_item('admin/commerce/orders/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
 }
 
 /**

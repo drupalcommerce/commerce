@@ -43,10 +43,10 @@ function theme_customer_profile_add_list($variables) {
   }
   else {
     if (user_access('administer customer profile types')) {
-      $output = '<p>' . t('You have not created any customer profile types yet. Go to the <a href="@create-customer-profile-type">profile type creation page</a> to add a new profile type.', array('@create-customer-profile-type' => url('admin/commerce/customer/profiles/types/add'))) . '</p>';
+      $output = '<p>' . t('You have not enabled modules defining any customer profile types yet.') . '</p>';
     }
     else {
-      $output = '<p>' . t('No customer profile types have been created yet for you to use.') . '</p>';
+      $output = '<p>' . t('No customer profile types have been enabled yet for you to use.') . '</p>';
     }
   }
 

@@ -312,10 +312,3 @@ function theme_commerce_checkout_review($variables) {
 
   return theme('table', array('rows' => $rows, 'attributes' => array('class' => array('checkout-review'))));
 }
-
-/**
- * Displays the checkout completion page for an order.
- */
-function commerce_checkout_completion($order) {
-  return t('Your order is complete! This is placeholder text for order completion message.');
-}

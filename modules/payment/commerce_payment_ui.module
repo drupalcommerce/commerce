@@ -30,7 +30,6 @@ function commerce_payment_ui_menu() {
     'page callback' => 'commerce_payment_ui_payment_transaction_view',
     'page arguments' => array(3, 5, 'administrator'),
     'access arguments' => array('administer payments'),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 

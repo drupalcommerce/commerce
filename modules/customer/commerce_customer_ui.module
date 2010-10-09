@@ -19,7 +19,6 @@ function commerce_customer_ui_menu() {
     'description' => 'Add a new customer profile.',
     'page callback' => 'commerce_customer_ui_customer_profile_add_page',
     'access callback' => 'commerce_customer_ui_customer_profile_add_any_access',
-    'type' => MENU_LOCAL_ACTION,
     'weight' => 10,
     'file' => 'includes/commerce_customer_ui.profiles.inc',
   );
@@ -46,7 +45,6 @@ function commerce_customer_ui_menu() {
     'weight' => 0,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_customer_ui.profiles.inc',
-    'type' => MENU_CALLBACK,
   );
   $items['admin/commerce/customer-profiles/%commerce_customer_profile/edit'] = array(
     'title' => 'Edit',
@@ -60,7 +58,6 @@ function commerce_customer_ui_menu() {
     'page arguments' => array(3),
     'access callback' => 'commerce_customer_profile_access',
     'access arguments' => array('update', 3),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_customer_ui.profiles.inc',
   );
 
@@ -79,7 +76,6 @@ function commerce_customer_ui_menu() {
     'page callback' => 'commerce_customer_ui_profile_type_redirect',
     'page arguments' => array(4),
     'access arguments' => array('administer customer profile types'),
-    'type' => MENU_CALLBACK,
   );
 
   return $items;
@@ -130,6 +126,23 @@ function commerce_customer_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
   $items['admin/commerce/customer-profiles/types/%commerce_customer_profile_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
   $items['admin/commerce/customer-profiles/types/%commerce_customer_profile_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function commerce_customer_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link 'admin/commerce/customer-profiles/add' on
+  // 'admin/commerce/customer-profiles'.
+  if ($root_path == 'admin/commerce/customer-profiles') {
+    $item = menu_get_item('admin/commerce/customer-profiles/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
 }
 
 /**
