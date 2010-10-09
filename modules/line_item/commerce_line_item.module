@@ -320,11 +320,13 @@ function commerce_line_item_type_get_name($type = NULL) {
   }
 
   // Otherwise turn the array values into the type name only.
-  foreach ($line_item_types as $key => $value) {
-    $line_item_types[$key] = $value->name;
+  $line_item_type_names = array();
+
+  foreach ((array) $line_item_types as $key => $value) {
+    $line_item_type_names[$key] = $value->name;
   }
 
-  return $line_item_types;
+  return $line_item_type_names;
 }
 
 /**
