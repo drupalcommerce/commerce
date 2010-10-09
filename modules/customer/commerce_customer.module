@@ -117,6 +117,17 @@ function commerce_customer_permission() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_customer_theme() {
+  return array(
+    'commerce_customer_profile' => array(
+      'variables' => array('profile' => NULL, 'view_mode' => NULL),
+    ),
+  );
+}
+
+/**
  * Implements hook_commerce_customer_profile_info().
  */
 function commerce_customer_commerce_customer_profile_info() {
