@@ -82,6 +82,9 @@ function commerce_payment_permission() {
  */
 function commerce_payment_theme() {
   return array(
+    'commerce_payment_transaction' => array(
+      'variables' => array('order' => NULL, 'transaction' => NULL, 'view_mode' => NULL),
+    ),
     'commerce_payment_transaction_status_text' => array(
       'variables' => array('text' => NULL, 'transaction_status' => NULL),
     ),

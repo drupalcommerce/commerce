@@ -356,7 +356,7 @@ function commerce_customer_ui_views_api() {
 function commerce_customer_ui_set_breadcrumb($profile_types = FALSE) {
   $breadcrumb = array(
     l(t('Home'), '<front>'),
-    l(t('Dashboard'), 'admin'),
+    l(t('Administration'), 'admin'),
     l(t('Store'), 'admin/commerce'),
     l(t('Customer profiles'), 'admin/commerce/customer-profiles'),
   );

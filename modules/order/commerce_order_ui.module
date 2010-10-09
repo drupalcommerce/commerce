@@ -259,7 +259,7 @@ function commerce_order_ui_set_breadcrumb($view_mode = 'administrator') {
   if ($view_mode == 'administrator') {
     $breadcrumb = array(
       l(t('Home'), '<front>'),
-      l(t('Dashboard'), 'admin'),
+      l(t('Administration'), 'admin'),
       l(t('Store'), 'admin/commerce'),
       l(t('Orders'), 'admin/commerce/orders'),
     );
