@@ -723,31 +723,8 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       );
     }
 
-    // Prepare a default set of action elements to display beneath the manager.
-    $options = commerce_line_item_type_get_name();
-
-    // Only display the line item selector if line item types exist.
-    if (!empty($options)) {
-      $element['actions']['line_item_type'] = array(
-        '#type' => 'select',
-        '#options' => commerce_line_item_type_get_name(),
-        '#prefix' => '<div class="add-line-item">',
-      );
-      $element['actions']['line_item_add'] = array(
-        '#type' => 'submit',
-        '#value' => t('Add line item'),
-        '#ajax' => array(
-          'callback' => 'commerce_line_item_manager_refresh',
-          'wrapper' => 'line-item-manager',
-        ),
-        '#suffix' => '</div>',
-      );
-    }
-
     // If the the form has been instructed to add a line item...
     if (!empty($form_state['line_item_add'])) {
-      $element['actions'] = array();
-
       // Load the info object for the selected line item type.
       $line_item_type = commerce_line_item_type_load($form_state['line_item_add']);
 
@@ -784,6 +761,28 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
           'wrapper' => 'line-item-manager',
         ),
       );
+    }
+    else {
+      // Otherwise display the select list to add a new line item.
+      $options = commerce_line_item_type_get_name();
+
+      // Only display the line item selector if line item types exist.
+      if (!empty($options)) {
+        $element['actions']['line_item_type'] = array(
+          '#type' => 'select',
+          '#options' => commerce_line_item_type_get_name(),
+          '#prefix' => '<div class="add-line-item">',
+        );
+        $element['actions']['line_item_add'] = array(
+          '#type' => 'submit',
+          '#value' => t('Add line item'),
+          '#ajax' => array(
+            'callback' => 'commerce_line_item_manager_refresh',
+            'wrapper' => 'line-item-manager',
+          ),
+          '#suffix' => '</div>',
+        );
+      }
     }
 
     return $element;
@@ -888,6 +887,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
   // $form_state for the rebuild of the $form array.
   if ($form_state['clicked_button']['#value'] == t('Add line item')) {
     $form_state['line_item_add'] = $element['actions']['line_item_type']['#value'];
+    $form_state['rebuild'] = TRUE;
   }
   else {
     unset($form_state['line_item_add']);
@@ -923,6 +923,8 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         // doesn't affect the rest of the form submission process.
         drupal_set_message($error, 'error');
       }
+
+      $form_state['rebuild'] = TRUE;
     }
   }
 
