@@ -13,12 +13,8 @@
  * @param $profile
  *   The profile object to edit or for a create form an empty profile object
  *     with only a profile type defined.
- * @param $embed
- *   TRUE or FALSE indicating whether or not the form should be built to be
- *     embedded elsewhere, meaning it will not have submit buttons and some
- *     other administrative form elements.
  */
-function commerce_customer_customer_profile_form($form, &$form_state, $profile, $embed = FALSE) {
+function commerce_customer_customer_profile_form($form, &$form_state, $profile) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
 
@@ -26,46 +22,42 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile, 
   $form_state['customer_profile'] = $profile;
   field_attach_form('commerce_customer_profile', $profile, $form, $form_state);
 
-  // As long as the form isn't being embedded elsewhere, add form elements for
-  // the status selector and submit buttons.
-  if (!$embed) {
-    $form['status'] = array(
-      '#type' => 'radios',
-      '#title' => t('Status'),
-      '#description' => t('Disabled profiles will not be visible to customers.'),
-      '#options' => array(
-        '1' => t('Active'),
-        '0' => t('Disabled'),
-      ),
-      '#default_value' => $profile->status,
-      '#required' => TRUE,
-      '#weight' => 35,
-    );
+  $form['status'] = array(
+    '#type' => 'radios',
+    '#title' => t('Status'),
+    '#description' => t('Disabled profiles will not be visible to customers.'),
+    '#options' => array(
+      '1' => t('Active'),
+      '0' => t('Disabled'),
+    ),
+    '#default_value' => $profile->status,
+    '#required' => TRUE,
+    '#weight' => 35,
+  );
 
-    $form['actions'] = array(
-      '#type' => 'container',
-      '#attributes' => array('class' => array('form-actions')),
-      '#weight' => 40,
-    );
+  $form['actions'] = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('form-actions')),
+    '#weight' => 40,
+  );
 
-    // We add the form's #submit array to this button along with the actual submit
-    // handler to preserve any submit handlers added by a form callback_wrapper.
-    $submit = array();
+  // We add the form's #submit array to this button along with the actual submit
+  // handler to preserve any submit handlers added by a form callback_wrapper.
+  $submit = array();
 
-    if (!empty($form['#submit'])) {
-      $submit += $form['#submit'];
-    }
-
-    $form['actions']['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save profile'),
-      '#submit' => $submit + array('commerce_customer_customer_profile_form_submit'),
-    );
-
-    // We append the validate handler to #validate in case a form callback_wrapper
-    // is used to add validate handlers earlier.
-    $form['#validate'][] = 'commerce_customer_customer_profile_form_validate';
+  if (!empty($form['#submit'])) {
+    $submit += $form['#submit'];
   }
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save profile'),
+    '#submit' => $submit + array('commerce_customer_customer_profile_form_submit'),
+  );
+
+  // We append the validate handler to #validate in case a form callback_wrapper
+  // is used to add validate handlers earlier.
+  $form['#validate'][] = 'commerce_customer_customer_profile_form_validate';
 
   return $form;
 }

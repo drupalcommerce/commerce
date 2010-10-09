@@ -29,13 +29,6 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 		'#value' => $profile,
 	);
 
-	// Duplicate address data in the profile in the $form_state array.
-	// TODO: This won't scale for any number of fields that may use #ajax or if
-	// there are two fields on the form with the same name.
-	if (!empty($form_state['values'][$checkout_pane->pane_id])) {
-		$form_state['values'][$type . '_address'] = $form_state['values'][$checkout_pane->pane_id][$type . '_address'];
-	}
-
   // Add the field widgets for the profile.
   field_attach_form('commerce_customer_profile', $profile, $pane_form, $form_state);
 
@@ -45,24 +38,29 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 /**
  * Checkout pane callback: validates a customer profile edit form.
  */
-function commerce_customer_profile_pane_checkout_form_validate($form, $form_state, $checkout_pane, $order) {
-  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
+function commerce_customer_profile_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
+  $profile = $form_state['values'][$checkout_pane->pane_id]['customer_profile'];
 
-  $profile = $form_state['values']['customer_profile'];
+  // Store the form values locally to restore them after field submission.
+  $values = $form_state['values'];
+
+  // Temporarily make this pane's values the only values in the $form_state.
+  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
 
   // Notify field widgets to validate their data.
   field_attach_form_validate('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
 
-	return TRUE;
+  // Restore the values to the $form_state.
+  $form_state['values'] = $values;
+
+  return TRUE;
 }
 
 /**
  * Checkout pane callback: submits a customer profile edit form.
  */
-function commerce_customer_profile_pane_checkout_form_submit($form, $form_state, $checkout_pane, $order) {
-  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
-
-  $profile = &$form_state['values']['customer_profile'];
+function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
+  $profile = $form_state['values'][$checkout_pane->pane_id]['customer_profile'];
 
   // Ensure the profile is active.
   $profile->status = TRUE;
@@ -72,8 +70,17 @@ function commerce_customer_profile_pane_checkout_form_submit($form, $form_state,
     $profile->uid = $order->customer_uid;
   }
 
+  // Store the form values locally to restore them after field submission.
+  $values = $form_state['values'];
+
+  // Temporarily make this pane's values the only values in the $form_state.
+  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
+
   // Notify field widgets.
   field_attach_submit('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
+
+  // Restore the values to the $form_state.
+  $form_state['values'] = $values;
 
   // Save the profile.
   commerce_customer_profile_save($profile);
