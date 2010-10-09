@@ -289,7 +289,7 @@ function commerce_payment_method_instance_id($method_id, $rule) {
  */
 function commerce_payment_method_instance_load($instance_id) {
   // Return FALSE if there is no pipe delimeter in the instance ID.
-  if (strpos('|', $instance_id) === FALSE) {
+  if (strpos($instance_id, '|') === FALSE) {
     return FALSE;
   }
 
