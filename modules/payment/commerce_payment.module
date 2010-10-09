@@ -288,8 +288,18 @@ function commerce_payment_method_instance_id($method_id, $rule) {
  *     object with the addition of the settings array.
  */
 function commerce_payment_method_instance_load($instance_id) {
+  // Return FALSE if there is no pipe delimeter in the instance ID.
+  if (strpos('|', $instance_id) === FALSE) {
+    return FALSE;
+  }
+
   // Explode the method key into its component parts.
   list($method_id, $rule_name) = explode('|', $instance_id);
+
+  // Return FALSE if we didn't receive a proper instance ID.
+  if (empty($method_id) || empty($rule_name)) {
+    return FALSE;
+  }
 
   // First load the payment method and add the instance ID.
   $payment_method = commerce_payment_method_load($method_id);

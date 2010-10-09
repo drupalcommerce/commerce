@@ -101,28 +101,31 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
   $pane_form = $form[$checkout_pane->pane_id];
   $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
-  // If the selected payment method was changed...
-  if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
-    // And the newly selected method has a valid form callback...
-    if ($payment_method = commerce_payment_method_instance_load($pane_values['payment_method'])) {
-      if (commerce_payment_method_callback($payment_method, 'submit_form')) {
-        // Fail validation so the form is rebuilt to include the payment method
-        // specific form elements.
-        return FALSE;
+  // Only attempt validation if there were payment methods available.
+  if ($pane_values['payment_methods']) {
+    // If the selected payment method was changed...
+    if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
+      // And the newly selected method has a valid form callback...
+      if ($payment_method = commerce_payment_method_instance_load($pane_values['payment_method'])) {
+        if (commerce_payment_method_callback($payment_method, 'submit_form')) {
+          // Fail validation so the form is rebuilt to include the payment method
+          // specific form elements.
+          return FALSE;
+        }
       }
     }
-  }
 
-  // Delegate validation to the payment method callback.
-  $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
+    // Delegate validation to the payment method callback.
+    $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
-  if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
-    $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane->pane_id, 'payment_details'));
+    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
+      $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane->pane_id, 'payment_details'));
 
-    // To prevent payment method validation routines from having to return TRUE
-    // explicitly, only return FALSE if it was specifically returned.  Otherwise
-    // default to TRUE.
-    return $result === FALSE ? FALSE : TRUE;
+      // To prevent payment method validation routines from having to return TRUE
+      // explicitly, only return FALSE if it was specifically returned.  Otherwise
+      // default to TRUE.
+      return $result === FALSE ? FALSE : TRUE;
+    }
   }
 
   // Nothing to validate.
@@ -136,15 +139,18 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
   $pane_form = $form[$checkout_pane->pane_id];
   $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
-  $order->data['payment_method'] = $pane_values['payment_method'];
+  // Only process if there were payment methods available.
+  if ($pane_values['payment_methods']) {
+    $order->data['payment_method'] = $pane_values['payment_method'];
 
-  // If we can calculate a single order total for the order...
-  if ($balance = commerce_payment_order_balance($order)) {
-    // Delegate submit to the payment method callback.
-    $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
+    // If we can calculate a single order total for the order...
+    if ($balance = commerce_payment_order_balance($order)) {
+      // Delegate submit to the payment method callback.
+      $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
-    if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_submit')) {
-      return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance);
+      if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_submit')) {
+        return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance);
+      }
     }
   }
 }
@@ -154,7 +160,12 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
  */
 function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $checkout_pane, $order) {
   // First load the order's specified payment method instance.
-  $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+  if (!empty($order->data['payment_method'])) {
+    $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+  }
+  else {
+    $payment_method = FALSE;
+  }
 
   // If the payment method doesn't exist or does not require a redirect...
   if (!$payment_method || !$payment_method->offsite) {
