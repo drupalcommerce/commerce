@@ -19,7 +19,6 @@ function commerce_product_ui_menu() {
     'description' => 'Add a new product for sale.',
     'page callback' => 'commerce_product_ui_add_page',
     'access callback' => 'commerce_product_ui_product_add_any_access',
-    'type' => MENU_LOCAL_ACTION,
     'weight' => 10,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
@@ -46,7 +45,6 @@ function commerce_product_ui_menu() {
     'weight' => 0,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_product_ui.products.inc',
-    'type' => MENU_CALLBACK,
   );
   $items['admin/commerce/products/%commerce_product/edit'] = array(
     'title' => 'Edit',
@@ -60,7 +58,6 @@ function commerce_product_ui_menu() {
     'page arguments' => array(3),
     'access callback' => 'commerce_product_access',
     'access arguments' => array('update', 3),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_product_ui.products.inc',
   );
 
@@ -78,7 +75,7 @@ function commerce_product_ui_menu() {
     'page callback' => 'commerce_product_ui_product_type_form_wrapper',
     'page arguments' => array(commerce_product_type_new()),
     'access arguments' => array('administer product types'),
-    'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
+    'type' => MENU_LOCAL_ACTION,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/%commerce_product_type'] = array(
@@ -87,7 +84,6 @@ function commerce_product_ui_menu() {
     'page callback' => 'commerce_product_ui_product_type_form_wrapper',
     'page arguments' => array(4),
     'access arguments' => array('administer product types'),
-    'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
   $items['admin/commerce/products/types/%commerce_product_type/edit'] = array(
@@ -147,6 +143,22 @@ function commerce_product_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
   $items['admin/commerce/products/types/%commerce_product_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
   $items['admin/commerce/products/types/%commerce_product_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link 'admin/commerce/products/add' on 'admin/commerce/products'.
+  if ($root_path == 'admin/commerce/products') {
+    $item = menu_get_item('admin/commerce/products/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
 }
 
 /**
@@ -452,7 +464,7 @@ function commerce_product_ui_views_api() {
 function commerce_product_ui_set_breadcrumb($product_types = FALSE) {
   $breadcrumb = array(
     l(t('Home'), '<front>'),
-    l(t('Dashboard'), 'admin'),
+    l(t('Administration'), 'admin'),
     l(t('Store'), 'admin/commerce'),
     l(t('Products'), 'admin/commerce/products'),
   );
