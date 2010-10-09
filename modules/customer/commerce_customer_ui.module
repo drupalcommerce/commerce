@@ -104,7 +104,7 @@ function commerce_customer_ui_customer_profile_add_any_access() {
 
   // Check the user's access on a profile type basis.
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
-    if (commerce_customer_access('create', $type)) {
+    if (commerce_customer_profile_access('create', $type)) {
       return TRUE;
     }
   }
