@@ -16,7 +16,7 @@
  */
 function commerce_customer_customer_profile_form($form, &$form_state, $profile) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
 
   // Add the default field elements.
 
@@ -112,7 +112,7 @@ function commerce_customer_customer_profile_delete_form($form, &$form_state, $pr
   $form_state['customer_profile'] = $profile;
 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
 
   $form['#submit'][] = 'commerce_customer_profile_delete_form_submit';
 

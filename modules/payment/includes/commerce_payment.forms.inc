@@ -6,7 +6,6 @@
  * Defines forms for creating and administering payment transactions.
  */
 
-
 /**
  * Allows an administrator to choose a payment method type and add a transaction
  *  for a specific order.
@@ -16,7 +15,7 @@
  */
 function commerce_payment_order_transaction_add_form($form, &$form_state, $order) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_payment') . '/includes/commerce_payment.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_payment') . '/includes/commerce_payment.forms.inc';
 
   // Store the initial order in the form state.
   $form_state['order'] = $order;
@@ -231,7 +230,7 @@ function commerce_payment_payment_transaction_delete_form($form, &$form_state, $
   $form_state['payment_method'] = $payment_method;
 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_payment') . '/includes/commerce_payment.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_payment') . '/includes/commerce_payment.forms.inc';
 
   $form['#submit'][] = 'commerce_payment_payment_transaction_delete_form_submit';
 

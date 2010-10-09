@@ -16,7 +16,7 @@
  */
 function commerce_product_product_type_form($form, &$form_state, $product_type) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
   // Store the initial product type in the form state.
   $form_state['product_type'] = $product_type;
@@ -148,7 +148,7 @@ function commerce_product_product_type_delete_form($form, &$form_state, $product
   $form_state['product_type'] = $product_type;
 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
   $form['#submit'][] = 'commerce_product_product_type_delete_form_submit';
 
@@ -185,7 +185,7 @@ function commerce_product_product_type_delete_form_submit($form, &$form_state) {
  */
 function commerce_product_product_form($form, &$form_state, $product) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
   // Add the default field elements.
   // TODO: Update description to include the acceptable product tokens.
@@ -325,7 +325,7 @@ function commerce_product_product_delete_form($form, &$form_state, $product) {
   $form_state['product'] = $product;
 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
   $form['#submit'][] = 'commerce_product_product_delete_form_submit';
 

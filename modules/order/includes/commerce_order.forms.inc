@@ -15,7 +15,7 @@
  */
 function commerce_order_order_form($form, &$form_state, $order) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
 
   // Add the field related form elements.
   $form_state['commerce_order'] = $order;
@@ -123,7 +123,7 @@ function commerce_order_order_delete_form($form, &$form_state, $order) {
   $form_state['order'] = $order;
 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
-  $form_state['build_info']['file'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
 
   $form['#submit'][] = 'commerce_order_order_delete_form_submit';
 
