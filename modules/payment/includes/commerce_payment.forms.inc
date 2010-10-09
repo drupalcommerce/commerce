@@ -96,57 +96,67 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     $options = array();
     $optgroups = FALSE;
 
-    foreach (commerce_payment_methods() as $method_id => $payment_method) {
-      // Only check payment methods that should appear on the terminal.
-      if ($payment_method->terminal) {
-        // Look for a Rule enabling this payment method.
-        foreach ($event->getIterator() as $rule) {
-          foreach ($rule->actions() as $action) {
-            // If an action is found, add its instance to the options array.
-            if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
-              $instances[check_plain($payment_method->title)][] = array(
-                'instance_id' => commerce_payment_method_instance_id($method_id, $rule),
-                'label' => check_plain($rule->label()),
-              );
+    // Only build the options array if payment method Rules are enabled.
+    if (!empty($event)) {
+      foreach (commerce_payment_methods() as $method_id => $payment_method) {
+        // Only check payment methods that should appear on the terminal.
+        if ($payment_method->terminal) {
+          // Look for a Rule enabling this payment method.
+          foreach ($event->getIterator() as $rule) {
+            foreach ($rule->actions() as $action) {
+              // If an action is found, add its instance to the options array.
+              if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
+                $instances[check_plain($payment_method->title)][] = array(
+                  'instance_id' => commerce_payment_method_instance_id($method_id, $rule),
+                  'label' => check_plain($rule->label()),
+                );
 
-              // If this is the second instance for this payment method, turn
-              // on optgroups.
-              if (count($instances[check_plain($payment_method->title)]) > 1) {
-                $optgroups = TRUE;
+                // If this is the second instance for this payment method, turn
+                // on optgroups.
+                if (count($instances[check_plain($payment_method->title)]) > 1) {
+                  $optgroups = TRUE;
+                }
               }
             }
           }
         }
       }
-    }
 
-    // Build an options array based on whether or not optgroups are necessary.
-    foreach ($instances as $optgroup => $values) {
-      foreach ($values as $value) {
-        if ($optgroups) {
-          $options[$optgroup][$value['instance_id']] = $value['label'];
-        }
-        else {
-          $options[$value['instance_id']] = $value['label'];
+      // Build an options array based on whether or not optgroups are necessary.
+      foreach ($instances as $optgroup => $values) {
+        foreach ($values as $value) {
+          if ($optgroups) {
+            $options[$optgroup][$value['instance_id']] = $value['label'];
+          }
+          else {
+            $options[$value['instance_id']] = $value['label'];
+          }
         }
       }
     }
 
-    $form['payment_method'] = array(
-      '#type' => 'select',
-      '#options' => $options,
-      '#prefix' => '<div class="add-payment">',
-    );
+    if (!empty($options)) {
+      $form['payment_method'] = array(
+        '#type' => 'select',
+        '#options' => $options,
+        '#prefix' => '<div class="add-payment">',
+      );
 
-    $form['add_payment'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add payment'),
-      '#suffix' => '</div>',
-      '#ajax' => array(
-        'callback' => 'commerce_payment_order_transaction_add_form_add_refresh',
-        'wrapper' => 'commerce-payment-order-transaction-add-form',
-      ),
-    );
+      $form['add_payment'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add payment'),
+        '#suffix' => '</div>',
+        '#ajax' => array(
+          'callback' => 'commerce_payment_order_transaction_add_form_add_refresh',
+          'wrapper' => 'commerce-payment-order-transaction-add-form',
+        ),
+      );
+    }
+    else {
+      $form['payment_method'] = array(
+        '#markup' => t('No payment methods available to add payments.'),
+      );
+    }
   }
 
   return $form;
