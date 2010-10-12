@@ -33,7 +33,7 @@ function commerce_line_item_rules_event_info() {
       'access callback' => 'commerce_line_item_rules_access',
     ),
     'commerce_line_item_delete' => array(
-      'label' => t('After deleting an line item'),
+      'label' => t('After deleting a line item'),
       'group' => t('Commerce'),
       'variables' => commerce_line_item_rules_variables(t('deleted line item')),
       'access callback' => 'commerce_line_item_rules_access',
