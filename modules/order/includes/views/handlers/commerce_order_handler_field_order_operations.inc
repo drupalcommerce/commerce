@@ -22,7 +22,7 @@ class commerce_order_handler_field_order_operations extends views_handler_field 
     $links = menu_contextual_links('commerce-order', 'admin/commerce/orders', array($order_id));
 
     if (!empty($links)) {
-      drupal_add_css(drupal_get_path('module', 'commerce_order_ui') . '/theme/commerce_order_views.css');
+      drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order_views.css');
 
       return theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations')));
     }

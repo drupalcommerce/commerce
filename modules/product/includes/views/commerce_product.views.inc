@@ -179,5 +179,13 @@ function commerce_product_views_data() {
     ),
   );
 
+  $data['commerce_product']['operations'] = array(
+    'field' => array(
+      'title' => t('Operations links'),
+      'help' => t('Display all the available operations links for the product.'),
+      'handler' => 'commerce_product_handler_field_product_operations',
+    ),
+  );
+
   return $data;
 }
