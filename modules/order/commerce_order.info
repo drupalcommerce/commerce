@@ -24,6 +24,7 @@ files[] = includes/views/handlers/commerce_order_handler_field_order_status.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_delete.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_edit.inc
+files[] = includes/views/handlers/commerce_order_handler_field_order_operations.inc
 files[] = includes/views/handlers/commerce_order_handler_filter_status.inc
 
 ; Simple tests

@@ -20,6 +20,7 @@ function commerce_payment_ui_menu() {
     'access arguments' => array('administer payments'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 

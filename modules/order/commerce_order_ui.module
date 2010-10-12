@@ -60,11 +60,14 @@ function commerce_order_ui_menu() {
     'file' => 'includes/commerce_order_ui.orders.inc',
   );
   $items['admin/commerce/orders/%commerce_order/delete'] = array(
-    'title' => 'Delete an order',
+    'title' => 'Delete',
     'page callback' => 'commerce_order_ui_order_delete_form_wrapper',
     'page arguments' => array(3),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('update', 3),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 20,
+    'context' => MENU_CONTEXT_INLINE,
     'file' => 'includes/commerce_order_ui.orders.inc',
   );
 

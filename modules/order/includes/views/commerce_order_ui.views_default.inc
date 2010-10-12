@@ -28,6 +28,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'administer orders';
   $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = 50;
@@ -37,8 +38,7 @@ function commerce_order_ui_views_default_views() {
     'name' => 'name',
     'created' => 'created',
     'status' => 'status',
-    'edit_order' => 'edit_order',
-    'delete_order' => 'edit_order',
+    'operations' => 'operations',
   );
   $handler->display->display_options['style_options']['default'] = 'created';
   $handler->display->display_options['style_options']['info'] = array(
@@ -62,11 +62,7 @@ function commerce_order_ui_views_default_views() {
       'align' => '',
       'separator' => '',
     ),
-    'edit_order' => array(
-      'align' => '',
-      'separator' => ' &nbsp; &nbsp;',
-    ),
-    'delete_order' => array(
+    'operations' => array(
       'align' => '',
       'separator' => '',
     ),
@@ -144,34 +140,21 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['fields']['status']['hide_empty'] = 0;
   $handler->display->display_options['fields']['status']['empty_zero'] = 0;
   $handler->display->display_options['fields']['status']['link_to_order'] = 0;
-  /* Field: Commerce Order: Edit link */
-  $handler->display->display_options['fields']['edit_order']['id'] = 'edit_order';
-  $handler->display->display_options['fields']['edit_order']['table'] = 'commerce_order';
-  $handler->display->display_options['fields']['edit_order']['field'] = 'edit_order';
-  $handler->display->display_options['fields']['edit_order']['label'] = 'Operations';
-  $handler->display->display_options['fields']['edit_order']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['edit_order']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['edit_order']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['edit_order']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['edit_order']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['edit_order']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['edit_order']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['edit_order']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['edit_order']['empty_zero'] = 0;
-  /* Field: Commerce Order: Delete link */
-  $handler->display->display_options['fields']['delete_order']['id'] = 'delete_order';
-  $handler->display->display_options['fields']['delete_order']['table'] = 'commerce_order';
-  $handler->display->display_options['fields']['delete_order']['field'] = 'delete_order';
-  $handler->display->display_options['fields']['delete_order']['label'] = '';
-  $handler->display->display_options['fields']['delete_order']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['delete_order']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['delete_order']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['delete_order']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['delete_order']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['delete_order']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['delete_order']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['delete_order']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['delete_order']['empty_zero'] = 0;
+  /* Field: Commerce Order: Operations links */
+  $handler->display->display_options['fields']['operations']['id'] = 'operations';
+  $handler->display->display_options['fields']['operations']['table'] = 'commerce_order';
+  $handler->display->display_options['fields']['operations']['field'] = 'operations';
+  $handler->display->display_options['fields']['operations']['label'] = 'Operations';
+  $handler->display->display_options['fields']['operations']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
 
   /* Display: Admin page */
   $handler = $view->new_display('page', 'Admin page', 'admin_page');
