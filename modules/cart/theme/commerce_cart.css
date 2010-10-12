@@ -1,5 +1,30 @@
 /* $Id$ */
 
+#commerce-cart-form input.remove-line-item {
+  background: #fff url(buttons.png) 0 0 repeat-x;
+  border: 1px solid #e4e4e4;
+  border-bottom: 1px solid #b4b4b4;
+  border-left-color: #d2d2d2;
+  border-right-color: #d2d2d2;
+  color: #3a3a3a;
+  cursor: pointer;
+  font-size: 0.8em;
+  font-weight: normal;
+  text-align: center;
+  margin-bottom: 1em;
+  margin-right: 1em; /* LTR */
+  padding: 1px 6px;
+  -khtml-border-radius: 15px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+}
+
+#commerce-cart-form input.remove-line-item:hover,
+#commerce-cart-form input.remove-line-item:focus {
+  background: #dedede;
+}
+
 #commerce-cart-form .form-actions {
   text-align: right;
 }

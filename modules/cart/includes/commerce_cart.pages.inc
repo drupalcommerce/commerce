@@ -88,10 +88,11 @@ function commerce_cart_form($form, &$form_state, $order) {
         '#value' => $line_item,
       );
 
-      $form['line_items'][$line_item_id]['delete'] = array(
+      $form['line_items'][$line_item_id]['remove'] = array(
         '#type' => 'submit',
-        '#value' => t('Delete'),
-        '#name' => 'delete-line-item-' . $line_item_id,
+        '#value' => t('Remove'),
+        '#name' => 'remove-line-item-' . $line_item_id,
+        '#attributes' => array('class' => array('remove-line-item')),
       );
 
       $form['line_items'][$line_item_id]['title'] = array(
@@ -174,7 +175,7 @@ function commerce_cart_form_submit($form, &$form_state) {
   // Loop through the line items and update the items on the cart order.
   foreach (element_children($form['line_items']) as $line_item_id) {
     // Check for the removal of an item.
-    if ($form_state['clicked_button']['#name'] == 'delete-line-item-' . $line_item_id) {
+    if ($form_state['clicked_button']['#name'] == 'remove-line-item-' . $line_item_id) {
       // Remove the line item from the line item reference field.
       foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
         if ($value['line_item_id'] == $line_item_id) {
@@ -220,7 +221,7 @@ function theme_commerce_cart_form_product_table($variables) {
   // Add each line item to the table.
   foreach (element_children($form) as $line_item_id) {
     $row = array(
-      drupal_render($form[$line_item_id]['delete']),
+      drupal_render($form[$line_item_id]['remove']),
       drupal_render($form[$line_item_id]['title']),
       drupal_render($form[$line_item_id]['line_item_label']),
       drupal_render($form[$line_item_id]['quantity']),
