@@ -453,6 +453,7 @@ function commerce_customer_configure_customer_profile_type($type) {
       'entity_type' => 'commerce_customer_profile',
       'bundle' => $type,
       'label' => t('Address'),
+      'required' => TRUE,
       'widget' => array(
         'type' => 'addressfield_standard',
         'weight' => -10,

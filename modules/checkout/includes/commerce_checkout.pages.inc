@@ -50,20 +50,9 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'commerce_checkout') . '/commerce_checkout.js';
 
-  $form['account'] = array(
-    '#type' => 'value',
-    '#value' => clone($user),
-  );
-
-  $form['order'] = array(
-    '#type' => 'value',
-    '#value' => $order,
-  );
-
-  $form['checkout_page'] = array(
-    '#type' => 'value',
-    '#value' => $checkout_page,
-  );
+  $form_state['order'] = $order;
+  $form_state['checkout_page'] = $checkout_page;
+  $form_state['account'] = clone($user);
 
   // Add any instructions for the checkout page.
   $form['help'] = array(
@@ -121,17 +110,14 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       );
 
       // Store the cancel redirect in the form so modules can modify it easily.
-      $form['cancel_redirect'] = array(
-        '#type' => 'value',
-        '#value' => '<front>',
-      );
+      $form_state['cancel_redirect'] = '<front>';
 
       $form['buttons']['cancel'] = array(
         '#type' => 'submit',
         '#value' => t('Cancel'),
         '#attributes' => array('class' => array('checkout-cancel')),
-        '#validate' => array(),
         '#submit' => array('commerce_checkout_form_cancel_submit'),
+        '#limit_validation_errors' => array(),
       );
     }
     elseif ($checkout_page->prev_page && !empty($checkout_page->back_value)) {
@@ -139,7 +125,8 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         '#type' => 'submit',
         '#value' => $checkout_page->back_value,
         '#attributes' => array('class' => array('checkout-back')),
-        '#submit' => array('commerce_checkout_form_submit'),
+        '#submit' => array('commerce_checkout_form_back_submit'),
+        '#limit_validation_errors' => array(),
       );
     }
 
@@ -165,10 +152,10 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 function commerce_checkout_form_submit($form, &$form_state) {
   global $user;
 
-  $checkout_page = $form_state['values']['checkout_page'];
+  $checkout_page = $form_state['checkout_page'];
 
   // Load a fresh copy of the order stored in the form.
-  $order = commerce_order_load($form_state['values']['order']->order_id);
+  $order = commerce_order_load($form_state['order']->order_id);
 
   // Catch and clear already pushed messages.
   $previous_messages = drupal_get_messages();
@@ -215,42 +202,43 @@ function commerce_checkout_form_submit($form, &$form_state) {
     return;
   }
 
-  // Determine which button was used to submit the form.
-  switch($form_state['values']['op']) {
-    // Customer clicked the back button.
-    case $form_state['values']['back']:
-      // If there is a previous page...
-      if ($previous_page = commerce_checkout_page_load($checkout_page->prev_page)) {
-        // Move the form back to that page.
-        if ($previous_page->prev_page) {
-          $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->prev_page;
-        }
-        else {
-          $form_state['redirect'] = 'checkout/' . $order->order_id;
-        }
-
-        // Otherwise update the order status for the checkout step.
-        $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->prev_page);
+  // If the form was submitted via the continue button...
+  if ($form_state['values']['op'] == $form_state['values']['continue']) {
+    // If there is another checkout page...
+    if ($checkout_page->next_page) {
+      // If it happens to be the complete page, process completion now.
+      if ($checkout_page->next_page == 'complete') {
+        // Or go ahead and complete the sale.
+        commerce_checkout_complete($form_state, $order);
       }
-      break;
 
-    // Customer clicked the continue button.
-    case $form_state['values']['continue']:
-      // If there is another checkout page...
-      if ($checkout_page->next_page) {
-        // If it happens to be the complete page, process completion now.
-        if ($checkout_page->next_page == 'complete') {
-          // Or go ahead and complete the sale.
-          commerce_checkout_complete($form_state, $order);
-        }
+      // Move the form forward to that page.
+      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->next_page;
 
-        // Move the form forward to that page.
-        $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->next_page;
+      // Update the order status for the checkout step.
+      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
+    }
+  }
+}
 
-        // Update the order status for the checkout step.
-        $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
-      }
-      break;
+/**
+ * Special submit handler for the back button to avoid processing orders.
+ */
+function commerce_checkout_form_back_submit($form, &$form_state) {
+  // If there is a previous page...
+  if ($previous_page = commerce_checkout_page_load($form_state['checkout_page']->prev_page)) {
+    $order = $form_state['order'];
+
+    // Move the form back to that page.
+    if ($previous_page->prev_page) {
+      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $previous_page->page_id;
+    }
+    else {
+      $form_state['redirect'] = 'checkout/' . $order->order_id;
+    }
+
+    // Update the order status for the checkout step.
+    $form_state['order'] = commerce_order_status_update($order, 'checkout_' . $previous_page->page_id);
   }
 }
 
@@ -258,14 +246,14 @@ function commerce_checkout_form_submit($form, &$form_state) {
  * Special submit handler for the cancel button to avoid processing orders.
  */
 function commerce_checkout_form_cancel_submit($form, &$form_state) {
-  if ($form_state['values']['order']) {
+  if ($form_state['order']) {
     // TODO: Implement order comments to do this.
     // commerce_order_comment_save($form_state['values']['order']->order_id, 0, t('Customer cancelled this order from the checkout form.'));
   }
 
   drupal_set_message(t('Checkout of your current order has been canceled and may be resumed when you are ready.'));
 
-  $form_state['redirect'] = $form_state['values']['cancel_redirect'];
+  $form_state['redirect'] = $form_state['cancel_redirect'];
 }
 
 /**

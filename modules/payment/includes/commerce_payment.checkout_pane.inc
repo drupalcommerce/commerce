@@ -170,7 +170,7 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   // If the payment method doesn't exist or does not require a redirect...
   if (!$payment_method || !$payment_method->offsite) {
     // Advance the customer to the next step of the checkout process.
-    $next_page = $form['checkout_page']['#value']->next_page;
+    $next_page = $form_state['checkout_page']->next_page;
 
     $order = commerce_order_status_update($order, 'checkout_' . $next_page);
 
@@ -200,7 +200,7 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
       }
 
       // Send the customer on to the next checkout page.
-      $next_page = $form['checkout_page']['#value']->next_page;
+      $next_page = $form_state['checkout_page']->next_page;
 
       $order = commerce_order_status_update($order, 'checkout_' . $next_page);
 

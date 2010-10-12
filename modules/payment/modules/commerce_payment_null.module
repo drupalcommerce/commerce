@@ -40,7 +40,9 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
+    '#description' => t('This is a demonstration field only and will fail validation with a single character.'),
     '#default_value' => $pane_values['name'],
+    '#required' => TRUE,
   );
 
   return $form;
@@ -50,11 +52,9 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
  * Payment method callback: checkout form validation.
  */
 function commerce_payment_null_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
-  // Throw an error if a name was not provided. Note that we can't use #required
-  // on the form element because of the current nature of the checkout form's
-  // back button. See: http://drupal.org/node/875220
-  if (empty($pane_values['name'])) {
-    form_set_error(implode('][', array_merge($form_parents, array('name'))), t('You must enter a name.'));
+  // Throw an error if a long enough name was not provided.
+  if (strlen($pane_values['name']) < 2) {
+    form_set_error(implode('][', array_merge($form_parents, array('name'))), t('You must enter a full name more than two characters long.'));
 
     // Even though the form error is enough to stop the submission of the form,
     // it's not enough to stop it from a Commerce standpoint because of the
