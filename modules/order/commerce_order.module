@@ -521,13 +521,13 @@ function commerce_order_state_reset($name) {
  * Returns the human readable title of any or all order states.
  *
  * @param $name
- *   Optional parameter specifying the status_id of the order status whose title
- *     to return.
+ *   Optional parameter specifying the name of the order state whose title
+ *     should be return.
  *
  * @return
- *   Either an array of all order status titles keyed by the status_id or a
- *     string containing the human readable title for the specified status. If a
- *     status is specified that does not exist, this function returns FALSE.
+ *   Either an array of all order state titles keyed by name or a string
+ *     containing the human readable title for the specified state. If a state
+ *     is specified that does not exist, this function returns FALSE.
  */
 function commerce_order_state_get_title($name = NULL) {
   $order_states = commerce_order_states();

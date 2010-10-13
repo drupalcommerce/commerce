@@ -39,6 +39,15 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#weight' => 99,
   );
 
+  // Build an array of order status options grouped by order state.
+  $options = array();
+
+  foreach (commerce_order_state_get_title() as $name => $title) {
+    foreach (commerce_order_statuses(array('state' => $name)) as $order_status) {
+      $options[check_plain($title)][$order_status->name] = check_plain($order_status->title);
+    }
+  }
+
   // Add a section to enter order comments.
   // TODO: Implement order comments and decide if e-mail notification should be
   // a core feature... my hunch is yes.
@@ -62,7 +71,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
   $form['order_status']['status'] = array(
     '#type' => 'select',
     '#title' => t('Status'),
-    '#options' => commerce_order_status_get_title(),
+    '#options' => $options,
     '#default_value' => $order->status,
   );
   $form['order_status']['status_original'] = array(
@@ -137,7 +146,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
   );
   $form['order_log']['log'] = array(
     '#type' => 'textarea',
-    '#title' => t('Update notes'),
+    '#title' => t('Log message'),
     '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
     '#rows' => 4,
   );
