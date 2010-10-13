@@ -923,9 +923,9 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         // doesn't affect the rest of the form submission process.
         drupal_set_message($error, 'error');
       }
-
-      $form_state['rebuild'] = TRUE;
     }
+
+    $form_state['rebuild'] = TRUE;
   }
 
   form_set_value($element, $value, $form_state);
