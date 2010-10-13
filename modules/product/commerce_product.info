@@ -1,7 +1,7 @@
 ; $Id$
 name = Product
 description = Defines the Product entity and associated features.
-package = Drupal Commerce
+package = Commerce
 dependencies[] = rules
 dependencies[] = commerce_price
 core = 7.x

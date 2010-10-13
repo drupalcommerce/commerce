@@ -1,7 +1,7 @@
 ; $Id$
 name = Null payment
 description = Implement a non-payment method for Drupal commerce.
-package = Drupal Commerce - Payment
+package = Commerce
 dependencies[] = commerce
 dependencies[] = commerce_payment
 core = 7.x

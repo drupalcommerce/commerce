@@ -1,7 +1,7 @@
 ; $Id$
 name = Commerce
 description = Defines features and functions common to the Commerce modules.
-package = Drupal Commerce
+package = Commerce
 core = 7.x
 
 ; Base module files

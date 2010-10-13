@@ -1,7 +1,7 @@
 ; $Id$
 name = Customer UI
 description = Exposes a default UI for Customers through profile edit forms and default Views.
-package = Drupal Commerce UI
+package = Commerce
 core = 7.x
 dependencies[] = contextual
 dependencies[] = field_ui

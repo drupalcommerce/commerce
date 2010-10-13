@@ -1,7 +1,7 @@
 ; $Id$
 name = Cart
 description = Implements the shopping cart system and add to cart features.
-package = Drupal Commerce
+package = Commerce
 dependencies[] = commerce_checkout
 dependencies[] = commerce_line_item
 dependencies[] = commerce_order

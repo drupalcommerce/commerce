@@ -1,7 +1,7 @@
 ; $Id$
 name = Line Item UI
 description = Exposes a default UI for Line Items through line item type forms and default Views.
-package = Drupal Commerce UI
+package = Commerce
 core = 7.x
 dependencies[] = contextual
 dependencies[] = field_ui

@@ -1,7 +1,7 @@
 ; $Id$
 name = Order
 description = Defines the Order entity and associated features.
-package = Drupal Commerce
+package = Commerce
 dependencies[] = rules
 dependencies[] = commerce
 dependencies[] = commerce_line_item
