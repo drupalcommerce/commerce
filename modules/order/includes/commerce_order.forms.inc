@@ -20,6 +20,10 @@ function commerce_order_order_form($form, &$form_state, $order) {
   // Ensure the owner name is accessible if the uid is set.
   if (!empty($order->uid) && $owner = user_load($order->uid)) {
     $order->name = $owner->name;
+
+    if (empty($order->mail)) {
+      $order->mail = $owner->mail;
+    }
   }
 
   if (empty($order->created)) {
@@ -35,36 +39,52 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#weight' => 99,
   );
 
-  // Add a log field to store revision information on save.
-  $form['update_notes'] = array(
+  // Add a section to enter order comments.
+  // TODO: Implement order comments and decide if e-mail notification should be
+  // a core feature... my hunch is yes.
+  $form['order_status'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Update notes'),
+    '#title' => t('Order status'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#group' => 'additional_settings',
     '#attached' => array(
-      'js' => array(drupal_get_path('module', 'commerce_order') . '/commerce_order.js'),
+      'js' => array(
+        drupal_get_path('module', 'commerce_order') . '/commerce_order.js',
+        array(
+          'type' => 'setting',
+          'data' => array('status_titles' => commerce_order_status_get_title()),
+        ),
+      ),
     ),
     '#weight' => 20,
   );
-  $form['update_notes']['revision'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Create new revision on update'),
-    '#description' => t('If this is not checked, the message below will be disregarded.'),
-    '#default_value' => TRUE,
-    '#access' => user_access('administer orders'),
+  $form['order_status']['status'] = array(
+    '#type' => 'select',
+    '#title' => t('Status'),
+    '#options' => commerce_order_status_get_title(),
+    '#default_value' => $order->status,
   );
-  $form['update_notes']['log'] = array(
+  $form['order_status']['status_original'] = array(
+    '#type' => 'hidden',
+    '#value' => $order->status,
+    '#attributes' => array('id' => 'edit-status-original'),
+  );
+  $form['order_status']['comment'] = array(
     '#type' => 'textarea',
-    '#title' => t('Update notes'),
+    '#title' => t('Add an order comment'),
+    '#description' => t('Leave an order comment visible to the customer explaining the current status of the order.'),
     '#rows' => 4,
-    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
+  );
+  $form['order_status']['email'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('E-mail an order status notification containing the comment above.'),
   );
 
-  // Add the owner and creation date fields.
-  $form['creation'] = array(
+  // Add the user account and e-mail fields.
+  $form['user'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Creation information'),
+    '#title' => t('User information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#access' => user_access('administer orders'),
@@ -78,24 +98,57 @@ function commerce_order_order_form($form, &$form_state, $order) {
         ),
       ),
     ),
-    '#weight' => 90,
+    '#weight' => 30,
   );
-  $form['creation']['name'] = array(
+  $form['user']['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Owned by'),
+    '#description' => empty($order->order_id) ? t('Leave blank to set yourself as the owner.') : t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
     '#default_value' => !empty($order->name) ? $order->name : '',
     '#weight' => -1,
-    '#description' => empty($order->order_id) ? t('Leave blank to set yourself as the owner.') : t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
-  $form['creation']['date'] = array(
+  $form['user']['mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Order contact e-mail'),
+    '#description' => t('Defaults to the owner account e-mail address if left blank. Used for order communication.'),
+    '#default_value' => $order->mail,
+  );
+
+  // Add a log field to store revision information on save.
+  $form['order_log'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Order log'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'commerce_order') . '/commerce_order.js'),
+    ),
+    '#weight' => 40,
+  );
+  $form['order_log']['revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create new revision on update'),
+    '#description' => t('If this is not checked, the message below will be disregarded.'),
+    '#default_value' => TRUE,
+    '#access' => user_access('administer orders'),
+  );
+  $form['order_log']['log'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Update notes'),
+    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
+    '#rows' => 4,
+  );
+  $form['order_log']['date'] = array(
     '#type' => 'textfield',
     '#title' => t('Created on'),
-    '#maxlength' => 25,
     '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($order->date) ? date_format(date_create($order->date), 'Y-m-d H:i:s O') : format_date($order->created, 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($order->date) ? date_format(date_create($order->date), 'O') : format_date($order->created, 'custom', 'O'))),
+    '#maxlength' => 25,
     '#default_value' => !empty($order->created) ? format_date($order->created, 'custom', 'Y-m-d H:i:s O') : '',
   );
+
 
   $form['actions'] = array(
     '#type' => 'container',
@@ -166,14 +219,26 @@ function commerce_order_order_form_submit($form, &$form_state) {
   // Set the order's owner uid if it's being created at this time.
   if (empty($order->order_id) && empty($form_state['values']['name'])) {
     $order->uid = $user->uid;
+
+    if (empty($form_state['values']['mail'])) {
+      $order->mail = $user->mail;
+    }
   }
   else {
     if ($account = user_load_by_name($form_state['values']['name'])) {
       $order->uid = $account->uid;
+
+      if (empty($form_state['values']['mail'])) {
+        $order->mail = $account->mail;
+      }
     }
     else {
       $order->uid = 0;
     }
+  }
+
+  if (!empty($form_state['values']['mail'])) {
+    $order->mail = $form_state['values']['mail'];
   }
 
   $order->created = !empty($form_state['values']['date']) ? strtotime($form_state['values']['date']) : REQUEST_TIME;
