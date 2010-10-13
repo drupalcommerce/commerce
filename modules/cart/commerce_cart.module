@@ -210,29 +210,29 @@ function theme_commerce_cart_empty_page() {
 /**
  * Loads the shopping cart order for the specified user.
  *
- * @param $customer_uid
+ * @param $uid
  *   The uid of the customer whose cart to load. If left 0, attempts to load
  *     an anonymous order from the session.
  *
  * @return
  *   The fully loaded shopping cart order or FALSE if non-existent.
  */
-function commerce_cart_order_load($customer_uid = 0) {
-  // Loaded orders will be cached keyed by $customer_uid.
+function commerce_cart_order_load($uid = 0) {
+  // Loaded orders will be cached keyed by $uid.
   $cart_orders = &drupal_static(__FUNCTION__);
 
   // First return the cached order if it has been loaded already.
-  if (!isset($cart_orders[$customer_uid])) {
+  if (!isset($cart_orders[$uid])) {
     $order_id = FALSE;
 
     // If a customer uid was specified...
-    if ($customer_uid) {
+    if ($uid) {
       // Create an array of valid shopping cart order statuses.
       $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
 
       // Look for the user's most recent shopping cart order, although they
       // should never really have more than one.
-      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE customer_uid = :customer_uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':customer_uid' => $customer_uid, ':status_ids' => $status_ids))->fetchField();
+      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
     }
     else {
       // Otherwise look for a shopping cart order ID in the session.
@@ -243,14 +243,14 @@ function commerce_cart_order_load($customer_uid = 0) {
 
     // If a valid order ID was found, load the order now.
     if ($order_id) {
-      $cart_orders[$customer_uid] = commerce_order_load($order_id);
+      $cart_orders[$uid] = commerce_order_load($order_id);
     }
     else {
-      $cart_orders[$customer_uid] = FALSE;
+      $cart_orders[$uid] = FALSE;
     }
   }
 
-  return $cart_orders[$customer_uid];
+  return $cart_orders[$uid];
 }
 
 /**
@@ -264,16 +264,16 @@ function commerce_cart_orders_reset() {
 /**
  * Creates a new shopping cart order for the specified user.
  *
- * @param $customer_uid
+ * @param $uid
  *   The uid of the user for whom to create the order. If left 0, the order will
  *     be created for the current user and associated with his or her session.
  *
  * @return
  *   The newly created shopping cart order object.
  */
-function commerce_cart_order_new($customer_uid = 0) {
+function commerce_cart_order_new($uid = 0) {
   // Create the new order with the customer's uid and the cart order status.
-  $order = commerce_order_new($customer_uid, 'cart');
+  $order = commerce_order_new($uid, 'cart');
   $order->log = t('Created as a shopping cart order.');
 
   // Save it so it gets an order ID and return the full object.
@@ -283,7 +283,7 @@ function commerce_cart_order_new($customer_uid = 0) {
   commerce_cart_orders_reset();
 
   // If the user is not logged in, ensure the order ID is stored in the session.
-  if (!$customer_uid && empty($_SESSION['commerce_cart_order_id'])) {
+  if (!$uid && empty($_SESSION['commerce_cart_order_id'])) {
     $_SESSION['commerce_cart_order_id'] = $order->order_id;
   }
 
@@ -293,7 +293,7 @@ function commerce_cart_order_new($customer_uid = 0) {
 /**
  * Adds the specified product to a customer's shopping cart.
  *
- * @param $customer_uid
+ * @param $uid
  *   The uid of the user whose cart you are adding the product to.
  * @param $product_id
  *   The ID of the product to add to the cart.
@@ -303,7 +303,7 @@ function commerce_cart_order_new($customer_uid = 0) {
  * @return
  *   The entire shopping cart order object or FALSE on failure.
  */
-function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
+function commerce_cart_product_add($uid, $product_id, $quantity) {
   // Load and validate the specified product ID.
   $product = commerce_product_load($product_id);
 
@@ -313,11 +313,11 @@ function commerce_cart_product_add($customer_uid, $product_id, $quantity) {
   }
 
   // First attempt to load the customer's shopping cart order.
-  $order = commerce_cart_order_load($customer_uid);
+  $order = commerce_cart_order_load($uid);
 
   // If no order existed, create one now.
   if (empty($order)) {
-    $order = commerce_cart_order_new($customer_uid);
+    $order = commerce_cart_order_new($uid);
   }
 
   // Determine if the product already exists on the order and increment its
@@ -416,7 +416,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quan
 
   // Store the customer uid in the form so other modules can override with a
   // selection widget if necessary.
-  $form['customer_uid'] = array(
+  $form['uid'] = array(
     '#type' => 'value',
     '#value' => $user->uid,
   );
@@ -502,7 +502,7 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   $product = $form_state['products'][$product_id];
 
   // Add the product to the specified shopping cart.
-  commerce_cart_product_add($form_state['values']['customer_uid'], $product_id, $form_state['values']['quantity']);
+  commerce_cart_product_add($form_state['values']['uid'], $product_id, $form_state['values']['quantity']);
 
   drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
 }

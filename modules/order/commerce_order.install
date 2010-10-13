@@ -29,14 +29,8 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'creator_uid' => array(
+      'uid' => array(
         'description' => 'The {users}.uid that created this order.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'customer_uid' => array(
-        'description' => 'The {users}.uid that placed this order.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -85,11 +79,7 @@ function commerce_order_schema() {
       ),
       'creator' => array(
         'table' => 'users',
-        'columns' => array('creator_uid' => 'uid'),
-      ),
-      'customer' => array(
-        'table' => 'users',
-        'columns' => array('customer_uid' => 'uid'),
+        'columns' => array('uid' => 'uid'),
       ),
       'status' => array(
         'table' => 'commerce_order_status',
@@ -120,14 +110,8 @@ function commerce_order_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'creator_uid' => array(
+      'uid' => array(
         'description' => 'The {users}.uid that created this order at this revision.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'customer_uid' => array(
-        'description' => 'The {users}.uid that placed this order saved at this revision.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -172,11 +156,7 @@ function commerce_order_schema() {
       ),
       'creator' => array(
         'table' => 'users',
-        'columns' => array('creator_uid' => 'uid'),
-      ),
-      'customer' => array(
-        'table' => 'users',
-        'columns' => array('customer_uid' => 'uid'),
+        'columns' => array('uid' => 'uid'),
       ),
       'status' => array(
         'table' => 'commerce_order_status',

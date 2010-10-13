@@ -15,19 +15,18 @@ class CommerceOrderEntityController extends EntityAPIController {
   /**
    * Create a default order.
    *
-   * @param $customer_uid
+   * @param $uid
    *   Optionally the uid of the customer for the order.
    *
    * @return
    *   An order object with all default fields initialized.
    */
-  public function create($customer_uid = 0, $status = '') {
+  public function create($uid = 0, $status = '') {
     return (object) array(
       'order_id' => '',
       'order_number' => '',
       'revision_id' => '',
-      'creator_uid' => '',
-      'customer_uid' => $customer_uid,
+      'uid' => $uid,
       'mail' => '',
       'status' => $status,
       'created' => '',
@@ -188,10 +187,10 @@ class CommerceOrderEntityController extends EntityAPIController {
    *     updated instead of a new one created.
    */
   function saveRevision($order, $uid, $update = FALSE) {
-    // Hold on to the order's original creator_uid but swap in the revision's
-    // creator_uid for the momentary write.
-    $temp_uid = $order->creator_uid;
-    $order->creator_uid = $uid;
+    // Hold on to the order's original uid but swap in the revision's uid for
+    // the momentary write.
+    $temp_uid = $order->uid;
+    $order->uid = $uid;
 
     // Update the existing revision if specified.
     if ($update) {
@@ -203,8 +202,8 @@ class CommerceOrderEntityController extends EntityAPIController {
       drupal_write_record('commerce_order_revision', $order);
     }
 
-    // Reset the order's creator_uid to the original value.
-    $order->creator_uid = $temp_uid;
+    // Reset the order's uid to the original value.
+    $order->uid = $temp_uid;
   }
 
   /**

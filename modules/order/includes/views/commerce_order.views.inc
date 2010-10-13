@@ -62,7 +62,7 @@ function commerce_order_views_data() {
   );
 
   // Expose the creator uid.
-  $data['commerce_order']['creator_uid'] = array(
+  $data['commerce_order']['uid'] = array(
     'title' => t('Creator'),
     'help' => t('Relate an order to the user who created it.'),
     'relationship' => array(
@@ -70,18 +70,6 @@ function commerce_order_views_data() {
       'base' => 'users',
       'field' => 'uid',
       'label' => t('Order creator'),
-    ),
-  );
-
-  // Expose the customer uid.
-  $data['commerce_order']['customer_uid'] = array(
-    'title' => t('Customer'),
-    'help' => t("Relate an order to the customer's user account."),
-    'relationship' => array(
-      'handler' => 'views_handler_relationship',
-      'base' => 'users',
-      'field' => 'uid',
-      'label' => t('Order customer'),
     ),
   );
 

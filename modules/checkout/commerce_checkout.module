@@ -530,7 +530,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
   // First, if this order doesn't belong to the account return FALSE.
   if ($account->uid) {
-    if ($account->uid != $order->customer_uid ) {
+    if ($account->uid != $order->uid ) {
       return FALSE;
     }
   }
@@ -593,7 +593,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
  */
 function commerce_checkout_complete(&$form_state, $order) {
   // Determine what to do for anonymous users completing checkout.
-  if ($order->customer_uid == 0) {
+  if ($order->uid == 0) {
     $create = variable_get('commerce_checkout_anonymous_account', 2);
     $notify = variable_get('commerce_checkout_anonymous_notify', 3);
 
@@ -602,7 +602,7 @@ function commerce_checkout_complete(&$form_state, $order) {
     if (FALSE && $create > 0) {
       $account = commerce_checkout_create_account($name, $mail, '', $create == 1 ? 0 : 1, $notify >= 2);
 
-      $order->customer_uid = $account->uid;
+      $order->uid = $account->uid;
       $order = commerce_order_save($order);
     }
     else {

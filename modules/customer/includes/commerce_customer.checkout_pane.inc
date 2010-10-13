@@ -21,7 +21,7 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 		$profile = commerce_customer_profile_load($order->data[$checkout_pane->pane_id]);
 	}
 	else {
-		$profile = commerce_customer_profile_new($type, $order->customer_uid);
+		$profile = commerce_customer_profile_new($type, $order->uid);
 	}
 
 	$pane_form['customer_profile'] = array(
@@ -67,7 +67,7 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
 
   // Set the profile's uid if it's being created at this time.
   if (empty($profile->profile_id)) {
-    $profile->uid = $order->customer_uid;
+    $profile->uid = $order->uid;
   }
 
   // Store the form values locally to restore them after field submission.

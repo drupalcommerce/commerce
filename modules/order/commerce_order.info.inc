@@ -57,7 +57,7 @@ function commerce_order_entity_property_info() {
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer orders',
   );*/
-  $properties['creator-uid'] = array(
+  $properties['uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the order creator."),
@@ -74,26 +74,7 @@ function commerce_order_entity_property_info() {
     'setter callback' => 'commerce_order_set_properties',
     'setter permission' => 'administer orders',
     'required' => TRUE,
-    'clear' => array('creator_uid'),
-  );
-  $properties['customer-uid'] = array(
-    'label' => t("Customer ID"),
-    'type' => 'integer',
-    'description' => t("The unique ID of the order customer."),
-    'setter callback' => 'entity_metadata_verbatim_set',
-    'setter permission' => 'administer orders',
-    'clear' => array('customer'),
-    'query callback' => 'entity_metadata_table_query',
-  );
-  $properties['customer'] = array(
-    'label' => t("Customer"),
-    'type' => 'user',
-    'description' => t("The customer of the order."),
-    'getter callback' => 'commerce_order_get_properties',
-    'setter callback' => 'commerce_order_set_properties',
-    'setter permission' => 'administer orders',
-    'required' => TRUE,
-    'clear' => array('customer_uid'),
+    'clear' => array('uid'),
   );
 
   return $info;

@@ -182,29 +182,29 @@ function commerce_order_commerce_order_status_info() {
 /**
  * Returns an initialized order object.
  *
- * @param $customer_uid
- *   The uid of the customer the order is for.
+ * @param $uid
+ *   The uid of the creator of the order.
  *
  * @return
  *   An order object with all default fields initialized.
  */
-function commerce_order_new($customer_uid = 0, $status = '') {
+function commerce_order_new($uid = 0, $status = '') {
   // If no status was specified, use the default Pending status.
   if (empty($status)) {
     $order_state = commerce_order_state_load('pending');
     $status = $order_state->default_status;
   }
 
-  return entity_get_controller('commerce_order')->create($customer_uid, $status);
+  return entity_get_controller('commerce_order')->create($uid, $status);
 }
 
 /**
  * Creation callback for the Entity Metadata module.
  */
 function _commerce_order_create($values = array()) {
-  // Create a new order for the specified customer.
-  $order = commerce_order_new($values['customer_uid']);
-  unset($values['customer_uid']);
+  // Create a new order owned by the specified user.
+  $order = commerce_order_new($values['uid']);
+  unset($values['uid']);
 
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
@@ -364,7 +364,7 @@ function commerce_order_access($op, $order = NULL, $account = NULL) {
     }
 
     // Others either don't have any access or must match the order uid.
-    if ($account->uid && user_access('edit own orders', $account) && $order->creator_uid == $account->uid) {
+    if ($account->uid && user_access('edit own orders', $account) && $order->uid == $account->uid) {
       return TRUE;
     }
   }
@@ -821,9 +821,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
 function commerce_order_get_properties($order, array $options, $name) {
   switch ($name) {
     case 'creator':
-      return $order->creator_uid;
-    case 'customer':
-      return $order->customer_uid;
+      return $order->uid;
     case 'view-url':
       return url('order/' . $order->order_id, $options);
     case 'admin-url':
@@ -839,10 +837,7 @@ function commerce_order_get_properties($order, array $options, $name) {
  */
 function commerce_order_set_properties($order, $name, $value) {
   if ($name == 'creator') {
-    $order->creator_uid = $value;
-  }
-  elseif ($name == 'customer') {
-    $order->customer_uid = $value;
+    $order->uid = $value;
   }
 }
 

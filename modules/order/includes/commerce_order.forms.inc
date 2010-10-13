@@ -17,29 +17,44 @@ function commerce_order_order_form($form, &$form_state, $order) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
 
+  // Ensure the creator name is accessible if the uid is set.
+  if (!empty($order->uid) && $creator = user_load($order->uid)) {
+    $order->name = $creator->name;
+  }
+
+  if (empty($order->created)) {
+    $order->date = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s O');
+  }
+
   // Add the field related form elements.
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
 
   // Add the default field elements.
-  $form['customer'] = array(
+  $form['creation'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Customer'),
+    '#title' => t('Creation information'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#access' => user_access('administer orders'),
+    '#group' => 'additional_settings',
+    '#weight' => 90,
   );
-  $form['customer']['customer_uid'] = array(
+  $form['creation']['name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Customer uid'),
-    '#default_value' => $order->customer_uid,
+    '#title' => t('Created by'),
+    '#maxlength' => 60,
+    '#autocomplete_path' => 'user/autocomplete',
+    '#default_value' => !empty($order->name) ? $order->name : '',
+    '#weight' => -1,
+    '#description' => t('Leave blank to set yourself as the creator.'),
   );
-
-  $form['creator'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Creator'),
-  );
-  $form['creator']['creator_uid'] = array(
+  $form['creation']['date'] = array(
     '#type' => 'textfield',
-    '#title' => t('Creator uid'),
-    '#default_value' => $order->creator_uid,
+    '#title' => t('Created on'),
+    '#maxlength' => 25,
+    '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($order->date) ? date_format(date_create($order->date), 'Y-m-d H:i:s O') : format_date($order->created, 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($order->date) ? date_format(date_create($order->date), 'O') : format_date($order->created, 'custom', 'O'))),
+    '#default_value' => !empty($order->created) ? format_date($order->created, 'custom', 'Y-m-d H:i:s O') : '',
   );
 
   $form['actions'] = array(
@@ -76,6 +91,18 @@ function commerce_order_order_form($form, &$form_state, $order) {
 function commerce_order_order_form_validate($form, &$form_state) {
   $order = $form_state['commerce_order'];
 
+  // Validate the "created by" field.
+  if (!empty($form_state['values']['name']) && !($account = user_load_by_name($form_state['values']['name']))) {
+    // The use of empty() is mandatory in the context of usernames
+    // as the empty string denotes the current user.
+    form_set_error('name', t('The username %name does not exist.', array('%name' => $form_state['values']['name'])));
+  }
+
+  // Validate the "created on" field.
+  if (!empty($form_state['values']['date']) && strtotime($form_state['values']['date']) === FALSE) {
+    form_set_error('date', t('You have to specify a valid date.'));
+  }
+
   // TODO: Pending token patterns for order numbers, validate the characters and
   // the final string for uniqueness.
 
@@ -91,15 +118,20 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   $order = &$form_state['commerce_order'];
 
-  $order->customer_uid = $form_state['values']['customer_uid'];
-
   // Set the order's creator uid if it's being created at this time.
-  if (empty($order->order_id) && empty($form_state['values']['creator_uid'])) {
-    $order->creator_uid = $user->uid;
+  if (empty($order->order_id) && empty($form_state['values']['name'])) {
+    $order->uid = $user->uid;
   }
   else {
-    $order->creator_uid = $form_state['values']['creator_uid'];
+    if ($account = user_load_by_name($form_state['values']['name'])) {
+      $order->uid = $account->uid;
+    }
+    else {
+      $order->uid = 0;
+    }
   }
+
+  $order->created = !empty($form_state['values']['date']) ? strtotime($form_state['values']['date']) : REQUEST_TIME;
 
   // Notify field widgets.
   field_attach_submit('commerce_order', $order, $form, $form_state);

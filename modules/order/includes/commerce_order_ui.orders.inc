@@ -40,7 +40,7 @@ function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
     drupal_set_title(t('Create an order'));
 
     if (!empty($account)) {
-      $order->customer_uid = $account->uid;
+      $order->uid = $account->uid;
     }
   }
 
