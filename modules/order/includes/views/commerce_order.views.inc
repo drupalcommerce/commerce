@@ -61,15 +61,15 @@ function commerce_order_views_data() {
     ),
   );
 
-  // Expose the creator uid.
+  // Expose the owner uid.
   $data['commerce_order']['uid'] = array(
-    'title' => t('Creator'),
-    'help' => t('Relate an order to the user who created it.'),
+    'title' => t('Owner'),
+    'help' => t('Relate an order to its owner.'),
     'relationship' => array(
       'handler' => 'views_handler_relationship',
       'base' => 'users',
       'field' => 'uid',
-      'label' => t('Order creator'),
+      'label' => t('Order owner'),
     ),
   );
 

@@ -17,9 +17,9 @@ function commerce_order_order_form($form, &$form_state, $order) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_order') . '/includes/commerce_order.forms.inc';
 
-  // Ensure the creator name is accessible if the uid is set.
-  if (!empty($order->uid) && $creator = user_load($order->uid)) {
-    $order->name = $creator->name;
+  // Ensure the owner name is accessible if the uid is set.
+  if (!empty($order->uid) && $owner = user_load($order->uid)) {
+    $order->name = $owner->name;
   }
 
   if (empty($order->created)) {
@@ -42,12 +42,12 @@ function commerce_order_order_form($form, &$form_state, $order) {
   );
   $form['creation']['name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Created by'),
+    '#title' => t('Owned by'),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
     '#default_value' => !empty($order->name) ? $order->name : '',
     '#weight' => -1,
-    '#description' => t('Leave blank to set yourself as the creator.'),
+    '#description' => empty($order->order_id) ? t('Leave blank to set yourself as the owner.') : t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
   $form['creation']['date'] = array(
     '#type' => 'textfield',
@@ -91,10 +91,10 @@ function commerce_order_order_form($form, &$form_state, $order) {
 function commerce_order_order_form_validate($form, &$form_state) {
   $order = $form_state['commerce_order'];
 
-  // Validate the "created by" field.
+  // Validate the "owned by" field.
   if (!empty($form_state['values']['name']) && !($account = user_load_by_name($form_state['values']['name']))) {
-    // The use of empty() is mandatory in the context of usernames
-    // as the empty string denotes the current user.
+    // The use of empty() is mandatory in the context of usernames as the empty
+    // string denotes the current user or an anonymous user.
     form_set_error('name', t('The username %name does not exist.', array('%name' => $form_state['values']['name'])));
   }
 
@@ -118,7 +118,7 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   $order = &$form_state['commerce_order'];
 
-  // Set the order's creator uid if it's being created at this time.
+  // Set the order's owner uid if it's being created at this time.
   if (empty($order->order_id) && empty($form_state['values']['name'])) {
     $order->uid = $user->uid;
   }

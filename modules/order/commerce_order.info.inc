@@ -58,18 +58,18 @@ function commerce_order_entity_property_info() {
     'setter permission' => 'administer orders',
   );*/
   $properties['uid'] = array(
-    'label' => t("Creator ID"),
+    'label' => t("Owner ID"),
     'type' => 'integer',
-    'description' => t("The unique ID of the order creator."),
+    'description' => t("The unique ID of the order owner."),
     'setter callback' => 'entity_metadata_verbatim_set',
     'setter permission' => 'administer orders',
-    'clear' => array('creator'),
+    'clear' => array('owner'),
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['creator'] = array(
-    'label' => t("Creator"),
+  $properties['owner'] = array(
+    'label' => t("Owner"),
     'type' => 'user',
-    'description' => t("The creator of the order."),
+    'description' => t("The owner of the order."),
     'getter callback' => 'commerce_order_get_properties',
     'setter callback' => 'commerce_order_set_properties',
     'setter permission' => 'administer orders',

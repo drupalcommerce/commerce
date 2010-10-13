@@ -61,9 +61,9 @@ function commerce_order_field_extra_fields() {
         'description' => t('Order module Customer information fieldset'),
         'weight' => 15,
       ),
-      'creator' => array(
+      'creation' => array(
         'label' => t('Creation information'),
-        'description' => t('Order module Creation date / user fieldset'),
+        'description' => t('Order module Creation user / date fieldset'),
         'weight' => 20,
       ),
     ),
@@ -183,7 +183,7 @@ function commerce_order_commerce_order_status_info() {
  * Returns an initialized order object.
  *
  * @param $uid
- *   The uid of the creator of the order.
+ *   The uid of the owner of the order.
  *
  * @return
  *   An order object with all default fields initialized.
@@ -820,7 +820,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
  */
 function commerce_order_get_properties($order, array $options, $name) {
   switch ($name) {
-    case 'creator':
+    case 'owner':
       return $order->uid;
     case 'view-url':
       return url('order/' . $order->order_id, $options);
@@ -836,7 +836,7 @@ function commerce_order_get_properties($order, array $options, $name) {
  * @see commerce_order_entity_property_info()
  */
 function commerce_order_set_properties($order, $name, $value) {
-  if ($name == 'creator') {
+  if ($name == 'owner') {
     $order->uid = $value;
   }
 }

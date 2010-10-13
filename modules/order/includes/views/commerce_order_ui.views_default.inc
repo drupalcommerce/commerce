@@ -76,7 +76,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['empty']['text']['field'] = 'area';
   $handler->display->display_options['empty']['text']['empty'] = FALSE;
   $handler->display->display_options['empty']['text']['content'] = 'No orders have been created yet.';
-  /* Relationship: Commerce Order: Creator */
+  /* Relationship: Commerce Order: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_order';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
@@ -100,7 +100,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'uid';
-  $handler->display->display_options['fields']['name']['label'] = 'Creator';
+  $handler->display->display_options['fields']['name']['label'] = 'Owner';
   $handler->display->display_options['fields']['name']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['name']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['name']['alter']['trim'] = 0;

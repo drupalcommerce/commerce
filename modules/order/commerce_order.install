@@ -30,7 +30,7 @@ function commerce_order_schema() {
         'default' => 0,
       ),
       'uid' => array(
-        'description' => 'The {users}.uid that created this order.',
+        'description' => 'The {users}.uid that owns this order.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -77,7 +77,7 @@ function commerce_order_schema() {
         'table' => 'commerce_order_revision',
         'columns'=> array('revision_id' => 'revision_id'),
       ),
-      'creator' => array(
+      'owner' => array(
         'table' => 'users',
         'columns' => array('uid' => 'uid'),
       ),
@@ -111,7 +111,7 @@ function commerce_order_schema() {
         'not null' => TRUE,
       ),
       'uid' => array(
-        'description' => 'The {users}.uid that created this order at this revision.',
+        'description' => 'The {users}.uid that owns the order at this revision.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
@@ -154,7 +154,7 @@ function commerce_order_schema() {
         'table' => 'commerce_order',
         'columns'=> array('order_id' => 'order_id'),
       ),
-      'creator' => array(
+      'owner' => array(
         'table' => 'users',
         'columns' => array('uid' => 'uid'),
       ),
