@@ -187,10 +187,7 @@ class CommerceOrderEntityController extends EntityAPIController {
    *     updated instead of a new one created.
    */
   function saveRevision($order, $uid, $update = FALSE) {
-    // Hold on to the order's original uid but swap in the revision's uid for
-    // the momentary write.
-    $temp_uid = $order->uid;
-    $order->uid = $uid;
+    $order->revision_uid = $uid;
 
     // Update the existing revision if specified.
     if ($update) {
@@ -201,9 +198,6 @@ class CommerceOrderEntityController extends EntityAPIController {
       // to include the revision_id.
       drupal_write_record('commerce_order_revision', $order);
     }
-
-    // Reset the order's uid to the original value.
-    $order->uid = $temp_uid;
   }
 
   /**

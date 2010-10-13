@@ -110,7 +110,7 @@ function commerce_order_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'uid' => array(
+      'revision_uid' => array(
         'description' => 'The {users}.uid that owns the order at this revision.',
         'type' => 'int',
         'not null' => TRUE,
