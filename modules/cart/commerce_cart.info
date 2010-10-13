@@ -14,8 +14,8 @@ core = 7.x
 files[] = commerce_cart.module
 
 ; Views include
+files[] = includes/views/commerce_cart.views.inc
 files[] = includes/views/commerce_cart.views_default.inc
 
 ; Views handlers
-; files[] = includes/views/handlers/views_handler_field_add_to_cart_form.inc
-; files[] = includes/views/handlers/views_handler_field_add_to_cart_link.inc
+files[] = includes/views/handlers/commerce_cart_handler_field_add_to_cart_form.inc
