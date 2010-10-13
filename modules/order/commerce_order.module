@@ -49,30 +49,6 @@ function commerce_order_entity_info() {
 }
 
 /**
- * Implements hook_field_extra_fields().
- */
-function commerce_order_field_extra_fields() {
-  $extra = array();
-
-  $extra['commerce_order']['commerce_order'] = array(
-    'form' => array(
-      'customer' => array(
-        'label' => t('Customer'),
-        'description' => t('Order module Customer information fieldset'),
-        'weight' => 15,
-      ),
-      'creation' => array(
-        'label' => t('Creation information'),
-        'description' => t('Order module Creation user / date fieldset'),
-        'weight' => 20,
-      ),
-    ),
-  );
-
-  return $extra;
-}
-
-/**
  * Implements hook_enable().
  */
 function commerce_order_enable() {

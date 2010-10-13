@@ -30,7 +30,38 @@ function commerce_order_order_form($form, &$form_state, $order) {
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
 
-  // Add the default field elements.
+  $form['additional_settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 99,
+  );
+
+  // Add a log field to store revision information on save.
+  $form['update_notes'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Update notes'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'commerce_order') . '/commerce_order.js'),
+    ),
+    '#weight' => 20,
+  );
+  $form['update_notes']['revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create new revision on update'),
+    '#description' => t('If this is not checked, the message below will be disregarded.'),
+    '#default_value' => TRUE,
+    '#access' => user_access('administer orders'),
+  );
+  $form['update_notes']['log'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Update notes'),
+    '#rows' => 4,
+    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
+  );
+
+  // Add the owner and creation date fields.
   $form['creation'] = array(
     '#type' => 'fieldset',
     '#title' => t('Creation information'),
@@ -38,6 +69,15 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#collapsed' => TRUE,
     '#access' => user_access('administer orders'),
     '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'commerce_order') . '/commerce_order.js',
+        array(
+          'type' => 'setting',
+          'data' => array('anonymous' => variable_get('anonymous', t('Anonymous'))),
+        ),
+      ),
+    ),
     '#weight' => 90,
   );
   $form['creation']['name'] = array(
@@ -116,7 +156,12 @@ function commerce_order_order_form_validate($form, &$form_state) {
 function commerce_order_order_form_submit($form, &$form_state) {
   global $user;
 
-  $order = &$form_state['commerce_order'];
+  $order = commerce_order_load($form_state['commerce_order']->order_id);
+
+  if ($form_state['values']['revision']) {
+    $order->revision = TRUE;
+    $order->log = $form_state['values']['log'];
+  }
 
   // Set the order's owner uid if it's being created at this time.
   if (empty($order->order_id) && empty($form_state['values']['name'])) {
