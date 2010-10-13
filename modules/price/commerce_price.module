@@ -242,6 +242,9 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
       empty($instance['widget']['settings']['currency_code'])) {
     $default_currency_code = NULL;
   }
+  else {
+    $default_currency_code = $instance['widget']['settings']['currency_code'];
+  }
 
   // If a price has already been set for this instance prepare default values.
   if (isset($items[$delta]['price'])) {
