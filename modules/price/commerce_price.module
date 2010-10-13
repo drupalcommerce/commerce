@@ -111,13 +111,19 @@ function commerce_price_create_instance($name, $entity_type, $bundle, $label, $w
       'field_name' => $name,
       'entity_type' => $entity_type,
       'bundle' => $bundle,
+
       'label' => $label,
       'required' => TRUE,
       'settings' => array(),
 
+      // Because this widget is locked, we need it to use the full price widget
+      // since the currency option can't be adjusted at the moment.
       'widget' => array(
-        'type' => 'commerce_price_simple',
+        'type' => 'commerce_price_full',
         'weight' => $weight,
+        'settings' => array(
+          'currency_code' => 'default',
+        ),
       ),
 
       'display' => array(),
@@ -188,14 +194,14 @@ function commerce_price_field_widget_info() {
       'label' => t('Price textfield'),
       'field types' => array('commerce_price'),
       'settings' => array(
-        'currency_code' => 'USD',
+        'currency_code' => 'default',
       ),
     ),
     'commerce_price_full' => array(
       'label' => t('Price with currency'),
       'field types' => array('commerce_price'),
       'settings' => array(
-        'currency_code' => 'USD',
+        'currency_code' => 'default',
       ),
     ),
   );
@@ -207,10 +213,20 @@ function commerce_price_field_widget_info() {
 function commerce_price_field_widget_settings_form($field, $instance) {
   $form = array();
 
+  // Build an options array of allowed currency values including the option for
+  // the widget to always use the store's default currency.
+  $options = array(
+    'default' => t('- Default store currency -'),
+  );
+
+  foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
+    $options[$currency_code] = t('@code - !name', array('@code' => $currency->code, '@symbol' => $currency->symbol, '!name' => $currency->name));
+  }
+
   $form['currency_code'] = array(
     '#type' => 'select',
     '#title' => ($instance['widget']['type'] == 'commerce_price_simple') ? t('Currency') : t('Default currency'),
-    '#options' => commerce_currency_get_symbol(),
+    '#options' => $options,
     '#default_value' => $instance['widget']['settings']['currency_code'],
   );
 
@@ -222,14 +238,12 @@ function commerce_price_field_widget_settings_form($field, $instance) {
  */
 function commerce_price_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Use the default currency if the setting is not present.
-  if (empty($instance['widget']['settings']['currency_code'])) {
-    $instance['widget']['settings']['currency_code'] = NULL;
+  if ($instance['widget']['settings']['currency_code'] == 'default' ||
+      empty($instance['widget']['settings']['currency_code'])) {
+    $default_currency_code = NULL;
   }
 
-  // Load the default currency for this instance.
-  $default_currency = commerce_currency_load($instance['widget']['settings']['currency_code']);
-
-  // If a price has already been set for this instance prepare a default value.
+  // If a price has already been set for this instance prepare default values.
   if (isset($items[$delta]['price'])) {
     // TODO: Adjust rounding to be currency specific.
 
@@ -240,10 +254,15 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     if (strpos($default_price, '.') === FALSE || strpos($default_price, '.') > strlen($default_price) - 2) {
       $default_price = number_format($default_price, 2);
     }
+
+    $default_currency_code = $items[$delta]['currency_code'];
   }
   else {
     $default_price = NULL;
   }
+
+  // Load the default currency for this instance.
+  $default_currency = commerce_currency_load($default_currency_code);
 
   $element['#attached']['css'][] = drupal_get_path('module', 'commerce_price') . '/theme/commerce_price.css';
 
@@ -271,7 +290,6 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         '#title' => $element['#title'],
         '#default_value' => $default_price,
         '#size' => 10,
-        '#prefix' => '<div class="commerce-price-full">',
       );
 
       // Build a currency options list from all enabled currencies.
@@ -285,12 +303,43 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         }
       }
 
-      $element['currency_code'] = array(
-        '#type' => 'select',
-        '#options' => $options,
-        '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $default_currency->code,
-        '#suffix' => '</div>',
-      );
+      // If the current currency value is not available, add it now with a
+      // message in the help text explaining it.
+      if (empty($options[$default_currency->code])) {
+        $options[$default_currency->code] = check_plain($default_currency->code);
+
+        if (!empty($default_currency->symbol)) {
+          $options[$default_currency->code] .= ' - ' . check_plain($default_currency->symbol);
+        }
+
+        $description = t('The currency set for this price is not currently enabled. If you change it now, you will not be able to set it back.');
+      }
+      else {
+        $description = '';
+      }
+
+      // If only one currency option is available, don't use a select list.
+      if (count($options) == 1) {
+        $currency_code = array_shift(array_keys($options));
+
+        $element['price']['#field_suffix'] = $currency_code;
+
+        $element['currency_code'] = array(
+          '#type' => 'value',
+          '#default_value' => $currency_code,
+        );
+      }
+      else {
+        $element['price']['#prefix'] = '<div class="commerce-price-full">';
+
+        $element['currency_code'] = array(
+          '#type' => 'select',
+          '#description' => $description,
+          '#options' => $options,
+          '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $default_currency->code,
+          '#suffix' => '</div>',
+        );
+      }
       break;
   }
 
