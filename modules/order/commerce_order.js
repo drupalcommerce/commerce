@@ -23,9 +23,16 @@ Drupal.behaviors.orderFieldsetSummaries = {
     });
 
     $('fieldset#edit-order-log', context).drupalSetSummary(function (context) {
-      return $('#edit-log', context).val() ?
-        Drupal.t('Notes added') :
-        Drupal.t('No notes added');
+      var summary = $('#edit-created', context).val() ?
+        Drupal.t('Created @date', { '@date' : $('#edit-created').val() }) :
+        Drupal.t('New order');
+
+      // Add the changed date to the summary if it's different from the created.
+      if ($('#edit-created', context).val() != $('#edit-changed', context).val()) {
+        summary += '<br />' + Drupal.t('Updated @date', { '@date' : $('#edit-changed').val() });
+      }
+
+      return summary;
     });
   }
 };

@@ -148,7 +148,16 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#maxlength' => 25,
     '#default_value' => !empty($order->created) ? format_date($order->created, 'custom', 'Y-m-d H:i:s O') : '',
   );
-
+  $form['order_log']['created'] = array(
+    '#type' => 'hidden',
+    '#value' => !empty($order->created) ? format_date($order->created, 'short') : '',
+    '#attributes' => array('id' => 'edit-created'),
+  );
+  $form['order_log']['changed'] = array(
+    '#type' => 'hidden',
+    '#value' => !empty($order->changed) ? format_date($order->changed, 'short') : '',
+    '#attributes' => array('id' => 'edit-changed'),
+  );
 
   $form['actions'] = array(
     '#type' => 'container',
