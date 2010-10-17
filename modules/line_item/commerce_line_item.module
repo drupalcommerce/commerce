@@ -642,6 +642,7 @@ function commerce_line_item_field_widget_info() {
     'settings' => array(),
     'behaviors' => array(
       'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      'default value' => FIELD_BEHAVIOR_NONE,
     ),
   );
 

@@ -87,7 +87,7 @@ function commerce_customer_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'uid' => array(
+      'revision_uid' => array(
         'description' => 'The {users}.uid that created this profile at this revision.',
         'type' => 'int',
         'not null' => TRUE,

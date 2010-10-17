@@ -524,7 +524,7 @@ function commerce_customer_field_info() {
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_customer_profile_reference_view',
       'settings' => array(
-        'referenceable_types' => array(),
+        'profile_type' => 'billing',
       ),
       'property_type' => 'commerce_customer_profile',
       'property_callbacks' => array('commerce_customer_profile_property_info_callback'),
@@ -567,13 +567,11 @@ function commerce_customer_field_settings_form($field, $instance, $has_data) {
       $options[$type] = check_plain($name);
     }
 
-    $form['referenceable_types'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Customer profile types that can be referenced'),
-      '#description' => t('If no types are selected, any type of customer profile may be referenced.'),
+    $form['profile_type'] = array(
+      '#type' => 'radios',
+      '#title' => t('Customer profile type that can be referenced'),
       '#options' => $options,
-      '#default_value' => is_array($settings['referenceable_types']) ? $settings['referenceable_types'] : array(),
-      '#multiple' => TRUE,
+      '#default_value' => !empty($settings['profile_type']) ? $settings['profile_type'] : 'billing',
       '#disabled' => $has_data,
     );
   }
@@ -610,10 +608,12 @@ function commerce_customer_field_validate($entity_type, $object, $field, $instan
 
     // Prevent performance hog if there are no ids to check.
     if ($profile_ids) {
-      $profiles = commerce_customer_profile_load_multiple($profile_ids);
+      $profiles = commerce_customer_profile_load_multiple($profile_ids, array('type' => $field['settings']['profile_type']));
 
       foreach ($items as $delta => $item) {
         if (is_array($item)) {
+          // Check that the item specifies a profile_id and that a profile of
+          // the proper type exists with that ID.
           if (!empty($item['profile_id']) && !isset($profiles[$item['profile_id']])) {
             $errors[$field['field_name']][$langcode][$delta][] = array(
               'error' => 'invalid_profile_id',
@@ -697,10 +697,23 @@ function commerce_customer_field_widget_info() {
     'settings' => array(),
     'behaviors' => array(
       'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      'default value' => FIELD_BEHAVIOR_NONE,
     ),
   );
 
   return $widgets;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_customer_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  // Alter the field edit form so it's obvious that customer profile manager
+  // widgets do not support multiple values.
+  if ($form['instance']['widget']['type']['#value'] == 'commerce_customer_profile_manager') {
+    $form['field']['cardinality']['#options'] = array('1' => '1');
+    $form['field']['cardinality']['#description'] = t('The customer profile manager widget only supports single value editing and entry via its form.');
+  }
 }
 
 /**
@@ -739,9 +752,11 @@ function commerce_customer_options_list($field) {
 function commerce_customer_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Define the complex customer profile reference field widget.
   if ($instance['widget']['type'] == 'commerce_customer_profile_manager') {
-    $profile_ids = array();
+    $profile_type = commerce_customer_profile_type_load($field['settings']['profile_type']);
 
     // Build an array of customer profile IDs from this field's values.
+    $profile_ids = array();
+
     foreach ($items as $item) {
       $profile_ids[] = $item['profile_id'];
     }
@@ -757,20 +772,27 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
     // functions and to include header information for the line item table.
     $element += array(
       '#element_validate' => array('commerce_customer_profile_manager_validate'),
-      'profiles' => array(),
+      'profiles' => array('#tree' => TRUE),
     );
 
     // Add a set of elements to the form for each referenced profile.
     foreach ($profiles as $profile_id => $profile) {
+      // Add a fieldset around the profile form.
+      $element['profiles'][$profile_id] = array(
+        '#type' => 'fieldset',
+        '#title' => check_plain($profile_type->name),
+      );
+
       // Store the original customer profile for later comparison.
       $element['profiles'][$profile_id]['profile'] = array(
         '#type' => 'value',
         '#value' => $profile,
       );
 
-      field_attach_form('commerce_customer_profile', $profile, $element, $form_state);
+      field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
 
       // This checkbox will be overridden with a clickable delete image.
+      // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
         $element['profiles'][$profile_id]['remove'] = array(
           '#type' => 'checkbox',
@@ -780,7 +802,11 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
       }
     }
 
-    commerce_unrequire_form_elements($element);
+    // If the reference field is not required, unrequire any elements in the
+    // profile edit form.
+    if (!$delta == 0 || !$instance['required']) {
+      commerce_unrequire_form_elements($element);
+    }
 
     return $element;
   }
@@ -804,22 +830,32 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
       commerce_customer_profile_delete($profile_id);
     }
     else {
-      // Add the profile ID to the current value of the reference field.
-      $value[] = array('profile_id' => $profile_id);
-
       // Update the profile based on the values in the additional elements.
       $profile = clone($element['profiles'][$profile_id]['profile']['#value']);
 
-      // Notify field widgets to validate their data.
-      field_attach_form_validate('commerce_customer_profile', $profile, $element, $form_state);
+      // Store the form values locally to restore them after field submission.
+      $values = $form_state['values'];
 
-      // Notify field widgets.
-      field_attach_submit('commerce_customer_profile', $profile, $element, $form_state);
+      // Temporarily make this pane's values the only values in the $form_state.
+      $form_state['values'] = $form_state['values'][$element['#field_name']][$element['#language']]['profiles'][$profile_id];
+
+      // Notify field widgets to validate their data.
+      field_attach_form_validate('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
+
+      // TODO: Trap it on error, rebuild the form with error messages.
+      // Notify field widgets to save the field data.
+      field_attach_submit('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
+
+      // Restore the values to the $form_state.
+      $form_state['values'] = $values;
 
       // Only save if values were actually changed.
       if ($profile != $element['profiles'][$profile_id]['profile']['#value']) {
         commerce_customer_profile_save($profile);
       }
+
+      // Add the profile ID to the current value of the reference field.
+      $value[] = array('profile_id' => $profile->profile_id);
     }
   }
 
