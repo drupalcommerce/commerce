@@ -59,7 +59,7 @@ function commerce_customer_entity_info() {
  * Implements hook_enable().
  */
 function commerce_customer_enable() {
-  // Add the address field to the default customer profile type.
+  // Add the address field to customer profile bundles.
   $entity_info = entity_get_info('commerce_customer_profile');
 
   foreach ($entity_info['bundles'] as $type => $data) {

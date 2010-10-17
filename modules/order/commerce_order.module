@@ -788,6 +788,58 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
     );
     field_create_instance($instance);
   }
+
+  // Add the customer profile reference fields for each profile type.
+  $entity_info = entity_get_info('commerce_customer_profile');
+
+  foreach ($entity_info['bundles'] as $profile_type => $data) {
+    $field_name = 'customer_' . $profile_type;
+
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('commerce_order', $field_name, $type);
+
+    if (empty($field)) {
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'commerce_customer_profile_reference',
+        'cardinality' => 1,
+        'entity_types' => array('commerce_order'),
+        'translatable' => FALSE,
+      );
+      $field = field_create_field($field);
+    }
+
+    if (empty($instance)) {
+      $instance = array(
+        'field_name' => $field_name,
+        'entity_type' => 'commerce_order',
+        'bundle' => $type,
+        'label' => check_plain($data['label']),
+        'widget' => array(
+          'type' => 'commerce_customer_profile_manager',
+          'weight' => -5,
+        ),
+        'settings' => array(
+          'profilee_type' => array($profile_type),
+        ),
+
+        // Define default formatters for the teaser and full view.
+        'display' => array(
+          'customer' => array(
+            'label' => 'above',
+            'type' => 'commerce_customer_profile_reference_display',
+          ),
+          'administrator' => array(
+            'label' => 'above',
+            'type' => 'commerce_customer_profile_reference_display',
+          ),
+        ),
+      );
+      field_create_instance($instance);
+
+      variable_set('commerce_customer_profile_' . $profile_type . '_field', $field_name);
+    }
+  }
 }
 
 /**

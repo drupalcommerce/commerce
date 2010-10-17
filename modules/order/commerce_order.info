@@ -4,6 +4,7 @@ description = Defines the Order entity and associated features.
 package = Commerce
 dependencies[] = rules
 dependencies[] = commerce
+dependencies[] = commerce_customer
 dependencies[] = commerce_line_item
 core = 7.x
 
