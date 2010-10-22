@@ -146,6 +146,7 @@ function commerce_cart_form($form, &$form_state, $order) {
     '#value' => t('Checkout'),
     '#submit' => $submit + array('commerce_cart_form_submit'),
     '#weight' => 45,
+    '#access' => user_access('access checkout'),
   );
 
   // We append the validate handler to #validate in case a form callback_wrapper

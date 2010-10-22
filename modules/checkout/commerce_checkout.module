@@ -14,13 +14,11 @@
 function commerce_checkout_menu() {
   $items = array();
 
-  // TODO: Add some sort of access control beyond 'access content' permission so
-  // customers don't checkout other customers' orders.
   $items['checkout/%commerce_order'] = array(
     'title' => 'Checkout',
     'page callback' => 'commerce_checkout_router',
     'page arguments' => array(1),
-    'access arguments' => array('access content'),
+    'access arguments' => array('access checkout'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.pages.inc',
   );
@@ -28,7 +26,7 @@ function commerce_checkout_menu() {
     'title' => 'Checkout',
     'page callback' => 'commerce_checkout_router',
     'page arguments' => array(1, 2),
-    'access arguments' => array('access content'),
+    'access arguments' => array('access checkout'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_checkout.pages.inc',
   );
@@ -77,12 +75,12 @@ function commerce_checkout_permission() {
   $permissions = array(
     'administer checkout' => array(
       'title' => t('Administer checkout'),
-      'description' => t('Configure checkout settings and the checkout form itself.'),
+      'description' => t('Access checkout for any order and configure checkout settings including the layout of the checkout form.'),
       'restrict access' => TRUE,
     ),
     'access checkout' => array(
       'title' => t('Access checkout'),
-      'description' => t('Complete a purchase through the checkout form.'),
+      'description' => t('Complete a purchase through the checkout form or be (or be redirected to login based on checkout settings).'),
     ),
   );
 
@@ -535,6 +533,13 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
     }
   }
   else {
+    // Return FALSE if the order does have a uid.
+    if ($order->uid) {
+      return FALSE;
+    }
+
+    // And then return FALSE if the anonymous user's session doesn't specify
+    // this order ID.
     if (empty($_SESSION['commerce_cart_order_id']) || $_SESSION['commerce_cart_order_id'] != $order->order_id) {
       return FALSE;
     }
@@ -553,10 +558,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
         return FALSE;
       }
     }
-    elseif ($checkout_page->page_id != 'complete') {
-      // TODO: This will likely cause problems for orders in statuses that have
-      // been canceled or something where accessing a checkout completion page
-      // shouldn't be possible.
+    else {
       return FALSE;
     }
   }
@@ -582,6 +584,17 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
       if ($checkout_page->weight > $status_checkout_page->weight) {
         return FALSE;
       }
+    }
+  }
+  // We've now handled above cases where the user is trying to access a checkout
+  // page other than the completion page for an order that is not in a checkout
+  // status.  We then handled cases where the user is trying to access any
+  // checkout page for orders in a checkout status.  We now turn to cases where
+  // the user is accessing the complete page for any other order state.
+  elseif ($checkout_page->page_id == 'complete') {
+    // Don't allow completion page access for orders in the cart or canceled states.
+    if (in_array($order_status->state, array('canceled', 'cart'))) {
+      return FALSE;
     }
   }
 

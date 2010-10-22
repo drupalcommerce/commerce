@@ -28,6 +28,10 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
     drupal_goto(variable_get('commerce_checkout_empty_redirect', '<front>'));
   }
 
+  // Prior to displaying the checkout form, allow other modules to route the
+  // checkout form.
+  module_invoke_all('commerce_checkout_router');
+
   // Update the page title if specified.
   if (!empty($checkout_page->title)) {
     drupal_set_title($checkout_page->title);

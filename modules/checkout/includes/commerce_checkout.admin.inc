@@ -12,10 +12,11 @@
 function commerce_checkout_settings_form($form, &$form_state) {
   global $base_url;
 
+  // TODO: Remove these settings in favor of hook_commerce_checkout_router()
+  // implementations and checkout completion Rules.
   $form['anonymous'] = array(
     '#type' => 'fieldset',
     '#title' => t('Anonymous checkout settings'),
-    '#description' => t('These settings alter the behavior of checkout when an anonymous user completes checkout.'),
   );
   $form['anonymous']['commerce_checkout_anonymous_account'] = array(
     '#type' => 'radios',

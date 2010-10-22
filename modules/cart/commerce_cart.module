@@ -23,12 +23,10 @@ function commerce_cart_menu() {
     'file' => 'includes/commerce_cart.pages.inc',
   );
 
-  // TODO: Replace access control with something more pertinent to checkout
-  // besides 'access content'.
   $items['checkout'] = array(
     'title' => 'Checkout',
     'page callback' => 'commerce_cart_checkout_router',
-    'access arguments' => array('access content'),
+    'access arguments' => array('access checkout'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/commerce_cart.pages.inc',
   );

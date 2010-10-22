@@ -78,7 +78,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       }
 
       // Only add the checkout link if checkout is enabled.
-      if (module_exists('commerce_checkout') && $this->options['links']['checkout'] === 'checkout') {
+      if (module_exists('commerce_checkout') && $this->options['links']['checkout'] === 'checkout' && user_access('access checkout')) {
         $links['line-item-summary-checkout'] = array(
           'title' => t('Checkout'),
           'href' => 'checkout',
