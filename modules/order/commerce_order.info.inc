@@ -15,12 +15,12 @@ function commerce_order_entity_property_info() {
   // Add meta-data about the basic commerce_order properties.
   $properties = &$info['commerce_order']['properties'];
 
-  $properties['order-id'] = array(
+  $properties['order_id'] = array(
     'label' => t('Order ID'),
     'description' => t('The internal numeric ID of the order.'),
     'type' => 'integer',
   );
-  $properties['order-number'] = array(
+  $properties['order_number'] = array(
     'label' => t('Order number'),
     'description' => t('The order number displayed to the customer.'),
     'type' => 'text',
@@ -28,19 +28,19 @@ function commerce_order_entity_property_info() {
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['view-url'] = array(
+  $properties['view_url'] = array(
     'label' => t('View URL'),
     'description' => t('The URL a customer can visit to view the order.'),
     'getter callback' => 'commerce_order_get_properties',
     'type' => 'uri',
   );
-  $properties['admin-url'] = array(
+  $properties['admin_url'] = array(
     'label' => t('Admin URL'),
     'description' => t("The URL of the order's administrative view page."),
     'getter callback' => 'commerce_order_get_properties',
     'type' => 'uri',
   );
-  $properties['edit-url'] = array(
+  $properties['edit_url'] = array(
     'label' => t('Edit URL'),
     'description' => t("The URL of the order's edit page."),
     'getter callback' => 'commerce_order_get_properties',

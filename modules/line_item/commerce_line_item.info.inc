@@ -15,7 +15,7 @@ function commerce_line_item_entity_property_info() {
   // Add meta-data about the basic commerce_line_item properties.
   $properties = &$info['commerce_line_item']['properties'];
 
-  $properties['line-item-id'] = array(
+  $properties['line_item_id'] = array(
     'label' => t('Line item ID'),
     'description' => t('The internal numeric ID of the line item.'),
     'type' => 'integer',
@@ -28,7 +28,7 @@ function commerce_line_item_entity_property_info() {
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['line-item-label'] = array(
+  $properties['line_item_label'] = array(
     'label' => t('Line item label'),
     'description' => t('The label displayed with the line item.'),
     'type' => 'text',

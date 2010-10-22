@@ -15,7 +15,7 @@ function commerce_product_entity_property_info() {
   // Add meta-data about the basic commerce_product properties.
   $properties = &$info['commerce_product']['properties'];
 
-  $properties['product-id'] = array(
+  $properties['product_id'] = array(
     'label' => t('Product ID'),
     'description' => t('The internal numeric ID of the product.'),
     'type' => 'integer',
@@ -44,7 +44,7 @@ function commerce_product_entity_property_info() {
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['edit-url'] = array(
+  $properties['edit_url'] = array(
     'label' => t('Edit URL'),
     'description' => t("The URL of the product's edit page."),
     'getter callback' => 'commerce_product_get_properties',
