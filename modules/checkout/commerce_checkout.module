@@ -532,7 +532,8 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
       return FALSE;
     }
   }
-  else {
+  elseif (empty($_SESSION['commerce_cart_completed_orders']) ||
+    !in_array($order->order_id, $_SESSION['commerce_cart_completed_orders'])) {
     // Return FALSE if the order does have a uid.
     if ($order->uid) {
       return FALSE;
@@ -604,7 +605,9 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 /**
  * Completes the checkout process for the given order.
  */
-function commerce_checkout_complete(&$form_state, $order) {
+function commerce_checkout_complete($form, &$form_state, $order) {
+  global $user;
+
   // Determine what to do for anonymous users completing checkout.
   if ($order->uid == 0) {
     $create = variable_get('commerce_checkout_anonymous_account', 2);
@@ -625,10 +628,14 @@ function commerce_checkout_complete(&$form_state, $order) {
 
   // Move the order status to the default "Pending" status if it hasn't
   // already been updated.
-  if ($order->status == $form_state['values']['order']->status) {
+  // TODO: Move this to Rules.
+  if (FALSE && $order->status == $form_state['order']->status) {
     $order_state = commerce_order_state_load('pending');
     $order = commerce_order_status_update($order, $order_state->default_status);
   }
+
+  // Allow other modules to react to checkout completion.
+  module_invoke_all('commerce_checkout_complete', $form, $form_state, $order);
 
   // TODO: Update to use Rules; the third argument should pass the proper account.
   // ca_pull_trigger('uc_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);

@@ -213,7 +213,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
       // If it happens to be the complete page, process completion now.
       if ($checkout_page->next_page == 'complete') {
         // Or go ahead and complete the sale.
-        commerce_checkout_complete($form_state, $order);
+        commerce_checkout_complete($form, $form_state, $order);
       }
 
       // Move the form forward to that page.

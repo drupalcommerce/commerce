@@ -84,6 +84,17 @@ function commerce_cart_commerce_checkout_pane_info() {
 }
 
 /**
+ * Implements hook_commerce_checkout_complete().
+ */
+function commerce_cart_commerce_checkout_complete($form, &$form_state, $order) {
+  // Move the cart order ID to a completed order ID.
+  if (!empty($_SESSION['commerce_cart_order_id'])) {
+    $_SESSION['commerce_cart_completed_orders'][] = $_SESSION['commerce_cart_order_id'];
+    unset($_SESSION['commerce_cart_order_id']);
+  }
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_cart_views_api() {
@@ -116,23 +127,6 @@ function commerce_cart_theme() {
 }
 
 /**
- * Implements hook_block_info().
- */
-function commerce_cart_block_info() {
-  $blocks = array();
-
-  // Define the basic shopping cart block and hide it on the checkout pages.
-  $blocks['cart'] = array(
-    'info' => t('Shopping cart'),
-    'cache' => DRUPAL_NO_CACHE,
-    'visibility' => 0,
-    'pages' => 'checkout*',
-  );
-
-  return $blocks;
-}
-
-/**
  * Implements hook_user_login().
  */
 function commerce_cart_user_login(&$edit, $account) {
@@ -159,6 +153,37 @@ function commerce_cart_user_login(&$edit, $account) {
       unset($_SESSION['commerce_cart_order_id']);
     }
   }
+
+  // Set the uid for any completed orders if they exist.
+  if (!empty($_SESSION['commerce_cart_completed_orders'])) {
+    foreach ((array) $_SESSION['commerce_cart_completed_orders'] as $order_id) {
+      if ($order = commerce_order_load($order_id)) {
+        if ($order->uid == 0) {
+          $order->uid = $account->uid;
+          commerce_order_save($order);
+        }
+      }
+    }
+
+    unset($_SESSION['commerce_cart_completed_orders']);
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function commerce_cart_block_info() {
+  $blocks = array();
+
+  // Define the basic shopping cart block and hide it on the checkout pages.
+  $blocks['cart'] = array(
+    'info' => t('Shopping cart'),
+    'cache' => DRUPAL_NO_CACHE,
+    'visibility' => 0,
+    'pages' => 'checkout*',
+  );
+
+  return $blocks;
 }
 
 /**

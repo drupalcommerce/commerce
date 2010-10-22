@@ -170,21 +170,13 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   // If the payment method doesn't exist or does not require a redirect...
   if (!$payment_method || !$payment_method->offsite) {
     // Advance the customer to the next step of the checkout process.
-    $next_page = $form_state['checkout_page']->next_page;
-
-    $order = commerce_order_status_update($order, 'checkout_' . $next_page);
-
-    drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
+    _commerce_payment_redirect_pane_next_page($form, $form_state, $order);
   }
 
   // If the user came to the cancel URL...
   if (arg(3) == 'back' && arg(4) == $order->data['payment_redirect_key']) {
     // Send the customer to the previous step of the checkout process.
-    $prev_page = $form['checkout_page']['#value']->prev_page;
-
-    $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
-
-    drupal_goto('checkout/' . $order->order_id . '/' . $prev_page);
+    _commerce_payment_redirect_pane_prev_page($form, $form_state, $order);
   }
 
   // If the user came to the return URL...
@@ -200,21 +192,13 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
       }
 
       // Send the customer on to the next checkout page.
-      $next_page = $form_state['checkout_page']->next_page;
-
-      $order = commerce_order_status_update($order, 'checkout_' . $next_page);
-
-      drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
+      _commerce_payment_redirect_pane_next_page($form, $form_state, $order);
     }
     else {
       // Otherwise display the failure message and send the customer back.
       drupal_set_message(t('Payment failed at the payment server. Please review your information and try again.'), 'error');
 
-      $prev_page = $form['checkout_page']['#value']->prev_page;
-
-      $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
-
-      drupal_goto('checkout/' . $order->order_id . '/' . $prev_page);
+      _commerce_payment_redirect_pane_prev_page($form, $form_state, $order);
     }
   }
 
@@ -276,4 +260,31 @@ function commerce_payment_post_redirect_form($action, array $values = array()) {
       '#markup' => drupal_render($form),
     ),
   );
+}
+
+/**
+ * Moves an order ahead to the next page via an order update and redirect.
+ */
+function _commerce_payment_redirect_pane_next_page($form, &$form_state, $order) {
+  $next_page = $form_state['checkout_page']->next_page;
+
+  // Inform modules of checkout completion if the next page is Completed.
+  if ($next_page == 'complete') {
+    commerce_checkout_complete($form, $form_state, $order);
+  }
+
+  $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+
+  drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
+}
+
+/**
+ * Moves an order back to the previous page via an order update and redirect.
+ */
+function _commerce_payment_redirect_pane_prev_page($form, &$form_state, $order) {
+  $prev_page = $form_state['checkout_page']->prev_page;
+
+  $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
+
+  drupal_goto('checkout/' . $order->order_id . '/' . $prev_page);
 }
