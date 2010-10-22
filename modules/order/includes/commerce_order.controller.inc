@@ -10,7 +10,7 @@
  * The controller class for orders contains methods for the order CRUD
  * operations. The load method is inherited from the default controller.
  */
-class CommerceOrderEntityController extends EntityAPIController {
+class CommerceOrderEntityController extends DrupalDefaultEntityController {
 
   /**
    * Create a default order.
