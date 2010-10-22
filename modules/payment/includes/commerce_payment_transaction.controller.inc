@@ -25,9 +25,12 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
    *   A payment transaction object with all default fields initialized.
    */
   public function create($method_id = '', $order_id = 0) {
+    global $user;
+
     return (object) array(
       'transaction_id' => '',
       'revision_id' => '',
+      'uid' => $user->uid,
       'order_id' => $order_id,
       'payment_method' => $method_id,
       'instance_id' => '',
@@ -186,6 +189,10 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
    *     updated instead of a new one created.
    */
   function saveRevision($transaction, $update = FALSE) {
+    global $user;
+
+    $transaction->revision_uid = $user->uid;
+
     // Update the existing revision if specified.
     if ($update) {
       drupal_write_record('commerce_payment_transaction_revision', $transaction, 'revision_id');

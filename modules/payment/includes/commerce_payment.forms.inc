@@ -20,6 +20,8 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
   // Store the initial order in the form state.
   $form_state['order'] = $order;
 
+  $form['#access'] = commerce_payment_transaction_access('create', $order);
+
   // If a payment method has already been selected...
   if (!empty($form_state['payment_method'])) {
     $payment_method = $form_state['payment_method'];

@@ -29,6 +29,12 @@ function commerce_payment_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this transaction.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'order_id' => array(
         'description' => 'The {commerce_order}.order_id of the order this payment is for.',
         'type' => 'int',
@@ -124,6 +130,10 @@ function commerce_payment_schema() {
         'table' => 'commerce_payment_transaction_revision',
         'columns'=> array('revision_id' => 'revision_id'),
       ),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
       'order_id' => array(
         'table' => 'commerce_order',
         'columns'=> array('order_id' => 'order_id'),
@@ -146,6 +156,12 @@ function commerce_payment_schema() {
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
+      ),
+      'revision_uid' => array(
+        'description' => 'The {users}.uid that created this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
       ),
       'remote_id' => array(
         'description' => 'The remote identifier for this transaction.',
@@ -209,6 +225,10 @@ function commerce_payment_schema() {
       'payment_transaction' => array(
         'table' => 'commerce_payment_transaction',
         'columns'=> array('transaction_id' => 'transaction_id'),
+      ),
+      'creator' => array(
+        'table' => 'users',
+        'columns' => array('revision_uid' => 'uid'),
       ),
     ),
   );

@@ -71,7 +71,27 @@ function commerce_payment_permission() {
   return array(
     'administer payments' => array(
       'title' => t('Administer payments'),
-      'description' => t('Allows users to perform any payment action for any order.'),
+      'description' => t('Allows users to perform any payment action for any order and view transaction payloads.'),
+      'restrict access' => TRUE,
+    ),
+    'view payments' => array(
+      'title' => t('View payments'),
+      'description' => t('Allows users to view the payments made to an order.'),
+      'restrict access' => TRUE,
+    ),
+    'create payments' => array(
+      'title' => t('Create payments'),
+      'description' => t('Allows users to create new payments for orders.'),
+      'restrict access' => TRUE,
+    ),
+    'update payments' => array(
+      'title' => t('Update payments'),
+      'description' => t('Allows users to update payments via payment method specific operations links.'),
+      'restrict access' => TRUE,
+    ),
+    'delete payments' => array(
+      'title' => t('Delete payments'),
+      'description' => t('Allows users to delete payments on orders they can access.'),
       'restrict access' => TRUE,
     ),
   );
@@ -103,7 +123,7 @@ function commerce_payment_theme() {
  * Adds the necessary CSS for the line item summary template.
  */
 function template_preprocess_commerce_payment_totals(&$variables) {
-  drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment_views.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css');
 }
 
 /**
@@ -566,7 +586,12 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
   }
 
   $transaction->content['transaction_table'] = array(
-    '#markup' => theme('table', array('rows' => $rows)),
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css',
+      ),
+    ),
+    '#markup' => theme('table', array('rows' => $rows, 'attributes' => array('class' => array('payment-transaction')))),
   );
 
   // Build fields content.
@@ -592,6 +617,81 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
   drupal_alter('commerce_payment_transaction_view', $build);
 
   return $build;
+}
+
+/**
+ * Determines access for a variety of operations on payment transactions.
+ *
+ * @param $op
+ *   The operation being performed, one of view, update, create, or delete.
+ * @param $order
+ *   The order object the payment operation applies to.
+ * @param $transaction
+ *   The payment transaction to check. Required for updating and deleting.
+ * @param $account
+ *   The user account attempting the operation; defaults to the current user.
+ *
+ * @return
+ *   TRUE or FALSE indicating access for the operation.
+ */
+function commerce_payment_transaction_access($op, $order, $transaction = NULL, $account = NULL) {
+  global $user;
+
+  // Grant administrators access to do anything.
+  if (user_access('administer payments')) {
+    return TRUE;
+  }
+
+  if (empty($order)) {
+    $order = commerce_order_load($transaction->order_id);
+  }
+
+  if (empty($account)) {
+    $account = clone($user);
+  }
+
+  switch ($op) {
+    // Creating new payment transactions.
+    case 'create':
+      if (user_access('create payments')) {
+        if (commerce_order_access('update', $order, $account)) {
+          return TRUE;
+        }
+      }
+      break;
+
+    // Viewing payment transactions.
+    case 'view':
+      if (user_access('view payments')) {
+        if (commerce_order_access('view', $order, $account)) {
+          return TRUE;
+        }
+      }
+      break;
+
+    case 'update':
+      if (user_access('update payments')) {
+        if (commerce_order_access('view', $order, $account)) {
+          return TRUE;
+        }
+      }
+    case 'delete':
+      if (user_access('delete payments')) {
+        if (commerce_order_access('update', $order, $account)) {
+          return TRUE;
+        }
+      }
+      break;
+  }
+
+  // Allow other modules to provide other cases for access grants.
+  foreach (module_invoke_all('commerce_payment_transaction_access', $op, $order, $transaction, $account) as $access) {
+    if ($access) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**

@@ -31,3 +31,7 @@
 .payment-terminal-amount div {
   display: inline;
 }
+
+table.payment-transaction td {
+  vertical-align: top;
+}
