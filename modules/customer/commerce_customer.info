@@ -1,6 +1,6 @@
 ; $Id$
 name = Customer
-description = Defines the Customer entity with Addressfield integration.
+description = Defines the Customer entity with Address Field integration.
 package = Commerce
 dependencies[] = addressfield
 dependencies[] = commerce
