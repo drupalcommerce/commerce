@@ -346,6 +346,7 @@ function commerce_product_type_validate_type_unique($type) {
  * Ensures a base price field is present on a product type bundle.
  */
 function commerce_product_configure_product_type($type) {
+  // TODO: Change the base_price field to purchase_price.
   commerce_price_create_instance('base_price', 'commerce_product', $type, t('Price'));
 }
 

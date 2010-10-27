@@ -227,7 +227,14 @@ function commerce_order_order_form_validate($form, &$form_state) {
 function commerce_order_order_form_submit($form, &$form_state) {
   global $user;
 
-  $order = commerce_order_load($form_state['commerce_order']->order_id);
+  // If the user is editing an order, load a fresh copy to merge changes to.
+  if ($form_state['commerce_order']->order_id) {
+    $order = commerce_order_load($form_state['commerce_order']->order_id);
+  }
+  else {
+    // Otherwise use the new order stored in the form state.
+    $order = $form_state['commerce_order'];
+  }
 
   if ($form_state['values']['revision']) {
     $order->revision = TRUE;

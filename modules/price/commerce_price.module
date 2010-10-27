@@ -19,9 +19,7 @@ function commerce_price_field_info() {
       'translatable' => FALSE,
       'default_widget' => 'commerce_price_simple',
       'default_formatter' => 'commerce_price_default',
-      'settings' => array(
-        'currency_code' => 'USD',
-      ),
+      'settings' => array(),
       'property_type' => 'commerce_price',
       'property_callbacks' => array('commerce_price_property_info_callback'),
     ),
