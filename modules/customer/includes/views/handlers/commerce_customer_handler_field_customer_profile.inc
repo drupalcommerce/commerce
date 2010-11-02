@@ -15,10 +15,6 @@ class commerce_customer_handler_field_customer_profile extends views_handler_fie
 
     if (!empty($this->options['link_to_profile'])) {
       $this->additional_fields['profile_id'] = 'profile_id';
-
-      if (module_exists('translation')) {
-        $this->additional_fields['language'] = array('table' => 'commerce_customer_profile', 'field' => 'language');
-      }
     }
   }
 

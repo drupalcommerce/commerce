@@ -28,7 +28,7 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
   $form = array();
 
   // Merge in values from the order.
-  if (isset($order->data['commerce_payment_null'])) {
+  if (!empty($order->data['commerce_payment_null'])) {
     $pane_values += $order->data['commerce_payment_null'];
   }
 
