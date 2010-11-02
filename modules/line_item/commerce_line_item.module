@@ -893,8 +893,10 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
   else {
     unset($form_state['line_item_add']);
 
+    $parent = array_pop($form_state['clicked_button']['#parents']);
+
     // If the save button was clicked from the line item type action form...
-    if (array_pop($form_state['clicked_button']['#parents']) == 'save_line_item') {
+    if ($parent == 'save_line_item') {
       $line_item_type = $element['actions']['line_item_type']['#value'];
 
       // Create the new line item.
@@ -927,7 +929,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
 
       $form_state['rebuild'] = TRUE;
     }
-    elseif (array_pop($form_state['clicked_button']['#parents']) == 'cancel') {
+    elseif ($parent == 'cancel') {
       // If the cancel button was clicked refresh without action.
       $form_state['rebuild'] = TRUE;
     }
