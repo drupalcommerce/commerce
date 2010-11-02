@@ -32,33 +32,21 @@ function commerce_product_product_type_form($form, &$form_state, $product_type) 
     '#description' => t('The human-readable name of this product type. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.'),
     '#required' => TRUE,
     '#size' => 32,
-    '#field_suffix' => ' <small id="edit-product-type-name-suffix">' . $product_type->type . '</small>',
+    '#field_suffix' => ' <small id="edit-product-type-name-suffix">' . t('Machine name: @type', array('@type' => $product_type->type)) . '</small>',
   );
 
   if (empty($product_type->type)) {
-    $js_settings = array(
-      'type' => 'setting',
-      'data' => array(
-        'machineReadableValue' => array(
-          'product-type-name' => array(
-            'text' => t('Machine name'),
-            'target' => 'product-type-type',
-            'searchPattern' => '[^a-z0-9]+',
-            'replaceToken' => '_',
-          ),
-        ),
-      ),
-    );
     $form['product_type']['type'] = array(
-      '#type' => 'textfield',
+      '#type' => 'machine_name',
       '#title' => t('Machine name'),
       '#default_value' => $product_type->type,
       '#maxlength' => 32,
       '#required' => TRUE,
-      '#description' => t('The machine-readable name of this product type. This name must contain only lowercase letters, numbers, and underscores, it must be unique.'),
-      '#attached' => array(
-        'js' => array(drupal_get_path('module', 'system') . '/system.js', $js_settings),
+      '#machine_name' => array(
+        'exists' => 'commerce_product_type_load',
+        'source' => array('product_type', 'name'),
       ),
+      '#description' => t('The machine-readable name of this product type. This name must contain only lowercase letters, numbers, and underscores, it must be unique.'),
     );
   }
 
