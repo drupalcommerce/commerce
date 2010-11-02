@@ -776,30 +776,34 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
     );
 
     // Add a set of elements to the form for each referenced profile.
-    foreach ($profiles as $profile_id => $profile) {
+    $key = 0;
+
+    foreach ($profiles as $profile) {
       // Add a fieldset around the profile form.
-      $element['profiles'][$profile_id] = array(
+      $element['profiles'][$key] = array(
         '#type' => 'fieldset',
         '#title' => check_plain($profile_type->name),
       );
 
       // Store the original customer profile for later comparison.
-      $element['profiles'][$profile_id]['profile'] = array(
+      $element['profiles'][$key]['profile'] = array(
         '#type' => 'value',
         '#value' => $profile,
       );
 
-      field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
+      field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
       // This checkbox will be overridden with a clickable delete image.
       // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
-        $element['profiles'][$profile_id]['remove'] = array(
+        $element['profiles'][$key]['remove'] = array(
           '#type' => 'checkbox',
           '#title' => t('Delete this profile'),
           '#default_value' => FALSE,
         );
       }
+
+      $key += 1;
     }
 
     // If the reference field is not required, unrequire any elements in the
@@ -823,34 +827,34 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
   $value = array();
 
   // Loop through the profiles in the manager table.
-  foreach (element_children($element['profiles']) as $profile_id) {
+  foreach (element_children($element['profiles']) as $key) {
+    // Update the profile based on the values in the additional elements.
+    $profile = clone($element['profiles'][$key]['profile']['#value']);
+
     // If the line item has been marked for deletion...
-    if ($profile_id && $element['profiles'][$profile_id]['remove']['#value']) {
+    if ($profile->profile_id && $element['profiles'][$key]['remove']['#value']) {
       // Delete the profile now and don't include it from the $value array.
-      commerce_customer_profile_delete($profile_id);
+      commerce_customer_profile_delete($profile->profile_id);
     }
     else {
-      // Update the profile based on the values in the additional elements.
-      $profile = clone($element['profiles'][$profile_id]['profile']['#value']);
-
       // Store the form values locally to restore them after field submission.
       $values = $form_state['values'];
 
       // Temporarily make this pane's values the only values in the $form_state.
-      $form_state['values'] = $form_state['values'][$element['#field_name']][$element['#language']]['profiles'][$profile_id];
+      $form_state['values'] = $form_state['values'][$element['#field_name']][$element['#language']]['profiles'][$key];
 
       // Notify field widgets to validate their data.
-      field_attach_form_validate('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
+      field_attach_form_validate('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
       // TODO: Trap it on error, rebuild the form with error messages.
       // Notify field widgets to save the field data.
-      field_attach_submit('commerce_customer_profile', $profile, $element['profiles'][$profile_id], $form_state);
+      field_attach_submit('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
       // Restore the values to the $form_state.
       $form_state['values'] = $values;
 
       // Only save if values were actually changed.
-      if ($profile != $element['profiles'][$profile_id]['profile']['#value']) {
+      if ($profile != $element['profiles'][$key]['profile']['#value']) {
         commerce_customer_profile_save($profile);
       }
 

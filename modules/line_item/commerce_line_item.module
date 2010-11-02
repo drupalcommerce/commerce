@@ -886,52 +886,54 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
 
   // If the "Add line item" button was clicked, store the line item type in the
   // $form_state for the rebuild of the $form array.
-  if ($form_state['clicked_button']['#value'] == t('Add line item')) {
-    $form_state['line_item_add'] = $element['actions']['line_item_type']['#value'];
-    $form_state['rebuild'] = TRUE;
-  }
-  else {
-    unset($form_state['line_item_add']);
-
-    $parent = array_pop($form_state['clicked_button']['#parents']);
-
-    // If the save button was clicked from the line item type action form...
-    if ($parent == 'save_line_item') {
-      $line_item_type = $element['actions']['line_item_type']['#value'];
-
-      // Create the new line item.
-      $line_item = commerce_line_item_new($line_item_type->type);
-
-      // If this type specifies a valid add form callback function...
-      if ($callback = commerce_line_item_type_callback($line_item_type, 'add_form_submit')) {
-        // Allow the callback to alter data onto the line item to be saved and
-        // to return an error message if something goes wrong.
-        $error = $callback($line_item, $element, $form_state, $form);
-      }
-      else {
-        // Assume no error if the callback isn't specified.
-        $error = FALSE;
-      }
-
-      // If we didn't end up with any errors...
-      if (empty($error)) {
-        // Save it and add it to the line item reference field's values array.
-        $line_item = commerce_line_item_save($line_item);
-
-        $value[] = array('line_item_id' => $line_item->line_item_id);
-      }
-      else {
-        // Otherwise display the error message; note this is not using
-        // form_set_error() on purpose, because a failed addition of a line item
-        // doesn't affect the rest of the form submission process.
-        drupal_set_message($error, 'error');
-      }
-
+  if (!empty($form_state['clicked_button'])) {
+    if ($form_state['clicked_button']['#value'] == t('Add line item')) {
+      $form_state['line_item_add'] = $element['actions']['line_item_type']['#value'];
       $form_state['rebuild'] = TRUE;
     }
-    elseif ($parent == 'cancel') {
-      // If the cancel button was clicked refresh without action.
-      $form_state['rebuild'] = TRUE;
+    else {
+      unset($form_state['line_item_add']);
+
+      $parent = array_pop($form_state['clicked_button']['#parents']);
+
+      // If the save button was clicked from the line item type action form...
+      if ($parent == 'save_line_item') {
+        $line_item_type = $element['actions']['line_item_type']['#value'];
+
+        // Create the new line item.
+        $line_item = commerce_line_item_new($line_item_type->type);
+
+        // If this type specifies a valid add form callback function...
+        if ($callback = commerce_line_item_type_callback($line_item_type, 'add_form_submit')) {
+          // Allow the callback to alter data onto the line item to be saved and
+          // to return an error message if something goes wrong.
+          $error = $callback($line_item, $element, $form_state, $form);
+        }
+        else {
+          // Assume no error if the callback isn't specified.
+          $error = FALSE;
+        }
+
+        // If we didn't end up with any errors...
+        if (empty($error)) {
+          // Save it and add it to the line item reference field's values array.
+          $line_item = commerce_line_item_save($line_item);
+
+          $value[] = array('line_item_id' => $line_item->line_item_id);
+        }
+        else {
+          // Otherwise display the error message; note this is not using
+          // form_set_error() on purpose, because a failed addition of a line item
+          // doesn't affect the rest of the form submission process.
+          drupal_set_message($error, 'error');
+        }
+
+        $form_state['rebuild'] = TRUE;
+      }
+      elseif ($parent == 'cancel') {
+        // If the cancel button was clicked refresh without action.
+        $form_state['rebuild'] = TRUE;
+      }
     }
   }
 
