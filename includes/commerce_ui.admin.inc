@@ -14,7 +14,7 @@ function commerce_currency_settings_form($form, &$form_state) {
   // Build a currency options list from all defined currencies.
   $options = array();
 
-  foreach (commerce_currencies() as $currency_code => $currency) {
+  foreach (commerce_currencies(FALSE, TRUE) as $currency_code => $currency) {
     $options[$currency_code] = t('@code - !name', array('@code' => $currency->code, '@symbol' => $currency->symbol, '!name' => $currency->name));
 
     if (!empty($currency->symbol)) {

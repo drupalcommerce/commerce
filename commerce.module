@@ -185,14 +185,19 @@ function commerce_currency_load($currency_code = NULL) {
  *
  * @param $enabled
  *   Boolean indicating whether or not to return only enabled currencies.
+ * @param $reset
+ *   Boolean indicating whether or not the cache should be reset before currency
+ *     data is loaded and returned.
  *
  * @return
  *   An array of altered currency objects keyed by the currency code.
  */
-function commerce_currencies($enabled = FALSE) {
-  $currencies = &drupal_static(__FUNCTION__);
-
-  if (empty($currencies)) {
+function commerce_currencies($enabled = FALSE, $reset = FALSE) {
+  // Attempt to load currency data from the cache first.
+  if (!$reset && $currencies = cache_get('commerce_currencies')) {
+    $currencies = $currencies->data;
+  }
+  else {
     // Establish some default values for currencies.
     $defaults = array(
       'symbol' => '',
@@ -214,6 +219,8 @@ function commerce_currencies($enabled = FALSE) {
     foreach ($currencies as $currency_code => $currency) {
       $currencies[$currency_code] = (object) array_merge($defaults, $currency);
     }
+
+    cache_set('commerce_currencies', $currencies);
   }
 
   // Return only enabled currencies if specified.
