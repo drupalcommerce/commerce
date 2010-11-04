@@ -218,7 +218,7 @@ function commerce_price_field_widget_settings_form($field, $instance) {
   );
 
   foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
-    $options[$currency_code] = t('@code - !name', array('@code' => $currency->code, '@symbol' => $currency->symbol, '!name' => $currency->name));
+    $options[$currency_code] = t('@code - @name', array('@code' => $currency->code, '@name' => $currency->name));
   }
 
   $form['currency_code'] = array(
@@ -298,10 +298,6 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
       foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
         $options[$currency_code] = check_plain($currency->code);
-
-        if (!empty($currency->symbol)) {
-          $options[$currency_code] .= ' - ' . check_plain($currency->symbol);
-        }
       }
 
       // If the current currency value is not available, add it now with a
