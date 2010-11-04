@@ -304,7 +304,7 @@ function commerce_product_ui_product_type_save($product_type) {
     // Notify the field API that a new bundle has been created.
     field_attach_create_bundle('commerce_product', $product_type->type);
 
-    // Add the base_price field to the product type.
+    // Add the purchase_price field to the product type.
     commerce_product_configure_product_type($product_type->type);
 
     // Notify other modules that a new product type has been created.

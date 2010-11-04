@@ -736,8 +736,8 @@ function commerce_product_line_item_populate(&$line_item, $product, $quantity = 
   $line_item->unit_price = array(
     $language => array(
       array(
-        'price' => $product->base_price[$language][0]['price'],
-        'currency_code' => $product->base_price[$language][0]['currency_code'],
+        'price' => $product->purchase_price[$language][0]['price'],
+        'currency_code' => $product->purchase_price[$language][0]['currency_code'],
       )
     )
   );

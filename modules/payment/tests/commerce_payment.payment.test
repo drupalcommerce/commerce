@@ -78,7 +78,7 @@ class CommercePaymentTestCase extends DrupalWebTestCase {
     $test_product->type = 'product';
     $test_product->sku = 'TEST-SKU';
     $test_product->title = 'Test product';
-    $test_product->base_price = array(
+    $test_product->purchase_price = array(
       LANGUAGE_NONE => array(
         array(
           'price' => 10,
@@ -147,4 +147,3 @@ class CommercePaymentTestCase extends DrupalWebTestCase {
     $this->checkoutWithPayment();
   }
 }
-

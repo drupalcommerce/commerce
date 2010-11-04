@@ -121,9 +121,9 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['type']['alter']['html'] = 0;
   $handler->display->display_options['fields']['type']['hide_empty'] = 0;
   $handler->display->display_options['fields']['type']['empty_zero'] = 0;
-  /* Field: Fields: base_price */
+  /* Field: Fields: purchase_price */
   $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
-  $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_base_price';
+  $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_purchase_price';
   $handler->display->display_options['fields']['entity_id']['field'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['label'] = 'Base Price';
   $handler->display->display_options['fields']['entity_id']['alter']['alter_text'] = 0;
