@@ -29,6 +29,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       'uid' => $uid,
       'mail' => '',
       'status' => $status,
+      'data' => array(),
       'created' => '',
       'changed' => '',
     );
@@ -198,6 +199,20 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       // to include the revision_id.
       drupal_write_record('commerce_order_revision', $order);
     }
+  }
+
+  /**
+   * Unserializes the data property of loaded orders.
+   */
+  public function attachLoad(&$queried_orders, $revision_id = FALSE) {
+    foreach ($queried_orders as $order_id => $order) {
+      $queried_orders[$order_id]->data = unserialize($order->data);
+    }
+
+    // Call the default attachLoad() method. This will add fields and call
+    // hook_user_load().
+    parent::attachLoad($queried_orders, $revision_id);
+
   }
 
   /**

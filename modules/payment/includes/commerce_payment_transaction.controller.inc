@@ -205,6 +205,22 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
   }
 
   /**
+   * Unserializes the message_variables and payload properties of loaded payment
+   *   transactions.
+   */
+  public function attachLoad(&$queried_transactions, $revision_id = FALSE) {
+    foreach ($queried_transactions as $transaction_id => $transaction) {
+      $queried_transactions[$transaction_id]->message_variables = unserialize($transaction->message_variables);
+      $queried_transactions[$transaction_id]->payload = unserialize($transaction->payload);
+    }
+
+    // Call the default attachLoad() method. This will add fields and call
+    // hook_user_load().
+    parent::attachLoad($queried_transactions, $revision_id);
+
+  }
+
+  /**
    * Deletes multiple payment transactions by ID.
    *
    * @param $transaction_ids
