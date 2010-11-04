@@ -3,19 +3,20 @@
 
 /**
  * @file
- * Provides a NULL payment method for Drupal Commerce; used for testing.
+ * Provides an example payment method for Drupal Commerce for testing and
+ *   development.
  */
 
 
 /**
  * Implements hook_commerce_payment_method_info().
  */
-function commerce_payment_null_commerce_payment_method_info() {
+function commerce_payment_example_commerce_payment_method_info() {
   $payment_methods = array();
 
-  $payment_methods['commerce_payment_null'] = (object) array(
-    'title' => t('No payment'),
-    'description' => t('No payment necessary.'),
+  $payment_methods['commerce_payment_example'] = (object) array(
+    'title' => t('Example payment'),
+    'description' => t('Demonstrates complete payment during checkout and serves as a development example.'),
   );
 
   return $payment_methods;
@@ -24,12 +25,12 @@ function commerce_payment_null_commerce_payment_method_info() {
 /**
  * Payment method callback: checkout form.
  */
-function commerce_payment_null_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
+function commerce_payment_example_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
   $form = array();
 
   // Merge in values from the order.
-  if (!empty($order->data['commerce_payment_null'])) {
-    $pane_values += $order->data['commerce_payment_null'];
+  if (!empty($order->data['commerce_payment_example'])) {
+    $pane_values += $order->data['commerce_payment_example'];
   }
 
   // Merge in default values.
@@ -40,7 +41,7 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
-    '#description' => t('This is a demonstration field only and will fail validation with a single character.'),
+    '#description' => t('This is a demonstration field coded to fail validation for single character values.'),
     '#default_value' => $pane_values['name'],
     '#required' => TRUE,
   );
@@ -51,10 +52,10 @@ function commerce_payment_null_submit_form($payment_method, $pane_values, $check
 /**
  * Payment method callback: checkout form validation.
  */
-function commerce_payment_null_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
+function commerce_payment_example_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
   // Throw an error if a long enough name was not provided.
   if (strlen($pane_values['name']) < 2) {
-    form_set_error(implode('][', array_merge($form_parents, array('name'))), t('You must enter a full name more than two characters long.'));
+    form_set_error(implode('][', array_merge($form_parents, array('name'))), t('You must enter a name two or more characters long.'));
 
     // Even though the form error is enough to stop the submission of the form,
     // it's not enough to stop it from a Commerce standpoint because of the
@@ -66,14 +67,14 @@ function commerce_payment_null_submit_form_validate($payment_method, $pane_form,
 /**
  * Payment method callback: checkout form submission.
  */
-function commerce_payment_null_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
-  $order->data['commerce_payment_null'] = $pane_values;
+function commerce_payment_example_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
+  $order->data['commerce_payment_example'] = $pane_values;
 
-  commerce_payment_null_transaction($payment_method, $order, $charge, $pane_values['name']);
+  commerce_payment_example_transaction($payment_method, $order, $charge, $pane_values['name']);
 }
 
 /**
- * Creates a NULL payment transaction for the specified charge amount.
+ * Creates an example payment transaction for the specified charge amount.
  *
  * @param $payment_method
  *   The payment method instance object used to charge this payment.
@@ -84,8 +85,8 @@ function commerce_payment_null_submit_form_submit($payment_method, $pane_form, $
  * @param $name
  *   The name entered on the submission form.
  */
-function commerce_payment_null_transaction($payment_method, $order, $charge, $name) {
-  $transaction = commerce_payment_transaction_new('commerce_payment_null', $order->order_id);
+function commerce_payment_example_transaction($payment_method, $order, $charge, $name) {
+  $transaction = commerce_payment_transaction_new('commerce_payment_example', $order->order_id);
   $transaction->instance_id = $payment_method->instance_id;
   $transaction->amount = $charge['amount'];
   $transaction->currency_code = $charge['currency_code'];

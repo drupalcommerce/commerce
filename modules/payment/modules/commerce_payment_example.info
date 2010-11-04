@@ -1,0 +1,10 @@
+; $Id$
+name = Payment Method Example
+description = Provides an example payment method for testing and development.
+package = Commerce
+dependencies[] = commerce
+dependencies[] = commerce_payment
+core = 7.x
+
+; Base module files
+files[] = commerce_payment_example.module
