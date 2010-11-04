@@ -50,14 +50,13 @@ function commerce_order_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'handler' => 'views_handler_filter_string',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
-    // TODO: Provide an argument handler for orders.
     'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
+      'handler' => 'views_handler_argument_string',
     ),
   );
 
