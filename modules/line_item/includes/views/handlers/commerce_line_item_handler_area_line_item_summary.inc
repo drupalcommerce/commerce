@@ -4,9 +4,6 @@
 /**
  * Defines a line item summary area handler so the summary can be plugged into
  *   the View itself.
- *
- * TODO: Add a view cart link when available and options pertaining to the types
- * of line items summarized and which links to include.
  */
 class commerce_line_item_handler_area_line_item_summary extends views_handler_area {
 
@@ -65,6 +62,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       // Add total information and a link to checkout.
       $quantity = commerce_line_items_quantity($line_item_ids);
       $total = commerce_line_items_total($line_item_ids);
+      $currency = commerce_currency_load($total['currency_code']);
 
       $links = array();
 
@@ -92,7 +90,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
         'quantity_raw' => $quantity,
         'quantity_label' => format_plural($quantity, 'item', 'items'),
         'quantity' => format_plural($quantity, '1 item', '@count items'),
-        'total_raw' => number_format(round($total['price'], 2), 2),
+        'total_raw' => number_format(commerce_currency_round($total['price'], $currency), $currency->decimals),
         'total_label' => t('Total:'),
         'total' => commerce_currency_format($total['price'], $total['currency_code'], $this->view),
         'links' => theme('links', array('links' => $links)),

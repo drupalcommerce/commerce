@@ -36,6 +36,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'addressfield',
       //'rules_admin',
       // UI
+      'ctools',
       'views',
       //'views_ui',
       'field',
@@ -63,7 +64,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'commerce_payment_ui',
     );
     $payment = array(
-      'commerce_payment_null',
+      'commerce_payment_example',
     );
 
     // Final module list
@@ -541,20 +542,22 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-drupal-commerce-commerce-product-enable',
       'edit-modules-drupal-commerce-commerce-product-reference-enable',
 
-      'edit-modules-drupal-commerce-payment-commerce-payment-null-enable',
+      'edit-modules-drupal-commerce-commerce-payment-example-enable',
 
-      'edit-modules-drupal-commerce-ui-commerce-ui-enable',
-      'edit-modules-drupal-commerce-ui-commerce-customer-ui-enable',
-      'edit-modules-drupal-commerce-ui-commerce-line-item-ui-enable',
-      'edit-modules-drupal-commerce-ui-commerce-order-ui-enable',
-      'edit-modules-drupal-commerce-ui-commerce-payment-ui-enable',
-      'edit-modules-drupal-commerce-ui-commerce-product-ui-enable',
+      'edit-modules-drupal-commerce-commerce-ui-enable',
+      'edit-modules-drupal-commerce-commerce-customer-ui-enable',
+      'edit-modules-drupal-commerce-commerce-line-item-ui-enable',
+      'edit-modules-drupal-commerce-commerce-order-ui-enable',
+      'edit-modules-drupal-commerce-commerce-payment-ui-enable',
+      'edit-modules-drupal-commerce-commerce-product-ui-enable',
 
       'edit-modules-other-addressfield-enable',
       'edit-modules-other-entity-enable',
       'edit-modules-other-entity-metadata-enable',
 
       'edit-modules-rules-rules-enable',
+
+      'edit-modules-chaos-tool-suite-ctools-enable',
 
       'edit-modules-views-views-enable',
     );
@@ -656,5 +659,66 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $product_node = $product_nodes[1];
     $this->drupalGet("node/{$product_node->nid}");
     $this->assertText($product_node->title, "Product <em>{$product_node->title}</em> node page exists!");
+  }
+
+
+  /**
+   * Test the currency value rounding.
+   */
+  public function testCurrencyRounding() {
+
+    // array( decimals => array( base => array( 'value' => 'expected result')));
+    $rounding_numbers = array(
+      '2' => array(
+        '5' => array(
+          '1' => '1',
+          '5' => '5',
+          '777' => '777',
+          '1.22' => '1.20',
+          '12.2249' => '12.20',
+          '1200.225' => '1200.25',
+          '0.2749' => '0.25',
+          '490.275' => '490.30',
+        ),
+        '2' => array(
+          '1' => '1',
+          '777' => '777',
+          '1.205' => '1.20',
+          '12.20999' => '12.20',
+          '1200.21' => '1200.22',
+          '0.26999' => '0.26',
+          '490.2712' => '490.28',
+        ),
+      ),
+      '1' => array(
+        '5' => array(
+          '1' => '1',
+          '5' => '5',
+          '1.22' => '1',
+          '12.2499' => '12',
+          '1200.25' => '1200.5',
+          '0.749' => '0.5',
+          '490.75' => '491.0',
+        ),
+        '2' => array(
+          '1' => '1',
+          '777' => '777',
+          '1.05' => '1',
+          '12.0999' => '12',
+          '1200.1' => '1200.2',
+          '0.6999' => '0.6',
+          '490.712' => '490.8',
+        ),
+      ),
+    );
+
+    foreach ($rounding_numbers as $decimals => $rounding_steps) {
+      foreach ($rounding_steps as $rounding_step => $numbers) {
+        foreach ($numbers as $input => $output) {
+          $result = commerce_currency_round($input, (object) array('decimals' => $decimals, 'rounding_step' => $rounding_step));
+          $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $decimals . ' decimals with ' . $rounding_step . ' as the rounding step results in ' . $output . '.');
+        }
+      }
+    }
   }
 }

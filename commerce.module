@@ -203,6 +203,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       'symbol' => '',
       'minor_unit' => '',
       'decimals' => 2,
+      'rounding_step' => 0,
       'thousands_separator' => ',',
       'decimal_separator' => '.',
       'symbol_placement' => '',
@@ -299,7 +300,7 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
   }
 
   // Format the price as a number.
-  $price = number_format(round($price, $currency->decimals), $currency->decimals, $currency->decimal_separator, $currency->thousands_separator);
+  $price = number_format(commerce_currency_round($price, $currency), $currency->decimals, $currency->decimal_separator, $currency->thousands_separator);
 
   // Establish the replacement values to format this price for its currency.
   $replacements = array(
@@ -312,4 +313,33 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
   );
 
   return t('@code_before @negative@symbol_before@price @symbol_after @code_after', $replacements);
+}
+
+/**
+ * Rounds a price amount for the specified currency.
+ *
+ * Normal rounding to the nearest hundredth will apply for the most currencies,
+ * but some have to be rounded to the nearest half or fifth of the major unit.
+ *
+ * @param $price
+ *   The numeric value of the price to be rounded.
+ * @param $currency
+ *   The currency object containing the rounding information pertinent to this
+ *     price. Specifically, this function looks for the 'decimals' property for
+ *     the number of decimal places to round to and the 'rounding_step' property
+ *     for the step size to round to (currently only works with 2 for the
+ *     nearest fifth and 5 for the nearest half). For example, Swiss Francs will
+ *     be rounded to the nearest .5.
+ *
+ * @return
+ *   The rounded numeric value for the price.
+ */
+function commerce_currency_round($price, $currency) {
+  if (!$currency->rounding_step) {
+    return round($price, $currency->decimals);
+  }
+
+  $modifier = 1 / ($currency->rounding_step / pow(10, $currency->decimals));
+
+  return round($price * $modifier) / $modifier;
 }

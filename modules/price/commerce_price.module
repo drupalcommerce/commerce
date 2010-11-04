@@ -246,14 +246,14 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
   // If a price has already been set for this instance prepare default values.
   if (isset($items[$delta]['price'])) {
-    // TODO: Adjust rounding to be currency specific.
+    $currency = commerce_currency_load($items[$delta]['currency_code']);
 
     // Round the default value.
     $default_price = round($items[$delta]['price'], 2);
 
     // Run it through number_format() to add the decimal places in if necessary.
-    if (strpos($default_price, '.') === FALSE || strpos($default_price, '.') > strlen($default_price) - 2) {
-      $default_price = number_format($default_price, 2, '.', '');
+    if (strpos($default_price, '.') === FALSE || strpos($default_price, '.') > strlen($default_price) - $currency->decimals) {
+      $default_price = number_format($default_price, $currency->decimals, '.', '');
     }
 
     $default_currency_code = $items[$delta]['currency_code'];
