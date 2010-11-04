@@ -76,7 +76,7 @@ function commerce_product_ui_menu() {
   $items['admin/commerce/products/types/add'] = array(
     'title' => 'Add product type',
     'page callback' => 'commerce_product_ui_product_type_form_wrapper',
-    'page arguments' => array(commerce_product_type_new()),
+    'page arguments' => array(commerce_product_ui_product_type_new()),
     'access arguments' => array('administer product types'),
     'type' => MENU_LOCAL_ACTION,
     'file' => 'includes/commerce_product_ui.types.inc',
@@ -260,20 +260,110 @@ function commerce_product_ui_uri($product) {
 }
 
 /**
+ * Implements hook_commerce_product_info().
+ */
+function commerce_product_ui_commerce_product_info() {
+  return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
+}
+
+/**
+ * Returns an initialized product type object.
+ */
+function commerce_product_ui_product_type_new() {
+  return (object) array(
+    'type' => '',
+    'name' => '',
+    'description' => '',
+    'help' => '',
+  );
+}
+
+/**
+ * Saves a product type.
+ *
+ * This function will either insert a new product type if $product_type->is_new
+ * is set or attempt to update an existing product type if it is not. It does
+ * not currently support changing the machine-readable name of the product type,
+ * nor is this possible through the form supplied by the Product UI module.
+ *
+ * @param $product_type
+ *   The product type object containing the basic properties as initialized in
+ *     commerce_product_type_new().
+ *
+ * @return
+ *   The return value of the call to drupal_write_record() to save the product
+ *     type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
+ *     the type of query performed to save the product type.
+ */
+function commerce_product_ui_product_type_save($product_type) {
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : array());
+  menu_rebuild();
+
+  // If this is a new product type and the insert did not fail...
+  if (!empty($product_type->is_new) && $op !== FALSE) {
+    // Notify the field API that a new bundle has been created.
+    field_attach_create_bundle('commerce_product', $product_type->type);
+
+    // Add the base_price field to the product type.
+    commerce_product_configure_product_type($product_type->type);
+
+    // Notify other modules that a new product type has been created.
+    module_invoke_all('commerce_product_type_insert', $product_type);
+  }
+  else {
+    // Notify other modules that an existing product type has been updated.
+    module_invoke_all('commerce_product_type_update', $product_type);
+  }
+
+  return $op;
+}
+
+/**
+ * Deletes a product type.
+ *
+ * @param $type
+ *   The machine-readable name of the product type.
+ */
+function commerce_product_ui_product_type_delete($type) {
+  $product_type = commerce_product_type_load($type);
+
+  db_delete('commerce_product_type')
+    ->condition('type', $type)
+    ->execute();
+
+  // Rebuild the menu to get rid of this type's product add menu item.
+  menu_rebuild();
+
+  // Notify the field API that this bundle has been destroyed.
+  field_attach_delete_bundle('commerce_product', $type);
+
+  // Notify other modules that this product type has been deleted.
+  module_invoke_all('commerce_product_type_delete', $product_type);
+}
+
+/**
+ * Checks to see if a given product type already exists.
+ *
+ * @param $type
+ *   The string to match against existing types.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not the product type exists.
+ */
+function commerce_product_ui_validate_product_type_unique($type) {
+  // Look for a match of the type.
+  if ($match_id = db_query('SELECT type FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchField()) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
  * Implements hook_forms().
  */
 function commerce_product_ui_forms($form_id, $args) {
   $forms = array();
-
-  // Define a wrapper ID for the product type add / edit form.
-  $forms['commerce_product_ui_product_type_form'] = array(
-    'callback' => 'commerce_product_product_type_form',
-  );
-
-  // Define a wrapper ID for the product type delete confirmation form.
-  $forms['commerce_product_ui_product_type_delete_form'] = array(
-    'callback' => 'commerce_product_product_type_delete_form',
-  );
 
   // Define a wrapper ID for the product add / edit form.
   $forms['commerce_product_ui_product_form'] = array(
@@ -298,86 +388,6 @@ function commerce_product_ui_form_alter(&$form, &$form_state, $form_id) {
       commerce_product_ui_set_breadcrumb(TRUE);
     }
   }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * The Product UI module instantiates the product type add/edit form at
- * particular paths in the Commerce IA. It uses its own form ID to do so and
- * alters the form here to add in appropriate redirection and buttons.
- *
- * @see commerce_product_ui_product_type_form()
- */
-function commerce_product_ui_form_commerce_product_ui_product_type_form_alter(&$form, &$form_state) {
-  // Add a submit handler to the save button to add a redirect.
-  $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_type_form_submit';
-
-  if (!empty($form_state['product_type']->type)) {
-    $form['actions']['delete'] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete product type'),
-      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
-      '#submit' => array('commerce_product_ui_product_type_form_delete_submit'),
-      '#weight' => 45,
-    );
-  }
-  else {
-    $form['actions']['save_continue'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save and add fields'),
-      '#suffix' => l('Cancel', 'admin/commerce/products/types'),
-      '#submit' => array('commerce_product_product_type_form_submit', 'commerce_product_ui_product_type_form_submit'),
-      '#weight' => 45,
-    );
-  }
-}
-
-/**
- * Submit callback for delete button on commerce_product_ui_product_type_form().
- *
- * @see commerce_product_ui_form_commerce_product_ui_product_type_form_alter()
- */
-function commerce_product_ui_product_type_form_delete_submit($form, &$form_state) {
-  $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type .'/delete';
-}
-
-/**
- * Submit callback for commerce_product_ui_product_type_form().
- *
- * @see commerce_product_ui_form_commerce_product_ui_product_type_form_alter()
- */
-function commerce_product_ui_product_type_form_submit($form, &$form_state) {
-  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type . '/fields';
-  }
-  else {
-    $form_state['redirect'] = 'admin/commerce/products/types';
-  }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * The Product UI module instantiates the product type delete form at a
- * particular path in the Commerce IA. It uses its own form ID to do so and
- * alters the form here to add in appropriate redirection.
- *
- * @see commerce_product_ui_product_type_delete_form()
- */
-function commerce_product_ui_form_commerce_product_ui_product_type_delete_form_alter(&$form, &$form_state) {
-  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/products/types');
-
-  $form['#submit'][] = 'commerce_product_ui_product_type_delete_form_submit';
-}
-
-/**
- * Submit callback for commerce_product_ui_product_type_delete_form().
- *
- * @see commerce_product_ui_form_commerce_product_ui_product_type_delete_form_alter()
- */
-function commerce_product_ui_product_type_delete_form_submit($form, &$form_state) {
-  $form_state['redirect'] = 'admin/commerce/products/types';
 }
 
 /**

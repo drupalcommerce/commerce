@@ -142,7 +142,7 @@ function commerce_product_permission() {
     ),
     'administer product types' => array(
       'title' => t('Administer product types'),
-      'description' => t('Allows users to add product types and configure their fields.'),
+      'description' => t('Allows users to configure product types and their fields.'),
       'restrict access' => TRUE,
     ),
     'access products' => array(
@@ -170,91 +170,6 @@ function commerce_product_permission() {
 }
 
 /**
- * Returns an initialized product type object.
- */
-function commerce_product_type_new() {
-  return (object) array(
-    'type' => '',
-    'name' => '',
-    'description' => '',
-    'help' => '',
-  );
-}
-
-/**
- * Saves a product type.
- *
- * This function will either insert a new product type if $product_type->is_new
- * is set or attempt to update an existing product type if it is not. It does
- * not currently support changing the machine-readable name of the product type,
- * nor is this possible through the form supplied by the Product UI module.
- *
- * @param $product_type
- *   The product type object containing the basic properties as initialized in
- *     commerce_product_type_new().
- *
- * @return
- *   The return value of the call to drupal_write_record() to save the product
- *     type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
- *     the type of query performed to save the product type.
- */
-function commerce_product_type_save($product_type) {
-  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : array());
-  menu_rebuild();
-
-  // If this is a new product type and the insert did not fail...
-  if (!empty($product_type->is_new) && $op !== FALSE) {
-    // Notify the field API that a new bundle has been created.
-    field_attach_create_bundle('commerce_product', $product_type->type);
-
-    // Add the base_price field to the product type.
-    commerce_product_configure_product_type($product_type->type);
-
-    // Notify other modules that a new product type has been created.
-    module_invoke_all('commerce_product_type_insert', $product_type);
-  }
-  else {
-    // Notify other modules that an existing product type has been updated.
-    module_invoke_all('commerce_product_type_update', $product_type);
-  }
-
-  return $op;
-}
-
-/**
- * Loads a product type.
- *
- * @param $type
- *   The machine-readable name of the product type.
- */
-function commerce_product_type_load($type) {
-  return db_query('SELECT * FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchObject();
-}
-
-/**
- * Deletes a product type.
- *
- * @param $type
- *   The machine-readable name of the product type.
- */
-function commerce_product_type_delete($type) {
-  $product_type = commerce_product_type_load($type);
-
-  db_delete('commerce_product_type')
-    ->condition('type', $type)
-    ->execute();
-
-  // Rebuild the menu to get rid of this type's product add menu item.
-  menu_rebuild();
-
-  // Notify the field API that this bundle has been destroyed.
-  field_attach_delete_bundle('commerce_product', $type);
-
-  // Notify other modules that this product type has been deleted.
-  module_invoke_all('commerce_product_type_delete', $product_type);
-}
-
-/**
  * Returns an array of product type objects keyed by type.
  */
 function commerce_product_types() {
@@ -263,7 +178,19 @@ function commerce_product_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($product_types)) {
-    $product_types = db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
+    $product_types = array();
+
+    // Find product types defined by hook_commerce_product_info().
+    foreach (module_implements('commerce_product_info') as $module) {
+      foreach (module_invoke($module, 'commerce_product_info') as $type => $product_type) {
+        // Set the module each product type is defined by.
+        $product_type->module = $module;
+        $product_types[$type] = $product_type;
+      }
+    }
+
+    // Last allow the info to be altered by other modules.
+    drupal_alter('commerce_product_info', $product_types);
   }
 
   return $product_types;
@@ -275,6 +202,17 @@ function commerce_product_types() {
 function commerce_product_types_reset() {
   $product_types = &drupal_static('commerce_product_types');
   $product_types = NULL;
+}
+
+/**
+ * Loads a product type.
+ *
+ * @param $type
+ *   The machine-readable name of the product type.
+ */
+function commerce_product_type_load($type) {
+  $product_types = commerce_product_types();
+  return !empty($product_types[$type]) ? $product_types[$type] : FALSE;
 }
 
 /**
@@ -322,24 +260,6 @@ function commerce_product_type_title($product_type) {
  */
 function commerce_product_type_to_arg($type) {
   return $type;
-}
-
-/**
- * Checks to see if a given product type already exists.
- *
- * @param $type
- *   The string to match against existing types.
- *
- * @return
- *   TRUE or FALSE indicating whether or not the product type exists.
- */
-function commerce_product_type_validate_type_unique($type) {
-  // Look for a match of the type.
-  if ($match_id = db_query('SELECT type FROM {commerce_product_type} WHERE type = :type', array(':type' => $type))->fetchField()) {
-    return FALSE;
-  }
-
-  return TRUE;
 }
 
 /**

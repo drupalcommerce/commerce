@@ -77,7 +77,7 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
   commerce_product_ui_set_breadcrumb(TRUE);
 
   // Include the forms file from the Product module.
-  module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
+  module_load_include('inc', 'commerce_product_ui', 'includes/commerce_product_ui.forms');
 
   return drupal_get_form('commerce_product_ui_product_type_form', $product_type);
 }
@@ -101,7 +101,7 @@ function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
   }
 
   // Include the forms file from the Product module.
-  module_load_include('inc', 'commerce_product', 'includes/commerce_product.forms');
+  module_load_include('inc', 'commerce_product_ui', 'includes/commerce_product_ui.forms');
 
   return drupal_get_form('commerce_product_ui_product_type_delete_form', $product_type);
 }

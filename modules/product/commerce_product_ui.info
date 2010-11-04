@@ -10,9 +10,11 @@ dependencies[] = commerce_product
 dependencies[] = views
 
 ; Base module files
+files[] = commerce_product_ui.install
 files[] = commerce_product_ui.module
 
 ; Module includes
+files[] = includes/commerce_product_ui.forms.inc
 files[] = includes/commerce_product_ui.products.inc
 files[] = includes/commerce_product_ui.types.inc
 
