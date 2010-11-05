@@ -1,0 +1,79 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * This file contains no working PHP code; it exists to provide additional
+ * documentation for doxygen as well as to document hooks in the standard
+ * Drupal manner.
+ */
+
+/**
+ * Defines currencies available to commerce.
+ *
+ * By default commerce provides all active currencies according to ISO 4217.
+ * Make sure to use the translate function t() for translatable properties.
+ *
+ * @return
+ *   An array of information about the currencies commerce should provide.
+ *   The array contains a sub-array for each currency, with the currency name
+ *   as the key.
+ *   Possible attributes for each sub-array are:
+ *   - code: The uppercase alphabetic currency code.
+ *      For example USD.
+ *   - numeric_code: The nummeric currceny code. According to ISO4217 this code
+ *     consists of three digits and first digit can be a zero.
+ *   - symbol: The currency symbol. For example $.
+ *   - name: The name of the currency. Translatable.
+ *   - symbol_placement: Defines where the currency symbol has to be placed for
+ *      display. Allowed values: before, after, hidden.
+ *   - code_placement: Defines where the currency code has to be placed for
+ *      display. Allowed values: before, after, hidden.
+ *   - minor_unit: Name of the minor unit of the currency. For example Cent.
+ *     Translatable
+ *   - major_unit: Name of the major unit of the currency. For example Dollar.
+ *     Translatable
+ *   - rounding_step: Defines which stepping has to is used for price rounding.
+ *     For example Swiss Francs use a rounding_step of 0.05. This means a
+ *     price like 10.93 is converted to 10.95. Currently only the steps
+ *     0.5,0.05... and 0.2, 0.02 ... are supported. This value has to be
+ *     defined as string, otherwise the rounding results can be unpredictable.
+ *     Default: 0 (no special rounding)
+ *   - decimals: The number of decimals to display.
+ *     Default: 2
+ *   - thousands_separator: The char to split the value in groups of thousand.
+ *     Default: ,
+ *   - decimal_separator: The char to split the integer from the decimal part.
+ *     Default: .
+ *   - format_callback: Custom callback function to format a price value.
+ *
+ * @see hook_commerce_currency_info_alter()
+ */
+function hook_commerce_currency_info() {
+  return array (
+    'CHF' => array(
+        'code' => 'CHF',
+        'numeric_code' => '756',
+        'symbol' => 'Fr.',
+        'name' => t('Swiss Franc'),
+        'symbol_placement' => 'before',
+        'code_placement' => 'before',
+        'minor_unit' => t('Rappen'),
+        'major_unit' => t('Franc'),
+        'rounding_step' => '0.05',
+    ),
+  );
+}
+
+/**
+ * Alter commerce currencies.
+ *
+ * By default Commerce provides all active currencies according to ISO 4217.
+ * This hook allows you to change the formatting properties of existing
+ * definitions.
+ *
+ * @see hook_commerce_currency_info()
+ */
+function hook_commerce_currency_info_alter(&$currencies, $langcode) {
+  $currencies['CHF']['code_placement'] = 'after';
+}

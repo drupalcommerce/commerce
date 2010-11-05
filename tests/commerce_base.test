@@ -162,7 +162,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @return
    *  A user with the permissions returned from permissionBuilder().
    */
-  protected function createUserWithPermissionHeper($set) {
+  protected function createUserWithPermissionHelper($set) {
     $permissions = $this->permissionBuilder($set);
     $user = $this->drupalCreateUser($permissions);
     return $user;
@@ -173,7 +173,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * modules in Drupal core.
    */
   protected function createSiteAdmin() {
-    return $this->createUserWithPermissionHeper('site admin');
+    return $this->createUserWithPermissionHelper('site admin');
   }
 
   /**
@@ -181,7 +181,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * Commerce modules.
    */
   protected function createStoreAdmin() {
-    return $this->createUserWithPermissionHeper('store admin');
+    return $this->createUserWithPermissionHelper('store admin');
   }
 
 
@@ -481,7 +481,6 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
 
 
   }
-
 }
 
 
@@ -531,16 +530,16 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->drupalGet('admin/modules');
 
     $module_ids = array(
-      'edit-modules-drupal-commerce-commerce-cart-enable',
-      'edit-modules-drupal-commerce-commerce-checkout-enable',
-      'edit-modules-drupal-commerce-commerce-enable',
-      'edit-modules-drupal-commerce-commerce-customer-enable',
-      'edit-modules-drupal-commerce-commerce-line-item-enable',
-      'edit-modules-drupal-commerce-commerce-order-enable',
-      'edit-modules-drupal-commerce-commerce-payment-enable',
-      'edit-modules-drupal-commerce-commerce-price-enable',
-      'edit-modules-drupal-commerce-commerce-product-enable',
-      'edit-modules-drupal-commerce-commerce-product-reference-enable',
+      'edit-modules-commerce-commerce-cart-enable',
+      'edit-modules-commerce-commerce-checkout-enable',
+      'edit-modules-commerce-commerce-enable',
+      'edit-modules-commerce-commerce-customer-enable',
+      'edit-modules-commerce-commerce-line-item-enable',
+      'edit-modules-commerce-commerce-order-enable',
+      'edit-modules-commerce-commerce-payment-enable',
+      'edit-modules-commerce-commerce-price-enable',
+      'edit-modules-commerce-commerce-product-enable',
+      'edit-modules-commerce-commerce-product-reference-enable',
 
       'edit-modules-drupal-commerce-commerce-payment-example-enable',
 
@@ -667,57 +666,53 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
    */
   public function testCurrencyRounding() {
 
-    // array( decimals => array( base => array( 'value' => 'expected result')));
+    // array( rounding_step => array( 'value' => 'expected result'));
     $rounding_numbers = array(
-      '2' => array(
-        '5' => array(
-          '1' => '1',
-          '5' => '5',
-          '777' => '777',
-          '1.22' => '1.20',
-          '12.2249' => '12.20',
-          '1200.225' => '1200.25',
-          '0.2749' => '0.25',
-          '490.275' => '490.30',
-        ),
-        '2' => array(
-          '1' => '1',
-          '777' => '777',
-          '1.205' => '1.20',
-          '12.20999' => '12.20',
-          '1200.21' => '1200.22',
-          '0.26999' => '0.26',
-          '490.2712' => '490.28',
-        ),
+      '0.05' => array(
+        '1' => '1',
+        '5' => '5',
+        '777' => '777',
+        '1.22' => '1.20',
+        '12.2249' => '12.20',
+        '1200.225' => '1200.25',
+        '0.2749' => '0.25',
+        '490.275' => '490.30',
       ),
-      '1' => array(
-        '5' => array(
-          '1' => '1',
-          '5' => '5',
-          '1.22' => '1',
-          '12.2499' => '12',
-          '1200.25' => '1200.5',
-          '0.749' => '0.5',
-          '490.75' => '491.0',
-        ),
-        '2' => array(
-          '1' => '1',
-          '777' => '777',
-          '1.05' => '1',
-          '12.0999' => '12',
-          '1200.1' => '1200.2',
-          '0.6999' => '0.6',
-          '490.712' => '490.8',
-        ),
+      '0.02' => array(
+        '1' => '1',
+        '777' => '777',
+        '1.205' => '1.20',
+        '12.20999' => '12.20',
+        '1200.21' => '1200.22',
+        '0.26999' => '0.26',
+        '490.2712' => '490.28',
+      ),
+      '0.5' => array(
+        '1' => '1',
+        '5' => '5',
+        '1.22' => '1',
+        '12.2499' => '12',
+        '1200.25' => '1200.5',
+        '0.749' => '0.5',
+        '490.75' => '491.0',
+      ),
+      '0.2' => array(
+        '1' => '1',
+        '777' => '777',
+        '1.05' => '1',
+        '12.0999' => '12',
+        '1200.1' => '1200.2',
+        '0.6999' => '0.6',
+        '490.712' => '490.8',
       ),
     );
 
-    foreach ($rounding_numbers as $decimals => $rounding_steps) {
-      foreach ($rounding_steps as $rounding_step => $numbers) {
-        foreach ($numbers as $input => $output) {
-          $result = commerce_currency_round($input, (object) array('decimals' => $decimals, 'rounding_step' => $rounding_step));
-          $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $decimals . ' decimals with ' . $rounding_step . ' as the rounding step results in ' . $output . '.');
-        }
+    foreach ($rounding_numbers as $rounding_step => $numbers) {
+      foreach ($numbers as $input => $output) {
+        $currency = (object) array('decimals' => 2, 'rounding_step' => $rounding_step);
+
+        $result = commerce_currency_round($input, $currency);
+        $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $output . ' with the rounding step: ' . $rounding_step . '.');
       }
     }
   }

@@ -246,7 +246,7 @@ function commerce_commerce_currency_info() {
       'code' => 'CHF',
       'symbol' => 'Fr.',
       'name' => t('Swiss Franc'),
-      'rounding_step' => 5,
+      'rounding_step' => '0.05',
       'symbol_placement' => 'before',
       'code_placement' => 'before',
       'numeric_code' => 756,

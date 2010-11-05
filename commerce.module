@@ -193,8 +193,10 @@ function commerce_currency_load($currency_code = NULL) {
  *   An array of altered currency objects keyed by the currency code.
  */
 function commerce_currencies($enabled = FALSE, $reset = FALSE) {
+  global $language;
+
   // Attempt to load currency data from the cache first.
-  if (!$reset && $currencies = cache_get('commerce_currencies')) {
+  if (!$reset && $currencies = cache_get('commerce_currencies:' . $language->language)) {
     $currencies = $currencies->data;
   }
   else {
@@ -221,7 +223,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       $currencies[$currency_code] = (object) array_merge($defaults, $currency);
     }
 
-    cache_set('commerce_currencies', $currencies);
+    cache_set('commerce_currencies:' . $language->language, $currencies);
   }
 
   // Return only enabled currencies if specified.
@@ -318,18 +320,18 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
 /**
  * Rounds a price amount for the specified currency.
  *
- * Normal rounding to the nearest hundredth will apply for the most currencies,
- * but some have to be rounded to the nearest half or fifth of the major unit.
+ * Rounding of the minor unit with a currency specific step size. For example,
+ * Swiss Francs are rounded using a step size of 0.05. This means a price of
+ * 10.93 is converted to 10.95.
  *
  * @param $price
  *   The numeric value of the price to be rounded.
  * @param $currency
  *   The currency object containing the rounding information pertinent to this
- *     price. Specifically, this function looks for the 'decimals' property for
- *     the number of decimal places to round to and the 'rounding_step' property
- *     for the step size to round to (currently only works with 2 for the
- *     nearest fifth and 5 for the nearest half). For example, Swiss Francs will
- *     be rounded to the nearest .5.
+ *     price. Specifically, this function looks for the 'rounding_step' property
+ *     for the step size to round to, supporting '0.05' and '0.02'. If the value
+ *     is 0, this function performs normal rounding to the nearest supported
+ *     decimal value.
  *
  * @return
  *   The rounded numeric value for the price.
@@ -339,7 +341,6 @@ function commerce_currency_round($price, $currency) {
     return round($price, $currency->decimals);
   }
 
-  $modifier = 1 / ($currency->rounding_step / pow(10, $currency->decimals));
-
+  $modifier = 1 / $currency->rounding_step;
   return round($price * $modifier) / $modifier;
 }
