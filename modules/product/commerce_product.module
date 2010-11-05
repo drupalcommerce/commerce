@@ -170,6 +170,34 @@ function commerce_product_permission() {
 }
 
 /**
+ * Implements hook_enable().
+ */
+function commerce_product_enable() {
+  // Loop through and configure all the currently defined product types.
+  foreach (commerce_product_types() as $product_type) {
+    commerce_product_configure_product_type($product_type);
+  }
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function commerce_product_modules_enabled($modules) {
+  // Loop through all the enabled modules.
+  foreach ($modules as $module) {
+    // If the module implements hook_commerce_product_info()...
+    if (module_hook($module, 'commerce_product_info')) {
+      $product_types = module_invoke($module, 'commerce_product_info');
+
+      // Loop through and configure the product types defined by the module.
+      foreach ($product_types as $product_type) {
+        commerce_product_configure_product_type($product_type);
+      }
+    }
+  }
+}
+
+/**
  * Returns an array of product type objects keyed by type.
  */
 function commerce_product_types() {

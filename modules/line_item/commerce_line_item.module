@@ -125,7 +125,7 @@ function commerce_line_item_views_api() {
 function commerce_line_item_enable() {
   // Loop through and configure all the currently defined line item types.
   foreach (commerce_line_item_types() as $line_item_type) {
-    commerce_line_item_type_configure($line_item_type);
+    commerce_line_item_configure_line_item_type($line_item_type);
   }
 }
 
@@ -135,13 +135,13 @@ function commerce_line_item_enable() {
 function commerce_line_item_modules_enabled($modules) {
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
-    // If the module implements hook_commerce_line_item()...
+    // If the module implements hook_commerce_line_item_info()...
     if (module_hook($module, 'commerce_line_item_info')) {
       $line_item_types = module_invoke($module, 'commerce_line_item_info');
 
       // Loop through and configure the line item types defined by the module.
       foreach ($line_item_types as $line_item_type) {
-        commerce_line_item_type_configure($line_item_type);
+        commerce_line_item_configure_line_item_type($line_item_type);
       }
     }
   }
@@ -335,7 +335,7 @@ function commerce_line_item_type_get_name($type = NULL) {
  * @param $line_item_type
  *   The fully loaded line item type object to configure.
  */
-function commerce_line_item_type_configure($line_item_type) {
+function commerce_line_item_configure_line_item_type($line_item_type) {
   // Add the default price fields to the line item type.
   $weight = 0;
 
