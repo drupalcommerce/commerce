@@ -29,6 +29,13 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'type' => array(
+        'description' => 'The type of this order.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'uid' => array(
         'description' => 'The {users}.uid that owns this order.',
         'type' => 'int',
@@ -40,6 +47,7 @@ function commerce_order_schema() {
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
+        'default' => '',
       ),
       'status' => array(
         'description' => 'The {commerce_order_status}.name of this order.',

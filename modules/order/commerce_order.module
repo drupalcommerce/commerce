@@ -20,7 +20,11 @@ function commerce_order_entity_info() {
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'order_id',
+        'bundle' => 'type',
         'revision' => 'revision_id',
+      ),
+      'bundle keys' => array(
+        'bundle' => 'type',
       ),
       'bundles' => array(
         'commerce_order' => array(
@@ -155,24 +159,67 @@ function commerce_order_commerce_order_status_info() {
   return $order_statuses;
 }
 
+/**
+ * Returns the name of the specified order type or all names keyed by type if no
+ *   type is specified.
+ *
+ * For Drupal Commerce 1.0, the decision was made to support order types at the
+ * database level but not to introduce their complexity into the UI. To that end
+ * order "types" (i.e. bundles) may only be defined by altering the entity info.
+ *
+ * This function merely traverses the bundles array looking for data instead of
+ * relying on a special hook.
+ *
+ * @param $type
+ *   The order type whose name should be returned; corresponds to the bundle key
+ *     in the order entity definition.
+ *
+ * @return
+ *   Either the specified name, defaulting to the type itself if the name is not
+ *     found, or an array of all names keyed by type if no type is passed in.
+ */
+function commerce_order_type_get_name($type = NULL) {
+  $names = array();
+
+  $entity = entity_get_info('commerce_order');
+
+  foreach ($entity['bundles'] as $key => $value) {
+    $names[$key] = $value['label'];
+  }
+
+  if (empty($type)) {
+    return $names;
+  }
+
+  if (empty($names[$type])) {
+    return check_plain($type);
+  }
+  else {
+    return $names[$type];
+  }
+}
 
 /**
  * Returns an initialized order object.
  *
  * @param $uid
  *   The uid of the owner of the order.
+ * @param $status
+ *   Optionally the order status of the new order.
+ * @param $type
+ *   The type of the order; defaults to the standard 'order' type.
  *
  * @return
  *   An order object with all default fields initialized.
  */
-function commerce_order_new($uid = 0, $status = '') {
+function commerce_order_new($uid = 0, $status = '', $type = 'commerce_order') {
   // If no status was specified, use the default Pending status.
   if (empty($status)) {
     $order_state = commerce_order_state_load('pending');
     $status = $order_state->default_status;
   }
 
-  return entity_get_controller('commerce_order')->create($uid, $status);
+  return entity_get_controller('commerce_order')->create($uid, $status, $type);
 }
 
 /**

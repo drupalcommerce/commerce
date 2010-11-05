@@ -17,15 +17,20 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    *
    * @param $uid
    *   Optionally the uid of the customer for the order.
+   * @param $status
+   *   Optionally the order status of the new order.
+   * @param $type
+   *   The type of the order; defaults to the standard 'order' type.
    *
    * @return
    *   An order object with all default fields initialized.
    */
-  public function create($uid = 0, $status = '') {
+  public function create($uid = 0, $status = '', $type = 'commerce_order') {
     return (object) array(
       'order_id' => '',
       'order_number' => '',
       'revision_id' => '',
+      'type' => $type,
       'uid' => $uid,
       'mail' => '',
       'status' => $status,

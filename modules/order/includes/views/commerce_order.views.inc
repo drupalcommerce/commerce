@@ -60,6 +60,25 @@ function commerce_order_views_data() {
     ),
   );
 
+  // Expose the order type.
+  $data['commerce_order']['type'] = array(
+    'title' => t('Order type'),
+    'help' => t('The type of the order.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order_type',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'commerce_order_handler_filter_order_type',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Expose the owner uid.
   $data['commerce_order']['uid'] = array(
     'title' => t('Owner'),
