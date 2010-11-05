@@ -174,8 +174,8 @@ function commerce_product_permission() {
  */
 function commerce_product_enable() {
   // Loop through and configure all the currently defined product types.
-  foreach (commerce_product_types() as $product_type) {
-    commerce_product_configure_product_type($product_type);
+  foreach (commerce_product_types() as $type => $product_type) {
+    commerce_product_configure_product_type($type);
   }
 }
 
@@ -190,8 +190,8 @@ function commerce_product_modules_enabled($modules) {
       $product_types = module_invoke($module, 'commerce_product_info');
 
       // Loop through and configure the product types defined by the module.
-      foreach ($product_types as $product_type) {
-        commerce_product_configure_product_type($product_type);
+      foreach ($product_types as $type => $product_type) {
+        commerce_product_configure_product_type($type);
       }
     }
   }
