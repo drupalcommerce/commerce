@@ -54,16 +54,16 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
         $unchanged[$line_item->line_item_id] = clone commerce_line_item_load($line_item->line_item_id);
       }
 
-      // Give modules the opportunity to prepare field data for saving.
-      field_attach_presave('commerce_line_item', $line_item);
-      module_invoke_all('commerce_line_item_presave', $line_item);
-      rules_invoke_event('commerce_line_item_presave', $line_item);
-
       // Update the total of the line item based on the quantity and unit price.
       $line_item->total[LANGUAGE_NONE][0] = array(
         'price' => $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['price'],
         'currency_code' => $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'],
       );
+
+      // Give modules the opportunity to prepare field data for saving.
+      field_attach_presave('commerce_line_item', $line_item);
+      module_invoke_all('commerce_line_item_presave', $line_item);
+      rules_invoke_event('commerce_line_item_presave', $line_item);
 
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
