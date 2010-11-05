@@ -18,21 +18,21 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
   $pane_form['review'] = array(
     '#theme' => 'commerce_checkout_review',
     '#data' => array(),
-	);
+  );
 
   // Load all the checkout panes enabled for the review page.
   $checkout_panes = commerce_checkout_panes(array('enabled' => TRUE, 'review' => TRUE));
 
   // Loop through all the pages before the review page...
   foreach (commerce_checkout_pages() as $page_id => $checkout_page) {
-		// Exit the loop once the review page is reached.
-		if ($page_id == 'review') {
-			break;
-		}
+    // Exit the loop once the review page is reached.
+    if ($page_id == 'review') {
+      break;
+    }
 
     // Then loop through all the panes...
     foreach (commerce_checkout_panes(array('page' => $page_id)) as $pane_id => $checkout_pane_local) {
-		  // If the pane is on the review callback...
+      // If the pane is on the review callback...
       if ($callback = commerce_checkout_pane_callback($checkout_pane_local, 'review')) {
         // Add a row for it in the review data.
         $pane_form['review']['#data'][$pane_id] = array(
@@ -43,9 +43,9 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
         $pane_form['review']['#data'][$pane_id]['data'] = $callback($form, $form_state, $checkout_pane_local, $order);
       }
     }
-	}
+  }
 
-	return $pane_form;
+  return $pane_form;
 }
 
 /**
