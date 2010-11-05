@@ -1,5 +1,10 @@
 /* $Id$ */
 
+.views-field-status img.pending {
+  position: relative;
+  top: 3px;
+}
+
 .payment-totals-table {
   width: 33%;
   float: right;

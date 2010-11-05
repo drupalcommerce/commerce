@@ -369,7 +369,7 @@ function commerce_payment_transaction_statuses() {
       COMMERCE_PAYMENT_STATUS_PENDING => (object) array(
         'status' => COMMERCE_PAYMENT_STATUS_PENDING,
         'title' => t('Pending'),
-        'icon' => '',
+        'icon' => drupal_get_path('module', 'commerce_payment') . '/theme/icon-pending.png',
         'total' => FALSE,
       ),
       COMMERCE_PAYMENT_STATUS_SUCCESS => (object) array(
