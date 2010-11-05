@@ -200,13 +200,13 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
         $description = $description .' '. $this->randomString(128);
         $help = $help .' '. $this->randomString(128);
       }
-      $new_product_type = commerce_product_type_new();
+      $new_product_type = commerce_product_ui_product_type_new();
       $new_product_type->type = $type;
       $new_product_type->name = $name;
       $new_product_type->description = $description;
       $new_product_type->help = $help;
       $new_product_type->is_new = TRUE;
-      $save_result = commerce_product_type_save($new_product_type);
+      $save_result = commerce_product_ui_product_type_save($new_product_type);
       if ($save_result === FALSE) {
         return FALSE;
       }
