@@ -23,7 +23,7 @@ function commerce_customer_ui_menu() {
     'file' => 'includes/commerce_customer_ui.profiles.inc',
   );
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
-    $items['admin/commerce/customer-profiles/add/' . $type] = array(
+    $items['admin/commerce/customer-profiles/add/' . strtr($type, array('_' => '-'))] = array(
       'title' => 'Create @name',
       'title arguments' => array('@name' => $profile_type->name),
       'description' => $profile_type->description,
@@ -116,7 +116,7 @@ function commerce_customer_ui_customer_profile_add_any_access() {
  * Redirects a customer profile type URL to its fields management page.
  */
 function commerce_customer_ui_profile_type_redirect($profile_type) {
-  drupal_goto('admin/commerce/customer-profiles/types/' . $profile_type->type . '/fields');
+  drupal_goto('admin/commerce/customer-profiles/types/' . strtr($profile_type->type, array('_' => '-')) . '/fields');
 }
 
 /**
@@ -172,7 +172,7 @@ function commerce_customer_ui_help($path, $arg) {
 
   // Return the user defined help text per customer profile type when adding profiles.
   if ($arg[1] == 'commerce' && $arg[2] == 'customer-profiles' && $arg[3] == 'add' && $arg[4]) {
-    $profile_type = commerce_customer_profile_type_load(str_replace('-', '_', $arg[5]));
+    $profile_type = commerce_customer_profile_type_load($arg[5]);
     return (!empty($profile_type->help) ? '<p>' . filter_xss_admin($profile_type->help) . '</p>' : '');
   }
 }
@@ -209,7 +209,7 @@ function commerce_customer_ui_entity_info_alter(&$entity_info) {
   foreach ($entity_info['commerce_customer_profile']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
       'path' => 'admin/commerce/customer-profiles/types/%commerce_customer_profile_type',
-      'real path' => 'admin/commerce/customer-profiles/types/' . $type,
+      'real path' => 'admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')),
       'bundle argument' => 4,
       'access arguments' => array('administer customer profile types'),
     );
@@ -302,7 +302,7 @@ function commerce_customer_ui_form_commerce_customer_ui_customer_profile_form_al
 function commerce_customer_ui_customer_profile_form_submit($form, &$form_state) {
   // Set the redirect based on the button clicked.
   if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/customer-profiles/add/' . $form_state['customer_profile']->type;
+    $form_state['redirect'] = 'admin/commerce/customer-profiles/add/' . strtr($form_state['customer_profile']->type, array('_' => '-'));
   }
   elseif (arg(2) == 'customer-profiles' && arg(3) == 'add') {
     $form_state['redirect'] = 'admin/commerce/customer-profiles';

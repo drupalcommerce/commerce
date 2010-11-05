@@ -207,7 +207,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
   static function t($text, $strings) {
     $placeholders = array();
     foreach ($strings as $string) {
-      $placeholders['%' . $string] = drupal_placeholder(array('text' => $string));
+      $placeholders['%' . $string] = drupal_placeholder($string);
     }
     return strtr($text, $placeholders);
   }

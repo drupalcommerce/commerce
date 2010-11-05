@@ -22,7 +22,7 @@ function commerce_customer_ui_customer_profile_types_overview() {
   // Loop through all defined customer profile types.
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
     // Build the operation links for the current profile type.
-    $links = menu_contextual_links('commerce-customer-profile-type', 'admin/commerce/customer-profiles/types', array($type));
+    $links = menu_contextual_links('commerce-customer-profile-type', 'admin/commerce/customer-profiles/types', array(strtr($type, array('_' => '-'))));
 
     // Add the profile type's row to the table's rows array.
     $rows[] = array(

@@ -73,6 +73,11 @@ function commerce_order_entity_property_info() {
     'required' => TRUE,
     'clear' => array('uid'),
   );
+  $properties['line_items'] = array(
+    'label' => t('Line items'),
+    'description' => t('The line items attached to this order.'),
+    'type' => 'commerce_line_item',
+  );
 
   return $info;
 }

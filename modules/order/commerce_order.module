@@ -42,6 +42,7 @@ function commerce_order_entity_info() {
       'save callback' => 'commerce_order_save',
       'deletion callback' => 'commerce_order_delete',
       'access callback' => 'commerce_order_access',
+      'token type' => 'order',
     ),
   );
 

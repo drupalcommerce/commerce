@@ -65,6 +65,7 @@ function commerce_product_entity_info() {
       'save callback' => 'commerce_product_save',
       'deletion callback' => 'commerce_product_delete',
       'access callback' => 'commerce_product_access',
+      'token type' => 'product',
     ),
   );
 
@@ -236,9 +237,11 @@ function commerce_product_types_reset() {
  * Loads a product type.
  *
  * @param $type
- *   The machine-readable name of the product type.
+ *   The machine-readable name of the product type; accepts normal machine names
+ *     and URL prepared machine names with underscores replaced by hyphens.
  */
 function commerce_product_type_load($type) {
+  $type = strtr($type, array('-' => '_'));
   $product_types = commerce_product_types();
   return !empty($product_types[$type]) ? $product_types[$type] : FALSE;
 }

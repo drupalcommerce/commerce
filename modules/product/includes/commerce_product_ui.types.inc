@@ -22,7 +22,7 @@ function commerce_product_ui_types_overview() {
   // Loop through all defined product types.
   foreach (commerce_product_types() as $type => $product_type) {
     // Build the operation links for the current product type.
-    $links = menu_contextual_links('commerce-product-type', 'admin/commerce/products/types', array($type));
+    $links = menu_contextual_links('commerce-product-type', 'admin/commerce/products/types', array(strtr($type, array('_' => '-'))));
 
     // Add the product type's row to the table's rows array.
     $rows[] = array(

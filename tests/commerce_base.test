@@ -541,14 +541,14 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-commerce-commerce-product-enable',
       'edit-modules-commerce-commerce-product-reference-enable',
 
-      'edit-modules-drupal-commerce-commerce-payment-example-enable',
+      'edit-modules-commerce-commerce-payment-example-enable',
 
-      'edit-modules-drupal-commerce-commerce-ui-enable',
-      'edit-modules-drupal-commerce-commerce-customer-ui-enable',
-      'edit-modules-drupal-commerce-commerce-line-item-ui-enable',
-      'edit-modules-drupal-commerce-commerce-order-ui-enable',
-      'edit-modules-drupal-commerce-commerce-payment-ui-enable',
-      'edit-modules-drupal-commerce-commerce-product-ui-enable',
+      'edit-modules-commerce-commerce-ui-enable',
+      'edit-modules-commerce-commerce-customer-ui-enable',
+      'edit-modules-commerce-commerce-line-item-ui-enable',
+      'edit-modules-commerce-commerce-order-ui-enable',
+      'edit-modules-commerce-commerce-payment-ui-enable',
+      'edit-modules-commerce-commerce-product-ui-enable',
 
       'edit-modules-other-addressfield-enable',
       'edit-modules-other-entity-enable',

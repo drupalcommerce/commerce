@@ -77,6 +77,11 @@ function commerce_product_entity_property_info() {
     'required' => TRUE,
     'clear' => array('uid'),
   );
+  $properties['purchase_price'] = array(
+      'label' => t('Price'),
+      'description' => t('Purchase price of this product.'),
+      'type' => 'integer',
+  );
 
   return $info;
 }

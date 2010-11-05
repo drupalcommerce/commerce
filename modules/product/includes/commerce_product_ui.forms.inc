@@ -143,7 +143,7 @@ function commerce_product_ui_product_type_form_submit($form, &$form_state) {
   drupal_set_message(t('Product type saved.'));
 
   if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
-    $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type . '/fields';
+    $form_state['redirect'] = 'admin/commerce/products/types/' . strtr($form_state['product_type']->type, array('_' => '-')) . '/fields';
   }
   else {
     $form_state['redirect'] = 'admin/commerce/products/types';
@@ -156,7 +156,7 @@ function commerce_product_ui_product_type_form_submit($form, &$form_state) {
  * @see commerce_product_ui_product_type_form()
  */
 function commerce_product_ui_product_type_form_delete_submit($form, &$form_state) {
-  $form_state['redirect'] = 'admin/commerce/products/types/' . $form_state['product_type']->type .'/delete';
+  $form_state['redirect'] = 'admin/commerce/products/types/' . strtr($form_state['product_type']->type, array('_' => '-')) . '/delete';
 }
 
 /**

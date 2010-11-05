@@ -749,8 +749,7 @@ function commerce_product_line_item_populate(&$line_item, $product, $quantity = 
  * @see commerce_product_reference_field_info().
  */
 function commerce_product_reference_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
-  $name = str_replace('_', '-', $field['field_name']);
-  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
   $property['options list'] = 'entity_metadata_field_options_list';
   unset($property['query callback']);
 }

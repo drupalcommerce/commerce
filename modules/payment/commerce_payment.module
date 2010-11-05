@@ -52,6 +52,7 @@ function commerce_payment_entity_info() {
       'save callback' => 'commerce_payment_transaction_save',
       'deletion callback' => 'commerce_payment_transaction_delete',
       'access callback' => 'commerce_payment_transaction_access',
+      'token type' => 'payment',
     ),
   );
 

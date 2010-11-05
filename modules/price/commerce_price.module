@@ -356,8 +356,7 @@ function commerce_price_field_widget_error($element, $error, $form, &$form_state
  * @see commerce_product_reference_field_info().
  */
 function commerce_price_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
-  $name = str_replace('_', '-', $field['field_name']);
-  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
 
   $property['getter callback'] = 'entity_metadata_field_verbatim_get';
   $property['setter callback'] = 'entity_metadata_field_verbatim_set';
