@@ -149,7 +149,10 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
       $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
       if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_submit')) {
-        return $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance);
+        // If payment fails, rebuild the checkout form without progressing.
+        if ($callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, $balance) === FALSE) {
+          $form_state['rebuild'] = TRUE;
+        }
       }
     }
   }
