@@ -300,6 +300,7 @@ function commerce_product_ui_product_type_new() {
  */
 function commerce_product_ui_product_type_save($product_type, $configure = TRUE) {
   $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : array());
+  commerce_product_types_reset();
   menu_rebuild();
 
   // If this is a new product type and the insert did not fail...
@@ -337,6 +338,7 @@ function commerce_product_ui_product_type_delete($type) {
     ->execute();
 
   // Rebuild the menu to get rid of this type's product add menu item.
+  commerce_product_types_reset();
   menu_rebuild();
 
   // Notify the field API that this bundle has been destroyed.
