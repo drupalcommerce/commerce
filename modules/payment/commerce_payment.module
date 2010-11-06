@@ -21,6 +21,35 @@ define('COMMERCE_PAYMENT_STATUS_SUCCESS', 'success');
 // Failure is used when a transaction cannot be completed or is rejected.
 define('COMMERCE_PAYMENT_STATUS_FAILURE', 'failure');
 
+// Credit card transaction types definitions:
+
+// Used to just authorize an amount on a credit card account.
+define('COMMERCE_CREDIT_AUTH_ONLY', 'authorize');
+
+// Used to capture funds from a prior authorization.
+define('COMMERCE_CREDIT_PRIOR_AUTH_CAPTURE', 'prior_auth_capture');
+
+// Used to authorize and capture money all at once.
+define('COMMERCE_CREDIT_AUTH_CAPTURE', 'auth_capture');
+
+// Used to set up a credit card reference through the payment gateway.
+define('COMMERCE_CREDIT_REFERENCE_SET', 'reference_set');
+
+// Used to capture funds using a credit card reference.
+define('COMMERCE_CREDIT_REFERENCE_TXN', 'reference_txn');
+
+// Used to remove a reference from the payment gateway.
+define('COMMERCE_CREDIT_REFERENCE_REMOVE', 'reference_remove');
+
+// Used to credit funds to a reference at the payment gateway.
+define('COMMERCE_CREDIT_REFERENCE_CREDIT', 'reference_credit');
+
+// Used to credit funds to a credit card account.
+define('COMMERCE_CREDIT_CREDIT', 'credit');
+
+// Used to void a transaction before the transaction clears.
+define('COMMERCE_CREDIT_VOID', 'void');
+
 /**
  * Implements of hook_entity_info().
  */

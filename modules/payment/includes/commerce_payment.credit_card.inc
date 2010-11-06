@@ -7,7 +7,8 @@
  */
 
 /**
- * Form callback: return a snippet credit card form.
+ * Form callback: return a set of credit card form elements that payment method
+ *   modules can incorporate into their submission form callbacks.
  *
  * @param $default
  *   An array of default values for the available CC fields.
@@ -15,7 +16,21 @@
  *   An array specifying the CC fields that should be included on the form; the
  *     card number and expiration date fields are always present.
  */
-function commerce_payment_credit_card_form($form, &$form_state, $default = array(), $fields = array()) {
+function commerce_payment_credit_card_form($form, &$form_state, $fields = array(), $default = array()) {
+  // Merge default values into the default array.
+  $default += array(
+    'cc_type' => '',
+    'cc_owner' => '',
+    'cc_number' => '',
+    'cc_start_month' => '',
+    'cc_start_year' => '',
+    'cc_exp_month' => '',
+    'cc_exp_year' => '',
+    'cc_issue' => '',
+    'cc_cvv' => '',
+    'cc_bank' => '',
+  );
+
   // Add a card type selector if specified.
   if (isset($fields['cc_type'])) {
     $form['cc_type'] = array(
