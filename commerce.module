@@ -344,3 +344,23 @@ function commerce_currency_round($price, $currency) {
   $modifier = 1 / $currency->rounding_step;
   return round($price * $modifier) / $modifier;
 }
+
+/**
+ * Returns an associative array of month names keyed by numeric representation.
+ */
+function commerce_months() {
+  return array(
+    '01' => t('January'),
+    '02' => t('February'),
+    '03' => t('March'),
+    '04' => t('April'),
+    '05' => t('May'),
+    '06' => t('June'),
+    '07' => t('July'),
+    '08' => t('August'),
+    '09' => t('September'),
+    '10' => t('October'),
+    '11' => t('November'),
+    '12' => t('December'),
+  );
+}
