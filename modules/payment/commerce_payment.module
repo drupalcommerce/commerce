@@ -596,7 +596,7 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
     array(t('Order'), l(check_plain($order->order_number), 'admin/commerce/orders/' . $order->order_id)),
     array(t('Payment method'), $title),
     array(t('Remote ID'), check_plain($transaction->remote_id)),
-    array(t('Message'), t($transaction->message, unserialize($transaction->message_variables))),
+    array(t('Message'), t($transaction->message, $transaction->message_variables)),
     array(t('Amount'), commerce_currency_format($transaction->amount, $transaction->currency_code)),
     array(t('Status'), check_plain($transaction_statuses[$transaction->status]->title)),
     array(t('Remote status'), check_plain($transaction->remote_status)),
@@ -608,10 +608,8 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
   }
 
   if (user_access('administer payments')) {
-    $payload = unserialize($transaction->payload);
-
-    if (!empty($payload)) {
-      $rows[] = array(t('Payload'), '<pre>' . check_plain(print_r($payload, TRUE)) . '</pre>');
+    if (!empty($transaction->payload)) {
+      $rows[] = array(t('Payload'), '<pre>' . check_plain(print_r($transaction->payload, TRUE)) . '</pre>');
     }
   }
 
