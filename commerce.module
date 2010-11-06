@@ -209,7 +209,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       'thousands_separator' => ',',
       'decimal_separator' => '.',
       'symbol_placement' => '',
-      'code_placement' => '',
+      'code_placement' => 'after',
       'format_callback' => '',
     );
 
