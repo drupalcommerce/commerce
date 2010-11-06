@@ -24,6 +24,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
   public function create($type = '') {
     return (object) array(
       'product_id' => '',
+      'is_new' => TRUE,
       'sku' => '',
       'type' => $type,
       'title' => '',
@@ -52,7 +53,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       // Save a copy of the unchanged product for rules in case of updates.
       // see commerce_product_rules_var_unchanged().
       $unchanged = &drupal_static('commerce_product_unchanged', array());
-      if (!empty($product->product_id)) {
+      if (!empty($product->product_id) && (!isset($product->is_new) || !$product->is_new)) {
         $unchanged[$product->product_id] = clone commerce_product_load($product->product_id);
       }
 
@@ -62,9 +63,11 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       rules_invoke_event('commerce_product_presave', $product);
 
       // If this is a new product...
-      if (empty($product->product_id)) {
-        // Set the creation timestamp.
-        $product->created = REQUEST_TIME;
+      if ((isset($product->is_new) && $product->is_new) || empty($product->product_id)) {
+        // Set the creation timestamp if not set.
+        if (!isset($product->created) || empty($product->created)) {
+          $product->created = REQUEST_TIME;
+        }
 
         // Save the new product and fields.
         drupal_write_record('commerce_product', $product);
