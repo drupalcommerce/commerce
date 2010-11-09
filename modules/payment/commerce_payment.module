@@ -65,6 +65,7 @@ function commerce_payment_entity_info() {
         'id' => 'transaction_id',
         'revision' => 'revision_id',
         'bundle' => 'payment_method',
+        'label' => 'transaction_id', // TODO: Update to use a custom callback.
       ),
       'bundle keys' => array(
         'bundle' => 'payment_method',

@@ -22,6 +22,7 @@ function commerce_order_entity_info() {
         'id' => 'order_id',
         'bundle' => 'type',
         'revision' => 'revision_id',
+        'label' => 'order_number',
       ),
       'bundle keys' => array(
         'bundle' => 'type',

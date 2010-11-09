@@ -37,6 +37,7 @@ function commerce_product_entity_info() {
       'entity keys' => array(
         'id' => 'product_id',
         'bundle' => 'type',
+        'label' => 'title',
       ),
       'bundle keys' => array(
         'bundle' => 'type',
