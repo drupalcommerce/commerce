@@ -427,14 +427,16 @@ function commerce_cart_forms($form_id, $args) {
  *
  * @param $product_ids
  *   An array of product IDs that will be included in the form.
- * @param $quantity
- *   The default quantity to place in the quantity textfield; leave 0 to default
- *     to a hidden quantity textfield with a value of 1.
+ * @param $show_quantity
+ *   Boolean indicating whether or not the quantity field should be shown;
+ *     defaults to FALSE resulting in a hidden field.
+ * @param $default_quantity
+ *   The value to place in the quantity field, defaults to 1.
  *
  * @return
  *   The form array.
  */
-function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quantity = 0) {
+function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show_quantity = FALSE, $default_quantity = 1) {
   global $user;
 
   // Store the customer uid in the form so other modules can override with a
@@ -632,20 +634,20 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quan
       }
     }
 
-    // If a quantity greater than 0 is specified, present a quantity selector as
-    // a textfield with the value as the default.
-    if ($quantity > 0) {
+    // Render the quantity field as either a textfield if shown or a hidden
+    // field if not.
+    if ($show_quantity) {
       $form['quantity'] = array(
         '#type' => 'textfield',
         '#title' => t('Quantity'),
-        '#default_value' => $quantity,
+        '#default_value' => $default_quantity,
         '#size' => 5,
       );
     }
     else {
       $form['quantity'] = array(
         '#type' => 'hidden',
-        '#value' => 1,
+        '#value' => $default_quantity,
       );
     }
 
@@ -716,8 +718,68 @@ function commerce_cart_field_formatter_info() {
       'label' => t('Add to Cart form'),
       'description' => t('Display an Add to Cart form for the referenced product.'),
       'field types' => array('commerce_product_reference'),
+      'settings' => array(
+        'show_quantity' => FALSE,
+        'default_quantity' => 1,
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function commerce_cart_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  if ($display['type'] == 'commerce_cart_add_to_cart_form') {
+    $element['show_quantity'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display a textfield quantity widget on the add to cart form.'),
+      '#default_value' => $settings['show_quantity'],
+    );
+
+    $element['default_quantity'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Default quantity'),
+      '#default_value' => $settings['default_quantity'] <= 0 ? 1 : $settings['default_quantity'],
+      '#element_validate' => array('commerce_cart_field_formatter_settings_form_quantity_validate'),
+      '#size' => 16,
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Element validate callback: ensure a valid quantity is entered.
+ */
+function commerce_cart_field_formatter_settings_form_quantity_validate($element, &$form_state, $form) {
+  if (!is_numeric($element['#value']) || $element['#value'] <= 0) {
+    form_set_error(implode('][', $element['#parents']), t('You must enter a positive numeric default quantity value.'));
+  }
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function commerce_cart_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  if ($display['type'] == 'commerce_cart_add_to_cart_form') {
+    $summary = array(
+      t('Quantity widget: !status', array('!status' => $settings['show_quantity'] ? t('Enabled') : t('Disabled'))),
+      t('Default quantity: @quantity', array('@quantity' => $settings['default_quantity'])),
+    );
+  }
+
+  return implode('<br />', $summary);
 }
 
 /**
@@ -733,12 +795,12 @@ function commerce_cart_field_formatter_view($entity_type, $object, $field, $inst
     $product_ids[$item['product_id']] = $item['product_id'];
   }
 
-  switch ($display['type']) {
-    case 'commerce_cart_add_to_cart_form':
-      $result[0] = array(
-         '#markup' => drupal_render(drupal_get_form(commerce_cart_add_to_cart_form_id($product_ids), $product_ids)),
-       );
-      break;
+  if ($display['type'] == 'commerce_cart_add_to_cart_form') {
+    $settings = $display['settings'];
+
+    $result[] = array(
+       '#markup' => drupal_render(drupal_get_form(commerce_cart_add_to_cart_form_id($product_ids), $product_ids, $settings['show_quantity'], $settings['default_quantity'])),
+     );
   }
 
   return $result;
