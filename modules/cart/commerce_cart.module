@@ -95,6 +95,26 @@ function commerce_cart_commerce_checkout_complete($form, &$form_state, $order) {
 }
 
 /**
+ * Implements hook_commerce_line_item_summary_link_info().
+ */
+function commerce_cart_commerce_line_item_summary_link_info() {
+  return array(
+    'view_cart' => array(
+      'title' => t('View cart'),
+      'href' => 'cart',
+      'attributes' => array('rel' => 'nofollow'),
+      'weight' => 0,
+    ),
+    'checkout' => array(
+      'title' => t('Checkout'),
+      'href' => 'checkout',
+      'attributes' => array('rel' => 'nofollow'),
+      'weight' => 5,
+    ),
+  );
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_cart_views_api() {

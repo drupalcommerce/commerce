@@ -14,7 +14,11 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
     unset($options['empty']);
 
     // Define an option to control the links displayed in the summary.
-    $options['links'] = array('default' => array('view_cart' => 0, 'checkout' => 0));
+    $options['links'] = array('default' => array());
+
+    foreach (commerce_line_item_summary_links() as $name => $link) {
+      $options['links']['default'][$name] = 0;
+    }
 
     return $options;
   }
@@ -28,12 +32,8 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
     // Add checkboxes for the summary links if any are available.
     $options = array();
 
-    if (module_exists('commerce_cart')) {
-      $options['view_cart'] = t('View cart');
-    }
-
-    if (module_exists('commerce_checkout')) {
-      $options['checkout'] = t('Checkout');
+    foreach (commerce_line_item_summary_links() as $name => $link) {
+      $options[$name] = $link['title'];
     }
 
     if (!empty($options)) {
@@ -59,29 +59,15 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
         }
       }
 
-      // Add total information and a link to checkout.
+      // Add total information and the line item summary links.
       $quantity = commerce_line_items_quantity($line_item_ids);
       $total = commerce_line_items_total($line_item_ids);
       $currency = commerce_currency_load($total['currency_code']);
 
       $links = array();
 
-      // Only add the view cart link if the cart is enabled.
-      if (module_exists('commerce_cart') && $this->options['links']['view_cart'] === 'view_cart') {
-        $links['line-item-summary-view-cart'] = array(
-          'title' => t('View cart'),
-          'href' => 'cart',
-          'attributes' => array('rel' => 'nofollow'),
-        );
-      }
-
-      // Only add the checkout link if checkout is enabled.
-      if (module_exists('commerce_checkout') && $this->options['links']['checkout'] === 'checkout' && user_access('access checkout')) {
-        $links['line-item-summary-checkout'] = array(
-          'title' => t('Checkout'),
-          'href' => 'checkout',
-          'attributes' => array('rel' => 'nofollow'),
-        );
+      foreach (commerce_line_item_summary_links() as $name => $link) {
+        $links[str_replace('_', '-', 'line-item-summary-' . $name)] = $link;
       }
 
       // Build the variables array to send to the template.

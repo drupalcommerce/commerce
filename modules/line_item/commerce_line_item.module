@@ -1053,6 +1053,22 @@ function commerce_line_items_total($value, $type = '', $language = '') {
 }
 
 /**
+ * Returns a sorted array of line item summary links.
+ *
+ * @see hook_commerce_line_item_summary_link_info()
+ */
+function commerce_line_item_summary_links() {
+  // Retrieve links defined by the hook and allow other modules to alter them.
+  $links = module_invoke_all('commerce_line_item_summary_link_info');
+  drupal_alter('commerce_line_item_summary_link_info', $links);
+
+  // Sort the links by weight and return the array.
+  uasort($links, 'drupal_sort_weight');
+
+  return $links;
+}
+
+/**
  * Implements hook_field_views_data_alter().
  *
  * This is a Views hook implemented to enable adding relationships for
