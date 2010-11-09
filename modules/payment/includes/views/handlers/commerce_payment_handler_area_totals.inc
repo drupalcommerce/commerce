@@ -71,60 +71,6 @@ class commerce_payment_handler_area_totals extends views_handler_area {
       }
     }
 
-    $rows = array();
-
-    if (count($totals) == 0) {
-      // Add a row for the remaining balance on the order.
-      if ($order) {
-        $balance = commerce_payment_order_balance($order, $totals);
-
-        $rows[] = array(
-          'data' => array(
-            array('data' => t('Order balance'), 'class' => array('label')),
-            array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
-          ),
-          'class' => array('order-balance'),
-        );
-      }
-    }
-    elseif (count($totals) == 1) {
-      // Otherwise if there's only a single currency total...
-      $currency_code = array_shift(array_keys($totals));
-
-      // Add a row for the total amount paid.
-      $rows[] = array(
-        'data' => array(
-          array('data' => t('Total paid'), 'class' => array('label')),
-          array('data' => commerce_currency_format($totals[$currency_code], $currency_code), 'class' => array('total')),
-        ),
-        'class' => array('total-paid'),
-      );
-
-      // Add a row for the remaining balance on the order.
-      if ($order) {
-        $balance = commerce_payment_order_balance($order, $totals);
-
-        $rows[] = array(
-          'data' => array(
-            array('data' => t('Order balance'), 'class' => array('label')),
-            array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
-          ),
-          'class' => array('order-balance'),
-        );
-      }
-    }
-    else {
-      foreach ($totals as $currency_code => $amount) {
-        $rows[] = array(
-          'data' => array(
-            array('data' => t('Total paid (@currency_code)', array('@currency_code' => $currency_code)), 'class' => array('label')),
-            array('data' => commerce_currency_format($amount, $currency_code), 'class' => array('total')),
-          ),
-          'class' => array('total-paid', 'total-' . $currency_code),
-        );
-      }
-    }
-
     // Build and render the form to add a payment if the View contains a valid
     // order argument.
     if ($this->options['add_payment_form'] && $order) {
@@ -138,7 +84,7 @@ class commerce_payment_handler_area_totals extends views_handler_area {
 
     // Prepare variables for use in the theme function.
     $variables = array(
-      'rows' => $rows,
+      'rows' => commerce_payment_totals_rows($totals, $order),
       'form' => $form,
       'view' => $this->view,
       'totals' => $totals,

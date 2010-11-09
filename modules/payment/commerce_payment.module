@@ -202,6 +202,73 @@ function commerce_payment_commerce_checkout_pane_info() {
 }
 
 /**
+ * Implements hook_commerce_payment_totals_row_info().
+ */
+function commerce_payment_commerce_payment_totals_row_info($totals, $order) {
+  $rows = array();
+
+  if (count($totals) == 0) {
+    // Add a row for the remaining balance on the order.
+    if ($order) {
+      $balance = commerce_payment_order_balance($order, $totals);
+
+      $rows[] = array(
+        'data' => array(
+          array('data' => t('Order balance'), 'class' => array('label')),
+          array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
+        ),
+        'class' => array('order-balance'),
+        'weight' => 10,
+      );
+    }
+  }
+  elseif (count($totals) == 1) {
+    // Otherwise if there's only a single currency total...
+    $currency_code = array_shift(array_keys($totals));
+
+    // Add a row for the total amount paid.
+    $rows[] = array(
+      'data' => array(
+        array('data' => t('Total paid'), 'class' => array('label')),
+        array('data' => commerce_currency_format($totals[$currency_code], $currency_code), 'class' => array('total')),
+      ),
+      'class' => array('total-paid'),
+      'weight' => 0,
+    );
+
+    // Add a row for the remaining balance on the order.
+    if ($order) {
+      $balance = commerce_payment_order_balance($order, $totals);
+
+      $rows[] = array(
+        'data' => array(
+          array('data' => t('Order balance'), 'class' => array('label')),
+          array('data' => commerce_currency_format($balance['amount'], $balance['currency_code']), 'class' => array('balance')),
+        ),
+        'class' => array('order-balance'),
+        'weight' => 10,
+      );
+    }
+  }
+  else {
+    $weight = 0;
+
+    foreach ($totals as $currency_code => $amount) {
+      $rows[] = array(
+        'data' => array(
+          array('data' => t('Total paid (@currency_code)', array('@currency_code' => $currency_code)), 'class' => array('label')),
+          array('data' => commerce_currency_format($amount, $currency_code), 'class' => array('total')),
+        ),
+        'class' => array('total-paid', 'total-' . $currency_code),
+        'weight' => $weight++,
+      );
+    }
+  }
+
+  return $rows;
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_payment_views_api() {
@@ -770,4 +837,29 @@ function commerce_payment_order_balance($order, $totals = array()) {
   else {
     return FALSE;
   }
+}
+
+/**
+ * Returns a sorted array of payment totals table rows.
+ *
+ * @param $totals
+ *   An array of payment totals whose keys are currency codes and values are the
+ *     total amount paid in each currency.
+ * @param $order
+ *   If available, the order object to which the payments apply.
+ *
+ * @return
+ *   An array of table row data as expected by theme_table().
+ *
+ * @see hook_commerce_payment_totals_row_info()
+ */
+function commerce_payment_totals_rows($totals, $order) {
+  // Retrieve rows defined by the hook and allow other modules to alter them.
+  $rows = module_invoke_all('commerce_payment_totals_row_info', $totals, $order);
+  drupal_alter('commerce_payment_totals_row_info', $rows, $totals, $order);
+
+  // Sort the rows by weight and return the array.
+  uasort($rows, 'drupal_sort_weight');
+
+  return $rows;
 }
