@@ -26,8 +26,14 @@ function commerce_line_item_rules_event_info() {
       'variables' => commerce_line_item_rules_variables(t('updated line item'), TRUE),
       'access callback' => 'commerce_line_item_rules_access',
     ),
-    'commerce_line_item_presave' => array(
-      'label' => t('Before saving a line item'),
+    'commerce_line_item_presave_insert' => array(
+      'label' => t('Before saving a new line item'),
+      'group' => t('Commerce'),
+      'variables' => commerce_line_item_rules_variables(t('saved line item'), TRUE),
+      'access callback' => 'commerce_line_item_rules_access',
+    ),
+    'commerce_line_item_presave_update' => array(
+      'label' => t('Before saving an updated line item'),
       'group' => t('Commerce'),
       'variables' => commerce_line_item_rules_variables(t('saved line item'), TRUE),
       'access callback' => 'commerce_line_item_rules_access',
