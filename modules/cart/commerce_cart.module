@@ -687,7 +687,7 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
 
   // Render the form afresh to capture any changes to the available widgets
   // based on the latest selection.
-  $commands[] = ajax_command_replace('#' . str_replace('_', '-', $form['attributes']['#form_id']), drupal_render($form));
+  $commands[] = ajax_command_replace('#' . str_replace('_', '-', $form['#form_id']), drupal_render($form));
 
   return array('#type' => 'ajax', '#commands' => $commands);
 }
