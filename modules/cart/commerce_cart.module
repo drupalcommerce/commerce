@@ -458,6 +458,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quan
   else {
     $form_state['products'] = $products;
 
+    // If the form is for a single product, store the product_id in a hidden
+    // form field for use by the submit handler.
     if (count($products) == 1) {
       $form['product_id'] = array(
         '#type' => 'hidden',
@@ -465,16 +467,169 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $quan
       );
     }
     else {
-      $options = array();
+      // However, if more than one products are represented on it, attempt to
+      // use smart select boxes for the product selection. If the products are
+      // all of the same type and there are qualifying fields on that product
+      // type, display their options for customer selection.
+      $same_type = TRUE;
+      $qualifying_fields = array();
+      $type = '';
+
+      // Find the default product so we know how to set default options on the
+      // various Add to Cart form widgets and an array of any matching product
+      // based on attribute selections so we can add a selection widget.
+      $matching_products = array();
+      $default_product = NULL;
 
       foreach ($products as $product_id => $product) {
-        $options[$product_id] = check_plain($product->title);
+        // Store the first product type.
+        if (empty($type)) {
+          $type = $product->type;
+        }
+
+        // If the current product type is different from the first, we are not
+        // dealing with a set of same typed products.
+        if ($product->type != $type) {
+          $same_type = FALSE;
+        }
+
+        // If the form state contains a set of attribute data, use it to try
+        // and determine the default product.
+        if (!empty($form_state['values']['attributes'])) {
+          $match = TRUE;
+
+          foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
+            if ($product->{$key}[LANGUAGE_NONE][0]['value'] != $value) {
+              $match = FALSE;
+            }
+          }
+
+          if ($match) {
+            $matching_products[$product_id] = $product;
+          }
+        }
       }
 
-      $form['product_id'] = array(
-        '#type' => 'select',
-        '#options' => $options,
-      );
+      // Set the default product now if it isn't already set.
+      if (empty($matching_products)) {
+        $default_product = $products[array_shift(array_keys($products))];
+      }
+      else {
+        // If the product selector has a value, use that.
+        if (!empty($form_state['values']['attributes']['product_select']) &&
+            !empty($products[$form_state['values']['attributes']['product_select']])) {
+          $default_product = $products[$form_state['values']['attributes']['product_select']];
+        }
+        else {
+          $default_product = $matching_products[array_shift(array_keys($matching_products))];
+        }
+      }
+
+      // If all the products are of the same type...
+      if ($same_type) {
+        // Loop through all the field instances on that product type.
+        foreach (field_info_instances('commerce_product', $type) as $name => $instance) {
+          // A field qualifies if it is single value, required and uses a widget
+          // with a definite set of options. For the sake of simplicity, this is
+          // currently restricted to fields defined by the options module.
+          $field = field_info_field($instance['field_name']);
+
+          if ($field['cardinality'] == 1 && $instance['required'] && $instance['widget']['module'] == 'options') {
+            // Get the options properties from the options module and store the
+            // options for the instance in select list format in the array of
+            // qualifying fields.
+            $properties = _options_properties('select', FALSE, TRUE, TRUE);
+
+            $qualifying_fields[$name] = array(
+              'field' => $field,
+              'instance' => $instance,
+              'options' => _options_get_options($field, $instance, $properties),
+            );
+          }
+        }
+      }
+
+      // Otherwise for products of varying types, display a simple select list
+      // by product title.
+      if (!empty($qualifying_fields)) {
+        foreach ($qualifying_fields as $name => $data) {
+          // Build an options array of widget options used by referenced products.
+          $used_options = array();
+
+          foreach ($products as $product_id => $product) {
+            // With our hard dependency on widgets provided by the Options
+            // module, we can make assumptions about where the data is stored.
+            $used_options[] = $product->{$name}[LANGUAGE_NONE][0]['value'];
+          }
+
+          // If for some reason no options for this field are used, remove it
+          // from the qualifying fields array.
+          if (empty($used_options)) {
+            unset($qualifying_fields[$name]);
+          }
+          else {
+            $form['attributes'][$name] = array(
+              '#type' => 'select',
+              '#title' => check_plain($data['instance']['label']),
+              '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options)),
+              '#default_value' => $default_product->{$name}[LANGUAGE_NONE][0]['value'],
+              '#ajax' => array(
+                'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
+              ),
+            );
+          }
+        }
+
+        if (!empty($form['attributes'])) {
+          $form_id = commerce_cart_add_to_cart_form_id($product_ids, $quantity);
+
+          $form['attributes'] += array(
+            '#tree' => 'TRUE',
+            '#prefix' => '<div class="attribute-widgets">',
+            '#suffix' => '</div>',
+          );
+
+          // If there were more than one matching products for the current
+          // attribute selection, add a product selection widget.
+          if (count($matching_products) > 1) {
+            $options = array();
+
+            foreach ($matching_products as $product_id => $product) {
+              $options[$product_id] = check_plain($product->title);
+            }
+
+            $form['attributes']['product_select'] = array(
+              '#type' => 'select',
+              '#title' => t('Select a product'),
+              '#options' => $options,
+              '#default_value' => $default_product->product_id,
+              '#ajax' => array(
+                'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
+              ),
+            );
+          }
+
+          $form['product_id'] = array(
+            '#type' => 'hidden',
+            '#value' => $default_product->product_id,
+          );
+        }
+      }
+
+      // If the products referenced were of different types or did not posess
+      // any qualifying attribute fields, add a product selection widget.
+      if (!$same_type || empty($qualifying_fields)) {
+        $options = array();
+
+        foreach ($products as $product_id => $product) {
+          $options[$product_id] = check_plain($product->title);
+        }
+
+        $form['product_id'] = array(
+          '#type' => 'select',
+          '#options' => $options,
+        );
+      }
     }
 
     // If a quantity greater than 0 is specified, present a quantity selector as
@@ -515,6 +670,26 @@ function commerce_cart_add_to_cart_form_validate($form, &$form_state) {
   if (!is_numeric($form_state['values']['quantity']) || $form_state['values']['quantity'] <= 0) {
     form_set_error('quantity', t('You must specify a valid quantity to add to the cart.'));
   }
+
+  // If the attributes matching product selector was used, set the value of the
+  // product_id field to match; this will be fixed on rebuild when the actual
+  // default product will be selected based on the product selector value.
+  if (!empty($form_state['values']['attributes']['product_select'])) {
+    form_set_value($form['product_id'], $form_state['values']['attributes']['product_select'], $form_state);
+  }
+}
+
+/**
+ * Ajax callback: returns AJAX commands when an attribute widget is changed.
+ */
+function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
+  $commands = array();
+
+  // Render the form afresh to capture any changes to the available widgets
+  // based on the latest selection.
+  $commands[] = ajax_command_replace('#' . str_replace('_', '-', $form['attributes']['#form_id']), drupal_render($form));
+
+  return array('#type' => 'ajax', '#commands' => $commands);
 }
 
 /**
@@ -527,6 +702,8 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   // Add the product to the specified shopping cart.
   commerce_cart_product_add($form_state['values']['uid'], $product_id, $form_state['values']['quantity']);
 
+  // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
+  // display the product title or the product display node title?
   drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
 }
 
