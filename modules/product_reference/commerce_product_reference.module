@@ -77,6 +77,13 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
           foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
             // Add the fields into the node for display.
             $node->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, 'node_' . $view_mode);
+
+            $class = array('node', $node->nid, 'product', $product_field_name);
+
+            $node->content['product:' . $product_field_name] += array(
+              '#prefix' => '<span class="' . drupal_html_class(implode('-', $class)) . '">',
+              '#suffix' => '</span>',
+            );
           }
         }
       }
