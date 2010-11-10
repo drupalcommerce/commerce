@@ -553,7 +553,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       else {
         // If the product selector has a value, use that.
         if (!empty($form_state['values']['attributes']['product_select']) &&
-            !empty($products[$form_state['values']['attributes']['product_select']])) {
+            !empty($products[$form_state['values']['attributes']['product_select']]) &&
+            in_array($products[$form_state['values']['attributes']['product_select']], $matching_products)) {
           $default_product = $products[$form_state['values']['attributes']['product_select']];
         }
         else {
