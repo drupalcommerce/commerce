@@ -473,6 +473,10 @@ function commerce_cart_forms($form_id, $args) {
 function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show_quantity = FALSE, $default_quantity = 1, $context = array()) {
   global $user;
 
+  // Store the form ID as a class of the form to avoid the incrementing form ID
+  // from causing the AJAX refresh not to work.
+  $form['#attributes']['class'][] = drupal_html_class(commerce_cart_add_to_cart_form_id($product_ids, $default_quantity));
+
   // Store the customer uid in the form so other modules can override with a
   // selection widget if necessary.
   $form['uid'] = array(
@@ -621,8 +625,6 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
         }
 
         if (!empty($form['attributes'])) {
-          $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
-
           $form['attributes'] += array(
             '#tree' => 'TRUE',
             '#prefix' => '<div class="attribute-widgets">',
@@ -727,7 +729,7 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
 
   // Render the form afresh to capture any changes to the available widgets
   // based on the latest selection.
-  $commands[] = ajax_command_replace('#' . str_replace('_', '-', $form['#form_id']), drupal_render($form));
+  $commands[] = ajax_command_replace('.' . str_replace('_', '-', $form['#form_id']), drupal_render($form));
 
   // Then render and return the various product fields that might need to be
   // updated on the page.
