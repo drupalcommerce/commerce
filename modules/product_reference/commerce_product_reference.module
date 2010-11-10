@@ -46,8 +46,8 @@ function commerce_product_reference_field_extra_fields() {
  */
 function commerce_product_reference_node_view($node, $view_mode = 'full') {
   // Loop through product reference fields to see if any exist on this node
-  // type's bundle that is either or hidden or displayed with the Add to Cart
-  // form display formatter.
+  // type's bundle that is either hidden or displayed with the Add to Cart form
+  // display formatter.
   foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
     if (in_array($node->type, $field['bundles']['node']) &&
       (!isset($node->content[$field_name]) ||
@@ -56,6 +56,23 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
       if ($field['cardinality'] == 1) {
         // If the referenced product exists...
         if ($product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][0]['product_id'])) {
+          // Loop through the fields on the referenced product's type.
+          foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
+            // Add the fields into the node for display.
+            $node->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, 'node_' . $view_mode);
+          }
+        }
+      }
+      else {
+        // Find the first existing referenced product.
+        $product = NULL;
+
+        for ($key = 0, $count = $node->{$field_name}[LANGUAGE_NONE]; empty($product) && $key < $count; $key++) {
+          $product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][$key]['product_id']);
+        }
+
+        // If we actually got a valid product...
+        if (!empty($product)) {
           // Loop through the fields on the referenced product's type.
           foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
             // Add the fields into the node for display.
