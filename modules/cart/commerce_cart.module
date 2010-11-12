@@ -535,16 +535,38 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
 
         // If the form state contains a set of attribute data, use it to try
         // and determine the default product.
+        $changed_attribute = NULL;
+
         if (!empty($form_state['values']['attributes'])) {
           $match = TRUE;
 
           foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
+            // If this is the attribute widget that was changed...
+            if ($value != $form_state['values']['unchanged_attributes'][$key]) {
+              // Store the field name.
+              $changed_attribute = $key;
+            }
+
+            // If a field name has been stored and we've moved past it to
+            // compare the next attribute field...
+            if (!empty($changed_attribute) && $changed_attribute != $key) {
+              // Wipe subsequent values from the form state so they attribute
+              // widgets can use the default values from the new default product.
+              unset($form_states['values']['attributes'][$key]);
+              unset($form_states['values']['unchanged_attributes'][$key]);
+
+              // Don't accept this as a matching product.
+              continue;
+            }
+
             if ($product->{$key}[LANGUAGE_NONE][0]['value'] != $value) {
               $match = FALSE;
             }
           }
 
-          if ($match) {
+          // If the field name has already been stored, only accept the first
+          // matching product by ignoring the rest that would match.
+          if ($match && (empty($changed_attribute) || empty($matching_products))) {
             $matching_products[$product_id] = $product;
           }
         }
@@ -595,6 +617,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               'field' => $field,
               'instance' => $instance,
               'options' => _options_get_options($field, $instance, $properties),
+              'weight' => $instance['widget']['weight'],
             );
           }
         }
@@ -603,31 +626,51 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       // Otherwise for products of varying types, display a simple select list
       // by product title.
       if (!empty($qualifying_fields)) {
-        foreach ($qualifying_fields as $name => $data) {
-          // Build an options array of widget options used by referenced products.
-          $used_options = array();
+        $used_options = array();
 
+        // Sort the fields by weight.
+        uasort($qualifying_fields, 'drupal_sort_weight');
+
+        foreach ($qualifying_fields as $field_name => $data) {
+          // Build an options array of widget options used by referenced products.
           foreach ($products as $product_id => $product) {
+            // Only add options to the present array that appear on products that
+            // match the default value of the previously added attribute widgets.
+            foreach ($used_options as $used_field_name => $unused) {
+              // Don't apply this check for the current field being evaluated.
+              if ($used_field_name == $field_name) {
+                continue;
+              }
+
+              if ($product->{$used_field_name}[LANGUAGE_NONE][0]['value'] != $form['attributes'][$used_field_name]['#default_value']) {
+                continue 2;
+              }
+            }
+
             // With our hard dependency on widgets provided by the Options
             // module, we can make assumptions about where the data is stored.
-            $used_options[] = $product->{$name}[LANGUAGE_NONE][0]['value'];
+            $used_options[$field_name][] = $product->{$field_name}[LANGUAGE_NONE][0]['value'];
           }
 
           // If for some reason no options for this field are used, remove it
           // from the qualifying fields array.
-          if (empty($used_options)) {
-            unset($qualifying_fields[$name]);
+          if (empty($used_options[$field_name])) {
+            unset($qualifying_fields[$field_name]);
           }
           else {
-            $form['attributes'][$name] = array(
+            $form['attributes'][$field_name] = array(
               '#type' => 'select',
               '#title' => check_plain($data['instance']['label']),
-              '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options)),
-              '#default_value' => $default_product->{$name}[LANGUAGE_NONE][0]['value'],
+              '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options[$field_name])),
+              '#default_value' => $default_product->{$field_name}[LANGUAGE_NONE][0]['value'],
               '#weight' => $data['instance']['widget']['weight'],
               '#ajax' => array(
                 'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
               ),
+            );
+            $form['unchanged_attributes'][$field_name] = array(
+              '#type' => 'value',
+              '#value' => $default_product->{$field_name}[LANGUAGE_NONE][0]['value'],
             );
           }
         }
@@ -638,6 +681,9 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             '#prefix' => '<div class="attribute-widgets">',
             '#suffix' => '</div>',
             '#weight' => 0,
+          );
+          $form['unchanged_attributes'] += array(
+            '#tree' => 'TRUE',
           );
 
           // If there were more than one matching products for the current
