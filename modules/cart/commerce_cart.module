@@ -552,7 +552,14 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
 
       // Set the default product now if it isn't already set.
       if (empty($matching_products)) {
-        $default_product = $products[array_shift(array_keys($products))];
+        // If a product ID value was passed in, use that product if it exists.
+        if (!empty($form_state['values']['product_id']) &&
+            !empty($products[$form_state['values']['product_id']])) {
+          $default_product = $products[$form_state['values']['product_id']];
+        }
+        else {
+          $default_product = $products[array_shift(array_keys($products))];
+        }
       }
       else {
         // If the product selector has a value, use that.
@@ -673,6 +680,11 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
         $form['product_id'] = array(
           '#type' => 'select',
           '#options' => $options,
+          '#default_value' => $default_product->product_id,
+          '#weight' => 0,
+          '#ajax' => array(
+            'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
+          ),
         );
       }
     }
