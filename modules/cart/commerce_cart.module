@@ -617,6 +617,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               '#title' => check_plain($data['instance']['label']),
               '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options)),
               '#default_value' => $default_product->{$name}[LANGUAGE_NONE][0]['value'],
+              '#weight' => $data['instance']['widget']['weight'],
               '#ajax' => array(
                 'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
               ),
