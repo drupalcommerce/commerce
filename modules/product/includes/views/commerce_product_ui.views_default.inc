@@ -15,7 +15,7 @@ function commerce_product_ui_views_default_views() {
   $view = new view;
   $view->name = 'commerce_products';
   $view->description = 'Display a list of products for store admin.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_product';
   $view->is_cacheable = FALSE;

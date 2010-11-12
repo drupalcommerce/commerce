@@ -15,7 +15,7 @@ function commerce_order_ui_views_default_views() {
   $view = new view;
   $view->name = 'commerce_orders';
   $view->description = 'Display a list of orders for the store admin.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_order';
   $view->is_cacheable = FALSE;

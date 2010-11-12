@@ -15,7 +15,7 @@ function commerce_payment_ui_views_default_views() {
   $view = new view;
   $view->name = 'commerce_payment_order';
   $view->description = 'Display and total an order\'s payment transaction history.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_payment_transaction';
   $view->is_cacheable = FALSE;

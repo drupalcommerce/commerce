@@ -15,7 +15,7 @@ function commerce_customer_ui_views_default_views() {
   $view = new view;
   $view->name = 'commerce_customer_profiles';
   $view->description = 'A list of customer profiles of all types.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_customer_profile';
   $view->is_cacheable = FALSE;

@@ -15,7 +15,7 @@ function commerce_line_item_views_default_views() {
   $view = new view;
   $view->name = 'commerce_line_item_table';
   $view->description = 'Display a set of line items in a table.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_line_item';
   $view->is_cacheable = FALSE;

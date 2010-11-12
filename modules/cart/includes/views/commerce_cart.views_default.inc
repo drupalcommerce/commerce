@@ -15,7 +15,7 @@ function commerce_cart_views_default_views() {
   $view = new view;
   $view->name = 'commerce_cart_block';
   $view->description = 'Display a list of line items addded to cart.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_order';
   $view->is_cacheable = FALSE;
@@ -147,7 +147,7 @@ function commerce_cart_views_default_views() {
   $view = new view;
   $view->name = 'commerce_cart_summary';
   $view->description = 'Cart line item summary displayed during checkout.';
-  $view->tag = '';
+  $view->tag = 'commerce';
   $view->view_php = '';
   $view->base_table = 'commerce_order';
   $view->is_cacheable = FALSE;
