@@ -39,7 +39,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     }
     else {
       $default_amount = '';
-      $default_currency_code = variable_get('commerce_default_currency', 'USD');
+      $default_currency_code = commerce_default_currency();
     }
 
     $form['payment_terminal']['amount'] = array(

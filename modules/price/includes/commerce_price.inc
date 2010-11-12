@@ -25,7 +25,7 @@ class CommercePrice {
     }
 
     if (empty($currency_code)) {
-      $currency_code = variable_get('commerce_default_currency', 'USD');
+      $currency_code = commerce_default_currency();
     }
 
     $this->base_currency_code = $currency_code;

@@ -27,7 +27,7 @@ function commerce_currency_settings_form($form, &$form_state) {
     '#title' => t('Default store currency'),
     '#description' => t('The default store currency will be used as the default for all price fields.'),
     '#options' => $options,
-    '#default_value' => variable_get('commerce_default_currency', 'USD'),
+    '#default_value' => commerce_default_currency(),
   );
 
   // Place the enabled currencies checkboxes in a fieldset so the full list

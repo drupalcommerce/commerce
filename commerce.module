@@ -161,6 +161,13 @@ function commerce_email_from() {
 }
 
 /**
+ * Returns the currency code of the site's default currency.
+ */
+function commerce_default_currency() {
+  return variable_get('commerce_default_currency', 'USD');
+}
+
+/**
  * Returns a single currency object.
  *
  * @param $currency_code
@@ -174,7 +181,7 @@ function commerce_currency_load($currency_code = NULL) {
 
   // Check to see if we should return the default currency.
   if (empty($currency_code)) {
-    $currency_code = variable_get('commerce_default_currency', 'USD');
+    $currency_code = commerce_default_currency();
   }
 
   return isset($currencies[$currency_code]) ? $currencies[$currency_code] : FALSE;
