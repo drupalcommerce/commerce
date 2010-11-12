@@ -30,7 +30,7 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
 
   // Prior to displaying the checkout form, allow other modules to route the
   // checkout form.
-  module_invoke_all('commerce_checkout_router');
+  module_invoke_all('commerce_checkout_router', $order, $checkout_page);
 
   // Update the page title if specified.
   if (!empty($checkout_page->title)) {
