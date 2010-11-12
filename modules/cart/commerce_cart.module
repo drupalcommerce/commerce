@@ -564,9 +564,21 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             }
           }
 
-          // If the field name has already been stored, only accept the first
-          // matching product by ignoring the rest that would match.
-          if ($match && (empty($changed_attribute) || empty($matching_products))) {
+          // If the changed field name has already been stored, only accept the
+          // first matching product by ignoring the rest that would match. An
+          // exception is granted for additional matching products that share
+          // the exact same attribute values as the first.
+          if ($match && !empty($changed_attribute) && !empty($matching_products)) {
+            $matching_product = $matching_products[array_shift(array_keys($matching_products))];
+
+            foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
+              if ($product->{$key}[LANGUAGE_NONE][0]['value'] != $matching_product->{$key}[LANGUAGE_NONE][0]['value']) {
+                $match = FALSE;
+              }
+            }
+          }
+
+          if ($match) {
             $matching_products[$product_id] = $product;
           }
         }
@@ -685,6 +697,25 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           $form['unchanged_attributes'] += array(
             '#tree' => 'TRUE',
           );
+
+          // If the matching products array is empty, it means this is the first
+          // time the form is being built. We should populate it now with
+          // products that match the default attribute options.
+          if (empty($matching_products)) {
+            foreach ($products as $product_id => $product) {
+              $match = TRUE;
+
+              foreach (element_children($form['attributes']) as $field_name) {
+                if ($product->{$field_name}[LANGUAGE_NONE][0]['value'] != $form['attributes'][$field_name]['#default_value']) {
+                  $match = FALSE;
+                }
+              }
+
+              if ($match) {
+                $matching_products[$product_id] = $product;
+              }
+            }
+          }
 
           // If there were more than one matching products for the current
           // attribute selection, add a product selection widget.
