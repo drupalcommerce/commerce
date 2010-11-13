@@ -48,9 +48,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
     }
   }
 
-  // Add a section to enter order comments.
-  // TODO: Implement order comments and decide if e-mail notification should be
-  // a core feature... my hunch is yes.
+  // Add a section to update the status and leave a log message.
   $form['order_status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Order status'),
@@ -79,15 +77,11 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#value' => $order->status,
     '#attributes' => array('id' => 'edit-status-original'),
   );
-  $form['order_status']['comment'] = array(
+  $form['order_status']['log'] = array(
     '#type' => 'textarea',
-    '#title' => t('Add an order comment'),
-    '#description' => t('Leave an order comment visible to the customer explaining the current status of the order.'),
+    '#title' => t('Update log message'),
+    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
     '#rows' => 4,
-  );
-  $form['order_status']['email'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('E-mail an order status notification containing the comment above.'),
   );
 
   // Add the user account and e-mail fields.
@@ -125,10 +119,10 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#default_value' => $order->mail,
   );
 
-  // Add a log field to store revision information on save.
-  $form['order_log'] = array(
+  // Add a log checkbox and timestamp field to a history tab.
+  $form['order_history'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Order log'),
+    '#title' => t('Order history'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#group' => 'additional_settings',
@@ -137,32 +131,26 @@ function commerce_order_order_form($form, &$form_state, $order) {
     ),
     '#weight' => 40,
   );
-  $form['order_log']['revision'] = array(
+  $form['order_history']['revision'] = array(
     '#type' => 'checkbox',
     '#title' => t('Create new revision on update'),
-    '#description' => t('If this is not checked, the message below will be disregarded.'),
+    '#description' => t('If an update log message is entered, a revision will be created even if this is unchecked.'),
     '#default_value' => TRUE,
     '#access' => user_access('administer orders'),
   );
-  $form['order_log']['log'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Log message'),
-    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful audit trail for updates to this order.'),
-    '#rows' => 4,
-  );
-  $form['order_log']['date'] = array(
+  $form['order_history']['date'] = array(
     '#type' => 'textfield',
     '#title' => t('Created on'),
     '#description' => t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($order->date) ? date_format(date_create($order->date), 'Y-m-d H:i:s O') : format_date($order->created, 'custom', 'Y-m-d H:i:s O'), '%timezone' => !empty($order->date) ? date_format(date_create($order->date), 'O') : format_date($order->created, 'custom', 'O'))),
     '#maxlength' => 25,
     '#default_value' => !empty($order->created) ? format_date($order->created, 'custom', 'Y-m-d H:i:s O') : '',
   );
-  $form['order_log']['created'] = array(
+  $form['order_history']['created'] = array(
     '#type' => 'hidden',
     '#value' => !empty($order->created) ? format_date($order->created, 'short') : '',
     '#attributes' => array('id' => 'edit-created'),
   );
-  $form['order_log']['changed'] = array(
+  $form['order_history']['changed'] = array(
     '#type' => 'hidden',
     '#value' => !empty($order->changed) ? format_date($order->changed, 'short') : '',
     '#attributes' => array('id' => 'edit-changed'),
@@ -236,7 +224,7 @@ function commerce_order_order_form_submit($form, &$form_state) {
     $order = $form_state['commerce_order'];
   }
 
-  if ($form_state['values']['revision']) {
+  if ($form_state['values']['revision'] || !empty($form_state['values']['log'])) {
     $order->revision = TRUE;
     $order->log = $form_state['values']['log'];
   }

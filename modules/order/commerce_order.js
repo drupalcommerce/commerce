@@ -22,7 +22,7 @@ Drupal.behaviors.orderFieldsetSummaries = {
         Drupal.t('Owned by @name', { '@name': name });
     });
 
-    $('fieldset#edit-order-log', context).drupalSetSummary(function (context) {
+    $('fieldset#edit-order-history', context).drupalSetSummary(function (context) {
       var summary = $('#edit-created', context).val() ?
         Drupal.t('Created @date', { '@date' : $('#edit-created').val() }) :
         Drupal.t('New order');
