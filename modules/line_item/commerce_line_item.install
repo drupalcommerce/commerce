@@ -60,17 +60,24 @@ function commerce_line_item_schema() {
  * Implements hook_field_schema().
  */
 function commerce_line_item_field_schema($field) {
-  return array(
-    'columns' => array(
-      'line_item_id' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
+  if ($field['type'] == 'commerce_line_item_reference') {
+    return array(
+      'columns' => array(
+        'line_item_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ),
       ),
-    ),
-    'indexes' => array(
-      'line_item_id' => array('line_item_id'),
-    ),
-  );
+      'indexes' => array(
+        'line_item_id' => array('line_item_id'),
+      ),
+      'foreign keys' => array(
+        'line_item_id' => array(
+          'table' => 'commerce_line_item',
+          'columns' => array('line_item_id' => 'line_item_id'),
+        ),
+      ),
+    );
+  }
 }
-

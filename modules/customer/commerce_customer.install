@@ -144,7 +144,12 @@ function commerce_customer_field_schema($field) {
       'indexes' => array(
         'profile_id' => array('profile_id'),
       ),
+      'foreign keys' => array(
+        'profile_id' => array(
+          'table' => 'commerce_customer',
+          'columns' => array('profile_id' => 'profile_id'),
+        ),
+      ),
     );
   }
 }
-
