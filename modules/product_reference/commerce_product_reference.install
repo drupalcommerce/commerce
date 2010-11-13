@@ -15,6 +15,12 @@ function commerce_product_reference_field_schema($field) {
     'indexes' => array(
       'product_id' => array('product_id'),
     ),
+    'foreign keys' => array(
+      'product_id' => array(
+        'table' => 'commerce_product',
+        'columns' => array('product_id' => 'product_id'),
+      ),
+    ),
   );
 }
 
