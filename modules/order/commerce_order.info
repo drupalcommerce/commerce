@@ -13,6 +13,9 @@ files[] = commerce_order.module
 files[] = commerce_order.install
 
 ; Module includes
+files[] = commerce_order.info.inc
+files[] = commerce_order.rules.inc
+files[] = commerce_order.tokens.inc
 files[] = includes/commerce_order.controller.inc
 
 ; Views include

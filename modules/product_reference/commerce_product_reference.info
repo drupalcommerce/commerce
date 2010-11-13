@@ -10,3 +10,4 @@ core = 7.x
 
 ; Base module files
 files[] = commerce_product_reference.module
+files[] = commerce_product_reference.install

@@ -11,6 +11,9 @@ files[] = commerce_line_item.module
 files[] = commerce_line_item.install
 
 ; Module includes
+files[] = commerce_line_item.info.inc
+files[] = commerce_line_item.rules.inc
+files[] = commerce_line_item.tokens.inc
 files[] = includes/commerce_line_item.controller.inc
 
 ; Views include
