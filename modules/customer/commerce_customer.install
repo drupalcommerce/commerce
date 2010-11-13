@@ -127,3 +127,24 @@ function commerce_customer_schema() {
 
   return $schema;
 }
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_customer_field_schema($field) {
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    return array(
+      'columns' => array(
+        'profile_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ),
+      ),
+      'indexes' => array(
+        'profile_id' => array('profile_id'),
+      ),
+    );
+  }
+}
+

@@ -521,24 +521,6 @@ function commerce_line_item_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function commerce_line_item_field_schema($field) {
-  return array(
-    'columns' => array(
-      'line_item_id' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
-      ),
-    ),
-    'indexes' => array(
-      'line_item_id' => array('line_item_id'),
-    ),
-  );
-}
-
-/**
  * Implements hook_field_validate().
  *
  * Possible error codes:

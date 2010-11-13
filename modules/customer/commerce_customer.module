@@ -538,26 +538,6 @@ function commerce_customer_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function commerce_customer_field_schema($field) {
-  if ($field['type'] == 'commerce_customer_profile_reference') {
-    return array(
-      'columns' => array(
-        'profile_id' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => FALSE,
-        ),
-      ),
-      'indexes' => array(
-        'profile_id' => array('profile_id'),
-      ),
-    );
-  }
-}
-
-/**
  * Implements hook_field_settings_form().
  */
 function commerce_customer_field_settings_form($field, $instance, $has_data) {

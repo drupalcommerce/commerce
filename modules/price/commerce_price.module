@@ -27,34 +27,6 @@ function commerce_price_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function commerce_price_field_schema($field) {
-  if ($field['type'] == 'commerce_price') {
-    return array(
-      'columns' => array(
-        'price' => array(
-          'description' => 'The price amount.',
-          'type' => 'numeric',
-          'precision' => 16,
-          'scale' => 5,
-          'not null' => TRUE,
-        ),
-        'currency_code' => array(
-          'description' => 'The currency code for the price.',
-          'type' => 'varchar',
-          'length' => 32,
-          'not null' => TRUE,
-        ),
-      ),
-      'indexes' => array(
-        'currency_price' => array('price', 'currency_code'),
-      ),
-    );
-  }
-}
-
-/**
  * Implements hook_field_validate().
  */
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {

@@ -112,24 +112,6 @@ function commerce_product_reference_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function commerce_product_reference_field_schema($field) {
-  return array(
-    'columns' => array(
-      'product_id' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
-      ),
-    ),
-    'indexes' => array(
-      'product_id' => array('product_id'),
-    ),
-  );
-}
-
-/**
  * Implements hook_field_settings_form().
  */
 function commerce_product_reference_field_settings_form($field, $instance, $has_data) {
