@@ -150,6 +150,12 @@ function commerce_order_commerce_order_status_info() {
     'title' => t('Pending'),
     'state' => 'pending',
   );
+  $order_statuses['processing'] = (object) array(
+    'name' => 'processing',
+    'title' => t('Processing'),
+    'state' => 'pending',
+    'weight' => 5,
+  );
 
   $order_statuses['completed'] = (object) array(
     'name' => 'completed',
