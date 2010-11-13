@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_product_reference_field_schema($field) {
+  return array(
+    'columns' => array(
+      'product_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'product_id' => array('product_id'),
+    ),
+  );
+}
+

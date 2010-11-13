@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_price_field_schema($field) {
+  if ($field['type'] == 'commerce_price') {
+    return array(
+      'columns' => array(
+        'price' => array(
+          'description' => 'The price amount.',
+          'type' => 'numeric',
+          'precision' => 16,
+          'scale' => 5,
+          'not null' => TRUE,
+        ),
+        'currency_code' => array(
+          'description' => 'The currency code for the price.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+        ),
+      ),
+      'indexes' => array(
+        'currency_price' => array('price', 'currency_code'),
+      ),
+    );
+  }
+}
+
