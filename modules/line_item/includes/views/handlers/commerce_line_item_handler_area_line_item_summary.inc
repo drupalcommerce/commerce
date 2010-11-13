@@ -67,7 +67,9 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       $links = array();
 
       foreach (commerce_line_item_summary_links() as $name => $link) {
-        $links[str_replace('_', '-', 'line-item-summary-' . $name)] = $link;
+        if ($this->options['links'][$name] === $name) {
+          $links[str_replace('_', '-', 'line-item-summary-' . $name)] = $link;
+        }
       }
 
       // Build the variables array to send to the template.
