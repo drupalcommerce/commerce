@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * Implements hook_field_schema().
