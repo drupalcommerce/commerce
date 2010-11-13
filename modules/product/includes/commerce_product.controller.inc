@@ -59,8 +59,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_product', $product);
-      module_invoke_all('commerce_product_presave', $product);
-      rules_invoke_event('commerce_product_presave', $product);
+      rules_invoke_all('commerce_product_presave', $product);
 
       // If this is a new product...
       if ((isset($product->is_new) && $product->is_new) || empty($product->product_id)) {

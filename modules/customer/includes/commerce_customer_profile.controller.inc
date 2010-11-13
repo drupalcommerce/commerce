@@ -77,8 +77,7 @@ class CommerceCustomerProfileEntityController extends DrupalDefaultEntityControl
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_customer_profile', $profile);
-      module_invoke_all('commerce_customer_profile_presave', $profile);
-      rules_invoke_event('commerce_customer_profile_presave', $profile);
+      rules_invoke_all('commerce_customer_profile_presave', $profile);
 
       if ($profile->is_new || !empty($profile->revision)) {
         // When inserting either a new profile or revision, $profile->log must

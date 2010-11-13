@@ -16,7 +16,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   // Invoke the payment methods event that will populate the order with
   // an array of method IDs for available payment methods.
   $order->payment_methods = array();
-  rules_invoke_event('commerce_payment_methods', $order);
+  rules_invoke_all('commerce_payment_methods', $order);
 
   // Generate an array of payment method options for the checkout form.
   $options = array();

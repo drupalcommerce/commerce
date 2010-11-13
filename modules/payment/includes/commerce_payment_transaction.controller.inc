@@ -87,8 +87,7 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_payment_transaction', $transaction);
-      module_invoke_all('commerce_payment_transaction_presave', $transaction);
-      rules_invoke_event('commerce_payment_transaction_presave', $transaction);
+      rules_invoke_all('commerce_payment_transaction_presave', $transaction);
 
       if ($transaction->is_new || !empty($transaction->revision)) {
         // When inserting either a new transaction or revision, $transaction->log

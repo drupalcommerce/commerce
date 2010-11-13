@@ -83,8 +83,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_order', $order);
-      module_invoke_all('commerce_order_presave', $order);
-      rules_invoke_event('commerce_order_presave', $order);
+      rules_invoke_all('commerce_order_presave', $order);
 
       if ($order->is_new || !empty($order->revision)) {
         // When inserting either a new order or revision, $order->log must be set
