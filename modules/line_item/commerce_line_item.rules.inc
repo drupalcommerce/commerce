@@ -47,7 +47,8 @@ function commerce_line_item_rules_event_info() {
   );
 
   // Specify that on presave the line item is saved anyway.
-  $items['commerce_line_item_presave']['variables']['line_item']['skip save'] = TRUE;
+  $items['commerce_line_item_presave_insert']['variables']['line_item']['skip save'] = TRUE;
+  $items['commerce_line_item_presave_update']['variables']['line_item']['skip save'] = TRUE;
 
   return $items;
 }
