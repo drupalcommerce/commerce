@@ -156,7 +156,7 @@ function commerce_cart_user_login(&$edit, $account) {
   if ($anonymous_order = commerce_cart_order_load()) {
     // If the anonymous user had any items in the cart, add them to the user's
     // authenticated cart.
-    if (count($anonymous_order->line_items[LANGUAGE_NONE]) > 0) {
+    if (!empty($anonymous_order->line_items[LANGUAGE_NONE])) {
       // Add each of the anonymous cart items to the authenticated user's cart.
       $line_item_ids = array();
 
