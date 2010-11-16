@@ -492,6 +492,27 @@ function commerce_line_item_delete_multiple($line_item_ids) {
 }
 
 /**
+ * Determines access to perform an operation on a particular line item.
+ *
+ * @param $op
+ *   The operation to perform on the line item.
+ * @param $line_item
+ *   The line item object in question.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not access should be granted.
+ */
+function commerce_line_item_access($op, $line_item, $account = NULL) {
+  if (empty($account)) {
+    global $user;
+    $account = clone($user);
+  }
+
+  // TODO: Implement actual access control for line items.
+
+  return TRUE;
+}
+/**
  * Handler to load the unchanged line item variable for rules.
  * @see commerce_line_item_rules_variables().
  */
