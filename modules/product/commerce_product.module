@@ -348,6 +348,10 @@ function commerce_product_save($product) {
  * Loads a product by ID.
  */
 function commerce_product_load($product_id) {
+  if (empty($product_id)) {
+    return FALSE;
+  }
+
   $products = commerce_product_load_multiple(array($product_id), array());
   return $products ? reset($products) : FALSE;
 }
@@ -377,6 +381,10 @@ function commerce_product_load_by_sku($sku) {
  *   An array of product objects indexed by product_id.
  */
 function commerce_product_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
+  if (empty($product_ids) && empty($conditions)) {
+    return array();
+  }
+
   return entity_load('commerce_product', $product_ids, $conditions, $reset);
 }
 
