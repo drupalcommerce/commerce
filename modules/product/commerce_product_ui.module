@@ -246,17 +246,24 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Entity uri callback: points to the edit form of the given product.
+ * Entity uri callback: points to the edit form of the given product if no other
+ *   URI is specified.
  */
 function commerce_product_ui_uri($product) {
-  // Only return a value if the user has permission to view the product.
+  // First look for a return value in the default entity uri callback.
+  $uri = commerce_product_uri($product);
+
+  // If a value was found, return it now.
+  if (!empty($uri)) {
+    return $uri;
+  }
+
+  // Otherwise return an admin URI if the user has permission.
   if (commerce_product_access('view', $product)) {
     return array(
       'path' => 'admin/commerce/products/' . $product->product_id,
     );
   }
-
-  return NULL;
 }
 
 /**

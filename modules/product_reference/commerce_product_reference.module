@@ -8,6 +8,16 @@
 
 
 /**
+ * Implements hook_commerce_product_uri().
+ */
+function commerce_product_reference_commerce_product_uri($product) {
+  // If the product has a display context, use its URI.
+  if (!empty($product->display_context)) {
+    return entity_uri($product->display_context['entity_type'], $product->display_context['entity']);
+  }
+}
+
+/**
  * Implements hook_field_extra_fields().
  *
  * This implementation will define "extra fields" on node bundles with product
@@ -106,7 +116,12 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
  * preprocess function for the image formatter is used to change the path to the
  * path of the entity the field is displayed on. This context is derived from an
  * array added to the product entity in hook_node_view() for nodes.
- */
+ *
+ * TODO: Determine if we can completely do away with this function in favor of
+ * the entity_uri() method currently implemented. I hesitate because I don't
+ * know how working through entity_uri() will work with products added to the
+ * shopping cart and what we can do about non-entity uris.
+ *
 function commerce_product_reference_preprocess_image_formatter(&$variables) {
   // If the image has a link to a product entity with a display context...
   if (!empty($variables['path']['path']) &&
@@ -116,7 +131,7 @@ function commerce_product_reference_preprocess_image_formatter(&$variables) {
     // Change the link to point to the item in the display context.
     $variables['path'] = entity_uri($variables['path']['options']['entity']->display_context['entity_type'], $variables['path']['options']['entity']->display_context['entity']);
   }
-}
+}*/
 
 /**
  * Implements hook_field_info().

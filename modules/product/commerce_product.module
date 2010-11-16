@@ -62,6 +62,7 @@ function commerce_product_entity_info() {
           'custom settings' => FALSE,
         ),
       ),
+      'uri callback' => 'commerce_product_uri',
       'creation callback' => '_commerce_product_create',
       'save callback' => 'commerce_product_save',
       'deletion callback' => 'commerce_product_delete',
@@ -77,6 +78,21 @@ function commerce_product_entity_info() {
   }
 
   return $return;
+}
+
+/**
+ * Entity uri callback: gives modules a chance to specify a path for a product.
+ */
+function commerce_product_uri($product) {
+  // Allow modules to specify a path, returning the first one found.
+  foreach (module_implements('commerce_product_uri') as $module) {
+    $uri = module_invoke($module, 'commerce_product_uri', $product);
+
+    // If the implementation returned data, use that now.
+    if (!empty($uri)) {
+      return $uri;
+    }
+  }
 }
 
 /**
