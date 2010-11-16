@@ -2,6 +2,7 @@
 name = Commerce UI
 description = Defines menu items common to the various Drupal Commerce UI modules.
 package = Commerce
+dependencies[] = commerce
 core = 7.x
 
 ; Base module files
