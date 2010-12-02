@@ -22,7 +22,7 @@ function commerce_line_item_ui_types_overview() {
     // Add the line item type's row to the table's rows array.
     $rows[] = array(
       theme('line_item_type_admin_overview', array('line_item_type' => $line_item_type)),
-      theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations'))),
+      theme('links', array('links' => $links, 'attributes' => array('class' => 'links inline operations'))),
     );
   }
 

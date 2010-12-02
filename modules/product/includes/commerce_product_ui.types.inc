@@ -27,7 +27,7 @@ function commerce_product_ui_types_overview() {
     // Add the product type's row to the table's rows array.
     $rows[] = array(
       theme('product_type_admin_overview', array('product_type' => $product_type)),
-      theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations'))),
+      theme('links', array('links' => $links, 'attributes' => array('class' => 'links inline operations'))),
     );
   }
 

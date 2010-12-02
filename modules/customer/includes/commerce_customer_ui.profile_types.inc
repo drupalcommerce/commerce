@@ -27,7 +27,7 @@ function commerce_customer_ui_customer_profile_types_overview() {
     // Add the profile type's row to the table's rows array.
     $rows[] = array(
       theme('customer_profile_type_admin_overview', array('profile_type' => $profile_type)),
-      theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations'))),
+      theme('links', array('links' => $links, 'attributes' => array('class' => 'links inline operations'))),
     );
   }
 
