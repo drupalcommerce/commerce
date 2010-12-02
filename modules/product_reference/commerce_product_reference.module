@@ -106,34 +106,6 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
 }
 
 /**
- * Implements hook_preprocess_HOOK().
- *
- * When product image fields are displayed in the context of some other entity
- * through the product reference field, if they are set to link to content, the
- * link will go to the product's administrative URL instead of the URL of the
- * entity the field is being displayed on. There was no readily apparent earlier
- * point where the path information could be changed prior to theming, so the
- * preprocess function for the image formatter is used to change the path to the
- * path of the entity the field is displayed on. This context is derived from an
- * array added to the product entity in hook_node_view() for nodes.
- *
- * TODO: Determine if we can completely do away with this function in favor of
- * the entity_uri() method currently implemented. I hesitate because I don't
- * know how working through entity_uri() will work with products added to the
- * shopping cart and what we can do about non-entity uris.
- *
-function commerce_product_reference_preprocess_image_formatter(&$variables) {
-  // If the image has a link to a product entity with a display context...
-  if (!empty($variables['path']['path']) &&
-    !empty($variables['path']['options']['entity_type']) &&
-    $variables['path']['options']['entity_type'] == 'commerce_product' &&
-    !empty($variables['path']['options']['entity']->display_context)) {
-    // Change the link to point to the item in the display context.
-    $variables['path'] = entity_uri($variables['path']['options']['entity']->display_context['entity_type'], $variables['path']['options']['entity']->display_context['entity']);
-  }
-}*/
-
-/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
