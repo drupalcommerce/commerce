@@ -634,8 +634,8 @@ function commerce_checkout_complete($form, &$form_state, $order) {
     $order = commerce_order_status_update($order, $order_state->default_status);
   }
 
-  // Allow other modules to react to checkout completion.
-  // Because we want to pass $form_state by reference, we can't use module_invoke_all
+  // Allow other modules to react to checkout completion. We need to pass
+  // $form_state by reference, so we can't use module_invoke_all().
   foreach (module_implements('commerce_checkout_complete') as $module) {
     $function = $module . '_commerce_checkout_complete';
     $function($form, $form_state, $order);
