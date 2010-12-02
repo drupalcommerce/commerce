@@ -74,7 +74,7 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['empty']['area']['label'] = 'Empty line item text.';
   $handler->display->display_options['empty']['area']['empty'] = FALSE;
   $handler->display->display_options['empty']['area']['content'] = 'No line items found.';
-  $handler->display->display_options['empty']['area']['format'] = '1';
+  $handler->display->display_options['empty']['text']['format'] = 'filtered_html';
   /* Field: Commerce Line Item: Line item ID */
   $handler->display->display_options['fields']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['fields']['line_item_id']['table'] = 'commerce_line_item';
