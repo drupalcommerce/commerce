@@ -113,12 +113,10 @@ function commerce_product_reference_field_info() {
     'commerce_product_reference' => array(
       'label' => t('Product reference'),
       'description' => t('This field stores the ID of a related product as an integer value.'),
-      'translatable' => FALSE,
+      'settings' => array('referenceable_types' => array()),
+      'instance_settings' => array(),
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_product_reference_title_link',
-      'settings' => array(
-        'referenceable_types' => array(),
-      ),
       'property_type' => 'commerce_product',
       'property_callbacks' => array('commerce_product_reference_property_info_callback'),
     ),

@@ -16,10 +16,10 @@ function commerce_price_field_info() {
     'commerce_price' => array(
       'label' => t('Price'),
       'description' => t('This field stores prices for products consisting of an amount and a currency.'),
-      'translatable' => FALSE,
+      'settings' => array(),
+      'instance_settings' => array(),
       'default_widget' => 'commerce_price_simple',
       'default_formatter' => 'commerce_price_default',
-      'settings' => array(),
       'property_type' => 'commerce_price',
       'property_callbacks' => array('commerce_price_property_info_callback'),
     ),

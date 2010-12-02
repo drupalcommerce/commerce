@@ -532,9 +532,10 @@ function commerce_line_item_field_info() {
     'commerce_line_item_reference' => array(
       'label' => t('Line item reference'),
       'description' => t('This field stores the ID of a related line item as an integer value.'),
+      'settings' => array(),
+      'instance_settings' => array(),
       'default_widget' => 'commerce_line_item_manager',
       'default_formatter' => 'commerce_line_item_reference_view',
-      'settings' => array(),
       'property_type' => 'commerce_line_item',
       'property_callbacks' => array('commerce_line_item_property_info_callback'),
     ),
