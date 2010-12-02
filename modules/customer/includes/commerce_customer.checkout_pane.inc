@@ -42,7 +42,7 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
  * Checkout pane callback: returns a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
-  $pane_form = array();
+  $pane_form = array('#parents' => array($checkout_pane->pane_id));
 
   // Extract the type of profile represented by this pane from its ID.
   $type = substr($checkout_pane->pane_id, 17);
@@ -87,17 +87,8 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 function commerce_customer_profile_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
   $profile = $form_state['values'][$checkout_pane->pane_id]['customer_profile'];
 
-  // Store the form values locally to restore them after field submission.
-  $values = $form_state['values'];
-
-  // Temporarily make this pane's values the only values in the $form_state.
-  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
-
   // Notify field widgets to validate their data.
   field_attach_form_validate('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
-
-  // Restore the values to the $form_state.
-  $form_state['values'] = $values;
 
   return TRUE;
 }
@@ -116,17 +107,8 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
     $profile->uid = $order->uid;
   }
 
-  // Store the form values locally to restore them after field submission.
-  $values = $form_state['values'];
-
-  // Temporarily make this pane's values the only values in the $form_state.
-  $form_state['values'] = $form_state['values'][$checkout_pane->pane_id];
-
   // Notify field widgets.
   field_attach_submit('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
-
-  // Restore the values to the $form_state.
-  $form_state['values'] = $values;
 
   // Save the profile.
   commerce_customer_profile_save($profile);

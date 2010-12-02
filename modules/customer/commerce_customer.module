@@ -525,11 +525,10 @@ function commerce_customer_field_info() {
     'commerce_customer_profile_reference' => array(
       'label' => t('Customer profile reference'),
       'description' => t('This field stores the ID of a related customer profile as an integer value.'),
+      'settings' => array('profile_type' => 'billing'),
+      'instance_settings' => array(),
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_customer_profile_reference_view',
-      'settings' => array(
-        'profile_type' => 'billing',
-      ),
       'property_type' => 'commerce_customer_profile',
       'property_callbacks' => array('commerce_customer_profile_property_info_callback'),
     ),
@@ -778,6 +777,9 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
 
       field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
+      // Remove the default #parents array so the normal tree can do its thing.
+      unset($element['profiles'][$key]['#parents']);
+
       // This checkbox will be overridden with a clickable delete image.
       // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
@@ -822,21 +824,12 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
       commerce_customer_profile_delete($profile->profile_id);
     }
     else {
-      // Store the form values locally to restore them after field submission.
-      $values = $form_state['values'];
-
-      // Temporarily make this pane's values the only values in the $form_state.
-      $form_state['values'] = $form_state['values'][$element['#field_name']][$element['#language']]['profiles'][$key];
-
       // Notify field widgets to validate their data.
       field_attach_form_validate('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
       // TODO: Trap it on error, rebuild the form with error messages.
       // Notify field widgets to save the field data.
       field_attach_submit('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
-
-      // Restore the values to the $form_state.
-      $form_state['values'] = $values;
 
       // Only save if values were actually changed.
       if ($profile != $element['profiles'][$key]['profile']['#value']) {
