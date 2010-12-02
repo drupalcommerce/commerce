@@ -13,7 +13,13 @@
 }
 
 .line-item-summary .links {
+  margin-top: .5em;
   clear: left;
+}
+
+.line-item-summary .links li {
+  display: inline;
+  padding-right: 1em;
 }
 
 .line-item-summary .links li.last {
