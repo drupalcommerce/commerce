@@ -693,7 +693,8 @@ function commerce_customer_field_widget_info() {
 function commerce_customer_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
   // Alter the field edit form so it's obvious that customer profile manager
   // widgets do not support multiple values.
-  if (!empty($form['instance']) &&
+  if (!empty($form['locked']) &&
+      !empty($form['instance']) &&
       $form['instance']['widget']['type']['#value'] == 'commerce_customer_profile_manager') {
     $form['field']['cardinality']['#options'] = array('1' => '1');
     $form['field']['cardinality']['#description'] = t('The customer profile manager widget only supports single value editing and entry via its form.');
