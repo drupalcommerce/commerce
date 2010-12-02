@@ -16,7 +16,6 @@ function commerce_payment_ui_views_default_views() {
   $view->name = 'commerce_payment_order';
   $view->description = 'Display and total an order\'s payment transaction history.';
   $view->tag = 'commerce';
-  $view->view_php = '';
   $view->base_table = 'commerce_payment_transaction';
   $view->is_cacheable = FALSE;
   $view->api_version = '3.0-alpha1';
@@ -85,11 +84,6 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['footer']['totals']['field'] = 'totals';
   $handler->display->display_options['footer']['totals']['empty'] = TRUE;
   $handler->display->display_options['footer']['totals']['add_payment_form'] = 1;
-  /* Relationship: Commerce Payment Transaction: Order ID */
-  $handler->display->display_options['relationships']['order_id']['id'] = 'order_id';
-  $handler->display->display_options['relationships']['order_id']['table'] = 'commerce_payment_transaction';
-  $handler->display->display_options['relationships']['order_id']['field'] = 'order_id';
-  $handler->display->display_options['relationships']['order_id']['required'] = 1;
   /* Field: Commerce Payment Transaction: Status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'commerce_payment_transaction';
@@ -196,11 +190,10 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['operations']['alter']['html'] = 0;
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
-  /* Argument: Commerce Order: Order ID */
+  /* Argument: Commerce Payment Transaction: Order ID */
   $handler->display->display_options['arguments']['order_id']['id'] = 'order_id';
-  $handler->display->display_options['arguments']['order_id']['table'] = 'commerce_order';
+  $handler->display->display_options['arguments']['order_id']['table'] = 'commerce_payment_transaction';
   $handler->display->display_options['arguments']['order_id']['field'] = 'order_id';
-  $handler->display->display_options['arguments']['order_id']['relationship'] = 'order_id';
   $handler->display->display_options['arguments']['order_id']['default_action'] = 'empty';
   $handler->display->display_options['arguments']['order_id']['style_plugin'] = 'default_summary';
   $handler->display->display_options['arguments']['order_id']['default_argument_type'] = 'fixed';
