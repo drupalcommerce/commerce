@@ -635,7 +635,11 @@ function commerce_checkout_complete($form, &$form_state, $order) {
   }
 
   // Allow other modules to react to checkout completion.
-  module_invoke_all('commerce_checkout_complete', $form, $form_state, $order);
+  // Because we want to pass $form_state by reference, we can't use module_invoke_all
+  foreach (module_implements('commerce_checkout_complete') as $module) {
+    $function = $module . '_commerce_checkout_complete';
+    $function($form, $form_state, $order);
+  }
 
   // TODO: Update to use Rules; the third argument should pass the proper account.
   // ca_pull_trigger('uc_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
