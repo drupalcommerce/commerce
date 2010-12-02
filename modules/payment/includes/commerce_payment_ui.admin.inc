@@ -30,10 +30,6 @@ function commerce_payment_ui_admin_page() {
 
   $content['disabled']['title']['#markup'] = '<h3>' . t('Disabled payment rules') . '</h3>';
 
-  // Clear the default rule configuration cache so default configurations can
-  // appear in this second table.
-  entity_get_controller('rules_config')->resetCache();
-
   $conditions['active'] = FALSE;
   $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions);
   $content['disabled']['rules']['#empty'] = t('There are no disabled payment methods.');
