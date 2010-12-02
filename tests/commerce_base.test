@@ -258,10 +258,14 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @see attachProductReferenceField()
    */
   public function createDummyProductDisplayContentType($type = 'product_display', $attach_product_reference_field = TRUE, $field_name = 'field_product') {
-    // TODO: Add check to make sure this content type doesn't already exist.
+    // If the specified node type already exists, return it now.
+    if ($content_type = node_type_load($type)) {
+      return $content_type;
+    }
+
     $content_type = array(
       'type' => $type,
-      'name' => $type, // Dont use a human readable name here to keep it simple
+      'name' => $type, // Don't use a human readable name here to keep it simple.
       'base' => 'node_content',
       'description' => 'Use <em>product displays</em> to display products for sale to your customers.',
       'custom' => 1,
