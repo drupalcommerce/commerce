@@ -81,7 +81,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
         'total_raw' => number_format(commerce_currency_round($total['price'], $currency), $currency->decimals),
         'total_label' => t('Total:'),
         'total' => commerce_currency_format($total['price'], $total['currency_code'], $this->view),
-        'links' => theme('links', array('links' => $links)),
+        'links' => theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline')))),
       );
 
       return theme('commerce_line_item_summary', $variables);

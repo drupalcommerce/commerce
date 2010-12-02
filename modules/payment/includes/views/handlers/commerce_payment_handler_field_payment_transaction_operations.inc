@@ -26,7 +26,7 @@ class commerce_payment_handler_field_payment_transaction_operations extends view
     if (!empty($links)) {
       drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css');
 
-      return theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations')));
+      return theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline', 'operations'))));
     }
   }
 }

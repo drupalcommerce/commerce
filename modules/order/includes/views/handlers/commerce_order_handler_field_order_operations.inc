@@ -24,7 +24,7 @@ class commerce_order_handler_field_order_operations extends views_handler_field 
     if (!empty($links)) {
       drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order_views.css');
 
-      return theme('links', array('links' => $links, 'attributes' => array('class' => 'links operations')));
+      return theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline', 'operations'))));
     }
   }
 }
