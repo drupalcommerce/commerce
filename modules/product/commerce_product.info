@@ -26,6 +26,7 @@ files[] = includes/views/handlers/commerce_product_handler_field_product_link.in
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_delete.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_edit.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_operations.inc
+files[] = includes/views/handlers/commerce_product_handler_argument_product_id.inc
 
 ; Simple tests
 files[] = tests/commerce_product.test

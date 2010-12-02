@@ -34,7 +34,7 @@ function commerce_product_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
+      'handler' => 'commerce_product_handler_argument_product_id',
     ),
   );
 
