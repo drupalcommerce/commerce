@@ -17,6 +17,7 @@ function commerce_payment_default_rules_configuration() {
     $rule = rules_reaction_rule();
 
     $rule->label = $payment_method->title;
+    $rule->plugin = 'reaction rule';
     $rule->active = FALSE;
 
     $rule
