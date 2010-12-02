@@ -50,3 +50,36 @@ function hook_commerce_product_uri($product) {
 function hook_commerce_product_presave(&$product) {
   // No example.
 }
+
+/**
+ * Lets modules prevent the deletion of a particular product.
+ *
+ * Before a product can be deleted, other modules are given the chance to say
+ * whether or not the action should be allowed. Modules implementing this hook
+ * can check for reference data or any other reason to prevent a product from
+ * being deleted and return FALSE to prevent the action.
+ *
+ * This is an API level hook, so implementations should not display any messages
+ * to the user (although logging to the watchdog is fine).
+ *
+ * @param $product
+ *   The product to be deleted.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not the given product can be deleted.
+ *
+ * @see commerce_product_reference_commerce_product_can_delete()
+ */
+function hook_commerce_product_can_delete($product) {
+  // Use EntityFieldQuery to look for line items referencing this product and do
+  // not allow the delete to occur if one exists.
+  $query = new EntityFieldQuery();
+
+  $query
+    ->entityCondition('entity_type', 'commerce_line_item', '=')
+    ->entityCondition('bundle', 'product', '=')
+    ->fieldCondition('product', 'product_id', $product->product_id, '=')
+    ->count();
+
+  return $query->execute() > 0 ? FALSE : TRUE;
+}

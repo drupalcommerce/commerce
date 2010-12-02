@@ -765,6 +765,23 @@ function commerce_product_line_item_populate(&$line_item, $product, $quantity = 
 }
 
 /**
+ * Implements hook_commerce_product_can_delete().
+ */
+function commerce_product_reference_commerce_product_can_delete($product) {
+  // Use EntityFieldQuery to look for line items referencing this product and do
+  // not allow the delete to occur if one exists.
+  $query = new EntityFieldQuery();
+
+  $query
+    ->entityCondition('entity_type', 'commerce_line_item', '=')
+    ->entityCondition('bundle', 'product', '=')
+    ->fieldCondition('product', 'product_id', $product->product_id, '=')
+    ->count();
+
+  return $query->execute() > 0 ? FALSE : TRUE;
+}
+
+/**
  * Callback to alter the property info of the reference fields.
  *
  * @see commerce_product_reference_field_info().

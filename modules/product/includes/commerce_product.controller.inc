@@ -112,8 +112,17 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
     if (!empty($product_ids)) {
       $products = $this->load($product_ids, array());
 
-      // TODO: We'll need to ensure products on orders cannot be deleted when we
-      // have orders implemented.
+      // Ensure the products can actually be deleted.
+      foreach ((array) $products as $product_id => $product) {
+        if (in_array(FALSE, module_invoke_all('commerce_product_can_delete', $product))) {
+          unset($products[$product_id]);
+        }
+      }
+
+      // If none of the specified products can be deleted, return FALSE.
+      if (empty($products)) {
+        return FALSE;
+      }
 
       $transaction = db_transaction();
 
