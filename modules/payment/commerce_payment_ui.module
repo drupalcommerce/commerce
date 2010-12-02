@@ -162,7 +162,8 @@ function commerce_payment_ui_set_order_breadcrumb($order, $view_mode = 'administ
       l(t('Administration'), 'admin'),
       l(t('Store'), 'admin/commerce'),
       l(t('Orders'), 'admin/commerce/orders'),
-      l(t('Order @order-number', array('@order-number' => $order->order_number)), 'admin/commerce/orders/' . $order->order_id . '/payment'),
+      l(t('Order @order-number', array('@order-number' => $order->order_number)), 'admin/commerce/orders/' . $order->order_id),
+      l(t('Payment'), 'admin/commerce/orders/' . $order->order_id . '/payment'),
     );
   }
 
