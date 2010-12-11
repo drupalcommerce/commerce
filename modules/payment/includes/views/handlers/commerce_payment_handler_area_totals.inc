@@ -50,23 +50,26 @@ class commerce_payment_handler_area_totals extends views_handler_area {
       $order = FALSE;
     }
 
+    // Prepare the proper aliases for finding data in the result set.
+    $status_alias = $this->view->query->fields['commerce_payment_transaction_status']['alias'];
+    $currency_code_alias = $this->view->query->fields['commerce_payment_transaction_currency_code']['alias'];
+    $amount_alias = $this->view->query->fields['commerce_payment_transaction_amount']['alias'];
+
     // Calculate a total of successful payments for each currency.
     $transaction_statuses = commerce_payment_transaction_statuses();
     $totals = array();
 
-    // TODO: This loop uses hardcoded field aliases because $this->aliases isn't
-    // set for area handlers. This should be worked around or fixed in Views.
     foreach ($this->view->result as $result) {
       // If the payment transaction status indicates it should include the
       // current transaction in the total...
-      if (!empty($transaction_statuses[$result->commerce_payment_transaction_status]) && $transaction_statuses[$result->commerce_payment_transaction_status]->total) {
+      if (!empty($transaction_statuses[$result->{$status_alias}]) && $transaction_statuses[$result->{$status_alias}]->total) {
         // Add the transaction to its currency's running total if it exists...
-        if (isset($totals[$result->commerce_payment_transaction_currency_code])) {
-          $totals[$result->commerce_payment_transaction_currency_code] += $result->commerce_payment_transaction_amount;
+        if (isset($totals[$result->{$currency_code_alias}])) {
+          $totals[$result->{$currency_code_alias}] += $result->{$amount_alias};
         }
         else {
           // Or begin a new running total for the currency.
-          $totals[$result->commerce_payment_transaction_currency_code] = $result->commerce_payment_transaction_amount;
+          $totals[$result->{$currency_code_alias}] = $result->{$amount_alias};
         }
       }
     }
