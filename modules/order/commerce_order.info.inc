@@ -84,7 +84,8 @@ function commerce_order_entity_property_info() {
   $properties['line_items'] = array(
     'label' => t('Line items'),
     'description' => t('The line items attached to this order.'),
-    'type' => 'commerce_line_item',
+    'type' => 'list<commerce_line_item>',
+    'getter callback' => 'commerce_order_get_properties',
   );
 
   return $info;

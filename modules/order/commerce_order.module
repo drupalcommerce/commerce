@@ -911,6 +911,14 @@ function commerce_order_get_properties($order, array $options, $name) {
       return url('admin/commerce/orders/' . $order->order_id, $options);
     case 'edit-url':
       return url('admin/commerce/orders/' . $order->order_id . '/edit', $options);
+    case 'line_items':
+      $line_item_ids = array();
+
+      foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
+        $line_item_ids[] = $value['line_item_id'];
+      }
+
+      return commerce_line_item_load_multiple($line_item_ids);
   }
 }
 
