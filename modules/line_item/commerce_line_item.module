@@ -1081,7 +1081,8 @@ function commerce_line_item_summary_links() {
 function commerce_line_item_field_views_data_alter(&$data, $field, $module) {
   // If the field is a line item reference field...
   if ($field['type'] == 'commerce_line_item_reference') {
-    $table = array_shift(array_keys($data));
+    $keys = array_keys($data);
+    $table = array_shift($keys);
 
     // Add the relationship data to the proper line_item_id column.
     foreach (array_keys($data[$table]) as $key) {

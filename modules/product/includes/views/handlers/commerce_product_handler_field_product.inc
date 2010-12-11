@@ -10,7 +10,7 @@
  * Field handler to provide simple renderer that allows linking to a product.
  */
 class commerce_product_handler_field_product extends views_handler_field {
-  function init(&$view, $options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
 
     if (!empty($this->options['link_to_product'])) {

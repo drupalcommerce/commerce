@@ -575,7 +575,8 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
 function commerce_product_reference_field_views_data_alter(&$data, $field, $module) {
   // If the field is a product reference field...
   if ($field['type'] == 'commerce_product_reference') {
-    $table = array_shift(array_keys($data));
+    $keys = array_keys($data);
+    $table = array_shift($keys);
 
     // Add the relationship data to the proper product_id column.
     foreach (array_keys($data[$table]) as $key) {
