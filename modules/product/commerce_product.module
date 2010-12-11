@@ -625,7 +625,7 @@ function commerce_product_get_properties($product, array $options, $name) {
   switch ($name) {
     case 'creator':
       return $product->uid;
-    case 'edit-url':
+    case 'edit_url':
       return url('admin/commerce/products/' . $product->product_id . '/edit', $options);
   }
 }
@@ -818,6 +818,7 @@ function _commerce_product_match_products_standard($field, $string = '', $match 
  */
 function commerce_product_rules_var_unchanged($product) {
   $unchanged = drupal_static('commerce_product_unchanged');
+
   if (isset($product->product_id) && isset($unchanged[$product->product_id])) {
     return $unchanged[$product->product_id];
   }
