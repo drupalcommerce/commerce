@@ -63,7 +63,7 @@ function commerce_payment_ui_menu() {
   // Payment method Rules administration page.
   $items['admin/commerce/config/payment'] = array(
     'title' => 'Payment settings',
-    'description' => t('Enable and configure payment method rule configurations.'),
+    'description' => 'Enable and configure payment method rule configurations.',
     'page callback' => 'commerce_payment_ui_admin_page',
     'access arguments' => array('administer payments'),
     'file' => 'includes/commerce_payment_ui.admin.inc',

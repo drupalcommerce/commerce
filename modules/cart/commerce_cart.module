@@ -17,7 +17,7 @@ function commerce_cart_menu() {
   $items = array();
 
   $items['cart'] = array(
-    'title' => t('Shopping cart'),
+    'title' => 'Shopping cart',
     'page callback' => 'commerce_cart_view',
     'access arguments' => array('access content'),
     'file' => 'includes/commerce_cart.pages.inc',
