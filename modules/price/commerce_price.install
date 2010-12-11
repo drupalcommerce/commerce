@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * Implements hook_field_schema().
@@ -20,6 +21,13 @@ function commerce_price_field_schema($field) {
           'length' => 32,
           'not null' => TRUE,
         ),
+        'data' => array(
+          'description' => 'A serialized array of additional price data.',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE,
+          'serialize' => TRUE,
+        ),
       ),
       'indexes' => array(
         'currency_price' => array('price', 'currency_code'),
@@ -27,4 +35,3 @@ function commerce_price_field_schema($field) {
     );
   }
 }
-
