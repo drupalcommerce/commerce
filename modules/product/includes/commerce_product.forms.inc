@@ -160,13 +160,10 @@ function commerce_product_product_delete_form($form, &$form_state, $product) {
 
   $form['#submit'][] = 'commerce_product_product_delete_form_submit';
 
-  // TODO: Replace the SKU in the description parameter with the product view
-  // per http://drupal.org/node/733044.
-
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),
     '',
-    '<p>' . t('SKU: @sku. Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
+    drupal_render(commerce_product_build_content($product)) . '<p>' . t('Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
     t('Delete'),
     t('Cancel'),
     'confirm'
