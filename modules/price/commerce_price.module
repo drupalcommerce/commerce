@@ -420,12 +420,14 @@ function commerce_price_field_data_property_info($name = NULL) {
       'description' => !empty($name) ? t('Amount value of field %name', array('%name' => $name)) : '',
       'type' => 'decimal',
       'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
     ),
     'currency_code' => array(
       'label' => t('Currency'),
       'description' => !empty($name) ? t('Currency code of field %name', array('%name' => $name)) : '',
       'type' => 'text',
       'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
     ),
   );
 }
