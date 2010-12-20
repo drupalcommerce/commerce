@@ -246,6 +246,16 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
 }
 
 /**
+ * Returns an associative array of the specified currency codes.
+ *
+ * @param $enabled
+ *   Boolean indicating whether or not to include only enabled currencies.
+ */
+function commerce_currency_get_code($enabled = FALSE) {
+  return drupal_map_assoc(array_keys(commerce_currencies($enabled)));
+}
+
+/**
  * Returns the symbol of any or all currencies.
  *
  * @param $code
