@@ -10,22 +10,6 @@
  */
 
 /**
- * Implements hook_rules_event_info().
- */
-function commerce_price_rules_event_info() {
-  $items = array();
-
-  $items['commerce_price_alter'] = array(
-    'label' => t('Alter a price for display / purchase'),
-    'group' => t('Commerce - price'),
-    'variables' => commerce_price_rules_variables(t('Price')),
-    'access callback' => 'commerce_order_rules_access',
-  );
-
-  return $items;
-}
-
-/**
  * Returns parameters suitable for using Rules to alter prices.
  */
 function commerce_price_rules_variables() {

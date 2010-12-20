@@ -106,6 +106,75 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
 }
 
 /**
+ * Implements hook_commerce_price_field_calculation_options().
+ *
+ * To accommodate dynamic sell price calculation on the display level, we depend
+ * on display formatter settings to alert the module when to calculate a price.
+ * However, by default all price fields are set to show the original price as
+ * loaded with no option to change this. This module needs to add its own option
+ * to the list so it can know which prices should be calculated on display.
+ *
+ * @see commerce_product_reference_commerce_price_field_formatter_prepare_view()
+ */
+function commerce_product_reference_commerce_price_field_calculation_options($field, $instance, $view_mode) {
+  // If this is a single value purchase price field attached to a product...
+  if (($instance['entity_type'] == 'commerce_product' || $field['entity_types'] == array('commerce_product')) &&
+    $field['field_name'] == 'purchase_price' && $field['cardinality'] == 1) {
+    return array('calculated_sell_price' => t('Display the calculated sell price for the current user.'));
+  }
+}
+
+/**
+ * Implements hook_commerce_price_field_formatter_prepare_view().
+ *
+ * It isn't until the point of display that we know whether a particular price
+ * field should be altered to display the current user's purchase price of the
+ * product. Therefore, instead of trying to calculate dynamic prices on load,
+ * we calculate them prior to display but at the point where we know the full
+ * context of the display, including the display formatter settings for the
+ * pertinent view mode.
+ *
+ * The hook is invoked before a price field is formatted, so this implementation
+ * lets us swap in the calculated sell price of a product for a given point of
+ * display. The way it calculates the price is by creating a pseudo line item
+ * for the current product that is passed to Rules for transformation. Rule
+ * configurations may then use actions to set and alter the unit price of the
+ * line item, which, being an object, is passed by reference through all the
+ * various actions. Upon completion of the Rules execution, the unit price data
+ * is then swapped in for the data of the current field for display.
+ */
+function commerce_product_reference_commerce_price_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  // If this is a single value purchase price field attached to a product...
+  if ($entity_type == 'commerce_product' && $field['field_name'] == 'purchase_price' && $field['cardinality'] == 1) {
+    // Prepare the items for each entity passed in.
+    foreach ($entities as $product_id => $product) {
+      // If this price should be calculated...
+      if ($displays[$product_id]['settings']['calculation'] == 'calculated_sell_price') {
+        // If we don't have a full product object, load it now. This accommodation
+        // is currently being made for Views, as Views is currently engineered to
+        // avoid loading the full object even though it still uses the display
+        // formatters. See http://drupal.org/node/936196.
+        if (!isset($product->sku)) {
+          // Additionally, because only a single product is being passed through
+          // this hook at a time (due to the way the Field API apparently works),
+          // there's no need to pursue optimization with a load multiple.
+          $product = commerce_product_load($product_id);
+        }
+
+        // First create a pseudo product line item that we will pass to Rules.
+        $line_item = commerce_product_line_item_new($product);
+
+        // Pass the line item to Rules.
+        rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
+
+        // Replace the item being displayed with the line item's unit price.
+        $items[$product_id] = array($line_item->unit_price[$langcode][0]);
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
@@ -718,8 +787,8 @@ function commerce_product_line_item_new($product, $quantity = 1, $language = LAN
   // Populate it with the product information.
   commerce_product_line_item_populate($line_item, $product, $quantity, $language);
 
-  // Return the saved line item.
-  return commerce_line_item_save($line_item);
+  // Return the line item.
+  return $line_item;
 }
 
 /**

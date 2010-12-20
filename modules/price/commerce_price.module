@@ -123,12 +123,88 @@ function commerce_price_field_formatter_info() {
     'commerce_price_raw_amount' => array(
       'label' => t('Raw amount'),
       'field types' => array('commerce_price'),
+      'settings' => array(
+        'calculation' => FALSE,
+      ),
     ),
     'commerce_price_formatted_amount' => array(
       'label' => t('Formatted amount'),
       'field types' => array('commerce_price'),
+      'settings' => array(
+        'calculation' => FALSE,
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function commerce_price_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  if ($display['type'] == 'commerce_price_raw_amount' || $display['type'] == 'commerce_price_formatted_amount') {
+    $options = module_invoke_all('commerce_price_field_calculation_options', $field, $instance, $view_mode);
+
+    if (empty($options)) {
+      $element['calculation'] = array(
+        '#type' => 'value',
+        '#value' => FALSE,
+      );
+
+      $element['help'] = array(
+        '#markup' => '<p>' . t('No configuration is necessary. The original price will be displayed as loaded.') . '</p>',
+      );
+    }
+    else {
+      // Add the option to display the original price; unshifting will give it a
+      // key of 0 which will equate to FALSE with an Equal operator.
+      array_unshift($options, t('Display the original price as loaded.'));
+
+      $element['calculation'] = array(
+        '#type' => 'radios',
+        '#options' => $options,
+        '#default_value' => empty($settings['calculation']) ? 0 : $settings['calculation'],
+      );
+    }
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function commerce_price_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  if ($display['type'] == 'commerce_price_raw_amount' || $display['type'] == 'commerce_price_formatted_amount') {
+    if ($settings['calculation'] == FALSE) {
+      $summary[] = t('Displaying the original price');
+    }
+    else {
+      $summary[] = t('Displaying a calculated price');
+    }
+  }
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_prepare_view().
+ */
+function commerce_price_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  // Allow other modules to prepare the item values prior to formatting.
+  foreach(module_implements('commerce_price_field_formatter_prepare_view') as $module) {
+    $function = $module . '_commerce_price_field_formatter_prepare_view';
+    $function($entity_type, $entities, $field, $instances, $langcode, $items, $displays);
+  }
 }
 
 /**

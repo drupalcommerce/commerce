@@ -393,6 +393,13 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
     // Create the new product line item.
     $line_item = commerce_product_line_item_new($product, $quantity);
 
+    // Process the unit price through Rules so it reflects the user's actual
+    // purchase price.
+    rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
+
+    // Save the line item now so we get its ID.
+    $line_item = commerce_line_item_save($line_item);
+
     // Add it to the order's line item reference value.
     $order->line_items[LANGUAGE_NONE][] = array(
       'line_item_id' => $line_item->line_item_id,
