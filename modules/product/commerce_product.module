@@ -331,7 +331,7 @@ function commerce_product_new($type = '') {
 }
 
 /**
- * Creation callback for the Entity Metadata module.
+ * Creation callback for the Entity module.
  */
 function _commerce_product_create($values = array()) {
   // Create a new product of the specified type.

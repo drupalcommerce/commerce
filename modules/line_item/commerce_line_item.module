@@ -159,6 +159,11 @@ function commerce_line_item_permission() {
       'description' => t('View and configure fields attached to module defined line item types.'),
       'restrict access' => TRUE,
     ),
+    'administer line items' => array(
+      'title' => t('Administer line items'),
+      'description' => t('Update and delete any line item on the site.'),
+      'restrict access' => TRUE,
+    ),
   );
 
   return $permissions;
@@ -408,7 +413,7 @@ function commerce_line_item_new($type = '') {
 }
 
 /**
- * Creation callback for the Entity Metadata module.
+ * Creation callback for the Entity module.
  */
 function _commerce_line_item_create($values = array()) {
   // Create a new line item of the specified type.

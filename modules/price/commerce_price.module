@@ -330,8 +330,8 @@ function commerce_price_field_widget_error($element, $error, $form, &$form_state
 function commerce_price_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
 
-  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
-  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['getter callback'] = 'entity_property_field_verbatim_get';
+  $property['setter callback'] = 'entity_property_field_verbatim_set';
   $property['data info']['properties'] = array(
     'amount' => array(
       'type' => 'decimal',
@@ -349,7 +349,7 @@ function commerce_price_property_info_callback(&$info, $entity_type, $field, $in
 }
 
 /**
- * Entity metadata callback for getting the amount value of price fields.
+ * Entity property callback for getting the amount value of price fields.
  *
  * @see commerce_price_property_info_callback().
  */
@@ -358,7 +358,7 @@ function commerce_price_field_get_amount(&$item, array $options, $name) {
 }
 
 /**
- * Entity metadata callback for getting the price value of price fields.
+ * Entity property callback for getting the price value of price fields.
  *
  * @see commerce_price_property_info_callback().
  */

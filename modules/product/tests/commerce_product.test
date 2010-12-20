@@ -189,7 +189,7 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 }
 
 /**
- * Test the Rules and Entity Metadata integration.
+ * Test the Rules and Entity integration.
  */
 class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
@@ -272,7 +272,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
       }
     }
     $values['type'] = 'product';
-    $product = entity_metadata_entity_create('commerce_product', $values)->value();
+    $product = entity_create('commerce_product', $values)->value();
     $this->assertTrue($product, "Created a product and set all setable values.");
 
     $wrapper = entity_metadata_wrapper('commerce_product', $product);
@@ -305,7 +305,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
     if (isset($info['options list'])) {
       $options = array_keys($info['options list']());
-      return entity_metadata_list_extract_type($type) ? array(reset($options)) : reset($options);
+      return entity_property_list_extract_type($type) ? array(reset($options)) : reset($options);
     }
 
     switch ($type) {

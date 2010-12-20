@@ -31,7 +31,6 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     $dependencies = array(
       // API
       'entity',
-      'entity_metadata',
       'rules',
       'addressfield',
       //'rules_admin',
@@ -559,7 +558,6 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
 
       'edit-modules-other-addressfield-enable',
       'edit-modules-other-entity-enable',
-      'edit-modules-other-entity-metadata-enable',
 
       'edit-modules-rules-rules-enable',
 

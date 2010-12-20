@@ -24,7 +24,7 @@ function commerce_product_entity_property_info() {
     'label' => t('SKU'),
     'description' => t('The human readable product SKU.'),
     'type' => 'text',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
@@ -40,7 +40,7 @@ function commerce_product_entity_property_info() {
     'label' => t('Title'),
     'description' => t('The title of the product.'),
     'type' => 'text',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
@@ -54,7 +54,7 @@ function commerce_product_entity_property_info() {
     'label' => t('Date created'),
     'description' => t('The date the product was created.'),
     'type' => 'date',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer products',
   );
@@ -62,7 +62,7 @@ function commerce_product_entity_property_info() {
     'label' => t("Creator ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the product creator."),
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer products',
     'clear' => array('creator'),
     'query callback' => 'entity_metadata_table_query',

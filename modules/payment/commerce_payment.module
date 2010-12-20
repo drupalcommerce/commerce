@@ -534,7 +534,7 @@ function commerce_payment_transaction_new($method_id = '', $order_id = 0) {
 }
 
 /**
- * Creation callback for the Entity Metadata module.
+ * Creation callback for the Entity module.
  */
 function _commerce_payment_transaction_create($values = array()) {
   // Create a new transaction of the specified type.

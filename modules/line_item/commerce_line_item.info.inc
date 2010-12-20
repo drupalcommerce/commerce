@@ -32,7 +32,7 @@ function commerce_line_item_entity_property_info() {
     'label' => t('Line item label'),
     'description' => t('The label displayed with the line item.'),
     'type' => 'text',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );

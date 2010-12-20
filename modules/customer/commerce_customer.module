@@ -267,7 +267,7 @@ function commerce_customer_profile_new($type = '', $uid = 0) {
 }
 
 /**
- * Creation callback for the Entity Metadata module.
+ * Creation callback for the Entity module.
  */
 function _commerce_customer_profile_create($values = array()) {
   // Create a new customer profile for the specified user.

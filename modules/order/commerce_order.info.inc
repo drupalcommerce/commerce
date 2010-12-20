@@ -24,7 +24,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Order number'),
     'description' => t('The order number displayed to the customer.'),
     'type' => 'text',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
@@ -50,7 +50,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Date created'),
     'description' => t('The date the order was created.'),
     'type' => 'date',
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer orders',
   );
@@ -66,7 +66,7 @@ function commerce_order_entity_property_info() {
     'label' => t("Owner ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the order owner."),
-    'setter callback' => 'entity_metadata_verbatim_set',
+    'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer orders',
     'clear' => array('owner'),
     'query callback' => 'entity_metadata_table_query',

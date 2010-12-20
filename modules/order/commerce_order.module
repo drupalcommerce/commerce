@@ -230,7 +230,7 @@ function commerce_order_new($uid = 0, $status = '', $type = 'commerce_order') {
 }
 
 /**
- * Creation callback for the Entity Metadata module.
+ * Creation callback for the Entity module.
  */
 function _commerce_order_create($values = array()) {
   // Create a new order owned by the specified user.
