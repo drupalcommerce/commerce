@@ -47,13 +47,6 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
     try {
       $line_item->changed = REQUEST_TIME;
 
-      // Save a copy of the unchanged line item for rules in case of updates.
-      // see commerce_line_item_rules_var_unchanged().
-      $unchanged = &drupal_static('commerce_line_item_unchanged', array());
-      if (!empty($line_item->line_item_id)) {
-        $unchanged[$line_item->line_item_id] = clone commerce_line_item_load($line_item->line_item_id);
-      }
-
       // Update the total of the line item based on the quantity and unit price.
       $line_item->total[LANGUAGE_NONE][0] = array(
         'amount' => $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['amount'],

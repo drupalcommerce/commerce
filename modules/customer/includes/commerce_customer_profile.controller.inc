@@ -68,13 +68,6 @@ class CommerceCustomerProfileEntityController extends DrupalDefaultEntityControl
       $profile->revision_timestamp = REQUEST_TIME;
       $update_profile = TRUE;
 
-      // Save a copy of the unchanged profile for rules in case of updates.
-      // see commerce_customer_profile_rules_var_unchanged().
-      $unchanged = &drupal_static('commerce_customer_profile_unchanged', array());
-      if (!empty($profile->profile_id)) {
-        $unchanged[$profile->profile_id] = clone commerce_customer_profile_load($profile->profile_id);
-      }
-
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_customer_profile', $profile);
       rules_invoke_all('commerce_customer_profile_presave', $profile);

@@ -78,13 +78,6 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       $transaction->revision_timestamp = REQUEST_TIME;
       $update_transaction = TRUE;
 
-      // Save a copy of the unchanged transaction for Rules in case of updates.
-      // see commerce_payment_transaction_rules_var_unchanged().
-      $unchanged = &drupal_static('commerce_payment_transaction_unchanged', array());
-      if (!empty($transaction->transaction_id)) {
-        $unchanged[$transaction->transaction_id] = clone commerce_payment_transaction_load($transaction->transaction_id);
-      }
-
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_payment_transaction', $transaction);
       rules_invoke_all('commerce_payment_transaction_presave', $transaction);

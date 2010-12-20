@@ -17,25 +17,25 @@ function commerce_product_rules_event_info() {
     'commerce_product_insert' => array(
       'label' => t('After saving a new product'),
       'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('created product')),
+      'variables' => commerce_product_rules_variables(t('Created product')),
       'access callback' => 'commerce_product_rules_access',
     ),
     'commerce_product_update' => array(
       'label' => t('After updating an existing product'),
       'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('updated product'), TRUE),
+      'variables' => commerce_product_rules_variables(t('Updated product'), TRUE),
       'access callback' => 'commerce_product_rules_access',
     ),
     'commerce_product_presave' => array(
       'label' => t('Before saving a product'),
       'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('saved product'), TRUE),
+      'variables' => commerce_product_rules_variables(t('Saved product'), TRUE),
       'access callback' => 'commerce_product_rules_access',
     ),
     'commerce_product_delete' => array(
       'label' => t('After deleting a product'),
       'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('deleted product')),
+      'variables' => commerce_product_rules_variables(t('Deleted product')),
       'access callback' => 'commerce_product_rules_access',
     ),
   );
@@ -49,17 +49,22 @@ function commerce_product_rules_event_info() {
  */
 function commerce_product_rules_variables($label, $update = FALSE) {
   $args = array(
-    'product' => array('type' => 'commerce_product', 'label' => $label),
+    'product' => array(
+      'type' => 'commerce_product',
+      'label' => $label,
+    ),
   );
+
   if ($update) {
     $args += array(
       'product_unchanged' => array(
         'type' => 'commerce_product',
-        'label' => t('unchanged product'),
-        'handler' => 'commerce_product_rules_var_unchanged',
+        'label' => t('Unchanged product'),
+        'handler' => 'rules_events_entity_unchanged',
       ),
     );
   }
+
   return $args;
 }
 

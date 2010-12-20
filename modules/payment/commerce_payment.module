@@ -618,19 +618,6 @@ function commerce_payment_transaction_delete_multiple($transaction_ids) {
 }
 
 /**
- * Handler to load the unchanged line item variable for rules.
- *
- * @see commerce_payment_rules_variables().
- */
-function commerce_payment_transaction_rules_var_unchanged($transaction) {
-  $unchanged = drupal_static('commerce_payment_transaction_unchanged');
-
-  if (isset($transaction->transaction_id) && isset($unchanged[$transaction->transaction_id])) {
-    return $unchanged[$transaction->transaction_id];
-  }
-}
-
-/**
  * Generate an array for rendering the given payment transaction.
  *
  * @param $transaction

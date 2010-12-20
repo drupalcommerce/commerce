@@ -506,18 +506,6 @@ function commerce_customer_profile_set_properties($profile, $name, $value) {
 }
 
 /**
- * Handler to load the unchanged customer profile variable for rules.
- * @see commerce_customer_rules_variables().
- */
-function commerce_customer_profile_rules_var_unchanged($profile) {
-  $unchanged = drupal_static('commerce_customer_profile_unchanged');
-
-  if (isset($profile->profile_id) && isset($unchanged[$profile->profile_id])) {
-    return $unchanged[$profile->profile_id];
-  }
-}
-
-/**
  * Implements hook_field_info().
  */
 function commerce_customer_field_info() {

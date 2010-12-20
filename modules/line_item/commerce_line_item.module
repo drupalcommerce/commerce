@@ -517,17 +517,6 @@ function commerce_line_item_access($op, $line_item, $account = NULL) {
 
   return TRUE;
 }
-/**
- * Handler to load the unchanged line item variable for rules.
- * @see commerce_line_item_rules_variables().
- */
-function commerce_line_item_rules_var_unchanged($line_item) {
-  $unchanged = drupal_static('commerce_line_item_unchanged');
-
-  if (isset($line_item->line_item_id) && isset($unchanged[$line_item->line_item_id])) {
-    return $unchanged[$line_item->line_item_id];
-  }
-}
 
 /**
  * Implements hook_field_info().

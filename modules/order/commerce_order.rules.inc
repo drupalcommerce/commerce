@@ -17,25 +17,25 @@ function commerce_order_rules_event_info() {
     'commerce_order_insert' => array(
       'label' => t('After saving a new order'),
       'group' => t('Commerce'),
-      'variables' => commerce_order_rules_variables(t('created order')),
+      'variables' => commerce_order_rules_variables(t('Created order')),
       'access callback' => 'commerce_order_rules_access',
     ),
     'commerce_order_update' => array(
       'label' => t('After updating an existing order'),
       'group' => t('Commerce'),
-      'variables' => commerce_order_rules_variables(t('updated order'), TRUE),
+      'variables' => commerce_order_rules_variables(t('Updated order'), TRUE),
       'access callback' => 'commerce_order_rules_access',
     ),
     'commerce_order_presave' => array(
       'label' => t('Before saving an order'),
       'group' => t('Commerce'),
-      'variables' => commerce_order_rules_variables(t('saved order'), TRUE),
+      'variables' => commerce_order_rules_variables(t('Saved order'), TRUE),
       'access callback' => 'commerce_order_rules_access',
     ),
     'commerce_order_delete' => array(
       'label' => t('After deleting an order'),
       'group' => t('Commerce'),
-      'variables' => commerce_order_rules_variables(t('deleted order')),
+      'variables' => commerce_order_rules_variables(t('Deleted order')),
       'access callback' => 'commerce_order_rules_access',
     ),
   );
@@ -51,15 +51,18 @@ function commerce_order_rules_event_info() {
  */
 function commerce_order_rules_variables($label, $update = FALSE) {
   $args = array(
-    'order' => array('type' => 'commerce_order', 'label' => $label),
+    'order' => array(
+      'type' => 'commerce_order',
+      'label' => $label,
+    ),
   );
 
   if ($update) {
     $args += array(
       'order_unchanged' => array(
         'type' => 'commerce_order',
-        'label' => t('unchanged order'),
-        'handler' => 'commerce_order_rules_var_unchanged',
+        'label' => t('Unchanged order'),
+        'handler' => 'rules_events_entity_unchanged',
       ),
     );
   }

@@ -50,13 +50,6 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
     try {
       $product->changed = REQUEST_TIME;
 
-      // Save a copy of the unchanged product for rules in case of updates.
-      // see commerce_product_rules_var_unchanged().
-      $unchanged = &drupal_static('commerce_product_unchanged', array());
-      if (!empty($product->product_id) && (!isset($product->is_new) || !$product->is_new)) {
-        $unchanged[$product->product_id] = clone commerce_product_load($product->product_id);
-      }
-
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_product', $product);
       rules_invoke_all('commerce_product_presave', $product);

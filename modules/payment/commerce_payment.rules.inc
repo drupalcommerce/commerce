@@ -17,7 +17,7 @@ function commerce_payment_rules_event_info() {
     'commerce_payment_methods' => array(
       'label' => t('Select available payment methods for an order'),
       'group' => t('Commerce - payment'),
-      'variables' => commerce_order_rules_variables(t('order')),
+      'variables' => commerce_order_rules_variables(t('Order')),
       'access callback' => 'commerce_order_rules_access',
     ),
   );

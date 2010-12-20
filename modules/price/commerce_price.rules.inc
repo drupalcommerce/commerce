@@ -18,7 +18,7 @@ function commerce_price_rules_event_info() {
   $items['commerce_price_alter'] = array(
     'label' => t('Alter a price for display / purchase'),
     'group' => t('Commerce - price'),
-    'variables' => commerce_price_rules_variables(t('price')),
+    'variables' => commerce_price_rules_variables(t('Price')),
     'access callback' => 'commerce_order_rules_access',
   );
 

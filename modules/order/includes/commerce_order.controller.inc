@@ -74,13 +74,6 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $order->revision_timestamp = REQUEST_TIME;
       $update_order = TRUE;
 
-      // Save a copy of the unchanged order for rules in case of updates.
-      // see commerce_order_rules_var_unchanged().
-      $unchanged = &drupal_static('commerce_order_unchanged', array());
-      if (!empty($order->order_id)) {
-        $unchanged[$order->order_id] = clone commerce_order_load($order->order_id);
-      }
-
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_order', $order);
       rules_invoke_all('commerce_order_presave', $order);

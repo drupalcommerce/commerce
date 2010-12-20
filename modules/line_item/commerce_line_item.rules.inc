@@ -17,31 +17,31 @@ function commerce_line_item_rules_event_info() {
     'commerce_line_item_insert' => array(
       'label' => t('After saving a new line item'),
       'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('created line item')),
+      'variables' => commerce_line_item_rules_variables(t('Created line item')),
       'access callback' => 'commerce_line_item_rules_access',
     ),
     'commerce_line_item_update' => array(
       'label' => t('After updating an existing line item'),
       'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('updated line item'), TRUE),
+      'variables' => commerce_line_item_rules_variables(t('Updated line item'), TRUE),
       'access callback' => 'commerce_line_item_rules_access',
     ),
     'commerce_line_item_presave_insert' => array(
       'label' => t('Before saving a new line item'),
       'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('saved line item'), TRUE),
+      'variables' => commerce_line_item_rules_variables(t('Saved line item'), TRUE),
       'access callback' => 'commerce_line_item_rules_access',
     ),
     'commerce_line_item_presave_update' => array(
       'label' => t('Before saving an updated line item'),
       'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('saved line item'), TRUE),
+      'variables' => commerce_line_item_rules_variables(t('Saved line item'), TRUE),
       'access callback' => 'commerce_line_item_rules_access',
     ),
     'commerce_line_item_delete' => array(
       'label' => t('After deleting a line item'),
       'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('deleted line item')),
+      'variables' => commerce_line_item_rules_variables(t('Deleted line item')),
       'access callback' => 'commerce_line_item_rules_access',
     ),
   );
@@ -58,15 +58,18 @@ function commerce_line_item_rules_event_info() {
  */
 function commerce_line_item_rules_variables($label, $update = FALSE) {
   $args = array(
-    'line_item' => array('type' => 'commerce_line_item', 'label' => $label),
+    'line_item' => array(
+      'type' => 'commerce_line_item',
+      'label' => $label,
+    ),
   );
 
   if ($update) {
     $args += array(
       'line_item_unchanged' => array(
         'type' => 'commerce_line_item',
-        'label' => t('unchanged line item'),
-        'handler' => 'commerce_line_item_rules_var_unchanged',
+        'label' => t('Unchanged line item'),
+        'handler' => 'rules_events_entity_unchanged',
       ),
     );
   }

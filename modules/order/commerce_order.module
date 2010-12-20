@@ -931,15 +931,3 @@ function commerce_order_set_properties($order, $name, $value) {
     $order->uid = $value;
   }
 }
-
-/**
- * Handler to load the unchanged order variable for rules.
- * @see commerce_order_rules_variables().
- */
-function commerce_order_rules_var_unchanged($order) {
-  $unchanged = drupal_static('commerce_order_unchanged');
-
-  if (isset($order->order_id) && isset($unchanged[$order->order_id])) {
-    return $unchanged[$order->order_id];
-  }
-}
