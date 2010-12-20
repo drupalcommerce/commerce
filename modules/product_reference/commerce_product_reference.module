@@ -167,8 +167,8 @@ function commerce_product_reference_commerce_price_field_formatter_prepare_view(
         // Pass the line item to Rules.
         rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
 
-        // Replace the item being displayed with the line item's unit price.
-        $items[$product_id] = array($line_item->unit_price[$langcode][0]);
+        // Replace the data being displayed with data from the unit price.
+        $items[$product_id] = array(entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value());
       }
     }
   }
