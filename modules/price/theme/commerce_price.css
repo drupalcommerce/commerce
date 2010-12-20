@@ -4,3 +4,7 @@
   display: inline;
   margin-right: 1em;
 }
+
+#edit-parameter-value .commerce-price-full {
+  margin: 1em 0;
+}

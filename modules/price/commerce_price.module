@@ -208,8 +208,7 @@ function commerce_price_field_widget_settings_form($field, $instance) {
  */
 function commerce_price_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Use the default currency if the setting is not present.
-  if ($instance['widget']['settings']['currency_code'] == 'default' ||
-      empty($instance['widget']['settings']['currency_code'])) {
+  if (empty($instance['widget']['settings']['currency_code']) || $instance['widget']['settings']['currency_code'] == 'default') {
     $default_currency_code = NULL;
   }
   else {
@@ -277,10 +276,6 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
       if (empty($options[$default_currency->code])) {
         $options[$default_currency->code] = check_plain($default_currency->code);
 
-        if (!empty($default_currency->symbol)) {
-          $options[$default_currency->code] .= ' - ' . check_plain($default_currency->symbol);
-        }
-
         $description = t('The currency set for this price is not currently enabled. If you change it now, you will not be able to set it back.');
       }
       else {
@@ -325,45 +320,38 @@ function commerce_price_field_widget_error($element, $error, $form, &$form_state
 /**
  * Callback to alter the property info of price fields.
  *
- * @see commerce_product_reference_field_info().
+ * @see commerce_price_field_info().
  */
 function commerce_price_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
-  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
 
-  $property['getter callback'] = 'entity_property_field_verbatim_get';
-  $property['setter callback'] = 'entity_property_field_verbatim_set';
-  $property['data info']['properties'] = array(
-    'amount' => array(
-      'type' => 'decimal',
-      'label' => t('Price amount'),
-      'getter callback' => 'commerce_price_field_get_amount',
-    ),
-    'currency-code' => array(
-      'type' => 'list<text>',
-      'label' => t('Currency'),
-      'options list' => 'commerce_currency_get_symbol',
-      'getter callback' => 'commerce_price_field_get_currency_code',
-    ),
-  );
+  $property['type'] = ($field['cardinality'] != 1) ? 'list<commerce_price>' : 'commerce_price';
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['property info'] = commerce_price_field_data_property_info();
+
   unset($property['query callback']);
 }
 
 /**
- * Entity property callback for getting the amount value of price fields.
- *
- * @see commerce_price_property_info_callback().
+ * Defines info for the properties of the Price field data structure.
  */
-function commerce_price_field_get_amount(&$item, array $options, $name) {
-  return $item['amount'];
-}
-
-/**
- * Entity property callback for getting the price value of price fields.
- *
- * @see commerce_price_property_info_callback().
- */
-function commerce_price_field_get_currency_code(&$item, array $options, $name) {
-  return $item['currency_code'];
+function commerce_price_field_data_property_info($name = NULL) {
+  return array(
+    'amount' => array(
+      'label' => t('Amount'),
+      'description' => !empty($name) ? t('Amount value of field %name', array('%name' => $name)) : '',
+      'type' => 'decimal',
+      'getter callback' => 'entity_property_verbatim_get',
+    ),
+    'currency_code' => array(
+      'label' => t('Currency'),
+      'description' => !empty($name) ? t('Currency code of field %name', array('%name' => $name)) : '',
+      'type' => 'text',
+      'getter callback' => 'entity_property_verbatim_get',
+    ),
+  );
 }
 
 function commerce_price_object_get_amount($price) {
