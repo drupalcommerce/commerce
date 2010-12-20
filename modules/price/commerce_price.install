@@ -2,6 +2,99 @@
 // $Id$
 
 /**
+ * Implements hook_schema().
+ */
+function commerce_price_schema() {
+  $schema = array();
+
+  $schema['commerce_calculated_price'] = array(
+    'description' => 'Stores pre-calculated dynamic prices.',
+    'fields' => array(
+      'module' => array(
+        'description' => 'The name of the module performing the calculation.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'module_key' => array(
+        'description' => 'A module specific key useful for indicating the context of a particular calculation, e.g. the IDs of Rules evaluated to produce the calculated price.',
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'description' => 'The type of entity this price belongs to.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'entity_id' => array(
+        'description' => 'The entity ID of the object this price belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'field_name' => array(
+        'description' => 'The name of the field the calculated price relates to.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of the entity.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'delta' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The sequence number for this data item, used for multi-value fields',
+      ),
+      'amount' => array(
+        'description' => 'The price amount.',
+        'type' => 'numeric',
+        'precision' => 16,
+        'scale' => 5,
+        'not null' => TRUE,
+      ),
+      'currency_code' => array(
+        'description' => 'The currency code for the price.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'data' => array(
+        'description' => 'A serialized array of additional price data.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the price was calculated.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'module' => array('module'),
+      'entity_type' => array('entity_type'),
+      'entity_id' => array('entity_id'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
  * Implements hook_field_schema().
  */
 function commerce_price_field_schema($field) {

@@ -170,7 +170,7 @@ function commerce_product_calculate_sell_price($product) {
   // If we don't have a full product object, load it now. This accommodation
   // is currently being made for Views, as Views is currently engineered to
   // avoid loading the full object even though it still uses the display
-  // formatters. See http://drupal.org/node/936196.
+  // formatters. A fix should come through http://drupal.org/node/1002744.
   if (!isset($product->sku)) {
     // Additionally, because only a single product is being passed through
     // this hook at a time (due to the way the Field API apparently works),
@@ -182,9 +182,120 @@ function commerce_product_calculate_sell_price($product) {
   $line_item = commerce_product_line_item_new($product);
 
   // Pass the line item to Rules.
-  rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
+  rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
   return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
+}
+
+function commerce_product_pre_calculate_sell_prices() {
+  // Load the sell price calculation event.
+  $event = rules_get_cache('event_commerce_product_calculate_sell_price');
+
+  drupal_set_message('<pre>'. print_r($event, TRUE) .'</pre>');
+
+  // Build an array of the IDs of all rule configurations that qualify for
+  // dynamic pre-calculation.
+  $rule_ids = array();
+
+  foreach ($event as $rule) {
+    if (commerce_product_valid_pre_calculation_rule($rule)) {
+      $rule_ids[] = $rule->id;
+    }
+  }
+
+  // Sort to ensure the IDs are always in numerical order.
+  sort($rule_ids);
+
+  // Using the array of IDs, generate an array that contains keys for every
+  // possible combination of these Rules applying (i.e. conditions all passing).
+  $rule_keys = array();
+
+  // First find the maximum number of combinations as a power of two.
+  $max = pow(2, count($rule_ids));
+
+  // Loop through each combination expressed as an integer.
+  for ($i = 0; $i < $max; $i++) {
+    // Convert the integer to a string binary representation, reverse it (so the
+    // first bit is on the left instead of right), and split it into an array
+    // with each bit as its own value.
+    $bits = str_split(strrev(sprintf('%0' . count($rule_ids) .'b', $i)));
+
+    // Create a key of underscore delimited Rule IDs by assuming a 1 means the
+    // Rule ID in the $rule_ids array with the same key as the bit's position in
+    // the string should be assumed to have applied.
+    $key = implode('_', array_intersect_key($rule_ids, array_intersect($bits, array('1'))));
+
+    // And of course, for the empty key (i.e. 0), make it a string, too.
+    if (empty($key)) {
+      $key = '0';
+    }
+
+    $rule_keys[] = $key;
+  }
+
+  // Load all products.
+  $query = db_query("SELECT product_id FROM {commerce_product}");
+
+  while ($product_id = $query->fetchField()) {
+    $product = commerce_product_load($product_id);
+
+    if (commerce_product_valid_pre_calculation_product($product)) {
+      foreach ($rule_keys as $key) {
+        // TODO: Figure out how to execute the actions of only the Rules
+        // signified in the key; then store the price in the DB.
+      }
+    }
+  }
+}
+
+/**
+ * Determines if a given rule configuration meets the requirements for price
+ *   pre-calculation.
+ *
+ * @param $rule
+ *   A rule configuration belonging to the commerce_product_calculate_sell_price
+ *     event.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not the rule configuration is valid.
+ */
+function commerce_product_valid_pre_calculation_rule($rule) {
+  // Inspect each condition on the rule configuration. This likely needs to be
+  // recursive for conditions in nested operator groups.
+  foreach ($rule->conditions() as $condition) {
+    // Look for line item usage in any selector in the condition settings.
+    foreach ($condition->settings as $key => $value) {
+      if (substr($key, -7) == ':select') {
+        // If the selector references either line-item or line-item-unchanged,
+        // the Rule is not valid for price pre-calculation.
+        if (strpos($value, 'line-item') === 0) {
+          return FALSE;
+        }
+      }
+    }
+  }
+
+  // TODO: Add a way for otherwise valid rule configurations to "opt out" of
+  // being included in pre-calculation.
+
+  return TRUE;
+}
+
+/**
+ * Determines if a given product should be considered for price pre-calculation.
+ *
+ * @param $product
+ *   The product being considered for sell price pre-calculation.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether or not the product is valid.
+ */
+function commerce_product_valid_pre_calculation_product($product) {
+  // TODO: Add a hook for modules to prevent products from being included in
+  // pre-calculation; e.g. for products that will never appear in Views that are
+  // sorted or filtered by the sell price.
+
+  return TRUE;
 }
 
 /**

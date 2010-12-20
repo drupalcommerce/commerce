@@ -33,7 +33,7 @@ function commerce_product_schema() {
       'language' => array(
         'description' => 'The {languages}.language of this product.',
         'type' => 'varchar',
-        'length' => 12,
+        'length' => 32,
         'not null' => TRUE,
         'default' => '',
       ),
