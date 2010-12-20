@@ -150,28 +150,41 @@ function commerce_product_reference_commerce_price_field_formatter_prepare_view(
     foreach ($entities as $product_id => $product) {
       // If this price should be calculated...
       if ($displays[$product_id]['settings']['calculation'] == 'calculated_sell_price') {
-        // If we don't have a full product object, load it now. This accommodation
-        // is currently being made for Views, as Views is currently engineered to
-        // avoid loading the full object even though it still uses the display
-        // formatters. See http://drupal.org/node/936196.
-        if (!isset($product->sku)) {
-          // Additionally, because only a single product is being passed through
-          // this hook at a time (due to the way the Field API apparently works),
-          // there's no need to pursue optimization with a load multiple.
-          $product = commerce_product_load($product_id);
-        }
-
-        // First create a pseudo product line item that we will pass to Rules.
-        $line_item = commerce_product_line_item_new($product);
-
-        // Pass the line item to Rules.
-        rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
-
-        // Replace the data being displayed with data from the unit price.
-        $items[$product_id] = array(entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value());
+        // Replace the data being displayed with data from a calculated price.
+        $items[$product_id] = array(commerce_product_calculate_sell_price($product));
       }
     }
   }
+}
+
+/**
+ * Returns the calculated sell price for the given product.
+ *
+ * @param $product
+ *   The product whose sell price will be calculated.
+ *
+ * @return
+ *   A price field data array as returned by entity_metadata_wrapper().
+ */
+function commerce_product_calculate_sell_price($product) {
+  // If we don't have a full product object, load it now. This accommodation
+  // is currently being made for Views, as Views is currently engineered to
+  // avoid loading the full object even though it still uses the display
+  // formatters. See http://drupal.org/node/936196.
+  if (!isset($product->sku)) {
+    // Additionally, because only a single product is being passed through
+    // this hook at a time (due to the way the Field API apparently works),
+    // there's no need to pursue optimization with a load multiple.
+    $product = commerce_product_load($product_id);
+  }
+
+  // First create a pseudo product line item that we will pass to Rules.
+  $line_item = commerce_product_line_item_new($product);
+
+  // Pass the line item to Rules.
+  rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
+
+  return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
 }
 
 /**
