@@ -224,7 +224,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     $default_amount = round($items[$delta]['amount'], 2);
 
     // Run it through number_format() to add the decimal places in if necessary.
-    if (strpos($default_price, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency->decimals) {
+    if (strpos($default_amount, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency->decimals) {
       $default_amount = number_format($default_amount, $currency->decimals, '.', '');
     }
 
