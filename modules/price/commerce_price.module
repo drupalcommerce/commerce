@@ -32,7 +32,7 @@ function commerce_price_field_info() {
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
   // Ensure only numeric values are entered in price fields.
   foreach ($items as $delta => $item) {
-    if (!empty($item['price']) && !is_numeric($item['price'])) {
+    if (!empty($item['amount']) && !is_numeric($item['amount'])) {
       $errors[$field['field_name']][$langcode][$delta][] = array(
         'error' => 'price_numeric',
         'message' => t('%name: you must enter a numeric value for the price.', array('%name' => check_plain($instance['label']))),
@@ -54,7 +54,7 @@ function commerce_price_field_presave($entity_type, $entity, $field, $instance, 
  * Implementation of hook_field_is_empty().
  */
 function commerce_price_field_is_empty($item, $field) {
-  return !isset($item['price']) || (string) $item['price'] == '';
+  return !isset($item['amount']) || (string) $item['amount'] == '';
 }
 
 /**
@@ -142,12 +142,12 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
     // Theme the display of the price based on the display type.
     if ($display['type'] == 'commerce_price_raw_amount') {
       $element[$delta] = array(
-        '#markup' => check_plain($item['price']),
+        '#markup' => check_plain($item['amount']),
       );
     }
     elseif ($display['type'] == 'commerce_price_formatted_amount') {
       $element[$delta] = array(
-        '#markup' => commerce_currency_format($item['price'], $item['currency_code'], $object),
+        '#markup' => commerce_currency_format($item['amount'], $item['currency_code'], $object),
       );
     }
   }
@@ -217,21 +217,21 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   }
 
   // If a price has already been set for this instance prepare default values.
-  if (isset($items[$delta]['price'])) {
+  if (isset($items[$delta]['amount'])) {
     $currency = commerce_currency_load($items[$delta]['currency_code']);
 
     // Round the default value.
-    $default_price = round($items[$delta]['price'], 2);
+    $default_amount = round($items[$delta]['amount'], 2);
 
     // Run it through number_format() to add the decimal places in if necessary.
-    if (strpos($default_price, '.') === FALSE || strpos($default_price, '.') > strlen($default_price) - $currency->decimals) {
-      $default_price = number_format($default_price, $currency->decimals, '.', '');
+    if (strpos($default_price, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency->decimals) {
+      $default_amount = number_format($default_amount, $currency->decimals, '.', '');
     }
 
     $default_currency_code = $items[$delta]['currency_code'];
   }
   else {
-    $default_price = NULL;
+    $default_amount = NULL;
   }
 
   // Load the default currency for this instance.
@@ -243,10 +243,10 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   switch ($instance['widget']['type']) {
     // The simple widget is just a textfield with a non-changeable currency.
     case 'commerce_price_simple':
-      $element['price'] = array(
+      $element['amount'] = array(
         '#type' => 'textfield',
         '#title' => $element['#title'],
-        '#default_value' => $default_price,
+        '#default_value' => $default_amount,
         '#size' => 10,
         '#field_suffix' => $default_currency->code,
       );
@@ -258,10 +258,10 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
     // The full widget is a textfield with a currency select list.
     case 'commerce_price_full':
-      $element['price'] = array(
+      $element['amount'] = array(
         '#type' => 'textfield',
         '#title' => $element['#title'],
-        '#default_value' => $default_price,
+        '#default_value' => $default_amount,
         '#size' => 10,
       );
 
@@ -291,7 +291,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
       if (count($options) == 1) {
         $currency_code = array_shift(array_keys($options));
 
-        $element['price']['#field_suffix'] = $currency_code;
+        $element['amount']['#field_suffix'] = $currency_code;
 
         $element['currency_code'] = array(
           '#type' => 'value',
@@ -299,7 +299,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         );
       }
       else {
-        $element['price']['#prefix'] = '<div class="commerce-price-full">';
+        $element['amount']['#prefix'] = '<div class="commerce-price-full">';
 
         $element['currency_code'] = array(
           '#type' => 'select',
@@ -319,7 +319,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
  * Implements hook_field_widget_error().
  */
 function commerce_price_field_widget_error($element, $error, $form, &$form_state) {
-  form_error($element['price'], $error['message']);
+  form_error($element['amount'], $error['message']);
 }
 
 /**
@@ -333,10 +333,10 @@ function commerce_price_property_info_callback(&$info, $entity_type, $field, $in
   $property['getter callback'] = 'entity_metadata_field_verbatim_get';
   $property['setter callback'] = 'entity_metadata_field_verbatim_set';
   $property['data info']['properties'] = array(
-    'price' => array(
+    'amount' => array(
       'type' => 'decimal',
       'label' => t('Price amount'),
-      'getter callback' => 'commerce_price_field_get_price',
+      'getter callback' => 'commerce_price_field_get_amount',
     ),
     'currency-code' => array(
       'type' => 'list<text>',
@@ -349,12 +349,12 @@ function commerce_price_property_info_callback(&$info, $entity_type, $field, $in
 }
 
 /**
- * Entity metadata callback for getting the price value of price fields.
+ * Entity metadata callback for getting the amount value of price fields.
  *
  * @see commerce_price_property_info_callback().
  */
-function commerce_price_field_get_price(&$item, array $options, $name) {
-  return $item['price'];
+function commerce_price_field_get_amount(&$item, array $options, $name) {
+  return $item['amount'];
 }
 
 /**
@@ -366,8 +366,8 @@ function commerce_price_field_get_currency_code(&$item, array $options, $name) {
   return $item['currency_code'];
 }
 
-function commerce_price_object_get_price($price) {
-  return $price->getPrice();
+function commerce_price_object_get_amount($price) {
+  return $price->getAmount();
 }
 
 function commerce_price_object_get_currency_code($price) {

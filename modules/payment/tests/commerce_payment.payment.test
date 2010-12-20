@@ -81,7 +81,7 @@ class CommercePaymentTestCase extends DrupalWebTestCase {
     $test_product->purchase_price = array(
       LANGUAGE_NONE => array(
         array(
-          'price' => 10,
+          'amount' => 10,
           'currency_code' => 'USD',
         ),
       ),

@@ -110,11 +110,11 @@ function commerce_cart_form($form, &$form_state, $order) {
       );
 
       $form['line_items'][$line_item_id]['unit_price'] = array(
-        '#markup' => commerce_currency_format($line_item->unit_price[LANGUAGE_NONE][0]['price'], $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'], $line_item),
+        '#markup' => commerce_currency_format($line_item->unit_price[LANGUAGE_NONE][0]['amount'], $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'], $line_item),
       );
 
       $form['line_items'][$line_item_id]['total'] = array(
-        '#markup' => commerce_currency_format($line_item->total[LANGUAGE_NONE][0]['price'], $line_item->total[LANGUAGE_NONE][0]['currency_code'], $line_item),
+        '#markup' => commerce_currency_format($line_item->total[LANGUAGE_NONE][0]['amount'], $line_item->total[LANGUAGE_NONE][0]['currency_code'], $line_item),
       );
     }
   }

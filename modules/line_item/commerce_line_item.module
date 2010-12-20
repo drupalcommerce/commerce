@@ -720,13 +720,13 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'unit_price'));
 
       // Unset the title and description and add it to the line item form.
-      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['price']['#title']);
-      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['price']['#description']);
+      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['amount']['#title']);
+      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['amount']['#description']);
 
       $element['line_items'][$line_item_id]['unit_price'] = $widget_form['unit_price'];
 
       $element['line_items'][$line_item_id]['total'] = array(
-        '#markup' => commerce_currency_format($line_item->total[LANGUAGE_NONE][0]['price'], $line_item->total[LANGUAGE_NONE][0]['currency_code'], $line_item),
+        '#markup' => commerce_currency_format($line_item->total[LANGUAGE_NONE][0]['amount'], $line_item->total[LANGUAGE_NONE][0]['currency_code'], $line_item),
       );
     }
 
@@ -875,11 +875,11 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       // Manually validate the unit price of each line item.
       $unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['unit_price'];
 
-      if (is_numeric($unit_price[$element['#language']][0]['price'])) {
+      if (is_numeric($unit_price[$element['#language']][0]['amount'])) {
         $line_item->unit_price = $unit_price;
       }
       else {
-        $name = implode('][', array_merge($element['line_items'][$line_item_id]['unit_price']['#parents'], array($element['#language'], 0, 'price')));
+        $name = implode('][', array_merge($element['line_items'][$line_item_id]['unit_price']['#parents'], array($element['#language'], 0, 'amount')));
         form_set_error($name, 'You must enter a numeric value for the unit price.');
       }
 
@@ -1017,7 +1017,7 @@ function commerce_line_items_quantity($value, $type = '', $language = '') {
  *   The language within the value array to use; defaults to LANGUAGE_NONE.
  *
  * @return
- *   An associative array of containing the total 'price' and 'currency_code' of
+ *   An associative array of containing the total 'amount' and 'currency_code' of
  *     the referenced line items.
  */
 function commerce_line_items_total($value, $type = '', $language = '') {
@@ -1049,11 +1049,11 @@ function commerce_line_items_total($value, $type = '', $language = '') {
         }
       }
 
-      $total += $line_item->total[$language][0]['price'];
+      $total += $line_item->total[$language][0]['amount'];
     }
   }
 
-  return array('price' => $total, 'currency_code' => $currency_code);
+  return array('amount' => $total, 'currency_code' => $currency_code);
 }
 
 /**

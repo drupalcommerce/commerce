@@ -8,7 +8,7 @@ function commerce_price_field_schema($field) {
   if ($field['type'] == 'commerce_price') {
     return array(
       'columns' => array(
-        'price' => array(
+        'amount' => array(
           'description' => 'The price amount.',
           'type' => 'numeric',
           'precision' => 16,
@@ -30,7 +30,7 @@ function commerce_price_field_schema($field) {
         ),
       ),
       'indexes' => array(
-        'currency_price' => array('price', 'currency_code'),
+        'currency_price' => array('amount', 'currency_code'),
       ),
     );
   }

@@ -78,9 +78,9 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
         'quantity_raw' => $quantity,
         'quantity_label' => format_plural($quantity, 'item', 'items'),
         'quantity' => format_plural($quantity, '1 item', '@count items'),
-        'total_raw' => number_format(commerce_currency_round($total['price'], $currency), $currency->decimals),
+        'total_raw' => number_format(commerce_currency_round($total['amount'], $currency), $currency->decimals),
         'total_label' => t('Total:'),
-        'total' => commerce_currency_format($total['price'], $total['currency_code'], $this->view),
+        'total' => commerce_currency_format($total['amount'], $total['currency_code'], $this->view),
         'links' => theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline')))),
       );
 

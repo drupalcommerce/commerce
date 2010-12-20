@@ -829,10 +829,10 @@ function commerce_payment_order_balance($order, $totals = array()) {
 
   // Only return a balance if the totals array contains a single matching currency.
   if (count($totals) == 1 && isset($totals[$order_total['currency_code']])) {
-    return array('amount' => $order_total['price'] - $totals[$order_total['currency_code']], 'currency_code' => $order_total['currency_code']);
+    return array('amount' => $order_total['amount'] - $totals[$order_total['currency_code']], 'currency_code' => $order_total['currency_code']);
   }
   elseif (empty($totals)) {
-    return array('amount' => $order_total['price'], 'currency_code' => $order_total['currency_code']);
+    return array('amount' => $order_total['amount'], 'currency_code' => $order_total['currency_code']);
   }
   else {
     return FALSE;

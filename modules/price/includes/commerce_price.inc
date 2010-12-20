@@ -13,15 +13,15 @@
 
 class CommercePrice {
   // Initialize base variables.
-  protected $price = 0;
-  protected $base_price = 0;
+  protected $amount = 0;
+  protected $base_amount = 0;
   protected $currency_code = '';
   protected $base_currency_code = '';
   protected $log = array();
 
-  function __construct($price = 0, $currency_code = NULL) {
-    if (is_numeric($price)) {
-      $this->base_price = $price;
+  function __construct($amount = 0, $currency_code = NULL) {
+    if (is_numeric($amount)) {
+      $this->base_amount = $amount;
     }
 
     if (empty($currency_code)) {
@@ -50,7 +50,7 @@ class CommercePrice {
    */
   function modifyPrice($module, $description, $amount, $currency_code = NULL) {
     if (is_numeric($amount)) {
-      $this->price += $amount;
+      $this->amount += $amount;
 
       $log = array(
         'module' => $module,
@@ -75,17 +75,17 @@ class CommercePrice {
   }
 
   /**
-   * Returns the current price value.
+   * Returns the current price amount value.
    */
-  function getPrice() {
-    return $this->price;
+  function getAmount() {
+    return $this->amount;
   }
 
   /**
-   * Returns the base price value.
+   * Returns the base price amount value.
    */
-  function getBasePrice() {
-    return $this->base_price;
+  function getBaseAmount() {
+    return $this->base_amount;
   }
 
   /**

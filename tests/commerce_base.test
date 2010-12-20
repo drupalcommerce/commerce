@@ -225,18 +225,21 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  A product type with most of it's basic fields set random values.
    *  FALSE if the appropraite modules were not available.
    */
-  public function createDummyProduct($sku = '', $title = '', $price = -1, $currency_code = 'USD', $uid = 1, $type_given = 'product') {
+  public function createDummyProduct($sku = '', $title = '', $amount = -1, $currency_code = 'USD', $uid = 1, $type_given = 'product') {
     if (module_exists('commerce_product')) {
       $new_product = commerce_product_new($type_given);
       $new_product->sku = empty($sku) ? $this->randomName(10) : $sku;
-      $new_product->type = $type_given;
       $new_product->title = empty($title) ? $this->randomName(10) : $title;
       $new_product->uid = $uid;
-      $new_product->purchase_price[LANGUAGE_NONE][0]['price'] = ($price < 0) ? rand(2, 500) : $price;
+
+      $new_product->purchase_price[LANGUAGE_NONE][0]['amount'] = ($amount < 0) ? rand(2, 500) : $amount;
       $new_product->purchase_price[LANGUAGE_NONE][0]['currency_code'] = 'USD';
+
       $save_result = commerce_product_save($new_product);
+
       return $new_product;
-    } else {
+    }
+    else {
       return FALSE;
     }
   }

@@ -56,7 +56,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
 
       // Update the total of the line item based on the quantity and unit price.
       $line_item->total[LANGUAGE_NONE][0] = array(
-        'price' => $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['price'],
+        'amount' => $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['amount'],
         'currency_code' => $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'],
       );
 
