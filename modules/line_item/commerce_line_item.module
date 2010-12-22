@@ -212,41 +212,6 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
 }
 
 /**
- * Implements hook_commerce_line_item_delete().
- *
- * When a line item is deleted, any references to the line item should also be
- * deleted. We don't know where these might exist, so we loop through every
- * defined field in search of line item reference fields to purge.
- */
-function commerce_line_item_commerce_line_item_delete($line_item) {
-  // Find every line item reference field.
-  foreach (field_info_fields() as $name => $field) {
-    if ($field['type'] == 'commerce_line_item_reference') {
-      // Look in the field's data for any entities that reference the line item
-      // being deleted.
-      $result = db_query('SELECT * FROM {field_data_' . $name . '} AS fd LEFT JOIN {field_config_entity_type} AS fc ON fd.etid = fc.etid WHERE line_items_line_item_id = :line_item_id', array(':line_item_id' => $line_item->line_item_id));
-
-      // If the line item was found referenced by an entity...
-      foreach ($result as $row) {
-        // Load the entity.
-        $entities = entity_load($row->type, array($row->entity_id));
-        $entity = $entities[$row->entity_id];
-
-        // Remove the line item from its reference field.
-        unset($entity->{$name}[$row->language][$row->delta]);
-
-        // Reset the delta values for referenced line items.
-        $entity->{$name}[$row->language] = array_merge($entity->{$name}[$row->language], array());
-
-        // Save the updated field data.
-        field_attach_presave($row->type, $entity);
-        field_attach_update($row->type, $entity);
-      }
-    }
-  }
-}
-
-/**
  * Returns an array of line item type objects keyed by type.
  */
 function commerce_line_item_types() {
