@@ -175,7 +175,7 @@ function commerce_product_calculate_sell_price($product) {
     // Additionally, because only a single product is being passed through
     // this hook at a time (due to the way the Field API apparently works),
     // there's no need to pursue optimization with a load multiple.
-    $product = commerce_product_load($product_id);
+    $product = commerce_product_load($product->product_id);
   }
 
   // First create a pseudo product line item that we will pass to Rules.
