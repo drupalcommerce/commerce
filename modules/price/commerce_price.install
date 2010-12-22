@@ -52,10 +52,11 @@ function commerce_price_schema() {
         'default' => '',
       ),
       'delta' => array(
+        'description' => 'The sequence number for this data item, used for multi-value fields',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => 'The sequence number for this data item, used for multi-value fields',
+        'default' => 0,
       ),
       'amount' => array(
         'description' => 'The price amount.',
@@ -74,7 +75,6 @@ function commerce_price_schema() {
         'description' => 'A serialized array of additional price data.',
         'type' => 'text',
         'size' => 'big',
-        'not null' => FALSE,
         'serialize' => TRUE,
       ),
       'created' => array(

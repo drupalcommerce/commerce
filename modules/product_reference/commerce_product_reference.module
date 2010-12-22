@@ -191,44 +191,37 @@ function commerce_product_pre_calculate_sell_prices() {
   // Load the sell price calculation event.
   $event = rules_get_cache('event_commerce_product_calculate_sell_price');
 
-  drupal_set_message('<pre>'. print_r($event, TRUE) .'</pre>');
-
-  // Build an array of the IDs of all rule configurations that qualify for
+  // Build an array of the names of all rule configurations that qualify for
   // dynamic pre-calculation.
-  $rule_ids = array();
+  $rule_names = array();
 
   foreach ($event as $rule) {
     if (commerce_product_valid_pre_calculation_rule($rule)) {
-      $rule_ids[] = $rule->id;
+      $rule_names[] = $rule->name;
     }
   }
 
-  // Sort to ensure the IDs are always in numerical order.
-  sort($rule_ids);
+  // Sort to ensure the names are always in alphabetical order.
+  sort($rule_names);
 
   // Using the array of IDs, generate an array that contains keys for every
   // possible combination of these Rules applying (i.e. conditions all passing).
   $rule_keys = array();
 
   // First find the maximum number of combinations as a power of two.
-  $max = pow(2, count($rule_ids));
+  $max = pow(2, count($rule_names));
 
   // Loop through each combination expressed as an integer.
   for ($i = 0; $i < $max; $i++) {
     // Convert the integer to a string binary representation, reverse it (so the
     // first bit is on the left instead of right), and split it into an array
     // with each bit as its own value.
-    $bits = str_split(strrev(sprintf('%0' . count($rule_ids) .'b', $i)));
+    $bits = str_split(strrev(sprintf('%0' . count($rule_names) . 'b', $i)));
 
     // Create a key of underscore delimited Rule IDs by assuming a 1 means the
     // Rule ID in the $rule_ids array with the same key as the bit's position in
     // the string should be assumed to have applied.
-    $key = implode('_', array_intersect_key($rule_ids, array_intersect($bits, array('1'))));
-
-    // And of course, for the empty key (i.e. 0), make it a string, too.
-    if (empty($key)) {
-      $key = '0';
-    }
+    $key = implode('|', array_intersect_key($rule_names, array_intersect($bits, array('1'))));
 
     $rule_keys[] = $key;
   }
@@ -239,10 +232,44 @@ function commerce_product_pre_calculate_sell_prices() {
   while ($product_id = $query->fetchField()) {
     $product = commerce_product_load($product_id);
 
+    // If the product is valid for pre-calculation...
     if (commerce_product_valid_pre_calculation_product($product)) {
+      // For each rule key (i.e. set of applicable rule configurations)...
       foreach ($rule_keys as $key) {
-        // TODO: Figure out how to execute the actions of only the Rules
-        // signified in the key; then store the price in the DB.
+        // Build a product line item and Rules state object.
+        $line_item = commerce_product_line_item_new($product);
+
+        $state = new RulesState();
+        $vars = $event->parameterInfo(TRUE);
+        $state->addVariable('line_item', $line_item, $vars['line_item']);
+
+        // For each Rule signified by the current key...
+        foreach (explode('|', $key) as $name) {
+          // Load the Rule and evaluate its actions directly, bypassing
+          // condition evaluation.
+          if ($rule = rules_config_load($name)) {
+            foreach ($rule->actions() as $action) {
+              $action->evaluate($state);
+            }
+          }
+        }
+
+        $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+        $record = array(
+          'module' => 'commerce_product_reference',
+          'module_key' => $key,
+          'entity_type' => 'commerce_product',
+          'entity_id' => $product_id,
+          'field_name' => 'purchase_price',
+          'language' => '',
+          'delta' => 0,
+          'amount' => $wrapper->unit_price->amount->value(),
+          'currency_code' => $wrapper->unit_price->currency_code->value(),
+          'created' => time(),
+        );
+
+        drupal_write_record('commerce_calculated_price', $record);
       }
     }
   }
