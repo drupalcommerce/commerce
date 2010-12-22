@@ -204,7 +204,7 @@ function commerce_product_pre_calculate_sell_prices() {
   // Sort to ensure the names are always in alphabetical order.
   sort($rule_names);
 
-  // Using the array of IDs, generate an array that contains keys for every
+  // Using the array of names, generate an array that contains keys for every
   // possible combination of these Rules applying (i.e. conditions all passing).
   $rule_keys = array();
 
@@ -254,6 +254,7 @@ function commerce_product_pre_calculate_sell_prices() {
           }
         }
 
+        // Build the record of the pre-calculated price and write it.
         $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
         $record = array(
