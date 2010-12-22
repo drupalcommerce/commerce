@@ -260,6 +260,12 @@ function commerce_product_pre_calculate_sell_prices() {
  *   TRUE or FALSE indicating whether or not the rule configuration is valid.
  */
 function commerce_product_valid_pre_calculation_rule($rule) {
+  // If a rule configuration doesn't have any conditions, it doesn't need to
+  // unique consideration in pre-calculation, as its actions will always apply.
+  if (count($rule->conditions()) == 0) {
+    return FALSE;
+  }
+
   // Inspect each condition on the rule configuration. This likely needs to be
   // recursive for conditions in nested operator groups.
   foreach ($rule->conditions() as $condition) {
