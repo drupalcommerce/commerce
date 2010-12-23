@@ -89,6 +89,15 @@ function commerce_payment_ui_payment_transaction_title($transaction) {
 }
 
 /**
+ * Implements hook_help().
+ */
+function commerce_payment_ui_help($path, $arg) {
+  if ($path == 'admin/commerce/config/payment') {
+    return t("Payment methods are enabled for use by the rule configurations listed below. An enabled payment rule can specify a payment method to enable using one of the available <em>Enable payment method</em> actions. The action's settings form will contain any necessary settings for the payment method that must be configured before it may be used.");
+  }
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_payment_ui_views_api() {
