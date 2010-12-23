@@ -67,7 +67,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       $links = array();
 
       foreach (commerce_line_item_summary_links() as $name => $link) {
-        if ($this->options['links'][$name] === $name) {
+        if ($this->options['links'][$name] === $name && $link['access']) {
           $links[str_replace('_', '-', 'line-item-summary-' . $name)] = $link;
         }
       }

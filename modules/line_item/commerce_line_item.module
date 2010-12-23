@@ -1023,6 +1023,15 @@ function commerce_line_items_total($value, $type = '', $language = '') {
 function commerce_line_item_summary_links() {
   // Retrieve links defined by the hook and allow other modules to alter them.
   $links = module_invoke_all('commerce_line_item_summary_link_info');
+
+  // Merge in default values for our custom properties.
+  foreach ($links as $key => &$link) {
+    $link += array(
+      'weight' => 0,
+      'access' => TRUE,
+    );
+  }
+
   drupal_alter('commerce_line_item_summary_link_info', $links);
 
   // Sort the links by weight and return the array.

@@ -28,6 +28,8 @@
  *     as HTML or escaped; defaults to FALSE
  *   - weight: custom to this hook, the weight property is an integer value used
  *     to sort links prior to rendering; defaults to 0
+ *   - access: custom to this hook, a boolean value indicating whether or not
+ *     the current user has access to the link; defaults to TRUE
  *   The full link array will be passed to theme_link(), meaning any additional
  *   properties can be included as desired (such as the attributes array as
  *   demonstrated below).
@@ -49,6 +51,7 @@ function hook_commerce_line_item_summary_link_info() {
       'href' => 'checkout',
       'attributes' => array('rel' => 'nofollow'),
       'weight' => 5,
+      'access' => user_access('access checkout'),
     ),
   );
 }

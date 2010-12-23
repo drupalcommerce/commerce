@@ -110,6 +110,7 @@ function commerce_cart_commerce_line_item_summary_link_info() {
       'href' => 'checkout',
       'attributes' => array('rel' => 'nofollow'),
       'weight' => 5,
+      'access' => user_access('access checkout'),
     ),
   );
 }
