@@ -32,7 +32,7 @@ function commerce_order_token_info() {
     'name' => t('Edit URL'),
     'description' => t("The URL of the order's edit page."),
   );
-  $order['order-status'] = array(
+  $order['status'] = array(
     'name' => t('Order status'),
     'description' => t('The current status of the order.'),
   );
@@ -91,7 +91,7 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
           $replacements[$original] = url('admin/commerce/orders/' . $order->order_id . '/edit', $url_options);
           break;
 
-        case 'order-status':
+        case 'status':
           $replacements[$original] = $sanitize ? check_plain(commerce_order_status_get_title($order->status)) : commerce_order_status_get_title($order->status);
           break;
 

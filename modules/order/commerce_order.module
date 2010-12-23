@@ -773,6 +773,13 @@ function commerce_order_status_get_title($name = NULL) {
 }
 
 /**
+ * Wraps commerce_order_status_get_title() for use by the Entity module.
+ */
+function commerce_order_status_options_list() {
+  return commerce_order_status_get_title();
+}
+
+/**
  * Updates the status of an order to the specified status.
  *
  * @param $order

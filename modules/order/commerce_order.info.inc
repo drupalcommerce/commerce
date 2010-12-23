@@ -46,6 +46,15 @@ function commerce_order_entity_property_info() {
     'getter callback' => 'commerce_order_get_properties',
     'type' => 'uri',
   );
+  $properties['status'] = array(
+    'label' => t('Status'),
+    'description' => t('The current status of the order.'),
+    'type' => 'text',
+    'setter callback' => 'entity_property_verbatim_set',
+    'options list' => 'commerce_order_status_options_list',
+    'query callback' => 'entity_metadata_table_query',
+    'required' => TRUE,
+  );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the order was created.'),
