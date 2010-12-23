@@ -187,9 +187,18 @@ function commerce_product_calculate_sell_price($product) {
   return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
 }
 
+/**
+ * Pre-calculates sell prices for qualifying products based on valid rule
+ *   configurations on the "Calculating product sell price" event.
+ */
 function commerce_product_pre_calculate_sell_prices() {
   // Load the sell price calculation event.
   $event = rules_get_cache('event_commerce_product_calculate_sell_price');
+
+  // If there are no rule configurations, leave without further processing.
+  if (empty($event)) {
+    return;
+  }
 
   // Build an array of the names of all rule configurations that qualify for
   // dynamic pre-calculation.
@@ -245,12 +254,10 @@ function commerce_product_pre_calculate_sell_prices() {
 
         // For each Rule signified by the current key...
         foreach (explode('|', $key) as $name) {
-          // Load the Rule and evaluate its actions directly, bypassing
-          // condition evaluation.
+          // Load the Rule and "fire" it, evaluating its actions without doing
+          // any condition evaluation.
           if ($rule = rules_config_load($name)) {
-            foreach ($rule->actions() as $action) {
-              $action->evaluate($state);
-            }
+            $rule->fire($state);
           }
         }
 
@@ -263,7 +270,7 @@ function commerce_product_pre_calculate_sell_prices() {
           'entity_type' => 'commerce_product',
           'entity_id' => $product_id,
           'field_name' => 'purchase_price',
-          'language' => '',
+          'language' => !empty($product->language) ? $product->language : '',
           'delta' => 0,
           'amount' => $wrapper->unit_price->amount->value(),
           'currency_code' => $wrapper->unit_price->currency_code->value(),
