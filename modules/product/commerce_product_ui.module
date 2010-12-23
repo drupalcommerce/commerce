@@ -91,6 +91,8 @@ function commerce_product_ui_menu() {
   );
   $items['admin/commerce/products/types/%commerce_product_type/edit'] = array(
     'title' => 'Edit',
+    'access callback' => 'commerce_product_ui_product_type_update_access',
+    'access arguments' => array(4),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
@@ -98,7 +100,8 @@ function commerce_product_ui_menu() {
     'title' => 'Delete',
     'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
     'page arguments' => array(4),
-    'access arguments' => array('administer product types'),
+    'access callback' => 'commerce_product_ui_product_type_update_access',
+    'access arguments' => array(4),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 10,
@@ -121,7 +124,7 @@ function commerce_product_ui_product_title($product) {
 }
 
 /**
- * Access callback: determine if the user can create any type of product.
+ * Access callback: determines if the user can create any type of product.
  */
 function commerce_product_ui_product_add_any_access() {
   // Grant automatic access to users with administer products permission.
@@ -134,6 +137,17 @@ function commerce_product_ui_product_add_any_access() {
     if (commerce_product_access('create', $type)) {
       return TRUE;
     }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Access callback: determines if the user can edit or delete a product type.
+ */
+function commerce_product_ui_product_type_update_access($product_type) {
+  if ($product_type->module == 'commerce_product_ui') {
+    return user_access('administer product types');
   }
 
   return FALSE;

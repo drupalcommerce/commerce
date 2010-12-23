@@ -76,6 +76,11 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
 
+  // Return a message if the product type is not governed by Product UI.
+  if ($product_type->module != 'commerce_product_ui') {
+    return t('This product type cannot be edited, because it is not defined by the Product UI module.');
+  }
+
   // Include the forms file from the Product module.
   module_load_include('inc', 'commerce_product_ui', 'includes/commerce_product_ui.forms');
 
@@ -93,6 +98,11 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
 function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
+
+  // Return a message if the product type is not governed by Product UI.
+  if ($product_type->module != 'commerce_product_ui') {
+    return t('This product type cannot be deleted, because it is not defined by the Product UI module.');
+  }
 
   // Don't allow deletion of product types that have products already.
   if (($count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_type->type))->rowCount()) > 0) {
