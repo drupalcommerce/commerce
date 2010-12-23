@@ -2,6 +2,7 @@
 name = Payment UI
 description = Implement core payment features for Drupal commerce.
 package = Commerce
+dependencies[] = rules_admin
 dependencies[] = commerce
 dependencies[] = commerce_order
 dependencies[] = commerce_order_ui

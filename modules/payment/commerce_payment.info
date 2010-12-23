@@ -2,6 +2,7 @@
 name = Payment
 description = Implement core payment features for Drupal commerce.
 package = Commerce
+dependencies[] = rules
 dependencies[] = commerce
 dependencies[] = commerce_order
 core = 7.x
