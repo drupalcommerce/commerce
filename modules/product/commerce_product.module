@@ -297,6 +297,13 @@ function commerce_product_type_get_name($type = NULL) {
 }
 
 /**
+ * Wraps commerce_product_type_get_name() for the Entity module.
+ */
+function commerce_product_type_options_list() {
+  return commerce_product_type_get_name();
+}
+
+/**
  * Title callback: return the human-readable product type name.
  */
 function commerce_product_type_title($product_type) {

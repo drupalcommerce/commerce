@@ -428,6 +428,7 @@ function commerce_price_field_data_property_info($name = NULL) {
       'type' => 'text',
       'getter callback' => 'entity_property_verbatim_get',
       'setter callback' => 'entity_property_verbatim_set',
+      'options list' => 'commerce_currency_code_options_list',
     ),
   );
 }

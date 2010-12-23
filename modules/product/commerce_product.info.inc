@@ -30,9 +30,11 @@ function commerce_product_entity_property_info() {
   );
   $properties['type'] = array(
     'label' => t('Type'),
-    'description' => t('The human readable name of the product type.'),
-    'type' => 'text',
-    'options list' => 'commerce_product_type_get_name',
+    'description' => t('The type of the product.'),
+    'type' => 'token',
+    'setter callback' => 'entity_property_verbatim_set',
+    'setter permission' => 'administer products',
+    'options list' => 'commerce_product_type_options_list',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );

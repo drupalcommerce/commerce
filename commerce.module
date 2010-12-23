@@ -256,6 +256,13 @@ function commerce_currency_get_code($enabled = FALSE) {
 }
 
 /**
+ * Wraps commerce_currency_get_code() for use by the Entity module.
+ */
+function commerce_currency_code_options_list() {
+  return commerce_currency_get_code();
+}
+
+/**
  * Returns the symbol of any or all currencies.
  *
  * @param $code
