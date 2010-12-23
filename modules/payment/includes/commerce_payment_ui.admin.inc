@@ -22,6 +22,8 @@ function commerce_payment_ui_order_tab($order) {
  *   to display payment method rules.
  */
 function commerce_payment_ui_admin_page() {
+  RulesPluginUI::$basePath = 'admin/commerce/config/payment';
+
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled payment rules') . '</h3>';
 
   $conditions = array('event' => 'commerce_payment_methods', 'plugin' => 'reaction rule', 'active' => TRUE);

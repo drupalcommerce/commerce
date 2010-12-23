@@ -69,6 +69,10 @@ function commerce_payment_ui_menu() {
     'file' => 'includes/commerce_payment_ui.admin.inc',
   );
 
+  // Add the menu items for the various Rules forms.
+  $controller = new RulesUIController();
+  $items += $controller->config_menu('admin/commerce/config/payment');
+
   return $items;
 }
 
