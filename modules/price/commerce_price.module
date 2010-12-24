@@ -108,6 +108,9 @@ function commerce_price_create_instance($name, $entity_type, $bundle, $label, $w
       $instance['display'][$view_mode] = array(
         'label' => 'hidden',
         'type' => 'commerce_price_formatted_amount',
+        'settings' => array(
+          'calculation' => 'calculated_sell_price',
+        ),
       );
     }
 
