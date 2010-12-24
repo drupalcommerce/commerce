@@ -77,7 +77,7 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
   commerce_product_ui_set_breadcrumb(TRUE);
 
   // Return a message if the product type is not governed by Product UI.
-  if ($product_type->module != 'commerce_product_ui') {
+  if (empty($product_type->module) || $product_type->module != 'commerce_product_ui') {
     return t('This product type cannot be edited, because it is not defined by the Product UI module.');
   }
 
