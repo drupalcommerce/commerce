@@ -656,6 +656,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       // based on attribute selections so we can add a selection widget.
       $matching_products = array();
       $default_product = NULL;
+      $attribute_names = array();
+      $unchanged_attributes = array();
 
       foreach ($products as $product_id => $product) {
         // Store the first product type.
@@ -676,9 +678,16 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
         if (!empty($form_state['values']['attributes'])) {
           $match = TRUE;
 
-          foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
+          // Set an array of checked attributes for later comparison against the
+          // default matching product.
+          if (empty($attribute_names)) {
+            $attribute_names = (array) array_diff_key($form_state['values']['attributes'], array('product_select' => ''));
+            $unchanged_attributes = $form_state['values']['unchanged_attributes'];
+          }
+
+          foreach ($attribute_names as $key => $value) {
             // If this is the attribute widget that was changed...
-            if ($value != $form_state['values']['unchanged_attributes'][$key]) {
+            if ($value != $unchanged_attributes[$key]) {
               // Store the field name.
               $changed_attribute = $key;
             }
@@ -686,10 +695,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             // If a field name has been stored and we've moved past it to
             // compare the next attribute field...
             if (!empty($changed_attribute) && $changed_attribute != $key) {
-              // Wipe subsequent values from the form state so they attribute
+              // Wipe subsequent values from the form state so the attribute
               // widgets can use the default values from the new default product.
-              unset($form_states['values']['attributes'][$key]);
-              unset($form_states['values']['unchanged_attributes'][$key]);
+              unset($form_state['values']['attributes'][$key]);
+              unset($form_state['values']['unchanged_attributes'][$key]);
 
               // Don't accept this as a matching product.
               continue;
@@ -708,7 +717,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             reset($matching_products);
             $matching_product = $matching_products[key($matching_products)];
 
-            foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
+            foreach ($attribute_names as $key => $value) {
               if ($product->{$key}[LANGUAGE_NONE][0]['value'] != $matching_product->{$key}[LANGUAGE_NONE][0]['value']) {
                 $match = FALSE;
               }
