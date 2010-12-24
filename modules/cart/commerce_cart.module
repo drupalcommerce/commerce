@@ -335,6 +335,25 @@ function commerce_cart_order_new($uid = 0) {
 }
 
 /**
+ * Entity metadata callback: returns the current user's shopping cart order.
+ *
+ * @see commerce_cart_entity_property_info_alter()
+ */
+function commerce_cart_get_properties($data = FALSE, array $options, $name) {
+  global $user;
+
+  switch ($name) {
+    case 'current_cart_order':
+      if ($order = commerce_cart_order_load($user->uid)) {
+        return $order;
+      }
+      else {
+        return commerce_order_new($user->uid, 'cart');
+      }
+  }
+}
+
+/**
  * Adds the specified product to a customer's shopping cart.
  *
  * @param $uid
