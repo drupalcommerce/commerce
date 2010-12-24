@@ -321,7 +321,7 @@ function commerce_product_type_to_arg($type) {
  * Ensures a base price field is present on a product type bundle.
  */
 function commerce_product_configure_product_type($type) {
-  commerce_price_create_instance('purchase_price', 'commerce_product', $type, t('Price'));
+  commerce_price_create_instance('purchase_price', 'commerce_product', $type, t('Price'), 0, 'calculated_sell_price');
 }
 
 /**

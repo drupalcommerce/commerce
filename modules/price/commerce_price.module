@@ -59,8 +59,23 @@ function commerce_price_field_is_empty($item, $field) {
 
 /**
  * Creates a required, locked instance of a price field on the specified bundle.
+ *
+ * @param $name
+ *   The name of the field; if it already exists, a new instance of the existing
+ *     field will be created.
+ * @param $entity_type
+ *   The type of entity the field instance will be attached to.
+ * @param $bundle
+ *   The bundle name of the entity the field instance will be attached to.
+ * @param $label
+ *   The label of the field instance.
+ * @param $weight
+ *   The default weight of the field instance widget.
+ * @param $calculation
+ *   A string indicating the default value of the display formatter's calculation
+ *     setting.
  */
-function commerce_price_create_instance($name, $entity_type, $bundle, $label, $weight = 0) {
+function commerce_price_create_instance($name, $entity_type, $bundle, $label, $weight = 0, $calculation = FALSE) {
   $field = field_info_field($name);
   $instance = field_info_instance($entity_type, $name, $bundle);
 
@@ -109,7 +124,7 @@ function commerce_price_create_instance($name, $entity_type, $bundle, $label, $w
         'label' => 'hidden',
         'type' => 'commerce_price_formatted_amount',
         'settings' => array(
-          'calculation' => 'calculated_sell_price',
+          'calculation' => $calculation,
         ),
       );
     }
