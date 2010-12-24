@@ -364,6 +364,9 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
     $order = commerce_cart_order_new($uid);
   }
 
+  // Invoke the product prepare event with the shopping cart order.
+  rules_invoke_all('commerce_cart_product_prepare', $order, $product, $quantity);
+
   // Determine if the product already exists on the order and increment its
   // quantity instead of adding a new line if it does.
   $line_item_match = NULL;
@@ -408,12 +411,18 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
 
     // Save the updated order.
     commerce_order_save($order);
+
+    // Invoke the product add event with the newly saved line item.
+    rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item);
   }
   else {
     // Increment the quantity of the line item and save it.
     $line_item_match->quantity += $quantity;
 
     commerce_line_item_save($line_item_match);
+
+    // Invoke the product add event with the updated line item.
+    rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item_match);
   }
 
   // Return the order.
