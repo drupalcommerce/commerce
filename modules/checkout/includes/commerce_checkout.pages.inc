@@ -11,9 +11,11 @@
  * Redirects invalid checkout attempts or displays the checkout form if valid.
  */
 function commerce_checkout_router($order, $checkout_page = NULL) {
+  $checkout_pages = commerce_checkout_pages();
+
   // If no checkout page is specified, default to the first one.
   if (empty($checkout_page)) {
-    $checkout_page = reset(commerce_checkout_pages());
+    $checkout_page = reset($checkout_pages);
   }
 
   // If the user does not have access to checkout the order, return a 404. We

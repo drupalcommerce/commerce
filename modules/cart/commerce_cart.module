@@ -639,7 +639,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
     if (count($products) == 1) {
       $form['product_id'] = array(
         '#type' => 'hidden',
-        '#value' => array_shift(array_keys($products)),
+        '#value' => key($products),
       );
     }
     else {
@@ -705,7 +705,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           // exception is granted for additional matching products that share
           // the exact same attribute values as the first.
           if ($match && !empty($changed_attribute) && !empty($matching_products)) {
-            $matching_product = $matching_products[array_shift(array_keys($matching_products))];
+            reset($matching_products);
+            $matching_product = $matching_products[key($matching_products)];
 
             foreach ((array) array_diff_key($form_state['values']['attributes'], array('product_select' => '')) as $key => $value) {
               if ($product->{$key}[LANGUAGE_NONE][0]['value'] != $matching_product->{$key}[LANGUAGE_NONE][0]['value']) {
@@ -728,7 +729,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           $default_product = $products[$form_state['values']['product_id']];
         }
         else {
-          $default_product = $products[array_shift(array_keys($products))];
+          reset($products);
+          $default_product = $products[key($products)];
         }
       }
       else {
@@ -739,7 +741,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           $default_product = $products[$form_state['values']['attributes']['product_select']];
         }
         else {
-          $default_product = $matching_products[array_shift(array_keys($matching_products))];
+          reset($matching_products);
+          $default_product = $matching_products[key($matching_products)];
         }
       }
 

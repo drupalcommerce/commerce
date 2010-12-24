@@ -551,7 +551,8 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
   // completion page unless the order is still a shopping cart.
   if ($order_status->state != 'checkout' && $checkout_page->page_id != 'complete') {
     if ($order_status->state == 'cart') {
-      $first_page = array_shift(array_keys(commerce_checkout_pages()));
+      $checkout_pages = commerce_checkout_pages();
+      $first_page = key($checkout_pages);
 
       if ($checkout_page->page_id != $first_page) {
         return FALSE;

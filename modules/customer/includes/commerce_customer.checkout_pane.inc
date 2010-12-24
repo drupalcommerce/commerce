@@ -137,5 +137,7 @@ function commerce_customer_profile_pane_review($form, $form_state, $checkout_pan
     $profile = commerce_customer_profile_load($order->data['profiles'][$checkout_pane->pane_id]);
   }
 
-  return drupal_render(commerce_customer_profile_build_content($profile, 'customer'));
+  $content = commerce_customer_profile_build_content($profile, 'customer');
+
+  return drupal_render($content);
 }

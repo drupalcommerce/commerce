@@ -378,7 +378,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
       // If only one currency option is available, don't use a select list.
       if (count($options) == 1) {
-        $currency_code = array_shift(array_keys($options));
+        $currency_code = key($options);
 
         $element['amount']['#field_suffix'] = $currency_code;
 

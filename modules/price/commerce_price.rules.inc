@@ -103,7 +103,7 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
 
     // If only one currency option is available, don't use a select list.
     if (count($options) == 1) {
-      $currency_code = array_shift(array_keys($options));
+      $currency_code = key($options);
 
       $form[$name]['amount']['#field_suffix'] = $currency_code;
 

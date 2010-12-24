@@ -62,7 +62,8 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
       $default_value = $order->data['payment_method'];
     }
     else {
-      $default_value = array_shift(array_keys($options));
+      reset($options);
+      $default_value = key($options);
     }
 
     // Set the default value for the payment method radios.

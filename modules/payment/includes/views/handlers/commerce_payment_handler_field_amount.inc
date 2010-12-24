@@ -10,7 +10,7 @@
  * Field handler to allow rendering of the amount using currency formatting.
  */
 class commerce_payment_handler_field_amount extends views_handler_field {
-  function init(&$view, $options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
 
     $this->additional_fields['currency_code'] = 'currency_code';

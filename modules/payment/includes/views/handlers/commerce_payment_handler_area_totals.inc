@@ -6,7 +6,7 @@
  *   a form to add new payments.
  */
 class commerce_payment_handler_area_totals extends views_handler_area {
-  function init(&$view, $options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
 
     $this->additional_fields['amount'] = 'amount';
@@ -79,7 +79,8 @@ class commerce_payment_handler_area_totals extends views_handler_area {
     if ($this->options['add_payment_form'] && $order) {
       module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.forms');
 
-      $form = drupal_render(drupal_get_form('commerce_payment_order_transaction_add_form', $order));
+      $content = drupal_get_form('commerce_payment_order_transaction_add_form', $order);
+      $form = drupal_render($content);
     }
     else {
       $form = NULL;

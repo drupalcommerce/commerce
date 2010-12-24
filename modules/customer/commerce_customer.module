@@ -710,8 +710,8 @@ function commerce_customer_options_list($field) {
   }
 
   // Simplify the options list if only one optgroup exists.
-  if (count(array_keys($options)) == 1) {
-    $options = $options[array_shift(array_keys($options))];
+  if (count($options) == 1) {
+    $options = reset($options);
   }
 
   return $options;

@@ -224,7 +224,7 @@ function commerce_payment_commerce_payment_totals_row_info($totals, $order) {
   }
   elseif (count($totals) == 1) {
     // Otherwise if there's only a single currency total...
-    $currency_code = array_shift(array_keys($totals));
+    $currency_code = key($totals);
 
     // Add a row for the total amount paid.
     $rows[] = array(
