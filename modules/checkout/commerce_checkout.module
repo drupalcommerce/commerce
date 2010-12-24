@@ -539,7 +539,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
     // And then return FALSE if the anonymous user's session doesn't specify
     // this order ID.
-    if (empty($_SESSION['commerce_cart_order_id']) || $_SESSION['commerce_cart_order_id'] != $order->order_id) {
+    if (empty($_SESSION['commerce_cart_orders']) || !in_array($order->order_id, $_SESSION['commerce_cart_orders'])) {
       return FALSE;
     }
   }

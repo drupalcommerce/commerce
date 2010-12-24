@@ -88,9 +88,9 @@ function commerce_cart_commerce_checkout_pane_info() {
  */
 function commerce_cart_commerce_checkout_complete($form, &$form_state, $order) {
   // Move the cart order ID to a completed order ID.
-  if (!empty($_SESSION['commerce_cart_order_id'])) {
-    $_SESSION['commerce_cart_completed_orders'][] = $_SESSION['commerce_cart_order_id'];
-    unset($_SESSION['commerce_cart_order_id']);
+  if (commerce_cart_order_session_exists($order->order_id)) {
+    commerce_cart_order_session_save($order->order_id, TRUE);
+    commerce_cart_order_session_delete($order->order_id);
   }
 }
 
@@ -113,6 +113,14 @@ function commerce_cart_commerce_line_item_summary_link_info() {
       'access' => user_access('access checkout'),
     ),
   );
+}
+
+/**
+ * Implements hook_commerce_order_delete().
+ */
+function commerce_cart_commerce_order_delete($order) {
+  commerce_cart_order_session_delete($order->order_id);
+  commerce_cart_order_session_delete($order->order_id, TRUE);
 }
 
 /**
@@ -171,13 +179,12 @@ function commerce_cart_user_login(&$edit, $account) {
 
       // Delete the anonymous order from the database and clear the reference.
       commerce_order_delete($anonymous_order->order_id);
-      unset($_SESSION['commerce_cart_order_id']);
     }
   }
 
   // Set the uid for any completed orders if they exist.
-  if (!empty($_SESSION['commerce_cart_completed_orders'])) {
-    foreach ((array) $_SESSION['commerce_cart_completed_orders'] as $order_id) {
+  if (commerce_cart_order_session_exists(NULL, TRUE)) {
+    foreach (commerce_cart_order_session_order_ids(TRUE) as $order_id) {
       if ($order = commerce_order_load($order_id)) {
         if ($order->uid == 0) {
           $order->uid = $account->uid;
@@ -186,7 +193,7 @@ function commerce_cart_user_login(&$edit, $account) {
       }
     }
 
-    unset($_SESSION['commerce_cart_completed_orders']);
+    commerce_cart_order_session_delete(NULL, TRUE);
   }
 }
 
@@ -269,10 +276,11 @@ function commerce_cart_order_load($uid = 0) {
   if (!isset($cart_orders[$uid])) {
     $order_id = FALSE;
 
+    // Create an array of valid shopping cart order statuses.
+    $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
     // If a customer uid was specified...
     if ($uid) {
-      // Create an array of valid shopping cart order statuses.
-      $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
 
       // Look for the user's most recent shopping cart order, although they
       // should never really have more than one.
@@ -280,8 +288,8 @@ function commerce_cart_order_load($uid = 0) {
     }
     else {
       // Otherwise look for a shopping cart order ID in the session.
-      if (!empty($_SESSION['commerce_cart_order_id'])) {
-        $order_id = $_SESSION['commerce_cart_order_id'];
+      if (commerce_cart_order_session_exists()) {
+        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
       }
     }
 
@@ -327,8 +335,8 @@ function commerce_cart_order_new($uid = 0) {
   commerce_cart_orders_reset();
 
   // If the user is not logged in, ensure the order ID is stored in the session.
-  if (!$uid && empty($_SESSION['commerce_cart_order_id'])) {
-    $_SESSION['commerce_cart_order_id'] = $order->order_id;
+  if (!$uid) {
+    commerce_cart_order_session_save($order->order_id);
   }
 
   return $order;
@@ -350,6 +358,91 @@ function commerce_cart_get_properties($data = FALSE, array $options, $name) {
       else {
         return commerce_order_new($user->uid, 'cart');
       }
+  }
+}
+
+/**
+ * Returns an array of cart order IDs stored in the session.
+ *
+ * @param $completed
+ *   Boolean indicating whether or not the operation should save to the
+ *     completed orders array instead of the active cart orders array.
+ *
+ * @return
+ *   An array of applicable cart order IDs or an empty array if none exist.
+ */
+function commerce_cart_order_session_order_ids($completed = FALSE) {
+  $key = $completed ? 'commerce_cart_completed_orders' : 'commerce_cart_orders';
+  return empty($_SESSION[$key]) ? array() : $_SESSION[$key];
+}
+
+/**
+ * Saves an order ID to the appropriate cart orders session variable.
+ *
+ * @param $order_id
+ *   The order ID to save to the array.
+ * @param $completed
+ *   Boolean indicating whether or not the operation should save to the
+ *     completed orders array instead of the active cart orders array.
+ */
+function commerce_cart_order_session_save($order_id, $completed = FALSE) {
+  $key = $completed ? 'commerce_cart_completed_orders' : 'commerce_cart_orders';
+
+  if (empty($_SESSION[$key])) {
+    $_SESSION['commerce_cart_orders'] = array($order_id);
+  }
+  elseif (!in_array($order_id, $_SESSION[$key])) {
+    $_SESSION[$key][] = $order_id;
+  }
+}
+
+/**
+ * Checks to see if any order ID or a specific order ID exists in the session.
+ *
+ * @param $order_id
+ *   Optionally specify an order ID to look for in the commerce_cart_orders
+ *     session variable; defaults to NULL.
+ * @param $completed
+ *   Boolean indicating whether or not the operation should look in the
+ *     completed orders array instead of the active cart orders array.
+ *
+ * @return
+ *   Boolean indicating whether or not any cart order ID exists in the session
+ *     or if the specified order ID exists in the session.
+ */
+function commerce_cart_order_session_exists($order_id = NULL, $completed = FALSE) {
+  $key = $completed ? 'commerce_cart_completed_orders' : 'commerce_cart_orders';
+
+  // If an order was specified, look for it in the array.
+  if (!empty($order_id)) {
+    return !empty($_SESSION[$key]) && in_array($order_id, $_SESSION[$key]);
+  }
+  else {
+    // Otherwise look for any value.
+    return !empty($_SESSION[$key]);
+  }
+}
+
+/**
+ * Deletes all order IDs or a specific order ID from the cart orders session
+ *   variable.
+ *
+ * @param $order_id
+ *   The order ID to remove from the array or NULL to delete the variable.
+ * @param $completed
+ *   Boolean indicating whether or not the operation should delete from the
+ *     completed orders array instead of the active cart orders array.
+ */
+function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE) {
+  $key = $completed ? 'commerce_cart_completed_orders' : 'commerce_cart_orders';
+
+  if (!empty($_SESSION[$key])) {
+    if (!empty($order_id)) {
+      $_SESSION[$key] = array_diff($_SESSION[$key], array($order_id));
+    }
+    else {
+      unset($_SESSION[$key]);
+    }
   }
 }
 
