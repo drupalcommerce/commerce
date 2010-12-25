@@ -350,6 +350,49 @@ function commerce_payment_method_load($method_id) {
 }
 
 /**
+ * Returns the title of any or all payment methods.
+ *
+ * @param $title
+ *   String indicating which title to return, either 'title', 'display_title',
+ *     or 'short_title'.
+ * @param $method
+ *   Optional parameter specifying the payment method whose title to return.
+ *
+ * @return
+ *   Either an array of all payment method titles keyed by the machine name or a
+ *     string containing the title for the specified type. If a type is specified
+ *     that does not exist, this function returns FALSE.
+ */
+function commerce_payment_method_get_title($title = 'title', $method = NULL) {
+  $payment_methods = commerce_payment_methods();
+
+  // Return a method title if specified and it exists.
+  if (!empty($method)) {
+    if (isset($payment_methods[$method])) {
+      return $payment_methods[$method]->{$title};
+    }
+    else {
+      // Return FALSE if it does not exist.
+      return FALSE;
+    }
+  }
+
+  // Otherwise turn the array values into the specified title only.
+  foreach ($payment_methods as $key => $value) {
+    $payment_methods[$key] = $value->{$title};
+  }
+
+  return $payment_methods;
+}
+
+/**
+ * Wraps commerce_payment_method_get_title() for the Entity module.
+ */
+function commerce_payment_method_options_list() {
+  return commerce_payment_method_get_title();
+}
+
+/**
  * Returns the specified callback for the given payment method if it exists.
  *
  * @param $payment_method
@@ -849,4 +892,34 @@ function commerce_payment_totals_rows($totals, $order) {
   uasort($rows, 'drupal_sort_weight');
 
   return $rows;
+}
+
+/**
+ * Callback for getting payment transaction properties.
+ *
+ * @see commerce_payment_entity_property_info()
+ */
+function commerce_payment_transaction_get_properties($transaction, array $options, $name) {
+  switch ($name) {
+    case 'user':
+      return $transaction->uid;
+    case 'order':
+      return $transaction->order_id;
+  }
+}
+
+/**
+ * Callback for setting payment transaction properties.
+ *
+ * @see commerce_payment_entity_property_info()
+ */
+function commerce_payment_transaction_set_properties($transaction, $name, $value) {
+  switch ($name) {
+    case 'user':
+      $transaction->uid = $value;
+      break;
+    case 'order':
+      $transaction->order_id = $value;
+      break;
+  }
 }

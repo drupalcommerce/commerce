@@ -36,7 +36,7 @@ function commerce_customer_entity_property_info() {
     'description' => t("The unique ID of the user the customer profile belongs to."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer customer profiles',
-    'clear' => array('owner'),
+    'clear' => array('user'),
     'query callback' => 'entity_metadata_table_query',
   );
   $properties['user'] = array(
@@ -65,7 +65,7 @@ function commerce_customer_entity_property_info() {
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer customer profiles',
   );
-  $properties['created'] = array(
+  $properties['changed'] = array(
     'label' => t('Date updated'),
     'description' => t('The date the product was last updated.'),
     'type' => 'date',
