@@ -259,23 +259,26 @@ function commerce_cart_commerce_order_presave($order) {
     return;
   }
 
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
   // Get the order directly from the database and compare with the current one.
   $unchanged_order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+  $unchanged_wrapper = entity_metadata_wrapper('commerce_order', $unchanged_order);
 
   // If the number of line items has changed, reset the status.
-  if (count($unchanged_order->line_items[LANGUAGE_NONE]) != count($unchanged_order->line_items[LANGUAGE_NONE])) {
+  if (count($unchanged_wrapper->line_items) != count($wrapper->line_items)) {
     $order->status = 'cart';
   }
   else {
     // Otherwise compare the actual line item IDs.
     $unchanged_line_item_ids = array();
 
-    foreach ($unchanged_order->line_items[LANGUAGE_NONE] as $key => $value) {
-      $unchanged_line_item_ids[] = $value['line_item_id'];
+    foreach ($unchanged_wrapper->line_items as $key => $value) {
+      $unchanged_line_item_ids[] = $key;
     }
 
-    foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
-      if (!in_array($value['line_item_id'], $unchanged_line_item_ids)) {
+    foreach ($wrapper->line_items as $key => $value) {
+      if (!in_array($key, $unchanged_line_item_ids)) {
         $order->status = 'cart';
       }
     }
