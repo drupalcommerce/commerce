@@ -919,6 +919,11 @@ function commerce_order_get_properties($order, array $options, $name) {
     case 'edit-url':
       return url('admin/commerce/orders/' . $order->order_id . '/edit', $options);
     case 'line_items':
+      // TODO: Convert to use entity_metadata_wrapper().
+      if (empty($order->line_items[LANGUAGE_NONE])) {
+        return array();
+      }
+
       $line_item_ids = array();
 
       foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
