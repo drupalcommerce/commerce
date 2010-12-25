@@ -22,7 +22,7 @@ function commerce_product_reference_rules_event_info() {
 
   $items['commerce_product_calculate_sell_price'] = array(
     'label' => t('Calculating the sell price of a product'),
-    'group' => t('Commerce product'),
+    'group' => t('Commerce Product'),
     'variables' => array(
       'line_item' => array(
         'label' => t('Product line item'),

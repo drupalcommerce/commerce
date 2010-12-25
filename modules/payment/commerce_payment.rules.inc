@@ -44,7 +44,7 @@ function commerce_payment_rules_action_info() {
           'payment_method' => $payment_method->method_id,
         ),
       ),
-      'group' => t('Commerce - payment'),
+      'group' => t('Commerce Payment'),
       'base' => $payment_method->base,
       'callbacks' => array(
         'execute' => 'commerce_payment_enable_method',
@@ -58,7 +58,7 @@ function commerce_payment_rules_action_info() {
       'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order')),
       'amount' => array('type' => 'text', 'label' => t('Amount')),
     ),
-    'group' => t('Commerce - payment'),
+    'group' => t('Commerce Payment'),
   );
 
   return $actions;
