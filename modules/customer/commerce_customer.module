@@ -238,6 +238,13 @@ function commerce_customer_profile_type_get_name($type = NULL) {
 }
 
 /**
+ * Wraps commerce_customer_profile_type_get_name() for the Entity module.
+ */
+function commerce_customer_profile_type_options_list() {
+  return commerce_customer_profile_type_get_name();
+}
+
+/**
  * Title callback: return the human-readable customer profile type name.
  */
 function commerce_customer_profile_type_title($profile_type) {
@@ -481,27 +488,6 @@ function commerce_customer_configure_customer_profile_type($type) {
       ),
     );
     field_create_instance($instance);
-  }
-}
-
-/**
- * Callback for getting customer profile properties.
- * @see commerce_customer_entity_property_info()
- */
-function commerce_customer_profile_get_properties($profile, array $options, $name) {
-  switch ($name) {
-    case 'user':
-      return $profile->uid;
-  }
-}
-
-/**
- * Callback for setting customer profile properties.
- * @see commerce_customer_entity_property_info()
- */
-function commerce_customer_profile_set_properties($profile, $name, $value) {
-  if ($name == 'user') {
-    $profile->uid = $value;
   }
 }
 
@@ -950,4 +936,27 @@ function _commerce_customer_match_customer_profiles_standard($field, $ids = arra
   }
 
   return $matches;
+}
+
+/**
+ * Callback for getting customer profile properties.
+ *
+ * @see commerce_customer_entity_property_info()
+ */
+function commerce_customer_profile_get_properties($profile, array $options, $name) {
+  switch ($name) {
+    case 'user':
+      return $profile->uid;
+  }
+}
+
+/**
+ * Callback for setting customer profile properties.
+ *
+ * @see commerce_customer_entity_property_info()
+ */
+function commerce_customer_profile_set_properties($profile, $name, $value) {
+  if ($name == 'user') {
+    $profile->uid = $value;
+  }
 }
