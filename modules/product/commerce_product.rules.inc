@@ -13,59 +13,66 @@
  * Implements hook_rules_event_info().
  */
 function commerce_product_rules_event_info() {
-  $items = array(
-    'commerce_product_insert' => array(
-      'label' => t('After saving a new product'),
-      'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('Created product')),
-      'access callback' => 'commerce_product_rules_access',
-    ),
-    'commerce_product_update' => array(
-      'label' => t('After updating an existing product'),
-      'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('Updated product'), TRUE),
-      'access callback' => 'commerce_product_rules_access',
-    ),
-    'commerce_product_presave' => array(
-      'label' => t('Before saving a product'),
-      'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('Saved product'), TRUE),
-      'access callback' => 'commerce_product_rules_access',
-    ),
-    'commerce_product_delete' => array(
-      'label' => t('After deleting a product'),
-      'group' => t('Commerce'),
-      'variables' => commerce_product_rules_variables(t('Deleted product')),
-      'access callback' => 'commerce_product_rules_access',
-    ),
+  $events = array();
+
+  $events['commerce_product_presave'] = array(
+    'label' => t('Before saving a product'),
+    'group' => t('Commerce Product'),
+    'variables' => commerce_product_rules_event_variables(t('Product'), TRUE, TRUE),
+    'access callback' => 'commerce_product_rules_access',
   );
-  // Specify that on presave the product is saved anyway.
-  $items['commerce_product_presave']['variables']['product']['skip save'] = TRUE;
-  return $items;
+  $events['commerce_product_insert'] = array(
+    'label' => t('After saving a new product'),
+    'group' => t('Commerce Product'),
+    'variables' => commerce_product_rules_event_variables(t('Created product'), TRUE),
+    'access callback' => 'commerce_product_rules_access',
+  );
+  $events['commerce_product_update'] = array(
+    'label' => t('After updating an existing product'),
+    'group' => t('Commerce Product'),
+    'variables' => commerce_product_rules_event_variables(t('Updated product'), TRUE),
+    'access callback' => 'commerce_product_rules_access',
+  );
+  $events['commerce_product_delete'] = array(
+    'label' => t('After deleting a product'),
+    'group' => t('Commerce Product'),
+    'variables' => commerce_product_rules_event_variables(t('Deleted product')),
+    'access callback' => 'commerce_product_rules_access',
+  );
+
+  return $events;
 }
 
 /**
- * Returns some parameter suitable for using it with a node
+ * Returns a variables array for product events.
+ *
+ * @param $label
+ *   The label for the primary product variable.
+ * @param $unchanged
+ *   Boolean indicating whether or not to include the unchanged product.
+ * @param $skip_save
+ *   Boolean indicating whether or not the primary product variable should skip
+ *     saving after event execution.
  */
-function commerce_product_rules_variables($label, $update = FALSE) {
-  $args = array(
+function commerce_product_rules_event_variables($label, $unchanged = FALSE, $skip_save = FALSE) {
+  $variables = array(
     'product' => array(
       'type' => 'commerce_product',
       'label' => $label,
+      'skip save' => $skip_save,
     ),
   );
 
-  if ($update) {
-    $args += array(
-      'product_unchanged' => array(
-        'type' => 'commerce_product',
-        'label' => t('Unchanged product'),
-        'handler' => 'rules_events_entity_unchanged',
-      ),
+  if ($unchanged) {
+    $variables['product_unchanged'] = array(
+      'type' => 'commerce_product',
+      'label' => t('Unchanged product'),
+      'skip save' => TRUE,
+      'handler' => 'rules_events_entity_unchanged',
     );
   }
 
-  return $args;
+  return $variables;
 }
 
 /**
