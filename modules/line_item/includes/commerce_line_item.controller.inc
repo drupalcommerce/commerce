@@ -53,15 +53,12 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
         'currency_code' => $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'],
       );
 
-      // Give modules the opportunity to prepare field data for saving, first
-      // through the Field API and then through $op specific hooks.
+      // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_line_item', $line_item);
+      rules_invoke_all('commerce_line_item_presave', $line_item);
 
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
-        // Give modules the opportunity to prepare field data for inserting.
-        rules_invoke_all('commerce_line_item_presave_insert', $line_item);
-
         // Set the creation timestamp.
         $line_item->created = REQUEST_TIME;
 
@@ -72,9 +69,6 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
         $op = 'insert';
       }
       else {
-        // Give modules the opportunity to prepare field data for updating.
-        rules_invoke_all('commerce_line_item_presave_update', $line_item);
-
         // Save the updated line item and fields.
         drupal_write_record('commerce_line_item', $line_item, 'line_item_id');
         field_attach_update('commerce_line_item', $line_item);

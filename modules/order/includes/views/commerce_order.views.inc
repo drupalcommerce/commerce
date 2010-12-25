@@ -96,7 +96,7 @@ function commerce_order_views_data() {
     'title' => t('Order status'),
     'help' => t('The workflow status of the order.'),
     'field' => array(
-      'handler' => 'commerce_order_handler_field_order_status',      
+      'handler' => 'commerce_order_handler_field_order_status',
       'click sortable' => TRUE,
     ),
     'filter' => array(
@@ -160,7 +160,7 @@ function commerce_order_views_data() {
     'field' => array(
       'title' => t('Delete link'),
       'help' => t('Provide a simple link to delete the order.'),
-      'handler' => 'commerce_order_handler_field_order_link_delete',      
+      'handler' => 'commerce_order_handler_field_order_link_delete',
     ),
   );
 

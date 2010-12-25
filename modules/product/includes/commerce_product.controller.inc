@@ -68,6 +68,8 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
         $op = 'insert';
       }
       else {
+        // Invoke presave to let modules react before the save.
+        rules_invoke_all('commerce_product_presave', $product);
         // Save the updated product and fields.
         drupal_write_record('commerce_product', $product, 'product_id');
         field_attach_update('commerce_product', $product);

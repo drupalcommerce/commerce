@@ -123,6 +123,8 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
         $op = 'insert';
       }
       else {
+        // Invoke presave to let modules react before the save.
+        rules_invoke_all('commerce_order_presave', $order);
         // Save the updated order.
         drupal_write_record('commerce_order', $order, 'order_id');
 

@@ -66,7 +66,7 @@ function commerce_product_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'commerce_product_handler_filter_product_type',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',

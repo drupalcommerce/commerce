@@ -13,68 +13,67 @@
  * Implements hook_rules_event_info().
  */
 function commerce_line_item_rules_event_info() {
-  $items = array(
-    'commerce_line_item_insert' => array(
-      'label' => t('After saving a new line item'),
-      'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('Created line item')),
-      'access callback' => 'commerce_line_item_rules_access',
-    ),
-    'commerce_line_item_update' => array(
-      'label' => t('After updating an existing line item'),
-      'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('Updated line item'), TRUE),
-      'access callback' => 'commerce_line_item_rules_access',
-    ),
-    'commerce_line_item_presave_insert' => array(
-      'label' => t('Before saving a new line item'),
-      'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('Saved line item'), TRUE),
-      'access callback' => 'commerce_line_item_rules_access',
-    ),
-    'commerce_line_item_presave_update' => array(
-      'label' => t('Before saving an updated line item'),
-      'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('Saved line item'), TRUE),
-      'access callback' => 'commerce_line_item_rules_access',
-    ),
-    'commerce_line_item_delete' => array(
-      'label' => t('After deleting a line item'),
-      'group' => t('Commerce'),
-      'variables' => commerce_line_item_rules_variables(t('Deleted line item')),
-      'access callback' => 'commerce_line_item_rules_access',
-    ),
+  $events = array();
+
+  $events['commerce_line_item_presave'] = array(
+    'label' => t('Before saving a line item'),
+    'group' => t('Commerce Line Item'),
+    'variables' => commerce_line_item_rules_event_variables(t('Line item'), TRUE, TRUE),
+    'access callback' => 'commerce_line_item_rules_access',
+  );
+  $events['commerce_line_item_insert'] = array(
+    'label' => t('After saving a new line item'),
+    'group' => t('Commerce Line Item'),
+    'variables' => commerce_line_item_rules_event_variables(t('Created line item'), TRUE),
+    'access callback' => 'commerce_line_item_rules_access',
+  );
+  $events['commerce_line_item_update'] = array(
+    'label' => t('After updating an existing line item'),
+    'group' => t('Commerce Line Item'),
+    'variables' => commerce_line_item_rules_event_variables(t('Updated line item'), TRUE),
+    'access callback' => 'commerce_line_item_rules_access',
+  );
+  $events['commerce_line_item_delete'] = array(
+    'label' => t('After deleting a line item'),
+    'group' => t('Commerce Line Item'),
+    'variables' => commerce_line_item_rules_event_variables(t('Deleted line item')),
+    'access callback' => 'commerce_line_item_rules_access',
   );
 
-  // Specify that on presave the line item is saved anyway.
-  $items['commerce_line_item_presave_insert']['variables']['line_item']['skip save'] = TRUE;
-  $items['commerce_line_item_presave_update']['variables']['line_item']['skip save'] = TRUE;
-
-  return $items;
+  return $events;
 }
 
 /**
- * Returns some parameter suitable for using it with a node
+ * Returns a variables array for line item events.
+ *
+ * @param $label
+ *   The label for the primary line item variable.
+ * @param $unchanged
+ *   Boolean indicating whether or not to include the unchanged line item.
+ * @param $skip_save
+ *   Boolean indicating whether or not the primary line item variable should
+ *     skip saving after event execution.
  */
-function commerce_line_item_rules_variables($label, $update = FALSE) {
-  $args = array(
+function commerce_line_item_rules_event_variables($label, $unchanged = FALSE, $skip_save = FALSE) {
+  $variables = array(
     'line_item' => array(
       'type' => 'commerce_line_item',
       'label' => $label,
+      'skip save' => $skip_save,
     ),
   );
 
-  if ($update) {
-    $args += array(
-      'line_item_unchanged' => array(
-        'type' => 'commerce_line_item',
-        'label' => t('Unchanged line item'),
-        'handler' => 'rules_events_entity_unchanged',
-      ),
+  // Include the unchanged line item if specified.
+  if ($unchanged) {
+    $variables['line_item_unchanged'] = array(
+      'type' => 'commerce_line_item',
+      'label' => t('Unchanged line item'),
+      'skip save' => TRUE,
+      'handler' => 'rules_events_entity_unchanged',
     );
   }
 
-  return $args;
+  return $variables;
 }
 
 /**
