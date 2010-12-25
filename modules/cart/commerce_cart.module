@@ -245,65 +245,104 @@ function commerce_cart_block_view($delta) {
 }
 
 /**
- * Implementation of hook_commerce_order_presave().
+ * Implements hook_commerce_order_presave().
+ *
+ * Resets the shopping cart order status when the cart contents are changed,
+ * which we check on order save by seeing if line items are added or removed.
  */
 function commerce_cart_commerce_order_presave($order) {
-  // We want update the order status when cart content is changed.
-  // This happens when a line item is added or removed.
-  // Create an array of shopping cart order statuses we want to react on.
+  // Create an array of shopping cart order statuses we need to monitor.
   $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
-  if (!isset($order->order_id) || empty($order->order_id) || !in_array($order->status, $status_ids)) {
+
+  // Exit if this is a new order or not in a cart status.
+  if (empty($order->order_id) || !in_array($order->status, $status_ids)) {
     return;
   }
+
   // Get the order directly from the database and compare with the current one.
-  $db_order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
-  // Easy comparison works most in most cases.
-  if (count($db_order->line_items[LANGUAGE_NONE]) != count($db_order->line_items[LANGUAGE_NONE])) {
+  $unchanged_order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+
+  // If the number of line items has changed, reset the status.
+  if (count($unchanged_order->line_items[LANGUAGE_NONE]) != count($unchanged_order->line_items[LANGUAGE_NONE])) {
     $order->status = 'cart';
   }
   else {
-    // Need to see if a line item was replaced with another one.
-    $db_line_item_ids = array();
-    foreach ($db_order->line_items[LANGUAGE_NONE] as $db_value) {
-      $db_line_item_ids[] = $db_value['line_item_id'];
+    // Otherwise compare the actual line item IDs.
+    $unchanged_line_item_ids = array();
+
+    foreach ($unchanged_order->line_items[LANGUAGE_NONE] as $key => $value) {
+      $unchanged_line_item_ids[] = $value['line_item_id'];
     }
-    foreach ($order->line_items[LANGUAGE_NONE] as $value) {
-      if (!in_array($value['line_item_id'], $db_line_item_ids)) {
+
+    foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
+      if (!in_array($value['line_item_id'], $unchanged_line_item_ids)) {
         $order->status = 'cart';
-        break;
       }
     }
   }
 }
 
 /**
- * Implementation of hook_commerce_line_item_presave().
+ * Implements hook_commerce_line_item_presave().
+ *
+ * Resets the pertinent shopping cart order status when line items are changed,
+ * which we check on line item save.
  */
 function commerce_cart_commerce_line_item_presave($line_item) {
-  // We want update the order status when cart content is changed.
-  // This happens when the quantity of a line item is changed.
-  // We don't want to react when line items are inserted or doesn't belong
-  // to an order.
-  if (!isset($line_item->line_item_id) || empty($line_item->line_item_id)) {
+  // Exit now if the line item is being inserted for the first time, as it won't
+  // be referenced by an order yet.
+  if (empty($line_item->line_item_id)) {
     return;
   }
-  // Get the order directly from the database and compare with the current one.
-  $db_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
-  // Quantity is changed, get order(s) that have a reference to this line item.
-  if ($db_line_item->quantity != $line_item->quantity) {
-    // Create an array of shopping cart order statuses we want to react on.
+
+  // Get the line item directly from the database and compare with the current one.
+  $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
+
+  // If the quantity has changed, find any orders that reference this line item.
+  if ($unchanged_line_item->quantity != $line_item->quantity) {
+    // Create an array of shopping cart order statuses we need to monitor.
     $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
     $query = new EntityFieldQuery();
+
     $query
-      ->fieldCondition('line_items', 'line_item_id', $line_item->line_item_id, '=')
       ->entityCondition('entity_type', 'commerce_order')
+      ->fieldCondition('line_items', 'line_item_id', $line_item->line_item_id, '=')
       ->execute();
-      foreach ($query->ordered_results as $entity) {
+
+    foreach ($query->ordered_results as $entity) {
       $order = commerce_order_load($entity->entity_id);
+
       if (in_array($order->status, $status_ids)) {
         $order->status = 'cart';
         commerce_order_save($order);
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_commerce_line_item_delete().
+ *
+ * Resets the pertinent shopping cart order status when a line item is deleted.
+ */
+function commerce_cart_commerce_line_item_delete($line_item) {
+  // Create an array of shopping cart order statuses we need to monitor.
+  $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
+  $query = new EntityFieldQuery();
+
+  $query
+    ->entityCondition('entity_type', 'commerce_order')
+    ->fieldCondition('line_items', 'line_item_id', $line_item->line_item_id, '=')
+    ->execute();
+
+  foreach ($query->ordered_results as $entity) {
+    $order = commerce_order_load($entity->entity_id);
+
+    if (in_array($order->status, $status_ids)) {
+      $order->status = 'cart';
+      commerce_order_save($order);
     }
   }
 }
