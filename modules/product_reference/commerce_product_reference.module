@@ -162,11 +162,14 @@ function commerce_product_reference_commerce_price_field_formatter_prepare_view(
  *
  * @param $product
  *   The product whose sell price will be calculated.
+ * @param $precalc
+ *   Boolean indicating whether or not the pre-calculated sell price from the
+ *     database should be requested before calculating it anew.
  *
  * @return
  *   A price field data array as returned by entity_metadata_wrapper().
  */
-function commerce_product_calculate_sell_price($product) {
+function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
   // If we don't have a full product object, load it now. This accommodation
   // is currently being made for Views, as Views is currently engineered to
   // avoid loading the full object even though it still uses the display
@@ -181,10 +184,89 @@ function commerce_product_calculate_sell_price($product) {
   // First create a pseudo product line item that we will pass to Rules.
   $line_item = commerce_product_line_item_new($product);
 
+  // Attempt to fetch a database stored price if specified.
+  if ($precalc) {
+    $module_key = commerce_product_pre_calculation_key();
+
+    $result = db_select('commerce_calculated_price')
+      ->fields('commerce_calculated_price', array('amount', 'currency_code', 'data'))
+      ->condition('module', 'commerce_product_reference')
+      ->condition('module_key', $module_key)
+      ->condition('entity_type', 'commerce_product')
+      ->condition('entity_id', $product->product_id)
+      ->condition('field_name', 'purchase_price')
+      ->execute()
+      ->fetchObject();
+
+    // If a pre-calculated price was found...
+    if (!empty($result)) {
+      // Wrap the line item, swap in the price, and return it.
+      $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+      $wrapper->unit_price->amount = $result->amount;
+      $wrapper->unit_price->currency_code = $result->currency_code;
+
+      // TODO: Add proper entity property support for data arrays.
+      // $wrapper->unit_price->data = $result->data;
+
+      return $wrapper->unit_price->value();
+    }
+  }
+
+  // First create a pseudo product line item that we will pass to Rules.
+  $line_item = commerce_product_line_item_new($product);
+
   // Pass the line item to Rules.
   rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
   return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
+}
+
+/**
+ * Generates a price pre-calculation module key indicating which pricing Rules
+ *   currently apply.
+ */
+function commerce_product_pre_calculation_key() {
+  // Load the sell price calculation event.
+  $event = rules_get_cache('event_commerce_product_calculate_sell_price');
+
+  // If there are no rule configurations, use an empty key.
+  if (empty($event)) {
+    return '';
+  }
+
+  // Build an array of the names of all rule configurations that qualify for
+  // dynamic pre-calculation.
+  $rule_names = array();
+
+  $state = new RulesState();
+
+  foreach ($event as $rule) {
+    if (count($rule->conditions()) > 0) {
+      $pass = TRUE;
+
+      foreach ($rule->conditions() as $condition) {
+        if (!$condition->evaluate($state)) {
+          $pass = FALSE;
+        }
+      }
+
+      if ($pass) {
+        $rule_names[] = $rule->name;
+      }
+    }
+  }
+
+  // If no valid Rules were found, return an empty string.
+  if (empty($rule_names)) {
+    return '';
+  }
+
+  // Otherwise sort to ensure the names are in alphabetical order and return the
+  // imploded module key.
+  sort($rule_names);
+
+  return implode('|', $rule_names);
 }
 
 /**
@@ -257,6 +339,14 @@ function commerce_product_pre_calculate_sell_prices() {
           // Load the Rule and "fire" it, evaluating its actions without doing
           // any condition evaluation.
           if ($rule = rules_config_load($name)) {
+            $rule->fire($state);
+          }
+        }
+
+        // Also fire any Rules that weren't included in the key because they
+        // don't have any conditions.
+        foreach ($event as $rule) {
+         if (count($rule->conditions()) == 0) {
             $rule->fire($state);
           }
         }
