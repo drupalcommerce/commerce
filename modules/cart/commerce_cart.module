@@ -803,8 +803,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             if (!empty($changed_attribute) && $changed_attribute != $key) {
               // Wipe subsequent values from the form state so the attribute
               // widgets can use the default values from the new default product.
-              unset($form_state['values']['attributes'][$key]);
-              unset($form_state['values']['unchanged_attributes'][$key]);
+              unset($form_state['input']['attributes'][$key]);
 
               // Don't accept this as a matching product.
               continue;
