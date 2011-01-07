@@ -1,6 +1,6 @@
 ; $Id$
 name = Payment UI
-description = Implement core payment features for Drupal commerce.
+description = Exposes a default UI for payment method configuration and payment transaction administration.
 package = Commerce
 dependencies[] = rules_admin
 dependencies[] = commerce

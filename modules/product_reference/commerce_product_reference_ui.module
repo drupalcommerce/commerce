@@ -1,0 +1,44 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Exposes a UI for the product pricing system defined by the Product Reference
+ *   module.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_product_reference_ui_menu() {
+  $items = array();
+
+  // Payment method Rules administration page.
+  $items['admin/commerce/products/price-calculation'] = array(
+    'title' => 'Price calculation',
+    'description' => 'Enable and configure product sell price calculation rule configurations.',
+    'page callback' => 'commerce_product_reference_ui_sell_price_rules',
+    'access arguments' => array('administer sell price calculation'),
+    'file' => 'includes/commerce_product_reference_ui.admin.inc',
+  );
+
+  // Add the menu items for the various Rules forms.
+  $controller = new RulesUIController();
+  $items += $controller->config_menu('admin/commerce/products/price-calculation');
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_product_reference_ui_permission() {
+  return array(
+    'administer sell price calculation' => array(
+      'title' => t('Administer sell price calculation'),
+      'description' => t('Grants access to the sell price calculation user interface and settings form.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
