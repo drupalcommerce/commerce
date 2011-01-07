@@ -495,7 +495,7 @@ function commerce_cart_order_session_save($order_id, $completed = FALSE) {
   $key = $completed ? 'commerce_cart_completed_orders' : 'commerce_cart_orders';
 
   if (empty($_SESSION[$key])) {
-    $_SESSION['commerce_cart_orders'] = array($order_id);
+    $_SESSION[$key] = array($order_id);
   }
   elseif (!in_array($order_id, $_SESSION[$key])) {
     $_SESSION[$key][] = $order_id;
