@@ -37,6 +37,17 @@ function commerce_product_reference_ui_menu() {
     'file' => 'rules_admin.inc',
   );
 
+  // Provide a configuration menu item for adjusting the product sell price
+  // pre-calculation settings.
+  $items['admin/commerce/config/product-price-pre-calculation'] = array(
+    'title' => 'Product price pre-calculation',
+    'description' => 'Configure the price pre-calculation settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_product_pre_calculation_settings_form'),
+    'access arguments' => array('administer sell price calculation'),
+    'file' => 'includes/commerce_product_reference_ui.admin.inc',
+  );
+
   return $items;
 }
 
