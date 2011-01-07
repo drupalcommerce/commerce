@@ -16,12 +16,12 @@ function commerce_order_entity_property_info() {
   $properties = &$info['commerce_order']['properties'];
 
   $properties['order_id'] = array(
-    'label' => t('Order ID'),
+    'label' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The internal numeric ID of the order.'),
     'type' => 'integer',
   );
   $properties['order_number'] = array(
-    'label' => t('Order number'),
+    'label' => t('Order number', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The order number displayed to the customer.'),
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',

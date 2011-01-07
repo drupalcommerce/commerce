@@ -40,7 +40,7 @@ function commerce_payment_views_data() {
 
   // Expose the order ID.
   $data['commerce_payment_transaction']['order_id'] = array(
-    'title' => t('Order ID'),
+    'title' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
     'help' => t('The unique internal identifier of the associated order.'),
     'field' => array(
       'handler' => 'commerce_order_handler_field_order',
@@ -62,7 +62,7 @@ function commerce_payment_views_data() {
       'handler' => 'views_handler_relationship',
       'base' => 'commerce_order',
       'field' => 'order_id',
-      'label' => t('Order'),
+      'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
     ),
   );
 

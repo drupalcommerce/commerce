@@ -18,7 +18,7 @@ function commerce_order_rules_event_info() {
   $events['commerce_order_presave'] = array(
     'label' => t('Before saving an order'),
     'group' => t('Commerce Order'),
-    'variables' => commerce_order_rules_event_variables(t('Order'), TRUE, TRUE),
+    'variables' => commerce_order_rules_event_variables(t('Order', array(), array('context' => 'a drupal commerce order')), TRUE, TRUE),
     'access callback' => 'commerce_order_rules_access',
   );
   $events['commerce_order_insert'] = array(

@@ -691,7 +691,7 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
 
   $rows = array(
     array(t('Transaction ID'), $transaction->transaction_id),
-    array(t('Order'), l(check_plain($order->order_number), 'admin/commerce/orders/' . $order->order_id)),
+    array(t('Order', array(), array('context' => 'a drupal commerce order')), l(check_plain($order->order_number), 'admin/commerce/orders/' . $order->order_id)),
     array(t('Payment method'), $title),
     array(t('Remote ID'), check_plain($transaction->remote_id)),
     array(t('Message'), t($transaction->message, $transaction->message_variables)),

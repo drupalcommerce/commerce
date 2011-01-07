@@ -208,7 +208,7 @@ function commerce_order_ui_form_commerce_order_ui_order_form_alter(&$form, &$for
  */
 function commerce_order_ui_order_form_submit($form, &$form_state) {
   // Apply the redirect based on the clicked button.
-  if ($form_state['clicked_button']['#value'] == t('Save order')) {
+  if ($form_state['clicked_button']['#value'] == t('Save order', array(), array('context' => 'a drupal commerce order'))) {
     drupal_set_message(t('Order saved.'));
 
     $form_state['redirect'] = 'admin/commerce/orders/' . $form_state['commerce_order']->order_id . '/edit';
@@ -264,7 +264,7 @@ function commerce_order_ui_set_breadcrumb($view_mode = 'administrator') {
       l(t('Home'), '<front>'),
       l(t('Administration'), 'admin'),
       l(t('Store'), 'admin/commerce'),
-      l(t('Orders'), 'admin/commerce/orders'),
+      l(t('Orders', array(), array('context' => 'a drupal commerce order')), 'admin/commerce/orders'),
     );
   }
 

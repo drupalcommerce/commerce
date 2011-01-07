@@ -13,7 +13,7 @@
 function commerce_order_entity_info() {
   $return = array(
     'commerce_order' => array(
-      'label' => t('Order'),
+      'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
       'controller class' => 'CommerceOrderEntityController',
       'base table' => 'commerce_order',
       'revision table' => 'commerce_order_revision',
@@ -29,7 +29,7 @@ function commerce_order_entity_info() {
       ),
       'bundles' => array(
         'commerce_order' => array(
-          'label' => t('Order'),
+          'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
         ),
       ),
       'load hook' => 'commerce_order_load',

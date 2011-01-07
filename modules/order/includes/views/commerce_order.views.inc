@@ -21,7 +21,7 @@ function commerce_order_views_data() {
 
   // Expose the order ID.
   $data['commerce_order']['order_id'] = array(
-    'title' => t('Order ID'),
+    'title' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
     'help' => t('The unique internal identifier of the order.'),
     'field' => array(
       'handler' => 'commerce_order_handler_field_order',
@@ -43,7 +43,7 @@ function commerce_order_views_data() {
 
   // Expose the order number.
   $data['commerce_order']['order_number'] = array(
-    'title' => t('Order number'),
+    'title' => t('Order number', array(), array('context' => 'a drupal commerce order')),
     'help' => t('The unique customer facing number of the order.'),
     'field' => array(
       'handler' => 'commerce_order_handler_field_order',
@@ -62,7 +62,7 @@ function commerce_order_views_data() {
 
   // Expose the order type.
   $data['commerce_order']['type'] = array(
-    'title' => t('Order type'),
+    'title' => t('Order type', array(), array('context' => 'a drupal commerce order')),
     'help' => t('The type of the order.'),
     'field' => array(
       'handler' => 'commerce_order_handler_field_order_type',

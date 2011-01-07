@@ -12,7 +12,7 @@
  */
 function commerce_order_token_info() {
   $type = array(
-    'name' => t('Orders'),
+    'name' => t('Orders', array(), array('context' => 'a drupal commerce order')),
     'description' => t('Tokens related to individual orders.'),
     'needs-data' => 'order',
   );
@@ -21,11 +21,11 @@ function commerce_order_token_info() {
   $order = array();
 
   $order['order-id'] = array(
-    'name' => t('Order ID'),
+    'name' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The unique numeric ID of the order.'),
   );
   $order['order-number'] = array(
-    'name' => t('Order number'),
+    'name' => t('Order number', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The order number displayed to the customer.'),
   );
   $order['edit-url'] = array(

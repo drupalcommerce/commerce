@@ -18,7 +18,7 @@ function commerce_payment_rules_event_info() {
   $events['commerce_payment_methods'] = array(
     'label' => t('Select available payment methods for an order'),
     'group' => t('Commerce Payment'),
-    'variables' => commerce_order_rules_event_variables(t('Order')),
+    'variables' => commerce_order_rules_event_variables(t('Order', array(), array('context' => 'a drupal commerce order'))),
     'access callback' => 'commerce_order_rules_access',
   );
   $events['commerce_payment_transaction_presave'] = array(
@@ -102,7 +102,7 @@ function commerce_payment_rules_action_info() {
     $actions['commerce_payment_enable_' . $payment_method->method_id] = array(
       'label' => t('Enable payment method: @method', array('@method' => $payment_method->title)),
       'parameter' => array(
-        'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order')),
+        'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
         'payment_method' => array(
           'type' => 'commerce_payment_settings',
           'restriction' => 'input',
@@ -121,7 +121,7 @@ function commerce_payment_rules_action_info() {
   $actions['commerce_payment_capture'] = array(
     'label' => t('Capture from a prior authorization'),
     'parameter' => array(
-      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order')),
+      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
       'amount' => array('type' => 'text', 'label' => t('Amount')),
     ),
     'group' => t('Commerce Payment'),

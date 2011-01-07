@@ -122,7 +122,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
   // Add a log checkbox and timestamp field to a history tab.
   $form['order_history'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Order history'),
+    '#title' => t('Order history', array(), array('context' => 'a drupal commerce order')),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#group' => 'additional_settings',
@@ -172,7 +172,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
 
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save order'),
+    '#value' => t('Save order', array(), array('context' => 'a drupal commerce order')),
     '#submit' => $submit + array('commerce_order_order_form_submit'),
     '#weight' => 40,
   );
