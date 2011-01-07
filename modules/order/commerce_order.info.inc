@@ -94,7 +94,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Line items'),
     'description' => t('The line items attached to this order.'),
     'type' => 'list<commerce_line_item>',
-    'getter callback' => 'commerce_order_get_properties',
+    'getter callback' => 'entity_metadata_field_property_get',
   );
 
   return $info;
