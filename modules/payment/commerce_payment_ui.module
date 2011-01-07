@@ -61,7 +61,7 @@ function commerce_payment_ui_menu() {
   );
 
   // Payment method Rules administration page.
-  $items['admin/commerce/config/payment'] = array(
+  $items['admin/commerce/config/payment-methods'] = array(
     'title' => 'Payment methods',
     'description' => 'Enable and configure payment method rule configurations.',
     'page callback' => 'commerce_payment_ui_admin_page',
@@ -71,13 +71,13 @@ function commerce_payment_ui_menu() {
 
   // Add the menu items for the various Rules forms.
   $controller = new RulesUIController();
-  $items += $controller->config_menu('admin/commerce/config/payment');
+  $items += $controller->config_menu('admin/commerce/config/payment-methods');
 
-  $items['admin/commerce/config/payment/add'] = array(
+  $items['admin/commerce/config/payment-methods/add'] = array(
     'title' => 'Add a payment method rule',
     'description' => 'Adds an additional payment method rule configuration.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_payment_ui_add_payment_rule_form', 'admin/commerce/config/payment'),
+    'page arguments' => array('commerce_payment_ui_add_payment_rule_form', 'admin/commerce/config/payment-methods'),
     'access arguments' => array('administer payments'),
     'file path' => drupal_get_path('module', 'rules_admin'),
     'file' => 'rules_admin.inc',
@@ -102,9 +102,10 @@ function commerce_payment_ui_payment_transaction_title($transaction) {
  * Implements hook_menu_local_tasks_alter().
  */
 function commerce_payment_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  // Add action link 'admin/commerce/config/payment/add' on 'admin/commerce/config/payment'.
-  if ($root_path == 'admin/commerce/config/payment') {
-    $item = menu_get_item('admin/commerce/config/payment/add');
+  // Add action link 'admin/commerce/config/payment-methods/add' on
+  // 'admin/commerce/config/payment-methods'.
+  if ($root_path == 'admin/commerce/config/payment-methods') {
+    $item = menu_get_item('admin/commerce/config/payment-methods/add');
     if ($item['access']) {
       $data['actions']['output'][] = array(
         '#theme' => 'menu_local_action',
@@ -119,10 +120,10 @@ function commerce_payment_ui_menu_local_tasks_alter(&$data, $router_item, $root_
  */
 function commerce_payment_ui_help($path, $arg) {
   switch ($path) {
-    case 'admin/commerce/config/payment':
+    case 'admin/commerce/config/payment-methods':
       return t("Payment methods are enabled for use by the rule configurations listed below. An enabled payment rule can specify a payment method to enable using one of the available <em>Enable payment method</em> actions. The action's settings form will contain any necessary settings for the payment method that must be configured before it may be used.");
 
-    case 'admin/commerce/config/payment/add':
+    case 'admin/commerce/config/payment-methods/add':
       return t('After setting the label for this rule configuration, you will be redirected to its empty edit page. There you must add an action enabling a particular payment method for use and any conditions that must be met for a customer to be able to choose the payment method during checkout.');
   }
 }
@@ -201,8 +202,10 @@ function commerce_payment_ui_payment_transaction_delete_form_submit($form, &$for
  * @see rules_admin_add_reaction_rule()
  */
 function commerce_payment_ui_form_commerce_payment_ui_add_payment_rule_form_alter(&$form, &$form_state) {
+  unset($form['settings']['help']);
   $form['settings']['event']['#type'] = 'value';
   $form['settings']['event']['#value'] = 'commerce_payment_methods';
+  $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/payment-methods');
 }
 
 /**

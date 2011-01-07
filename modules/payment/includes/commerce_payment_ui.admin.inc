@@ -22,7 +22,7 @@ function commerce_payment_ui_order_tab($order) {
  *   to display payment method rules.
  */
 function commerce_payment_ui_admin_page() {
-  RulesPluginUI::$basePath = 'admin/commerce/config/payment';
+  RulesPluginUI::$basePath = 'admin/commerce/config/payment-methods';
 
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled payment method rules') . '</h3>';
 
