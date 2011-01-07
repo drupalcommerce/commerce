@@ -42,10 +42,29 @@ function commerce_price_field_validate($entity_type, $entity, $field, $instance,
 }
 
 /**
+ * Implements hook_field_load().
+ */
+function commerce_price_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  // Deserialize additional data.
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      $items[$id][$delta]['data'] = !empty($items[$id][$delta]['data']) ? unserialize($items[$id][$delta]['data']) : array();
+    }
+  }
+}
+
+/**
  * Implements hook_field_presave().
  */
 function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   if ($field['type'] == 'commerce_price') {
+    // Serialize the data field before saving it to the database.
+    foreach ($items as $delta => $item) {
+      if (isset($item['data'])) {
+        $items[$delta]['data'] = serialize($item['data']);
+      }
+    }
+
     // TODO: Convert prices to the appropriate integer value.
   }
 }
