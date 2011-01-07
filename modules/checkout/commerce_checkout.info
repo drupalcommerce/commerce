@@ -7,13 +7,5 @@ dependencies[] = commerce_ui
 dependencies[] = commerce_order
 core = 7.x
 
-; Base module files
-files[] = commerce_checkout.module
-files[] = commerce_checkout.install
-
-; Module includes
-files[] = includes/commerce_checkout.admin.inc
-files[] = includes/commerce_checkout.pages.inc
-
 ; Simple tests
 ; files[] = tests/commerce_checkout.test

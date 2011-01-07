@@ -6,10 +6,6 @@ dependencies[] = commerce
 dependencies[] = rules
 core = 7.x
 
-; Base module files
-files[] = commerce_price.module
-files[] = commerce_price.install
-
 ; Module file includes
 files[] = commerce_price.rules.inc
 files[] = includes/commerce_price.inc

@@ -8,17 +8,10 @@ dependencies[] = commerce_customer
 dependencies[] = commerce_line_item
 core = 7.x
 
-; Base module files
-files[] = commerce_order.module
-files[] = commerce_order.install
-
 ; Module includes
-files[] = commerce_order.info.inc
-files[] = commerce_order.rules.inc
-files[] = commerce_order.tokens.inc
 files[] = includes/commerce_order.controller.inc
 
-; Views include
+; Views includes
 files[] = includes/views/commerce_order.views.inc
 
 ; Views handlers

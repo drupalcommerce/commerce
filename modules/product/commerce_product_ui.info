@@ -8,15 +8,3 @@ dependencies[] = field_ui
 dependencies[] = commerce_ui
 dependencies[] = commerce_product
 dependencies[] = views
-
-; Base module files
-files[] = commerce_product_ui.install
-files[] = commerce_product_ui.module
-
-; Module includes
-files[] = includes/commerce_product_ui.forms.inc
-files[] = includes/commerce_product_ui.products.inc
-files[] = includes/commerce_product_ui.types.inc
-
-; Views includes
-files[] = includes/views/commerce_product_ui.views_default.inc

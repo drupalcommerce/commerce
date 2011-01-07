@@ -6,18 +6,8 @@ dependencies[] = rules
 dependencies[] = commerce_price
 core = 7.x
 
-; Base module files
-files[] = commerce_product.module
-files[] = commerce_product.install
-
 ; Module includes
-files[] = commerce_product.info.inc
-files[] = commerce_product.rules.inc
-files[] = commerce_product.tokens.inc
 files[] = includes/commerce_product.controller.inc
-
-; Views include
-files[] = includes/views/commerce_product.views.inc
 
 ; Views handlers
 files[] = includes/views/handlers/commerce_product_handler_argument_product_id.inc
@@ -27,7 +17,7 @@ files[] = includes/views/handlers/commerce_product_handler_field_product_link.in
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_delete.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_link_edit.inc
 files[] = includes/views/handlers/commerce_product_handler_field_product_operations.inc
-files[] = includes/views/handlers/commerce_product_handler_filter_product_type.inc
+;files[] = includes/views/handlers/commerce_product_handler_filter_product_type.inc
 
 ; Simple tests
 files[] = tests/commerce_product.test

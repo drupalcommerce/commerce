@@ -7,7 +7,3 @@ dependencies[] = commerce_price
 dependencies[] = commerce_product
 dependencies[] = options
 core = 7.x
-
-; Base module files
-files[] = commerce_product_reference.module
-files[] = commerce_product_reference.install

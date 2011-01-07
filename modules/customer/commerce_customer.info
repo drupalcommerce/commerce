@@ -6,15 +6,8 @@ dependencies[] = addressfield
 dependencies[] = commerce
 core = 7.x
 
-; Base module files
-files[] = commerce_customer.module
-files[] = commerce_customer.install
-
 ; Module includes
 files[] = includes/commerce_customer_profile.controller.inc
-
-; Views include
-files[] = includes/views/commerce_customer.views.inc
 
 ; Views handlers
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile.inc

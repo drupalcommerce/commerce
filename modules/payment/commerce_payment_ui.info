@@ -8,9 +8,3 @@ dependencies[] = commerce_order
 dependencies[] = commerce_order_ui
 dependencies[] = commerce_payment
 core = 7.x
-
-; Base module files
-files[] = commerce_payment_ui.module
-
-; Views include
-files[] = includes/views/commerce_payment_ui.views_default.inc
