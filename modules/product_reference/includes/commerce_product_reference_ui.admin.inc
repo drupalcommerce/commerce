@@ -11,7 +11,7 @@
  * Builds the product sell price calculation Rules Overview page.
  */
 function commerce_product_reference_ui_sell_price_rules() {
-  RulesPluginUI::$basePath = 'admin/commerce/products/price-calculation';
+  RulesPluginUI::$basePath = 'admin/commerce/products/pricing-rules';
 
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled sell price calculation rules') . '</h3>';
 
