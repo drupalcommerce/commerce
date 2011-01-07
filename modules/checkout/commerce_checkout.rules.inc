@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Rules integration for checkout.
+ * Rules integration for the checkout process.
  *
  * @addtogroup rules
  * @{
@@ -14,17 +14,19 @@
  */
 function commerce_checkout_rules_event_info() {
   $events = array();
-  
+
   $events['commerce_checkout_complete'] = array(
-    'label' => t('Completion of the checkout flow'),
-    'group' => t('Commerce - checkout'),
+    'label' => t('Completing the checkout process'),
+    'group' => t('Commerce Checkout'),
     'variables' => array(
       'order' => array(
         'type' => 'commerce_order',
-        'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
-        'skip save' => FALSE,
+        'label' => t('Completed order', array(), array('context' => 'a drupal commerce order')),
       ),
-      'account' => array('type' => 'user', 'label' => t('User completed checkout'))
+      'account' => array(
+        'type' => 'user',
+        'label' => t('User account of completed order'),
+      ),
     ),
     'access callback' => 'commerce_order_rules_access',
   );

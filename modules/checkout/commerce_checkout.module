@@ -640,8 +640,8 @@ function commerce_checkout_complete($form, &$form_state, $order) {
     $function($form, $form_state, $order);
   }
 
-  // Invoke the rules event.
-  rules_invoke_event_by_args('commerce_checkout_complete', array($order, $order->uid == 0 && $account ? $account : $user));
+  // Invoke the Rules event.
+  rules_invoke_event('commerce_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
 }
 
 /**
