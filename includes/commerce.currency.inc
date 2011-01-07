@@ -868,6 +868,16 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Para'),
       'major_unit' => t('Dinars'),
     ),
+    'RUB' => array(
+      'code' => 'RUB',
+      'symbol' => 'руб.',
+      'name' => t('Russian Ruble'),
+      'numeric_code' => '643',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Kopek'),
+      'major_unit' => t('Ruble'),
+    ),
     'SAR' => array(
       'code' => 'SAR',
       'symbol' => 'SR',
