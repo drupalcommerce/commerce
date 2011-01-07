@@ -242,18 +242,10 @@ function commerce_product_pre_calculation_key() {
   $state = new RulesState();
 
   foreach ($event as $rule) {
-    if (count($rule->conditions()) > 0) {
-      $pass = TRUE;
-
-      foreach ($rule->conditions() as $condition) {
-        if (!$condition->evaluate($state)) {
-          $pass = FALSE;
-        }
-      }
-
-      if ($pass) {
-        $rule_names[] = $rule->name;
-      }
+    // Only add Rules with conditions that evaluate to TRUE.
+    if (count($rule->conditions()) > 0 &&
+      $rule->conditionContainer()->evaluate($state)) {
+      $rule_names[] = $rule->name;
     }
   }
 
