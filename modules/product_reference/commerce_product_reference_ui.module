@@ -20,6 +20,8 @@ function commerce_product_reference_ui_menu() {
     'description' => 'Enable and configure product sell price calculation rule configurations.',
     'page callback' => 'commerce_product_reference_ui_sell_price_rules',
     'access arguments' => array('administer sell price calculation'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -5,
     'file' => 'includes/commerce_product_reference_ui.admin.inc',
   );
 
