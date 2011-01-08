@@ -177,15 +177,7 @@ function commerce_cart_form_submit($form, &$form_state) {
   foreach (element_children($form['line_items']) as $line_item_id) {
     // Check for the removal of an item.
     if ($form_state['clicked_button']['#name'] == 'remove-line-item-' . $line_item_id) {
-      // Remove the line item from the line item reference field.
-      foreach ($order->line_items[LANGUAGE_NONE] as $key => $value) {
-        if ($value['line_item_id'] == $line_item_id) {
-          unset($order->line_items[LANGUAGE_NONE][$key]);
-        }
-      }
-
-      // Delete the actual line item.
-      commerce_line_item_delete($line_item_id);
+      commerce_cart_order_product_line_item_delete($order, $line_item_id);
     }
     else {
       // Otherwise if there is a change in quantity...

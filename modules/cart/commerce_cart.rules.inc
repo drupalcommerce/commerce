@@ -29,6 +29,13 @@ function commerce_cart_rules_event_info() {
     'access callback' => 'commerce_order_rules_access',
   );
 
+  $events['commerce_cart_product_remove'] = array(
+    'label' => t('After removing a product from the cart'),
+    'group' => t('Commerce Cart'),
+    'variables' => commerce_cart_rules_event_variables(TRUE),
+    'access callback' => 'commerce_order_rules_access',
+  );
+
   return $events;
 }
 
