@@ -419,19 +419,6 @@ function commerce_product_valid_pre_calculation_product($product) {
 }
 
 /**
- * Implements hook_views_query_alter().
- *
-function commerce_product_reference_views_query_alter($view) {
-  // If the View has a purchase price field on it that should display as a
-  // calculated sell price...
-  if (!empty($view->field['entity_id']) &&
-    $view->field['entity_id']->definition['field_name'] == 'purchase_price' &&
-    $view->field['entity_id']->options['settings']['calculation'] == 'calculated_sell_price') {
-    // TODO: Alter the View to pull price data from commerce_calculated_price.
-  }
-}
-
-/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
