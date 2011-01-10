@@ -17,6 +17,7 @@ function commerce_payment_example_commerce_payment_method_info() {
   $payment_methods['commerce_payment_example'] = (object) array(
     'title' => t('Example payment'),
     'description' => t('Demonstrates complete payment during checkout and serves as a development example.'),
+    'active' => TRUE,
   );
 
   return $payment_methods;
