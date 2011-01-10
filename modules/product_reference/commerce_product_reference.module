@@ -55,29 +55,26 @@ function commerce_product_reference_field_extra_fields() {
  * display if the product contains a non-empty product reference field.
  */
 function commerce_product_reference_node_view($node, $view_mode = 'full') {
+  $wrapper = entity_metadata_wrapper('node', $node);
+
   // Loop through product reference fields to see if any exist on this node
   // type's bundle that is either hidden or displayed with the Add to Cart form
   // display formatter.
   foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
-    if (in_array($node->type, $field['bundles']['node']) &&
-      !empty($node->{$field_name}[LANGUAGE_NONE]) &&
-      (!isset($node->content[$field_name]) ||
-      $node->content[$field_name]['#formatter'] == 'commerce_cart_add_to_cart_form')) {
+    if (in_array($node->type, $field['bundles']['node'])) {
       // Find the default product based on the cardinality of the field.
       if ($field['cardinality'] == 1) {
-        $product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][0]['product_id']);
+        $product = $wrapper->{$field_name}->value();
       }
       else {
-        // Find the first existing referenced product.
-        $product = NULL;
-
-        for ($key = 0, $count = $node->{$field_name}[LANGUAGE_NONE]; empty($product) && $key < $count; $key++) {
-          $product = commerce_product_load($node->{$field_name}[LANGUAGE_NONE][$key]['product_id']);
-        }
+        $product = $wrapper->{$field_name}->get(0)->value();
       }
 
-      // If a default product was actually found...
-      if (!empty($product)) {
+      // If a product was found and the reference field is either hidden or set
+      // to display as an Add to Cart form...
+      if (!empty($product) && (!isset($node->content[$field_name]) ||
+        $node->content[$field_name]['#formatter'] == 'commerce_cart_add_to_cart_form')) {
+
         // Add the display context for these field to the product.
         $product->display_context = array(
           'entity_type' => 'node',
