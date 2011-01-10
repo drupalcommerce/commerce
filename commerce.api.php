@@ -46,6 +46,10 @@
  *   - decimal_separator: The char to split the integer from the decimal part.
  *     Default: .
  *   - format_callback: Custom callback function to format a price value.
+ *   - conversion_rate: The conversion rate of this currency calculated against
+ *     the base currency, expressed as a decimal value denoting the value of
+ *     one majur unit of this currency when converted to the base currency.
+ *     Default: 1
  *
  * @see hook_commerce_currency_info_alter()
  */
@@ -71,6 +75,10 @@ function hook_commerce_currency_info() {
  * By default Commerce provides all active currencies according to ISO 4217.
  * This hook allows you to change the formatting properties of existing
  * definitions.
+ *
+ * Additionally, because every currency's default conversion rate is 1, this
+ * hook can be used to populate currency conversion rates with meaningful
+ * values.
  *
  * @see hook_commerce_currency_info()
  */
