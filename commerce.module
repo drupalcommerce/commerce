@@ -218,6 +218,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       'symbol_placement' => '',
       'code_placement' => 'after',
       'format_callback' => '',
+      'conversion_rate' => 1,
     );
 
     // Include the currency file and invoke the currency info hook.
@@ -348,8 +349,8 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
  * Swiss Francs are rounded using a step size of 0.05. This means a price of
  * 10.93 is converted to 10.95.
  *
- * @param $price
- *   The numeric value of the price to be rounded.
+ * @param $amount
+ *   The numeric amount value of the price to be rounded.
  * @param $currency
  *   The currency object containing the rounding information pertinent to this
  *     price. Specifically, this function looks for the 'rounding_step' property
@@ -358,15 +359,49 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
  *     decimal value.
  *
  * @return
- *   The rounded numeric value for the price.
+ *   The rounded numeric amount value for the price.
  */
-function commerce_currency_round($price, $currency) {
+function commerce_currency_round($amount, $currency) {
   if (!$currency->rounding_step) {
-    return round($price, $currency->decimals);
+    return round($amount, $currency->decimals);
   }
 
   $modifier = 1 / $currency->rounding_step;
-  return round($price * $modifier) / $modifier;
+
+  return round($amount * $modifier) / $modifier;
+}
+
+/**
+ * Converts a price amount from a currency to the target currency based on the
+ *   current currency conversion rates.
+ *
+ * The Commerce module establishes a default conversion rate for every currency
+ * as 1, so without any additional information there will be a 1:1 conversion
+ * from one currency to the next. Other modules can provide UI based or web
+ * service based alterations to the conversion rate of the defined currencies as
+ * long as every rate is calculated relative to a single base currency. It does
+ * not matter which currency is the base currency as long as the same one is
+ * used for every rate calculation.
+ *
+ * To convert an amount from one currency to another, we simply take the amount
+ * value and multiply it by the current currency's conversion rate divided by
+ * the target currency's conversion rate.
+ *
+ * @param $amount
+ *   The numeric amount value of the price to be rounded.
+ * @param $currency_code
+ *   The currency code for the current currency of the price.
+ * @param $target_currency_code
+ *   The currency code for the target currency of the price.
+ *
+ * @return
+ *   The numeric amount value converted to its equivalent in the target currency.
+ */
+function commerce_currency_convert($amount, $currency_code, $target_currency_code) {
+  $currency = commerce_currency_load($currency_code);
+  $target_currency = commerce_currency_load($target_currency_code);
+
+  return $amount * ($currency->conversion_rate / $target_currency->conversion_rate);
 }
 
 /**
