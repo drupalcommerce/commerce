@@ -395,8 +395,10 @@ function commerce_product_valid_pre_calculation_rule($rule) {
     }
   }
 
-  // TODO: Add a way for otherwise valid rule configurations to "opt out" of
-  // being included in pre-calculation.
+  // Allow other modules to invalidate this rule configuration.
+  if (in_array(FALSE, module_invoke_all('commerce_product_valid_pre_calculation_rule', $rule))) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -411,9 +413,10 @@ function commerce_product_valid_pre_calculation_rule($rule) {
  *   TRUE or FALSE indicating whether or not the product is valid.
  */
 function commerce_product_valid_pre_calculation_product($product) {
-  // TODO: Add a hook for modules to prevent products from being included in
-  // pre-calculation; e.g. for products that will never appear in Views that are
-  // sorted or filtered by the sell price.
+  // Allow other modules to invalidate this product.
+  if (in_array(FALSE, module_invoke_all('commerce_product_valid_pre_calculation_product', $product))) {
+    return FALSE;
+  }
 
   return TRUE;
 }
