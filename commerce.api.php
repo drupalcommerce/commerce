@@ -78,7 +78,8 @@ function hook_commerce_currency_info() {
  *
  * Additionally, because every currency's default conversion rate is 1, this
  * hook can be used to populate currency conversion rates with meaningful
- * values.
+ * values. Conversion rates can be calculated using any currency as the base
+ * currency as long as the same base currency is used for every rate.
  *
  * @see hook_commerce_currency_info()
  */
