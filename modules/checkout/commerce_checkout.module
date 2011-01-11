@@ -625,14 +625,6 @@ function commerce_checkout_complete($form, &$form_state, $order) {
     }
   }
 
-  // Move the order status to the default "Pending" status if it hasn't
-  // already been updated.
-  // TODO: Move this to Rules.
-  if (FALSE && $order->status == $form_state['order']->status) {
-    $order_state = commerce_order_state_load('pending');
-    $order = commerce_order_status_update($order, $order_state->default_status);
-  }
-
   // Allow other modules to react to checkout completion. We need to pass
   // $form_state by reference, so we can't use rules_invoke_all().
   foreach (module_implements('commerce_checkout_complete') as $module) {

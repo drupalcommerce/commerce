@@ -85,5 +85,37 @@ function commerce_order_rules_access($type, $name) {
 }
 
 /**
+ * Implements hook_rules_action_info().
+ */
+function commerce_order_rules_action_info() {
+  $actions = array();
+
+  $actions['commerce_order_update_status'] = array(
+    'label' => t('Update the order status'),
+    'parameter' => array(
+      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
+      'order_status' => array(
+        'type' => 'text',
+        'label' => t('Order status'),
+        'options list' => 'commerce_order_status_options_list',
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_update_status',
+    ),
+  );
+
+  return $actions;
+}
+
+/**
+ * Rules action: updates an order's status using the Order API.
+ */
+function commerce_order_rules_update_status($order, $name) {
+  commerce_order_status_update($order, $name);
+}
+
+/**
  * @}
  */

@@ -272,12 +272,12 @@ function commerce_payment_post_redirect_form($action, array $values = array()) {
 function _commerce_payment_redirect_pane_next_page($form, &$form_state, $order) {
   $next_page = $form_state['checkout_page']->next_page;
 
+  $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+
   // Inform modules of checkout completion if the next page is Completed.
   if ($next_page == 'complete') {
     commerce_checkout_complete($form, $form_state, $order);
   }
-
-  $order = commerce_order_status_update($order, 'checkout_' . $next_page);
 
   drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
 }

@@ -213,17 +213,16 @@ function commerce_checkout_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == $form_state['values']['continue']) {
     // If there is another checkout page...
     if ($checkout_page->next_page) {
+      // Update the order status to reflect the next checkout page.
+      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
+
       // If it happens to be the complete page, process completion now.
       if ($checkout_page->next_page == 'complete') {
-        // Or go ahead and complete the sale.
         commerce_checkout_complete($form, $form_state, $order);
       }
 
-      // Move the form forward to that page.
+      // Redirect to the next checkout page.
       $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->next_page;
-
-      // Update the order status for the checkout step.
-      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
     }
   }
 }
