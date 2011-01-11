@@ -607,6 +607,13 @@ function commerce_order_state_get_title($name = NULL) {
 }
 
 /**
+ * Wraps commerce_order_state_get_title() for use by the Entity module.
+ */
+function commerce_order_state_options_list() {
+  return commerce_order_state_get_title();
+}
+
+/**
  * Returns an array of some or all of the order statuses keyed by name.
  *
  * Order statuses can only be defined by modules but may have settings

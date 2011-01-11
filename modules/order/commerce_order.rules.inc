@@ -90,6 +90,23 @@ function commerce_order_rules_access($type, $name) {
 function commerce_order_rules_action_info() {
   $actions = array();
 
+  $actions['commerce_order_update_state'] = array(
+    'label' => t('Update the order state'),
+    'parameter' => array(
+      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
+      'order_state' => array(
+        'type' => 'text',
+        'label' => t('Order state'),
+        'description' => t('Select the order state whose default status the order will be updated to.'),
+        'options list' => 'commerce_order_state_options_list',
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_update_state',
+    ),
+  );
+
   $actions['commerce_order_update_status'] = array(
     'label' => t('Update the order status'),
     'parameter' => array(
@@ -107,6 +124,15 @@ function commerce_order_rules_action_info() {
   );
 
   return $actions;
+}
+
+/**
+ * Rules action: updates an order's status to the default status of the given
+ *   order state.
+ */
+function commerce_order_rules_update_state($order, $name) {
+  $order_state = commerce_order_state_load($name);
+  commerce_order_status_update($order, $order_state->default_status);
 }
 
 /**
