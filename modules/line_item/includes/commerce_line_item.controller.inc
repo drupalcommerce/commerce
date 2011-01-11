@@ -42,16 +42,15 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *   The saved line item object.
    */
   public function save($line_item) {
+    $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $transaction = db_transaction();
 
     try {
       $line_item->changed = REQUEST_TIME;
 
       // Update the total of the line item based on the quantity and unit price.
-      $line_item->total[LANGUAGE_NONE][0] = array(
-        'amount' => $line_item->quantity * $line_item->unit_price[LANGUAGE_NONE][0]['amount'],
-        'currency_code' => $line_item->unit_price[LANGUAGE_NONE][0]['currency_code'],
-      );
+      $wrapper->total->amount = $line_item->quantity * $wrapper->unit_price->amount->value();
+      $wrapper->total->currency_code = $wrapper->unit_price->currency_code->value();
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_line_item', $line_item);
