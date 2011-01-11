@@ -150,6 +150,22 @@ function commerce_line_item_rules_action_info() {
     'group' => t('Commerce Line Item'),
   );
 
+  $actions['commerce_line_item_unit_price_currency_convert'] = array(
+    'label' => t("Convert the unit price to a different currency"),
+    'parameter' => array(
+      'line_item' => array(
+        'type' => 'commerce_line_item',
+        'label' => t('Line item'),
+      ),
+      'currency_code' => array(
+        'type' => 'text',
+        'label' => t('Currency'),
+        'options list' => 'commerce_currency_get_code',
+      ),
+    ),
+    'group' => t('Commerce Line Item'),
+  );
+
   return $actions;
 }
 
@@ -208,6 +224,15 @@ function commerce_line_item_unit_price_amount($line_item, $amount) {
  */
 function commerce_line_item_unit_price_currency_code($line_item, $currency_code) {
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $wrapper->unit_price->currency_code = $currency_code;
+}
+
+/**
+ * Rules action: convert the unit price to a different currency.
+ */
+function commerce_line_item_unit_price_currency_convert($line_item, $currency_code) {
+  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $wrapper->unit_price->amount = commerce_currency_convert($wrapper->unit_price->amount->value(), $wrapper->unit_price->currency_code->value(), $currency_code);
   $wrapper->unit_price->currency_code = $currency_code;
 }
 
