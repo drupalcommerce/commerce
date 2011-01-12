@@ -381,17 +381,22 @@ function commerce_cart_commerce_line_item_delete($line_item) {
 
   $query = new EntityFieldQuery();
 
-  $query
+  // Look for any order referencing this line item.
+  $result = $query
     ->entityCondition('entity_type', 'commerce_order')
     ->fieldCondition('line_items', 'line_item_id', $line_item->line_item_id, '=')
     ->execute();
 
-  foreach ($query->ordered_results as $entity) {
-    $order = commerce_order_load($entity->entity_id);
-
-    if (in_array($order->status, $status_ids)) {
-      $order->status = 'cart';
-      commerce_order_save($order);
+  // If we received a result set...
+  if (!empty($result['commerce_order'])) {
+    // Loop through each item that we found.
+    foreach (commerce_order_load_multiple(array_keys($result['commerce_order'])) as $order) {
+      // If the current order's status is a shopping cart order status...
+      if (in_array($order->status, $status_ids)) {
+        // Reset the order to the Cart status directly.
+        $order->status = 'cart';
+        commerce_order_save($order);
+      }
     }
   }
 }

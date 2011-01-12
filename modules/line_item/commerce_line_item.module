@@ -207,9 +207,10 @@ function commerce_line_item_commerce_line_item_delete($line_item) {
  * When an entity is deleted, this hook is invoked so any attached fields can
  * do necessary clean-up. Because line items can't exist apart from a line item
  * reference field, this function checks the entity being deleted for any
- * referenced line items and deletes them.
+ * referenced line items that are orphaned and deletes them.
  */
 function commerce_line_item_field_attach_delete($entity_type, $entity) {
+  $wrapper = entity_metadata_wrapper($entity_type, $entity);
   $entity_info = entity_get_info($entity_type);
 
   // If the entity being deleted has a bundle...
@@ -223,16 +224,36 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
     $bundle = $entity_type;
   }
 
-  // Find any line item reference fields on this order and delete the
+  // Find any line item reference fields on this entity and delete any orphan
   // referenced line items.
   $line_item_ids = array();
 
-  foreach (field_info_instances($entity_type, $bundle) as $key => $value) {
+  foreach (field_info_instances($entity_type, $bundle) as $field_name => $field) {
     // Only examine line item reference fields using the manager widget.
-    if ($value['widget']['type'] == 'commerce_line_item_manager' && !empty($entity->{$key}[LANGUAGE_NONE])) {
-      // Add the IDs of the reference line items to the array.
-      foreach ($entity->{$key}[LANGUAGE_NONE] as $item) {
-        $line_item_ids[] = $item['line_item_id'];
+    if ($field['widget']['type'] == 'commerce_line_item_manager' && $wrapper->{$field_name}->count() > 0) {
+      // Loop over each line item referenced on this field...
+      foreach ($wrapper->{$field_name} as $delta => $line_item_wrapper) {
+        // To determine if it's still an orphan (i.e. no other entities reference
+        // this line item through any line item reference field).
+        $orphan = TRUE;
+
+        // Loop over each line item reference field to look for references.
+        foreach (commerce_info_fields('commerce_line_item_reference') as $key => $value) {
+          $query = new EntityFieldQuery();
+          $query->fieldCondition($key, 'line_item_id', $line_item_wrapper->line_item_id->value(), '=')->count();
+
+          // If some entity still references this line item through this field...
+          if ($query->execute() > 0) {
+            // It is not an orphan.
+            $orphan = FALSE;
+          }
+        }
+
+        // If this line item is an orphan, add it to the array of line items to
+        // be deleted.
+        if ($orphan) {
+          $line_item_ids[] = $line_item_wrapper->line_item_id->value();
+        }
       }
     }
   }
