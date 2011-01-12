@@ -170,6 +170,38 @@ function commerce_line_item_permission() {
 }
 
 /**
+ * Implements hook_commerce_line_item_delete().
+ *
+ * When a line item is deleted, any object referencing it should have its field
+ * data updated so the reference is wiped.
+ */
+function commerce_line_item_commerce_line_item_delete($line_item) {
+  // Check the data in every line item reference field.
+  foreach (commerce_info_fields('commerce_line_item_reference') as $field_name => $field) {
+    // Query for any entity referencing the deleted line item in this field.
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'line_item_id', $line_item->line_item_id, '=');
+    $result = $query->execute();
+
+    // If results were returned...
+    if (!empty($result)) {
+      // Loop over results for each type of entity returned.
+      foreach ($result as $entity_type => $data) {
+        // Load the entities of the current type.
+        $entities = entity_load($entity_type, array_keys($data));
+
+        // Loop over each entity and remove the reference to the deleted line item.
+        foreach ($entities as $entity_id => $entity) {
+          $order = commerce_line_item_reference_delete($entity_type, $entity, $field_name, $line_item->line_item_id);
+
+          commerce_order_save($order);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_attach_delete().
  *
  * When an entity is deleted, this hook is invoked so any attached fields can
@@ -921,6 +953,25 @@ function commerce_line_item_property_info_callback(&$info, $entity_type, $field,
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
   $property['options list'] = 'entity_metadata_field_options_list';
   unset($property['query callback']);
+}
+
+/**
+ * Deletes the reference to a specific line item from the line item reference
+ *   field on the given entity.
+ */
+function commerce_line_item_reference_delete($entity_type, $entity, $field_name, $line_item_id) {
+  $wrapper = entity_metadata_wrapper($entity_type, $entity);
+
+  // Loop over every line item referenced by the specified field.
+  foreach ($wrapper->{$field_name} as $delta => $line_item_wrapper) {
+    // If its ID matches the specified line item...
+    if ($line_item_wrapper->line_item_id->value() == $line_item_id) {
+      // Unset it and return the updated order object.
+      $wrapper->line_items->offsetUnset($delta);
+
+      return $wrapper->value();
+    }
+  }
 }
 
 /**
