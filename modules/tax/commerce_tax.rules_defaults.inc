@@ -15,8 +15,15 @@ function commerce_tax_default_rules_configuration() {
   // Loop over every tax rate looking for rates requiring a default component.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
     if ($tax_rate->component) {
-      // Create a new rules component.
-      $rule = rule(commerce_tax_rate_component_variables($tax_rate->order_context));
+      // Load the tax type data for the curent rate.
+      $tax_type = commerce_tax_type_load($tax_rate->type);
+
+      // Check whether or not taxes of this type require the order context to
+      // determine the applicability of the tax rate.
+      $order_context = $tax_type ? $tax_type->order_context : FALSE;
+
+      // Create a new rules component using variables based on the tax type.
+      $rule = rule(commerce_tax_rate_component_variables($order_context));
 
       $rule->label = t('Calculate @title', array('@title' => $tax_rate->title));
 
