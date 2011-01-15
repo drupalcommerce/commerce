@@ -81,7 +81,7 @@ function commerce_tax_rules_action_info() {
  */
 function commerce_tax_rate_rules_apply($line_item, $name) {
   if ($tax_rate = commerce_tax_rate_load($name)) {
-    commerce_tax_rate_apply($line_item, $tax_rate);
+    commerce_tax_rate_apply($tax_rate, $line_item);
   }
 }
 
@@ -91,8 +91,7 @@ function commerce_tax_rate_rules_apply($line_item, $name) {
  */
 function commerce_tax_calculate_by_type($line_item, $tax_type_name) {
   if ($tax_type = commerce_tax_type_load($tax_type_name)) {
-    // TODO: Load and evaluate every tax rate component that requires only a
-    // line item.
+    commerce_tax_type_calculate_rates($tax_type, $line_item);
   }
 }
 
@@ -102,8 +101,7 @@ function commerce_tax_calculate_by_type($line_item, $tax_type_name) {
  */
 function commerce_tax_calculate_order_by_type($line_item, $order, $tax_type_name) {
   if ($tax_type = commerce_tax_type_load($tax_type_name)) {
-    // TODO: Load and evaluate every tax rate component that requires a line
-    // item and an order.
+    commerce_tax_type_calculate_rates($tax_type, $line_item, $order);
   }
 }
 

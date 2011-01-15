@@ -14,7 +14,9 @@
  *   An array of information about tax types available for use by rates. The
  *   returned array should be an associative array of tax type arrays keyed by
  *   the tax type name. Each tax type array can include the following keys:
- *   - title: the display title of the tax type
+ *   - title: the title of the tax type
+ *   - display_title: a display title for the tax type suitable for presenting
+ *       to customers if necessary; defaults to the title
  *   - description: a short description of the tax type
  *   - display_inclusive: boolean indicating whether or not prices containing
  *       this tax will include the tax amount in the displayed price; defaults
@@ -50,7 +52,9 @@ function hook_commerce_tax_type_info_alter(&$tax_types) {
  *   An array of information about available tax rates. The returned array
  *   should be an associative array of tax rate arrays keyed by the tax rate
  *   name. Each tax rate array can include the following keys:
- *   - title: the display title of the tax rate
+ *   - title: the title of the tax rate
+ *   - display_title: a display title for the tax type suitable for presenting
+ *       to customers if necessary; defaults to the title
  *   - description: a short description of the tax rate
  *   - rate: the percentage used to calculate this tax expressed as a decimal
  *   - type: the name of the tax type this rate belongs to
@@ -77,4 +81,22 @@ function hook_commerce_tax_rate_info() {
  */
 function hook_commerce_tax_rate_info_alter(&$tax_rates) {
   $tax_rates['ky_sales_tax']['rate'] = .0625;
+}
+
+/**
+ * Allows modules to calculate taxes that don't determine applicability through
+ *   default Rules components.
+ *
+ * @param $tax_type
+ *   The tax type object whose rates should be calculated.
+ * @param $line_item
+ *   The line item to which the taxes should be applied.
+ * @param $order
+ *   If available, the order to which the line items belong.
+ *
+ * @see commerce_tax_type_calculate_rates()
+ */
+function hook_commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL) {
+  // An implementation might contact a web service and apply the tax to the unit
+  // price of the line item based on the returned data.
 }

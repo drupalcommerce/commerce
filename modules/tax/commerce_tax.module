@@ -25,6 +25,7 @@ function commerce_tax_types() {
         // Initialize tax rate properties if necessary.
         $defaults = array(
           'name' => $name,
+          'display_title' => $tax_type['title'],
           'description' => '',
           'display_inclusive' => FALSE,
           'order_context' => FALSE,
@@ -94,6 +95,7 @@ function commerce_tax_rates() {
         // Initialize tax rate properties if necessary.
         $defaults = array(
           'name' => $name,
+          'display_title' => $tax_rate['title'],
           'description' => '',
           'rate' => 0,
           'type' => '',
@@ -148,14 +150,53 @@ function commerce_tax_rate_titles() {
 }
 
 /**
+ * Calculates taxes of a particular type by invoking any components that match
+ *   the tax type and arguments passed.
+ *
+ * @param $tax_type
+ *   The tax type object whose rates should be calculated.
+ * @param $line_item
+ *   The line item to which the taxes should be applied.
+ * @param $order
+ *   If available, the order to which the line items belong.
+ */
+function commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL) {
+  // Load all the rule components.
+  $components = rules_get_components(FALSE, 'action');
+
+  // Loop over each tax rate in search of matching components.
+  foreach (commerce_tax_rates() as $name => $tax_rate) {
+    // If the current rate matches the type and specifies a default component...
+    if ($tax_rate->type == $tax_type->name && $tax_rate->component) {
+      $component_name = 'commerce_tax_rate_' . $name;
+
+      // If we can load the current rate's component...
+      if (!empty($components[$component_name])) {
+        // Invoke it using the appropriate arguments for the type.
+        if ($tax_type->order_context) {
+          rules_invoke_component($component_name, $line_item, $order);
+        }
+        else {
+          rules_invoke_component($component_name, $line_item);
+        }
+      }
+    }
+  }
+
+  // Allow modules handling tax application on their own to apply rates of the
+  // current type as well.
+  module_invoke_all('commerce_tax_type_calculate_rates', $tax_type, $line_item, $order);
+}
+
+/**
  * Applies a tax rate to the unit price of a line item.
  *
- * @param $line_item
- *   The line item whose unit price will be modified to include the tax.
  * @param $tax_rate
  *   The tax rate to apply to the line item.
+ * @param $line_item
+ *   The line item whose unit price will be modified to include the tax.
  */
-function commerce_tax_rate_apply($line_item, $tax_rate) {
+function commerce_tax_rate_apply($tax_rate, $line_item) {
   // If a valid rate is specified...
   if (is_numeric($tax_rate->rate)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
