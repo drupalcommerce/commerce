@@ -1,0 +1,120 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Defines tax rates and Rules integration for configuring tax rules for
+ *   applicability and display.
+ */
+
+
+/**
+ * Returns an array of tax type objects keyed by name.
+ */
+function commerce_tax_types() {
+  // First check the static cache for a tax types array.
+  $tax_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($tax_types)) {
+    $tax_types = array();
+
+    // Find tax types defined by hook_commerce_tax_type_info().
+    foreach (module_implements('commerce_tax_type_info') as $module) {
+      foreach (module_invoke($module, 'commerce_tax_type_info') as $name => $tax_type) {
+        // Initialize tax rate properties if necessary.
+        $defaults = array(
+          'name' => $name,
+          'description' => '',
+          'display_inclusive' => FALSE,
+          'module' => $module,
+        );
+
+        $tax_types[$name] = (object) array_merge($defaults, $tax_type);
+      }
+    }
+
+    // Last allow the info to be altered by other modules.
+    drupal_alter('commerce_tax_type_info', $tax_types);
+  }
+
+  return $tax_types;
+}
+
+/**
+ * Resets the cached list of tax types.
+ */
+function commerce_tax_types_reset() {
+  $tax_types = &drupal_static('commerce_tax_types');
+  $tax_types = NULL;
+}
+
+/**
+ * Returns a single tax type object.
+ *
+ * @param $name
+ *   The name of the tax type to return.
+ *
+ * @return
+ *   The specified tax type object or FALSE if it did not exist.
+ */
+function commerce_tax_type_load($name) {
+  $tax_types = commerce_tax_types();
+  return empty($tax_types[$name]) ? FALSE : $tax_types[$name];
+}
+
+/**
+ * Returns an array of tax rate objects keyed by name.
+ */
+function commerce_tax_rates() {
+  // First check the static cache for a tax rates array.
+  $tax_rates = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($tax_rates)) {
+    $tax_rates = array();
+
+    // Find tax rates defined by hook_commerce_tax_rate_info().
+    foreach (module_implements('commerce_tax_rate_info') as $module) {
+      foreach (module_invoke($module, 'commerce_tax_rate_info') as $name => $tax_rate) {
+        // Initialize tax rate properties if necessary.
+        $defaults = array(
+          'name' => $name,
+          'description' => '',
+          'rate' => 0,
+          'type' => '',
+          'module' => $module,
+        );
+
+        $tax_rates[$name] = (object) array_merge($defaults, $tax_rate);
+      }
+    }
+
+    // Last allow the info to be altered by other modules.
+    drupal_alter('commerce_tax_rate_info', $tax_rates);
+  }
+
+  return $tax_rates;
+}
+
+/**
+ * Resets the cached list of tax rates.
+ */
+function commerce_tax_rates_reset() {
+  $tax_rates = &drupal_static('commerce_tax_rates');
+  $tax_rates = NULL;
+}
+
+/**
+ * Returns a single tax rate object.
+ *
+ * @param $name
+ *   The name of the tax rate to return.
+ *
+ * @return
+ *   The specified tax rate object or FALSE if it did not exist.
+ */
+function commerce_tax_rate_load($name) {
+  $tax_rates = commerce_tax_rates();
+  return empty($tax_rates[$name]) ? FALSE : $tax_rates[$name];
+}
