@@ -3,6 +3,7 @@ name = Tax
 description = Define tax rates and configure tax rules for applicability and display.
 package = Commerce
 dependencies[] = rules
+dependencies[] = commerce_line_item
 dependencies[] = commerce_price
 core = 7.x
 

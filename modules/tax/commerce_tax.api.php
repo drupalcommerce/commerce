@@ -19,6 +19,9 @@
  *   - display_inclusive: boolean indicating whether or not prices containing
  *       this tax will include the tax amount in the displayed price; defaults
  *       to FALSE
+ *   - order_context: boolean indicating whether or not tax rates of this type
+ *       require an order context to be calculated (i.e. sales tax based on the
+ *       shipping location); defaults to FALSE
  */
 function hook_commerce_tax_type_info() {
   $tax_types = array();
@@ -51,6 +54,9 @@ function hook_commerce_tax_type_info_alter(&$tax_types) {
  *   - description: a short description of the tax rate
  *   - rate: the percentage used to calculate this tax expressed as a decimal
  *   - type: the name of the tax type this rate belongs to
+ *   - component: boolean indicating whether or not this rate will get its own
+ *       default Rules component used for determining the applicability of the
+ *       tax to a line item; defaults to TRUE
  */
 function hook_commerce_tax_rate_info() {
   $tax_rates = array();

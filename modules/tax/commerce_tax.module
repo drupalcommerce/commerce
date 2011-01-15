@@ -27,6 +27,7 @@ function commerce_tax_types() {
           'name' => $name,
           'description' => '',
           'display_inclusive' => FALSE,
+          'order_context' => FALSE,
           'module' => $module,
         );
 
@@ -64,6 +65,19 @@ function commerce_tax_type_load($name) {
 }
 
 /**
+ * Returns the titles of every tax type keyed by name.
+ */
+function commerce_tax_type_titles() {
+  $titles = array();
+
+  foreach (commerce_tax_types() as $name => $tax_type) {
+    $titles[$name] = $tax_type->title;
+  }
+
+  return $titles;
+}
+
+/**
  * Returns an array of tax rate objects keyed by name.
  */
 function commerce_tax_rates() {
@@ -83,6 +97,7 @@ function commerce_tax_rates() {
           'description' => '',
           'rate' => 0,
           'type' => '',
+          'component' => TRUE,
           'module' => $module,
         );
 
@@ -117,4 +132,50 @@ function commerce_tax_rates_reset() {
 function commerce_tax_rate_load($name) {
   $tax_rates = commerce_tax_rates();
   return empty($tax_rates[$name]) ? FALSE : $tax_rates[$name];
+}
+
+/**
+ * Returns the titles of every tax rate keyed by name.
+ */
+function commerce_tax_rate_titles() {
+  $titles = array();
+
+  foreach (commerce_tax_rates() as $name => $tax_rate) {
+    $titles[$name] = $tax_rate->title;
+  }
+
+  return $titles;
+}
+
+/**
+ * Applies a tax rate to the unit price of a line item.
+ *
+ * @param $line_item
+ *   The line item whose unit price will be modified to include the tax.
+ * @param $tax_rate
+ *   The tax rate to apply to the line item.
+ */
+function commerce_tax_rate_apply($line_item, $tax_rate) {
+  // If a valid rate is specified...
+  if (is_numeric($tax_rate->rate)) {
+    $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+    // Create a price data structure for the tax.
+    $tax_price = array(
+      'amount' => $wrapper->unit_price->amount->value() * $tax_rate->rate,
+      'currency_code' => $wrapper->unit_price->currency_code,
+      'data' => array(),
+    );
+
+    // TODO: Add the tax price to the unit price's data array; requires entity
+    // property info integration for the data property.
+
+    // If the rate specifies a valid tax type...
+    if ($tax_type = commerce_tax_type_load($tax_rate->type)) {
+      // Include the tax amount in the displayed unit price if specified.
+      if ($tax_type->display_inclusive) {
+        $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() + $tax_price['amount'];
+      }
+    }
+  }
 }
