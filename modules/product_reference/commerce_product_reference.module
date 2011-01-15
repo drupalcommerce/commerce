@@ -214,7 +214,7 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
   $line_item = commerce_product_line_item_new($product);
 
   // Pass the line item to Rules.
-  rules_invoke_all('commerce_product_calculate_sell_price', $line_item);
+  rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
   return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
 }
