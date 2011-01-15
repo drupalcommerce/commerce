@@ -93,7 +93,10 @@ function commerce_order_rules_action_info() {
   $actions['commerce_order_update_state'] = array(
     'label' => t('Update the order state'),
     'parameter' => array(
-      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order to update'),
+      ),
       'order_state' => array(
         'type' => 'text',
         'label' => t('Order state'),
@@ -110,7 +113,10 @@ function commerce_order_rules_action_info() {
   $actions['commerce_order_update_status'] = array(
     'label' => t('Update the order status'),
     'parameter' => array(
-      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order to update'),
+      ),
       'order_status' => array(
         'type' => 'text',
         'label' => t('Order status'),
