@@ -654,36 +654,9 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 /**
  * Completes the checkout process for the given order.
  */
-function commerce_checkout_complete($form, &$form_state, $order) {
-  global $user;
-
-  // Determine what to do for anonymous users completing checkout.
-  if ($order->uid == 0) {
-    $create = variable_get('commerce_checkout_anonymous_account', 2);
-    $notify = variable_get('commerce_checkout_anonymous_notify', 3);
-
-    // TODO: Pull $name and $mail from a customer information checkout pane,
-    // then remove the FALSE from this if statement.
-    if (FALSE && $create > 0) {
-      $account = commerce_checkout_create_account($name, $mail, '', $create == 1 ? 0 : 1, $notify >= 2);
-
-      $order->uid = $account->uid;
-      $order = commerce_order_save($order);
-    }
-    else {
-      $account = FALSE;
-    }
-  }
-
-  // Allow other modules to react to checkout completion. We need to pass
-  // $form_state by reference, so we can't use rules_invoke_all().
-  foreach (module_implements('commerce_checkout_complete') as $module) {
-    $function = $module . '_commerce_checkout_complete';
-    $function($form, $form_state, $order);
-  }
-
+function commerce_checkout_complete($order) {
   // Invoke the Rules event.
-  rules_invoke_event('commerce_checkout_complete', $order, $order->uid == 0 && $account ? $account : $user);
+  rules_invoke_event('commerce_checkout_complete', $order);
 }
 
 /**

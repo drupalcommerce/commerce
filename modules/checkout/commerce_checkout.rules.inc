@@ -23,10 +23,6 @@ function commerce_checkout_rules_event_info() {
         'type' => 'commerce_order',
         'label' => t('Completed order', array(), array('context' => 'a drupal commerce order')),
       ),
-      'account' => array(
-        'type' => 'user',
-        'label' => t('User account of completed order'),
-      ),
     ),
     'access callback' => 'commerce_order_rules_access',
   );
