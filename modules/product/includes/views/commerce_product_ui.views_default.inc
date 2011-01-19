@@ -38,8 +38,7 @@ function commerce_product_ui_views_default_views() {
     'title' => 'title',
     'type' => 'type',
     'entity_id' => 'entity_id',
-    'edit_product' => 'edit_product',
-    'delete_product' => 'edit_product',
+  	'operations' => 'operations',
   );
   $handler->display->display_options['style_options']['default'] = 'sku';
   $handler->display->display_options['style_options']['info'] = array(
@@ -63,11 +62,7 @@ function commerce_product_ui_views_default_views() {
       'align' => '',
       'separator' => '',
     ),
-    'edit_product' => array(
-      'align' => '',
-      'separator' => ' &nbsp; &nbsp;',
-    ),
-    'delete_product' => array(
+    'operations' => array(
       'align' => '',
       'separator' => '',
     ),
