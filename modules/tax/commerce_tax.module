@@ -9,6 +9,16 @@
 
 
 /**
+ * Implements hook_commerce_cart_line_item_refresh().
+ *
+ * Because some taxes require the order context to calculate, we have to check
+ * taxes when the line item is refreshed in the cart.
+ */
+function commerce_tax_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
+  rules_invoke_event('commerce_tax_calculate_order', $line_item, $order_wrapper->value());
+}
+
+/**
  * Returns an array of tax type objects keyed by name.
  */
 function commerce_tax_types() {
@@ -73,6 +83,22 @@ function commerce_tax_type_titles() {
 
   foreach (commerce_tax_types() as $name => $tax_type) {
     $titles[$name] = $tax_type->title;
+  }
+
+  return $titles;
+}
+
+/**
+ * Returns the titles of every tax type that requires an order context keyed
+ *   by name.
+ */
+function commerce_tax_type_order_context_titles() {
+  $titles = array();
+
+  foreach (commerce_tax_types() as $name => $tax_type) {
+    if ($tax_type->order_context) {
+      $titles[$name] = $tax_type->title;
+    }
   }
 
   return $titles;

@@ -30,7 +30,7 @@ function commerce_tax_default_rules_configuration() {
       // Add the action to apply the current tax.
       $rule
         ->action('commerce_tax_rate_apply', array(
-          'commerce_line_item:select' => 'line-item',
+          'line_item:select' => 'line-item',
           'tax_rate_name' => $name,
         ));
 
@@ -41,23 +41,34 @@ function commerce_tax_default_rules_configuration() {
   // Loop over every tax type and define a product pricing rule to calculate
   // any display inclusive tax rate that doesn't require an order context.
   foreach (commerce_tax_types() as $name => $tax_type) {
+    // Create a new product pricing rule.
+    $rule = rules_reaction_rule();
+
+    $rule->label = t('Calculate taxes: @title', array('@title' => $tax_type->title));
+    $rule->active = TRUE;
+
     if ($tax_type->display_inclusive && !$tax_type->order_context) {
-      // Create a new product pricing rule.
-      $rule = rules_reaction_rule();
-
-      $rule->label = t('Calculate @title tax rates', array('@title' => $tax_type->title));
-      $rule->active = TRUE;
-
       // Add the action to invoke every tax rate's component matching this type.
       $rule
         ->event('commerce_product_calculate_sell_price')
         ->action('commerce_tax_calculate_by_type', array(
-          'commerce_line_item:select' => 'line-item',
+          'line_item:select' => 'line-item',
           'tax_type_name' => $name,
         ));
-
-      $rules['commerce_tax_type_' . $name] = $rule;
     }
+    else {
+      // For tax types not meeting this criteria, create a rule using the Tax
+      // module's event for calculating taxes with the order.
+      $rule
+        ->event('commerce_tax_calculate_order')
+        ->action('commerce_tax_calculate_order_by_type', array(
+          'line_item:select' => 'line-item',
+          'order:select' => 'order',
+          'tax_type_name' => $name,
+        ));
+    }
+
+    $rules['commerce_tax_type_' . $name] = $rule;
   }
 
   return $rules;

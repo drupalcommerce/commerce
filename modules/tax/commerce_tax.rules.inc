@@ -11,6 +11,40 @@
 
 
 /**
+ * Implements hook_rules_event_info().
+ *
+ * Taxes that only need product information for calculation can be applied to a
+ * line item when the sell price of a product is calculated, but that won't
+ * accommodate calculating taxes for non-product line items or for tax types
+ * that require the order context for the line item for calculation. Thus the
+ * Tax module defines an additional event that calculates taxes with the order
+ * passed as a parameter.
+ */
+function commerce_tax_rules_event_info() {
+  $items = array();
+
+  $items['commerce_tax_calculate_order'] = array(
+    'label' => t('Calculating taxes for a line item on an order'),
+    'group' => t('Commerce Tax'),
+    'variables' => array(
+      'line_item' => array(
+        'label' => t('Line item'),
+        'type' => 'commerce_line_item',
+        'skip save' => TRUE,
+      ),
+      'order' => array(
+        'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
+        'type' => 'commerce_order',
+        'skip save' => TRUE,
+      ),
+    ),
+    'access callback' => 'commerce_order_rules_access',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_rules_action_info().
  */
 function commerce_tax_rules_action_info() {
@@ -60,7 +94,7 @@ function commerce_tax_rules_action_info() {
           'type' => 'commerce_line_item',
           'label' => t('Line item'),
         ),
-        'commerce_order' => array(
+        'order' => array(
            'type' => 'commerce_order',
            'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
         ),

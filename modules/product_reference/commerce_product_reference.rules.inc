@@ -41,3 +41,7 @@ function commerce_product_reference_rules_event_info() {
 
   return $items;
 }
+
+/**
+ * @}
+ */

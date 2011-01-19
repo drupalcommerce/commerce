@@ -258,6 +258,8 @@ function commerce_cart_commerce_order_load($orders) {
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
       // Loop over every line item on the order...
+      $unchanged_line_items = array();
+
       foreach ($order_wrapper->line_items as $delta => $line_item_wrapper) {
         // If the line item is a product line item...
         if ($line_item_wrapper->type->value() == 'product') {
@@ -268,24 +270,33 @@ function commerce_cart_commerce_order_load($orders) {
           // Process the unit price through Rules so it reflects the user's actual
           // current purchase price.
           rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
+        }
+        else {
+          $line_item = clone($line_item_wrapper->value());
+        }
 
-          // Compare the current unit price to the original unit price.
-          $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+        // Allow other modules alter line items on a shopping cart refresh.
+        module_invoke_all('commerce_cart_line_item_refresh', $line_item, $order_wrapper);
 
-          if ($line_item_wrapper->unit_price->amount->value() != $current_line_item_wrapper->unit_price->amount->value() ||
-            $line_item_wrapper->unit_price->currency_code->value() != $current_line_item_wrapper->unit_price->currency_code->value()) {
-            // Adjust the unit price accordingly if necessary.
-            $line_item_wrapper->unit_price->amount = $current_line_item_wrapper->unit_price->amount->value();
-            $line_item_wrapper->unit_price->currency_code = $current_line_item_wrapper->unit_price->currency_code->value();
+        // Compare the refreshed unit price to the original unit price.
+        $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-            // Save the updated line item; for some reason I have to call both
-            // of these functions for the changes to be fully evident on the
-            // current pageload. It could just be a static caching issue.
-            commerce_line_item_save($line_item_wrapper->value());
-            $line_item_wrapper->save();
-          }
+        if ($line_item_wrapper->unit_price->amount->value() != $current_line_item_wrapper->unit_price->amount->value() ||
+          $line_item_wrapper->unit_price->currency_code->value() != $current_line_item_wrapper->unit_price->currency_code->value()) {
+          // Adjust the unit price accordingly if necessary.
+          $line_item_wrapper->unit_price->amount = $current_line_item_wrapper->unit_price->amount->value();
+          $line_item_wrapper->unit_price->currency_code = $current_line_item_wrapper->unit_price->currency_code->value();
+
+          // Save the updated line item; for some reason I have to call both
+          // of these functions for the changes to be fully evident on the
+          // current pageload. It could just be a static caching issue.
+          commerce_line_item_save($line_item_wrapper->value());
+          $line_item_wrapper->save();
         }
       }
+
+      // Allow other modules to alter the entire order on a shopping cart refresh.
+      module_invoke_all('commerce_cart_order_refresh', $order_wrapper);
     }
   }
 }
