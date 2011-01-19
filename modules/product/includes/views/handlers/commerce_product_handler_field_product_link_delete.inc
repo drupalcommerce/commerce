@@ -19,7 +19,7 @@ class commerce_product_handler_field_product_link_delete extends commerce_produc
     $product->type = $values->{$this->aliases['type']};
     $product->uid = $values->{$this->aliases['uid']};
 
-    if (!commerce_product_access('update', $product)) {
+    if (!commerce_product_access('delete', $product)) {
       return;
     }
 
