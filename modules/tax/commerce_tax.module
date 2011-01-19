@@ -9,32 +9,6 @@
 
 
 /**
- * Implements hook_commerce_tax_type_info().
- */
-function commerce_tax_commerce_tax_type_info() {
-  return array(
-    'sales_tax' => array(
-      'title' => t('Sales tax'),
-      // 'display_inclusive' => TRUE,
-      // 'order_context' => TRUE,
-    ),
-  );
-}
-
-/**
- * Implements hook_commerce_tax_rate_info().
- */
-function commerce_tax_commerce_tax_rate_info() {
-  return array(
-    'ky_sales_tax' => array(
-      'title' => t('KY Sales Tax'),
-      'rate' => .06,
-      'type' => 'sales_tax',
-    ),
-  );
-}
-
-/**
  * Implements hook_commerce_cart_line_item_refresh().
  *
  * Because some taxes require the order context to calculate, we have to check
