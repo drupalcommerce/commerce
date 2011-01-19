@@ -86,7 +86,7 @@ function commerce_cart_commerce_checkout_pane_info() {
 /**
  * Implements hook_commerce_checkout_complete().
  */
-function commerce_cart_commerce_checkout_complete($form, &$form_state, $order) {
+function commerce_cart_commerce_checkout_complete($order) {
   // Move the cart order ID to a completed order ID.
   if (commerce_cart_order_session_exists($order->order_id)) {
     commerce_cart_order_session_save($order->order_id, TRUE);

@@ -655,8 +655,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
  * Completes the checkout process for the given order.
  */
 function commerce_checkout_complete($order) {
-  // Invoke the Rules event.
-  rules_invoke_event('commerce_checkout_complete', $order);
+  rules_invoke_all('commerce_checkout_complete', $order);
 }
 
 /**
