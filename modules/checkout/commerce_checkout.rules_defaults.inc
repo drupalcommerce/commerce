@@ -9,7 +9,7 @@
 /**
  * Implements hook_default_rules_configuration().
  */
-function commerce_order_default_rules_configuration() {
+function commerce_checkout_default_rules_configuration() {
   $rules = array();
 
   // Add a rule configuration to update an order to the default status of the
@@ -22,7 +22,7 @@ function commerce_order_default_rules_configuration() {
   $rule
     ->event('commerce_checkout_complete')
     ->action('commerce_order_update_state', array(
-      'commerce_order:select' => 'order',
+      'order:select' => 'order',
       'order_state' => 'pending',
     ));
 
