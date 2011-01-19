@@ -47,7 +47,7 @@ function commerce_customer_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'commerce_customer_handler_filter_customer_profile_type',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',

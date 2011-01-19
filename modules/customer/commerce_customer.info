@@ -15,6 +15,7 @@ files[] = includes/views/handlers/commerce_customer_handler_field_customer_profi
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link_delete.inc
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link_edit.inc
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_type.inc
+files[] = includes/views/handlers/commerce_customer_handler_filter_customer_profile_type.inc
 
 ; Simple tests
 ; files[] = tests/commerce_customer.test
