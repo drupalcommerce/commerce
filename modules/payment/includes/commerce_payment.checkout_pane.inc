@@ -276,7 +276,7 @@ function _commerce_payment_redirect_pane_next_page($form, &$form_state, $order) 
 
   // Inform modules of checkout completion if the next page is Completed.
   if ($next_page == 'complete') {
-    commerce_checkout_complete($form, $form_state, $order);
+    commerce_checkout_complete($order);
   }
 
   drupal_goto('checkout/' . $order->order_id . '/' . $next_page);
