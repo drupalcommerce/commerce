@@ -356,3 +356,25 @@ function commerce_checkout_pane_settings_form_reset_submit($form, &$form_state) 
 
   drupal_set_message(t('Checkout pane reset.'));
 }
+
+/**
+ * Builds the checkout completion Rules Overview page.
+ */
+function commerce_checkout_complete_rules() {
+  RulesPluginUI::$basePath = 'admin/commerce/config/checkout/rules';
+
+  $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled checkout complete rules') . '</h3>';
+
+  $conditions = array('event' => 'commerce_checkout_complete', 'plugin' => 'reaction rule', 'active' => TRUE);
+  $content['enabled']['rules'] = RulesPluginUI::overviewTable($conditions);
+  $content['enabled']['rules']['#empty'] = t('There are no active checkout completion rules.');
+
+  $content['disabled']['title']['#markup'] = '<h3>' . t('Disabled checkout completion rules') . '</h3>';
+
+  $conditions['active'] = FALSE;
+  $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions);
+  $content['disabled']['rules']['#empty'] = t('There are no disabled checkout rules.');
+
+  return $content;
+}
+

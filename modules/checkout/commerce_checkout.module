@@ -55,6 +55,32 @@ function commerce_checkout_menu() {
     'weight' => 0,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
+  
+  $items['admin/commerce/config/checkout/rules'] = array(
+    'title' => 'Checkout rules',
+    'description' => 'Enable and configure checkout completion rules.',
+    'page callback' => 'commerce_checkout_complete_rules',
+    'access arguments' => array('administer checkout'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+    'file' => 'includes/commerce_checkout.admin.inc',
+  );
+
+  // Add the menu items for the various Rules forms.
+  $controller = new RulesUIController();
+  $items += $controller->config_menu('admin/commerce/config/checkout/rules');
+
+  $items['admin/commerce/config/checkout/rules/add'] = array(
+    'title' => 'Add a checkout rule',
+    'description' => 'Adds an additional checkout completion rule configuration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_checkout_add_complete_rule_form', 'admin/commerce/config/checkout/rules'),
+    'access arguments' => array('administer checkout'),
+    'file path' => drupal_get_path('module', 'rules_admin'),
+    'file' => 'rules_admin.inc',
+    'type' => MENU_LOCAL_ACTION,
+  );
+
   $items['admin/commerce/config/checkout/form/pane/%commerce_checkout_pane'] = array(
     'title callback' => 'commerce_checkout_pane_settings_title',
     'title arguments' => array(6),
@@ -91,8 +117,12 @@ function commerce_checkout_permission() {
  * Implements hook_help().
  */
 function commerce_checkout_help($path, $arg) {
-  if ($path == 'admin/commerce/config/checkout-builder') {
-    return t('Use the table below to build your checkout form using the available checkout panes defined by modules enabled on your site. You may configure the checkout pane settings using the operations links below. You may also add additional pages to the checkout process using the tab above and edit them using the operations links below.');
+  switch ($path) {
+    case 'admin/commerce/config/checkout-builder':
+      return t('Use the table below to build your checkout form using the available checkout panes defined by modules enabled on your site. You may configure the checkout pane settings using the operations links below. You may also add additional pages to the checkout process using the tab above and edit them using the operations links below.');
+
+    case 'admin/commerce/config/checkout/rules':
+      return t('After completion of the checkout process rules can be executed, like mailing users, creating an account, etc.');
   }
 }
 
@@ -133,7 +163,27 @@ function commerce_checkout_forms($form_id, $args) {
     }
   }
 
+  $forms['commerce_checkout_add_complete_rule_form'] = array(
+    'callback' => 'rules_admin_add_reaction_rule',
+  );
+
   return $forms;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * The Checkout module instantiates the Rules Admin rule configuration add form
+ * at a particular path in the Commerce IA. It uses its own form ID to do so and
+ * alters the form here to select the necessary Rules event.
+ *
+ * @see rules_admin_add_reaction_rule()
+ */
+function commerce_checkout_form_commerce_checkout_add_complete_rule_form_alter(&$form, &$form_state) {
+  unset($form['settings']['help']);
+  $form['settings']['event']['#type'] = 'value';
+  $form['settings']['event']['#value'] = 'commerce_checkout_complete';
+  $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/checkout/rules');
 }
 
 /**
