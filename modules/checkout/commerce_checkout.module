@@ -122,7 +122,7 @@ function commerce_checkout_help($path, $arg) {
       return t('Use the table below to build your checkout form using the available checkout panes defined by modules enabled on your site. You may configure the checkout pane settings using the operations links below. You may also add additional pages to the checkout process using the tab above and edit them using the operations links below.');
 
     case 'admin/commerce/config/checkout/rules':
-      return t('When a customer reaches the checkout completion page, rules reacting on the <em>Completing the checkout process</em> are evaluated. Default rules handle standard tasks like updating the order status, sending order e-mails, and creating accounts for anonymous users. You can edit these or add additional rules to customize your checkout workflow.');
+      return t('When a customer advances to the checkout completion page, rules reacting on the <em>Completing the checkout process</em> are evaluated. Default rules handle standard tasks like updating the order status, sending order e-mails, and creating accounts for anonymous users. You can edit these or add additional rules to customize your checkout workflow.');
   }
 }
 
