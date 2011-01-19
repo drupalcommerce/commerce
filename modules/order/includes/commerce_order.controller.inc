@@ -32,7 +32,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       'revision_id' => '',
       'type' => $type,
       'uid' => $uid,
-      'mail' => '',
+      'mail' => ( $uid > 0 && ($account = user_load($uid)) ) ? $account->mail : '',
       'status' => $status,
       'data' => array(),
       'created' => '',
