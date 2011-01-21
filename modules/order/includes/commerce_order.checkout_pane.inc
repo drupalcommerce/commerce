@@ -93,9 +93,11 @@ function commerce_order_mail_pane_checkout_form_order_mail_info($checkout_pane, 
  * Checkout pane callback: validates the order mail form.
  */
 function commerce_order_mail_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  if ($error = user_validate_mail($form_state['values'][$checkout_pane->pane_id]['order_mail'])) {
-    form_set_error($checkout_pane->pane_id . '][order_mail', $error);
-    return FALSE;
+  if (isset($form_state['values'][$checkout_pane->pane_id]['order_mail'])) {
+    if ($error = user_validate_mail($form_state['values'][$checkout_pane->pane_id]['order_mail'])) {
+      form_set_error($checkout_pane->pane_id . '][order_mail', $error);
+      return FALSE;
+    }
   }
   
   return TRUE;
@@ -105,7 +107,9 @@ function commerce_order_mail_pane_checkout_form_validate($form, &$form_state, $c
  * Checkout pane callback: submits the order mail form.
  */
 function commerce_order_mail_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  $order->mail = $form_state['values'][$checkout_pane->pane_id]['order_mail'];
+  if (isset($form_state['values'][$checkout_pane->pane_id]['order_mail'])) {
+    $order->mail = $form_state['values'][$checkout_pane->pane_id]['order_mail'];
+  }
 }
 
 /**
