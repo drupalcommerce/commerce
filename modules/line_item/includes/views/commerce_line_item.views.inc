@@ -175,22 +175,22 @@ function commerce_line_item_views_data() {
  * Implements hook_views_post_render().
  */
 function commerce_line_item_views_post_render(&$view, &$output, &$cache) {
-  // TODO: Allow 'commerce_line_item' as base table?
   if ($view->base_table == 'commerce_order') {
-    // Check if there are any fields prior to creatin the form
+    // Check the fields on the View to see if any adding to an edit form by
+    // extending the field edit handler.
     $has_form_fields = FALSE;
-    foreach ($view->field as $name => $field) {
+
+    foreach ($view->field as $field_name => $field) {
       if(is_a($field, 'commerce_line_item_handler_field_edit')) {
         $has_form_fields = TRUE;
       }
     }
 
+    // If we did find form fields in the View, format the output of the View as
+    // a form using the line item Views form.
     if ($has_form_fields) {
       module_load_include('inc', 'commerce_line_item', 'includes/commerce_line_item.forms');
-  
-      // Add suffix to form to avoid clashing multiple forms on the same page.
-      $form_suffix = $view->name . '_' . $view->current_display;
-      $form = drupal_get_form('commerce_line_item_edit_form_' . $form_suffix, $view, $output);
+      $form = drupal_get_form(commerce_line_item_views_form_id($view), $view, $output);
       $output = drupal_render($form);
     }
   }

@@ -16,7 +16,7 @@ class commerce_line_item_handler_area_line_item_actions extends views_handler_ar
     // Define an option to control the buttons displayed in the summary.
     $options['buttons'] = array('default' => array());
 
-    foreach (commerce_line_item_actions() as $name => $button) {
+    foreach (commerce_line_item_actions(array('#submit' => array())) as $name => $button) {
       $options['buttons']['default'][$name] = 0;
     }
 
@@ -32,7 +32,7 @@ class commerce_line_item_handler_area_line_item_actions extends views_handler_ar
     // Add checkboxes for the summary buttons if any are available.
     $options = array();
 
-    foreach (commerce_line_item_actions() as $name => $button) {
+    foreach (commerce_line_item_actions(array('#submit' => array())) as $name => $button) {
       $options[$name] = $button['#value'];
     }
 
@@ -47,17 +47,20 @@ class commerce_line_item_handler_area_line_item_actions extends views_handler_ar
     }
   }
 
-  function render($empty = FALSE) {
+  function render($form, $empty = FALSE) {
     if (!$empty) {
       $buttons = array();
-      foreach (commerce_line_item_actions() as $name => $button) {
+
+      foreach (commerce_line_item_actions(array('#submit' => array())) as $name => $button) {
         if ($this->options['buttons'][$name] === $name) {
           $buttons[$name] = '<!--post-commerce-line-item-button-' . $name . '-->';
         }
       }
+
       $variables = array(
         'buttons' => $buttons,
       );
+
       return theme('commerce_line_item_actions', $variables);
     }
   }

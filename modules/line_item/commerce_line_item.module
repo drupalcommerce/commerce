@@ -101,7 +101,7 @@ function commerce_line_item_theme() {
       'path' => drupal_get_path('module', 'commerce_line_item') . '/theme',
       'template' => 'commerce-line-item-summary',
     ),
-    'commerce_line_item_edit_form' => array(
+    'commerce_line_item_views_form' => array(
       'render element' => 'form',
     ),
     'commerce_line_item_actions' => array(
@@ -112,15 +112,34 @@ function commerce_line_item_theme() {
 
 /**
  * Implements hook_forms().
- * 
- * Force each line item edit form instance to use the same callback.
+ *
+ * To provide distinct form IDs for line item Views forms, the View name and
+ * specific display name are appended to the base ID,
+ * commerce_line_item_views_form. When such a form is built or submitted, this
+ * function will return the proper callback function to use for the given form.
  */
 function commerce_line_item_forms($form_id, $args) {
-  $forms = array();
-  if (strpos($form_id, 'commerce_line_item_edit_form_') === 0) {
-    $forms[$form_id] = array('callback' => 'commerce_line_item_edit_form');
+  if (strpos($form_id, 'commerce_line_item_views_form_') === 0) {
+    return array(
+      $form_id => array(
+        'callback' => 'commerce_line_item_views_form',
+      ),
+    );
   }
-  return $forms;
+}
+
+/**
+ * Returns a form ID for a line item Views form using the name and display of
+ *   the View used to build the form.
+ */
+function commerce_line_item_views_form_id($view) {
+  $parts = array(
+    'commerce_line_item_views_form',
+    $view->name,
+    $view->current_display,
+  );
+
+  return implode('_', $parts);
 }
 
 /**
@@ -286,23 +305,24 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
 /**
  * Implements hook_commerce_line_item_action_form().
  */
-function commerce_line_item_commerce_line_item_action_form() {
-  $form['update'] = array(
+function commerce_line_item_commerce_line_item_action_form($form) {
+  $action_form = array();
+
+  $action_form['update'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
     '#weight' => 40,
-    '#submit' => array('commerce_line_item_edit_form_submit', 'commerce_line_item_line_item_edit_form_submit'),
+    '#submit' => $form['#submit'] + array('commerce_line_item_line_item_views_form_submit'),
   );
-  return $form;
+
+  return $action_form;
 }
 
 /**
  * Submit handler used when clicking the update button.
  */
-function commerce_line_item_line_item_edit_form_submit($form, &$form_state) {
-  // The update functions are processed on standard form submit. So we only
-  // need to set message here.
-  drupal_set_message(t('Your line items were updated.'));
+function commerce_line_item_line_item_views_form_submit($form, &$form_state) {
+  drupal_set_message(t('Line items saved.'));
 }
 
 /**
@@ -1165,9 +1185,9 @@ function commerce_line_item_summary_links() {
  *
  * @see hook_commerce_line_item_action_form()
  */
-function commerce_line_item_actions() {
+function commerce_line_item_actions($form) {
   // Retrieve buttons defined by the hook and allow other modules to alter them.
-  $buttons = module_invoke_all('commerce_line_item_action_form');
+  $buttons = module_invoke_all('commerce_line_item_action_form', $form);
   drupal_alter('commerce_line_item_action_form', $buttons);
 
   // Sort the links by weight and return the array.

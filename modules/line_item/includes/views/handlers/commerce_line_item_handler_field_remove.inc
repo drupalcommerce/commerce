@@ -31,13 +31,14 @@ class commerce_line_item_handler_field_remove extends commerce_line_item_handler
   }
 
   function edit_form_submit($form, &$form_state) {
-    $order = commerce_order_load($form_state['values']['order']->order_id);
+    $order = commerce_order_load($form_state['order']->order_id);
+
     foreach (element_children($form['remove']) as $line_item_id) {
       // Check for the removal of an item.
       if ($form_state['clicked_button']['#name'] == 'remove-line-item-' . $line_item_id) {
         commerce_cart_order_product_line_item_delete($order, $line_item_id);
       }
-    }    
+    }
   }
 
 }
