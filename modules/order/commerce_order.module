@@ -925,6 +925,9 @@ function commerce_order_get_properties($order, array $options, $name) {
       return url('admin/commerce/orders/' . $order->order_id, $options);
     case 'edit-url':
       return url('admin/commerce/orders/' . $order->order_id . '/edit', $options);
+    case 'state':
+      $order_status = commerce_order_status_load($order->status);
+      return $order_status->state;
   }
 }
 
