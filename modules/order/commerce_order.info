@@ -26,5 +26,8 @@ files[] = includes/views/handlers/commerce_order_handler_field_order_operations.
 files[] = includes/views/handlers/commerce_order_handler_filter_status.inc
 files[] = includes/views/handlers/commerce_order_handler_filter_order_type.inc
 
+; Views plugins
+files[] = includes/views/handlers/commerce_order_plugin_argument_validate_user.inc
+
 ; Simple tests
 ; files[] = tests/commerce_order.test

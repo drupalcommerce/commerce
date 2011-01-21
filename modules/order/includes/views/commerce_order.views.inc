@@ -174,3 +174,18 @@ function commerce_order_views_data() {
 
   return $data;
 }
+
+/**
+ * Implements hook_views_plugins
+ */
+function commerce_order_views_plugins() {
+  return array(
+    'argument validator' => array(
+      'commerce_user' => array(
+        'title' => t('Commerce Order User'),
+        'handler' => 'commerce_order_plugin_argument_validate_user',
+        'path' => drupal_get_path('module', 'commerce_order') . '/includes/views/handlers', // not necessary for most modules
+      ),
+    ),
+  );
+}
