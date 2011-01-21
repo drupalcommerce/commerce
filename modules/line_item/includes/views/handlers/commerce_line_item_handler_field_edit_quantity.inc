@@ -11,7 +11,7 @@
 /**
  * Field handler to present a field to change quantity of a line item.
  */
-class commerce_line_item_handler_field_quantity_edit extends commerce_line_item_handler_field_edit {
+class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_handler_field_edit {
 
   function construct() {
     parent::construct();
@@ -37,27 +37,30 @@ class commerce_line_item_handler_field_quantity_edit extends commerce_line_item_
 
     // Return the placeholder that will be used as token for replacing itself
     // with the rendered form field created above.
-    return '<!--post-commerce-line-item-quantity_edit-' . $line_item_id . '-->';
+    return '<!--post-commerce-line-item-edit_quantity-' . $line_item_id . '-->';
   }
 
   function edit_form_validate($form, &$form_state) {
-    foreach (element_children($form['quantity_edit']) as $line_item_id) {
-      if (!is_numeric($form_state['values']['quantity_edit'][$line_item_id]) || $form_state['values']['quantity_edit'][$line_item_id] <= 0) {
-        form_set_error('quantity_edit][' . $line_item_id, t('You must specify a positive numeric value for the quantity'));
+    foreach (element_children($form['edit_quantity']) as $line_item_id) {
+      if (!is_numeric($form_state['values']['edit_quantity'][$line_item_id]) || $form_state['values']['edit_quantity'][$line_item_id] <= 0) {
+        form_set_error('edit_quantity][' . $line_item_id, t('You must specify a positive numeric value for the quantity'));
       }
     }
   }
 
   function edit_form_submit($form, &$form_state) {
-    foreach (element_children($form['quantity_edit']) as $line_item_id) {
-      // Check if there is a change in quantity.
-      $line_item = commerce_line_item_load($line_item_id);
-      if ($form_state['values']['quantity_edit'][$line_item_id] != $line_item->quantity) {
-        // Change the quantity and save it.
-        $line_item->quantity = $form_state['values']['quantity_edit'][$line_item_id];
-        commerce_line_item_save($line_item);
+    foreach (element_children($form['edit_quantity']) as $line_item_id) {
+      // If the line item hasn't been deleted...
+      if ($line_item = commerce_line_item_load($line_item_id)) {
+        // And the quantity on the form is different...
+        if ($form_state['values']['edit_quantity'][$line_item_id] != $line_item->quantity) {
+          // Change the quantity and save the line item.
+          $line_item->quantity = $form_state['values']['edit_quantity'][$line_item_id];
+
+          commerce_line_item_save($line_item);
+        }
       }
-    }    
+    }
   }
 
 }

@@ -101,21 +101,21 @@ function commerce_line_item_views_data() {
     ),
   );
 
-  // Field that adds a field to edit quantity on the view.
-  $data['commerce_line_item']['quantity_edit'] = array(
+  // Adds a textfield to edit line item quantity on the view.
+  $data['commerce_line_item']['edit_quantity'] = array(
     'field' => array(
-      'title' => t('Quantity edit'),
-      'help' => t('Provide a field to edit quantity on the view.'),
-      'handler' => 'commerce_line_item_handler_field_quantity_edit',
+      'title' => t('Quantity text field'),
+      'help' => t('Adds a text field to edit the line item quantity in the View.'),
+      'handler' => 'commerce_line_item_handler_field_edit_quantity',
     ),
   );
 
-  // Field that adds a button to remove a line item.
-  $data['commerce_line_item']['remove'] = array(
+  // Adds a button to delete a line item.
+  $data['commerce_line_item']['edit_delete'] = array(
     'field' => array(
-      'title' => t('Remove'),
-      'help' => t('Provide a button to remove a line item.'),
-      'handler' => 'commerce_line_item_handler_field_remove',
+      'title' => t('Delete button'),
+      'help' => t('Adds a button to delete a line item.'),
+      'handler' => 'commerce_line_item_handler_field_edit_delete',
     ),
   );
 

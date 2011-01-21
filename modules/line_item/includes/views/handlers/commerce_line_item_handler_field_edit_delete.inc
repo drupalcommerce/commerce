@@ -9,9 +9,9 @@
  */
 
 /**
- * Field handler to present a button to remove a line item.
+ * Field handler to present a button to delete a line item.
  */
-class commerce_line_item_handler_field_remove extends commerce_line_item_handler_field_edit {
+class commerce_line_item_handler_field_edit_delete extends commerce_line_item_handler_field_edit {
 
   function render($values) {
     $line_item_id = $values->{$this->aliases['line_item_id']};
@@ -20,22 +20,22 @@ class commerce_line_item_handler_field_remove extends commerce_line_item_handler
     // at form rendering phase in commerce_line_item_views_post_render().
     $this->form[$line_item_id] = array(
       '#type' => 'submit',
-      '#value' => t('Remove'),
-      '#name' => 'remove-line-item-' . $line_item_id,
-      '#attributes' => array('class' => array('remove-line-item')),
+      '#value' => t('Delete'),
+      '#name' => 'delete-line-item-' . $line_item_id,
+      '#attributes' => array('class' => array('delete-line-item')),
     );
 
     // Return the placeholder that will be used as token for replacing itself
     // with the rendered form field created above.
-    return '<!--post-commerce-line-item-remove-' . $line_item_id . '-->';
+    return '<!--post-commerce-line-item-edit_delete-' . $line_item_id . '-->';
   }
 
   function edit_form_submit($form, &$form_state) {
     $order = commerce_order_load($form_state['order']->order_id);
 
-    foreach (element_children($form['remove']) as $line_item_id) {
+    foreach (element_children($form['edit_delete']) as $line_item_id) {
       // Check for the removal of an item.
-      if ($form_state['clicked_button']['#name'] == 'remove-line-item-' . $line_item_id) {
+      if ($form_state['clicked_button']['#name'] == 'delete-line-item-' . $line_item_id) {
         commerce_cart_order_product_line_item_delete($order, $line_item_id);
       }
     }

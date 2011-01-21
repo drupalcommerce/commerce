@@ -16,8 +16,8 @@ files[] = includes/views/handlers/commerce_line_item_handler_argument_line_item_
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_type.inc
 files[] = includes/views/handlers/commerce_line_item_handler_filter_line_item_type.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_edit.inc
-files[] = includes/views/handlers/commerce_line_item_handler_field_quantity_edit.inc
-files[] = includes/views/handlers/commerce_line_item_handler_field_remove.inc
+files[] = includes/views/handlers/commerce_line_item_handler_field_edit_quantity.inc
+files[] = includes/views/handlers/commerce_line_item_handler_field_edit_delete.inc
 
 ; Simple tests
 ; files[] = tests/commerce_line_item.test

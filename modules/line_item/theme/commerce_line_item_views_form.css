@@ -1,6 +1,6 @@
 /* $Id$ */
 
-.commerce-line-item-views-form input.remove-line-item {
+.commerce-line-item-views-form input.delete-line-item {
   background: #fff url(buttons.png) 0 0 repeat-x;
   border: 1px solid #e4e4e4;
   border-bottom: 1px solid #b4b4b4;
@@ -20,8 +20,8 @@
   border-radius: 15px;
 }
 
-.commerce-line-item-views-form input.remove-line-item:hover,
-.commerce-line-item-views-form input.remove-line-item:focus {
+.commerce-line-item-views-form input.delete-line-item:hover,
+.commerce-line-item-views-form input.delete-line-item:focus {
   background: #dedede;
 }
 
