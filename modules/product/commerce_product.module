@@ -653,8 +653,10 @@ function commerce_product_set_properties($product, $name, $value) {
  * The values returned will be keyed by SKU and appear as such in the textfield,
  * even though the preview in the autocomplete list shows "SKU: Title".
  */
-function commerce_product_autocomplete($field_name, $string = '') {
+function commerce_product_autocomplete($entity_type, $field_name, $bundle, $string = '') {
   $field = field_info_field($field_name);
+  $instance = field_info_instance($entity_type, $field_name, $bundle);
+
   $matches = array();
 
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
@@ -668,7 +670,7 @@ function commerce_product_autocomplete($field_name, $string = '') {
     $match = isset($field['widget']['autocomplete_match']) ? $field['widget']['autocomplete_match'] : 'contains';
 
     // Get an array of matching products.
-    $products = commerce_product_match_products($field, NULL, $tag_last, $match, array(), 10);
+    $products = commerce_product_match_products($field, $instance, $tag_last, $match, array(), 10);
 
     // Loop through the products and convert them into autocomplete output.
     foreach ($products as $product_id => $data) {
@@ -727,7 +729,7 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
   ));
 
   if (!isset($results[$cid])) {
-    $matches = _commerce_product_match_products_standard($field, $instance, $string, $match, $ids, $limit);
+    $matches = _commerce_product_match_products_standard($instance, $string, $match, $ids, $limit);
 
     // Store the results.
     $results[$cid] = !empty($matches) ? $matches : array();
@@ -741,7 +743,7 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
  *
  * Returns an array of products matching the specific parameters.
  */
-function _commerce_product_match_products_standard($field, $instance = NULL, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
+function _commerce_product_match_products_standard($instance, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
   // Build the query object with the necessary fields.
   $query = db_select('commerce_product', 'cp');
   $product_id_alias = $query->addField('cp', 'product_id');
@@ -750,7 +752,7 @@ function _commerce_product_match_products_standard($field, $instance = NULL, $st
   $product_type_alias = $query->addField('cp', 'type');
 
   // Add a condition to the query to filter by matching product types.
-  if (!empty($field['settings']) && is_array($instance['settings']['referenceable_types']) && !empty($instance['settings']['referenceable_types'])) {
+  if (!empty($instance['settings']) && is_array($instance['settings']['referenceable_types']) && !empty($instance['settings']['referenceable_types'])) {
     $types = array_diff(array_values($instance['settings']['referenceable_types']), array(0, NULL));
 
     // Only filter by type if some types have been specified.
