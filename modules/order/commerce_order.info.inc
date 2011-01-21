@@ -90,6 +90,12 @@ function commerce_order_entity_property_info() {
     'required' => TRUE,
     'clear' => array('uid'),
   );
+  $properties['mail'] = array(
+    'label' => t("Email"),
+    'description' => t("The email address of the order."),
+    'setter callback' => 'entity_property_verbatim_set',
+    'validation callback' => 'valid_email_address',
+  );
 
   return $info;
 }
