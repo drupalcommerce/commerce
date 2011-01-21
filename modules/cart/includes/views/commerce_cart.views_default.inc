@@ -14,7 +14,7 @@ function commerce_cart_views_default_views() {
   // Shopping cart view for cart form page.
   $view = new view;
   $view->name = 'commerce_cart_form';
-  $view->description = 'Shopping cart form view.';
+  $view->description = 'Display a shopping cart edit form.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
   $view->human_name = '';
