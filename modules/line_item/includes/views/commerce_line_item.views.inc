@@ -186,7 +186,7 @@ function commerce_line_item_views_post_render(&$view, &$output, &$cache) {
     }
 
     if ($has_form_fields) {
-      module_load_include('inc', 'commerce_line_item', 'includes/commerce_line_item.edit_form');
+      module_load_include('inc', 'commerce_line_item', 'includes/commerce_line_item.forms');
   
       // Add suffix to form to avoid clashing multiple forms on the same page.
       $form_suffix = $view->name . '_' . $view->current_display;
