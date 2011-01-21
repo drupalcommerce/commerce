@@ -101,6 +101,24 @@ function commerce_line_item_views_data() {
     ),
   );
 
+  // Field that adds a field to edit quantity on the view.
+  $data['commerce_line_item']['quantity_edit'] = array(
+    'field' => array(
+      'title' => t('Quantity edit'),
+      'help' => t('Provide a field to edit quantity on the view.'),
+      'handler' => 'commerce_line_item_handler_field_quantity_edit',
+    ),
+  );
+
+  // Field that adds a button to remove a line item.
+  $data['commerce_line_item']['remove'] = array(
+    'field' => array(
+      'title' => t('Remove'),
+      'help' => t('Provide a button to remove a line item.'),
+      'handler' => 'commerce_line_item_handler_field_remove',
+    ),
+  );
+
   // Expose the created and changed timestamps.
   $data['commerce_line_item']['created'] = array(
     'title' => t('Created date'),
@@ -141,5 +159,39 @@ function commerce_line_item_views_data() {
     ),
   );
 
+  // Define an area handler for displaying line item action buttons.
+  $data['commerce_line_item']['line_item_actions'] = array(
+    'title' => t('Line item actions'),
+    'help' => t('Display buttons to act on line items.'),
+    'area' => array(
+      'handler' => 'commerce_line_item_handler_area_line_item_actions',
+    ),
+  );
+
   return $data;
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function commerce_line_item_views_post_render(&$view, &$output, &$cache) {
+  // TODO: Allow 'commerce_line_item' as base table?
+  if ($view->base_table == 'commerce_order') {
+    // Check if there are any fields prior to creatin the form
+    $has_form_fields = FALSE;
+    foreach ($view->field as $name => $field) {
+      if(is_a($field, 'commerce_line_item_handler_field_edit')) {
+        $has_form_fields = TRUE;
+      }
+    }
+
+    if ($has_form_fields) {
+      module_load_include('inc', 'commerce_line_item', 'includes/commerce_line_item.edit_form');
+  
+      // Add suffix to form to avoid clashing multiple forms on the same page.
+      $form_suffix = $view->name . '_' . $view->current_display;
+      $form = drupal_get_form('commerce_line_item_edit_form_' . $form_suffix, $view, $output);
+      $output = drupal_render($form);
+    }
+  }
 }

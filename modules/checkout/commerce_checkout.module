@@ -225,6 +225,30 @@ function commerce_checkout_commerce_order_status_info() {
 }
 
 /**
+ * Implements hook_commerce_line_item_action_info().
+ */
+function commerce_checkout_commerce_line_item_action_info() {
+  $form['checkout'] = array(
+    '#type' => 'submit',
+    '#value' => t('Checkout'),
+    '#weight' => 5,
+    '#access' => user_access('access checkout'),
+    '#submit' => array('commerce_line_item_edit_form_submit', 'commerce_checkout_line_item_edit_form_submit'),
+  );
+  return $form;
+}
+
+/**
+ * Submit handler used when clicking the checkout button.
+ */
+function commerce_checkout_line_item_edit_form_submit($form, &$form_state) {
+  // Redirect to the checkout page if specified.
+  if ($form_state['clicked_button']['#value'] == $form['actions']['checkout']['#value']) {
+    $form_state['redirect'] = 'checkout';
+  }
+}
+
+/**
  * Implements hook_commerce_checkout_page_info().
  */
 function commerce_checkout_commerce_checkout_page_info() {

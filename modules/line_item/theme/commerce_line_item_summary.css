@@ -2,6 +2,7 @@
 
 .line-item-summary {
   text-align: right;
+  margin-bottom: 1em;
 }
 
 .line-item-summary .line-item-quantity {

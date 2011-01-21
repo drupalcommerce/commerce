@@ -149,9 +149,6 @@ function commerce_cart_theme() {
       'path' => drupal_get_path('module', 'commerce_cart') . '/theme',
       'template' => 'commerce-cart-block',
     ),
-    'commerce_cart_form_product_table' => array(
-      'render element' => 'form',
-    ),
   );
 }
 

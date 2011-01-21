@@ -20,6 +20,12 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       $options['links']['default'][$name] = 0;
     }
 
+    // Define an option to control the info displayed in the summary.
+    $options['info'] = array('default' => array(
+      'quantity' => 1,
+      'total' => 1,
+    ));
+
     return $options;
   }
 
@@ -45,6 +51,14 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
         '#default_value' => $this->options['links'],
       );
     }
+
+    $form['info'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Info'),
+      '#description' => t('Select what info you want displayed in the summary.'),
+      '#options' => array('quantity' => t('Item quantity'), 'total' => t('Total')),
+      '#default_value' => $this->options['info'],
+    );
   }
 
   function render($empty = FALSE) {
@@ -75,14 +89,22 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       // Build the variables array to send to the template.
       $variables = array(
         'view' => $this->view,
-        'quantity_raw' => $quantity,
-        'quantity_label' => format_plural($quantity, 'item', 'items'),
-        'quantity' => format_plural($quantity, '1 item', '@count items'),
-        'total_raw' => number_format(commerce_currency_round($total['amount'], $currency), $currency->decimals),
-        'total_label' => t('Total:'),
-        'total' => commerce_currency_format($total['amount'], $total['currency_code'], $this->view),
         'links' => theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline')))),
       );
+      if ($this->options['info']['quantity']) {
+        $variables = array(
+          'quantity_raw' => $quantity,
+          'quantity_label' => format_plural($quantity, 'item', 'items'),
+          'quantity' => format_plural($quantity, '1 item', '@count items'),        
+        ) + $variables;
+      }
+      if ($this->options['info']['total']) {
+        $variables = array(
+          'total_raw' => number_format(commerce_currency_round($total['amount'], $currency), $currency->decimals),
+          'total_label' => t('Total:'),
+          'total' => commerce_currency_format($total['amount'], $total['currency_code'], $this->view),
+        ) + $variables;
+      }
 
       return theme('commerce_line_item_summary', $variables);
     }
