@@ -909,18 +909,21 @@ function commerce_product_reference_field_views_data_alter(&$data, $field, $modu
         }
         $appears_on = implode(', ', $appears_on);
 
-         // Create list with referencable types
-         $referenceable_types = array_filter($field['settings']['referenceable_types']);
-         $referenceable_types = implode(', ', $referenceable_types);
-         $referenceable_types = (!$referenceable_types) ? t('all types') : $referenceable_types;
+        // Create list with referencable types
+        $referenceable_types = array_filter($field['settings']['referenceable_types']);
+        $referenceable_types = implode(', ', $referenceable_types);
+
+        if (empty($referenceable_types)) {
+          $help = t('Product Reference appears on @details and references all product types.', array('@details' => $appears_on));
+        }
+        else {
+          $help = t('Product Reference appears on @details and references to @types.', array('@details' => $appears_on, '@types' => $referenceable_types));
+        }
 
          // Then add the relationship data to the field itself.
         $data[$table][$key]['relationship'] = array(
           'title' => t('Referenced product'),
-          'help' => t(
-            'Product Reference appears on !details references to !types',
-            array('!details' => $appears_on, '!types' => $referenceable_types)
-          ),
+          'help' => $help,
           'base' => 'commerce_product',
           'base field' => 'product_id',
           'handler' => 'views_handler_relationship',
