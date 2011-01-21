@@ -15,11 +15,30 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
   }
 
   function options_form(&$form, &$form_state) {
-	  parent::options_form($form, $form_state);
+    parent::options_form($form, $form_state);
+
+    // unsetting these two form elements. We don't need them here
+    $form['restrict_roles'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Restrict access based on the current users\' roles'),
+      '#description' => t('If the argument does not match the current logged in user, fall back to matching roles. This equals to \'current user or has a particular role\'.'),
+      '#default_value' => $this->options['restrict_roles'],
+    );
 	
-	  // unsetting these two form elements. We don't need them here
-	  unset($form['restrict_roles']);
-	  unset($form['roles']);
+    $form['roles'] = array(
+      '#type' => 'select',
+      '#title' => t('Users have these allowed roles'),
+      '#description' => t('Select one or more roles which the current users should have.'),
+      '#prefix' => '<div id="edit-options-argument-validate-commerce-user-roles-wrapper">',
+      '#suffix' => '</div>',
+      '#multiple' => TRUE,
+      '#options' => user_roles(TRUE),
+      '#default_value' => $this->options['roles'],
+      '#process' => array('form_process_select', 'ctools_dependent_process'),
+      '#dependency' => array(
+        'edit-options-argument-validate-commerce-user-restrict-roles' => array(1),
+      ),
+    );
   }
 
   function validate_argument($argument) {
@@ -62,10 +81,19 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
       return FALSE;
     }
 
-    // validate for the current user
+    // validation of the current user
     if ($user->uid != $account->uid) {
-	    // only people with the 'access administration page' get access to other people's orders
-      return user_access('access administration pages'));
+      if (!empty($this->options['restrict_roles']) && !empty($this->options['roles'])) {
+        $roles = array();
+        foreach ($this->options['roles'] as $rid) {
+          $role = user_role_load($rid);
+          $roles[$rid] = $role->name;
+        }
+        if (!(bool) array_intersect($user->roles, $roles)) {
+          // no matching roles for the current user
+          return FALSE;
+        }
+      }
     }
 
     $this->argument->argument = $account->uid;
@@ -73,4 +101,3 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
     return TRUE;
   }
 }
-
