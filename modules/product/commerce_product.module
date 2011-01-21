@@ -752,7 +752,7 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
   $product_type_alias = $query->addField('cp', 'type');
 
   // Add a condition to the query to filter by matching product types.
-  if (!empty($instance['settings']) && is_array($instance['settings']['referenceable_types']) && !empty($instance['settings']['referenceable_types'])) {
+  if (!empty($instance['settings']['referenceable_types'])) {
     $types = array_diff(array_values($instance['settings']['referenceable_types']), array(0, NULL));
 
     // Only filter by type if some types have been specified.
