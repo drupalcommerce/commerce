@@ -11,17 +11,17 @@
 function commerce_cart_views_default_views() {
   $views = array();
 
-  // Shopping cart view for cart form page.
+  // Define the shopping cart update form as a View.
   $view = new view;
   $view->name = 'commerce_cart_form';
-  $view->description = 'Display a shopping cart edit form.';
+  $view->description = 'Display a shopping cart update form.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
   $view->human_name = '';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-  
+
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->display->display_options['title'] = 'Shopping cart';
@@ -32,22 +32,26 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
-    'line_item_label' => 'line_item_label',
+    'remove' => 'remove',
     'title' => 'title',
+    'line_item_label' => 'line_item_label',
     'entity_id_1' => 'entity_id_1',
     'quantity_edit' => 'quantity_edit',
-    'remove' => 'title',
     'entity_id' => 'entity_id',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
-    'line_item_label' => array(
+    'remove' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+    'title' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
     ),
-    'title' => array(
+    'line_item_label' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -60,10 +64,6 @@ function commerce_cart_views_default_views() {
       'separator' => '',
     ),
     'quantity_edit' => array(
-      'align' => '',
-      'separator' => '',
-    ),
-    'remove' => array(
       'align' => '',
       'separator' => '',
     ),
@@ -104,6 +104,25 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['relationships']['product_product_id']['table'] = 'field_data_product';
   $handler->display->display_options['relationships']['product_product_id']['field'] = 'product_product_id';
   $handler->display->display_options['relationships']['product_product_id']['relationship'] = 'line_items_line_item_id';
+  /* Field: Commerce Line Item: Remove */
+  $handler->display->display_options['fields']['remove']['id'] = 'remove';
+  $handler->display->display_options['fields']['remove']['table'] = 'commerce_line_item';
+  $handler->display->display_options['fields']['remove']['field'] = 'remove';
+  $handler->display->display_options['fields']['remove']['relationship'] = 'line_items_line_item_id';
+  $handler->display->display_options['fields']['remove']['label'] = '';
+  $handler->display->display_options['fields']['remove']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['remove']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['remove']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['remove']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['remove']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['remove']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['remove']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['remove']['empty_zero'] = 0;
   /* Field: Commerce Line Item: Line item label */
   $handler->display->display_options['fields']['line_item_label']['id'] = 'line_item_label';
   $handler->display->display_options['fields']['line_item_label']['table'] = 'commerce_line_item';
@@ -177,23 +196,6 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['quantity_edit']['element_default_classes'] = 0;
   $handler->display->display_options['fields']['quantity_edit']['hide_empty'] = 0;
   $handler->display->display_options['fields']['quantity_edit']['empty_zero'] = 0;
-  /* Field: Commerce Line Item: Remove */
-  $handler->display->display_options['fields']['remove']['id'] = 'remove';
-  $handler->display->display_options['fields']['remove']['table'] = 'commerce_line_item';
-  $handler->display->display_options['fields']['remove']['field'] = 'remove';
-  $handler->display->display_options['fields']['remove']['relationship'] = 'line_items_line_item_id';
-  $handler->display->display_options['fields']['remove']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['remove']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['remove']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['remove']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['remove']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['remove']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['remove']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['remove']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['remove']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['remove']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['remove']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['remove']['empty_zero'] = 0;
   /* Field: Fields: total */
   $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_total';
@@ -252,7 +254,6 @@ function commerce_cart_views_default_views() {
     t('<div>[title] ([line_item_label])</div>'),
     t('Price'),
     t('Quantity'),
-    t('Remove'),
     t('Total'),
   );
 
