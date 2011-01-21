@@ -21,7 +21,7 @@ class commerce_line_item_handler_field_edit extends views_handler_field {
   }
 
   /**
-   * Return a form field array used to edit the value of this field.
+   * Returns a form field array used to edit the value of this field.
    */
   function get_edit_form() {
     return $this->form;

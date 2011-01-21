@@ -171,6 +171,21 @@ function commerce_checkout_forms($form_id, $args) {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function commerce_checkout_form_alter(&$form, &$form_values, $form_id) {
+  if (strpos($form_id, 'commerce_line_item_views_form_commerce_cart_form_') === 0) {
+    $form['actions']['checkout'] = array(
+      '#type' => 'submit',
+      '#value' => t('Checkout'),
+      '#weight' => 5,
+      '#access' => user_access('access checkout'),
+      '#submit' => array_merge($form['#submit'], array('commerce_checkout_line_item_views_form_submit')),
+    );
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * The Checkout module instantiates the Rules Admin rule configuration add form
@@ -222,23 +237,6 @@ function commerce_checkout_commerce_order_status_info() {
   }
 
   return $order_statuses;
-}
-
-/**
- * Implements hook_commerce_line_item_action_form().
- */
-function commerce_checkout_commerce_line_item_action_form($form) {
-  $action_form = array();
-
-  $action_form['checkout'] = array(
-    '#type' => 'submit',
-    '#value' => t('Checkout'),
-    '#weight' => 5,
-    '#access' => user_access('access checkout'),
-    '#submit' => $form['#submit'] + array('commerce_checkout_line_item_views_form_submit'),
-  );
-
-  return $action_form;
 }
 
 /**

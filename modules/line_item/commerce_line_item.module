@@ -143,6 +143,13 @@ function commerce_line_item_views_form_id($view) {
 }
 
 /**
+ * Submit handler used when clicking the update button.
+ */
+function commerce_line_item_line_item_views_form_submit($form, &$form_state) {
+  drupal_set_message(t('Line items saved.'));
+}
+
+/**
  * Adds the necessary CSS for the line item summary template.
  */
 function template_preprocess_commerce_line_item_summary(&$variables) {
@@ -303,33 +310,10 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
 }
 
 /**
- * Implements hook_commerce_line_item_action_form().
- */
-function commerce_line_item_commerce_line_item_action_form($form) {
-  $action_form = array();
-
-  $action_form['update'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-    '#weight' => 40,
-    '#submit' => $form['#submit'] + array('commerce_line_item_line_item_views_form_submit'),
-  );
-
-  return $action_form;
-}
-
-/**
- * Submit handler used when clicking the update button.
- */
-function commerce_line_item_line_item_views_form_submit($form, &$form_state) {
-  drupal_set_message(t('Line items saved.'));
-}
-
-/**
  * Theme line item edit form actions.
  */
 function theme_commerce_line_item_actions($variables) {
-  return '<div class="commerce-line-item-actions">' . implode('', $variables['buttons']) . '</div>';
+  return '<div class="commerce-line-item-actions">' . $variables['buttons'] . '</div>';
 }
 
 /**
@@ -1178,22 +1162,6 @@ function commerce_line_item_summary_links() {
   uasort($links, 'drupal_sort_weight');
 
   return $links;
-}
-
-/**
- * Returns a sorted array of line item summary buttons.
- *
- * @see hook_commerce_line_item_action_form()
- */
-function commerce_line_item_actions($form) {
-  // Retrieve buttons defined by the hook and allow other modules to alter them.
-  $buttons = module_invoke_all('commerce_line_item_action_form', $form);
-  drupal_alter('commerce_line_item_action_form', $buttons);
-
-  // Sort the links by weight and return the array.
-  uasort($buttons, 'drupal_sort_weight');
-
-  return $buttons;
 }
 
 /**

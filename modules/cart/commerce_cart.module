@@ -120,8 +120,16 @@ function commerce_cart_commerce_line_item_summary_link_info() {
  */
 function commerce_cart_form_alter(&$form, &$form_values, $form_id) {
   if (strpos($form_id, 'commerce_line_item_views_form_commerce_cart_form_') === 0) {
+    // Change the Save button to say Update cart.
     $form['actions']['update']['#value'] = t('Update cart');
-    $form['actions']['update']['#submit'] = $form['#submit'] + array('commerce_cart_line_item_views_form_submit');
+    $form['actions']['update']['#submit'] = array_merge($form['#submit'], array('commerce_cart_line_item_views_form_submit'));
+
+    // Change any Delete buttons to say Remove.
+    if (!empty($form['edit_delete'])) {
+      foreach(element_children($form['edit_delete']) as $line_item_id) {
+        $form['edit_delete'][$line_item_id]['#value'] = t('Remove');
+      }
+    }
   }
 }
 

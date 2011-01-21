@@ -69,10 +69,11 @@ function commerce_line_item_views_form($form, &$form_state, $view, $output) {
     '#weight' => 100,
   );
 
-  // Add the module defined line item action submit buttons to the form.
-  foreach (commerce_line_item_actions($form) as $name => $button) {
-    $form['actions'][$name] = $button;
-  }
+  $form['actions']['update'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#submit' => array_merge($form['#submit'], array('commerce_line_item_line_item_views_form_submit')),
+  );
 
   return $form;
 }
@@ -135,10 +136,8 @@ function theme_commerce_line_item_views_form($variables) {
   }
 
   // Add line item action submit buttons.
-  foreach (commerce_line_item_actions(array('#submit' => array())) as $name => $button) {
-    $search[] = '<!--post-commerce-line-item-button-' . $name . '-->';
-    $replace[] = drupal_render($form['actions'][$name]);
-  }
+  $search[] = '<!--post-commerce-line-item-buttons-->';
+  $replace[] = drupal_render($form['actions']);
 
   // Apply replacements to the rendered output.
   $output = str_replace($search, $replace, $output);
