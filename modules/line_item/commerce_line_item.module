@@ -284,12 +284,12 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
 }
 
 /**
- * Implements hook_commerce_line_item_action_info().
+ * Implements hook_commerce_line_item_action_form().
  */
-function commerce_line_item_commerce_line_item_action_info() {
+function commerce_line_item_commerce_line_item_action_form() {
   $form['update'] = array(
     '#type' => 'submit',
-    '#value' => t('Update cart'),
+    '#value' => t('Save'),
     '#weight' => 40,
     '#submit' => array('commerce_line_item_edit_form_submit', 'commerce_line_item_line_item_edit_form_submit'),
   );
@@ -302,7 +302,7 @@ function commerce_line_item_commerce_line_item_action_info() {
 function commerce_line_item_line_item_edit_form_submit($form, &$form_state) {
   // The update functions are processed on standard form submit. So we only
   // need to set message here.
-  drupal_set_message(t('Your shopping cart has been updated.'));
+  drupal_set_message(t('Your line items were updated.'));
 }
 
 /**
@@ -1163,12 +1163,12 @@ function commerce_line_item_summary_links() {
 /**
  * Returns a sorted array of line item summary buttons.
  *
- * @see hook_commerce_line_item_action_info()
+ * @see hook_commerce_line_item_action_form()
  */
 function commerce_line_item_actions() {
   // Retrieve buttons defined by the hook and allow other modules to alter them.
-  $buttons = module_invoke_all('commerce_line_item_action_info');
-  drupal_alter('commerce_line_item_action_info', $buttons);
+  $buttons = module_invoke_all('commerce_line_item_action_form');
+  drupal_alter('commerce_line_item_action_form', $buttons);
 
   // Sort the links by weight and return the array.
   uasort($buttons, 'drupal_sort_weight');

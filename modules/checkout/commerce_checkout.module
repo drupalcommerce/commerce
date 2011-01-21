@@ -225,9 +225,9 @@ function commerce_checkout_commerce_order_status_info() {
 }
 
 /**
- * Implements hook_commerce_line_item_action_info().
+ * Implements hook_commerce_line_item_action_form().
  */
-function commerce_checkout_commerce_line_item_action_info() {
+function commerce_checkout_commerce_line_item_action_form() {
   $form['checkout'] = array(
     '#type' => 'submit',
     '#value' => t('Checkout'),
