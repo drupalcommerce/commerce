@@ -103,6 +103,23 @@ function commerce_order_permission() {
 }
 
 /**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function commerce_order_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+
+  $checkout_panes['account'] = (object) array(
+    'title' => t('Account information'),
+    'file' => 'includes/commerce_order.checkout_pane.inc',
+    'base' => 'commerce_order_account_pane',
+    'page' => 'checkout',
+    'weight' => -5,
+  );
+
+  return $checkout_panes;
+}
+
+/**
  * Implements hook_commerce_order_state_info().
  */
 function commerce_order_commerce_order_state_info() {
@@ -898,21 +915,4 @@ function commerce_order_set_properties($order, $name, $value) {
   if ($name == 'owner') {
     $order->uid = $value;
   }
-}
-
-/**
- * Implements hook_commerce_checkout_pane_info().
- */
-function commerce_order_commerce_checkout_pane_info() {
-  $checkout_panes = array();
-
-  $checkout_panes['order_mail'] = (object) array(
-    'title' => t('Order mail'),
-    'file' => 'includes/commerce_order.checkout_pane.inc',
-    'base' => 'commerce_order_mail_pane',
-    'page' => 'checkout',
-    'weight' => 3,
-  );
-
-  return $checkout_panes;
 }

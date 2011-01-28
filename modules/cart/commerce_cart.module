@@ -78,6 +78,7 @@ function commerce_cart_commerce_checkout_pane_info() {
     'base' => 'commerce_cart_contents_pane',
     'file' => 'includes/commerce_cart.checkout_pane.inc',
     'page' => 'checkout',
+    'weight' => -10,
   );
 
   return $checkout_panes;
