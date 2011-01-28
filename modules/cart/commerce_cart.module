@@ -135,16 +135,24 @@ function commerce_cart_form_alter(&$form, &$form_values, $form_id) {
 
 /**
  * Implements hook_form_FORM_ID_alter().
- * This form alters ensures that administrators can't try to alter orders in cart
- * statuses.
- * @see commerce_cart_commerce_order_load.
+ *
+ * Alter the order edit form so administrators cannot attempt to alter line item
+ * unit prices for orders still in a shopping cart status. On order load, the
+ * cart module refreshes these prices based on the current product price and
+ * pricing rules, so any alterations would not be persistent anyways.
+ *
+ * @see commerce_cart_commerce_order_load()
  */
-function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_values, $form_id) {
-  $order = $form_values['commerce_order'];
+function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_state) {
+  $order = $form_state['commerce_order'];
+
+  // If the order being edited is in a shopping cart status...
   if (in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+    // Loop over the line items on the form...
     foreach ($form['line_items'][LANGUAGE_NONE]['line_items'] as &$line_item) {
-      $line_item['unit_price'][LANGUAGE_NONE][0]['amount']['#disabled'] = 'true';
-      $line_item['unit_price'][LANGUAGE_NONE][0]['currency_code']['#disabled'] = 'true';
+      // Disable the unit price amount and currency code fields.
+      $line_item['unit_price'][LANGUAGE_NONE][0]['amount']['#disabled'] = TRUE;
+      $line_item['unit_price'][LANGUAGE_NONE][0]['currency_code']['#disabled'] = TRUE;
     }
   }
 }
