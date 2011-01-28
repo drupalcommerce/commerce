@@ -483,11 +483,3 @@ function commerce_price_field_data_property_info($name = NULL) {
     ),
   );
 }
-
-function commerce_price_object_get_amount($price) {
-  return $price->getAmount();
-}
-
-function commerce_price_object_get_currency_code($price) {
-  return $price->getCurrencyCode();
-}
