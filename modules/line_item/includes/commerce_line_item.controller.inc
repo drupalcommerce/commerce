@@ -17,14 +17,16 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    *
    * @param $type
    *   The machine-readable type of the line item.
+   * @param $order_id
+   *   The ID of the order the line item belongs to (if available).
    *
    * @return
    *   A line item object with all default fields initialized.
    */
-  public function create($type = '') {
+  public function create($type = '', $order_id = 0) {
     return (object) array(
       'line_item_id' => '',
-      'order_id' => '',
+      'order_id' => $order_id,
       'type' => $type,
       'line_item_label' => '',
       'quantity' => 1,

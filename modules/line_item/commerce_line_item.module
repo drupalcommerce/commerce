@@ -474,12 +474,14 @@ function commerce_line_item_type_callback($line_item_type, $callback) {
  *
  * @param $type
  *   The machine-readable type of the line item.
+ * @param $order_id
+ *   The ID of the order the line item belongs to (if available).
  *
  * @return
  *   A line item object with all default fields initialized.
  */
-function commerce_line_item_new($type = '') {
-  return entity_get_controller('commerce_line_item')->create($type);
+function commerce_line_item_new($type = '', $order_id = 0) {
+  return entity_get_controller('commerce_line_item')->create($type, $order_id);
 }
 
 /**
