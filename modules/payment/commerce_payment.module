@@ -907,12 +907,12 @@ function commerce_payment_transaction_get_properties($transaction, array $option
     case 'order':
       return $transaction->order_id;
     case 'message':
-      $message = '';
       if ($transaction->message) {
-        $message = t($transaction->message, is_array($transaction->message_variables) ? $transaction->message_variables : array());
+        return t($transaction->message, is_array($transaction->message_variables) ? $transaction->message_variables : array());
       }
-      return $message;
-      break;
+      else {
+        return '';
+      }
   }
 }
 
