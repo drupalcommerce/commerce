@@ -20,6 +20,25 @@ function commerce_line_item_entity_property_info() {
     'description' => t('The internal numeric ID of the line item.'),
     'type' => 'integer',
   );
+  $properties['order_id'] = array(
+    'label' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
+    'type' => 'integer',
+    'description' => t('The unique ID of the order the line item belongs to.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'setter permission' => 'administer line items',
+    'clear' => array('order'),
+    'query callback' => 'entity_metadata_table_query',
+  );
+  $properties['order'] = array(
+    'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
+    'type' => 'commerce_order',
+    'description' => t('The order the line item belongs to.'),
+    'getter callback' => 'commerce_line_item_get_properties',
+    'setter callback' => 'commerce_line_item_set_properties',
+    'setter permission' => 'administer line items',
+    'required' => TRUE,
+    'clear' => array('order_id'),
+  );
   $properties['type'] = array(
     'label' => t('Type'),
     'description' => t('The human readable name of the line item type.'),
@@ -56,26 +75,7 @@ function commerce_line_item_entity_property_info() {
     'type' => 'date',
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['order_id'] = array(
-    'label' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
-    'type' => 'integer',
-    'description' => t("The unique ID of the order the line item belongs to."),
-    'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer line items',
-    'clear' => array('order'),
-    'query callback' => 'entity_metadata_table_query',
-  );
-  $properties['order'] = array(
-    'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
-    'type' => 'commerce_order',
-    'description' => t("The order the line item belongs to."),
-    'getter callback' => 'commerce_payment_transaction_get_properties',
-    'setter callback' => 'commerce_payment_transaction_set_properties',
-    'setter permission' => 'administer line items',
-    'required' => TRUE,
-    'clear' => array('order_id'),
-  );
-  
+
   return $info;
 }
 

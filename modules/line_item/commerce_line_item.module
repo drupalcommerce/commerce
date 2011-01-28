@@ -1079,6 +1079,31 @@ function commerce_line_item_field_widget_error($element, $error) {
 }
 
 /**
+ * Callback for getting line item properties.
+ *
+ * @see commerce_line_item_entity_property_info()
+ */
+function commerce_line_item_get_properties($line_item, array $options, $name) {
+  switch ($name) {
+    case 'order':
+      return $line_item->order_id;
+  }
+}
+
+/**
+ * Callback for setting line item properties.
+ *
+ * @see commerce_line_item_entity_property_info()
+ */
+function commerce_line_item_set_properties($line_item, $name, $value) {
+  switch ($name) {
+    case 'order':
+      $line_item->order_id = $value;
+      break;
+  }
+}
+
+/**
  * Callback to alter the property info of the reference field.
  *
  * @see commerce_line_item_field_info().
