@@ -687,11 +687,11 @@ function commerce_line_item_field_formatter_settings_form($field, $instance, $vi
     $options = array();
 
      // Generate an option list from all user defined and module defined views.
-     foreach (views_get_all_views() as $view_id => $view_value) {
+     foreach (views_get_all_views() as $name => $view) {
       // Only include line item Views.
-      if ($view_value->base_table == 'commerce_line_item') {
-         foreach ($view_value->display as $display_id => $display_value) {
-          $options[check_plain($view_id)][$view_id .'|'. $display_id] = check_plain($display_value->display_title);
+      if ($view->base_table == 'commerce_line_item') {
+         foreach ($view->display as $display_name => $display) {
+          $options[check_plain($name)][$name .'|'. $display_name] = check_plain($display->display_title);
         }
        }
      }
@@ -718,7 +718,11 @@ function commerce_line_item_field_formatter_settings_summary($field, $instance, 
   $summary = array();
 
   if ($display['type'] == 'commerce_line_item_reference_view') {
-    $summary = t('View: !view', array('!view' => $settings['view']));
+    // Load the View and display its information in the summary.
+    list($name, $display_name) = explode('|', $display['settings']['view']);
+    $view = views_get_view($name);
+
+    $summary = t('View: @name - @display', array('@name' => $view->name, '@display' => $view->display[$display_name]->display_title));
   }
 
   return $summary;
@@ -739,7 +743,9 @@ function commerce_line_item_field_formatter_view($entity_type, $object, $field, 
 
   switch ($display['type']) {
     case 'commerce_line_item_reference_view':
+      // Extract the View and display ID from the setting.
       list($view_id, $display_id) = explode('|', $display['settings']['view']);
+
       $result[0] = array(
         '#markup' => commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids))),
       );
