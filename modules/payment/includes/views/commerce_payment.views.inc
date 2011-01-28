@@ -265,7 +265,7 @@ function commerce_payment_views_data_alter(&$data) {
   $data['commerce_order']['balance'] = array(
     'field' => array(
       'title' => t('Order Balance'),
-    	'help' => t('Total transaction payment balance for the order.'),
+      'help' => t('Total transaction payment balance for the order.'),
       'handler' => 'commerce_payment_handler_field_balance',
     ),
   );
