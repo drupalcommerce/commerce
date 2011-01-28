@@ -1026,10 +1026,9 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           // A field qualifies if it is single value, required and uses a widget
           // with a definite set of options. For the sake of simplicity, this is
           // currently restricted to fields defined by the options module.
-          // Currently product attribute fields cannot be translatable either.
           $field = field_info_field($instance['field_name']);
 
-          if ($field['cardinality'] == 1 && $instance['required'] && $instance['widget']['module'] == 'options' && empty($field['translatable'])) {
+          if ($field['cardinality'] == 1 && $instance['required'] && $instance['widget']['module'] == 'options') {
             // Get the options properties from the options module and store the
             // options for the instance in select list format in the array of
             // qualifying fields.
