@@ -285,7 +285,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['fields']['order_number']['field'] = 'order_number';
   $handler->display->display_options['fields']['order_number']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['order_number']['alter']['make_link'] = 1;
-  $handler->display->display_options['fields']['order_number']['alter']['path'] = 'user/[uid]/orders/[order_id]/detail';
+  $handler->display->display_options['fields']['order_number']['alter']['path'] = 'user/[uid]/orders/[order_id]';
   $handler->display->display_options['fields']['order_number']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['order_number']['alter']['trim'] = 0;
   $handler->display->display_options['fields']['order_number']['alter']['nl2br'] = 0;
@@ -387,7 +387,7 @@ function commerce_order_ui_views_default_views() {
     t('Uid'),
     t('Order ID'),
     t('Order number'),
-    t('user/[uid]/orders/[order_id]/detail'),
+    t('user/[uid]/orders/[order_id]'),
     t('Created'),
     t('Updated date'),
     t('Order status'),
