@@ -75,7 +75,7 @@ function commerce_payment_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'commerce_payment_handler_filter_payment_method',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -132,7 +132,7 @@ function commerce_payment_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'commerce_payment_handler_filter_currency_code',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -170,7 +170,7 @@ function commerce_payment_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'commerce_payment_handler_filter_payment_transaction_status',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
