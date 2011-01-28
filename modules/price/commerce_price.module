@@ -95,6 +95,11 @@ function commerce_price_field_is_empty($item, $field) {
  *     setting.
  */
 function commerce_price_create_instance($name, $entity_type, $bundle, $label, $weight = 0, $calculation = FALSE) {
+  // If a field type we know should exist isn't found, clear the Field cache.
+  if (!field_info_field_types('commerce_price')) {
+    field_clear_cache();
+  }
+
   $field = field_info_field($name);
   $instance = field_info_instance($entity_type, $name, $bundle);
 
