@@ -396,12 +396,12 @@ function commerce_cart_views_default_views() {
   $view->name = 'commerce_cart_summary';
   $view->description = 'Cart line item summary displayed during checkout.';
   $view->tag = 'commerce';
-  $view->view_php = '';
   $view->base_table = 'commerce_order';
-  $view->is_cacheable = FALSE;
+  $view->human_name = '';
+  $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-
+  
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->display->display_options['title'] = 'Shopping cart';
@@ -440,63 +440,106 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['footer']['line_item_summary']['id'] = 'line_item_summary';
   $handler->display->display_options['footer']['line_item_summary']['table'] = 'commerce_line_item';
   $handler->display->display_options['footer']['line_item_summary']['field'] = 'line_item_summary';
-  $handler->display->display_options['footer']['line_item_summary']['links'] = array(
-    'checkout' => 0,
-  );
   /* Relationship: Fields: Referenced line item */
   $handler->display->display_options['relationships']['line_items_line_item_id']['id'] = 'line_items_line_item_id';
   $handler->display->display_options['relationships']['line_items_line_item_id']['table'] = 'field_data_line_items';
   $handler->display->display_options['relationships']['line_items_line_item_id']['field'] = 'line_items_line_item_id';
   $handler->display->display_options['relationships']['line_items_line_item_id']['required'] = 1;
+  /* Relationship: Fields: Referenced product */
+  $handler->display->display_options['relationships']['product_product_id']['id'] = 'product_product_id';
+  $handler->display->display_options['relationships']['product_product_id']['table'] = 'field_data_product';
+  $handler->display->display_options['relationships']['product_product_id']['field'] = 'product_product_id';
+  $handler->display->display_options['relationships']['product_product_id']['relationship'] = 'line_items_line_item_id';
+  $handler->display->display_options['relationships']['product_product_id']['required'] = 0;
+  /* Field: Commerce Product: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'commerce_product';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['relationship'] = 'product_product_id';
+  $handler->display->display_options['fields']['title']['label'] = 'Product';
+  $handler->display->display_options['fields']['title']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['title']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['title']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['title']['link_to_product'] = 0;
+  /* Field: Fields: unit_price */
+  $handler->display->display_options['fields']['entity_id_1']['id'] = 'entity_id_1';
+  $handler->display->display_options['fields']['entity_id_1']['table'] = 'field_data_unit_price';
+  $handler->display->display_options['fields']['entity_id_1']['field'] = 'entity_id';
+  $handler->display->display_options['fields']['entity_id_1']['relationship'] = 'line_items_line_item_id';
+  $handler->display->display_options['fields']['entity_id_1']['label'] = 'Price';
+  $handler->display->display_options['fields']['entity_id_1']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['entity_id_1']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['entity_id_1']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id_1']['click_sort_column'] = 'amount';
+  $handler->display->display_options['fields']['entity_id_1']['type'] = 'commerce_price_formatted_amount';
+  $handler->display->display_options['fields']['entity_id_1']['settings'] = array(
+    'calculation' => FALSE,
+  );
   /* Field: Commerce Line Item: Quantity */
   $handler->display->display_options['fields']['quantity']['id'] = 'quantity';
   $handler->display->display_options['fields']['quantity']['table'] = 'commerce_line_item';
   $handler->display->display_options['fields']['quantity']['field'] = 'quantity';
   $handler->display->display_options['fields']['quantity']['relationship'] = 'line_items_line_item_id';
-  $handler->display->display_options['fields']['quantity']['label'] = '';
   $handler->display->display_options['fields']['quantity']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['quantity']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['quantity']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['quantity']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['quantity']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['quantity']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['quantity']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['quantity']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['quantity']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['quantity']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['quantity']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['quantity']['hide_empty'] = 0;
   $handler->display->display_options['fields']['quantity']['empty_zero'] = 0;
   $handler->display->display_options['fields']['quantity']['set_precision'] = 0;
   $handler->display->display_options['fields']['quantity']['precision'] = '0';
-  $handler->display->display_options['fields']['quantity']['suffix'] = ' × ';
-  /* Field: Commerce Line Item: Line item label */
-  $handler->display->display_options['fields']['line_item_label']['id'] = 'line_item_label';
-  $handler->display->display_options['fields']['line_item_label']['table'] = 'commerce_line_item';
-  $handler->display->display_options['fields']['line_item_label']['field'] = 'line_item_label';
-  $handler->display->display_options['fields']['line_item_label']['relationship'] = 'line_items_line_item_id';
-  $handler->display->display_options['fields']['line_item_label']['label'] = '';
-  $handler->display->display_options['fields']['line_item_label']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['line_item_label']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['line_item_label']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['line_item_label']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['quantity']['format_plural'] = 0;
   /* Field: Fields: total */
   $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_total';
   $handler->display->display_options['fields']['entity_id']['field'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['relationship'] = 'line_items_line_item_id';
-  $handler->display->display_options['fields']['entity_id']['label'] = '';
+  $handler->display->display_options['fields']['entity_id']['label'] = 'Total';
   $handler->display->display_options['fields']['entity_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['entity_id']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['absolute'] = 0;
   $handler->display->display_options['fields']['entity_id']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['entity_id']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['entity_id']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['entity_id']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['entity_id']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['entity_id']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['entity_id']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['entity_id']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['entity_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['entity_id']['click_sort_column'] = 'amount';
   $handler->display->display_options['fields']['entity_id']['type'] = 'commerce_price_formatted_amount';
+  $handler->display->display_options['fields']['entity_id']['settings'] = array(
+    'calculation' => FALSE,
+  );
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
   $handler->display->display_options['sorts']['line_item_id']['table'] = 'commerce_line_item';
@@ -517,6 +560,24 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['filters']['type']['relationship'] = 'line_items_line_item_id';
   $handler->display->display_options['filters']['type']['value'] = array(
     'product' => 'product',
+  );
+  $translatables['commerce_cart_summary'] = array(
+    t('Defaults'),
+    t('Shopping cart'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort By'),
+    t('Asc'),
+    t('Desc'),
+    t('Line Item'),
+    t('Product'),
+    t('Price'),
+    t('Quantity'),
+    t('.'),
+    t(','),
+    t('Total'),
+    t('All'),
   );
 
   $views[$view->name] = $view;
