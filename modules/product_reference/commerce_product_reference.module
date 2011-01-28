@@ -1045,7 +1045,9 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
   $product = commerce_product_load($element['actions']['product_id']['#value']);
 
   // Populate the line item with the product data.
-  commerce_product_line_item_populate($line_item, $product, NULL, NULL, $element['#language']);
+  // The $qty parameter is NULL because because this submit handler is called from the 'add line item' button
+  // The line item entity controller will set a default value right before the line item is created.
+  commerce_product_line_item_populate($line_item, $product, NULL, $form_state['commerce_order'], $element['#language']);
 }
 
 /**
