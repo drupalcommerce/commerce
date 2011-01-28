@@ -174,9 +174,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
    */
   function testCommerceProductTokens() {
     $product = commerce_product_new('product');
+    $author = $this->drupalCreateUser();
+
     $product->sku = $this->randomName(10);
     $product->title = $this->randomName(10);
-    $product->uid = 1;
+    $product->uid = $author->uid;
     $product = commerce_product_save($product);
 
     $this->assertEqual(token_replace('[product:product-id]', array('product' => $product)), $product->product_id, '[product:product-id] was replaced with the product ID.');
@@ -184,7 +186,10 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $this->assertEqual(token_replace('[product:type]', array('product' => $product)), commerce_product_type_get_name($product->type), '[product:type] was replaced with the product type.');
     $this->assertEqual(token_replace('[product:title]', array('product' => $product)), $product->title, '[product:title] was replaced with the title.');
     $this->assertNotIdentical(strpos(token_replace('[product:edit-url]', array('product' => $product)), url('admin/commerce/products/' . $product->product_id . '/edit')), FALSE, '[product:edit-url] was replaced with the edit URL.');
+    $this->assertEqual(token_replace('[product:author:uid]', array('product' => $product)), $product->uid, '[product:author:uid] was replaced with the uid of the author');
+    $this->assertEqual(token_replace('[product:author:name]', array('product' => $product)), check_plain(format_username($author)), '[product:author:name] was replaced with the name of the author');
     $this->assertEqual(token_replace('[product:created]', array('product' => $product)), format_date($product->created, 'medium'), '[product:created] was replaced with the created date.');
+    $this->assertEqual(token_replace('[product:changed]', array('product' => $product)), format_date($product->changed, 'medium'), '[product:changed] was replaced with the changed date.');
   }
 }
 
