@@ -1253,36 +1253,28 @@ function commerce_line_item_summary_links() {
 }
 
 /**
- * Implements hook_field_views_data_alter().
- *
- * This is a Views hook implemented to enable adding relationships for
- * referenced line items.
+ * Implements hook_field_views_data().
  */
-function commerce_line_item_field_views_data_alter(&$data, $field, $module) {
-  // If the field is a line item reference field...
-  if ($field['type'] == 'commerce_line_item_reference') {
-    $keys = array_keys($data);
-    $table = array_shift($keys);
+function commerce_line_item_field_views_data($field) {
+  $data = field_views_field_default_views_data($field);
+  $bundles = array();
+  foreach ($field['bundles'] as $entity => $bundles) {
+    $bundles[] = $entity . ' (' . implode(', ', $bundles) . ')';
+  }
 
-    // Add the relationship data to the proper line_item_id column.
-    foreach (array_keys($data[$table]) as $key) {
-      if (strpos($key, '_line_item_id') == strlen($key) - 13) {
-        // First indicate this field's table joins to the commerce_line_item table.
-        $data[$table]['table']['join']['commerce_line_item'] = array(
-          'left_field' => 'line_item_id',
-          'field' => $key,
-        );
-
-        // Then add the relationship data to the field itself.
-        $data[$table][$key]['relationship'] = array(
+  foreach ($data as $table_name => $table_data) {
+    foreach ($table_data as $field_name => $field_data) {
+      if (!in_array($field_name, array('table', 'entity_id', 'revision_id'))) {
+        $data[$table_name][$field_name]['relationship'] = array(
           'title' => t('Referenced line item'),
           'help' => t('The line item referenced through this field.'),
           'base' => 'commerce_line_item',
           'base field' => 'line_item_id',
           'handler' => 'views_handler_relationship',
           'label' => t('Line Item'),
-        );
-      }
-    }
-  }
+         );
+       }
+     }
+   }
+   return $data;
 }
