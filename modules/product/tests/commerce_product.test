@@ -174,11 +174,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
    */
   function testCommerceProductTokens() {
     $product = commerce_product_new('product');
-    $author = $this->drupalCreateUser();
+    $creator = $this->drupalCreateUser();
 
     $product->sku = $this->randomName(10);
     $product->title = $this->randomName(10);
-    $product->uid = $author->uid;
+    $product->uid = $creator->uid;
     $product = commerce_product_save($product);
 
     $this->assertEqual(token_replace('[product:product-id]', array('product' => $product)), $product->product_id, '[product:product-id] was replaced with the product ID.');
