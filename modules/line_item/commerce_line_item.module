@@ -666,8 +666,62 @@ function commerce_line_item_field_formatter_info() {
       'label' => t('Line item View'),
       'description' => t('Display the line items via a default View.'),
       'field types' => array('commerce_line_item_reference'),
+      'settings' => array(
+        'view' => 'commerce_line_item_table|default',
+      ),
     ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function commerce_line_item_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  if ($display['type'] == 'commerce_line_item_reference_view') {
+    // Build an options array of Views available for the order contents pane.
+    $options = array();
+
+     // Generate an option list from all user defined and module defined views.
+     foreach (views_get_all_views() as $view_id => $view_value) {
+      // Only include line item Views.
+      if ($view_value->base_table == 'commerce_line_item') {
+         foreach ($view_value->display as $display_id => $display_value) {
+          $options[check_plain($view_id)][$view_id .'|'. $display_id] = check_plain($display_value->display_title);
+        }
+       }
+     }
+
+    $element['view'] = array(
+      '#type' => 'select',
+      '#title' => t('Order contents View'),
+      '#description' => t('Specify the View to use in the order contents pane.'),
+      '#options' => $options,
+      '#default_value' => $settings['view'],
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function commerce_line_item_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  if ($display['type'] == 'commerce_line_item_reference_view') {
+    $summary = t('View: !view', array('!view' => $settings['view']));
+  }
+
+  return $summary;
 }
 
 /**
@@ -685,8 +739,9 @@ function commerce_line_item_field_formatter_view($entity_type, $object, $field, 
 
   switch ($display['type']) {
     case 'commerce_line_item_reference_view':
+      list($view_id, $display_id) = explode('|', $display['settings']['view']);
       $result[0] = array(
-        '#markup' => commerce_embed_view('commerce_line_item_table', 'defaults', array(implode(',', $line_item_ids))),
+        '#markup' => commerce_embed_view($view_id, $display_id, array(implode(',', $line_item_ids))),
       );
 
       break;
