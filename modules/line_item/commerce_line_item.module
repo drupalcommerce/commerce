@@ -1264,7 +1264,10 @@ function commerce_line_item_summary_links() {
  */
 function commerce_line_item_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
+
+  // Build an array of bundles the field appears on.
   $bundles = array();
+
   foreach ($field['bundles'] as $entity => $bundles) {
     $bundles[] = $entity . ' (' . implode(', ', $bundles) . ')';
   }
@@ -1279,9 +1282,10 @@ function commerce_line_item_field_views_data($field) {
           'base field' => 'line_item_id',
           'handler' => 'views_handler_relationship',
           'label' => t('Line Item'),
-         );
-       }
-     }
-   }
-   return $data;
+        );
+      }
+    }
+  }
+
+  return $data;
 }

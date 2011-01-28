@@ -909,7 +909,10 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
  */
 function commerce_product_reference_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
+
+  // Build an array of bundles the product reference field appears on.
   $bundles = array();
+
   foreach ($field['bundles'] as $entity => $bundles) {
     $bundles[] = $entity . ' (' . implode(', ', $bundles) . ')';
   }
@@ -924,11 +927,12 @@ function commerce_product_reference_field_views_data($field) {
           'base field' => 'product_id',
           'handler' => 'views_handler_relationship',
           'label' => t('Product'),
-         );
-       }
-     }
-   }
-   return $data;
+        );
+      }
+    }
+  }
+
+  return $data;
 }
 
 /**
