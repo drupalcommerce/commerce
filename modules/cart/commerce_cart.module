@@ -380,25 +380,15 @@ function commerce_cart_commerce_line_item_presave($line_item) {
   // Get the line item directly from the database and compare with the current one.
   $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
 
-  // If the quantity has changed, find any orders that reference this line item.
+  // If the line item has changed, find the order this line item belongs to
   if ($unchanged_line_item->quantity != $line_item->quantity) {
     // Create an array of shopping cart order statuses we need to monitor.
     $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+    $order = commerce_order_load($line_item->order_id);
 
-    $query = new EntityFieldQuery();
-
-    $query
-      ->entityCondition('entity_type', 'commerce_order')
-      ->fieldCondition('line_items', 'line_item_id', $line_item->line_item_id, '=')
-      ->execute();
-
-    foreach ($query->ordered_results as $entity) {
-      $order = commerce_order_load($entity->entity_id);
-
-      if (in_array($order->status, $status_ids)) {
-        $order->status = 'cart';
-        commerce_order_save($order);
-      }
+    if (in_array($order->status, $status_ids)) {
+      $order->status = 'cart';
+      commerce_order_save($order);
     }
   }
 }
