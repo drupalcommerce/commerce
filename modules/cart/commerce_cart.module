@@ -147,7 +147,7 @@ function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_st
   $order = $form_state['commerce_order'];
 
   // If the order being edited is in a shopping cart status...
-  if (in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+  if (commerce_cart_order_is_cart($order)) {
     // Loop over the line items on the form...
     foreach ($form['line_items'][LANGUAGE_NONE]['line_items'] as &$line_item) {
       // Disable the unit price amount and currency code fields.
@@ -300,7 +300,7 @@ function commerce_cart_block_view($delta) {
  */
 function commerce_cart_commerce_order_load($orders) {
   foreach ($orders as $order) {
-    if (in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+    if (commerce_cart_order_is_cart($order)) {
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
       // Loop over every line item on the order...
@@ -354,11 +354,8 @@ function commerce_cart_commerce_order_load($orders) {
  * which we check on order save by seeing if line items are added or removed.
  */
 function commerce_cart_commerce_order_presave($order) {
-  // Create an array of shopping cart order statuses we need to monitor.
-  $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
-
   // Exit if this is a new order or not in a cart status.
-  if (empty($order->order_id) || !in_array($order->status, $status_ids)) {
+  if (empty($order->order_id) || !commerce_cart_order_is_cart($order)) {
     return;
   }
 
@@ -406,11 +403,9 @@ function commerce_cart_commerce_line_item_presave($line_item) {
     // Get the line item directly from the database and compare with the current one.
     $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
 
-    // If the line item's quantity has changed and it's attached to an order in a
-    // shopping cart status...
-    if ($line_item->quantity != $unchanged_line_item->quantity &&
-      in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
-
+    // If the line item's quantity has changed and it's attached to a shopping
+    // cart order...
+    if ($line_item->quantity != $unchanged_line_item->quantity && commerce_cart_order_is_cart($order)) {
       // Return the order to the cart status.
       $order->status = 'cart';
       commerce_order_save($order);
@@ -426,8 +421,8 @@ function commerce_cart_commerce_line_item_presave($line_item) {
 function commerce_cart_commerce_line_item_delete($line_item) {
   // If the order for this line item exists...
   if ($order = commerce_order_load($line_item->order_id)) {
-    // If it's in a shopping cart status...
-    if (in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+    // And it's a shopping cart order...
+    if (commerce_cart_order_is_cart($order)) {
       // Reset the order to the Cart status directly.
       $order->status = 'cart';
       commerce_order_save($order);
@@ -530,6 +525,21 @@ function commerce_cart_order_new($uid = 0) {
   }
 
   return $order;
+}
+
+/**
+ * Determines whether or not the given order is a shopping cart order.
+ */
+function commerce_cart_order_is_cart($order) {
+  // If the order is in a shopping cart order status, assume it is a cart.
+  $is_cart = in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))));
+
+  // Allow other modules to make the judgment based on some other criteria.
+  if (in_array(FALSE, module_invoke_all('commerce_cart_order_is_cart', $order, $is_cart))) {
+    $is_cart = FALSE;
+  }
+
+  return $is_cart;
 }
 
 /**
