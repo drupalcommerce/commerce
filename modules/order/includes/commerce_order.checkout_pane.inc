@@ -50,33 +50,18 @@ function commerce_order_account_pane_checkout_form($form, &$form_state, $checkou
   }
   else {
     // Otherwise add an order e-mail address field to the form.
-    $pane_form['mail'] = array(
+    $pane_form['login'] = array(
+      '#type' => 'container',
+      '#prefix' => '<div id="account-login-container">',
+      '#suffix' => '</div>',
+    );
+
+    $pane_form['login']['mail'] = array(
       '#type' => 'textfield',
       '#title' => t('E-mail address'),
       '#default_value' => $order->mail,
       '#required' => TRUE,
-      '#ajax' => array(
-        'callback' => 'commerce_order_account_pane_checkout_form_refresh',
-        'wrapper' => 'account-information-pane',
-      ),
-      '#prefix' => '<div id="account-information-pane">',
-      '#suffix' => '</div>',
     );
-
-    // Check the form state to see if an e-mail address has been specified.
-    if (!empty($form_state['values'][$checkout_pane->pane_id])) {
-      $mail = trim($form_state['values'][$checkout_pane->pane_id]['mail']);
-
-      // Don't attempt to load the user for an invalid e-mail address.
-      if ($error = user_validate_mail($mail)) {
-        form_set_error($checkout_pane->pane_id . '][mail', $error);
-      }
-      elseif (user_load_by_mail($mail)) {
-        // If a user already exists for the given e-mail address, display a
-        // message letting the customer know this.
-        $pane_form['mail']['#description'] = t('There is already an account registered to %mail. <a href="!login_url">Login now</a> to use your account information during checkout.', array('%mail' => $mail, '!login_url' => url('user/login')));
-      }
-    }
   }
 
   return $pane_form;
@@ -89,10 +74,10 @@ function commerce_order_account_pane_checkout_form_validate($form, &$form_state,
   $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
   // If the e-mail address field was present on the form...
-  if (!empty($pane_values['mail'])) {
+  if (!empty($pane_values['login']['mail'])) {
     // Display an error if an invalid e-mail address was given.
-    if ($error = user_validate_mail($pane_values['mail'])) {
-      form_set_error($checkout_pane->pane_id . '][mail', $error);
+    if ($error = user_validate_mail($pane_values['login']['mail'])) {
+      form_set_error($checkout_pane->pane_id . '][login][mail', $error);
       return FALSE;
     }
   }
@@ -106,16 +91,9 @@ function commerce_order_account_pane_checkout_form_validate($form, &$form_state,
 function commerce_order_account_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
   $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
-  if (!empty($pane_values['mail'])) {
-    $order->mail = $pane_values['mail'];
+  if (!empty($pane_values['login']['mail'])) {
+    $order->mail = $pane_values['login']['mail'];
   }
-}
-
-/**
- * Ajax callback: returns the account information pane to an AJAX request.
- */
-function commerce_order_account_pane_checkout_form_refresh($form, $form_state) {
-  return $form['account']['mail'];
 }
 
 /**
