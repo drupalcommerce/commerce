@@ -16,6 +16,12 @@ function commerce_line_item_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'order_id' => array(
+        'description' => 'The unique ID of the order the line item belongs to.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'type' => array(
         'description' => 'The module defined type of this line item.',
         'type' => 'varchar',

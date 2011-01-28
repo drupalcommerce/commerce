@@ -287,7 +287,7 @@ function commerce_cart_commerce_order_load($orders) {
         if ($line_item_wrapper->type->value() == 'product') {
           // Create a new product line item referencing the same product as though
           // we had not added it to the cart yet, but use the current quantity.
-          $line_item = commerce_product_line_item_new($line_item_wrapper->product->value(), $line_item_wrapper->quantity->value());
+          $line_item = commerce_product_line_item_new($line_item_wrapper->product->value(), $line_item_wrapper->quantity->value(), $order);
 
           // Process the unit price through Rules so it reflects the user's actual
           // current purchase price.
@@ -696,7 +696,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
   // If no matching line item was found...
   if (empty($line_item_match)) {
     // Create the new product line item.
-    $line_item = commerce_product_line_item_new($product, $quantity);
+    $line_item = commerce_product_line_item_new($product, $quantity, $order);
 
     // Process the unit price through Rules so it reflects the user's actual
     // purchase price.

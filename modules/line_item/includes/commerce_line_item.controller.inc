@@ -24,6 +24,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
   public function create($type = '') {
     return (object) array(
       'line_item_id' => '',
+      'order_id' => '',
       'type' => $type,
       'line_item_label' => '',
       'quantity' => 1,
