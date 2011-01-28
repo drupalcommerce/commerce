@@ -68,24 +68,61 @@ function commerce_payment_entity_property_info() {
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
-
-  // TODO: add remote_id, message, amount, currency_code, status, and remote_status.
-
   $properties['created'] = array(
     'label' => t('Date created'),
-    'description' => t('The date the product was created.'),
+    'description' => t('The date the payment was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer payment transactions',
   );
   $properties['changed'] = array(
     'label' => t('Date updated'),
-    'description' => t('The date the product was last updated.'),
+    'description' => t('The date the payment was last updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer payment transactions',
+  );
+  $properties['remote_id'] = array(
+    'label' => t('Remote id'),
+    'description' => t('The remote identifier for this transaction.'),
+    'type' => 'text',
+    'query callback' => 'entity_metadata_table_query',
+  );
+  $properties['amount'] = array(
+    'label' => t('Amount'),
+    'description' => t('The amount for this transaction.'),
+    'type' => 'decimal',
+    'query callback' => 'entity_metadata_table_query',
+  );
+  $properties['currency_code'] = array(
+    'label' => t('Currency Code'),
+    'description' => t('The currency code for this transaction.'),
+    'type' => 'text',
+    'query callback' => 'entity_metadata_table_query',
+  );
+  $properties['message'] = array(
+    'label' => t('Message'),
+    'description' => t('Message for this transaction.'),
+    'type' => 'text',
+    'getter callback' => 'commerce_payment_transaction_get_properties',
+  );
+  $properties['status'] = array(
+    'label' => t('Status'),
+    'description' => t('Status of the payment transaction.'),
+    'type' => 'text',
+    'setter callback' => 'entity_property_verbatim_set',
+    'query callback' => 'entity_metadata_table_query',
+    'setter permission' => 'administer payment transactions',
+  );
+  $properties['remote_status'] = array(
+    'label' => t('Remote status'),
+    'description' => t('Remote status of the payment transaction.'),
+    'type' => 'text',
+    'setter callback' => 'entity_property_verbatim_set',
+    'query callback' => 'entity_metadata_table_query',
+    'setter permission' => 'administer payment transactions',
   );
 
   return $info;
