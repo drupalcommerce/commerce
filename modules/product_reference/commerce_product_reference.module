@@ -49,6 +49,29 @@ function commerce_product_reference_field_extra_fields() {
 }
 
 /**
+ * Implements hook_form_FORMID_alter().
+ *
+ * Override the field manage display screen to add a description to the fields
+ * we embed into the target node from the product.
+ */
+function commerce_product_reference_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
+  if (!module_exists('commerce_product_ui')) {
+    return;
+  }
+
+  $entity_type = $form['#entity_type'];
+  $bundle = $form['#bundle'];
+
+  $product_fields = commerce_product_reference_field_extra_fields();
+
+  if (isset($product_fields[$entity_type][$bundle])) {
+    foreach ($product_fields[$entity_type][$bundle]['display'] as $field_name => $field) {
+      $form['fields'][$field_name]['format']['type']['#description'] = t('Modify this field settings on the <a href="@url">product display configuration</a>.', array('@url' => url('admin/commerce/products/types')));
+    }
+  }
+}
+
+/**
  * Implements hook_node_view().
  *
  * This implementation adds product fields to the content array of a node on
