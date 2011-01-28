@@ -60,6 +60,14 @@ function commerce_product_entity_property_info() {
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer products',
   );
+  $properties['changed'] = array(
+    'label' => t('Date changed'),
+    'description' => t('The date the product was most recently updated.'),
+    'type' => 'date',
+    'setter callback' => 'entity_property_verbatim_set',
+    'query callback' => 'entity_metadata_table_query',
+    'setter permission' => 'administer products',
+  );
   $properties['uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',
