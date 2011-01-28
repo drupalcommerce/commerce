@@ -24,6 +24,7 @@ files[] = includes/views/handlers/commerce_payment_handler_field_status.inc
 files[] = includes/views/handlers/commerce_payment_handler_filter_payment_method.inc
 files[] = includes/views/handlers/commerce_payment_handler_filter_payment_transaction_status.inc
 files[] = includes/views/handlers/commerce_payment_handler_filter_currency_code.inc
+files[] = includes/views/handlers/commerce_payment_handler_field_balance.inc
 
 ; Tests
 files[] = tests/commerce_payment.payment.test
