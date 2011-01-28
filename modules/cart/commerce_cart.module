@@ -401,20 +401,20 @@ function commerce_cart_commerce_line_item_presave($line_item) {
     return;
   }
 
-  // Get the line item directly from the database and compare with the current one.
-  $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
+  // If the line item is attached to an existing order...
+  if ($order = commerce_order_load($line_item->order_id)) {
+    // Get the line item directly from the database and compare with the current one.
+    $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
 
-  // Wrap the the updated line item to have access to its order.
-  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    // If the line item's quantity has changed and it's attached to an order in a
+    // shopping cart status...
+    if ($line_item->quantity != $unchanged_line_item->quantity &&
+      in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
 
-  // If the line item's quantity has changed and it's attached to an order in a
-  // shopping cart status...
-  if ($line_item->quantity != $unchanged_line_item->quantity &&
-    in_array($wrapper->order->status->value(), array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
-
-    // Return the order to the cart status.
-    $order->status = 'cart';
-    commerce_order_save($order);
+      // Return the order to the cart status.
+      $order->status = 'cart';
+      commerce_order_save($order);
+    }
   }
 }
 
