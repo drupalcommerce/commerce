@@ -1033,8 +1033,15 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       if ($parent == 'save_line_item') {
         $line_item_type = $element['actions']['line_item_type']['#value'];
 
+        // Extract an order ID from the form if present.
+        $order_id = 0;
+
+        if (!empty($form_state['commerce_order'])) {
+          $order_id = $form_state['commerce_order']->order_id;
+        }
+
         // Create the new line item.
-        $line_item = commerce_line_item_new($line_item_type->type);
+        $line_item = commerce_line_item_new($line_item_type->type, $order_id);
 
         // If this type specifies a valid add form callback function...
         if ($callback = commerce_line_item_type_callback($line_item_type, 'add_form_submit')) {

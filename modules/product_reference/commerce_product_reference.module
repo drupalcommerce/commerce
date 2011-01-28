@@ -1030,9 +1030,7 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
   $product = commerce_product_load($element['actions']['product_id']['#value']);
 
   // Populate the line item with the product data.
-  // The $qty parameter is NULL because because this submit handler is called from the 'add line item' button
-  // The line item entity controller will set a default value right before the line item is created.
-  commerce_product_line_item_populate($line_item, $product, NULL, $form_state['commerce_order'], $element['#language']);
+  commerce_product_line_item_populate($line_item, $product, NULL, $element['#language']);
 }
 
 /**
@@ -1042,18 +1040,20 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   The fully loaded product referenced by the line item.
  * @param $quantity
  *   The quantity to set for the product.
+ * @param $order_id
+ *   The ID of the order the line item belongs to (if available).
  * @param $language
  *   Optionally specify the language for the line item.
  *
  * @return
  *   The fully loaded line item populated with the product data as specified.
  */
-function commerce_product_line_item_new($product, $quantity = 1, $order = NULL, $language = LANGUAGE_NONE) {
+function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $language = LANGUAGE_NONE) {
   // Create the new line item.
-  $line_item = commerce_line_item_new('product');
+  $line_item = commerce_line_item_new('product', $order_id);
 
   // Populate it with the product information.
-  commerce_product_line_item_populate($line_item, $product, $quantity, $order, $language);
+  commerce_product_line_item_populate($line_item, $product, $quantity, $language);
 
   // Return the line item.
   return $line_item;
@@ -1071,13 +1071,9 @@ function commerce_product_line_item_new($product, $quantity = 1, $order = NULL, 
  * @param $language
  *   Optionally specify the language for the line item.
  */
-function commerce_product_line_item_populate(&$line_item, $product, $quantity = NULL, $order = NULL, $language = LANGUAGE_NONE) {
+function commerce_product_line_item_populate(&$line_item, $product, $quantity = 1, $language = LANGUAGE_NONE) {
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
-  if (!is_null($order)) {
-    $line_item->order_id = $order->order_id;    
-  }
-
 
   // Only update the quantity value if one is specified.
   if (!empty($quantity)) {
