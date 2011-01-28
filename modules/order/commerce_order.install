@@ -50,7 +50,7 @@ function commerce_order_schema() {
         'default' => '',
       ),
       'status' => array(
-        'description' => 'The {commerce_order_status}.name of this order.',
+        'description' => 'The status name of this order.',
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE,
@@ -88,10 +88,6 @@ function commerce_order_schema() {
       'owner' => array(
         'table' => 'users',
         'columns' => array('uid' => 'uid'),
-      ),
-      'status' => array(
-        'table' => 'commerce_order_status',
-        'columns' => array('status' => 'name'),
       ),
     ),
   );
@@ -131,7 +127,7 @@ function commerce_order_schema() {
         'not null' => TRUE,
       ),
       'status' => array(
-        'description' => 'The {commerce_order_status}.name of this revision.',
+        'description' => 'The status name of this revision.',
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE,
@@ -166,70 +162,7 @@ function commerce_order_schema() {
         'table' => 'users',
         'columns' => array('uid' => 'uid'),
       ),
-      'status' => array(
-        'table' => 'commerce_order_status',
-        'columns' => array('status' => 'name'),
-      ),
     ),
-  );
-
-  $schema['commerce_order_state'] = array(
-    'description' => 'Order state configuration data.',
-    'fields' => array(
-      'name' => array(
-        'description' => 'The machine readable name of the order state.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'default_status' => array(
-        'description' => 'The name of the default order status for this state.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'weight' => array(
-        'description' => 'The sorting weight of the status for lists of statuses.',
-        'type' => 'int',
-        'size' => 'small',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-    ),
-    'primary key' => array('name'),
-    'foreign keys' => array(
-      'default_status' => array(
-        'table' => 'commerce_order_status',
-        'columns' => array('default_status' => 'name'),
-      ),
-    ),
-  );
-
-  $schema['commerce_order_status'] = array(
-    'description' => 'Order status configuration data.',
-    'fields' => array(
-      'name' => array(
-        'description' => 'The machine readable name of the order status.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'weight' => array(
-        'description' => 'The sorting weight of the status for lists of statuses.',
-        'type' => 'int',
-        'size' => 'small',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'status' => array(
-        'description' => 'Boolean value indicating whether or not the order status is active.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'default' => 1,
-      ),
-    ),
-    'primary key' => array('name'),
   );
 
   return $schema;

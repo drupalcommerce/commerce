@@ -504,14 +504,6 @@ function commerce_order_states() {
   if (empty($order_states)) {
     $order_states = module_invoke_all('commerce_order_state_info');
 
-    $saved_states = db_query('SELECT * FROM {commerce_order_state}')->fetchAllAssoc('name');
-
-    foreach ((array) $saved_states as $name => $data) {
-      $order_states[$name]->weight = $data->weight;
-      $order_states[$name]->default_status = $data->default_status;
-      $order_states[$name]->saved = TRUE;
-    }
-
     // Give other modules a chance to alter the order states.
     drupal_alter('commerce_order_state_info', $order_states);
 
@@ -527,21 +519,6 @@ function commerce_order_states() {
 function commerce_order_states_reset() {
   $order_statuses = &drupal_static('commerce_order_statuses');
   $order_statuses = NULL;
-}
-
-/**
- * Saves the configuration of an order state.
- *
- * @param $order_state
- *   The fully loaded order state object.
- *
- * @return
- *   The return value of the call to drupal_write_record() to save the order
- *     state, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
- *     the type of query performed to save the order state.
- */
-function commerce_order_state_save($order_state) {
-  return drupal_write_record('commerce_order_state', $order_state, empty($order_state->saved) ? 'name' : array());
 }
 
 /**
@@ -638,14 +615,6 @@ function commerce_order_statuses($conditions = array()) {
   if (!isset($order_statuses)) {
     $order_statuses = module_invoke_all('commerce_order_status_info');
 
-    $saved_statuses = db_query('SELECT * FROM {commerce_order_status}')->fetchAllAssoc('name');
-
-    foreach ((array) $saved_statuses as $name => $data) {
-      $order_statuses[$name]->weight = $data->weight;
-      $order_statuses[$name]->status = $data->status;
-      $order_statuses[$name]->saved = TRUE;
-    }
-
     // Merge in defaults.
     foreach ($order_statuses as $name => $order_status) {
       // Set some defaults for the checkout pane.
@@ -700,21 +669,6 @@ function commerce_order_statuses($conditions = array()) {
 function commerce_order_statuses_reset() {
   $order_statuses = &drupal_static('commerce_order_statuses');
   $order_statuses = NULL;
-}
-
-/**
- * Saves the configuration of an order status.
- *
- * @param $order_status
- *   The fully loaded order status object.
- *
- * @return
- *   The return value of the call to drupal_write_record() to save the order
- *     status, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
- *     the type of query performed to save the order status.
- */
-function commerce_order_status_save($order_status) {
-  return drupal_write_record('commerce_order_status', $order_status, empty($order_status->saved) ? 'name' : array());
 }
 
 /**
