@@ -14,48 +14,48 @@ function commerce_customer_item_token_info() {
   $type = array(
     'name' => t('Customer profiles'),
     'description' => t('Tokens related to customer profiles.'),
-    'needs-data' => 'customer',
+    'needs-data' => 'customer-profile',
   );
 
   // Tokens for customer profiles.
-  $customer = array();
+  $profile = array();
 
-  $customer['customer-profile-id'] = array(
-    'name' => t('Customer profile ID', array(), array('context' => 'a drupal customer profile')),
+  $profile['customer-profile-id'] = array(
+    'name' => t('Customer profile ID'),
     'description' => t('The unique numeric ID of the customer profile.'),
   );
-  $customer['revision-id'] = array(
+  $profile['revision-id'] = array(
     'name' => t('Revision ID'),
     'description' => t("The unique ID of the customer profile's latest revision."),
   );
-  $customer['type'] = array(
+  $profile['type'] = array(
     'name' => t('Customer profile type'),
     'description' => t('The type of the customer profile.'),
   );
-  $customer['type-name'] = array(
+  $profile['type-name'] = array(
     'name' => t('Customer profile type name'),
     'description' => t('The type name of the customer profile.'),
   );
   // Chained tokens for customer profiles.
-  $customer['author'] = array(
-    'name' => t('Customer profile author'),
-    'description' => t('The author of the customer profile.'),
+  $profile['owner'] = array(
+    'name' => t('Customer profile owner'),
+    'description' => t('The user the customer profile belongs to.'),
     'type' => 'user',
   );
-  $customer['created'] = array(
+  $profile['created'] = array(
     'name' => t('Date created'),
     'description' => t('The date the customer profile was created.'),
     'type' => 'date',
   );
-  $customer['changed'] = array(
+  $profile['changed'] = array(
     'name' => t('Date updated'),
     'description' => t('The date the customer profile was last updated.'),
     'type' => 'date',
   );
 
   return array(
-    'types' => array('customer' => $type),
-    'tokens' => array('customer' => $customer),
+    'types' => array('customer-profile' => $type),
+    'tokens' => array('customer-profile' => $profile),
   );
 }
 
@@ -77,59 +77,58 @@ function commerce_customer_tokens($type, $tokens, array $data = array(), array $
 
   $replacements = array();
 
-  if ($type == 'customer' && !empty($data['customer'])) {
-    $customer = $data['customer'];
+  if ($type == 'customer-profile' && !empty($data['customer-profile'])) {
+    $profile = $data['customer-profile'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
         // Simple key values on the customer profile.
         case 'customer-profile-id':
-          $replacements[$original] = $customer->profile_id;
+          $replacements[$original] = $profile->profile_id;
           break;
 
         case 'revision-id':
-          $replacements[$original] = $customer->revision_id;
+          $replacements[$original] = $profile->revision_id;
           break;
 
         case 'type':
-          $replacements[$original] = $sanitize ? check_plain($customer->type) : $customer->type;
+          $replacements[$original] = $sanitize ? check_plain($profile->type) : $profile->type;
           break;
 
         case 'type-name':
-          $types =commerce_customer_profile_types();
-          $replacements[$original] = $types[$customer->type]->name;
+          $replacements[$original] = commerce_customer_profile_type_get_name($profile->type);
           break;
 
         // Default values for the chained tokens handled below.
-        case 'author':
-          if ($customer->uid == 0) {
+        case 'owner':
+          if ($profile->uid == 0) {
             $name = variable_get('anonymous', t('Anonymous'));
           }
           else {
-            $account = user_load($customer->uid);
+            $account = user_load($profile->uid);
             $name = $account->name;
           }
           $replacements[$original] = $sanitize ? filter_xss($name) : $name;
           break;
 
         case 'created':
-          $replacements[$original] = format_date($customer->created, 'medium', '', NULL, $language_code);
+          $replacements[$original] = format_date($profile->created, 'medium', '', NULL, $language_code);
           break;
 
         case 'changed':
-          $replacements[$original] = format_date($customer->changed, 'medium', '', NULL, $language_code);
+          $replacements[$original] = format_date($profile->changed, 'medium', '', NULL, $language_code);
           break;
       }
     }
 
-    if ($author_tokens = token_find_with_prefix($tokens, 'author')) {
-      $author = user_load($customer->uid);
-      $replacements += token_generate('user', $author_tokens, array('user' => $author), $options);
+    if ($owner_tokens = token_find_with_prefix($tokens, 'owner')) {
+      $owner = user_load($profile->uid);
+      $replacements += token_generate('user', $owner_tokens, array('user' => $owner), $options);
     }
 
     foreach (array('created', 'changed') as $date) {
       if ($created_tokens = token_find_with_prefix($tokens, $date)) {
-        $replacements += token_generate('date', $created_tokens, array('date' => $customer->{$date}), $options);
+        $replacements += token_generate('date', $created_tokens, array('date' => $profile->{$date}), $options);
       }
     }
   }
