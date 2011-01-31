@@ -28,6 +28,10 @@ function commerce_line_item_token_info() {
     'name' => t('Line item type'),
     'description' => t('The type of the line item.'),
   );
+  $line_item['type-name'] = array(
+    'name' => t('Line item type name'),
+    'description' => t('The human-readable name of the line item type.'),
+  );
   $line_item['line-item-label'] = array(
     'name' => t('Line item label'),
     'description' => t('The label displayed with the line item.'),
@@ -89,6 +93,10 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
           break;
 
         case 'type':
+          $replacements[$original] = $sanitize ? check_plain($line_item->type) : $line_item->type;
+          break;
+
+        case 'type-name':
           $replacements[$original] = $sanitize ? check_plain(commerce_line_item_type_get_name($line_item->type)) : commerce_line_item_type_get_name($line_item->type);
           break;
 
@@ -129,5 +137,6 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
       }
     }
   }
+
   return $replacements;
 }
