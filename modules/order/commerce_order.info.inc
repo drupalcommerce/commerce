@@ -110,6 +110,7 @@ function commerce_order_entity_property_info() {
     'description' => t('The e-mail address associated with this order.'),
     'setter callback' => 'entity_property_verbatim_set',
     'validation callback' => 'valid_email_address',
+    'query callback' => 'entity_metadata_table_query',
   );
 
   return $info;

@@ -259,13 +259,15 @@ function commerce_order_order_form_submit($form, &$form_state) {
   // Notify field widgets.
   field_attach_submit('commerce_order', $order, $form, $form_state);
 
-  // Save the order.
-  $order = commerce_order_save($order);
-
   // Update the order status if specified.
   if ($form_state['values']['status'] != $form_state['values']['status_original']) {
-    commerce_order_status_update($order, $form_state['values']['status']);
+    // We skip order saving in the update since we do it below once for the
+    // entire form submission.
+    commerce_order_status_update($order, $form_state['values']['status'], TRUE);
   }
+
+  // Save the order.
+  $order = commerce_order_save($order);
 }
 
 /**
