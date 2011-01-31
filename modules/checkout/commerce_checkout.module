@@ -143,6 +143,36 @@ function commerce_checkout_theme() {
 }
 
 /**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Currently the Entity module does not add query callbacks for various core
+ * entity properties. Checkout depends on being able to load a user account by
+ * e-mail address, so we must alter in the callback until Entity is updated.
+ *
+ * @see http://drupal.org/node/1044312
+ */
+function commerce_checkout_entity_property_info_alter(&$info) {
+  // TODO: Switch to using entity_metadata_table_query() when
+  // http://drupal.org/node/1041240 is fixed.
+  $info['user']['properties']['mail']['query callback'] = 'commerce_checkout_entity_metadata_table_query';
+}
+
+/**
+ * Entity callback: queries the database for an entity by a given property.
+ */
+function commerce_checkout_entity_metadata_table_query($entity_type, $property, $value, $limit) {
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', $entity_type, '=')
+        ->propertyCondition($property, $value, '=')
+        ->range(0, $limit);
+
+  $result = $query->execute();
+
+  return !empty($result[$entity_type]) ? array_keys($result[$entity_type]) : array();
+}
+
+/**
  * Implements hook_forms().
  *
  * Each page of the checkout form is actually a unique form as opposed to a

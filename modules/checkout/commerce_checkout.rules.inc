@@ -157,14 +157,7 @@ function commerce_checkout_entity_type_options() {
 function commerce_checkout_condition_entity_exists($type, $property, $value) {
   // TODO: This can be replaced with a call to entity_metadata_table_query()
   // when http://drupal.org/node/1041240 gets fixed.
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', $type, '=')
-    ->propertyCondition($property, $value, '=')
-    ->range(0, 1);
-
-  $result = $query->execute();
-
+  $result = commerce_checkout_entity_metadata_table_query($type, $property, $value, 1);
   return !empty($result);
 }
 
