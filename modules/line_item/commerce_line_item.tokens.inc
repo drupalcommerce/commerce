@@ -24,6 +24,10 @@ function commerce_line_item_token_info() {
     'name' => t('Line item ID'),
     'description' => t('The unique numeric ID of the line item.'),
   );
+  $line_item['type'] = array(
+    'name' => t('Line item type'),
+    'description' => t('The type of the line item.'),
+  );
   $line_item['line-item-label'] = array(
     'name' => t('Line item label'),
     'description' => t('The label displayed with the line item.'),
@@ -34,6 +38,11 @@ function commerce_line_item_token_info() {
   );
 
   // Chained tokens for products.
+  $line_item['order'] = array(
+    'name' => t('Order'),
+    'description' => t('Order associated with the line item'),
+    'type' => 'order',
+  );
   $line_item['created'] = array(
     'name' => t('Date created'),
     'description' => t('The date the line item was created.'),
@@ -92,6 +101,13 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
           break;
 
         // Default values for the chained tokens handled below.
+        case 'order':
+          if ($line_item->order_id) {
+            $order = commerce_order_load($line_item->order_id);
+            $replacements[$original] = $sanitize ? check_plain($order->order_number) : $order->order_number;
+          }
+          break;
+
         case 'created':
           $replacements[$original] = format_date($line_item->created, 'medium', '', NULL, $language_code);
           break;
@@ -99,10 +115,19 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
         case 'changed':
           $replacements[$original] = format_date($line_item->changed, 'medium', '', NULL, $language_code);
           break;
+      }
+    }
 
+    if ($order_tokens = token_find_with_prefix($tokens, 'order')) {
+      $order = commerce_order_load($line_item->order_id);
+      $replacements += token_generate('order', $order_tokens, array('order' => $order), $options);
+    }
+
+    foreach (array('created', 'changed') as $date) {
+      if ($created_tokens = token_find_with_prefix($tokens, $date)) {
+        $replacements += token_generate('date', $created_tokens, array('date' => $order->{$date}), $options);
       }
     }
   }
-
   return $replacements;
 }
