@@ -10,6 +10,9 @@
  * Implements hook_default_rules_configuration().
  */
 function commerce_checkout_default_rules_configuration() {
+  // Store the customer profile entity info for use in default rules.
+  $customer_profile_entity_info = entity_get_info('commerce_customer_profile');
+
   $rules = array();
 
   // Add a reaction rule to update an order to the default status of the pending
@@ -71,9 +74,7 @@ function commerce_checkout_default_rules_configuration() {
     ));
 
   // Accommodate any profile types referenced by the order.
-  $entity_info = entity_get_info('commerce_customer_profile');
-
-  foreach ($entity_info['bundles'] as $profile_type => $data) {
+  foreach ($customer_profile_entity_info['bundles'] as $profile_type => $data) {
     $loop
       ->action('data_set', array(
         'data:select' => 'order:' . strtr('customer-' . $profile_type, '_', '-') . ':uid',
@@ -85,6 +86,68 @@ function commerce_checkout_default_rules_configuration() {
   $rule->action($loop);
 
   $rules['commerce_checkout_order_convert'] = $rule;
+
+  // Add a reaction rule that creates a new user account during checkout
+  // completion if the customer specified a non-existent e-mail address. The
+  // default functionality is to create an active user account with the e-mail
+  // for administrator created accounts and will always assume the need for
+  // e-mail verification for setting a password.
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Create a new account for an anonymous order');
+  // TODO: Default this to TRUE once http://drupal.org/node/1044342 is fixed.
+  $rule->active = FALSE;
+
+  $rule
+    ->event('commerce_checkout_complete')
+    ->condition(rules_condition('entity_exists', array(
+      'type' => 'user',
+      'property' => 'mail',
+      'value:select' => 'order:mail',
+    ))->negate())
+    ->condition('data_is', array(
+      'data:select' => 'order:type',
+      'op' => '==',
+      'value' => 'commerce_order',
+    ))
+    ->action('entity_create', array(
+      'type' => 'user',
+      'param_name:select' => 'order:mail',
+      'param_mail:select' => 'order:mail',
+      'entity_created:label' => t('Created account'),
+      'entity_created:var' => 'account_created',
+    ))
+    ->action('data_set', array(
+      'data:select' => 'account-created:status',
+      'value' => 1,
+    ))
+    ->action('entity_save', array(
+      'data:select' => 'account-created',
+      'immediate' => 1,
+    ))
+    ->action('send_account_email', array(
+      'account:select' => 'account-created',
+      'email_type' => 'register_admin_created',
+    ))
+    ->action('data_set', array(
+      'data:select' => 'order:uid',
+      'value:select' => 'account-created:uid',
+    ));
+
+  // Accommodate any profile types referenced by the order.
+  foreach ($customer_profile_entity_info['bundles'] as $profile_type => $data) {
+    $rule
+      ->action('data_set', array(
+        'data:select' => 'order:' . strtr('customer-' . $profile_type, '_', '-') . ':uid',
+        'value:select' => 'account-created:uid',
+      ));
+  }
+
+  // Adjust the weight so this rule executes after the one checking for a pre-
+  // existing user account.
+  $rule->weight = 2;
+
+  $rules['commerce_checkout_new_account'] = $rule;
 
   return $rules;
 }
