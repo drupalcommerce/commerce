@@ -33,25 +33,17 @@ function commerce_checkout_menu() {
 
   $items['admin/commerce/config/checkout'] = array(
     'title' => 'Checkout settings',
-    'description' => 'Configure checkout settings and customize the checkout form.',
+    'description' => 'Customize the checkout form and configure checkout rules.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_checkout_settings_form'),
+    'page arguments' => array('commerce_checkout_builder_form'),
     'access arguments' => array('administer checkout'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
-  $items['admin/commerce/config/checkout/settings'] = array(
-    'title' => 'Settings',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
   $items['admin/commerce/config/checkout/form'] = array(
     'title' => 'Checkout form',
     'description' => 'Build your checkout pages using module defined checkout form elements.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_checkout_builder_form'),
-    'access arguments' => array('administer checkout'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
     'file' => 'includes/commerce_checkout.admin.inc',
   );
@@ -118,7 +110,8 @@ function commerce_checkout_permission() {
  */
 function commerce_checkout_help($path, $arg) {
   switch ($path) {
-    case 'admin/commerce/config/checkout-builder':
+    case 'admin/commerce/config/checkout':
+    case 'admin/commerce/config/checkout/form':
       return t('Use the table below to build your checkout form using the available checkout panes defined by modules enabled on your site. You may configure the checkout pane settings using the operations links below. You may also add additional pages to the checkout process using the tab above and edit them using the operations links below.');
 
     case 'admin/commerce/config/checkout/rules':

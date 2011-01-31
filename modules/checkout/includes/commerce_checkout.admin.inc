@@ -6,57 +6,6 @@
  * Administrative callbacks for the Checkout module.
  */
 
-/**
- * Builds the admin settings form.
- */
-function commerce_checkout_settings_form($form, &$form_state) {
-  global $base_url;
-
-  // TODO: Remove these settings in favor of hook_commerce_checkout_router()
-  // implementations and checkout completion Rules.
-  $form['anonymous'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Anonymous checkout settings'),
-  );
-  $form['anonymous']['commerce_checkout_anonymous_account'] = array(
-    '#type' => 'radios',
-    '#title' => t('Account creation behavior'),
-    '#description' => t('This setting affects account creation for anonymous users who do not have pre-existing user accounts.'),
-    '#options' => array(
-      0 => t('Do not create a user account for the order.'),
-      1 => t('Create a blocked user account for the order.'),
-      2 => t('Create an active user account for the order.'),
-    ),
-    '#default_value' => variable_get('commerce_checkout_anonymous_account', 2),
-  );
-  $form['anonymous']['commerce_checkout_anonymous_notify'] = array(
-    '#type' => 'radios',
-    '#title' => t('Account creation notification'),
-    '#description' => t('The notification settings only apply to active user accounts created upon checkout completion.'),
-    '#options' => array(
-      0 => t('Do not notify the user of the new account.'),
-      1 => t('Notify the user on the checkout completion page.'),
-      2 => t('Notify the user through a new account e-mail based on your user settings.'),
-      3 => t('Notify the user on the checkout completion page and through the new account e-mail.'),
-    ),
-    '#default_value' => variable_get('commerce_checkout_anonymous_notify', 3),
-  );
-  $form['anonymous']['commerce_checkout_anonymous_login'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Login customers who have user accounts created for them upon checkout completion.'),
-    '#default_value' => variable_get('commerce_checkout_anonymous_login', FALSE),
-  );
-
-  $form['commerce_checkout_empty_redirect'] = array(
-    '#type'  => 'textfield',
-    '#title' => t('Empty order redirect destination'),
-    '#default_value' => variable_get('commerce_checkout_empty_redirect', ''),
-    '#field_prefix' => $base_url . '/',
-    '#description' => t('Customers will be redirected to this URL if they try to access checkout with an empty order.'),
-  );
-
-  return system_settings_form($form);
-}
 
 /**
  * Build the checkout form builder, adding in data for the checkout pages and
@@ -377,4 +326,3 @@ function commerce_checkout_complete_rules() {
 
   return $content;
 }
-

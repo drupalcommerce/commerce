@@ -160,7 +160,7 @@ function commerce_checkout_default_rules_configuration() {
     ->action('mail', array(
       'to:select' => 'order:mail',
       'subject' => t('Order [order:order-number] at [site:name]'),
-      'message' => t("Thanks for your order at [site:name].\n\nWe have received your order [order:order-number].  After logging in to your account on our website, you can visit the following address to check the status of your order:\n\n[site:url]user/[order:uid]/orders/[order:order-id]\n\nPlease contact us if you have any questions about your order."),
+      'message' => t("Thanks for your order [order:order-number] at [site:name].\n\nTo view your order history on our website, you can login to your account at the following address:\n\n[site:login-url]\n\nYou can find the status of your current order at:\n\n[site:url]user/[order:uid]/orders/[order:order-id]\n\nPlease contact us if you have any questions about your order."),
       'from' => '',
     ));
 

@@ -27,7 +27,7 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
 
   // If there are no line items on the order, redirect away.
   if (commerce_line_items_quantity($order->line_items, 'product') == 0) {
-    drupal_goto(variable_get('commerce_checkout_empty_redirect', '<front>'));
+    drupal_goto('<front>');
   }
 
   // Prior to displaying the checkout form, allow other modules to route the
