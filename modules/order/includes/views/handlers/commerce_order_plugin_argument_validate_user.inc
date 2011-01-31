@@ -20,7 +20,7 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
     // unsetting these two form elements. We don't need them here
     $form['restrict_roles'] = array(
       '#type' => 'checkbox',
-      '#title' => t("Restrict access based on the current users' roles"),
+      '#title' => t("Restrict access based on the current user's roles"),
       '#description' => t("If the argument does not match the current logged in user, fall back to matching roles. This is functionally equivalent to the validator checking for 'current user or has a particular role.'"),
       '#default_value' => $this->options['restrict_roles'],
     );
