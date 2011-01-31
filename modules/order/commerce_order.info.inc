@@ -82,7 +82,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Type'),
     'description' => t('The human readable name of the order type.'),
     'type' => 'text',
-    'options list' => 'commerce_order_type_get_name',
+    'options list' => 'commerce_order_type_options_list',
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );

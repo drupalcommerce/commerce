@@ -224,6 +224,13 @@ function commerce_order_type_get_name($type = NULL) {
 }
 
 /**
+ * Wraps commerce_product_type_get_name() for the Entity module.
+ */
+function commerce_order_type_options_list() {
+  return commerce_order_type_get_name();
+}
+
+/**
  * Returns an initialized order object.
  *
  * @param $uid
