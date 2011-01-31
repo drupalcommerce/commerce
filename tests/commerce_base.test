@@ -556,7 +556,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-commerce-commerce-payment-ui-enable',
       'edit-modules-commerce-commerce-product-ui-enable',
 
-      'edit-modules-other-addressfield-enable',
+      'edit-modules-fields-addressfield-enable',
       'edit-modules-other-entity-enable',
 
       'edit-modules-rules-rules-enable',
