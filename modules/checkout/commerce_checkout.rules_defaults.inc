@@ -149,5 +149,26 @@ function commerce_checkout_default_rules_configuration() {
 
   $rules['commerce_checkout_new_account'] = $rule;
 
+  // Add a reaction rule to send order e-mail upon checkout completion.
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Send an order notification e-mail');
+  $rule->active = TRUE;
+
+  $rule
+    ->event('commerce_checkout_complete')
+    ->action('mail', array(
+      'to:select' => 'order:mail',
+      'subject' => t('Order [order:order-number] at [site:name]'),
+      'message' => t("Thanks for your order at [site:name].\n\nWe have received your order [order:order-number].  After logging in to your account on our website, you can visit the following address to check the status of your order:\n\n[site:url]user/[order:uid]/orders/[order:order-id]\n\nPlease contact us if you have any questions about your order."),
+      'from' => '',
+    ));
+
+  // Adjust the weight so this rule executes after the order has been updated to
+  // the proper user account.
+  $rule->weight = 4;
+
+  $rules['commerce_checkout_order_email'] = $rule;
+
   return $rules;
 }
