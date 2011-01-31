@@ -91,7 +91,7 @@ function commerce_order_ui_menu() {
     'page callback' => 'commerce_order_ui_order_view',
     'page arguments' => array(3, 'customer'),
     'access callback' => 'commerce_order_access',
-    'access arguments' => array('view', 3, 1),
+    'access arguments' => array('view', 3),
   );
 
   return $items;
