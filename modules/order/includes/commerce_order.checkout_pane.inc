@@ -71,14 +71,16 @@ function commerce_order_account_pane_checkout_form($form, &$form_state, $checkou
  * Account pane: validatation callback.
  */
 function commerce_order_account_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+  if (!empty($form_state['values'][$checkout_pane->pane_id])) {
+    $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
-  // If the e-mail address field was present on the form...
-  if (!empty($pane_values['login']['mail'])) {
-    // Display an error if an invalid e-mail address was given.
-    if ($error = user_validate_mail($pane_values['login']['mail'])) {
-      form_set_error($checkout_pane->pane_id . '][login][mail', $error);
-      return FALSE;
+    // If the e-mail address field was present on the form...
+    if (!empty($pane_values['login']['mail'])) {
+      // Display an error if an invalid e-mail address was given.
+      if ($error = user_validate_mail($pane_values['login']['mail'])) {
+        form_set_error($checkout_pane->pane_id . '][login][mail', $error);
+        return FALSE;
+      }
     }
   }
 
@@ -89,10 +91,12 @@ function commerce_order_account_pane_checkout_form_validate($form, &$form_state,
  * Account pane: checkout form submission callback.
  */
 function commerce_order_account_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+  if (!empty($form_state['values'][$checkout_pane->pane_id])) {
+    $pane_values = $form_state['values'][$checkout_pane->pane_id];
 
-  if (!empty($pane_values['login']['mail'])) {
-    $order->mail = $pane_values['login']['mail'];
+    if (!empty($pane_values['login']['mail'])) {
+      $order->mail = $pane_values['login']['mail'];
+    }
   }
 }
 
