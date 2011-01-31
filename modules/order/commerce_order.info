@@ -18,12 +18,14 @@ files[] = includes/views/commerce_order.views.inc
 files[] = includes/views/handlers/commerce_order_handler_argument_order_order_id.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_status.inc
+files[] = includes/views/handlers/commerce_order_handler_field_order_state.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_type.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_delete.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_link_edit.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order_operations.inc
-files[] = includes/views/handlers/commerce_order_handler_filter_status.inc
+files[] = includes/views/handlers/commerce_order_handler_filter_order_status.inc
+files[] = includes/views/handlers/commerce_order_handler_filter_order_state.inc
 files[] = includes/views/handlers/commerce_order_handler_filter_order_type.inc
 
 ; Views plugins

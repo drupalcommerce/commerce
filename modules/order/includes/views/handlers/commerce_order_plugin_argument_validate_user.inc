@@ -20,11 +20,11 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
     // unsetting these two form elements. We don't need them here
     $form['restrict_roles'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Restrict access based on the current users\' roles'),
-      '#description' => t('If the argument does not match the current logged in user, fall back to matching roles. This equals to \'current user or has a particular role\'.'),
+      '#title' => t("Restrict access based on the current users' roles"),
+      '#description' => t("If the argument does not match the current logged in user, fall back to matching roles. This is functionally equivalent to the validator checking for 'current user or has a particular role.'"),
       '#default_value' => $this->options['restrict_roles'],
     );
-	
+
     $form['roles'] = array(
       '#type' => 'select',
       '#title' => t('Users have these allowed roles'),
@@ -42,26 +42,28 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
   }
 
   function validate_argument($argument) {
-  	global $user;
+    global $user;
+
     $type = $this->options['type'];
+
     // is_numeric() can return false positives, so we ensure it's an integer.
     // However, is_integer() will always fail, since $argument is a string.
-    if (is_numeric($argument) && $argument == (int)$argument) {
+    if (is_numeric($argument) && $argument == (int) $argument) {
       if ($type == 'uid' || $type == 'either') {
-        if ($argument == $GLOBALS['user']->uid) {
+        if ($argument == $user->uid) {
           // If you assign an object to a variable in PHP, the variable
           // automatically acts as a reference, not a copy, so we use
           // clone to ensure that we don't actually mess with the
           // real global $user object.
-          $account = clone $GLOBALS['user'];
+          $account = clone $user;
         }
         $where = 'uid = :argument';
       }
     }
     else {
       if ($type == 'name' || $type == 'either') {
-        if ($argument == $GLOBALS['user']->name) {
-          $account = clone $GLOBALS['user'];
+        if ($argument == $user->name) {
+          $account = clone $user;
         }
         $where = "name = :argument";
       }
