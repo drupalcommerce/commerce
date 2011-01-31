@@ -51,7 +51,7 @@ function commerce_checkout_rules_action_info() {
       ),
     ),
     'group' => t('User'),
-		'base' => 'commerce_checkout_action_send_account_email',
+    'base' => 'commerce_checkout_action_send_account_email',
     'access callback' => 'rules_system_integration_access',
   );
 
