@@ -483,5 +483,12 @@ function commerce_price_field_data_property_info($name = NULL) {
       'setter callback' => 'entity_property_verbatim_set',
       'options list' => 'commerce_currency_code_options_list',
     ),
+    'data' => array(
+      'label' => t('Data'),
+      'description' => !empty($name) ? t('Data array of field %name', array('%name' => $name)) : '',
+      'type' => 'struct',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
   );
 }
