@@ -50,16 +50,16 @@ function commerce_product_ui_types_overview() {
  *
  * @param $variables
  *   An array of variables used to generate the display; by default includes the
- *     type key with a value of the product type object.
+ *     type key with a value of the product type array.
  *
  * @ingroup themeable
  */
 function theme_product_type_admin_overview($variables) {
   $product_type = $variables['product_type'];
 
-  $output = check_plain($product_type->name);
-  $output .= ' <small> (Machine name: ' . check_plain($product_type->type) . ')</small>';
-  $output .= '<div class="description">' . filter_xss_admin($product_type->description) . '</div>';
+  $output = check_plain($product_type['name']);
+  $output .= ' <small> (Machine name: ' . check_plain($product_type['type']) . ')</small>';
+  $output .= '<div class="description">' . filter_xss_admin($product_type['description']) . '</div>';
 
   return $output;
 }
@@ -68,7 +68,7 @@ function theme_product_type_admin_overview($variables) {
  * Form callback wrapper: create or edit a product type.
  *
  * @param $product_type
- *   The product type object being edited by this form.
+ *   The product type array being created or edited by this form.
  *
  * @see commerce_product_product_type_form()
  */
@@ -77,7 +77,7 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
   commerce_product_ui_set_breadcrumb(TRUE);
 
   // Return a message if the product type is not governed by Product UI.
-  if (!empty($product_type->type) && $product_type->module != 'commerce_product_ui') {
+  if (!empty($product_type['type']) && $product_type['module'] != 'commerce_product_ui') {
     return t('This product type cannot be edited, because it is not defined by the Product UI module.');
   }
 
@@ -91,7 +91,7 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
  * Form callback wrapper: confirmation form for deleting a product type.
  *
  * @param $product_type
- *   The product type object being deleted by this form.
+ *   The product type array being deleted by this form.
  *
  * @see commerce_product_product_type_delete_form()
  */
@@ -100,13 +100,13 @@ function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
   commerce_product_ui_set_breadcrumb(TRUE);
 
   // Return a message if the product type is not governed by Product UI.
-  if ($product_type->module != 'commerce_product_ui') {
+  if ($product_type['module'] != 'commerce_product_ui') {
     return t('This product type cannot be deleted, because it is not defined by the Product UI module.');
   }
 
   // Don't allow deletion of product types that have products already.
-  if (($count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_type->type))->rowCount()) > 0) {
-    drupal_set_title(t('Cannot delete the %name product type', array('%name' => $product_type->name)), PASS_THROUGH);
+  if (($count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_type['type']))->rowCount()) > 0) {
+    drupal_set_title(t('Cannot delete the %name product type', array('%name' => $product_type['name'])), PASS_THROUGH);
     return t('There are @count products of this type. It cannot be deleted.', array('@count' => $count));
   }
 

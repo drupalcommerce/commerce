@@ -216,7 +216,7 @@ function commerce_product_modules_enabled($modules) {
 }
 
 /**
- * Returns an array of product type objects keyed by type.
+ * Returns an array of product type arrays keyed by type.
  */
 function commerce_product_types() {
   // First check the static cache for a product types array.
@@ -230,7 +230,7 @@ function commerce_product_types() {
     foreach (module_implements('commerce_product_type_info') as $module) {
       foreach (module_invoke($module, 'commerce_product_type_info') as $type => $product_type) {
         // Set the module each product type is defined by.
-        $product_type->module = $module;
+        $product_type['module'] = $module;
         $product_types[$type] = $product_type;
       }
     }
@@ -280,7 +280,7 @@ function commerce_product_type_get_name($type = NULL) {
   // Return a type name if specified and it exists.
   if (!empty($type)) {
     if (isset($product_types[$type])) {
-      return $product_types[$type]->name;
+      return $product_types[$type]['name'];
     }
     else {
       // Return FALSE if it does not exist.
@@ -290,7 +290,7 @@ function commerce_product_type_get_name($type = NULL) {
 
   // Otherwise turn the array values into the type name only.
   foreach ($product_types as $key => $value) {
-    $product_types[$key] = $value->name;
+    $product_types[$key] = $value['name'];
   }
 
   return $product_types;
@@ -307,14 +307,14 @@ function commerce_product_type_options_list() {
  * Title callback: return the human-readable product type name.
  */
 function commerce_product_type_title($product_type) {
-  return $product_type->name;
+  return $product_type['name'];
 }
 
 /**
  * Returns a path argument from a product type.
  */
 function commerce_product_type_to_arg($type) {
-  return $type;
+  return strtr($type, '_', '-');
 }
 
 /**

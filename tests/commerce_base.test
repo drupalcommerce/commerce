@@ -199,18 +199,23 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
         $description = $description .' '. $this->randomString(128);
         $help = $help .' '. $this->randomString(128);
       }
+
       $new_product_type = commerce_product_ui_product_type_new();
-      $new_product_type->type = $type;
-      $new_product_type->name = $name;
-      $new_product_type->description = $description;
-      $new_product_type->help = $help;
-      $new_product_type->is_new = TRUE;
+      $new_product_type['type'] = $type;
+      $new_product_type['name'] = $name;
+      $new_product_type['description'] = $description;
+      $new_product_type['help'] = $help;
+      $new_product_type['is_new'] = TRUE;
+
       $save_result = commerce_product_ui_product_type_save($new_product_type);
+
       if ($save_result === FALSE) {
         return FALSE;
       }
+
       return $new_product_type;
-    } else {
+    }
+    else {
       return FALSE;
     }
   }
@@ -590,7 +595,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalGet('admin/commerce/products/types');
-    $this->assertText($product_type->name, 'Dummy product type name found on admin/commerce/products/types');
+    $this->assertText($product_type['name'], 'Dummy product type name found on admin/commerce/products/types');
   }
 
   /**

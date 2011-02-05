@@ -8,10 +8,10 @@ function commerce_product_ui_install() {
   // Create the basic product type.
   $product_type = commerce_product_ui_product_type_new();
 
-  $product_type->type = 'product';
-  $product_type->name = t('Product');
-  $product_type->description = t('A basic product type.');
-  $product_type->is_new = TRUE;
+  $product_type['type'] = 'product';
+  $product_type['name'] = t('Product');
+  $product_type['description'] = t('A basic product type.');
+  $product_type['is_new'] = TRUE;
 
   commerce_product_ui_product_type_save($product_type, FALSE);
 }

@@ -25,8 +25,8 @@ function commerce_product_ui_menu() {
   foreach (commerce_product_types() as $type => $product_type) {
     $items['admin/commerce/products/add/' . strtr($type, array('_' => '-'))] = array(
       'title' => 'Create @name',
-      'title arguments' => array('@name' => $product_type->name),
-      'description' => $product_type->description,
+      'title arguments' => array('@name' => $product_type['name']),
+      'description' => $product_type['description'],
       'page callback' => 'commerce_product_ui_product_form_wrapper',
       'page arguments' => array(commerce_product_new($type)),
       'access callback' => 'commerce_product_access',
@@ -81,32 +81,37 @@ function commerce_product_ui_menu() {
     'type' => MENU_LOCAL_ACTION,
     'file' => 'includes/commerce_product_ui.types.inc',
   );
-  $items['admin/commerce/products/types/%commerce_product_type'] = array(
-    'title callback' => 'commerce_product_type_title',
-    'title arguments' => array(4),
-    'page callback' => 'commerce_product_ui_product_type_form_wrapper',
-    'page arguments' => array(4),
-    'access arguments' => array('administer product types'),
-    'file' => 'includes/commerce_product_ui.types.inc',
-  );
-  $items['admin/commerce/products/types/%commerce_product_type/edit'] = array(
-    'title' => 'Edit',
-    'access callback' => 'commerce_product_ui_product_type_update_access',
-    'access arguments' => array(4),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-  );
-  $items['admin/commerce/products/types/%commerce_product_type/delete'] = array(
-    'title' => 'Delete',
-    'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
-    'page arguments' => array(4),
-    'access callback' => 'commerce_product_ui_product_type_update_access',
-    'access arguments' => array(4),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
-    'weight' => 10,
-    'file' => 'includes/commerce_product_ui.types.inc',
-  );
+  foreach (commerce_product_types() as $type => $product_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $type_arg = strtr($type, '_', '-');
+
+    $items['admin/commerce/products/types/' . $type_arg] = array(
+      'title callback' => 'commerce_product_type_title',
+      'title arguments' => array($product_type),
+      'page callback' => 'commerce_product_ui_product_type_form_wrapper',
+      'page arguments' => array($product_type),
+      'access arguments' => array('administer product types'),
+      'file' => 'includes/commerce_product_ui.types.inc',
+    );
+    $items['admin/commerce/products/types/' . $type_arg . '/edit'] = array(
+      'title' => 'Edit',
+      'access callback' => 'commerce_product_ui_product_type_update_access',
+      'access arguments' => array($product_type),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    );
+    $items['admin/commerce/products/types/' . $type_arg . '/delete'] = array(
+      'title' => 'Delete',
+      'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
+      'page arguments' => array($product_type),
+      'access callback' => 'commerce_product_ui_product_type_update_access',
+      'access arguments' => array($product_type),
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 10,
+      'file' => 'includes/commerce_product_ui.types.inc',
+    );
+  }
 
   return $items;
 }
@@ -146,7 +151,7 @@ function commerce_product_ui_product_add_any_access() {
  * Access callback: determines if the user can edit or delete a product type.
  */
 function commerce_product_ui_product_type_update_access($product_type) {
-  if ($product_type->module == 'commerce_product_ui') {
+  if ($product_type['module'] == 'commerce_product_ui') {
     return user_access('administer product types');
   }
 
@@ -158,8 +163,13 @@ function commerce_product_ui_product_type_update_access($product_type) {
  */
 function commerce_product_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
-  $items['admin/commerce/products/types/%commerce_product_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
-  $items['admin/commerce/products/types/%commerce_product_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  foreach (commerce_product_types() as $type => $product_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $type_arg = strtr($type, '_', '-');
+
+    $items['admin/commerce/products/types/' . $type_arg . '/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+    $items['admin/commerce/products/types/' . $type_arg . '/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  }
 }
 
 /**
@@ -184,10 +194,16 @@ function commerce_product_ui_menu_local_tasks_alter(&$data, $router_item, $root_
 function commerce_product_ui_admin_menu_map() {
   // Add awareness to the administration menu of the various product types so
   // they are included in the dropdown menu.
-  $map['admin/commerce/products/types/%commerce_product_type'] = array(
+  $type_args = array();
+
+  foreach (array_keys(commerce_product_types()) as $type) {
+    $type_args[] = strtr($type, '_', '-');
+  }
+
+  $map['admin/commerce/products/types/%'] = array(
     'parent' => 'admin/commerce/products/types',
     'arguments' => array(
-      array('%commerce_product_type' => array_keys(commerce_product_types())),
+      array('%' => $type_args),
     ),
   );
 
@@ -206,7 +222,7 @@ function commerce_product_ui_help($path, $arg) {
   // Return the user defined help text per product type when adding products.
   if ($arg[1] == 'commerce' && $arg[2] == 'products' && $arg[3] == 'add' && $arg[4]) {
     $product_type = commerce_product_type_load($arg[4]);
-    return (!empty($product_type->help) ? '<p>' . filter_xss_admin($product_type->help) . '</p>' : '');
+    return (!empty($product_type['help']) ? '<p>' . filter_xss_admin($product_type['help']) . '</p>' : '');
   }
 }
 
@@ -251,9 +267,7 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for product fields.
   foreach ($entity_info['commerce_product']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/commerce/products/types/%commerce_product_type',
-      'real path' => 'admin/commerce/products/types/' . strtr($type, array('_' => '-')),
-      'bundle argument' => 4,
+      'path' => 'admin/commerce/products/types/' . strtr($type, '_', '-'),
       'access arguments' => array('administer product types'),
     );
   }
@@ -284,14 +298,14 @@ function commerce_product_ui_uri($product) {
  * Implements hook_commerce_product_type_info().
  */
 function commerce_product_ui_commerce_product_type_info() {
-  return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
+  return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
 }
 
 /**
- * Returns an initialized product type object.
+ * Returns an initialized product type array.
  */
 function commerce_product_ui_product_type_new() {
-  return (object) array(
+  return array(
     'type' => '',
     'name' => '',
     'description' => '',
@@ -302,13 +316,13 @@ function commerce_product_ui_product_type_new() {
 /**
  * Saves a product type.
  *
- * This function will either insert a new product type if $product_type->is_new
+ * This function will either insert a new product type if $product_type['is_new']
  * is set or attempt to update an existing product type if it is not. It does
  * not currently support changing the machine-readable name of the product type,
  * nor is this possible through the form supplied by the Product UI module.
  *
  * @param $product_type
- *   The product type object containing the basic properties as initialized in
+ *   The product type array containing the basic properties as initialized in
  *     commerce_product_type_new().
  * @param $configure
  *   Boolean indicating whether or not product type configuration should be
@@ -320,18 +334,16 @@ function commerce_product_ui_product_type_new() {
  *     the type of query performed to save the product type.
  */
 function commerce_product_ui_product_type_save($product_type, $configure = TRUE) {
-  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type->is_new) ? 'type' : array());
-  commerce_product_types_reset();
-  menu_rebuild();
+  $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type['is_new']) ? 'type' : array());
 
   // If this is a new product type and the insert did not fail...
-  if (!empty($product_type->is_new) && $op !== FALSE) {
+  if (!empty($product_type['is_new']) && $op !== FALSE) {
     // Notify the field API that a new bundle has been created.
-    field_attach_create_bundle('commerce_product', $product_type->type);
+    field_attach_create_bundle('commerce_product', $product_type['type']);
 
     // Add the default price field to the product type.
     if ($configure) {
-      commerce_product_configure_product_type($product_type->type);
+      commerce_product_configure_product_type($product_type['type']);
     }
 
     // Notify other modules that a new product type has been created.
@@ -341,6 +353,9 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE)
     // Notify other modules that an existing product type has been updated.
     module_invoke_all('commerce_product_type_update', $product_type);
   }
+
+  commerce_product_types_reset();
+  menu_rebuild();
 
   return $op;
 }

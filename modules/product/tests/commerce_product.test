@@ -49,10 +49,10 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
   function testCommerceProductTypeCrud() {
     // Ensure commerce_product_ui_product_type_new() returns a valid empty product type.
     $new_product_type = commerce_product_ui_product_type_new();
-    $this->assertNotNull($new_product_type->type, 'commerce_product_ui_product_type_new() instantiated the type property.');
-    $this->assertNotNull($new_product_type->name, 'commerce_product_ui_product_type_new() instantiated the help property.');
-    $this->assertNotNull($new_product_type->description, 'commerce_product_ui_product_type_new() instantiated the help property.');
-    $this->assertNotNull($new_product_type->help, 'commerce_product_ui_product_type_new() instantiated the help property');
+    $this->assertNotNull($new_product_type['type'], 'commerce_product_ui_product_type_new() instantiated the type property.');
+    $this->assertNotNull($new_product_type['name'], 'commerce_product_ui_product_type_new() instantiated the help property.');
+    $this->assertNotNull($new_product_type['description'], 'commerce_product_ui_product_type_new() instantiated the help property.');
+    $this->assertNotNull($new_product_type['help'], 'commerce_product_ui_product_type_new() instantiated the help property');
 
     // Supply customer values for the product type properties.
     $type = $this->randomName(20);
@@ -61,11 +61,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $help = $this->randomString(128);
 
     // Add the values to the new content type.
-    $new_product_type->type = $type;
-    $new_product_type->name = $name;
-    $new_product_type->description = $description;
-    $new_product_type->help = $help;
-    $new_product_type->is_new = TRUE;
+    $new_product_type['type'] = $type;
+    $new_product_type['name'] = $name;
+    $new_product_type['description'] = $description;
+    $new_product_type['help'] = $help;
+    $new_product_type['is_new'] = TRUE;
 
     // Ensure content_product_ui_product_type_save() returns the proper value when inserting.
     $return = commerce_product_ui_product_type_save($new_product_type);
@@ -76,14 +76,14 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 
     // Ensure the values that were saved match the values that we created.
     $this->assertTrue($saved_product_type, 'commerce_product_type_load() loaded the new product type.');
-    $this->assertEqual($type, $saved_product_type->type, 'The new product type type was properly saved and loaded.');
-    $this->assertEqual($name, $saved_product_type->name, 'The new product type name was properly saved and loaded.');
-    $this->assertEqual($description, $saved_product_type->description, 'The new product type description text was properly saved and loaded.');
-    $this->assertEqual($help, $saved_product_type->help, 'The new product type help text was properly saved and loaded.');
+    $this->assertEqual($type, $saved_product_type['type'], 'The new product type type was properly saved and loaded.');
+    $this->assertEqual($name, $saved_product_type['name'], 'The new product type name was properly saved and loaded.');
+    $this->assertEqual($description, $saved_product_type['description'], 'The new product type description text was properly saved and loaded.');
+    $this->assertEqual($help, $saved_product_type['help'], 'The new product type help text was properly saved and loaded.');
 
     // Alter the title, to ensure the update function works.
     $altered_name = $this->randomName(40);
-    $saved_product_type->name = $altered_name;
+    $saved_product_type['name'] = $altered_name;
 
     // Ensure commerce_product_ui_product_type_save() returns the proper value when updating.
     $return = commerce_product_ui_product_type_save($saved_product_type);
@@ -93,7 +93,7 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     commerce_product_types_reset();
     $types = commerce_product_types();
     $this->assertNotNull($types[$type], 'commerce_product_types_reset() successfully reset the product types.');
-    $this->assertEqual($saved_product_type->name, $altered_name, 'commerce_product_ui_product_type_save() successfully updated the product type name.');
+    $this->assertEqual($saved_product_type['name'], $altered_name, 'commerce_product_ui_product_type_save() successfully updated the product type name.');
 
     // Ensure commerce_product_ui_product_type_delete() deletes a content type.
     commerce_product_ui_product_type_delete($type);
