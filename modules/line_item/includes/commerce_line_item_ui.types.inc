@@ -52,9 +52,9 @@ function commerce_line_item_ui_types_overview() {
 function theme_line_item_type_admin_overview($variables) {
   $line_item_type = $variables['line_item_type'];
 
-  $output = check_plain($line_item_type->name);
-  $output .= ' <small> (Machine name: ' . check_plain($line_item_type->type) . ')</small>';
-  $output .= '<div class="description">' . filter_xss_admin($line_item_type->description) . '</div>';
+  $output = check_plain($line_item_type['name']);
+  $output .= ' <small> (Machine name: ' . check_plain($line_item_type['type']) . ')</small>';
+  $output .= '<div class="description">' . filter_xss_admin($line_item_type['description']) . '</div>';
 
   return $output;
 }

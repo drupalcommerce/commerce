@@ -879,7 +879,7 @@ function commerce_product_reference_options_list($field) {
  */
 function commerce_product_reference_commerce_line_item_type_info() {
   return array(
-    'product' => (object) array(
+    'product' => array(
       'type' => 'product',
       'name' => t('Product'),
       'description' => t('References a product and displays it with the SKU as the label.'),

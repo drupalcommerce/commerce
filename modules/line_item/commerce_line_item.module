@@ -317,7 +317,7 @@ function theme_commerce_line_item_actions($variables) {
 }
 
 /**
- * Returns an array of line item type objects keyed by type.
+ * Returns an array of line item type arrays keyed by type.
  */
 function commerce_line_item_types() {
   // First check the static cache for a line item types array.
@@ -334,12 +334,12 @@ function commerce_line_item_types() {
         'callbacks' => array(),
       );
 
-      $line_item_type = (object) ((array) $line_item_type + $defaults);
+      $line_item_type += $defaults;
 
       // Merge in default callbacks.
       foreach (array('configuration', 'title', 'add_form', 'add_form_submit') as $callback) {
-        if (!isset($line_item_type->callbacks[$callback])) {
-          $line_item_type->callbacks[$callback] = $line_item_type->base . '_' . $callback;
+        if (!isset($line_item_type['callbacks'][$callback])) {
+          $line_item_type['callbacks'][$callback] = $line_item_type['base'] . '_' . $callback;
         }
       }
     }
@@ -349,13 +349,13 @@ function commerce_line_item_types() {
 }
 
 /**
- * Returns a single line item type object.
+ * Returns a single line item type array.
  *
  * @param $type
  *   The machine-readable name of the line item type.
  *
  * @return
- *   The specified line item type object or FALSE if it does not exist.
+ *   The specified line item type array or FALSE if it does not exist.
  */
 function commerce_line_item_type_load($type) {
   $line_item_types = commerce_line_item_types();
@@ -388,7 +388,7 @@ function commerce_line_item_type_get_name($type = NULL) {
   // Return a type name if specified and it exists.
   if (!empty($type)) {
     if (isset($line_item_types[$type])) {
-      return $line_item_types[$type]->name;
+      return $line_item_types[$type]['name'];
     }
     else {
       // Return FALSE if it does not exist.
@@ -400,7 +400,7 @@ function commerce_line_item_type_get_name($type = NULL) {
   $line_item_type_names = array();
 
   foreach ((array) $line_item_types as $key => $value) {
-    $line_item_type_names[$key] = $value->name;
+    $line_item_type_names[$key] = $value['name'];
   }
 
   return $line_item_type_names;
@@ -410,14 +410,14 @@ function commerce_line_item_type_get_name($type = NULL) {
  * Configures a line item type by calling its configuration callback.
  *
  * @param $line_item_type
- *   The fully loaded line item type object to configure.
+ *   The fully loaded line item type array to configure.
  */
 function commerce_line_item_configure_line_item_type($line_item_type) {
   // Add the default price fields to the line item type.
   $weight = 0;
 
   foreach (array('commerce_unit_price' => t('Unit price'), 'commerce_total' => t('Total')) as $field_name => $label) {
-    commerce_price_create_instance($field_name, 'commerce_line_item', $line_item_type->type, $label, $weight++);
+    commerce_price_create_instance($field_name, 'commerce_line_item', $line_item_type['type'], $label, $weight++);
   }
 
   // If this line item type specifies a configuration callback...
@@ -431,7 +431,7 @@ function commerce_line_item_configure_line_item_type($line_item_type) {
  * Title callback: return the human-readable line item type name.
  */
 function commerce_line_item_type_title($line_item_type) {
-  return $line_item_type->name;
+  return $line_item_type['name'];
 }
 
 /**
@@ -445,7 +445,7 @@ function commerce_line_item_type_to_arg($type) {
  * Returns the specified callback for the given line item type if one exists.
  *
  * @param $line_item_type
- *   The line item type object.
+ *   The line item type array.
  * @param $callback
  *   The callback function to return, one of:
  *   - configuration
@@ -460,9 +460,9 @@ function commerce_line_item_type_to_arg($type) {
  */
 function commerce_line_item_type_callback($line_item_type, $callback) {
   // If the specified callback function exists, return it.
-  if (!empty($line_item_type->callbacks[$callback]) &&
-      function_exists($line_item_type->callbacks[$callback])) {
-    return $line_item_type->callbacks[$callback];
+  if (!empty($line_item_type['callbacks'][$callback]) &&
+      function_exists($line_item_type['callbacks'][$callback])) {
+    return $line_item_type['callbacks'][$callback];
   }
 
   // Otherwise return FALSE.
@@ -880,7 +880,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       // Add a default save button.
       $element['actions']['save_line_item'] = array(
         '#type' => 'submit',
-        '#value' => !empty($line_item_type->add_form_submit_value) ? $line_item_type->add_form_submit_value : t('Save'),
+        '#value' => !empty($line_item_type['add_form_submit_value']) ? $line_item_type['add_form_submit_value'] : t('Save'),
         '#ajax' => array(
           'callback' => 'commerce_line_item_manager_refresh',
           'wrapper' => 'line-item-manager',
@@ -1041,7 +1041,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         }
 
         // Create the new line item.
-        $line_item = commerce_line_item_new($line_item_type->type, $order_id);
+        $line_item = commerce_line_item_new($line_item_type['type'], $order_id);
 
         // If this type specifies a valid add form callback function...
         if ($callback = commerce_line_item_type_callback($line_item_type, 'add_form_submit')) {
