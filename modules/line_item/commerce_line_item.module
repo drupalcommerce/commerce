@@ -842,6 +842,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#datatype' => 'integer',
         '#default_value' => round($line_item->quantity),
         '#size' => 4,
+        '#maxlength' => 8,
       );
 
       // Retrieve the widget form for just the unit price.
