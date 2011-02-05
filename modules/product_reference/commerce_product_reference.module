@@ -875,9 +875,9 @@ function commerce_product_reference_options_list($field) {
 }
 
 /**
- * Implements hook_commerce_line_item_info().
+ * Implements hook_commerce_line_item_type_info().
  */
-function commerce_product_reference_commerce_line_item_info() {
+function commerce_product_reference_commerce_line_item_type_info() {
   return array(
     'product' => (object) array(
       'type' => 'product',

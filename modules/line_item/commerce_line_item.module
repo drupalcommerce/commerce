@@ -182,9 +182,9 @@ function commerce_line_item_enable() {
 function commerce_line_item_modules_enabled($modules) {
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
-    // If the module implements hook_commerce_line_item_info()...
-    if (module_hook($module, 'commerce_line_item_info')) {
-      $line_item_types = module_invoke($module, 'commerce_line_item_info');
+    // If the module implements hook_commerce_line_item_type_info()...
+    if (module_hook($module, 'commerce_line_item_type_info')) {
+      $line_item_types = module_invoke($module, 'commerce_line_item_type_info');
 
       // Loop through and configure the line item types defined by the module.
       foreach ($line_item_types as $line_item_type) {
@@ -325,8 +325,8 @@ function commerce_line_item_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($line_item_types)) {
-    $line_item_types = module_invoke_all('commerce_line_item_info');
-    drupal_alter('commerce_line_item_info', $line_item_types);
+    $line_item_types = module_invoke_all('commerce_line_item_type_info');
+    drupal_alter('commerce_line_item_type_info', $line_item_types);
 
     foreach ($line_item_types as $type => &$line_item_type) {
       $defaults = array(
