@@ -92,6 +92,6 @@ function commerce_line_item_entity_property_info_alter(&$info) {
     $properties += $bundle_info['properties'];
   }
 
-  $info['commerce_line_item']['properties']['unit_price'] = $properties['unit_price'];
-  $info['commerce_line_item']['properties']['total'] = $properties['total'];
+  $info['commerce_line_item']['properties']['commerce_unit_price'] = $properties['commerce_unit_price'];
+  $info['commerce_line_item']['properties']['commerce_total'] = $properties['commerce_total'];
 }

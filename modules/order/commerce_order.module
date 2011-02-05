@@ -800,12 +800,14 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
     field_cache_clear();
   }
 
-  $field = field_info_field('line_items');
-  $instance = field_info_instance('commerce_order', 'line_items', $type);
+  // Look for or add a line item reference field to the order type.
+  $field_name = 'commerce_line_items';
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_order', $field_name, $type);
 
   if (empty($field)) {
     $field = array(
-      'field_name' => 'line_items',
+      'field_name' => $field_name,
       'type' => 'commerce_line_item_reference',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'entity_types' => array('commerce_order'),
@@ -817,7 +819,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
 
   if (empty($instance)) {
     $instance = array(
-      'field_name' => 'line_items',
+      'field_name' => $field_name,
       'entity_type' => 'commerce_order',
       'bundle' => $type,
       'label' => t('Line items'),
@@ -846,7 +848,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
   $entity_info = entity_get_info('commerce_customer_profile');
 
   foreach ($entity_info['bundles'] as $profile_type => $data) {
-    $field_name = 'customer_' . $profile_type;
+    $field_name = 'commerce_customer_' . $profile_type;
 
     $field = field_info_field($field_name);
     $instance = field_info_instance('commerce_order', $field_name, $type);
@@ -873,7 +875,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
           'weight' => -5,
         ),
         'settings' => array(
-          'profilee_type' => array($profile_type),
+          'profile_type' => array($profile_type),
         ),
 
         // Define default formatters for the teaser and full view.

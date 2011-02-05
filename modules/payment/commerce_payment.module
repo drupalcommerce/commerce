@@ -836,7 +836,7 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
  *     of the order or FALSE if it is impossible to calculate.
  */
 function commerce_payment_order_balance($order, $totals = array()) {
-  $order_total = commerce_line_items_total($order->line_items);
+  $order_total = commerce_line_items_total($order->commerce_line_items);
 
   // Calculate the transaction totals if not supplied.
   if (empty($totals)) {

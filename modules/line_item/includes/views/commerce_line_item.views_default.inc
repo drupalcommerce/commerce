@@ -136,9 +136,9 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['fields']['quantity']['set_precision'] = 0;
   $handler->display->display_options['fields']['quantity']['precision'] = '0';
   $handler->display->display_options['fields']['quantity']['format_plural'] = 0;
-  /* Field: Fields: unit_price */
+  /* Field: Fields: commerce_unit_price */
   $handler->display->display_options['fields']['entity_id_1']['id'] = 'entity_id_1';
-  $handler->display->display_options['fields']['entity_id_1']['table'] = 'field_data_unit_price';
+  $handler->display->display_options['fields']['entity_id_1']['table'] = 'field_data_commerce_unit_price';
   $handler->display->display_options['fields']['entity_id_1']['field'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id_1']['label'] = 'Unit price';
   $handler->display->display_options['fields']['entity_id_1']['alter']['alter_text'] = 0;
@@ -152,9 +152,9 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['fields']['entity_id_1']['hide_empty'] = 0;
   $handler->display->display_options['fields']['entity_id_1']['empty_zero'] = 0;
   $handler->display->display_options['fields']['entity_id_1']['type'] = 'commerce_price_formatted_amount';
-  /* Field: Fields: total */
+  /* Field: Fields: commerce_total */
   $handler->display->display_options['fields']['entity_id']['id'] = 'entity_id';
-  $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_total';
+  $handler->display->display_options['fields']['entity_id']['table'] = 'field_data_commerce_total';
   $handler->display->display_options['fields']['entity_id']['field'] = 'entity_id';
   $handler->display->display_options['fields']['entity_id']['label'] = 'Total';
   $handler->display->display_options['fields']['entity_id']['alter']['alter_text'] = 0;

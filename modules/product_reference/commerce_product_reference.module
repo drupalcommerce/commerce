@@ -139,7 +139,7 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
 function commerce_product_reference_commerce_price_field_calculation_options($field, $instance, $view_mode) {
   // If this is a single value purchase price field attached to a product...
   if (($instance['entity_type'] == 'commerce_product' || $field['entity_types'] == array('commerce_product')) &&
-    $field['field_name'] == 'purchase_price' && $field['cardinality'] == 1) {
+    $field['field_name'] == 'commerce_price' && $field['cardinality'] == 1) {
     return array('calculated_sell_price' => t('Display the calculated sell price for the current user.'));
   }
 }
@@ -165,7 +165,7 @@ function commerce_product_reference_commerce_price_field_calculation_options($fi
  */
 function commerce_product_reference_commerce_price_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
   // If this is a single value purchase price field attached to a product...
-  if ($entity_type == 'commerce_product' && $field['field_name'] == 'purchase_price' && $field['cardinality'] == 1) {
+  if ($entity_type == 'commerce_product' && $field['field_name'] == 'commerce_price' && $field['cardinality'] == 1) {
     // Prepare the items for each entity passed in.
     foreach ($entities as $product_id => $product) {
       // If this price should be calculated...
@@ -214,7 +214,7 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
       ->condition('module_key', $module_key)
       ->condition('entity_type', 'commerce_product')
       ->condition('entity_id', $product->product_id)
-      ->condition('field_name', 'purchase_price')
+      ->condition('field_name', 'commerce_price')
       ->execute()
       ->fetchObject();
 
@@ -223,13 +223,13 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
       // Wrap the line item, swap in the price, and return it.
       $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-      $wrapper->unit_price->amount = $result->amount;
-      $wrapper->unit_price->currency_code = $result->currency_code;
+      $wrapper->commerce_unit_price->amount = $result->amount;
+      $wrapper->commerce_unit_price->currency_code = $result->currency_code;
 
       // TODO: Add proper entity property support for data arrays.
-      // $wrapper->unit_price->data = $result->data;
+      // $wrapper->commerce_unit_price->data = $result->data;
 
-      return $wrapper->unit_price->value();
+      return $wrapper->commerce_unit_price->value();
     }
   }
 
@@ -239,7 +239,7 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
   // Pass the line item to Rules.
   rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
-  return entity_metadata_wrapper('commerce_line_item', $line_item)->unit_price->value();
+  return entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_unit_price->value();
 }
 
 /**
@@ -371,11 +371,11 @@ function commerce_product_pre_calculate_sell_prices() {
           'module_key' => $key,
           'entity_type' => 'commerce_product',
           'entity_id' => $product_id,
-          'field_name' => 'purchase_price',
+          'field_name' => 'commerce_price',
           'language' => !empty($product->language) ? $product->language : '',
           'delta' => 0,
-          'amount' => $wrapper->unit_price->amount->value(),
-          'currency_code' => $wrapper->unit_price->currency_code->value(),
+          'amount' => $wrapper->commerce_unit_price->amount->value(),
+          'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
           'created' => time(),
         );
 
@@ -948,12 +948,14 @@ function commerce_product_reference_configure_line_item() {
     field_clear_cache();
   }
 
-  $field = field_info_field('product');
-  $instance = field_info_instance('commerce_line_item', 'product', 'product');
+  // Look for or add a product reference field to the product line item type.
+  $field_name = 'commerce_product';
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_line_item', $field_name, 'product');
 
   if (empty($field)) {
     $field = array(
-      'field_name' => 'product',
+      'field_name' => $field_name,
       'type' => 'commerce_product_reference',
       'cardinality' => 1,
       'entity_types' => array('commerce_line_item'),
@@ -965,7 +967,7 @@ function commerce_product_reference_configure_line_item() {
 
   if (empty($instance)) {
     $instance = array(
-      'field_name' => 'product',
+      'field_name' => $field_name,
       'entity_type' => 'commerce_line_item',
       'bundle' => 'product',
       'label' => t('Product'),
@@ -992,7 +994,7 @@ function commerce_product_reference_configure_line_item() {
 function commerce_product_line_item_title($line_item) {
   // Currently, just return the product's title.  However, in the future replace
   // this with the product preview build mode.
-  if ($product = commerce_product_load($line_item->product[LANGUAGE_NONE][0]['product_id'])) {
+  if ($product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id'])) {
     return check_plain($product->title);
   }
 }
@@ -1085,7 +1087,7 @@ function commerce_product_line_item_populate(&$line_item, $product, $quantity = 
   }
 
   // Add the product reference value to the line item for the right language.
-  $line_item->product = array(
+  $line_item->commerce_product = array(
     $language => array(
       array(
         'product_id' => $product->product_id,
@@ -1094,13 +1096,13 @@ function commerce_product_line_item_populate(&$line_item, $product, $quantity = 
   );
 
   // Set the unit price on the line item object.
-  $line_item->unit_price = array(
+  $line_item->commerce_unit_price = array(
     $language => array(
       array(
-        'amount' => $product->purchase_price[$language][0]['amount'],
-        'currency_code' => $product->purchase_price[$language][0]['currency_code'],
-      )
-    )
+        'amount' => $product->commerce_price[$language][0]['amount'],
+        'currency_code' => $product->commerce_price[$language][0]['currency_code'],
+      ),
+    ),
   );
 }
 

@@ -175,7 +175,7 @@ function commerce_line_item_rules_action_info() {
 function commerce_line_item_unit_price_add($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() + $amount;
+    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() + $amount;
   }
 }
 
@@ -185,7 +185,7 @@ function commerce_line_item_unit_price_add($line_item, $amount) {
 function commerce_line_item_unit_price_subtract($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() - $amount;
+    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() - $amount;
   }
 }
 
@@ -195,7 +195,7 @@ function commerce_line_item_unit_price_subtract($line_item, $amount) {
 function commerce_line_item_unit_price_multiply($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() * $amount;
+    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() * $amount;
   }
 }
 
@@ -205,7 +205,7 @@ function commerce_line_item_unit_price_multiply($line_item, $amount) {
 function commerce_line_item_unit_price_divide($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() / $amount;
+    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() / $amount;
   }
 }
 
@@ -215,7 +215,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount) {
 function commerce_line_item_unit_price_amount($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->unit_price->amount = $amount;
+    $wrapper->commerce_unit_price->amount = $amount;
   }
 }
 
@@ -224,7 +224,7 @@ function commerce_line_item_unit_price_amount($line_item, $amount) {
  */
 function commerce_line_item_unit_price_currency_code($line_item, $currency_code) {
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  $wrapper->unit_price->currency_code = $currency_code;
+  $wrapper->commerce_unit_price->currency_code = $currency_code;
 }
 
 /**
@@ -232,8 +232,8 @@ function commerce_line_item_unit_price_currency_code($line_item, $currency_code)
  */
 function commerce_line_item_unit_price_currency_convert($line_item, $currency_code) {
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  $wrapper->unit_price->amount = commerce_currency_convert($wrapper->unit_price->amount->value(), $wrapper->unit_price->currency_code->value(), $currency_code);
-  $wrapper->unit_price->currency_code = $currency_code;
+  $wrapper->commerce_unit_price->amount = commerce_currency_convert($wrapper->commerce_unit_price->amount->value(), $wrapper->unit_price->currency_code->value(), $currency_code);
+  $wrapper->commerce_unit_price->currency_code = $currency_code;
 }
 
 /**

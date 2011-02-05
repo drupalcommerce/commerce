@@ -52,8 +52,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       $line_item->changed = REQUEST_TIME;
 
       // Update the total of the line item based on the quantity and unit price.
-      $wrapper->total->amount = $line_item->quantity * $wrapper->unit_price->amount->value();
-      $wrapper->total->currency_code = $wrapper->unit_price->currency_code->value();
+      $wrapper->commerce_total->amount = $line_item->quantity * $wrapper->commerce_unit_price->amount->value();
+      $wrapper->commerce_total->currency_code = $wrapper->commerce_unit_price->currency_code->value();
 
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_line_item', $line_item);

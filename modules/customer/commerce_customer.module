@@ -449,12 +449,14 @@ function commerce_customer_configure_customer_profile_type($type) {
     field_cache_clear();
   }
 
-  $field = field_info_field($type . '_address');
-  $instance = field_info_instance('commerce_customer_profile', $type . '_address', $type);
+  // Look for or add an address field to the customer profile type.
+  $field_name = 'commerce_' . $type . '_address';
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_customer_profile', $field_name, $type);
 
   if (empty($field)) {
     $field = array(
-      'field_name' => $type . '_address',
+      'field_name' => $field_name,
       'type' => 'addressfield',
       'cardinality' => 1,
       'entity_types' => array('commerce_customer_profile'),
@@ -465,7 +467,7 @@ function commerce_customer_configure_customer_profile_type($type) {
 
   if (empty($instance)) {
     $instance = array(
-      'field_name' => $type . '_address',
+      'field_name' => $field_name,
       'entity_type' => 'commerce_customer_profile',
       'bundle' => $type,
       'label' => t('Address'),

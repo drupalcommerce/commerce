@@ -150,10 +150,10 @@ function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_st
   // If the order being edited is in a shopping cart status...
   if (commerce_cart_order_is_cart($order)) {
     // Loop over the line items on the form...
-    foreach ($form['line_items'][LANGUAGE_NONE]['line_items'] as &$line_item) {
+    foreach ($form['commerce_line_items'][LANGUAGE_NONE]['line_items'] as &$line_item) {
       // Disable the unit price amount and currency code fields.
-      $line_item['unit_price'][LANGUAGE_NONE][0]['amount']['#disabled'] = TRUE;
-      $line_item['unit_price'][LANGUAGE_NONE][0]['currency_code']['#disabled'] = TRUE;
+      $line_item['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#disabled'] = TRUE;
+      $line_item['commerce_unit_price'][LANGUAGE_NONE][0]['currency_code']['#disabled'] = TRUE;
     }
   }
 }
@@ -212,16 +212,16 @@ function commerce_cart_user_login(&$edit, $account) {
   if ($anonymous_order = commerce_cart_order_load()) {
     // If the anonymous user had any items in the cart, add them to the user's
     // authenticated cart.
-    if (!empty($anonymous_order->line_items[LANGUAGE_NONE])) {
+    if (!empty($anonymous_order->commerce_line_items[LANGUAGE_NONE])) {
       // Add each of the anonymous cart items to the authenticated user's cart.
       $line_item_ids = array();
 
-      foreach ($anonymous_order->line_items[LANGUAGE_NONE] as $line_item_reference) {
+      foreach ($anonymous_order->commerce_line_items[LANGUAGE_NONE] as $line_item_reference) {
         $line_item_ids[] = $line_item_reference['line_item_id'];
       }
 
       foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
-        commerce_cart_product_add($account->uid, $line_item->product[LANGUAGE_NONE][0]['product_id'], $line_item->quantity);
+        commerce_cart_product_add($account->uid, $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'], $line_item->quantity);
       }
 
       // Delete the anonymous order from the database and clear the reference.
@@ -273,7 +273,7 @@ function commerce_cart_block_view($delta) {
     $order = commerce_cart_order_load($user->uid);
 
     // If the cart is empty...
-    if (!$order || empty($order->line_items)) {
+    if (!$order || empty($order->commerce_line_items)) {
       // Display an appropriate message.
       $content = theme('commerce_cart_empty_block');
     }
@@ -307,12 +307,12 @@ function commerce_cart_commerce_order_load($orders) {
       // Loop over every line item on the order...
       $unchanged_line_items = array();
 
-      foreach ($order_wrapper->line_items as $delta => $line_item_wrapper) {
+      foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
         // If the line item is a product line item...
         if ($line_item_wrapper->type->value() == 'product') {
           // Create a new product line item referencing the same product as though
           // we had not added it to the cart yet, but use the current quantity.
-          $line_item = commerce_product_line_item_new($line_item_wrapper->product->value(), $line_item_wrapper->quantity->value(), $order->order_id);
+          $line_item = commerce_product_line_item_new($line_item_wrapper->commerce_product->value(), $line_item_wrapper->quantity->value(), $order->order_id);
 
           // Process the unit price through Rules so it reflects the user's actual
           // current purchase price.
@@ -328,11 +328,11 @@ function commerce_cart_commerce_order_load($orders) {
         // Compare the refreshed unit price to the original unit price.
         $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-        if ($line_item_wrapper->unit_price->amount->value() != $current_line_item_wrapper->unit_price->amount->value() ||
-          $line_item_wrapper->unit_price->currency_code->value() != $current_line_item_wrapper->unit_price->currency_code->value()) {
+        if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
+          $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value()) {
           // Adjust the unit price accordingly if necessary.
-          $line_item_wrapper->unit_price->amount = $current_line_item_wrapper->unit_price->amount->value();
-          $line_item_wrapper->unit_price->currency_code = $current_line_item_wrapper->unit_price->currency_code->value();
+          $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
+          $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
 
           // Save the updated line item; for some reason I have to call both
           // of these functions for the changes to be fully evident on the
@@ -367,18 +367,18 @@ function commerce_cart_commerce_order_presave($order) {
   $unchanged_wrapper = entity_metadata_wrapper('commerce_order', $unchanged_order);
 
   // If the number of line items has changed, reset the status.
-  if (count($unchanged_wrapper->line_items) != count($wrapper->line_items)) {
+  if (count($unchanged_wrapper->commerce_line_items) != count($wrapper->commerce_line_items)) {
     $order->status = 'cart';
   }
   else {
     // Otherwise compare the actual line item IDs.
     $unchanged_line_item_ids = array();
 
-    foreach ($unchanged_wrapper->line_items as $key => $value) {
+    foreach ($unchanged_wrapper->commerce_line_items as $key => $value) {
       $unchanged_line_item_ids[] = $key;
     }
 
-    foreach ($wrapper->line_items as $key => $value) {
+    foreach ($wrapper->commerce_line_items as $key => $value) {
       if (!in_array($key, $unchanged_line_item_ids)) {
         $order->status = 'cart';
       }
@@ -685,11 +685,11 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
   $line_item_match = NULL;
 
   // If the order has line items on it...
-  if (!empty($order->line_items)) {
+  if (!empty($order->commerce_line_items)) {
     $line_item_ids = array();
 
     // Build an array of the line item IDs.
-    foreach ($order->line_items[LANGUAGE_NONE] as $line_item_reference) {
+    foreach ($order->commerce_line_items[LANGUAGE_NONE] as $line_item_reference) {
       $line_item_ids[] = $line_item_reference['line_item_id'];
     }
 
@@ -698,7 +698,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
       // If this line item matches the product being added...
       if (empty($line_item_match) &&
           $line_item->type == 'product' &&
-          $line_item->product[LANGUAGE_NONE][0]['product_id'] == $product_id) {
+          $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'] == $product_id) {
         // Exit this loop with the $line_item intact so it gets updated.
         $line_item_match = clone($line_item);
       }
@@ -718,7 +718,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
     $line_item = commerce_line_item_save($line_item);
 
     // Add it to the order's line item reference value.
-    $order->line_items[LANGUAGE_NONE][] = array(
+    $order->commerce_line_items[LANGUAGE_NONE][] = array(
       'line_item_id' => $line_item->line_item_id,
     );
 
@@ -736,7 +736,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
 
     // Invoke the product add event with the updated line item.
     // TODO: Debug why the updated quantity isn't available to Rules when
-    // iterating over $order->line_items.
+    // iterating over $order->commerce_line_items.
     rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item_match);
   }
 
@@ -757,7 +757,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
  *     from the order and then save.
  *
  * @return
- *   The order with the matching product line item deleted from the line_items
+ *   The order with the matching product line item deleted from the line item
  *     reference field.
  */
 function commerce_cart_order_product_line_item_delete($order, $line_item_id, $skip_save = FALSE) {
@@ -769,11 +769,11 @@ function commerce_cart_order_product_line_item_delete($order, $line_item_id, $sk
   }
 
   // Remove the line item from the line item reference field.
-  $order = commerce_line_item_reference_delete('commerce_order', $order, 'line_items', $line_item_id);
+  $order = commerce_line_item_reference_delete('commerce_order', $order, 'commerce_line_items', $line_item_id);
 
   // Wrap the line item to be deleted and extract the product from it.
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  $product = $wrapper->product->value();
+  $product = $wrapper->commerce_product->value();
 
   // Invoke the product removal event with the line item about to be deleted.
   rules_invoke_all('commerce_cart_product_remove', $order, $product, $line_item->quantity, $line_item);
@@ -799,7 +799,7 @@ function commerce_cart_order_empty($order) {
   // Build an array of product line item IDs.
   $line_item_ids = array();
 
-  foreach ($order_wrapper->line_items as $delta => $line_item_wrapper) {
+  foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     if ($line_item_wrapper->type->value() == 'product') {
       $line_item_ids[] = $line_item_wrapper->line_item_id->value();
     }

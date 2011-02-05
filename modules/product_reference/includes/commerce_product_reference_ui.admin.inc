@@ -37,7 +37,7 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
     ->fields('commerce_calculated_price', array('created'))
     ->condition('module', 'commerce_product_reference')
     ->condition('entity_type', 'commerce_product')
-    ->condition('field_name', 'purchase_price')
+    ->condition('field_name', 'commerce_price')
     ->execute();
 
   $count = $query->rowCount();
@@ -122,7 +122,7 @@ function commerce_product_pre_calculation_settings_form_submit($form, &$form_sta
     db_delete('commerce_calculated_price')
       ->condition('module', 'commerce_product_reference')
       ->condition('entity_type', 'commerce_product')
-      ->condition('field_name', 'purchase_price')
+      ->condition('field_name', 'commerce_price')
       ->execute();
   }
 }

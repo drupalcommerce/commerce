@@ -19,7 +19,7 @@ function commerce_cart_checkout_router() {
   // If no shopping cart order could be found, redirect away from checkout.
   // TODO: Redirect to the cart page instead which would then appear as an
   // empty shopping cart page. Depends on
-  if (empty($order) || commerce_line_items_quantity($order->line_items, 'product') == 0) {
+  if (empty($order) || commerce_line_items_quantity($order->commerce_line_items, 'product') == 0) {
     drupal_set_message(t('Add some items to your cart and then try checking out.'));
     drupal_goto(variable_get('commerce_checkout_empty_redirect', ''));
   }
@@ -37,7 +37,7 @@ function commerce_cart_view() {
   $order = commerce_cart_order_load($user->uid);
 
   // If the cart is empty...
-  if (!$order || empty($order->line_items)) {
+  if (!$order || empty($order->commerce_line_items)) {
     // Display an appropriate message.
     $content = theme('commerce_cart_empty_page');
   }

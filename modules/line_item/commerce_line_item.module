@@ -416,8 +416,8 @@ function commerce_line_item_configure_line_item_type($line_item_type) {
   // Add the default price fields to the line item type.
   $weight = 0;
 
-  foreach (array('unit_price' => t('Unit price'), 'total' => t('Total')) as $name => $label) {
-    commerce_price_create_instance($name, 'commerce_line_item', $line_item_type->type, $label, $weight++);
+  foreach (array('commerce_unit_price' => t('Unit price'), 'commerce_total' => t('Total')) as $field_name => $label) {
+    commerce_price_create_instance($field_name, 'commerce_line_item', $line_item_type->type, $label, $weight++);
   }
 
   // If this line item type specifies a configuration callback...
@@ -844,16 +844,16 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       );
 
       // Retrieve the widget form for just the unit price.
-      $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'unit_price'));
+      $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'commerce_unit_price'));
 
       // Unset the title and description and add it to the line item form.
-      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['amount']['#title']);
-      unset($widget_form['unit_price'][LANGUAGE_NONE][0]['amount']['#description']);
+      unset($widget_form['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#title']);
+      unset($widget_form['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#description']);
 
-      $element['line_items'][$line_item_id]['unit_price'] = $widget_form['unit_price'];
+      $element['line_items'][$line_item_id]['commerce_unit_price'] = $widget_form['commerce_unit_price'];
 
-      $element['line_items'][$line_item_id]['total'] = array(
-        '#markup' => commerce_currency_format($line_item->total[LANGUAGE_NONE][0]['amount'], $line_item->total[LANGUAGE_NONE][0]['currency_code'], $line_item),
+      $element['line_items'][$line_item_id]['commerce_total'] = array(
+        '#markup' => commerce_currency_format($line_item->commerce_total[LANGUAGE_NONE][0]['amount'], $line_item->commerce_total[LANGUAGE_NONE][0]['currency_code'], $line_item),
       );
     }
 
@@ -946,8 +946,8 @@ function theme_commerce_line_item_manager($variables) {
       drupal_render($form['line_items'][$line_item_id]['title']),
       drupal_render($form['line_items'][$line_item_id]['line_item_label']),
       drupal_render($form['line_items'][$line_item_id]['quantity']),
-      drupal_render($form['line_items'][$line_item_id]['unit_price']),
-      drupal_render($form['line_items'][$line_item_id]['total']),
+      drupal_render($form['line_items'][$line_item_id]['commerce_unit_price']),
+      drupal_render($form['line_items'][$line_item_id]['commerce_total']),
     );
 
     $rows[] = $row;
@@ -1000,13 +1000,13 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       }
 
       // Manually validate the unit price of each line item.
-      $unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['unit_price'];
+      $unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['commerce_unit_price'];
 
       if (is_numeric($unit_price[$element['#language']][0]['amount'])) {
-        $line_item->unit_price = $unit_price;
+        $line_item->commerce_unit_price = $unit_price;
       }
       else {
-        $name = implode('][', array_merge($element['line_items'][$line_item_id]['unit_price']['#parents'], array($element['#language'], 0, 'amount')));
+        $name = implode('][', array_merge($element['line_items'][$line_item_id]['commerce_unit_price']['#parents'], array($element['#language'], 0, 'amount')));
         form_set_error($name, 'You must enter a numeric value for the unit price.');
       }
 
@@ -1135,7 +1135,7 @@ function commerce_line_item_reference_delete($entity_type, $entity, $field_name,
     // If its ID matches the specified line item...
     if ($line_item_wrapper->line_item_id->value() == $line_item_id) {
       // Unset it and return the updated order object.
-      $wrapper->line_items->offsetUnset($delta);
+      $wrapper->{$field_name}->offsetUnset($delta);
 
       return $wrapper->value();
     }
@@ -1218,16 +1218,16 @@ function commerce_line_items_total($value, $type = '', $language = '') {
     if (empty($type) || $line_item->type == $type) {
       // Set the initial currency code.
       if (empty($currency_code)) {
-        $currency_code = $line_item->total[$language][0]['currency_code'];
+        $currency_code = $line_item->commerce_total[$language][0]['currency_code'];
       }
       else {
         // Check to see if the line items or of a mixed currency.
-        if ($currency_code != $line_item->total[$language][0]['currency_code']) {
+        if ($currency_code != $line_item->commerce_total[$language][0]['currency_code']) {
           // TODO: Figure out what to do then!
         }
       }
 
-      $total += $line_item->total[$language][0]['amount'];
+      $total += $line_item->commerce_total[$language][0]['amount'];
     }
   }
 

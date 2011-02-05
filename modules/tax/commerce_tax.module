@@ -229,8 +229,8 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
 
     // Create a price data structure for the tax.
     $tax_price = array(
-      'amount' => $wrapper->unit_price->amount->value() * $tax_rate->rate,
-      'currency_code' => $wrapper->unit_price->currency_code,
+      'amount' => $wrapper->commerce_unit_price->amount->value() * $tax_rate->rate,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code,
       'data' => array(),
     );
 
@@ -241,7 +241,7 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
     if ($tax_type = commerce_tax_type_load($tax_rate->type)) {
       // Include the tax amount in the displayed unit price if specified.
       if ($tax_type->display_inclusive) {
-        $wrapper->unit_price->amount = $wrapper->unit_price->amount->value() + $tax_price['amount'];
+        $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() + $tax_price['amount'];
       }
     }
   }
