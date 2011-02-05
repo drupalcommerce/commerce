@@ -51,7 +51,7 @@ class commerce_payment_handler_field_amount extends views_handler_field {
         $currency = commerce_currency_load($values->{$this->aliases['currency_code']});
 
         // Format the price as a number.
-        return number_format(commerce_currency_round($values->{$this->field_alias}, $currency), $currency->decimals);
+        return number_format(commerce_currency_round($values->{$this->field_alias}, $currency), $currency['decimals']);
     }
   }
 }

@@ -56,7 +56,7 @@ class commerce_payment_handler_field_balance extends views_handler_field {
         // Then load the full currency object.
         $currency = commerce_currency_load();
         // Format the price as a number.
-        return number_format(commerce_currency_round($balance['amount'], $currency), $currency->decimals);
+        return number_format(commerce_currency_round($balance['amount'], $currency), $currency['decimals']);
     }
   }
 }

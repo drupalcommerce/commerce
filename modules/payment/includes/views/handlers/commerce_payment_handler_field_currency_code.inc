@@ -40,6 +40,6 @@ class commerce_payment_handler_field_currency_code extends views_handler_field {
   function render($values) {
     $currency = commerce_currency_load($values->{$this->field_alias});
 
-    return check_plain($currency->{$this->options['display_format']});
+    return check_plain($currency[$this->options['display_format']]);
   }
 }

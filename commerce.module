@@ -228,7 +228,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
 
     // Add default values if they don't exist and convert to objects.
     foreach ($currencies as $currency_code => $currency) {
-      $currencies[$currency_code] = (object) array_merge($defaults, $currency);
+      $currencies[$currency_code] = array_merge($defaults, $currency);
     }
 
     cache_set('commerce_currencies:' . $language->language, $currencies);
@@ -280,7 +280,7 @@ function commerce_currency_get_symbol($currency_code = NULL) {
   // Return a specific currency symbol if specified.
   if (!empty($currency_code)) {
     if (isset($currencies[$currency_code])) {
-      return $currencies[$currency_code]->symbol;
+      return $currencies[$currency_code]['symbol'];
     }
     else {
       return FALSE;
@@ -289,7 +289,7 @@ function commerce_currency_get_symbol($currency_code = NULL) {
 
   // Otherwise turn the array values into the type name only.
   foreach ($currencies as $currency_code => $currency) {
-    $currencies[$currency_code] = $currency->symbol;
+    $currencies[$currency_code] = $currency['symbol'];
   }
 
   return $currencies;
@@ -313,8 +313,8 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
   $currency = commerce_currency_load($currency_code);
 
   // Invoke the custom format callback if specified.
-  if (!empty($currency->format_callback)) {
-    return $currency->format_callback($price, $currency, $entity);
+  if (!empty($currency['format_callback'])) {
+    return $currency['format_callback']($price, $currency, $entity);
   }
 
   // Separate the negative symbol from the number itself.
@@ -327,15 +327,15 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
   }
 
   // Format the price as a number.
-  $price = number_format(commerce_currency_round($price, $currency), $currency->decimals, $currency->decimal_separator, $currency->thousands_separator);
+  $price = number_format(commerce_currency_round($price, $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
 
   // Establish the replacement values to format this price for its currency.
   $replacements = array(
-    '@code_before' => $currency->code_placement == 'before' ? $currency->code : '',
-    '@symbol_before' => $currency->symbol_placement == 'before' ? $currency->symbol : '',
+    '@code_before' => $currency['code_placement'] == 'before' ? $currency['code'] : '',
+    '@symbol_before' => $currency['symbol_placement'] == 'before' ? $currency['symbol'] : '',
     '@price' => $price,
-    '@symbol_after' => $currency->symbol_placement == 'after' ? $currency->symbol : '',
-    '@code_after' => $currency->code_placement == 'after' ? $currency->code : '',
+    '@symbol_after' => $currency['symbol_placement'] == 'after' ? $currency['symbol'] : '',
+    '@code_after' => $currency['code_placement'] == 'after' ? $currency['code'] : '',
     '@negative' => $negative ? '-' : '',
   );
 
@@ -362,11 +362,11 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
  *   The rounded numeric amount value for the price.
  */
 function commerce_currency_round($amount, $currency) {
-  if (!$currency->rounding_step) {
-    return round($amount, $currency->decimals);
+  if (!$currency['rounding_step']) {
+    return round($amount, $currency['decimals']);
   }
 
-  $modifier = 1 / $currency->rounding_step;
+  $modifier = 1 / $currency['rounding_step'];
 
   return round($amount * $modifier) / $modifier;
 }
@@ -401,7 +401,7 @@ function commerce_currency_convert($amount, $currency_code, $target_currency_cod
   $currency = commerce_currency_load($currency_code);
   $target_currency = commerce_currency_load($target_currency_code);
 
-  return $amount * ($currency->conversion_rate / $target_currency->conversion_rate);
+  return $amount * ($currency['conversion_rate'] / $target_currency['conversion_rate']);
 }
 
 /**

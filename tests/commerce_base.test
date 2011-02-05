@@ -714,7 +714,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
 
     foreach ($rounding_numbers as $rounding_step => $numbers) {
       foreach ($numbers as $input => $output) {
-        $currency = (object) array('decimals' => 2, 'rounding_step' => $rounding_step);
+        $currency = array('decimals' => 2, 'rounding_step' => $rounding_step);
 
         $result = commerce_currency_round($input, $currency);
         $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $output . ' with the rounding step: ' . $rounding_step . '.');

@@ -54,7 +54,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     $options = array();
 
     foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
-      $options[$currency_code] = check_plain($currency->code);
+      $options[$currency_code] = check_plain($currency['code']);
     }
 
     $form['payment_terminal']['currency_code'] = array(

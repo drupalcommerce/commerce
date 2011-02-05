@@ -11,7 +11,7 @@ class commerce_payment_handler_filter_currency_code extends views_handler_filter
       $this->value_title = t('Currency Code');
       $currencies = commerce_currencies();
       foreach ($currencies as $currency => $info) {
-        $options[$currency] = t('@code - !name - @symbol', array('@code' => $info->code, '@symbol' => $info->symbol, '!name' => $info->name));
+        $options[$currency] = t('@code - !name - @symbol', array('@code' => $info['code'], '@symbol' => $info['symbol'], '!name' => $info['name']'));
       }
       $this->value_options = $options;
     }

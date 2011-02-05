@@ -62,8 +62,8 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
       $default_amount = round($settings[$name]['amount'], 2);
 
       // Run it through number_format() to add the decimal places in if necessary.
-      if (strpos($default_amount, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency->decimals) {
-        $default_amount = number_format($default_amount, $currency->decimals, '.', '');
+      if (strpos($default_amount, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency['decimals']) {
+        $default_amount = number_format($default_amount, $currency['decimals'], '.', '');
       }
 
       $default_currency_code = $settings[$name]['currency_code'];
@@ -87,13 +87,13 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
     $options = array();
 
     foreach (commerce_currencies(TRUE) as $currency_code => $currency) {
-      $options[$currency_code] = check_plain($currency->code);
+      $options[$currency_code] = check_plain($currency['code']);
     }
 
     // If the current currency value is not available, add it now with a
     // message in the help text explaining it.
-    if (empty($options[$default_currency->code])) {
-      $options[$default_currency->code] = check_plain($default_currency->code);
+    if (empty($options[$default_currency['code']])) {
+      $options[$default_currency['code']] = check_plain($default_currency['code']);
 
       $description = t('The currency set for this action is not currently enabled. If you change it now, you will not be able to set it back.');
     }
@@ -119,7 +119,7 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
         '#type' => 'select',
         '#description' => $description,
         '#options' => $options,
-        '#default_value' => isset($settings[$name]['currency_code']) ? $settings[$name]['currency_code'] : $default_currency->code,
+        '#default_value' => isset($settings[$name]['currency_code']) ? $settings[$name]['currency_code'] : $default_currency['code'],
         '#suffix' => '</div>',
       );
     }

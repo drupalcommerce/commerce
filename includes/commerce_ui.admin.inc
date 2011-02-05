@@ -15,10 +15,10 @@ function commerce_currency_settings_form($form, &$form_state) {
   $options = array();
 
   foreach (commerce_currencies(FALSE, TRUE) as $currency_code => $currency) {
-    $options[$currency_code] = t('@code - !name', array('@code' => $currency->code, '@symbol' => $currency->symbol, '!name' => $currency->name));
+    $options[$currency_code] = t('@code - !name', array('@code' => $currency['code'], '@symbol' => $currency['symbol'], '!name' => $currency['name']));
 
-    if (!empty($currency->symbol)) {
-      $options[$currency_code] .= ' - ' . check_plain($currency->symbol);
+    if (!empty($currency['symbol'])) {
+      $options[$currency_code] .= ' - ' . check_plain($currency['symbol']);
     }
   }
 
