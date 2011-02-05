@@ -130,9 +130,9 @@ function commerce_customer_theme() {
 }
 
 /**
- * Implements hook_commerce_customer_profile_info().
+ * Implements hook_commerce_customer_profile_type_info().
  */
-function commerce_customer_commerce_customer_profile_info() {
+function commerce_customer_commerce_customer_profile_type_info() {
   $profile_types = array();
 
   $profile_types['billing'] = (object) array(
@@ -174,9 +174,9 @@ function commerce_customer_profile_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($profile_types)) {
-    // Find profile types defined by hook_commerce_customer_profile_info().
-    foreach (module_implements('commerce_customer_profile_info') as $module) {
-      foreach (module_invoke($module, 'commerce_customer_profile_info') as $type => $profile_type) {
+    // Find profile types defined by hook_commerce_customer_profile_type_info().
+    foreach (module_implements('commerce_customer_profile_type_info') as $module) {
+      foreach (module_invoke($module, 'commerce_customer_profile_type_info') as $type => $profile_type) {
         // Set the module each profile type is defined by.
         $profile_type->module = $module;
         $profile_types[$type] = $profile_type;
@@ -184,7 +184,7 @@ function commerce_customer_profile_types() {
     }
 
     // Last allow the info to be altered by other modules.
-    drupal_alter('commerce_customer_profile_info', $profile_types);
+    drupal_alter('commerce_customer_profile_type_info', $profile_types);
   }
 
   return $profile_types;
