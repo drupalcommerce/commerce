@@ -26,7 +26,7 @@
  * @param $order
  *   The order object specified by the checkout URL.
  * @param $checkout_page
- *   The checkout page object specified by the checkout URL.
+ *   The checkout page array specified by the checkout URL.
  *
  * @see commerce_checkout_router()
  */

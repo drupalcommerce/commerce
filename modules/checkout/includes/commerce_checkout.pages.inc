@@ -35,11 +35,11 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
   module_invoke_all('commerce_checkout_router', $order, $checkout_page);
 
   // Update the page title if specified.
-  if (!empty($checkout_page->title)) {
-    drupal_set_title($checkout_page->title);
+  if (!empty($checkout_page['title'])) {
+    drupal_set_title($checkout_page['title']);
   }
 
-  return drupal_get_form('commerce_checkout_form_' . $checkout_page->page_id, $order, $checkout_page);
+  return drupal_get_form('commerce_checkout_form_' . $checkout_page['page_id'], $order, $checkout_page);
 }
 
 /**
@@ -62,7 +62,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
   // Add any instructions for the checkout page.
   $form['help'] = array(
-    '#markup' => '<div class="checkout-help">' . filter_xss($checkout_page->help) . '</div>',
+    '#markup' => '<div class="checkout-help">' . filter_xss($checkout_page['help']) . '</div>',
   );
 
   // Restore form errors.
@@ -72,7 +72,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   }
 
   // Add any enabled checkout panes for this page to the form.
-  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page->page_id)) as $pane_id => $checkout_pane) {
+  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page['page_id'])) as $pane_id => $checkout_pane) {
     if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form')) {
       // Display error messages before the form.
       if (!empty($form_state['storage']['messages'][$pane_id])) {
@@ -98,7 +98,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   }
 
   // Only add buttons to the form if the checkout page hasn't disabled them.
-  if ($checkout_page->buttons) {
+  if ($checkout_page['buttons']) {
     $form['buttons'] = array(
       '#type' => 'fieldset',
       '#attributes' => array('class' => array('checkout-buttons')),
@@ -108,7 +108,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
     // submit handlers because we're using hook_forms() to use this form builder
     // function and to avoid issues if other modules implement button level submit
     // handlers on these or custom checkout buttons.
-    if (!$checkout_page->prev_page && !empty($checkout_page->back_value)) {
+    if (!$checkout_page['prev_page'] && !empty($checkout_page['back_value'])) {
       // Add an empty "Back" button value to avoid submission errors.
       $form['buttons']['back'] = array(
         '#type' => 'value',
@@ -126,10 +126,10 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         '#limit_validation_errors' => array(),
       );
     }
-    elseif ($checkout_page->prev_page && !empty($checkout_page->back_value)) {
+    elseif ($checkout_page['prev_page'] && !empty($checkout_page['back_value'])) {
       $form['buttons']['back'] = array(
         '#type' => 'submit',
-        '#value' => $checkout_page->back_value,
+        '#value' => $checkout_page['back_value'],
         '#attributes' => array('class' => array('checkout-back')),
         '#submit' => array('commerce_checkout_form_back_submit'),
         '#limit_validation_errors' => array(),
@@ -138,7 +138,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
     $form['buttons']['continue'] = array(
       '#type' => 'submit',
-      '#value' => $checkout_page->submit_value,
+      '#value' => $checkout_page['submit_value'],
       '#attributes' => array('class' => array('checkout-continue')),
       '#submit' => array('commerce_checkout_form_submit'),
     );
@@ -168,7 +168,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
 
   // Loop through the enabled checkout panes for the current page.
   $form_validate = TRUE;
-  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page->page_id)) as $pane_id => $checkout_pane) {
+  foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page['page_id'])) as $pane_id => $checkout_pane) {
     $validate = TRUE;
 
     // If the pane has defined a checkout form validate handler...
@@ -212,17 +212,17 @@ function commerce_checkout_form_submit($form, &$form_state) {
   // If the form was submitted via the continue button...
   if ($form_state['values']['op'] == $form_state['values']['continue']) {
     // If there is another checkout page...
-    if ($checkout_page->next_page) {
+    if ($checkout_page['next_page']) {
       // Update the order status to reflect the next checkout page.
-      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page->next_page);
+      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page['next_page']);
 
       // If it happens to be the complete page, process completion now.
-      if ($checkout_page->next_page == 'complete') {
+      if ($checkout_page['next_page'] == 'complete') {
         commerce_checkout_complete($order);
       }
 
       // Redirect to the next checkout page.
-      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page->next_page;
+      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $checkout_page['next_page'];
     }
   }
 }
@@ -232,19 +232,19 @@ function commerce_checkout_form_submit($form, &$form_state) {
  */
 function commerce_checkout_form_back_submit($form, &$form_state) {
   // If there is a previous page...
-  if ($previous_page = commerce_checkout_page_load($form_state['checkout_page']->prev_page)) {
+  if ($previous_page = commerce_checkout_page_load($form_state['checkout_page']['prev_page'])) {
     $order = $form_state['order'];
 
     // Move the form back to that page.
-    if ($previous_page->prev_page) {
-      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $previous_page->page_id;
+    if ($previous_page['prev_page']) {
+      $form_state['redirect'] = 'checkout/' . $order->order_id . '/' . $previous_page['page_id'];
     }
     else {
       $form_state['redirect'] = 'checkout/' . $order->order_id;
     }
 
     // Update the order status for the checkout step.
-    $form_state['order'] = commerce_order_status_update($order, 'checkout_' . $previous_page->page_id);
+    $form_state['order'] = commerce_order_status_update($order, 'checkout_' . $previous_page['page_id']);
   }
 }
 

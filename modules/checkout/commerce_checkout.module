@@ -251,11 +251,11 @@ function commerce_checkout_commerce_order_status_info() {
   foreach (commerce_checkout_pages() as $page_id => $checkout_page) {
     $order_statuses['checkout_' . $page_id] = (object) array(
       'name' => 'checkout_' . $page_id,
-      'title' => t('Checkout: @page', array('@page' => $checkout_page->name)),
+      'title' => t('Checkout: @page', array('@page' => $checkout_page['name'])),
       'state' => 'checkout',
       'checkout_page' => $page_id,
-      'cart' => $checkout_page->status_cart,
-      'weight' => $checkout_page->weight,
+      'cart' => $checkout_page['status_cart'],
+      'weight' => $checkout_page['weight'],
     );
   }
 
@@ -279,13 +279,13 @@ function commerce_checkout_commerce_checkout_page_info() {
   $checkout_pages = array();
 
   // Define a primary checkout page as the first step.
-  $checkout_pages['checkout'] = (object) array(
+  $checkout_pages['checkout'] = array(
     'title' => t('Checkout'),
     'weight' => 0,
   );
 
   // Define a page for reviewing the data entered during checkout.
-  $checkout_pages['review'] = (object) array(
+  $checkout_pages['review'] = array(
     'name' => t('Review'),
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
@@ -293,7 +293,7 @@ function commerce_checkout_commerce_checkout_page_info() {
   );
 
   // Define a page for checkout completion with no submit buttons on it.
-  $checkout_pages['complete'] = (object) array(
+  $checkout_pages['complete'] = array(
     'name' => t('Complete'),
     'title' => t('Checkout complete'),
     'weight' => 50,
@@ -345,7 +345,7 @@ function commerce_checkout_pages() {
     foreach ($checkout_pages as $page_id => $checkout_page) {
       $defaults = array(
         'page_id' => $page_id,
-        'name' => $checkout_page->title,
+        'name' => $checkout_page['title'],
         'title' => '',
         'help' => '',
         'status_cart' => TRUE,
@@ -356,31 +356,30 @@ function commerce_checkout_pages() {
         'next_page' => NULL,
       );
 
-      $checkout_pages[$page_id] = (object) ((array) $checkout_page + $defaults);
+      $checkout_pages[$page_id] += $defaults;
 
       // Set a weight that preserves the order of 0 weighted pages.
-      if (empty($checkout_page->weight)) {
-        $checkout_pages[$page_id]->weight = $count++ / count($checkout_pages);
+      if (empty($checkout_page['weight'])) {
+        $checkout_pages[$page_id]['weight'] = $count++ / count($checkout_pages);
       }
     }
 
-    uasort($checkout_pages, 'commerce_sort_weight');
+    uasort($checkout_pages, 'drupal_sort_weight');
 
     // Initialize the previous and next pages.
     $previous_page = NULL;
     $checkout_page = NULL;
 
-    foreach ($checkout_pages as $checkout_page) {
+    foreach ($checkout_pages as &$checkout_page) {
       // Look for any checkout panes assigned to this page.
-      $checkout_panes = commerce_checkout_panes(array('page' => $checkout_page->page_id));
-
+      $checkout_panes = commerce_checkout_panes(array('page' => $checkout_page['page_id']));
       // If this is the completion page or at least one pane was found...
-      if ($checkout_page->page_id == 'complete' || !empty($checkout_panes)) {
+      if ($checkout_page['page_id'] == 'complete' || !empty($checkout_panes)) {
         // If a page has been stored as the previous page...
         if ($previous_page) {
           // Set the current page's previous page and the previous page's next.
-          $checkout_page->prev_page = $previous_page->page_id;
-          $previous_page->next_page = $checkout_page->page_id;
+          $checkout_page['prev_page'] = $previous_page['page_id'];
+          $checkout_pages[$previous_page['page_id']]['next_page'] = $checkout_page['page_id'];
         }
 
         // Set the current page as the previous page for the next iteration.
@@ -388,7 +387,6 @@ function commerce_checkout_pages() {
       }
     }
   }
-
   return $checkout_pages;
 }
 
@@ -644,15 +642,14 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
   // Load the order status object for the current order.
   $order_status = commerce_order_status_load($order->status);
-
   // If the order is not in a checkout status, return FALSE for any page but the
   // completion page unless the order is still a shopping cart.
-  if ($order_status->state != 'checkout' && $checkout_page->page_id != 'complete') {
+  if ($order_status->state != 'checkout' && $checkout_page['page_id'] != 'complete') {
     if ($order_status->state == 'cart') {
       $checkout_pages = commerce_checkout_pages();
       $first_page = key($checkout_pages);
 
-      if ($checkout_page->page_id != $first_page) {
+      if ($checkout_page['page_id'] != $first_page) {
         return FALSE;
       }
     }
@@ -668,18 +665,18 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
     // However, if buttons aren't present on the status's checkout page, don't
     //  allow access unless the order status matches the page.
-    if (!$status_checkout_page->buttons && $status_checkout_page->page_id != $checkout_page->page_id) {
+    if (!$status_checkout_page['buttons'] && $status_checkout_page['page_id'] != $checkout_page['page_id']) {
       // The exception here for the checkout completion page allows customers to
       // access this page for any order status the order might be moved to when
       // the order is completed.
-      if ($checkout_page->page_id != 'complete') {
+      if ($checkout_page['page_id'] != 'complete') {
         return FALSE;
       }
     }
     else {
       // Compare the weights of the currently requested page against the weight
       // of the order status's page and return FALSE if it's greater.
-      if ($checkout_page->weight > $status_checkout_page->weight) {
+      if ($checkout_page['weight'] > $status_checkout_page['weight']) {
         return FALSE;
       }
     }
@@ -689,7 +686,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
   // status.  We then handled cases where the user is trying to access any
   // checkout page for orders in a checkout status.  We now turn to cases where
   // the user is accessing the complete page for any other order state.
-  elseif ($checkout_page->page_id == 'complete') {
+  elseif ($checkout_page['page_id'] == 'complete') {
     // Don't allow completion page access for orders in the cart or canceled states.
     if (in_array($order_status->state, array('canceled', 'cart'))) {
       return FALSE;

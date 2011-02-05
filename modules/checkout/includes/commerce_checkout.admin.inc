@@ -16,7 +16,7 @@ function commerce_checkout_builder_form($form, &$form_state) {
   $checkout_pages = commerce_checkout_pages();
 
   // Add a "disabled" pseudo-page.
-  $checkout_pages['disabled'] = (object) array('page_id' => 'disabled', 'title' => t('Disabled'));
+  $checkout_pages['disabled'] = array('page_id' => 'disabled', 'title' => t('Disabled'));
 
   $form['checkout_pages'] = array(
     '#type' => 'value',
@@ -147,7 +147,7 @@ function theme_commerce_checkout_builder_form($variables) {
 
     // Add a non-draggable header row for each checkout page.
     $row = array(
-      array('data' => $checkout_page->title, 'colspan' => 4),
+      array('data' => $checkout_page['title'], 'colspan' => 4),
     );
 
     $rows[] = array('data' => $row, 'class' => array('page-header'));

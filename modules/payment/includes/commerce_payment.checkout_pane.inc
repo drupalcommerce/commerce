@@ -270,7 +270,7 @@ function commerce_payment_post_redirect_form($action, array $values = array()) {
  * Moves an order ahead to the next page via an order update and redirect.
  */
 function _commerce_payment_redirect_pane_next_page($form, &$form_state, $order) {
-  $next_page = $form_state['checkout_page']->next_page;
+  $next_page = $form_state['checkout_page']['next_page'];
 
   $order = commerce_order_status_update($order, 'checkout_' . $next_page);
 
@@ -286,7 +286,7 @@ function _commerce_payment_redirect_pane_next_page($form, &$form_state, $order) 
  * Moves an order back to the previous page via an order update and redirect.
  */
 function _commerce_payment_redirect_pane_prev_page($form, &$form_state, $order) {
-  $prev_page = $form_state['checkout_page']->prev_page;
+  $prev_page = $form_state['checkout_page']['prev_page'];
 
   $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
 

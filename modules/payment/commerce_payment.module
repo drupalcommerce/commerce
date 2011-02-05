@@ -163,7 +163,7 @@ function template_preprocess_commerce_payment_totals(&$variables) {
 function commerce_payment_commerce_checkout_page_info() {
   $checkout_pages = array();
 
-  $checkout_pages['payment'] = (object) array(
+  $checkout_pages['payment'] = array(
     'title' => t('Payment'),
     'help' => t('Use the button below to proceed to the payment server.'),
     'status_cart' => FALSE,
