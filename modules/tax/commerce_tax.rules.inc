@@ -85,6 +85,7 @@ function commerce_tax_rules_action_info() {
           'options list' => 'commerce_tax_type_titles',
         ),
       ),
+      'group' => t('Commerce Tax'),
     );
 
     $actions['commerce_tax_calculate_order_by_type'] = array(
@@ -104,6 +105,7 @@ function commerce_tax_rules_action_info() {
           'options list' => 'commerce_tax_type_order_context_titles',
         ),
       ),
+      'group' => t('Commerce Tax'),
     );
   }
 

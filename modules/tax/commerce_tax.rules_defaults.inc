@@ -14,18 +14,18 @@ function commerce_tax_default_rules_configuration() {
 
   // Loop over every tax rate looking for rates requiring a default component.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
-    if ($tax_rate->component) {
+    if ($tax_rate['component']) {
       // Load the tax type data for the curent rate.
-      $tax_type = commerce_tax_type_load($tax_rate->type);
+      $tax_type = commerce_tax_type_load($tax_rate['type']);
 
       // Check whether or not taxes of this type require the order context to
       // determine the applicability of the tax rate.
-      $order_context = $tax_type ? $tax_type->order_context : FALSE;
+      $order_context = $tax_type ? $tax_type['order_context'] : FALSE;
 
       // Create a new rules component using variables based on the tax type.
       $rule = rule(commerce_tax_rate_component_variables($order_context));
 
-      $rule->label = t('Calculate @title', array('@title' => $tax_rate->title));
+      $rule->label = t('Calculate @title', array('@title' => $tax_rate['title']));
 
       // Add the action to apply the current tax.
       $rule
@@ -44,10 +44,10 @@ function commerce_tax_default_rules_configuration() {
     // Create a new product pricing rule.
     $rule = rules_reaction_rule();
 
-    $rule->label = t('Calculate taxes: @title', array('@title' => $tax_type->title));
+    $rule->label = t('Calculate taxes: @title', array('@title' => $tax_type['title']));
     $rule->active = TRUE;
 
-    if ($tax_type->display_inclusive && !$tax_type->order_context) {
+    if ($tax_type['display_inclusive'] && !$tax_type['order_context']) {
       // Add the action to invoke every tax rate's component matching this type.
       $rule
         ->event('commerce_product_calculate_sell_price')

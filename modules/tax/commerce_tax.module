@@ -42,7 +42,7 @@ function commerce_tax_types() {
           'module' => $module,
         );
 
-        $tax_types[$name] = (object) array_merge($defaults, $tax_type);
+        $tax_types[$name] = array_merge($defaults, $tax_type);
       }
     }
 
@@ -82,7 +82,7 @@ function commerce_tax_type_titles() {
   $titles = array();
 
   foreach (commerce_tax_types() as $name => $tax_type) {
-    $titles[$name] = $tax_type->title;
+    $titles[$name] = $tax_type['title'];
   }
 
   return $titles;
@@ -96,8 +96,8 @@ function commerce_tax_type_order_context_titles() {
   $titles = array();
 
   foreach (commerce_tax_types() as $name => $tax_type) {
-    if ($tax_type->order_context) {
-      $titles[$name] = $tax_type->title;
+    if ($tax_type['order_context']) {
+      $titles[$name] = $tax_type['title'];
     }
   }
 
@@ -129,7 +129,7 @@ function commerce_tax_rates() {
           'module' => $module,
         );
 
-        $tax_rates[$name] = (object) array_merge($defaults, $tax_rate);
+        $tax_rates[$name] = array_merge($defaults, $tax_rate);
       }
     }
 
@@ -169,7 +169,7 @@ function commerce_tax_rate_titles() {
   $titles = array();
 
   foreach (commerce_tax_rates() as $name => $tax_rate) {
-    $titles[$name] = $tax_rate->title;
+    $titles[$name] = $tax_rate['title'];
   }
 
   return $titles;
@@ -193,13 +193,13 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL)
   // Loop over each tax rate in search of matching components.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
     // If the current rate matches the type and specifies a default component...
-    if ($tax_rate->type == $tax_type->name && $tax_rate->component) {
+    if ($tax_rate['type'] == $tax_type['name'] && $tax_rate['component']) {
       $component_name = 'commerce_tax_rate_' . $name;
 
       // If we can load the current rate's component...
       if (!empty($components[$component_name])) {
         // Invoke it using the appropriate arguments for the type.
-        if ($tax_type->order_context) {
+        if ($tax_type['order_context']) {
           rules_invoke_component($component_name, $line_item, $order);
         }
         else {
@@ -224,12 +224,12 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL)
  */
 function commerce_tax_rate_apply($tax_rate, $line_item) {
   // If a valid rate is specified...
-  if (is_numeric($tax_rate->rate)) {
+  if (is_numeric($tax_rate['rate'])) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
     // Create a price data structure for the tax.
     $tax_price = array(
-      'amount' => $wrapper->commerce_unit_price->amount->value() * $tax_rate->rate,
+      'amount' => $wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'],
       'currency_code' => $wrapper->commerce_unit_price->currency_code,
       'data' => array(),
     );
@@ -238,9 +238,9 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
     // property info integration for the data property.
 
     // If the rate specifies a valid tax type...
-    if ($tax_type = commerce_tax_type_load($tax_rate->type)) {
+    if ($tax_type = commerce_tax_type_load($tax_rate['type'])) {
       // Include the tax amount in the displayed unit price if specified.
-      if ($tax_type->display_inclusive) {
+      if ($tax_type['display_inclusive']) {
         $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() + $tax_price['amount'];
       }
     }
