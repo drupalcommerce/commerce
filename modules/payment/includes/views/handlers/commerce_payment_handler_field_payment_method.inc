@@ -33,7 +33,7 @@ class commerce_payment_handler_field_payment_method extends views_handler_field 
 
   function render($values) {
     if ($payment_method = commerce_payment_method_load($values->{$this->field_alias})) {
-      return check_plain($payment_method->{$this->options['title']});
+      return check_plain($payment_method[$this->options['title']]);
     }
     else {
       return t('Unknown');

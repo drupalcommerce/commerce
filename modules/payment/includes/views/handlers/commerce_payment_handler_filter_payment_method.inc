@@ -10,7 +10,7 @@ class commerce_payment_handler_filter_payment_method extends views_handler_filte
       $this->value_title = t('Payment Method');
       $methods = commerce_payment_methods();
       foreach ($methods as $method => $info) {
-        $options[$method] = t($info->title);
+        $options[$method] = t($info['title']);
       }
       $this->value_options = $options;
     }

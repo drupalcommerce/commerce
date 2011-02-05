@@ -88,7 +88,7 @@ function commerce_payment_entity_info() {
 
   foreach (commerce_payment_methods() as $method_id => $payment_method) {
     $return['commerce_payment_transaction']['bundles'][$method_id] = array(
-      'label' => $payment_method->title,
+      'label' => $payment_method['title'],
     );
   }
 
@@ -304,14 +304,14 @@ function commerce_payment_methods() {
         'callbacks' => array(),
       );
 
-      $payment_method = (object) ((array) $payment_method + $defaults);
+      $payment_method += $defaults;
 
       // Default the display title to the title if necessary.  The display title
       // is used in instances where the payment method has an official name used
       // as the title (i.e. PayPal WPS) but a different method of display on
       // selection forms (like some text and a set of images).
-      if (empty($payment_method->display_title)) {
-        $payment_method->display_title = $payment_method->title;
+      if (empty($payment_method['display_title'])) {
+        $payment_method['display_title'] = $payment_method['title'];
       }
 
       // Default the short title to the title if necessary.  Like the display
@@ -320,14 +320,14 @@ function commerce_payment_methods() {
       // stripped off.  The payment method title might be PayPal WPS as it
       // distinguishes itself from other PayPal payment services, but you would
       // only want to display PayPal to the customer as their means of payment.
-      if (empty($payment_methods[$method_id]->short_title)) {
-        $payment_method->short_title = $payment_method->title;
+      if (empty($payment_methods[$method_id]['short_title'])) {
+        $payment_method['short_title'] = $payment_method['title'];
       }
 
       // Merge in default callbacks.
       foreach (array('settings_form', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
-        if (!isset($payment_method->callbacks[$callback])) {
-          $payment_method->callbacks[$callback] = $payment_method->base . '_' . $callback;
+        if (!isset($payment_method['callbacks'][$callback])) {
+          $payment_method['callbacks'][$callback] = $payment_method['base'] . '_' . $callback;
         }
       }
     }
@@ -337,7 +337,7 @@ function commerce_payment_methods() {
 }
 
 /**
- * Returns a payment method object.
+ * Returns a payment method array.
  *
  * @param $method_id
  *   The ID of the payment method to return.
@@ -370,7 +370,7 @@ function commerce_payment_method_get_title($title = 'title', $method = NULL) {
   // Return a method title if specified and it exists.
   if (!empty($method)) {
     if (isset($payment_methods[$method])) {
-      return $payment_methods[$method]->{$title};
+      return $payment_methods[$method][$title];
     }
     else {
       // Return FALSE if it does not exist.
@@ -380,7 +380,7 @@ function commerce_payment_method_get_title($title = 'title', $method = NULL) {
 
   // Otherwise turn the array values into the specified title only.
   foreach ($payment_methods as $key => $value) {
-    $payment_methods[$key] = $value->{$title};
+    $payment_methods[$key] = $value[$title];
   }
 
   return $payment_methods;
@@ -414,9 +414,9 @@ function commerce_payment_method_options_list() {
  */
 function commerce_payment_method_callback($payment_method, $callback) {
   // If the specified callback function exists, return it.
-  if (!empty($payment_method->callbacks[$callback]) &&
-      function_exists($payment_method->callbacks[$callback])) {
-    return $payment_method->callbacks[$callback];
+  if (!empty($payment_method['callbacks'][$callback]) &&
+      function_exists($payment_method['callbacks'][$callback])) {
+    return $payment_method['callbacks'][$callback];
   }
 
   // Otherwise return FALSE.
@@ -468,19 +468,19 @@ function commerce_payment_method_instance_load($instance_id) {
 
   // First load the payment method and add the instance ID.
   $payment_method = commerce_payment_method_load($method_id);
-  $payment_method->instance_id = $instance_id;
+  $payment_method['instance_id'] = $instance_id;
 
   // Then load the Rule configuration that enables the method.
   $rule = rules_config_load($rule_name);
 
   // Iterate over its actions to find one with the matching element ID and pull
   // its settings into the payment method object.
-  $payment_method->settings = array();
+  $payment_method['settings'] = array();
 
   foreach ($rule->actions() as $action) {
     if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
       if (is_array($action->settings['payment_method']) && !empty($action->settings['payment_method']['settings'])) {
-        $payment_method->settings = $action->settings['payment_method']['settings'];
+        $payment_method['settings'] = $action->settings['payment_method']['settings'];
       }
     }
   }
@@ -680,12 +680,12 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
 
   // Add the default fields inherent to the transaction entity.
   if (!empty($transaction->instance_id) && $payment_method = commerce_payment_method_instance_load($transaction->instance_id)) {
-    list($method_id, $rule_name) = explode('|', $payment_method->instance_id);
-    $title = l(check_plain($payment_method->title), 'admin/config/workflow/rules/config/' . $rule_name);
+    list($method_id, $rule_name) = explode('|', $payment_method['instance_id']);
+    $title = l(check_plain($payment_method['title']), 'admin/config/workflow/rules/config/' . $rule_name);
   }
   else {
     $payment_method = commerce_payment_method_load($transaction->payment_method);
-    $title = check_plain($payment_method->title);
+    $title = check_plain($payment_method['title']);
   }
 
   $transaction_statuses = commerce_payment_transaction_statuses();

@@ -99,19 +99,19 @@ function commerce_payment_rules_action_info() {
 
   // Add an action for each available payment method.
   foreach (commerce_payment_methods() as $payment_method) {
-    $actions['commerce_payment_enable_' . $payment_method->method_id] = array(
-      'label' => t('Enable payment method: @method', array('@method' => $payment_method->title)),
+    $actions['commerce_payment_enable_' . $payment_method['method_id']] = array(
+      'label' => t('Enable payment method: @method', array('@method' => $payment_method['title'])),
       'parameter' => array(
         'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
         'payment_method' => array(
           'type' => 'commerce_payment_settings',
           'restriction' => 'input',
           'label' => t('Payment settings'),
-          'payment_method' => $payment_method->method_id,
+          'payment_method' => $payment_method['method_id'],
         ),
       ),
       'group' => t('Commerce Payment'),
-      'base' => $payment_method->base,
+      'base' => $payment_method['base'],
       'callbacks' => array(
         'execute' => 'commerce_payment_enable_method',
       ),

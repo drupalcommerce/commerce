@@ -21,10 +21,10 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   // Generate an array of payment method options for the checkout form.
   $options = array();
 
-  foreach ((array) $order->payment_methods as $instance_id => $method_info) {
+  foreach ($order->payment_methods as $instance_id => $method_info) {
     // Ensure we've received a valid payment method.
     if ($payment_method = commerce_payment_method_load($method_info['method_id'])) {
-      $options[$instance_id] = $payment_method->display_title;
+      $options[$instance_id] = $payment_method['display_title'];
     }
   }
 
@@ -72,7 +72,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     // Add the payment method specific form elements.
     $method_info = $order->payment_methods[$pane_form['payment_method']['#default_value']];
     $payment_method = commerce_payment_method_load($method_info['method_id']);
-    $payment_method->settings = $method_info['settings'];
+    $payment_method['settings'] = $method_info['settings'];
 
     if ($callback = commerce_payment_method_callback($payment_method, 'submit_form')) {
       $pane_form['payment_details'] = $callback($payment_method, $pane_values, $checkout_pane, $order);
@@ -172,7 +172,7 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   }
 
   // If the payment method doesn't exist or does not require a redirect...
-  if (!$payment_method || !$payment_method->offsite) {
+  if (!$payment_method || !$payment_method['offsite']) {
     // Advance the customer to the next step of the checkout process.
     _commerce_payment_redirect_pane_next_page($form, $form_state, $order);
   }
@@ -221,7 +221,7 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
   }
   else {
     // Alert the administrator that the module does not provide a required form.
-    drupal_set_message(t('The %title payment method indicates it is offsite but does not define the necessary form to process the redirect.', array('%title' => $payment_method->title)), 'error');
+    drupal_set_message(t('The %title payment method indicates it is offsite but does not define the necessary form to process the redirect.', array('%title' => $payment_method['title'])), 'error');
   }
 }
 

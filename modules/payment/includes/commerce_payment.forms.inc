@@ -28,7 +28,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
 
     $form['payment_terminal'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Payment terminal: @title', array('@title' => $payment_method->title)),
+      '#title' => t('Payment terminal: @title', array('@title' => $payment_method['title'])),
       '#attributes' => array('class' => array('payment-terminal')),
     );
 
@@ -97,20 +97,20 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     if (!empty($event)) {
       foreach (commerce_payment_methods() as $method_id => $payment_method) {
         // Only check payment methods that should appear on the terminal.
-        if ($payment_method->terminal) {
+        if ($payment_method['terminal']) {
           // Look for a Rule enabling this payment method.
           foreach ($event->getIterator() as $rule) {
             foreach ($rule->actions() as $action) {
               // If an action is found, add its instance to the options array.
               if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
-                $instances[check_plain($payment_method->title)][] = array(
+                $instances[check_plain($payment_method['title'])][] = array(
                   'instance_id' => commerce_payment_method_instance_id($method_id, $rule),
                   'label' => check_plain($rule->label()),
                 );
 
                 // If this is the second instance for this payment method, turn
                 // on optgroups.
-                if (count($instances[check_plain($payment_method->title)]) > 1) {
+                if (count($instances[check_plain($payment_method['title'])]) > 1) {
                   $optgroups = TRUE;
                 }
               }
@@ -235,7 +235,7 @@ function commerce_payment_payment_transaction_delete_form($form, &$form_state, $
   $form = confirm_form($form,
     t('Are you sure you want to delete this transaction?'),
     '',
-    '<p>' . t('@amount paid via %method on @date. Deleting this transaction cannot be undone.', array('@amount' => commerce_currency_format($transaction->amount, $transaction->currency_code), '%method' => $payment_method->title, '@date' => format_date($transaction->created, 'short'))) . '</p>',
+    '<p>' . t('@amount paid via %method on @date. Deleting this transaction cannot be undone.', array('@amount' => commerce_currency_format($transaction->amount, $transaction->currency_code), '%method' => $payment_method['title'], '@date' => format_date($transaction->created, 'short'))) . '</p>',
     t('Delete'),
     t('Cancel'),
     'confirm'

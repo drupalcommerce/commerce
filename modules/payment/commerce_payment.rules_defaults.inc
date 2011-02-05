@@ -16,8 +16,8 @@ function commerce_payment_default_rules_configuration() {
   foreach (commerce_payment_methods() as $method_id => $payment_method) {
     $rule = rules_reaction_rule();
 
-    $rule->label = $payment_method->title;
-    $rule->active = $payment_method->active;
+    $rule->label = $payment_method['title'];
+    $rule->active = $payment_method['active'];
 
     $rule
       ->event('commerce_payment_methods')
