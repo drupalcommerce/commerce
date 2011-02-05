@@ -367,26 +367,27 @@ function commerce_checkout_pages() {
     uasort($checkout_pages, 'drupal_sort_weight');
 
     // Initialize the previous and next pages.
-    $previous_page = NULL;
-    $checkout_page = NULL;
+    $previous_page_id = NULL;
 
     foreach ($checkout_pages as &$checkout_page) {
       // Look for any checkout panes assigned to this page.
       $checkout_panes = commerce_checkout_panes(array('page' => $checkout_page['page_id']));
+
       // If this is the completion page or at least one pane was found...
       if ($checkout_page['page_id'] == 'complete' || !empty($checkout_panes)) {
         // If a page has been stored as the previous page...
-        if ($previous_page) {
+        if ($previous_page_id) {
           // Set the current page's previous page and the previous page's next.
-          $checkout_page['prev_page'] = $previous_page['page_id'];
-          $checkout_pages[$previous_page['page_id']]['next_page'] = $checkout_page['page_id'];
+          $checkout_page['prev_page'] = $previous_page_id;
+          $checkout_pages[$previous_page_id]['next_page'] = $checkout_page['page_id'];
         }
 
         // Set the current page as the previous page for the next iteration.
-        $previous_page = $checkout_page;
+        $previous_page_id = $checkout_page['page_id'];
       }
     }
   }
+
   return $checkout_pages;
 }
 
@@ -642,6 +643,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
   // Load the order status object for the current order.
   $order_status = commerce_order_status_load($order->status);
+
   // If the order is not in a checkout status, return FALSE for any page but the
   // completion page unless the order is still a shopping cart.
   if ($order_status->state != 'checkout' && $checkout_page['page_id'] != 'complete') {
