@@ -19,19 +19,21 @@ function commerce_line_item_ui_menu() {
     'access arguments' => array('administer line item types'),
     'file' => 'includes/commerce_line_item_ui.types.inc',
   );
-
-  // Because there is no edit page for line item types, we still need some menu
-  // item against which the field UI will be considered local tasks. This item
-  // simply redirects back to the main line item types admin URL to prevent that
-  // page showing with non-sensical tabs.
   $items['admin/commerce/config/line-items/%'] = array(
     'title' => 'Line item types',
-    'page callback' => 'drupal_goto',
-    'page arguments' => array('admin/commerce/config/line-items'),
+    'page callback' => 'commerce_line_item_ui_line_item_type_redirect',
+    'page arguments' => array(4),
     'access arguments' => array('administer line item types'),
   );
 
   return $items;
+}
+
+/**
+ * Redirects a line item type URL to its fields management page.
+ */
+function commerce_line_item_ui_line_item_type_redirect($type) {
+  drupal_goto('admin/commerce/config/line-items/' . strtr($type, array('_' => '-')) . '/fields');
 }
 
 /**
