@@ -27,4 +27,4 @@ files[] = includes/views/handlers/commerce_payment_handler_filter_currency_code.
 files[] = includes/views/handlers/commerce_payment_handler_field_balance.inc
 
 ; Tests
-files[] = tests/commerce_payment.payment.test
+;files[] = tests/commerce_payment.test
