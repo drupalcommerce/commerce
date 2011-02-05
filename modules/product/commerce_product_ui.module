@@ -281,9 +281,9 @@ function commerce_product_ui_uri($product) {
 }
 
 /**
- * Implements hook_commerce_product_info().
+ * Implements hook_commerce_product_type_info().
  */
-function commerce_product_ui_commerce_product_info() {
+function commerce_product_ui_commerce_product_type_info() {
   return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type');
 }
 

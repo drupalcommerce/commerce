@@ -203,9 +203,9 @@ function commerce_product_enable() {
 function commerce_product_modules_enabled($modules) {
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
-    // If the module implements hook_commerce_product_info()...
-    if (module_hook($module, 'commerce_product_info')) {
-      $product_types = module_invoke($module, 'commerce_product_info');
+    // If the module implements hook_commerce_product_type_info()...
+    if (module_hook($module, 'commerce_product_type_info')) {
+      $product_types = module_invoke($module, 'commerce_product_type_info');
 
       // Loop through and configure the product types defined by the module.
       foreach ($product_types as $type => $product_type) {
@@ -226,9 +226,9 @@ function commerce_product_types() {
   if (!isset($product_types)) {
     $product_types = array();
 
-    // Find product types defined by hook_commerce_product_info().
-    foreach (module_implements('commerce_product_info') as $module) {
-      foreach (module_invoke($module, 'commerce_product_info') as $type => $product_type) {
+    // Find product types defined by hook_commerce_product_type_info().
+    foreach (module_implements('commerce_product_type_info') as $module) {
+      foreach (module_invoke($module, 'commerce_product_type_info') as $type => $product_type) {
         // Set the module each product type is defined by.
         $product_type->module = $module;
         $product_types[$type] = $product_type;
@@ -236,7 +236,7 @@ function commerce_product_types() {
     }
 
     // Last allow the info to be altered by other modules.
-    drupal_alter('commerce_product_info', $product_types);
+    drupal_alter('commerce_product_type_info', $product_types);
   }
 
   return $product_types;
