@@ -170,7 +170,7 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
 
         case 'status':
           $transaction_status = commerce_payment_transaction_status_load($transaction->status);
-          $replacements[$original] = $sanitize ? check_plain($transaction_status->title) : $transaction_status->title;
+          $replacements[$original] = $sanitize ? check_plain($transaction_status['title']) : $transaction_status['title'];
           break;
 
         case 'remote-status':

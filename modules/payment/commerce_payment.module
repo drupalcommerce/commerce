@@ -537,7 +537,7 @@ function commerce_payment_transaction_statuses() {
 function theme_commerce_payment_transaction_status_icon($variables) {
   $transaction_status = $variables['transaction_status'];
 
-  return '<img src="' . url($transaction_status->icon, array('absolute' => TRUE)) . '" class="' . drupal_html_class($transaction_status->status) . '" title="' . $transaction_status->title . '" alt="' . $transaction_status->title . '" />';
+  return '<img src="' . url($transaction_status['icon'], array('absolute' => TRUE)) . '" class="' . drupal_html_class($transaction_status['status']) . '" title="' . $transaction_status['title'] . '" alt="' . $transaction_status['title'] . '" />';
 }
 
 /**
@@ -546,7 +546,7 @@ function theme_commerce_payment_transaction_status_icon($variables) {
 function theme_commerce_payment_transaction_status_text($variables) {
   $transaction_status = $variables['transaction_status'];
 
-  return '<span class="' . drupal_html_class($transaction_status->status) . '">' . $variables['text'] . '</span>';
+  return '<span class="' . drupal_html_class($transaction_status['status']) . '">' . $variables['text'] . '</span>';
 }
 
 /**

@@ -10,7 +10,7 @@ class commerce_payment_handler_filter_payment_transaction_status extends views_h
       $this->value_title = t('Payment Status');
       $statuses = commerce_payment_transaction_statuses();
       foreach ($statuses as $status => $info) {
-        $options[$status] = t($info->title);
+        $options[$status] = t($info['title']);
       }
       $this->value_options = $options;
     }
