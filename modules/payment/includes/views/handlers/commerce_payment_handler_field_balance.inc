@@ -53,7 +53,7 @@ class commerce_payment_handler_field_balance extends views_handler_field {
         // Get the order object and the balance.
         $order = commerce_order_load($values->{$this->aliases['order_id']});
         $balance = commerce_payment_order_balance($order);
-        // Then load the full currency object.
+        // Then load the currency array.
         $currency = commerce_currency_load();
         // Format the price as a number.
         return number_format(commerce_currency_round($balance['amount'], $currency), $currency['decimals']);

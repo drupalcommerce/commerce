@@ -168,13 +168,13 @@ function commerce_default_currency() {
 }
 
 /**
- * Returns a single currency object.
+ * Returns a single currency array.
  *
  * @param $currency_code
  *   The code of the currency to return or NULL to return the default currency.
  *
  * @return
- *   The specified currency object or FALSE if it does not exist.
+ *   The specified currency array or FALSE if it does not exist.
  */
 function commerce_currency_load($currency_code = NULL) {
   $currencies = commerce_currencies();
@@ -197,7 +197,7 @@ function commerce_currency_load($currency_code = NULL) {
  *     data is loaded and returned.
  *
  * @return
- *   An array of altered currency objects keyed by the currency code.
+ *   An array of altered currency arrays keyed by the currency code.
  */
 function commerce_currencies($enabled = FALSE, $reset = FALSE) {
   global $language;
@@ -309,7 +309,7 @@ function commerce_currency_get_symbol($currency_code = NULL) {
  *   A fully formatted currency.
  */
 function commerce_currency_format($price, $currency_code, $object = NULL) {
-  // First load the full currency object.
+  // First load the currency array.
   $currency = commerce_currency_load($currency_code);
 
   // Invoke the custom format callback if specified.
@@ -352,7 +352,7 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
  * @param $amount
  *   The numeric amount value of the price to be rounded.
  * @param $currency
- *   The currency object containing the rounding information pertinent to this
+ *   The currency array containing the rounding information pertinent to this
  *     price. Specifically, this function looks for the 'rounding_step' property
  *     for the step size to round to, supporting '0.05' and '0.02'. If the value
  *     is 0, this function performs normal rounding to the nearest supported

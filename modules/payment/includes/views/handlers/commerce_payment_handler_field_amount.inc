@@ -47,7 +47,7 @@ class commerce_payment_handler_field_amount extends views_handler_field {
         return commerce_currency_format($values->{$this->field_alias}, $values->{$this->aliases['currency_code']});
 
       case 'raw':
-        // First load the full currency object.
+        // First load the full currency array.
         $currency = commerce_currency_load($values->{$this->aliases['currency_code']});
 
         // Format the price as a number.
