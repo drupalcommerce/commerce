@@ -89,7 +89,7 @@ function commerce_order_ui_menu() {
     'title callback' => 'commerce_order_ui_order_title',
     'title arguments' => array(3),
     'page callback' => 'commerce_order_ui_order_view',
-    'page arguments' => array(3, 'customer'),
+    'page arguments' => array(3, 'customer', FALSE),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('view', 3),
   );
