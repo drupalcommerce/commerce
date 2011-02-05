@@ -310,9 +310,13 @@ function commerce_cart_commerce_order_load($orders) {
       foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
         // If the line item is a product line item...
         if ($line_item_wrapper->type->value() == 'product') {
+          // Load the product unchanged from the database so any existing price
+          // adjustments aren't duplicated in this line item.
+          $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
+
           // Create a new product line item referencing the same product as though
           // we had not added it to the cart yet, but use the current quantity.
-          $line_item = commerce_product_line_item_new($line_item_wrapper->commerce_product->value(), $line_item_wrapper->quantity->value(), $order->order_id);
+          $line_item = commerce_product_line_item_new($product, $line_item_wrapper->quantity->value(), $order->order_id);
 
           // Process the unit price through Rules so it reflects the user's actual
           // current purchase price.
