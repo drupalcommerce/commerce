@@ -232,7 +232,7 @@ function commerce_line_item_unit_price_currency_code($line_item, $currency_code)
  */
 function commerce_line_item_unit_price_currency_convert($line_item, $currency_code) {
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  $wrapper->commerce_unit_price->amount = commerce_currency_convert($wrapper->commerce_unit_price->amount->value(), $wrapper->unit_price->currency_code->value(), $currency_code);
+  $wrapper->commerce_unit_price->amount = commerce_currency_convert($wrapper->commerce_unit_price->amount->value(), $wrapper->commerce_unit_price->currency_code->value(), $currency_code);
   $wrapper->commerce_unit_price->currency_code = $currency_code;
 }
 
