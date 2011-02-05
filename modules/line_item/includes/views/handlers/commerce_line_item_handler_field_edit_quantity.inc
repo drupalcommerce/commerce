@@ -29,8 +29,7 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
     // at form rendering phase in commerce_line_item_views_post_render().
     $this->form[$line_item_id] = array(
       '#type' => 'textfield',
-      // TODO: Allow decimal quantities, i.e. for other units than piece:
-      // kilograms, milligrams, etc.
+      '#datatype' => 'integer',
       '#default_value' => round($quantity),
       '#size' => 4,
     );
@@ -42,8 +41,16 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
 
   function edit_form_validate($form, &$form_state) {
     foreach (element_children($form['edit_quantity']) as $line_item_id) {
+      // Ensure the quantity is actually a numeric value.
       if (!is_numeric($form_state['values']['edit_quantity'][$line_item_id]) || $form_state['values']['edit_quantity'][$line_item_id] <= 0) {
-        form_set_error('edit_quantity][' . $line_item_id, t('You must specify a positive numeric value for the quantity'));
+        form_set_error('edit_quantity][' . $line_item_id, t('You must specify a positive number for the quantity'));
+      }
+
+      // If the custom data type attribute of the quantity element is integer,
+      // ensure we only accept whole number values.
+      if ($form['edit_quantity'][$line_item_id]['#datatype'] == 'integer' &&
+        (int) $form_state['values']['edit_quantity'][$line_item_id] != $form_state['values']['edit_quantity'][$line_item_id]) {
+        form_set_error('edit_quantity][' . $line_item_id, t('You must specify a whole number for the quantity.'));
       }
     }
   }

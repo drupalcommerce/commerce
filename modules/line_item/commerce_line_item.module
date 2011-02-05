@@ -839,6 +839,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
 
       $element['line_items'][$line_item_id]['quantity'] = array(
         '#type' => 'textfield',
+        '#datatype' => 'integer',
         '#default_value' => round($line_item->quantity),
         '#size' => 4,
       );
@@ -991,12 +992,18 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       $line_item = clone($element['line_items'][$line_item_id]['line_item']['#value']);
 
       // Validate the quantity of each line item.
-      if (is_numeric($element['line_items'][$line_item_id]['quantity']['#value'])) {
-        $line_item->quantity = $element['line_items'][$line_item_id]['quantity']['#value'];
+      $element_name = implode('][', $element['line_items'][$line_item_id]['quantity']['#parents']);
+      $quantity = $element['line_items'][$line_item_id]['quantity']['#value'];
+
+      if (!is_numeric($quantity) || $quantity <= 0) {
+        form_set_error($element_name, t('You must specify a positive number for the quantity'));
+      }
+      elseif ($element['line_items'][$line_item_id]['quantity']['#datatype'] == 'integer' &&
+        (int) $quantity != $quantity) {
+        form_set_error($element_name, t('You must specify a whole number for the quantity.'));
       }
       else {
-        $name = implode('][', $element['line_items'][$line_item_id]['quantity']['#parents']);
-        form_set_error($name, 'You must specify a positive number for the quantity.');
+        $line_item->quantity = $quantity;
       }
 
       // Manually validate the unit price of each line item.
