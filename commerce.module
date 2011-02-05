@@ -51,20 +51,6 @@ function commerce_info_fields($field_type, $entity_type = NULL) {
 }
 
 /**
- * Sorts an array of objects by weight through uasort().
- *
- * For sorting arrays of associative arrays, use drupal_sort_weight().
- */
-function commerce_sort_weight($a, $b) {
-  $a_weight = (is_object($a) && isset($a->weight)) ? $a->weight : 0;
-  $b_weight = (is_object($b) && isset($b->weight)) ? $b->weight : 0;
-  if ($a_weight == $b_weight) {
-    return 0;
-  }
-  return ($a_weight < $b_weight) ? -1 : 1;
-}
-
-/**
  * Makes any required form elements in a form unrequired.
  *
  * @param $form
