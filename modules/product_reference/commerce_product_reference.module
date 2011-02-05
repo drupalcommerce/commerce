@@ -1117,7 +1117,7 @@ function commerce_product_reference_commerce_product_can_delete($product) {
   $query
     ->entityCondition('entity_type', 'commerce_line_item', '=')
     ->entityCondition('bundle', 'product', '=')
-    ->fieldCondition('product', 'product_id', $product->product_id, '=')
+    ->fieldCondition('commerce_product', 'product_id', $product->product_id, '=')
     ->count();
 
   return $query->execute() > 0 ? FALSE : TRUE;

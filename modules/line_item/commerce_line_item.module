@@ -927,7 +927,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
  * Returns the line item manager element for display via AJAX.
  */
 function commerce_line_item_manager_refresh($form, $form_state) {
-  return $form['line_items'][$form['line_items']['#language']];
+  return $form['commerce_line_items'][$form['commerce_line_items']['#language']];
 }
 
 /**
@@ -1000,7 +1000,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       }
 
       // Manually validate the unit price of each line item.
-      $unit_price = $form_state['values']['line_items'][$element['#language']]['line_items'][$line_item_id]['commerce_unit_price'];
+      $unit_price = $form_state['values']['commerce_line_items'][$element['#language']]['line_items'][$line_item_id]['commerce_unit_price'];
 
       if (is_numeric($unit_price[$element['#language']][0]['amount'])) {
         $line_item->commerce_unit_price = $unit_price;
