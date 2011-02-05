@@ -58,7 +58,9 @@ function commerce_line_item_entity_property_info() {
   $properties['quantity'] = array(
     'label' => t('Quantity'),
     'description' => t('Quantity associated with this line item'),
-    'type' => 'integer',
+    'type' => 'decimal',
+    'getter callback' => 'entity_property_verbatim_get',
+    'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
   );
   $properties['created'] = array(

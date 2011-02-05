@@ -1036,7 +1036,7 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
   $product = commerce_product_load($element['actions']['product_id']['#value']);
 
   // Populate the line item with the product data.
-  commerce_product_line_item_populate($line_item, $product, NULL, $element['#language']);
+  commerce_product_line_item_populate($line_item, $product);
 }
 
 /**
@@ -1048,18 +1048,20 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   The quantity to set for the product.
  * @param $order_id
  *   The ID of the order the line item belongs to (if available).
- * @param $language
- *   Optionally specify the language for the line item.
  *
  * @return
  *   The fully loaded line item populated with the product data as specified.
  */
-function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $language = LANGUAGE_NONE) {
+function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0) {
   // Create the new line item.
-  $line_item = commerce_line_item_new('product', $order_id);
+  $line_item = entity_create('commerce_line_item', array(
+    'type' => 'product',
+    'order_id' => $order_id,
+    'quantity' => $quantity,
+  ));
 
   // Populate it with the product information.
-  commerce_product_line_item_populate($line_item, $product, $quantity, $language);
+  commerce_product_line_item_populate($line_item, $product);
 
   // Return the line item.
   return $line_item;
@@ -1068,42 +1070,25 @@ function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, 
 /**
  * Populates an existing product line item with the product and quantity data.
  *
- * @param &$line_item
- *   The fully loaded line item.
+ * @param $line_item
+ *   The fully loaded line item object, populated by reference.
  * @param $product
  *   The fully loaded product referenced by the line item.
- * @param $quantity
- *   The quantity to set for the line item or NULL to leave it unchanged.
- * @param $language
- *   Optionally specify the language for the line item.
  */
-function commerce_product_line_item_populate(&$line_item, $product, $quantity = 1, $language = LANGUAGE_NONE) {
+function commerce_product_line_item_populate($line_item, $product) {
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
-  // Only update the quantity value if one is specified.
-  if (!empty($quantity)) {
-    $line_item->quantity = $quantity;
-  }
+  // Wrap the line item and product to easily set field information.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
 
   // Add the product reference value to the line item for the right language.
-  $line_item->commerce_product = array(
-    $language => array(
-      array(
-        'product_id' => $product->product_id,
-      ),
-    ),
-  );
+  $line_item_wrapper->commerce_product = $product->product_id;
 
-  // Set the unit price on the line item object.
-  $line_item->commerce_unit_price = array(
-    $language => array(
-      array(
-        'amount' => $product->commerce_price[$language][0]['amount'],
-        'currency_code' => $product->commerce_price[$language][0]['currency_code'],
-      ),
-    ),
-  );
+  // Set the unit price amount and currency code on the line item object.
+  $line_item_wrapper->commerce_unit_price->amount = $product_wrapper->commerce_price->amount->value();
+  $line_item_wrapper->commerce_unit_price->currency_code = $product_wrapper->commerce_price->currency_code->value();
 }
 
 /**
@@ -1129,7 +1114,29 @@ function commerce_product_reference_commerce_product_can_delete($product) {
  * @see commerce_product_reference_field_info().
  */
 function commerce_product_reference_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
-  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['type'] = ($field['cardinality'] != 1) ? 'list<commerce_product>' : 'commerce_product';
   $property['options list'] = 'entity_metadata_field_options_list';
+  $propery['getter callback'] = 'entity_metadata_field_property_get';
+  $property['setter callback'] = 'entity_metadata_field_property_set';
+  $property['property info'] = commerce_product_reference_field_data_property_info();
+
   unset($property['query callback']);
+}
+
+/**
+ * Defines info for the properties of the Price field data structure.
+ */
+function commerce_product_reference_field_data_property_info($name = NULL) {
+  return array(
+    'product_id' => array(
+      'label' => t('Product ID'),
+      'description' => t('The ID of the referenced product.'),
+      'type' => 'integer',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+  );
 }
