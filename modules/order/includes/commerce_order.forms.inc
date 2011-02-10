@@ -34,6 +34,9 @@ function commerce_order_order_form($form, &$form_state, $order) {
   $form_state['commerce_order'] = $order;
   field_attach_form('commerce_order', $order, $form, $form_state);
 
+  // Hide the order total field from direct editing.
+  $form['commerce_order_total']['#access'] = FALSE;
+
   $form['additional_settings'] = array(
     '#type' => 'vertical_tabs',
     '#weight' => 99,

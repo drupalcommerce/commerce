@@ -115,3 +115,20 @@ function commerce_order_entity_property_info() {
 
   return $info;
 }
+
+/**
+ * Implements hook_entity_property_info_alter() on top of the Order module.
+ */
+function commerce_order_entity_property_info_alter(&$info) {
+  // Move the line items and order total properties to the order by default; as
+  // they are required default fields, this makes dealing with them more convenient.
+  $properties = array();
+
+  foreach ($info['commerce_order']['bundles'] as $bundle => $bundle_info) {
+    $bundle_info += array('properties' => array());
+    $properties += $bundle_info['properties'];
+  }
+
+  $info['commerce_order']['properties']['commerce_line_items'] = $properties['commerce_line_items'];
+  $info['commerce_order']['properties']['commerce_order_total'] = $properties['commerce_order_total'];
+}

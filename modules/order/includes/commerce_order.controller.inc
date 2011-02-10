@@ -74,6 +74,28 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $order->revision_timestamp = REQUEST_TIME;
       $update_order = TRUE;
 
+      // Update the order total field's value.
+      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+      // First set the currency to the site default if this is a new order.
+      if ($order->is_new || $order_wrapper->commerce_order_total->currency_code->value() == NULL) {
+        $order_wrapper->commerce_order_total->currency_code = commerce_default_currency();
+      }
+
+      // Then loop over each line item and add its total to the order total.
+      $total = 0;
+
+      foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+        // Convert the line item's total to the order's currency for totalling.
+        $total += commerce_currency_convert(
+          $line_item_wrapper->commerce_total->amount->value(),
+          $line_item_wrapper->commerce_total->currency_code->value(),
+          $order_wrapper->commerce_order_total->currency_code->value()
+        );
+      }
+
+      $order_wrapper->commerce_order_total->amount = $total;
+
       // Give modules the opportunity to prepare field data for saving.
       field_attach_presave('commerce_order', $order);
       rules_invoke_all('commerce_order_presave', $order);
