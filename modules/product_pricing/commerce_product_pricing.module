@@ -99,7 +99,6 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
 
       // Unserialize the saved prices data array and initialize to an empty
       // array if the column was empty.
-      drupal_set_message('<pre>'. print_r($result->data, TRUE) .'</pre>');
       $result->data = unserialize($result->data);
       $wrapper->commerce_unit_price->data = !empty($result->data) ? $result->data : array();
 
