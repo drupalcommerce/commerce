@@ -267,7 +267,7 @@ function _commerce_order_create($values = array()) {
     $wrapper->$name->set($value);
   }
 
-  return $wrapper;
+  return $wrapper->value();
 }
 
 /**

@@ -287,7 +287,7 @@ function _commerce_customer_profile_create($values = array()) {
     $wrapper->$name->set($value);
   }
 
-  return $wrapper;
+  return $wrapper->value();
 }
 
 /**
