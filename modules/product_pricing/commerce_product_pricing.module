@@ -97,8 +97,11 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
       $wrapper->commerce_unit_price->amount = $result->amount;
       $wrapper->commerce_unit_price->currency_code = $result->currency_code;
 
-      // TODO: Add proper entity property support for data arrays.
-      // $wrapper->commerce_unit_price->data = $result->data;
+      // Unserialize the saved prices data array and initialize to an empty
+      // array if the column was empty.
+      drupal_set_message('<pre>'. print_r($result->data, TRUE) .'</pre>');
+      $result->data = unserialize($result->data);
+      $wrapper->commerce_unit_price->data = !empty($result->data) ? $result->data : array();
 
       return $wrapper->commerce_unit_price->value();
     }
@@ -247,6 +250,7 @@ function commerce_product_pre_calculate_sell_prices() {
           'delta' => 0,
           'amount' => $wrapper->commerce_unit_price->amount->value(),
           'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+          'data' => $wrapper->commerce_unit_price->data->value(),
           'created' => time(),
         );
 
