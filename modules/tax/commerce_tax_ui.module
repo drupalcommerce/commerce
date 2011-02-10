@@ -1,0 +1,382 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Provides a UI for creating simple tax types and rates.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_tax_ui_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/taxes'] = array(
+    'title' => 'Taxes',
+    'description' => 'Manage tax rates and types.',
+    'page callback' => 'commerce_tax_ui_overview',
+    'page arguments' => array('rates'),
+    'access arguments' => array('administer taxes'),
+    'file' => 'includes/commerce_tax_ui.admin.inc',
+  );
+
+  $items['admin/commerce/config/taxes/rates'] = array(
+    'title' => 'Tax rates',
+    'description' => 'Manage tax rates.',
+    'weight' => 0,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/commerce/config/taxes/rates/add'] = array(
+    'title' => 'Add a tax rate',
+    'description' => 'Create a new tax rate.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_tax_ui_tax_rate_form', commerce_tax_ui_tax_rate_new()),
+    'access arguments' => array('administer taxes'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/commerce_tax_ui.admin.inc',
+  );
+  foreach (commerce_tax_rates() as $name => $tax_rate) {
+    // Convert underscores to hyphens for the menu item argument.
+    $name_arg = strtr($name, '_', '-');
+
+    $items['admin/commerce/config/taxes/rates/' . $name_arg] = array(
+      'title callback' => 'commerce_tax_ui_tax_rate_title',
+      'title arguments' => array($name),
+      'description' => 'Edit a tax rate.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_tax_ui_tax_rate_form', $tax_rate),
+      'access arguments' => array('administer taxes'),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+    );
+    $items['admin/commerce/config/taxes/rates/' . $name_arg . '/edit'] = array(
+      'title' => 'Edit',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      'weight' => 0,
+    );
+
+    if (rules_config_load('commerce_tax_rate_' . $name)) {
+      $items['admin/commerce/config/taxes/rates/' . $name_arg . '/component'] = array(
+        'title' => 'Configure component',
+        'description' => 'Add conditions to the Rules component used to apply this tax to products.',
+        'page callback' => 'drupal_goto',
+        'page arguments' => array('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $name),
+        'access arguments' => array('administer rules'),
+        'type' => MENU_LOCAL_TASK,
+        'context' => MENU_CONTEXT_INLINE,
+        'weight' => 5,
+      );
+    }
+
+    $items['admin/commerce/config/taxes/rates/' . $name_arg . '/delete'] = array(
+      'title' => 'Delete',
+      'page arguments' => array('commerce_tax_ui_tax_rate_delete_form', $tax_rate),
+      'access arguments' => array('administer taxes'),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 10,
+    );
+  }
+
+  $items['admin/commerce/config/taxes/types'] = array(
+    'title' => 'Tax types',
+    'description' => 'Manage tax types.',
+    'page callback' => 'commerce_tax_ui_overview',
+    'page arguments' => array('types'),
+    'access arguments' => array('administer taxes'),
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/commerce_tax_ui.admin.inc',
+  );
+  $items['admin/commerce/config/taxes/types/add'] = array(
+    'title' => 'Add a tax type',
+    'description' => 'Create a new tax type.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_tax_ui_tax_type_form', commerce_tax_ui_tax_type_new()),
+    'access arguments' => array('administer taxes'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'includes/commerce_tax_ui.admin.inc',
+  );
+  foreach (commerce_tax_types() as $name => $tax_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $name_arg = strtr($name, '_', '-');
+
+    $items['admin/commerce/config/taxes/types/' . $name_arg] = array(
+      'title callback' => 'commerce_tax_ui_tax_type_title',
+      'title arguments' => array($name),
+      'description' => 'Edit a tax type.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_tax_ui_tax_type_form', $tax_type),
+      'access arguments' => array('administer taxes'),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+    );
+    $items['admin/commerce/config/taxes/types/' . $name_arg . '/edit'] = array(
+      'title' => 'Edit',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      'weight' => 0,
+    );
+
+    if (rules_config_load('commerce_tax_type_' . $name)) {
+      $items['admin/commerce/config/taxes/types/' . $name_arg . '/rule'] = array(
+        'title' => 'Configure rule',
+        'description' => 'Add conditions to the rule used to apply taxes of this type to products.',
+        'page callback' => 'drupal_goto',
+        'page arguments' => array('admin/config/workflow/rules/reaction/manage/commerce_tax_type_' . $name),
+        'access arguments' => array('administer rules'),
+        'type' => MENU_LOCAL_TASK,
+        'context' => MENU_CONTEXT_INLINE,
+        'weight' => 5,
+      );
+    }
+
+    $items['admin/commerce/config/taxes/types/' . $name_arg . '/delete'] = array(
+      'title' => 'Delete',
+      'page callback' => 'commerce_tax_ui_tax_type_delete_form_wrapper',
+      'page arguments' => array($tax_type),
+      'access arguments' => array('administer taxes'),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+      'type' => MENU_LOCAL_TASK,
+      'context' => MENU_CONTEXT_INLINE,
+      'weight' => 10,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Title callback: return the title of a tax rate.
+ */
+function commerce_tax_ui_tax_rate_title($name) {
+  $titles = commerce_tax_rate_titles();
+  return !empty($titles[$name]) ? $titles[$name] : '';
+}
+
+/**
+ * Title callback: return the title of a tax type.
+ */
+function commerce_tax_ui_tax_type_title($name) {
+  $titles = commerce_tax_type_titles();
+  return !empty($titles[$name]) ? $titles[$name] : '';
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_tax_ui_permission() {
+  return array(
+    'administer taxes' => array(
+      'title' => t('Administer taxes'),
+      'description' => t('Manage the UI defined tax rates and types.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_tax_ui_theme() {
+  return array(
+    'tax_rate_admin_overview' => array(
+      'variables' => array('tax_rate' => NULL),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+    ),
+    'tax_type_admin_overview' => array(
+      'variables' => array('tax_type' => NULL),
+      'file' => 'includes/commerce_tax_ui.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_tax_ui_help($path, $arg) {
+  switch ($path) {
+    case 'admin/commerce/config/taxes':
+    case 'admin/commerce/config/taxes/rates':
+      return '<p>' . t('Define a tax rate for each tax you must collect from your customers. Tax rates are defined in decimal format and may be applied to line item via Rules. Default Rules components are defined for any tax rate specifying it and can be accessed using the appropriate operations link below.') . '</p>';
+
+    case 'admin/commerce/config/taxes/types':
+      return '<p>' . t('Tax types categorize tax rates and specify whether or not the calculated tax should be included in product prices on display. Default rules are defined for each tax type for applying its tax rates to line items. These can be accessed using the appropriate operations link below.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_commerce_tax_type_info().
+ */
+function commerce_tax_ui_commerce_tax_type_info() {
+  return db_query('SELECT * FROM {commerce_tax_type}')->fetchAllAssoc('name', PDO::FETCH_ASSOC);
+}
+
+/**
+ * Returns an initialized tax type array.
+ */
+function commerce_tax_ui_tax_type_new() {
+  return array(
+    'name' => '',
+    'title' => '',
+    'display_title' => '',
+    'description' => '',
+    'display_inclusive' => FALSE,
+    'order_context' => FALSE,
+    'module' => 'commerce_tax_ui',
+    'is_new' => TRUE,
+  );
+}
+
+/**
+ * Saves a tax type.
+ *
+ * This function will either insert a new tax type if $tax_type['is_new'] is set
+ * or attempt to update an existing tax type if it is not. It does not currently
+ * support changing the machine-name of the tax type, nor is this possible
+ * through the form supplied by the Tax UI module.
+ *
+ * @param $tax_type
+ *   The tax type array containing the basic properties as initialized in
+ *     commerce_tax_ui_tax_type_new().
+ *
+ * @return
+ *   The return value of the call to drupal_write_record() to save the tax type,
+ *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the type
+ *     of query performed to save the tax type.
+ */
+function commerce_tax_ui_tax_type_save($tax_type) {
+  $op = drupal_write_record('commerce_tax_type', $tax_type, empty($tax_type['is_new']) ? 'name' : array());
+
+  // If this is a new tax type and the insert did not fail...
+  if (!empty($tax_type['is_new']) && $op !== FALSE) {
+    // Notify other modules that a new tax type has been created.
+    module_invoke_all('commerce_tax_type_insert', $tax_type);
+  }
+  elseif ($op !== FALSE) {
+    // Notify other modules that an existing tax type has been updated.
+    module_invoke_all('commerce_tax_type_update', $tax_type);
+  }
+
+  // Clear the necessary caches and rebuild the menu items.
+  commerce_tax_types_reset();
+  rules_clear_cache();
+  menu_rebuild();
+
+  return $op;
+}
+
+/**
+ * Deletes a tax type.
+ *
+ * @param $name
+ *   The machine-name of the tax type.
+ */
+function commerce_tax_ui_tax_type_delete($name) {
+  $tax_type = commerce_tax_type_load($name);
+
+  db_delete('commerce_tax_type')
+    ->condition('name', $name)
+    ->execute();
+
+  rules_config_delete(array('commerce_tax_type_' . $name));
+
+  // Clear the necessary caches and rebuild the menu items.
+  commerce_tax_types_reset();
+  rules_clear_cache();
+  menu_rebuild();
+
+  // Notify other modules that this tax type has been deleted.
+  module_invoke_all('commerce_tax_type_delete', $tax_type);
+}
+
+/**
+ * Implements hook_commerce_tax_rate_info().
+ */
+function commerce_tax_ui_commerce_tax_rate_info() {
+  return db_query('SELECT * FROM {commerce_tax_rate}')->fetchAllAssoc('name', PDO::FETCH_ASSOC);
+}
+
+/**
+ * Returns an initialized tax rate array.
+ *
+ * @param $type
+ *   The name of the tax type for the new rate.
+ */
+function commerce_tax_ui_tax_rate_new($type = '') {
+  return array(
+    'name' => '',
+    'title' => '',
+    'display_title' => '',
+    'description' => '',
+    'rate' => 0,
+    'type' => $type,
+    'component' => TRUE,
+    'module' => 'commerce_tax_ui',
+    'is_new' => TRUE,
+  );
+}
+
+/**
+ * Saves a tax rate.
+ *
+ * This function will either insert a new tax rate if $tax_rate['is_new'] is set
+ * or attempt to update an existing tax rate if it is not. It does not currently
+ * support changing the machine-name of the tax rate, nor is this possible
+ * through the form supplied by the Tax UI module.
+ *
+ * @param $tax_rate
+ *   The tax rate array containing the basic properties as initialized in
+ *     commerce_tax_ui_tax_rate_new().
+ *
+ * @return
+ *   The return value of the call to drupal_write_record() to save the tax rate,
+ *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the rate
+ *     of query performed to save the tax rate.
+ */
+function commerce_tax_ui_tax_rate_save($tax_rate) {
+  $op = drupal_write_record('commerce_tax_rate', $tax_rate, empty($tax_rate['is_new']) ? 'name' : array());
+
+  // If this is a new tax rate and the insert did not fail...
+  if (!empty($tax_rate['is_new']) && $op !== FALSE) {
+    // Notify other modules that a new tax rate has been created.
+    module_invoke_all('commerce_tax_rate_insert', $tax_rate);
+  }
+  elseif ($op !== FALSE) {
+    // Notify other modules that an existing tax rate has been updated.
+    module_invoke_all('commerce_tax_rate_update', $tax_rate);
+  }
+
+  // Clear the necessary caches and rebuild the menu items.
+  commerce_tax_rates_reset();
+  rules_clear_cache();
+  menu_rebuild();
+
+  return $op;
+}
+
+/**
+ * Deletes a tax rate.
+ *
+ * @param $name
+ *   The machine-name of the tax rate.
+ */
+function commerce_tax_ui_tax_rate_delete($name) {
+  $tax_rate = commerce_tax_rate_load($name);
+
+  db_delete('commerce_tax_rate')
+    ->condition('name', $name)
+    ->execute();
+
+  rules_config_delete(array('commerce_tax_rate_' . $name));
+
+  // Clear the necessary caches and rebuild the menu items.
+  commerce_tax_rates_reset();
+  rules_clear_cache();
+  menu_rebuild();
+
+  // Notify other modules that this tax rate has been deleted.
+  module_invoke_all('commerce_tax_rate_delete', $tax_rate);
+}
