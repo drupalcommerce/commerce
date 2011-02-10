@@ -107,7 +107,10 @@ function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
   // Don't allow deletion of product types that have products already.
   if (($count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_type['type']))->rowCount()) > 0) {
     drupal_set_title(t('Cannot delete the %name product type', array('%name' => $product_type['name'])), PASS_THROUGH);
-    return t('There are @count products of this type. It cannot be deleted.', array('@count' => $count));
+    return format_plural($count,
+      'There is 1 product of this type. It cannot be deleted.',
+      'There are @count products of this type. It cannot be deleted.'
+    );
   }
 
   // Include the forms file from the Product module.

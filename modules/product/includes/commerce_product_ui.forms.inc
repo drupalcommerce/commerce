@@ -12,7 +12,7 @@
  *
  * @param $product_type
  *   The product type array to edit or for a create form an empty product type
- *     object with properties instantiated but not populated.
+ *     array with properties instantiated but not populated.
  */
 function commerce_product_ui_product_type_form($form, &$form_state, $product_type) {
   // Ensure this include file is loaded when the form is rebuilt from the cache.
@@ -119,7 +119,7 @@ function commerce_product_ui_product_type_form_validate($form, &$form_state) {
   // If saving a new product type, ensure it has a unique machine name.
   if (empty($product_type['type'])) {
     if (!commerce_product_ui_validate_product_type_unique($form_state['values']['product_type']['type'])) {
-      form_set_error('product_type][type', 'The machine name specified is already in use.');
+      form_set_error('product_type][type', t('The machine name specified is already in use.'));
     }
   }
 }

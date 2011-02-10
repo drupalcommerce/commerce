@@ -98,7 +98,7 @@ function commerce_product_product_form_validate($form, &$form_state) {
 
   // If invalid tokens were specified, throw an error.
   if ($sku === FALSE) {
-    form_set_error('sku', 'The SKU contains invalid tokens.');
+    form_set_error('sku', t('The SKU contains invalid tokens.'));
   }
   else {
     // Validate the remaining characters of the string.
@@ -108,7 +108,7 @@ function commerce_product_product_form_validate($form, &$form_state) {
 
     // Ensure the proposed SKU is unique.
     if (!commerce_product_validate_sku_unique($sku, $product->product_id)) {
-      form_set_error('sku', 'This SKU is already in use and must be unique. Please supply another value.');
+      form_set_error('sku', t('This SKU is already in use and must be unique. Please supply another value.'));
     }
   }
 

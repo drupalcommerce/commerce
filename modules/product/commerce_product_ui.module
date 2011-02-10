@@ -323,7 +323,7 @@ function commerce_product_ui_product_type_new() {
  *
  * @param $product_type
  *   The product type array containing the basic properties as initialized in
- *     commerce_product_type_new().
+ *     commerce_product_ui_product_type_new().
  * @param $configure
  *   Boolean indicating whether or not product type configuration should be
  *     performed in the event of a new product type being saved.
@@ -349,7 +349,7 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE)
     // Notify other modules that a new product type has been created.
     module_invoke_all('commerce_product_type_insert', $product_type);
   }
-  else {
+  elseif ($op !== FALSE) {
     // Notify other modules that an existing product type has been updated.
     module_invoke_all('commerce_product_type_update', $product_type);
   }
