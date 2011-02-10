@@ -1198,6 +1198,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
         '#type' => 'textfield',
         '#title' => t('Quantity'),
         '#default_value' => $default_quantity,
+        '#datatype' => 'integer',
         '#size' => 5,
         '#weight' => 5,
       );
@@ -1206,6 +1207,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       $form['quantity'] = array(
         '#type' => 'hidden',
         '#value' => $default_quantity,
+        '#datatype' => 'integer',
         '#weight' => 5,
       );
     }
@@ -1231,6 +1233,13 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
 function commerce_cart_add_to_cart_form_validate($form, &$form_state) {
   if (!is_numeric($form_state['values']['quantity']) || $form_state['values']['quantity'] <= 0) {
     form_set_error('quantity', t('You must specify a valid quantity to add to the cart.'));
+  }
+
+  // If the custom data type attribute of the quantity element is integer,
+  // ensure we only accept whole number values.
+  if ($form['quantity']['#datatype'] == 'integer' &&
+    (int) $form_state['values']['quantity'] != $form_state['values']['quantity']) {
+    form_set_error('quantity', t('You must specify a whole number for the quantity.'));
   }
 
   // If the attributes matching product selector was used, set the value of the
