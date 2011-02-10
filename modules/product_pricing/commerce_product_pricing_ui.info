@@ -1,0 +1,10 @@
+; $Id$
+name = Product Pricing UI
+description = Exposes a UI for managing product pricing rules and pre-calculation settings.
+package = Commerce
+dependencies[] = rules_admin
+dependencies[] = commerce_ui
+dependencies[] = commerce_price
+dependencies[] = commerce_product_pricing
+dependencies[] = commerce_product_reference
+core = 7.x

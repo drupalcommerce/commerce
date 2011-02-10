@@ -1,0 +1,8 @@
+; $Id$
+name = Product Pricing
+description = Enables Rules based product sell price calculation for dynamic product pricing.
+package = Commerce
+dependencies[] = rules_admin
+dependencies[] = commerce_price
+dependencies[] = commerce_product_reference
+core = 7.x

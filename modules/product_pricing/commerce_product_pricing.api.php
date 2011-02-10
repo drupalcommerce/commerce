@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Hooks provided by the Product Reference module.
+ * Hooks provided by the Product Pricing module.
  */
 
 

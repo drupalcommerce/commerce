@@ -3,15 +3,15 @@
 
 /**
  * @file
- * Administrative page callbacks for the Product Reference UI module.
+ * Administrative page callbacks for the Product Pricing UI module.
  */
 
 
 /**
  * Builds the product sell price calculation Rules Overview page.
  */
-function commerce_product_reference_ui_sell_price_rules() {
-  RulesPluginUI::$basePath = 'admin/commerce/products/pricing-rules';
+function commerce_product_pricing_ui_sell_price_rules() {
+  RulesPluginUI::$basePath = 'admin/commerce/config/product-pricing/rules';
 
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled sell price calculation rules') . '</h3>';
 
@@ -35,7 +35,7 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
   // Count the number of rows in the price pre-calculation table.
   $query = db_select('commerce_calculated_price')
     ->fields('commerce_calculated_price', array('created'))
-    ->condition('module', 'commerce_product_reference')
+    ->condition('module', 'commerce_product_pricing')
     ->condition('entity_type', 'commerce_product')
     ->condition('field_name', 'commerce_price')
     ->execute();
@@ -120,7 +120,7 @@ function commerce_product_pre_calculation_settings_form_submit($form, &$form_sta
   // get this query the heck out of here.
   if (!empty($values['delete']) && $values['op'] == $values['delete']) {
     db_delete('commerce_calculated_price')
-      ->condition('module', 'commerce_product_reference')
+      ->condition('module', 'commerce_product_pricing')
       ->condition('entity_type', 'commerce_product')
       ->condition('field_name', 'commerce_price')
       ->execute();

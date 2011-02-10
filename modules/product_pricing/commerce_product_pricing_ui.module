@@ -3,51 +3,57 @@
 
 /**
  * @file
- * Exposes a UI for the product pricing system defined by the Product Reference
- *   module.
+ * Exposes a UI for managing product pricing rules and pre-calculation settings.
  */
 
 
 /**
  * Implements hook_menu().
  */
-function commerce_product_reference_ui_menu() {
+function commerce_product_pricing_ui_menu() {
   $items = array();
 
-  // Payment method Rules administration page.
-  $items['admin/commerce/products/pricing-rules'] = array(
-    'title' => 'Pricing rules',
-    'description' => 'Enable and configure product sell price calculation rule configurations.',
-    'page callback' => 'commerce_product_reference_ui_sell_price_rules',
-    'access arguments' => array('administer sell price calculation'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => -5,
-    'file' => 'includes/commerce_product_reference_ui.admin.inc',
+  // Product price calculation Rules admin overview.
+  $items['admin/commerce/config/product-pricing'] = array(
+    'title' => 'Product pricing rules',
+    'description' => 'Enable and configure product pricing rules and pre-calculation.',
+    'page callback' => 'commerce_product_pricing_ui_sell_price_rules',
+    'access arguments' => array('administer product pricing'),
+    'file' => 'includes/commerce_product_pricing_ui.admin.inc',
+  );
+
+  $items['admin/commerce/config/product-pricing/rules'] = array(
+    'title' => 'List',
+    'description' => 'Administer the rules used for calculating product sell prices.',
+    'weight' => 0,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   // Add the menu items for the various Rules forms.
   $controller = new RulesUIController();
-  $items += $controller->config_menu('admin/commerce/products/pricing-rules');
+  $items += $controller->config_menu('admin/commerce/config/product-pricing/rules');
 
-  $items['admin/commerce/products/pricing-rules/add'] = array(
+  $items['admin/commerce/config/product-pricing/rules/add'] = array(
     'title' => 'Add a pricing rule',
     'description' => 'Adds an additional sell price calculation rule configuration.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_product_reference_ui_add_pricing_rule_form', 'admin/commerce/products/pricing-rules'),
-    'access arguments' => array('administer payments'),
+    'page arguments' => array('commerce_product_pricing_ui_add_pricing_rule_form', 'admin/commerce/config/product-pricing/rules'),
+    'access arguments' => array('administer product pricing'),
     'file path' => drupal_get_path('module', 'rules_admin'),
     'file' => 'rules_admin.inc',
   );
 
   // Provide a configuration menu item for adjusting the product sell price
   // pre-calculation settings.
-  $items['admin/commerce/config/product-price-pre-calculation'] = array(
-    'title' => 'Product price pre-calculation',
+  $items['admin/commerce/config/product-pricing/pre-calculation'] = array(
+    'title' => 'Pre-calculation',
     'description' => 'Configure the price pre-calculation settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_product_pre_calculation_settings_form'),
-    'access arguments' => array('administer sell price calculation'),
-    'file' => 'includes/commerce_product_reference_ui.admin.inc',
+    'access arguments' => array('administer product pricing'),
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/commerce_product_pricing_ui.admin.inc',
   );
 
   return $items;
@@ -56,10 +62,10 @@ function commerce_product_reference_ui_menu() {
 /**
  * Implements hook_permission().
  */
-function commerce_product_reference_ui_permission() {
+function commerce_product_pricing_ui_permission() {
   return array(
-    'administer sell price calculation' => array(
-      'title' => t('Administer sell price calculation'),
+    'administer product pricing' => array(
+      'title' => t('Administer product pricing'),
       'description' => t('Grants access to the sell price calculation user interface and settings form.'),
       'restrict access' => TRUE,
     ),
@@ -69,11 +75,11 @@ function commerce_product_reference_ui_permission() {
 /**
  * Implements hook_menu_local_tasks_alter().
  */
-function commerce_product_reference_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  // Add action link 'admin/commerce/products/pricing-rules/add' on
-  // 'admin/commerce/products/pricing-rules'.
-  if ($root_path == 'admin/commerce/products/pricing-rules') {
-    $item = menu_get_item('admin/commerce/products/pricing-rules/add');
+function commerce_product_pricing_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link 'admin/commerce/config/product-pricing/rules/add' on
+  // 'admin/commerce/config/product-pricing'.
+  if ($root_path == 'admin/commerce/config/product-pricing') {
+    $item = menu_get_item('admin/commerce/config/product-pricing/rules/add');
     if ($item['access']) {
       $data['actions']['output'][] = array(
         '#theme' => 'menu_local_action',
@@ -86,14 +92,14 @@ function commerce_product_reference_ui_menu_local_tasks_alter(&$data, $router_it
 /**
  * Implements hook_help().
  */
-function commerce_product_reference_ui_help($path, $arg) {
+function commerce_product_pricing_ui_help($path, $arg) {
   switch ($path) {
-    case 'admin/commerce/products/pricing-rules':
+    case 'admin/commerce/config/product-pricing':
       // TODO: Add a note regarding the restrictions that apply for price pre-
       // calculation based on the current pre-calculation method setting.
       return t('Prior to purchase, product sell prices are calculated using the rule configurations listed below. Pricing rules can be used for things like discounts, price lists, currency conversions, and tax application depending on the Rules elements defined by your enabled modules. To apply the enabled pricing rules on product display, you must ensure the display formatter settings for your product price fields are configured to display the <em>Calculated sell price for the current user</em>.');
 
-    case 'admin/commerce/products/pricing-rules/add':
+    case 'admin/commerce/config/product-pricing/rules/add':
       return t('After setting the label for this rule configuration, you will be redirected to its empty edit page. There you should add the conditions that must be met for the pricing rule to apply. You can then use actions that alter the unit price of the product line item passed to the rule to affect the sell price customers will see prior to purchase.');
   }
 }
@@ -101,10 +107,10 @@ function commerce_product_reference_ui_help($path, $arg) {
 /**
  * Implements hook_forms().
  */
-function commerce_product_reference_ui_forms($form_id, $args) {
+function commerce_product_pricing_ui_forms($form_id, $args) {
   $forms = array();
 
-  $forms['commerce_product_reference_ui_add_pricing_rule_form'] = array(
+  $forms['commerce_product_pricing_ui_add_pricing_rule_form'] = array(
     'callback' => 'rules_admin_add_reaction_rule',
   );
 
@@ -120,7 +126,7 @@ function commerce_product_reference_ui_forms($form_id, $args) {
  *
  * @see rules_admin_add_reaction_rule()
  */
-function commerce_product_reference_ui_form_commerce_product_reference_ui_add_pricing_rule_form_alter(&$form, &$form_state) {
+function commerce_product_pricing_ui_form_commerce_product_pricing_ui_add_pricing_rule_form_alter(&$form, &$form_state) {
   unset($form['settings']['help']);
   $form['settings']['event']['#type'] = 'value';
   $form['settings']['event']['#value'] = 'commerce_product_calculate_sell_price';
