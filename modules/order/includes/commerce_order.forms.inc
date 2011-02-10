@@ -106,7 +106,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
   $form['user']['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Owned by'),
-    '#description' => empty($order->order_id) ? t('Leave blank to set yourself as the owner.') : t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+    '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
     '#default_value' => !empty($order->name) ? $order->name : '',
@@ -193,7 +193,7 @@ function commerce_order_order_form_validate($form, &$form_state) {
   // Validate the "owned by" field.
   if (!empty($form_state['values']['name']) && !($account = user_load_by_name($form_state['values']['name']))) {
     // The use of empty() is mandatory in the context of usernames as the empty
-    // string denotes the current user or an anonymous user.
+    // string denotes an anonymous user.
     form_set_error('name', t('The username %name does not exist.', array('%name' => $form_state['values']['name'])));
   }
 
@@ -229,25 +229,16 @@ function commerce_order_order_form_submit($form, &$form_state) {
     $order->log = $form_state['values']['log'];
   }
 
-  // Set the order's owner uid if it's being created at this time.
-  if (empty($order->order_id) && empty($form_state['values']['name'])) {
-    $order->uid = $user->uid;
+  // Set the order's owner uid based on the supplied name.
+  if (!empty($form_state['values']['name']) && $account = user_load_by_name($form_state['values']['name'])) {
+    $order->uid = $account->uid;
 
     if (empty($form_state['values']['mail'])) {
-      $order->mail = $user->mail;
+      $order->mail = $account->mail;
     }
   }
   else {
-    if ($account = user_load_by_name($form_state['values']['name'])) {
-      $order->uid = $account->uid;
-
-      if (empty($form_state['values']['mail'])) {
-        $order->mail = $account->mail;
-      }
-    }
-    else {
-      $order->uid = 0;
-    }
+    $order->uid = 0;
   }
 
   if (!empty($form_state['values']['mail'])) {
