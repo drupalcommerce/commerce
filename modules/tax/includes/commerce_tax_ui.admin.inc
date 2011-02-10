@@ -114,6 +114,18 @@ function theme_tax_type_admin_overview($variables) {
 }
 
 /**
+ * Form callback wrapper: ensure tax types exist before going to the add form.
+ */
+function commerce_tax_ui_tax_rate_add_form_wrapper($tax_rate) {
+  if (count(commerce_tax_type_titles()) == 0) {
+    drupal_set_message(t('You must define at least one tax type before you can start adding tax rates.'), 'error');
+    drupal_goto('admin/commerce/config/taxes/types');
+  }
+
+  return drupal_get_form('commerce_tax_ui_tax_rate_form', $tax_rate);
+}
+
+/**
  * Form callback: create or edit a tax rate.
  *
  * @param $tax_rate
@@ -175,6 +187,7 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
     '#description' => t('The percentage used to calculate this tax expressed as a decimal, e.g. .06 for a rate of 6%.'),
     '#default_value' => $tax_rate['rate'],
     '#size' => 16,
+    '#required' => TRUE,
   );
 
   $form['tax_rate']['type'] = array(
@@ -183,6 +196,7 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
     '#description' => t('The tax type for this rate.'),
     '#options' => commerce_tax_type_titles(),
     '#default_value' => $tax_rate['type'],
+    '#required' => TRUE,
   );
 
   $form['tax_rate']['component'] = array(

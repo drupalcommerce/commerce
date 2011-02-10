@@ -31,8 +31,8 @@ function commerce_tax_ui_menu() {
   $items['admin/commerce/config/taxes/rates/add'] = array(
     'title' => 'Add a tax rate',
     'description' => 'Create a new tax rate.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_tax_ui_tax_rate_form', commerce_tax_ui_tax_rate_new()),
+    'page callback' => 'commerce_tax_ui_tax_rate_add_form_wrapper',
+    'page arguments' => array(commerce_tax_ui_tax_rate_new()),
     'access arguments' => array('administer taxes'),
     'type' => MENU_LOCAL_ACTION,
     'file' => 'includes/commerce_tax_ui.admin.inc',
