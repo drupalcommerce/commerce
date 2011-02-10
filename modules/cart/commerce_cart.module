@@ -23,6 +23,16 @@ function commerce_cart_menu() {
     'file' => 'includes/commerce_cart.pages.inc',
   );
 
+  $items['cart/my'] = array(
+    'title' => 'Shopping cart (# items)',
+    'title callback' => 'commerce_cart_menu_item_title',
+    'title arguments' => array(TRUE),
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('cart'),
+    'access arguments' => array('access content'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+
   $items['checkout'] = array(
     'title' => 'Checkout',
     'page callback' => 'commerce_cart_checkout_router',
@@ -32,6 +42,27 @@ function commerce_cart_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Returns the title of the shopping cart menu item with an item count.
+ */
+function commerce_cart_menu_item_title() {
+  global $user;
+
+  // Load the current user's cart order.
+  $order = commerce_cart_order_load($user->uid);
+
+  // If it's empty or has no line items, return a static title.
+  if (empty($order) || empty($order->commerce_line_items)) {
+    return t('Shopping cart');
+  }
+
+  // Count the number of product line items on the order.
+  $quantity = commerce_line_items_quantity($order->commerce_line_items, 'product');
+
+  // Return the title with an item count appended.
+  return format_plural($quantity, 'Shopping cart (1 item)', 'Shopping cart (@count items)');
 }
 
 /**
