@@ -42,8 +42,9 @@ function commerce_line_item_entity_property_info() {
   $properties['type'] = array(
     'label' => t('Type'),
     'description' => t('The human readable name of the line item type.'),
-    'type' => 'text',
-    'options list' => 'commerce_line_item_type_get_name',
+    'type' => 'token',
+    'setter callback' => 'entity_property_verbatim_set',
+    'options list' => 'commerce_line_item_type_options_list',
     'query callback' => 'entity_metadata_table_query',
     'required' => TRUE,
   );

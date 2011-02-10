@@ -407,6 +407,13 @@ function commerce_line_item_type_get_name($type = NULL) {
 }
 
 /**
+ * Wraps commerce_line_item_type_get_name() for the Entity module.
+ */
+function commerce_line_item_type_options_list() {
+  return commerce_line_item_type_get_name();
+}
+
+/**
  * Configures a line item type by calling its configuration callback.
  *
  * @param $line_item_type
