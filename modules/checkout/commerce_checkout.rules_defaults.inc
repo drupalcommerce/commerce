@@ -74,10 +74,10 @@ function commerce_checkout_default_rules_configuration() {
     ));
 
   // Accommodate any profile types referenced by the order.
-  foreach ($customer_profile_entity_info['bundles'] as $profile_type => $data) {
+  foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
     $loop
       ->action('data_set', array(
-        'data:select' => 'order:' . strtr('customer-' . $profile_type, '_', '-') . ':uid',
+        'data:select' => 'order:' . strtr('customer-' . $type, '_', '-') . ':uid',
         'value:select' => 'list-item:uid',
       ));
   }
@@ -135,10 +135,10 @@ function commerce_checkout_default_rules_configuration() {
     ));
 
   // Accommodate any profile types referenced by the order.
-  foreach ($customer_profile_entity_info['bundles'] as $profile_type => $data) {
+  foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
     $rule
       ->action('data_set', array(
-        'data:select' => 'order:' . strtr('customer-' . $profile_type, '_', '-') . ':uid',
+        'data:select' => 'order:' . strtr('customer-' . $type, '_', '-') . ':uid',
         'value:select' => 'account-created:uid',
       ));
   }

@@ -33,7 +33,7 @@ function commerce_checkout_builder_form($form, &$form_state) {
 
   foreach ($panes as $pane_id => $checkout_pane) {
     // Determine a checkout pane's current checkout page.
-    $page_id = $checkout_pane->enabled ? $checkout_pane->page : 'disabled';
+    $page_id = $checkout_pane['enabled'] ? $checkout_pane['page'] : 'disabled';
 
     // If the page no longer exists, place the pane on the first page.
     if (empty($checkout_pages[$page_id])) {
@@ -43,23 +43,23 @@ function commerce_checkout_builder_form($form, &$form_state) {
 
     // Add the pane's name to the form array.
     $form['page'][$page_id]['panes'][$pane_id]['name'] = array(
-      '#markup' => check_plain($checkout_pane->name),
+      '#markup' => check_plain($checkout_pane['name']),
     );
 
     // Add the select field for the pane's checkout page.
     $form['page'][$page_id]['panes'][$pane_id]['page'] = array(
       '#type' => 'select',
       '#options' => drupal_map_assoc(array_keys($checkout_pages)),
-      '#default_value' => $checkout_pane->page,
-      '#attributes' => array('class' => array('checkout-pane-page checkout-pane-page-'. $checkout_pane->page)),
+      '#default_value' => $checkout_pane['page'],
+      '#attributes' => array('class' => array('checkout-pane-page checkout-pane-page-'. $checkout_pane['page'])),
     );
 
     // Add the select field for the pane's weight.
     $form['page'][$page_id]['panes'][$pane_id]['weight'] = array(
       '#type' => 'weight',
       '#delta' => 20,
-      '#default_value' => $checkout_pane->weight,
-      '#attributes' => array('class' => array('checkout-pane-weight checkout-pane-weight-'. $checkout_pane->page)),
+      '#default_value' => $checkout_pane['weight'],
+      '#attributes' => array('class' => array('checkout-pane-weight checkout-pane-weight-'. $checkout_pane['page'])),
     );
 
     // Add a configuration link for the pane.
@@ -96,16 +96,16 @@ function commerce_checkout_builder_form_save_submit($form, &$form_state) {
     foreach ($form_state['values']['panes'] as $pane_id => $data) {
       // Load and update the checkout pane array.
       $checkout_pane = commerce_checkout_pane_load($pane_id);
-      $checkout_pane->weight = $data['weight'];
+      $checkout_pane['weight'] = $data['weight'];
 
       // Accommodate the "Disabled" pseudo-page in the form.
       if ($data['page'] == 'disabled') {
-        $checkout_pane->enabled = FALSE;
-        unset($checkout_pane->page);
+        $checkout_pane['enabled'] = FALSE;
+        $checkout_pane['page'] = 'disabled';
       }
       else {
-        $checkout_pane->enabled = TRUE;
-        $checkout_pane->page = $data['page'];
+        $checkout_pane['enabled'] = TRUE;
+        $checkout_pane['page'] = $data['page'];
       }
 
       commerce_checkout_pane_save($checkout_pane);
@@ -210,12 +210,12 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
       'collapsible' => t('Display this pane in a collapsible fieldset.'),
       'collapsed' => t('Display this pane in a collapsed fieldset.'),
     ),
-    '#default_value' => $checkout_pane->collapsible ? ($checkout_pane->collapsed ? 'collapsed' : 'collapsible') : 'default',
+    '#default_value' => $checkout_pane['collapsible'] ? ($checkout_pane['collapsed'] ? 'collapsed' : 'collapsible') : 'default',
   );
   $form['display']['review'] = array(
     '#type' => 'checkbox',
     '#title' => t('Include this pane on the Review checkout pane.'),
-    '#default_value' => $checkout_pane->review,
+    '#default_value' => $checkout_pane['review'],
   );
 
   // If a settings form exists for the specified checkout pane...
@@ -251,27 +251,27 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
  */
 function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
   // Load and update the pane with values from the form.
-  $checkout_pane = commerce_checkout_pane_load($form_state['values']['checkout_pane']->pane_id);
+  $checkout_pane = commerce_checkout_pane_load($form_state['values']['checkout_pane']['pane_id']);
 
   // Update the fieldset collapsibility variables.
   switch ($form_state['values']['collapsibility']) {
     case 'collapsible':
-      $checkout_pane->collapsible = TRUE;
-      $checkout_pane->collapsed = FALSE;
+      $checkout_pane['collapsible'] = TRUE;
+      $checkout_pane['collapsed'] = FALSE;
       break;
     case 'collapsed':
-      $checkout_pane->collapsible = TRUE;
-      $checkout_pane->collapsed = TRUE;
+      $checkout_pane['collapsible'] = TRUE;
+      $checkout_pane['collapsed'] = TRUE;
       break;
     case 'default':
     default:
-      $checkout_pane->collapsible = FALSE;
-      $checkout_pane->collapsed = FALSE;
+      $checkout_pane['collapsible'] = FALSE;
+      $checkout_pane['collapsed'] = FALSE;
       break;
   }
 
   // Update the pane's review page visibility.
-  $checkout_pane->review = $form_state['values']['review'];
+  $checkout_pane['review'] = $form_state['values']['review'];
 
   // Save the changes.
   commerce_checkout_pane_save($checkout_pane);
@@ -294,7 +294,7 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
  */
 function commerce_checkout_pane_settings_form_reset_submit($form, &$form_state) {
   // Reset the display settings for the checkout pane.
-  commerce_checkout_pane_reset($form_state['values']['checkout_pane']->pane_id);
+  commerce_checkout_pane_reset($form_state['values']['checkout_pane']['pane_id']);
 
   // Reset this checkout pane's settings as if this was a system settings form.
   if (!empty($form['settings'])) {

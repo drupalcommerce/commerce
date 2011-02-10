@@ -25,8 +25,8 @@ function commerce_customer_ui_menu() {
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
     $items['admin/commerce/customer-profiles/add/' . strtr($type, array('_' => '-'))] = array(
       'title' => 'Create @name',
-      'title arguments' => array('@name' => $profile_type->name),
-      'description' => $profile_type->description,
+      'title arguments' => array('@name' => $profile_type['name']),
+      'description' => $profile_type['description'],
       'page callback' => 'commerce_customer_ui_customer_profile_form_wrapper',
       'page arguments' => array(commerce_customer_profile_new($type)),
       'access callback' => 'commerce_customer_profile_access',
@@ -70,9 +70,8 @@ function commerce_customer_ui_menu() {
     'weight' => 0,
     'file' => 'includes/commerce_customer_ui.profile_types.inc',
   );
-  $items['admin/commerce/customer-profiles/types/%commerce_customer_profile_type'] = array(
-    'title callback' => 'commerce_customer_profile_type_title',
-    'title arguments' => array(4),
+  $items['admin/commerce/customer-profiles/types/%'] = array(
+    'title callback' => 'Profile types',
     'page callback' => 'commerce_customer_ui_profile_type_redirect',
     'page arguments' => array(4),
     'access arguments' => array('administer customer profile types'),
@@ -115,8 +114,8 @@ function commerce_customer_ui_customer_profile_add_any_access() {
 /**
  * Redirects a customer profile type URL to its fields management page.
  */
-function commerce_customer_ui_profile_type_redirect($profile_type) {
-  drupal_goto('admin/commerce/customer-profiles/types/' . strtr($profile_type->type, array('_' => '-')) . '/fields');
+function commerce_customer_ui_profile_type_redirect($type) {
+  drupal_goto('admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')) . '/fields');
 }
 
 /**
@@ -124,8 +123,8 @@ function commerce_customer_ui_profile_type_redirect($profile_type) {
  */
 function commerce_customer_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
-  $items['admin/commerce/customer-profiles/types/%commerce_customer_profile_type/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
-  $items['admin/commerce/customer-profiles/types/%commerce_customer_profile_type/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  $items['admin/commerce/customer-profiles/types/%/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  $items['admin/commerce/customer-profiles/types/%/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
 }
 
 /**
@@ -151,10 +150,10 @@ function commerce_customer_ui_menu_local_tasks_alter(&$data, $router_item, $root
 function commerce_customer_ui_admin_menu_map() {
   // Add awareness to the administration menu of the various profile types so
   // they are included in the dropdown menu.
-  $map['admin/commerce/customer-profiles/types/%commerce_customer_profile_type'] = array(
+  $map['admin/commerce/customer-profiles/types/%'] = array(
     'parent' => 'admin/commerce/customer-profiles/types',
     'arguments' => array(
-      array('%commerce_customer_profile_type' => array_keys(commerce_customer_profile_types())),
+      array('%' => array_keys(commerce_customer_profile_types())),
     ),
   );
 
@@ -173,7 +172,7 @@ function commerce_customer_ui_help($path, $arg) {
   // Return the user defined help text per customer profile type when adding profiles.
   if ($arg[1] == 'commerce' && $arg[2] == 'customer-profiles' && $arg[3] == 'add' && $arg[4]) {
     $profile_type = commerce_customer_profile_type_load($arg[5]);
-    return (!empty($profile_type->help) ? '<p>' . filter_xss_admin($profile_type->help) . '</p>' : '');
+    return (!empty($profile_type['help']) ? '<p>' . filter_xss_admin($profile_type['help']) . '</p>' : '');
   }
 }
 
@@ -208,9 +207,8 @@ function commerce_customer_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for profile fields.
   foreach ($entity_info['commerce_customer_profile']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/commerce/customer-profiles/types/%commerce_customer_profile_type',
+      'path' => 'admin/commerce/customer-profiles/types/%',
       'real path' => 'admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')),
-      'bundle argument' => 4,
       'access arguments' => array('administer customer profile types'),
     );
   }
@@ -259,7 +257,7 @@ function commerce_customer_ui_form_alter(&$form, &$form_state, $form_id) {
       // Load the customer profile type being modified for this form.
       $profile_type = commerce_customer_profile_type_load($form['#bundle']);
 
-      drupal_set_title(check_plain($profile_type->name));
+      drupal_set_title(check_plain($profile_type['name']));
 
       commerce_customer_ui_set_breadcrumb(TRUE);
     }

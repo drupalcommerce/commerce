@@ -67,9 +67,18 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
       // results that we'll use to interact with the line item API.
       $line_item_ids = array(LANGUAGE_NONE => array());
 
+      // Find the alias for the line_item_id field.
+      $field_alias = '';
+
+      foreach ($this->view->query->fields as $key => $value) {
+        if ($value['field'] == 'line_item_id') {
+          $field_alias = $value['alias'];
+        }
+      }
+
       foreach ($this->view->result as $result) {
-        if (!empty($result->commerce_line_item_field_data_line_items_line_item_id)) {
-          $line_item_ids[LANGUAGE_NONE][] = array('line_item_id' => $result->commerce_line_item_field_data_line_items_line_item_id);
+        if (!empty($result->{$field_alias})) {
+          $line_item_ids[LANGUAGE_NONE][] = array('line_item_id' => $result->{$field_alias});
         }
       }
 

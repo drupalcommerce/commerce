@@ -138,7 +138,7 @@ function commerce_order_rules_action_info() {
  */
 function commerce_order_rules_update_state($order, $name) {
   $order_state = commerce_order_state_load($name);
-  commerce_order_status_update($order, $order_state->default_status);
+  commerce_order_status_update($order, $order_state['default_status']);
 }
 
 /**

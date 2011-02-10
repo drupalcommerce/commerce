@@ -36,7 +36,7 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
       if ($callback = commerce_checkout_pane_callback($checkout_pane_local, 'review')) {
         // Add a row for it in the review data.
         $pane_form['review']['#data'][$pane_id] = array(
-          'title' => $checkout_pane_local->title,
+          'title' => $checkout_pane_local['title'],
         );
 
         // Get the review data for this pane.

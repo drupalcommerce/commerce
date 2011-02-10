@@ -160,6 +160,7 @@ function commerce_payment_enable_method($order, $payment_method, $action_setting
     'method_id' => $method_id,
     'settings' => $settings,
     'rule_name' => $rule->name,
+    'weight' => $rule->weight,
   );
 }
 

@@ -57,45 +57,9 @@ function commerce_customer_ui_customer_profile_types_overview() {
 function theme_customer_profile_type_admin_overview($variables) {
   $profile_type = $variables['profile_type'];
 
-  $output = check_plain($profile_type->name);
-  $output .= ' <small> (Machine name: ' . check_plain($profile_type->type) . ')</small>';
-  $output .= '<div class="description">' . filter_xss_admin($profile_type->description) . '</div>';
+  $output = check_plain($profile_type['name']);
+  $output .= ' <small> (Machine name: ' . check_plain($profile_type['type']) . ')</small>';
+  $output .= '<div class="description">' . filter_xss_admin($profile_type['description']) . '</div>';
 
   return $output;
-}
-
-/**
- * Form callback wrapper: create or edit a customer profile type.
- *
- * @param $profile_type
- *   The customer profile type object being edited by this form.
- *
- * @see commerce_customer_customer_profile_type_form()
- */
-function commerce_customer_ui_customer_profile_type_form_wrapper($profile_type) {
-  // Add the breadcrumb for the form's location.
-  commerce_customer_ui_set_breadcrumb(TRUE);
-
-  // Include the forms file from the Customer module.
-  module_load_include('inc', 'commerce_customer', 'includes/commerce_customer_profile.forms');
-
-  return drupal_get_form('commerce_customer_ui_customer_profile_type_form', $profile_type);
-}
-
-/**
- * Form callback wrapper: confirmation form for deleting a customer profile type.
- *
- * @param $profile_type
- *   The profile type object being deleted by this form.
- *
- * @see commerce_customer_customer_profile_type_delete_form()
- */
-function commerce_customer_ui_customer_profile_type_delete_form_wrapper($profile_type) {
-  // Add the breadcrumb for the form's location.
-  commerce_profile_ui_set_breadcrumb(TRUE, TRUE);
-
-  // Include the forms file from the Customer module.
-  module_load_include('inc', 'commerce_customer', 'includes/commerce_customer_profile.forms');
-
-  return drupal_get_form('commerce_customer_ui_customer_profile_type_delete_form', $profile_type);
 }

@@ -14,7 +14,7 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
   $form = array();
 
   // Extract the type of profile represented by this pane from its ID.
-  $type = substr($checkout_pane->pane_id, 17);
+  $type = substr($checkout_pane['pane_id'], 17);
 
   // Build an options array of customer profile reference fields available for
   // the data from this customer profile pane.
@@ -27,12 +27,12 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
     }
   }
 
-  $form['commerce_' . $checkout_pane->pane_id . '_field'] = array(
+  $form['commerce_' . $checkout_pane['pane_id'] . '_field'] = array(
     '#type' => 'select',
     '#title' => t('Related customer profile reference field'),
     '#description' => t('Specify the customer profile reference field on the order to populate with profile data from this checkout pane.'),
     '#options' => $options,
-    '#default_value' => variable_get('commerce_' . $checkout_pane->pane_id . '_field', ''),
+    '#default_value' => variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', ''),
   );
 
   return $form;
@@ -42,23 +42,23 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
  * Checkout pane callback: returns a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
-  $pane_form = array('#parents' => array($checkout_pane->pane_id));
+  $pane_form = array('#parents' => array($checkout_pane['pane_id']));
 
   // Extract the type of profile represented by this pane from its ID.
-  $type = substr($checkout_pane->pane_id, 17);
+  $type = substr($checkout_pane['pane_id'], 17);
 
   // Find the referenced profile ID using the related reference field...
   $profile_id = 0;
 
-  if ($field_name = variable_get('commerce_' . $checkout_pane->pane_id . '_field', '')) {
+  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
     if (!empty($order->{$field_name}[LANGUAGE_NONE][0]['profile_id'])) {
       $profile_id = $order->{$field_name}[LANGUAGE_NONE][0]['profile_id'];
     }
   }
   else {
     // Or try the association stored in the order's data array if no field is set.
-    if (!empty($order->data['profiles'][$checkout_pane->pane_id])) {
-      $profile_id = $order->data['profiles'][$checkout_pane->pane_id];
+    if (!empty($order->data['profiles'][$checkout_pane['pane_id']])) {
+      $profile_id = $order->data['profiles'][$checkout_pane['pane_id']];
     }
   }
 
@@ -85,10 +85,10 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
  * Checkout pane callback: validates a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  $profile = $form_state['values'][$checkout_pane->pane_id]['customer_profile'];
+  $profile = $form_state['values'][$checkout_pane['pane_id']]['customer_profile'];
 
   // Notify field widgets to validate their data.
-  field_attach_form_validate('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
+  field_attach_form_validate('commerce_customer_profile', $profile, $form[$checkout_pane['pane_id']], $form_state);
 
   return TRUE;
 }
@@ -97,7 +97,7 @@ function commerce_customer_profile_pane_checkout_form_validate($form, &$form_sta
  * Checkout pane callback: submits a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  $profile = $form_state['values'][$checkout_pane->pane_id]['customer_profile'];
+  $profile = $form_state['values'][$checkout_pane['pane_id']]['customer_profile'];
 
   // Ensure the profile is active.
   $profile->status = TRUE;
@@ -108,18 +108,18 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
   }
 
   // Notify field widgets.
-  field_attach_submit('commerce_customer_profile', $profile, $form[$checkout_pane->pane_id], $form_state);
+  field_attach_submit('commerce_customer_profile', $profile, $form[$checkout_pane['pane_id']], $form_state);
 
   // Save the profile.
   commerce_customer_profile_save($profile);
 
   // Store the profile ID for the related field as specified on the settings form.
-  if ($field_name = variable_get('commerce_' . $checkout_pane->pane_id . '_field', '')) {
+  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
     $order->{$field_name}[LANGUAGE_NONE][0]['profile_id'] = $profile->profile_id;
   }
   else {
     // Or make the association in the order's data array if no field was found.
-    $order->data['profiles'][$checkout_pane->pane_id] = $profile->profile_id;
+    $order->data['profiles'][$checkout_pane['pane_id']] = $profile->profile_id;
   }
 }
 
@@ -129,12 +129,12 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
  */
 function commerce_customer_profile_pane_review($form, $form_state, $checkout_pane, $order) {
   // Load the profile based on the related customer profile reference field...
-  if ($field_name = variable_get('commerce_' . $checkout_pane->pane_id . '_field', '')) {
+  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
     $profile = commerce_customer_profile_load($order->{$field_name}[LANGUAGE_NONE][0]['profile_id']);
   }
   else {
     // Or use the association stored in the order's data array if no field is set.
-    $profile = commerce_customer_profile_load($order->data['profiles'][$checkout_pane->pane_id]);
+    $profile = commerce_customer_profile_load($order->data['profiles'][$checkout_pane['pane_id']]);
   }
 
   $content = commerce_customer_profile_build_content($profile, 'customer');

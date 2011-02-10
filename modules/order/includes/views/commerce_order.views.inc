@@ -197,10 +197,9 @@ function commerce_order_views_data() {
 function commerce_order_views_plugins() {
   return array(
     'argument validator' => array(
-      'commerce_user' => array(
-        'title' => t('Commerce Order User'),
+      'current_user_or_role' => array(
+        'title' => t('Current user or role'),
         'handler' => 'commerce_order_plugin_argument_validate_user',
-        'path' => drupal_get_path('module', 'commerce_order') . '/includes/views/handlers', // not necessary for most modules
       ),
     ),
   );

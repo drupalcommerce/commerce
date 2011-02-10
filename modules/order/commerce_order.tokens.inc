@@ -151,12 +151,12 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
 
         case 'state':
           $order_status = commerce_order_status_load($order->status);
-          $replacements[$original] = $sanitize ? check_plain($order_status->state) : $order_status->state;
+          $replacements[$original] = $sanitize ? check_plain($order_status['state']) : $order_status['state'];
           break;
 
         case 'state-title':
           $order_status = commerce_order_status_load($order->status);
-          $replacements[$original] = $sanitize ? check_plain(commerce_order_state_get_title($order_status->state)) : commerce_order_state_get_title($order_status->state);
+          $replacements[$original] = $sanitize ? check_plain(commerce_order_state_get_title($order_status['state'])) : commerce_order_state_get_title($order_status['state']);
           break;
 
         case 'url':

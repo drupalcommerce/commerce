@@ -18,6 +18,9 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   $order->payment_methods = array();
   rules_invoke_all('commerce_payment_methods', $order);
 
+  // Sort the payment methods array by the enabling Rules' weight values.
+  uasort($order->payment_methods, 'drupal_sort_weight');
+
   // Generate an array of payment method options for the checkout form.
   $options = array();
 
@@ -53,7 +56,7 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
 
     // Find the default payment method using either the preselected value stored
     // in the order / checkout pane or the first available method.
-    $pane_values = !empty($form_state['values']) ? $form_state['values'][$checkout_pane->pane_id] : array();
+    $pane_values = !empty($form_state['values']) ? $form_state['values'][$checkout_pane['pane_id']] : array();
 
     if (isset($pane_values['payment_method']) && isset($options[$pane_values['payment_method']])) {
       $default_value = $pane_values['payment_method'];
@@ -99,8 +102,8 @@ function commerce_payment_pane_checkout_form_details_refresh($form, $form_state)
  * Payment pane: validation callback.
  */
 function commerce_payment_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  $pane_form = $form[$checkout_pane->pane_id];
-  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+  $pane_form = $form[$checkout_pane['pane_id']];
+  $pane_values = $form_state['values'][$checkout_pane['pane_id']];
 
   // Only attempt validation if there were payment methods available.
   if ($pane_values['payment_methods']) {
@@ -120,7 +123,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
     $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
     if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
-      $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane->pane_id, 'payment_details'));
+      $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane['pane_id'], 'payment_details'));
 
       // To prevent payment method validation routines from having to return TRUE
       // explicitly, only return FALSE if it was specifically returned.  Otherwise
@@ -137,8 +140,8 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
  * Payment pane: submit callback.
  */
 function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  $pane_form = $form[$checkout_pane->pane_id];
-  $pane_values = $form_state['values'][$checkout_pane->pane_id];
+  $pane_form = $form[$checkout_pane['pane_id']];
+  $pane_values = $form_state['values'][$checkout_pane['pane_id']];
 
   // Only process if there were payment methods available.
   if ($pane_values['payment_methods']) {
