@@ -510,7 +510,7 @@ function commerce_cart_order_load($uid = 0) {
     else {
       // Otherwise look for a shopping cart order ID in the session.
       if (commerce_cart_order_session_exists()) {
-        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
+        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
       }
     }
 
