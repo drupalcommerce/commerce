@@ -47,26 +47,23 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   // Extract the type of profile represented by this pane from its ID.
   $type = substr($checkout_pane['pane_id'], 17);
 
-  // Find the referenced profile ID using the related reference field...
-  $profile_id = 0;
+  // Find the referenced profile using the related reference field...
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $profile = NULL;
 
+  // If the associated order field has been set...
   if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
-    if (!empty($order->{$field_name}[LANGUAGE_NONE][0]['profile_id'])) {
-      $profile_id = $order->{$field_name}[LANGUAGE_NONE][0]['profile_id'];
-    }
+    $profile = $wrapper->{$field_name}->value();
   }
   else {
     // Or try the association stored in the order's data array if no field is set.
     if (!empty($order->data['profiles'][$checkout_pane['pane_id']])) {
-      $profile_id = $order->data['profiles'][$checkout_pane['pane_id']];
+      $profile = commerce_customer_profile_load($order->data['profiles'][$checkout_pane['pane_id']]);
     }
   }
 
   // Create a new profile of the specified type if it hasn't already been made.
-  if (!empty($profile_id)) {
-    $profile = commerce_customer_profile_load($profile_id);
-  }
-  else {
+  if (empty($profile)) {
     $profile = commerce_customer_profile_new($type, $order->uid);
   }
 
@@ -114,8 +111,10 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
   commerce_customer_profile_save($profile);
 
   // Store the profile ID for the related field as specified on the settings form.
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
   if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
-    $order->{$field_name}[LANGUAGE_NONE][0]['profile_id'] = $profile->profile_id;
+    $wrapper->{$field_name} = $profile;
   }
   else {
     // Or make the association in the order's data array if no field was found.
@@ -130,7 +129,7 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
 function commerce_customer_profile_pane_review($form, $form_state, $checkout_pane, $order) {
   // Load the profile based on the related customer profile reference field...
   if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
-    $profile = commerce_customer_profile_load($order->{$field_name}[LANGUAGE_NONE][0]['profile_id']);
+    $profile = entity_metadata_wrapper('commerce_order', $order)->{$field_name}->value();
   }
   else {
     // Or use the association stored in the order's data array if no field is set.
