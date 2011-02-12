@@ -1177,13 +1177,12 @@ function commerce_line_items_quantity($line_items, $type = '') {
   $quantity = 0;
 
   foreach ($line_items as $line_item) {
-    if (empty($type) || $line_item->type == $type) {
-      if (is_a($line_item, 'EntityMetadataWrapper')) {
-        $quantity += $line_item->quantity->value();
-      }
-      else {
-        $quantity += $line_item->quantity;
-      }
+    if (!is_a($line_item, 'EntityMetadataWrapper')) {
+      $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
+    }
+
+    if (empty($type) || $line_item->type->value() == $type) {
+      $quantity += $line_item->quantity->value();
     }
   }
 
