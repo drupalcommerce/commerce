@@ -1,0 +1,249 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Functional tests for the commerce checkout module.
+ */
+
+/**
+ * Test checkout process.
+ */
+class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
+	/**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+	/**
+   * Checkout url.
+   */
+  protected $cart_url;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce checkout process functional tests',
+      'description' => 'Tests the checkout process.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    // User creation for different operations.
+    $this->site_admin = $this->createSiteAdmin();
+    $this->store_admin = $this->createStoreAdmin();
+    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+
+    // The rule that sends a mail after checkout completion should be disabled
+    //  as it returns an error caused by how mail messages are stored.
+    $rules_config = rules_config_load('commerce_checkout_order_email');
+    $rules_config->active = FALSE;
+    $rules_config->save();
+
+    // Get the checkout url.
+    $links = commerce_line_item_summary_links();
+    $this->checkout_url = $links['checkout']['href'];
+  }
+
+  protected function generateAddressInformation() {
+    $address_info['name_line'] = $this->randomName();
+    $address_info['thoroughfare'] = $this->randomName();
+    $address_info['locality'] = $this->randomName();
+    $address_info['postal_code'] = rand(00000, 99999);
+
+    return $address_info;
+  }
+
+  /**
+   * Test changing the weight and page of a pane.
+   */
+  public function testCommerceCheckoutPanesForm() {
+    // Log in as store admin
+    $this->drupalLogin($this->store_admin);
+    // Access to the config page for checkout forms
+    $this->drupalGet('admin/commerce/config/checkout/form');
+    $this->assertResponse(200);
+
+    // Modify weight of the panes
+    $this->drupalPost('admin/commerce/config/checkout/form', array('panes[cart_contents][weight]'=> 1), t('Save configuration'));
+    $this->assertOptionSelected('edit-panes-cart-contents-weight', 1, t('Pane weight changed'));
+
+    // Change one pane to other page
+    $this->drupalPost('admin/commerce/config/checkout/form', array('panes[checkout_review][page]'=> 'disabled'), t('Save configuration'));
+    $this->assertOptionSelected('edit-panes-checkout-review-page', 'disabled', t('Pane page changed'));
+  }
+
+  /**
+   * Test the checkout process using an authenticated user.
+   */
+  public function testCommerceCheckoutProcessAuthenticatedUser() {
+    // Log in as normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Order creation, in cart status.
+    $this->order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Access to checkout page.
+    $this->drupalGet($this->checkout_url);
+
+    // Check if the page resolves and if the default panes are present
+    $this->assertResponse(200);
+    $this->assertTitle(t('Checkout') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertText(t('Shopping cart contents'), t('Shopping cart contents pane is present'));
+    $this->assertText(t('Billing information'), t('Billing information pane is present'));
+
+    // We are testing with authenticated user, so no account information
+    //  should appear
+    $this->assertNoText(t('Account information'), t('Account information pane is not present'));
+
+    // Generate random information, as city, postal code, etc.
+    $address_info = $this->generateAddressInformation();
+
+    // Fill in the billing address information
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+
+    // Check if the country has been selected correctly, this uses XPath as the
+    //  ajax call replaces the element and the id may change
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-customer-profile-billing-commerce-billing-address')]//option[@selected='selected']", 'US', t('Country selected'));
+
+    // Fill in the required information for billing pane, with a random State.
+    $info = array(
+      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
+    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
+    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
+    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+    );
+    $this->drupalPost(NULL, $info, t('Continue'));
+
+    // Check for default panes and information in this checkout phase.
+    $this->assertTitle(t('Review order') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertText($address_info['name_line'], t('Check billing information'));
+    $this->assertText($address_info['thoroughfare'], t('Check billing information'));
+    $this->assertText($address_info['locality'], t('Check billing information'));
+    $this->assertText(trim($address_info['postal_code']), t('Check billing information'));
+    $this->assertText('United States', t('Check billing information'));
+    $this->assertText('Example payment', t('Check example payment method'));
+
+    // Load the order to check the status.
+    $order = commerce_order_load($this->order->order_id);
+    // At this point we should be in Checkout Review.
+    $this->assertEqual($order->status, 'checkout_review', t('Order status is Checkout Review in the review phase.'));
+
+    // Test the back & continue buttons.
+    $this->drupalPost(NULL, array(), t('Back'));
+    $this->assertTitle(t('Checkout') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->assertTitle(t('Review order') . ' | Drupal', t('Title of the checkout phase checked'));
+
+    // Finish checkout process
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+
+    // Reload the order directly from db to update status.
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+
+    // Order status should be pending when completing checkout process.
+    $this->assertEqual(reset($order)->status, 'pending', t('Order status is Pending after completing checkout.'));
+    // Check if the completion message has been displayed.
+    $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertRaw('<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $this->order->order_number)) . '</div>', t('Completion message displayed'));
+  }
+
+  /**
+   * Test the checkout process with anonymous user.
+   */
+  public function testCommerceCheckoutProcessAnonymousUser() {
+    // Login as admin user to grat permissions and do set up.
+    $this->drupalLogin($this->site_admin);
+    // Enable the helper module.
+    module_enable(array('commerce_checkout_test'));
+    menu_rebuild();
+    // Grant Anonymous user to use checkout.
+    $this->assertTrue(module_exists('commerce_checkout_test'), t('Test Commerce Checkout module enabled.'));
+    user_role_change_permissions(DRUPAL_ANONYMOUS_RID, array(
+      'access checkout' => TRUE,
+    ));
+    // Log out to continue the process as anonymous.
+    $this->drupalLogout();
+
+    // Order creation, in cart status.
+    $this->order = $this->createDummyOrder(0);
+
+    // Fill the session cart variables with the order id through the helper
+    //  callback.
+    $this->drupalGet('commerce-checkout-test-cart-session-anonymous/'.$this->order->order_id);
+
+    // Access to checkout page.
+    $this->drupalGet($this->checkout_url);
+
+    // Check if the page resolves and if the default panes are present
+    $this->assertResponse(200);
+    $this->assertTitle(t('Checkout') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertText(t('Shopping cart contents'), t('Shopping cart contents pane is present'));
+    $this->assertText(t('Billing information'), t('Billing information pane is present'));
+    $this->assertText(t('Account information'), t('Account information pane is present'));
+
+    // Generate random information, as user name, city, etc.
+    $user_mail = $this->randomName() . '@example.com';
+    $address_info = $this->generateAddressInformation();
+
+    // Fill in the billing address information
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+
+    // Check if the country has been selected correctly, this uses XPath as the
+    //  ajax call replaces the element and the id may change
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-customer-profile-billing-commerce-billing-address')]//option[@selected='selected']", 'US', t('Country selected'));
+
+    // Fill in the required information for billing pane, with a random State.
+    $info = array(
+      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
+    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
+    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
+    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+    );
+
+    // Also add the mail for the account pane.
+    $info+= array(
+      'account[login][mail]' => $user_mail,
+    );
+
+    // Go to the next checkout step with the required information.
+    $this->drupalPost(NULL, $info, t('Continue'));
+
+    // Check for default panes and information in this checkout phase.
+    $this->assertTitle(t('Review order') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertText($address_info['name_line'], t('Check billing information'));
+    $this->assertText($address_info['thoroughfare'], t('Check billing information'));
+    $this->assertText($address_info['locality'], t('Check billing information'));
+    $this->assertText(trim($address_info['postal_code']), t('Check billing information'));
+    $this->assertText('United States', t('Check billing information'));
+    $this->assertText($user_mail, t('Check account information'));
+    $this->assertText('Example payment', t('Check example payment method'));
+
+    // Load the order to check the status.
+    $order = commerce_order_load($this->order->order_id);
+    // At this point we should be in Checkout Review.
+    $this->assertEqual($order->status, 'checkout_review', t('Order status is Checkout Review in the review phase.'));
+
+    // Finish checkout process
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+
+    // Reload the order directly from db to update status.
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+
+    // Order status should be pending when completing checkout process.
+    $this->assertEqual(reset($order)->status, 'pending', t('Order status is Pending after completing checkout.'));
+    // Check if the completion message has been displayed.
+    $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Title of the checkout phase checked'));
+    $this->assertRaw('<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $this->order->order_number)) . '</div>', t('Completion message displayed'));
+  }
+}

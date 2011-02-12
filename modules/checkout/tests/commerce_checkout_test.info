@@ -1,0 +1,7 @@
+; $Id$
+name = Commerce Checkout test
+description = Provides test helper callbacks and functions for Commerce Checkout tests.
+package = Testing
+version = VERSION
+core = 7.x
+hidden = TRUE

@@ -8,4 +8,4 @@ dependencies[] = commerce_order
 core = 7.x
 
 ; Simple tests
-; files[] = tests/commerce_checkout.test
+files[] = tests/commerce_checkout.test

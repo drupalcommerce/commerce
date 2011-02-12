@@ -1,0 +1,33 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Helper functions and callbacks for checkout tests.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_checkout_test_menu() {
+  $items = array();
+  $items['commerce-checkout-test-cart-session-anonymous/%'] = array(
+    'title' => 'Place session variables to anonymous cart',
+    'page callback' => 'commerce_checkout_test_cart_session_anonymous',
+  	'page arguments' => array(1),
+    'access callback' => 'user_is_anonymous',
+  	'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ *
+ */
+function commerce_checkout_test_cart_session_anonymous($order_id) {
+  if (is_numeric($order_id)) {
+    $_SESSION['commerce_cart_orders'] = array($order_id);
+  }
+  return t('Commerce cart order session variable set.');
+}
+
