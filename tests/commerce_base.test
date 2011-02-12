@@ -260,11 +260,14 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @param $field_name
    *  Only used if $attach_product_reference_field is TRUE. Sets the name for
    *  the field instance to attach. Creates the field if it doesn't exist.
+   * @param $cardinality_reference_field
+   *  Only used if $attach_product_reference_field is TRUE. Sets the
+   *  cardinality for the field instance to attach.
    * @return
    *  An object for the content type.
    * @see attachProductReferenceField()
    */
-  public function createDummyProductDisplayContentType($type = 'product_display', $attach_product_reference_field = TRUE, $field_name = 'field_product') {
+  public function createDummyProductDisplayContentType($type = 'product_display', $attach_product_reference_field = TRUE, $field_name = 'field_product', $cardinality_reference_field = 1) {
     // If the specified node type already exists, return it now.
     if ($content_type = node_type_load($type)) {
       return $content_type;
@@ -287,7 +290,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
     if ($attach_product_reference_field) {
       // Maybe $instance should be returned as well
-      $instance = $this->attachProductReferenceField($type, $field_name);
+      $instance = $this->attachProductReferenceField($type, $field_name, $cardinality_reference_field);
     }
 
     return $content_type;
@@ -307,7 +310,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  An object containing the field instance that was created.
    * @see createDummyProductDisplayContentType()
    */
-  public function attachProductReferenceField($content_type = 'product_display', $field_name = 'field_product') {
+  public function attachProductReferenceField($content_type = 'product_display', $field_name = 'field_product', $cardinality = 1) {
     if (module_exists('commerce_product')) {
       // Check if the field has already been created.
       $field_info = field_info_field($field_name);
@@ -316,7 +319,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
         $field = array(
           'field_name' => $field_name,
           'type' => 'commerce_product_reference',
-          'cardinality' => 1,
+          'cardinality' => $cardinality,
           'translatable' => FALSE,
         );
         field_create_field($field);
@@ -366,8 +369,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   /**
    * Creates a product display node with an associated product.
    *
-   * @param $product_id
-   *  Product ID to use for the product reference field.
+   * @param $product_ids
+   *  Array of product IDs to use for the product reference field.
    * @param $title
    *  Optional title for the product node. Will default to a random name.
    * @param $product_display_content_type
@@ -379,7 +382,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @return
    *  The newly saved $node object.
    */
-  public function createDummyProductNode($product_id, $title = '', $product_display_content_type = 'product_display', $product_ref_field_name = 'field_product') {
+  public function createDummyProductNode($product_ids, $title = '', $product_display_content_type = 'product_display', $product_ref_field_name = 'field_product') {
     if (module_exists('commerce_product')) {
       if (empty($title)) {
         $title = $this->randomString(10);
@@ -388,7 +391,9 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       node_object_prepare($node);
       $node->uid = 1;
       $node->title = $title;
-      $node->{$product_ref_field_name}[LANGUAGE_NONE][]['product_id'] = $product_id;
+      foreach ($product_ids as $product_id) {
+        $node->{$product_ref_field_name}[LANGUAGE_NONE][]['product_id'] = $product_id;
+      }
       node_save($node);
       return $node;
     } else {
@@ -415,7 +420,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       $title = "Product #$i";
       $price = $i*10;
       $product = $this->createDummyProduct($sku, $title, $price);
-      $product_node = $this->createDummyProductNode($product->product_id, $title);
+      $product_node = $this->createDummyProductNode(array($product->product_id), $title);
       $product_nodes[$i] = $product_node;
     }
     return $product_nodes;
@@ -489,8 +494,6 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
-
-
   }
 }
 
@@ -652,7 +655,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $sku = 'PROD-01';
     $product_name = 'Product One';
     $product = $this->createDummyProduct($sku, $product_name);
-    $product_node = $this->createDummyProductNode($product->product_id, $product_name);
+    $product_node = $this->createDummyProductNode(array($product->product_id), $product_name);
 
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('node/1');

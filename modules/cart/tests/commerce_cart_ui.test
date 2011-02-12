@@ -1,0 +1,486 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Unit tests for the commerce cart module.
+ */
+
+/**
+ * Test cart features for a product display that only has one product attached.
+ */
+class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
+  /**
+   * Product that is being added to the cart.
+   */
+  protected $product;
+
+  /**
+   * Product display.
+   */
+  protected $product_node;
+
+	/**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+	/**
+   * Cart url.
+   */
+  protected $cart_url;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce cart functional tests for simple products',
+      'description' => 'Tests cart features like add to cart, remove from cart, update quantities...',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+    $this->drupalLogin($this->site_admin);
+    // Create a dummy product display content type.
+    $this->createDummyProductDisplayContentType();
+
+    // Create dummy product display nodes (and their corresponding product
+    //  entities).
+    $sku = 'PROD-01';
+    $product_name = 'Product One';
+    $this->product = $this->createDummyProduct($sku, $product_name);
+    $this->product_node = $this->createDummyProductNode(array($this->product->product_id), $product_name);
+
+    // Log as a normal user to test cart process.
+    // User has to have the access checkout permission to check the Checkout
+    //  button integrity.
+    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+    $this->drupalLogin($this->normal_user);
+
+    // Submit the add to cart form.
+    $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
+
+    // Get the cart url.
+    $links = commerce_line_item_summary_links();
+    $this->cart_url = $links['view_cart']['href'];
+  }
+
+	/**
+   * Test if the product form has the correct structure.
+   */
+  public function testCommerceCartProductFormStructure() {
+    // Go to cart url.
+    $this->drupalGet('node/' . $this->product_node->nid);
+
+    $this->assertField('edit-submit', t('Add to cart button exists'));
+  }
+
+  /**
+   * Test if the product has been correctly added to the cart.
+   */
+  public function testCommerceCartAdd() {
+    // We check the cart message.
+    $this->assertRaw($this->product_node->title.'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+
+    // Test if the page resolves and there is something in the cart.
+    $this->assertResponse(200);
+    $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
+    $this->assertText($this->product->title, t('Product was added to the cart'));
+  }
+
+	/**
+   * Test if the cart form has the correct fields and structure.
+   */
+  public function testCommerceCartFormStructure() {
+    // Check if the form is present and it has the quantity field, remove and
+    //  submit buttons.
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+
+    // Check remove button.
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-delete')]", NULL, t('Remove button present'));
+
+    // Check quantity field.
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", NULL, t('Quantity field present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 1, t('Quantity field has correct number of items'));
+
+    // Check if the Update cart and Checkout buttons are present.
+    $this->assertField("edit-update", t('Update cart button present'));
+    $this->assertField("edit-checkout", t('Checkout button present'));
+  }
+
+	/**
+   * Test if the product is present in the order stored in db.
+   */
+  public function testCommerceCartOrder() {
+    // Load the current order of the user.
+    $order = commerce_cart_order_load($this->normal_user->uid);
+    $products = array();
+    $this->assertTrue(commerce_cart_order_is_cart($order), t('User has currently an order in cart status.'));
+    // Get the products out of the order and store them in an array.
+    foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+       if ($line_item_wrapper->type->value() == 'product') {
+         $product = $line_item_wrapper->commerce_product->value();
+         $products[$product->product_id]= $product;
+       }
+    }
+    // Check if the product is in the products array for the order.
+    $this->assertTrue(in_array($this->product->product_id, array_keys($products)), t('Product is actually in the cart'));
+  }
+
+	/**
+   * Test the quantity changes in the cart.
+   */
+  public function testCommerceCartChangeQty() {
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+    // Change quantity in the cart view form.
+    // We search for the first quantity field in the html and change the
+    //   amount there.
+    $qty = $this->xpath("//input[starts-with(@name, 'edit_quantity')]");
+    $this->drupalPost($this->cart_url, array((string) $qty[0]['name'] => 2), t('Update cart'));
+    // Check if the amount has been really changed.
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 2, t('Cart updated with new quantity'));
+  }
+
+	/**
+   * Test removing a product from the cart.
+   */
+  public function testCommerceCartRemove() {
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+    // Remove the product from the cart.
+    $this->drupalPost($this->cart_url, array(), t('Remove'));
+    // Test if the page resolves and there is something in the cart.
+    $this->assertText(t('Your shopping cart is empty.'), t('Removed product and cart is empty'));
+  }
+}
+
+/**
+ * Test cart features for a product display that has several products attached.
+ */
+class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
+  /**
+   * Products that are being added to the cart.
+   */
+  protected $products = array();
+
+  /**
+   * Titles of the products that are being added to the cart.
+   */
+  protected $product_titles = array();
+
+  /**
+   * Product display.
+   */
+  protected $product_node;
+
+	/**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+	/**
+   * Cart url.
+   */
+  protected $cart_url;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce cart functional tests with several products in a product display',
+      'description' => 'Tests cart features, add to cart, select other product...',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+    $this->drupalLogin($this->site_admin);
+    // Create a dummy product display content type.
+    $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', 2);
+
+    // Create dummy product display nodes (and their corresponding product
+    //  entities).
+    $products = array();
+    $sku = 'PROD-01';
+    $product_name = 'Product One';
+    $this->product_titles[] = $product_name;
+    $product = $this->createDummyProduct($sku, $product_name);
+    $this->products[$product->product_id] = $product;
+    $sku = 'PROD-02';
+    $product_name = 'Product Two';
+    $this->product_titles[] = $product_name;
+    $product = $this->createDummyProduct($sku, $product_name);
+    $this->products[$product->product_id] = $product;
+    $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
+
+    // Log as a normal user to test cart process.
+    // User has to have the access checkout permission to check the Checkout
+    //  button integrity.
+    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+    $this->drupalLogin($this->normal_user);
+
+    // Submit the add to cart form.
+    $this->drupalPost('node/' . $this->product_node->nid, array('product_id' => $this->products[2]->product_id), t('Add to cart'));
+
+    // Get the cart url.
+    $links = commerce_line_item_summary_links();
+    $this->cart_url = $links['view_cart']['href'];
+  }
+
+  /**
+   * Test the structure of the product form.
+   */
+  public function testCommerceCartProductFormStructure() {
+    $option_titles = array();
+    // Get the options of the product's select.
+    $options = $this->xpath("//select[@id='edit-product-id']//option");
+    foreach ($options as $option) {
+      $option_titles[] = (string) $option;
+    }
+
+    // Check if the selector exists.
+    $this->assertField('edit-product-id', t('The selector of products exists'));
+
+    // Check if the products actually are present in the selector.
+    $this->assertTrue($this->product_titles == $option_titles, t('Correct products are present in the selector'));
+
+    // Look for the Add to cart button.
+    $this->assertField('edit-submit', t('Add to cart button exists'));
+  }
+
+  /**
+   * Test to select one product and check if it has been correctly added to
+   *  the cart.
+   */
+  public function testCommerceCartSelectProductAdd() {
+    // Check the cart message.
+    $this->assertRaw($this->product_titles[1].'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+
+    // Test if the page resolves and there is something in the cart.
+    $this->assertResponse(200);
+    $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
+    $this->assertText($this->product_titles[1], t('Product was added to the cart'));
+  }
+
+	/**
+   * Test if the cart form has the correct fields and structure.
+   */
+  public function testCommerceCartFormStructure() {
+    // Check if the form is present and it has the quantity field, remove and
+    //  submit buttons.
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+
+    // Check remove button.
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-delete')]", NULL, t('Remove button present'));
+
+    // Check quantity field.
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", NULL, t('Quantity field present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 1, t('Quantity field has correct number of items'));
+
+    // Check if the Update cart and Checkout buttons are present.
+    $this->assertField("edit-update", t('Update cart button present'));
+    $this->assertField("edit-checkout", t('Checkout button present'));
+  }
+
+	/**
+   * Test if the product is present in the order stored in db.
+   */
+  public function testCommerceCartOrder() {
+    $products_in_cart = array();
+    // Load the current order of the user.
+    $order = commerce_cart_order_load($this->normal_user->uid);
+
+    // Check if the user has at least one order in cart status.
+    $this->assertTrue(commerce_cart_order_is_cart($order), t('User has currently an order in cart status.'));
+
+    // Get the products out of the order and store them in an array.
+    foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+       if ($line_item_wrapper->type->value() == 'product') {
+         $product = $line_item_wrapper->commerce_product->value();
+         $products_in_cart[$product->product_id]= $product;
+       }
+    }
+
+    // Check if the product is in the products array for the order.
+    $this->assertTrue(in_array($this->products[2]->product_id, array_keys($products_in_cart)), t('Product is actually in the cart'));
+  }
+}
+
+/**
+ * Test cart features for a product with attributes.
+ */
+class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
+  /**
+   * Products that are being added to the cart.
+   */
+  protected $products = array();
+
+  /**
+   * Product display.
+   */
+  protected $product_node;
+
+	/**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+	/**
+   * Cart url.
+   */
+  protected $cart_url;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce cart functional tests with attributes',
+      'description' => 'Tests cart features like switch attributes, add to cart...',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+    $this->drupalLogin($this->site_admin);
+    // Create a dummy product display content type.
+    $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', FIELD_CARDINALITY_UNLIMITED);
+
+    // Create the fields and bind them to the product.
+    $this->fields['field_1'] = array(
+    	'field_name' => 'field_1',
+    	'type' => 'list_text',
+    	'cardinality' => 1,
+    	'settings' => array(
+        'allowed_values' => array('field_1_value_1' => 'field_1_value_1', 'field_1_value_2' => 'field_1_value_2'),
+      ),
+    );
+    $this->fields['field_1'] = field_create_field($this->fields['field_1']);
+    $this->fields['field_2'] = array(
+    	'field_name' => 'field_2',
+    	'type' => 'list_text',
+    	'cardinality' => 1,
+    	'settings' => array(
+        'allowed_values' => array('field_2_value_1' => 'field_2_value_1', 'field_2_value_2' => 'field_2_value_2'),
+      ),
+    );
+    $this->fields['field_2'] = field_create_field($this->fields['field_2']);
+    foreach ($this->fields as $field) {
+      $instance = array(
+        'field_name' => $field['field_name'],
+        'entity_type' => 'commerce_product',
+        'bundle' => 'product',
+        'label' => $field['field_name']. '_label',
+        'description' => $field['field_name'] . '_description',
+        'required' => TRUE,
+        'widget' => array(
+          'module' => 'options',
+          'type' => 'options_select',
+        ),
+      );
+      field_create_instance($instance);
+    }
+
+    // Populate the different values for the fields and create products.
+    foreach ($this->fields['field_1']['settings']['allowed_values'] as  $field_1_value) {
+      foreach ($this->fields['field_2']['settings']['allowed_values'] as $field_2_value) {
+        $product = $this->createDummyProduct('PROD-' . $field_1_value . '-' . $field_2_value , $field_1_value.'_'.$field_2_value);
+        $product->field_1[LANGUAGE_NONE][0]['value'] = $field_1_value;
+        $product->field_2[LANGUAGE_NONE][0]['value'] = $field_2_value;
+        field_attach_update('commerce_product', $product);
+        $this->products[$product->product_id] = $product;
+      }
+    }
+
+    // Create dummy product display node.
+    $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
+    // Log as a normal user to test cart process.
+    // User has to have the access checkout permission to check the Checkout
+    //  button integrity.
+    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+    $this->drupalLogin($this->normal_user);
+
+    // Get the cart url.
+    $links = commerce_line_item_summary_links();
+    $this->cart_url = $links['view_cart']['href'];
+  }
+
+  /**
+   * Test the add to cart functional process with attributes.
+   */
+  public function AAtestCommerceCartSelectProductAdd() {
+    // Go to product page.
+    $this->drupalGet('node/' . $this->product_node->nid);
+    // Set the product that we are checking.
+    $product = entity_metadata_wrapper('commerce_product', $this->products[3]);
+
+    // Select one of the attributes.
+    $this->drupalPostAJAX(NULL, array('attributes[field_1]' => $product->field_1->value()), 'attributes[field_1]');
+    // Add product to the cart.
+    $this->drupalPost(NULL, array(), t('Add to cart'));
+
+    // We check the cart message.
+    $this->assertRaw('field_1_value_2_field_2_value_1'.'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+
+    // Go to cart url.
+    $this->drupalGet($this->cart_url);
+
+    // Test if the page resolves and there is something in the cart.
+    $this->assertResponse(200);
+    $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
+    $this->assertText('field_1_value_2_field_2_value_1', t('Product was added to the cart'));
+
+  }
+
+  /**
+   * Test the form structure of the Product.
+   */
+  public function testCommerceCartProductFormStructure() {
+    $this->drupalGet('node/' . $this->product_node->nid);
+    // Check whether the attribute selectors exist.
+    $this->assertField('edit-attributes-field-1', t('First attribute selector exists'));
+    $this->assertField('edit-attributes-field-2', t('Second attribute selector exists'));
+
+    // Check the number of attributes.
+    $options = $this->xpath("//select[@id='edit-attributes-field-1']//option");
+    $this->assertEqual(count($options), count($this->fields['field_1']['settings']['allowed_values']), t('Number of options for first attribute match'));
+    $options = $this->xpath("//select[@id='edit-attributes-field-2']//option");
+    $this->assertEqual(count($options), count($this->fields['field_2']['settings']['allowed_values']), t('Number of options for second attribute match'));
+
+    // Look for the Add to cart button.
+    $this->assertField('edit-submit', t('Add to cart button exists'));
+  }
+}
