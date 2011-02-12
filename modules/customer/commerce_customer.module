@@ -759,6 +759,14 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
 
       field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
+      // Tweak the form to remove the fieldset from address fields.
+      $field_name = 'commerce_' . $profile_type['type'] . '_address';
+      $language = $element['profiles'][$key][$field_name]['#language'];
+
+      foreach (element_children($element['profiles'][$key][$field_name][$language]) as $delta) {
+        $element['profiles'][$key][$field_name][$language][$delta]['#type'] = 'container';
+      }
+
       // Remove the default #parents array so the normal tree can do its thing.
       unset($element['profiles'][$key]['#parents']);
 
