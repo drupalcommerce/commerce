@@ -200,7 +200,7 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
   );
 
   $form['tax_rate']['component'] = array(
-    '#type' => 'checkox',
+    '#type' => 'checkbox',
     '#title' => t("Define a default Rules component for determining this tax rate's applicability to a product."),
     '#default_value' => $tax_rate['component'],
   );
