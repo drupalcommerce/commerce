@@ -233,12 +233,13 @@ function commerce_order_ui_views_default_views() {
 
   $views[$view->name] = $view;
 
+  // User order history displayed at user/%/orders.
   $view = new view;
-  $view->name = 'customer_orders';
-  $view->description = 'Display a list of orders for the logged in user.';
+  $view->name = 'commerce_user_orders';
+  $view->description = 'Display a list of completed orders for a user.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = 'Customer Orders';
+  $view->human_name = 'User Orders';
   $view->core = 7;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -247,12 +248,12 @@ function commerce_order_ui_views_default_views() {
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->display->display_options['title'] = 'Orders';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'access orders';
+  $handler->display->display_options['access']['perm'] = 'view own orders';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = 50;
+  $handler->display->display_options['pager']['options']['items_per_page'] = 25;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'order_number' => 'order_number',
@@ -296,7 +297,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['empty']['text']['table'] = 'views';
   $handler->display->display_options['empty']['text']['field'] = 'area';
   $handler->display->display_options['empty']['text']['empty'] = FALSE;
-  $handler->display->display_options['empty']['text']['content'] = 'No orders have been created yet.';
+  $handler->display->display_options['empty']['text']['content'] = 'You have not placed any orders with us yet.';
   /* Relationship: Commerce Order: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_order';
@@ -410,16 +411,25 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['arguments']['uid']['table'] = 'users';
   $handler->display->display_options['arguments']['uid']['field'] = 'uid';
   $handler->display->display_options['arguments']['uid']['relationship'] = 'uid';
-  $handler->display->display_options['arguments']['uid']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['uid']['default_action'] = 'not found';
   $handler->display->display_options['arguments']['uid']['style_plugin'] = 'default_summary';
   $handler->display->display_options['arguments']['uid']['default_argument_type'] = 'fixed';
-  $handler->display->display_options['arguments']['uid']['validate_type'] = 'commerce_user';
-  $handler->display->display_options['arguments']['uid']['validate_options']['restrict_roles'] = 0;
+  $handler->display->display_options['arguments']['uid']['validate_type'] = 'current_user_or_role';
+  $handler->display->display_options['arguments']['uid']['validate_options']['restrict_roles'] = '1';
   $handler->display->display_options['arguments']['uid']['validate_options']['roles'] = array(
-    0 => '3',
+    3 => '3',
   );
   $handler->display->display_options['arguments']['uid']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['uid']['not'] = 0;
+  /* Filter: Commerce Order: Order state */
+  $handler->display->display_options['filters']['state']['id'] = 'state';
+  $handler->display->display_options['filters']['state']['table'] = 'commerce_order';
+  $handler->display->display_options['filters']['state']['field'] = 'state';
+  $handler->display->display_options['filters']['state']['operator'] = 'not in';
+  $handler->display->display_options['filters']['state']['value'] = array(
+    'cart' => 'cart',
+    'checkout' => 'checkout',
+  );
 
   /* Display: User Orders */
   $handler = $view->new_display('page', 'User Orders', 'order_page');
@@ -429,10 +439,10 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['menu']['weight'] = '15';
   $handler->display->display_options['tab_options']['type'] = 'normal';
   $handler->display->display_options['tab_options']['title'] = 'Orders';
-  $handler->display->display_options['tab_options']['description'] = 'User ordes in the store.';
+  $handler->display->display_options['tab_options']['description'] = 'User orders in the store.';
   $handler->display->display_options['tab_options']['weight'] = '';
   $handler->display->display_options['tab_options']['name'] = 'user-menu';
-  $translatables['customer_orders'] = array(
+  $translatables['commerce_user_orders'] = array(
     t('Defaults'),
     t('Orders'),
     t('more'),
@@ -444,7 +454,7 @@ function commerce_order_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
-    t('No orders have been created yet.'),
+    t('You have not placed any orders with us yet.'),
     t('Order owner'),
     t('Uid'),
     t('Order ID'),

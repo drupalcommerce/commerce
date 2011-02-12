@@ -89,9 +89,9 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       if ($pane_form = $callback($form, $form_state, $checkout_pane, $order)) {
         $form[$pane_id] = $pane_form + array(
           '#type' => 'fieldset',
-          '#title' => check_plain($checkout_pane->title),
-          '#collapsible' => $checkout_pane->collapsible,
-          '#collapsed' => $checkout_pane->collapsed,
+          '#title' => check_plain($checkout_pane['title']),
+          '#collapsible' => $checkout_pane['collapsible'],
+          '#collapsed' => $checkout_pane['collapsed'],
           '#attributes' => array('class' => array($pane_id)),
           '#tree' => TRUE,
         );

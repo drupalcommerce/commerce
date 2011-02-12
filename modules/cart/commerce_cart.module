@@ -72,7 +72,7 @@ function commerce_cart_menu_item_title() {
 function commerce_cart_commerce_order_state_info() {
   $order_states = array();
 
-  $order_states['cart'] = (object) array(
+  $order_states['cart'] = array(
     'name' => 'cart',
     'title' => t('Shopping cart'),
     'description' => t('Orders in this state have not been completed by the customer yet.'),
@@ -89,7 +89,7 @@ function commerce_cart_commerce_order_state_info() {
 function commerce_cart_commerce_order_status_info() {
   $order_statuses = array();
 
-  $order_statuses['cart'] = (object) array(
+  $order_statuses['cart'] = array(
     'name' => 'cart',
     'title' => t('Shopping cart'),
     'state' => 'cart',
@@ -105,7 +105,7 @@ function commerce_cart_commerce_order_status_info() {
 function commerce_cart_commerce_checkout_pane_info() {
   $checkout_panes = array();
 
-  $checkout_panes['cart_contents'] = (object) array(
+  $checkout_panes['cart_contents'] = array(
     'title' => t('Shopping cart contents'),
     'base' => 'commerce_cart_contents_pane',
     'file' => 'includes/commerce_cart.checkout_pane.inc',

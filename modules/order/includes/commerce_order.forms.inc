@@ -47,7 +47,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
 
   foreach (commerce_order_state_get_title() as $name => $title) {
     foreach (commerce_order_statuses(array('state' => $name)) as $order_status) {
-      $options[check_plain($title)][$order_status->name] = check_plain($order_status->title);
+      $options[check_plain($title)][$order_status['name']] = check_plain($order_status['title']);
     }
   }
 

@@ -181,7 +181,7 @@ function commerce_payment_commerce_checkout_page_info() {
 function commerce_payment_commerce_checkout_pane_info() {
   $checkout_panes = array();
 
-  $checkout_panes['commerce_payment'] = (object) array(
+  $checkout_panes['commerce_payment'] = array(
     'title' => t('Payment'),
     'page' => 'review',
     'locked' => TRUE,
@@ -190,7 +190,7 @@ function commerce_payment_commerce_checkout_pane_info() {
     'weight' => 10,
   );
 
-  $checkout_panes['commerce_payment_redirect'] = (object) array(
+  $checkout_panes['commerce_payment_redirect'] = array(
     'title' => t('Off-site payment redirect'),
     'page' => 'payment',
     'locked' => TRUE,

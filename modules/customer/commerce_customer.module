@@ -135,7 +135,7 @@ function commerce_customer_theme() {
 function commerce_customer_commerce_customer_profile_type_info() {
   $profile_types = array();
 
-  $profile_types['billing'] = (object) array(
+  $profile_types['billing'] = array(
     'type' => 'billing',
     'name' => t('Billing information'),
     'description' => t('The profile used to collect billing information on the checkout and order forms.'),
@@ -153,8 +153,8 @@ function commerce_customer_commerce_checkout_pane_info() {
   $weight = 5;
 
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
-    $checkout_panes['customer_profile_' . $type] = (object) array(
-      'title' => $profile_type->name,
+    $checkout_panes['customer_profile_' . $type] = array(
+      'title' => $profile_type['name'],
       'file' => 'includes/commerce_customer.checkout_pane.inc',
       'base' => 'commerce_customer_profile_pane',
       'page' => 'checkout',
@@ -166,7 +166,7 @@ function commerce_customer_commerce_checkout_pane_info() {
 }
 
 /**
- * Returns an array of customer profile type objects keyed by type.
+ * Returns an array of customer profile type arrays keyed by type.
  */
 function commerce_customer_profile_types() {
   // First check the static cache for a profile types array.
@@ -178,7 +178,7 @@ function commerce_customer_profile_types() {
     foreach (module_implements('commerce_customer_profile_type_info') as $module) {
       foreach (module_invoke($module, 'commerce_customer_profile_type_info') as $type => $profile_type) {
         // Set the module each profile type is defined by.
-        $profile_type->module = $module;
+        $profile_type['module'] = $module;
         $profile_types[$type] = $profile_type;
       }
     }
@@ -221,7 +221,7 @@ function commerce_customer_profile_type_get_name($type = NULL) {
   // Return a type name if specified and it exists.
   if (!empty($type)) {
     if (isset($profile_types[$type])) {
-      return $profile_types[$type]->name;
+      return $profile_types[$type]['name'];
     }
     else {
       // Return FALSE if it does not exist.
@@ -231,7 +231,7 @@ function commerce_customer_profile_type_get_name($type = NULL) {
 
   // Otherwise turn the array values into the type name only.
   foreach ($profile_types as $key => $value) {
-    $profile_types[$key] = $value->name;
+    $profile_types[$key] = $value['name'];
   }
 
   return $profile_types;
@@ -248,7 +248,7 @@ function commerce_customer_profile_type_options_list() {
  * Title callback: return the human-readable customer profile type name.
  */
 function commerce_customer_profile_type_title($profile_type) {
-  return $profile_type->name;
+  return $profile_type['name'];
 }
 
 /**
@@ -748,7 +748,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
       // Add a fieldset around the profile form.
       $element['profiles'][$key] = array(
         '#type' => 'fieldset',
-        '#title' => check_plain($profile_type->name),
+        '#title' => check_plain($profile_type['name']),
       );
 
       // Store the original customer profile for later comparison.
