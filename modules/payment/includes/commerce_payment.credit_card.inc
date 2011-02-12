@@ -365,5 +365,10 @@ function commerce_payment_credit_card_types() {
     'mastercard' => t('MasterCard'),
     'discover' => t('Discover'),
     'amex' => t('American Express'),
+    'maestro' => t('Maestro'),
+    'delta' => t('Visa Debit / Delta'),
+    'dc' => t("Diner's Club"),
+    'jcb' => t('JCB'),
+    'laser' => t('Laser')
   );
 }
