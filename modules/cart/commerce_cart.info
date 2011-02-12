@@ -14,4 +14,4 @@ core = 7.x
 files[] = includes/views/handlers/commerce_cart_handler_field_add_to_cart_form.inc
 
 ; Simple tests
-files[] = tests/commerce_cart_ui.test
+files[] = tests/commerce_cart.test
