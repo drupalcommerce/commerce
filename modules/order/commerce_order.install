@@ -67,6 +67,13 @@ function commerce_order_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'hostname' => array(
+        'description' => 'The IP address that created this order.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'data' => array(
         'type' => 'blob',
         'not null' => FALSE,
@@ -143,6 +150,13 @@ function commerce_order_schema() {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+      ),
+      'revision_hostname' => array(
+        'description' => 'The IP address that created this order.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
       ),
       'data' => array(
         'type' => 'blob',

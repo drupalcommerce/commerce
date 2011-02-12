@@ -262,7 +262,7 @@ function commerce_cart_user_login(&$edit, $account) {
   if (commerce_cart_order_session_exists(NULL, TRUE)) {
     foreach (commerce_cart_order_session_order_ids(TRUE) as $order_id) {
       if ($order = commerce_order_load($order_id)) {
-        if ($order->uid == 0) {
+        if ($order->uid == 0 && $order->hostname == ip_address()) {
           $order->uid = $account->uid;
           commerce_order_save($order);
         }
@@ -508,7 +508,12 @@ function commerce_cart_order_load($uid = 0) {
     else {
       // Otherwise look for a shopping cart order ID in the session.
       if (commerce_cart_order_session_exists()) {
-        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
+        // We can't trust a user's session to contain only their order IDs, as
+        // they could've edited their session to try and gain access to someone
+        // else's order data. Therefore, this query restricts its search to
+        // orders assigned to anonymous users using the same IP address to try
+        // and mitigate risk as much as possible.
+        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
       }
     }
 

@@ -67,11 +67,13 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       // Set the timestamp fields.
       if (empty($order->created)) {
         $order->created = REQUEST_TIME;
+        $order->hostname = ip_address();
       }
 
       $order->changed = REQUEST_TIME;
 
       $order->revision_timestamp = REQUEST_TIME;
+      $order->revision_hostname = ip_address();
       $update_order = TRUE;
 
       // Update the order total field's value.
