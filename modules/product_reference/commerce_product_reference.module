@@ -675,7 +675,7 @@ function commerce_product_reference_configure_line_item() {
 function commerce_product_line_item_title($line_item) {
   // Currently, just return the product's title.  However, in the future replace
   // this with the product preview build mode.
-  if ($product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id'])) {
+  if ($product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value()) {
     return check_plain($product->title);
   }
 }
