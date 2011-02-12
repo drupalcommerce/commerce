@@ -63,9 +63,9 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
 
   function render($empty = FALSE) {
     if (!$empty) {
-      // Construct a pseudo line item reference field array based on the View's
-      // results that we'll use to interact with the line item API.
-      $line_item_ids = array(LANGUAGE_NONE => array());
+      // Build an array of line item IDs from the View results that we will load
+      // and use for calculating totals.
+      $line_item_ids = array();
 
       // Find the alias for the line_item_id field.
       $field_alias = '';
@@ -78,13 +78,15 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
 
       foreach ($this->view->result as $result) {
         if (!empty($result->{$field_alias})) {
-          $line_item_ids[LANGUAGE_NONE][] = array('line_item_id' => $result->{$field_alias});
+          $line_item_ids[] = $result->{$field_alias};
         }
       }
 
+      $line_items = commerce_line_item_load_multiple($line_item_ids);
+
       // Add total information and the line item summary links.
-      $quantity = commerce_line_items_quantity($line_item_ids);
-      $total = commerce_line_items_total($line_item_ids);
+      $quantity = commerce_line_items_quantity($line_items);
+      $total = commerce_line_items_total($line_items);
       $currency = commerce_currency_load($total['currency_code']);
 
       $links = array();

@@ -861,8 +861,11 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
 
       $element['line_items'][$line_item_id]['commerce_unit_price'] = $widget_form['commerce_unit_price'];
 
+      // Wrap the line item and add its formatted total to the form.
+      $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
       $element['line_items'][$line_item_id]['commerce_total'] = array(
-        '#markup' => commerce_currency_format($line_item->commerce_total[LANGUAGE_NONE][0]['amount'], $line_item->commerce_total[LANGUAGE_NONE][0]['currency_code'], $line_item),
+        '#markup' => commerce_currency_format($wrapper->commerce_total->amount->value(), $wrapper->commerce_total->currency_code->value(), $line_item),
       );
     }
 
@@ -1158,41 +1161,29 @@ function commerce_line_item_reference_delete($entity_type, $entity, $field_name,
 }
 
 /**
- * Returns the total quantity of line items referenced by a reference field.
+ * Returns the total quantity of an array of line items.
  *
- * @param $value
- *   The value array of the field whose line items you want to count.
+ * @param $line_items
+ *   The array of line items whose quantities you want to count; also accepts an
+ *     EntityListWrapper of a line item reference field.
  * @param $type
  *   Optional type string to filter line items by type before counting.
- * @param $language
- *   The language within the value array to use; defaults to LANGUAGE_NONE.
  *
  * @return
- *   The total quantity of all the matching line items referenced by the field.
+ *   The total quantity of all the matching line items.
  */
-function commerce_line_items_quantity($value, $type = '', $language = '') {
-  // Return 0 if the $value array is empty.
-  if (empty($value)) {
-    return 0;
-  }
-
-  if (empty($language)) {
-    $language = LANGUAGE_NONE;
-  }
-
-  // Extract the line item IDs for the language.
-  $line_item_ids = array();
-
-  foreach ((array) $value[$language] as $data) {
-    $line_item_ids[] = $data['line_item_id'];
-  }
-
+function commerce_line_items_quantity($line_items, $type = '') {
   // Sum up the quantity of all matching line items.
   $quantity = 0;
 
-  foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+  foreach ($line_items as $line_item) {
     if (empty($type) || $line_item->type == $type) {
-      $quantity += $line_item->quantity;
+      if (is_a($line_item, 'EntityMetadataWrapper')) {
+        $quantity += $line_item->quantity->value();
+      }
+      else {
+        $quantity += $line_item->quantity;
+      }
     }
   }
 
@@ -1200,49 +1191,41 @@ function commerce_line_items_quantity($value, $type = '', $language = '') {
 }
 
 /**
- * Returns the total price and currency  of line items referenced by a field.
+ * Returns the total price and currency of an array of line items.
  *
- * @param $value
- *   The value array of the field whose line items you want to count.
+ * @param $line_items
+ *   The array of line items whose quantities you want to count; also accepts an
+ *     EntityListWrapper of a line item reference field.
  * @param $type
  *   Optional type string to filter line items by type before counting.
- * @param $language
- *   The language within the value array to use; defaults to LANGUAGE_NONE.
  *
  * @return
- *   An associative array of containing the total 'amount' and 'currency_code' of
- *     the referenced line items.
+ *   An associative array of containing the total 'amount' and 'currency_code'
+ *     the line items.
  */
-function commerce_line_items_total($value, $type = '', $language = '') {
-  if (empty($language)) {
-    $language = LANGUAGE_NONE;
-  }
-
-  // Extract the line item IDs for the language.
-  $line_item_ids = array();
-
-  foreach ($value[$language] as $data) {
-    $line_item_ids[] = $data['line_item_id'];
-  }
-
+function commerce_line_items_total($line_items, $type = '') {
   // Sum up the total price of all matching line items.
   $total = 0;
   $currency_code = '';
 
-  foreach (commerce_line_item_load_multiple($line_item_ids) as $line_item) {
+  foreach ($line_items as $line_item) {
+    if (!is_a($line_item, 'EntityMetadataWrapper')) {
+      $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
+    }
+
     if (empty($type) || $line_item->type == $type) {
       // Set the initial currency code.
       if (empty($currency_code)) {
-        $currency_code = $line_item->commerce_total[$language][0]['currency_code'];
+        $currency_code = $line_item->commerce_total->currency_code->value();
       }
       else {
-        // Check to see if the line items or of a mixed currency.
-        if ($currency_code != $line_item->commerce_total[$language][0]['currency_code']) {
+        // Check to see if the line items are of a mixed currency.
+        if ($currency_code != $line_item->commerce_total->currency_code->value()) {
           // TODO: Figure out what to do then!
         }
       }
 
-      $total += $line_item->commerce_total[$language][0]['amount'];
+      $total += $line_item->commerce_total->amount->value();
     }
   }
 

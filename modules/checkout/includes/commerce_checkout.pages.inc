@@ -26,7 +26,9 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
   }
 
   // If there are no line items on the order, redirect away.
-  if (commerce_line_items_quantity($order->commerce_line_items, 'product') == 0) {
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  if (commerce_line_items_quantity($wrapper->commerce_line_items, 'product') == 0) {
     drupal_goto('<front>');
   }
 

@@ -59,7 +59,8 @@ function commerce_cart_menu_item_title() {
   }
 
   // Count the number of product line items on the order.
-  $quantity = commerce_line_items_quantity($order->commerce_line_items, 'product');
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, 'product');
 
   // Return the title with an item count appended.
   return format_plural($quantity, 'Shopping cart (1 item)', 'Shopping cart (@count items)');
