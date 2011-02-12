@@ -856,8 +856,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'commerce_unit_price'));
 
       // Unset the title and description and add it to the line item form.
-      unset($widget_form['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#title']);
-      unset($widget_form['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#description']);
+      $language = $widget_form['commerce_unit_price']['#language'];
+      unset($widget_form['commerce_unit_price'][$language][0]['amount']['#title']);
+      unset($widget_form['commerce_unit_price'][$language][0]['amount']['#description']);
 
       $element['line_items'][$line_item_id]['commerce_unit_price'] = $widget_form['commerce_unit_price'];
 

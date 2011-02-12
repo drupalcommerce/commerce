@@ -182,10 +182,11 @@ function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_st
   // If the order being edited is in a shopping cart status...
   if (commerce_cart_order_is_cart($order)) {
     // Loop over the line items on the form...
-    foreach ($form['commerce_line_items'][LANGUAGE_NONE]['line_items'] as &$line_item) {
+    foreach ($form['commerce_line_items'][$form['commerce_line_items']['#language']]['line_items'] as &$line_item) {
       // Disable the unit price amount and currency code fields.
-      $line_item['commerce_unit_price'][LANGUAGE_NONE][0]['amount']['#disabled'] = TRUE;
-      $line_item['commerce_unit_price'][LANGUAGE_NONE][0]['currency_code']['#disabled'] = TRUE;
+      $language = $line_item['commerce_unit_price']['#language'];
+      $line_item['commerce_unit_price'][$language][0]['amount']['#disabled'] = TRUE;
+      $line_item['commerce_unit_price'][$language][0]['currency_code']['#disabled'] = TRUE;
     }
   }
 }
