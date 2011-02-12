@@ -36,8 +36,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Assign an anonymous order to a pre-existing user');
-  // TODO: Default this to TRUE once http://drupal.org/node/1044308 is fixed.
-  $rule->active = FALSE;
+  $rule->active = TRUE;
 
   $rule
     ->event('commerce_checkout_complete')
@@ -77,13 +76,17 @@ function commerce_checkout_default_rules_configuration() {
   foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
     $loop
       ->action('data_set', array(
-        'data:select' => 'order:' . strtr('customer-' . $type, '_', '-') . ':uid',
+        'data:select' => 'order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
         'value:select' => 'list-item:uid',
       ));
   }
 
   // Add the loop to the rule as an action.
   $rule->action($loop);
+
+  // Adjust the weight so this rule executes after the order status has been
+  // updated.
+  $rule->weight = 1;
 
   $rules['commerce_checkout_order_convert'] = $rule;
 
@@ -125,23 +128,43 @@ function commerce_checkout_default_rules_configuration() {
       'data:select' => 'account-created',
       'immediate' => 1,
     ))
+    ->action('entity_query', array(
+      'type' => 'user',
+      'property' => 'mail',
+      'value:select' => 'order:mail',
+      'limit' => 1,
+      'entity_fetched:label' => t('Fetched account'),
+      'entity_fetched:var' => 'account_fetched',
+    ));
+
+  // Build a loop that send the account notification e-mail and updates the
+  // order and customer profile uids with the uid from the fetched user account.
+  $loop = rules_loop(array(
+    'list:select' => 'account-fetched',
+    'item:var' => 'list_item',
+    'item:label' => t('Current list item'),
+    'item:type' => 'user',
+  ))
     ->action('send_account_email', array(
-      'account:select' => 'account-created',
+      'account:select' => 'list-item',
       'email_type' => 'register_admin_created',
     ))
     ->action('data_set', array(
       'data:select' => 'order:uid',
-      'value:select' => 'account-created:uid',
+      'value:select' => 'list-item:uid',
     ));
 
   // Accommodate any profile types referenced by the order.
   foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
-    $rule
+    $loop
       ->action('data_set', array(
-        'data:select' => 'order:' . strtr('customer-' . $type, '_', '-') . ':uid',
-        'value:select' => 'account-created:uid',
+        'data:select' => 'order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
+        'value:select' => 'list-item:uid',
       ));
   }
+
+  // Add the loop to the rule as an action.
+  $rule->action($loop);
 
   // Adjust the weight so this rule executes after the one checking for a pre-
   // existing user account.
