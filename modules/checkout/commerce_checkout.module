@@ -147,6 +147,16 @@ function commerce_checkout_entity_property_info_alter(&$info) {
   // TODO: Switch to using entity_metadata_table_query() when
   // http://drupal.org/node/1041240 is fixed.
   $info['user']['properties']['mail']['query callback'] = 'commerce_checkout_entity_metadata_table_query';
+
+  // TODO: Remove this once http://drupal.org/node/1044332 is fixed.
+  if (empty($info['user']['properties']['status'])) {
+    $info['user']['properties']['status'] = array(
+      'label' => t("Status"),
+      'description' => t("Whether the user is active(1) or blocked(0)."),
+      'setter callback' => 'entity_property_verbatim_set',
+      'type' => 'integer',
+    );
+  }
 }
 
 /**
