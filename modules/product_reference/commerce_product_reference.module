@@ -72,14 +72,14 @@ function commerce_product_reference_form_field_ui_display_overview_form_alter(&$
 }
 
 /**
- * Implements hook_form_FORMID_alter().
+ * Implements hook_form_FORM_ID_alter().
  *
  * When a product is being deleted. Display a message on the confirmation form
  * saying how many times the product is referenced in all product reference
  * fields.
  */
 function commerce_product_reference_form_commerce_product_product_delete_form_alter(&$form, &$form_state) {
-  $count = 0;
+  $items = array();
 
   // Check the data in every product reference field.
   foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
@@ -92,22 +92,34 @@ function commerce_product_reference_form_commerce_product_product_delete_form_al
     if (!empty($result)) {
       // Loop over results for each type of entity returned.
       foreach ($result as $entity_type => $data) {
-        // Load the entities of the current type.
-        $entities = entity_load($entity_type, array_keys($data));
-        $count += count($entities);
+        if (($count = count($data)) > 0) {
+          // For line item references, display a message about the inability of
+          // the product to be deleted and disable the submit button.
+          if ($entity_type == 'commerce_line_item') {
+            $form['description']['#markup'] .= '<p>' . t('This product is referenced by a line item and therefore cannot be deleted. Disable it instead.') . '</p>';
+            $form['actions']['submit']['#disabled'] = TRUE;
+            return;
+          }
+
+          // Load the entity information.
+          $entity_info = entity_get_info($entity_type);
+
+          // Add a message regarding the references.
+          $items[] = t('@entity_label: @count', array('@entity_label' => $entity_info['label'], '@count' => $count));
+        }
       }
     }
   }
 
-  if (!empty($count)) {
-    $form['description']['#markup'] .= '<p>' . format_plural($count, 'This product is referenced by 1 entity.', 'This product is referenced by @count entities.') . '</p>';
+  if (!empty($items)) {
+    $form['description']['#markup'] .= '<p>' . t('This product is referenced by the following entities: !entity_list', array('!entity_list' => theme('item_list', array('items' => $items)))) . '</p>';
   }
 }
 
 /**
  * Implements hook_commerce_product_delete().
  *
- * Remove references to this product in product all reference field contents.
+ * Remove references to this product in all product reference field contents.
  */
 function commerce_product_reference_commerce_product_delete($product) {
   // Check the data in every product reference field.
@@ -126,7 +138,7 @@ function commerce_product_reference_commerce_product_delete($product) {
 
         // Loop over each entity and remove the reference to the deleted product.
         foreach ($entities as $entity_id => $entity) {
-          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $line_item->line_item_id);
+          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $product->product_id);
 
           // Store the changes to the entity.
           entity_save($entity_type, $entity);

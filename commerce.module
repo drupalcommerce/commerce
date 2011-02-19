@@ -51,36 +51,42 @@ function commerce_info_fields($field_type, $entity_type = NULL) {
 }
 
 /**
- * Deletes the reference to a specific referenced entity from an entity
- * reference field on the given containing entity.
+ * Deletes a reference to another entity from an entity with a reference field.
  *
  * @param $entity_type
- *   Entity type of the containing entity.
+ *   Entity type of the entity with the reference field.
  * @param $entity
- *   The entity that contains the referenced entity.
+ *   The entity that contains the reference field.
  * @param $field_name
  *   The name of the entity reference field.
  * @param $ref_entity_id
- *   The id of the referenced entity.
+ *   The ID of the entity to delete from the reference field.
  *
  * @return
- *   An array of the matching fields keyed by the field name.
+ *   The updated entity with the reference deleted.
  */
 function commerce_entity_reference_delete($entity_type, $entity, $field_name, $ref_entity_id) {
   $wrapper = entity_metadata_wrapper($entity_type, $entity);
 
-  // Loop over every entity referenced by the specified field.
-  foreach ($wrapper->{$field_name} as $delta => $line_item_wrapper) {
-    $entity_type_info = entity_get_info($entity_type);
-    // If its ID matches the specified entity...
-    $entity_id_field_name = $entity_type_info['entity keys']['id'];
-    if ($line_item_wrapper->{$entity_id_field_name}->value() == $ref_entity_id) {
-      // Unset the referenced entity and return the containing updated entity.
-      $wrapper->{$field_name}->offsetUnset($delta);
-
-      return $wrapper->value();
+  // If the reference field is multiple value...
+  if (is_array($wrapper->{$field_name})) {
+    // Loop over every entity referenced by the specified field.
+    foreach ($wrapper->{$field_name} as $delta => $ref_entity_wrapper) {
+      // If its ID matches the specified entity...
+      if ($ref_entity_wrapper->getIdentifier() == $ref_entity_id) {
+        // Unset the referenced entity and return the containing updated entity.
+        $wrapper->{$field_name}->offsetUnset($delta);
+      }
     }
   }
+  else {
+    // Otherwise check the reference value directly.
+    if ($wrapper->{$field_name}->getIdentifier() == $ref_entity_id) {
+      $wrapper->{$field_name} = 0;
+    }
+  }
+
+  return $wrapper->value();
 }
 
 /**
