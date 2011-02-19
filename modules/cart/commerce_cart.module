@@ -174,8 +174,8 @@ function commerce_cart_form_alter(&$form, &$form_state, $form_id) {
  */
 function commerce_cart_line_item_views_form_submit($form, &$form_state) {
   // Reset the status of the order to cart.
-  $form_state['order']->status = 'cart';
-  commerce_order_save($form_state['order']);
+  $order = commerce_order_load($form_state['order']->order_id);
+  $form_state['order'] = commerce_order_status_update($order, 'cart');
 
   drupal_set_message(t('Your shopping cart has been updated.'));
 }
