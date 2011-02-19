@@ -1201,7 +1201,7 @@ function commerce_line_items_total($line_items, $type = '') {
       $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
     }
 
-    if (empty($type) || $line_item->type == $type) {
+    if (empty($type) || $line_item->type->value() == $type) {
       // Set the initial currency code.
       if (empty($currency_code)) {
         $currency_code = $line_item->commerce_total->currency_code->value();
