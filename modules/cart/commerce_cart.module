@@ -179,6 +179,7 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   // Get the corresponding wrapper to show the correct title.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_items'][$line_item_id]);
   $title = $line_item_wrapper->type->value() == 'product' ? $line_item_wrapper->commerce_product->title->value() : $line_item_wrapper->line_item_label->value();
+
   drupal_set_message(t('%title removed from your cart.', array('%title' => $title)));
 }
 
