@@ -170,6 +170,17 @@ function commerce_cart_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Submit handler to show the shopping cart updated message.
+ */
+function commerce_cart_line_item_views_form_submit($form, &$form_state) {
+  // Reset the status of the order to cart.
+  $form_state['order']->status = 'cart';
+  commerce_order_save($form_state['order']);
+
+  drupal_set_message(t('Your shopping cart has been updated.'));
+}
+
+/**
  * Submit handler to show the line item delete message.
  */
 function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
@@ -178,7 +189,18 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
 
   // Get the corresponding wrapper to show the correct title.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_items'][$line_item_id]);
-  $title = $line_item_wrapper->type->value() == 'product' ? $line_item_wrapper->commerce_product->title->value() : $line_item_wrapper->line_item_label->value();
+
+  // If the deleted line item is a product...
+  if ($line_item_wrapper->type->value() == 'product') {
+    $title = $line_item_wrapper->commerce_product->title->value();
+
+    // Invoke the Rules event for removing an item from the cart so the order
+    // status can be reset by the default rule.
+    rules_invoke_all('commerce_cart_product_remove', $form_state['order'], $line_item_wrapper->commerce_product->value(), $line_item_wrapper->quantity->value(), $line_item_wrapper->value());
+  }
+  else {
+    $title = $line_item_wrapper->line_item_label->value();
+  }
 
   drupal_set_message(t('%title removed from your cart.', array('%title' => $title)));
 }
@@ -206,13 +228,6 @@ function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_st
       $line_item['commerce_unit_price'][$language][0]['currency_code']['#disabled'] = TRUE;
     }
   }
-}
-
-/**
- * Submit handler to show the shopping cart updated message.
- */
-function commerce_cart_line_item_views_form_submit($form, &$form_state) {
-  drupal_set_message(t('Your shopping cart has been updated.'));
 }
 
 /**
@@ -325,89 +340,6 @@ function commerce_cart_commerce_order_load($orders) {
   foreach ($orders as $order) {
     if (commerce_cart_order_is_cart($order)) {
       commerce_cart_order_refresh($order);
-    }
-  }
-}
-
-/**
- * Implements hook_commerce_order_presave().
- *
- * Resets the shopping cart order status when the cart contents are changed,
- * which we check on order save by seeing if line items are added or removed.
- */
-function commerce_cart_commerce_order_presave($order) {
-  // Exit if this is a new order or not in a cart status.
-  if (empty($order->order_id) || !commerce_cart_order_is_cart($order)) {
-    return;
-  }
-
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-  // Get the order directly from the database and compare with the current one.
-  $unchanged_order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
-  $unchanged_wrapper = entity_metadata_wrapper('commerce_order', $unchanged_order);
-
-  // If the number of line items has changed, reset the status.
-  if (count($unchanged_wrapper->commerce_line_items) != count($wrapper->commerce_line_items)) {
-    $order->status = 'cart';
-  }
-  else {
-    // Otherwise compare the actual line item IDs.
-    $unchanged_line_item_ids = array();
-
-    foreach ($unchanged_wrapper->commerce_line_items as $key => $value) {
-      $unchanged_line_item_ids[] = $key;
-    }
-
-    foreach ($wrapper->commerce_line_items as $key => $value) {
-      if (!in_array($key, $unchanged_line_item_ids)) {
-        $order->status = 'cart';
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_commerce_line_item_presave().
- *
- * Resets the pertinent shopping cart order status when line items are changed,
- * which we check on line item save.
- */
-function commerce_cart_commerce_line_item_presave($line_item) {
-  // Exit now if the line item is being inserted for the first time, as it won't
-  // be referenced by an order yet.
-  if (empty($line_item->line_item_id)) {
-    return;
-  }
-
-  // If the line item is attached to an existing order...
-  if ($order = commerce_order_load($line_item->order_id)) {
-    // Get the line item directly from the database and compare with the current one.
-    $unchanged_line_item = reset(commerce_line_item_load_multiple(array($line_item->line_item_id), array(), TRUE));
-
-    // If the line item's quantity has changed and it's attached to a shopping
-    // cart order...
-    if ($line_item->quantity != $unchanged_line_item->quantity && commerce_cart_order_is_cart($order)) {
-      // Return the order to the cart status.
-      $order->status = 'cart';
-      commerce_order_save($order);
-    }
-  }
-}
-
-/**
- * Implements hook_commerce_line_item_delete().
- *
- * Resets the pertinent shopping cart order status when a line item is deleted.
- */
-function commerce_cart_commerce_line_item_delete($line_item) {
-  // If the order for this line item exists...
-  if ($order = commerce_order_load($line_item->order_id)) {
-    // And it's a shopping cart order...
-    if (commerce_cart_order_is_cart($order)) {
-      // Reset the order to the Cart status directly.
-      $order->status = 'cart';
-      commerce_order_save($order);
     }
   }
 }

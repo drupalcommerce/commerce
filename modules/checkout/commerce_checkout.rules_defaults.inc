@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Default rules configuration for Order.
+ * Default rule configurations for Checkout.
  */
 
 /**

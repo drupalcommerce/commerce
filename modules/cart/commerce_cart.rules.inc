@@ -80,5 +80,35 @@ function commerce_cart_rules_event_variables($line_item = FALSE) {
 }
 
 /**
+ * Implements hook_rules_condition_info().
+ */
+function commerce_cart_rules_condition_info() {
+  $conditions = array();
+
+  $conditions['commerce_order_is_cart'] = array(
+    'label' => t('Order is a shopping cart'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+      ),
+    ),
+    'group' => t('Commerce Cart'),
+    'callbacks' => array(
+      'execute' => 'commerce_cart_rules_order_is_cart',
+    ),
+  );
+
+  return $conditions;
+}
+
+/**
+ * Rules condition: checks to see if the given order is in a cart status.
+ */
+function commerce_cart_rules_order_is_cart($order) {
+  return commerce_cart_order_is_cart($order);
+}
+
+/**
  * @}
  */
