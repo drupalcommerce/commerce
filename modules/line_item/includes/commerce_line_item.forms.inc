@@ -41,6 +41,11 @@ function commerce_line_item_views_form($form, &$form_state, $view, $output) {
     '#value' => $output,
   );
 
+  // Add the handlers manually since we're using hook_forms() to associate this
+  // form with form IDs based on the View used to display it.
+  $form['#validate'][] = 'commerce_line_item_views_form_validate';
+  $form['#submit'][] = 'commerce_line_item_views_form_submit';
+
   // Loop over each field on the View...
   foreach ($view->field as $field_name => $field) {
     // If it extends the line item field edit handler...
@@ -51,14 +56,15 @@ function commerce_line_item_views_form($form, &$form_state, $view, $output) {
       // Add it to the current form if data was returned.
       if (!empty($field_edit_form)) {
         $form[$field_name] = $field_edit_form + array('#tree' => TRUE);
+        // If the field has a #submit element, we add the form submit as well.
+        foreach (element_children($form[$field_name]) as $line_item_id) {
+          if (!empty($form[$field_name][$line_item_id]['#submit'])) {
+            $form[$field_name][$line_item_id]['#submit'] = array_merge($form['#submit'], $form[$field_name][$line_item_id]['#submit']);
+          }
+        }
       }
     }
   }
-
-  // Add the handlers manually since we're using hook_forms() to associate this
-  // form with form IDs based on the View used to display it.
-  $form['#validate'][] = 'commerce_line_item_views_form_validate';
-  $form['#submit'][] = 'commerce_line_item_views_form_submit';
 
   // Now add the submit buttons after setting the handlers, as it's likely that
   // buttons will need to add button specific handlers based on the form level

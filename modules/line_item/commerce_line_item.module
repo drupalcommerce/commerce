@@ -143,6 +143,13 @@ function commerce_line_item_views_form_id($view) {
 }
 
 /**
+ * Submit handler used when clicking the remove button.
+ */
+function commerce_line_item_line_item_views_delete_form_submit($form, &$form_state) {
+  drupal_set_message(t('Line item removed.'));
+}
+
+/**
  * Submit handler used when clicking the update button.
  */
 function commerce_line_item_line_item_views_form_submit($form, &$form_state) {
