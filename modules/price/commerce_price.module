@@ -45,10 +45,22 @@ function commerce_price_field_validate($entity_type, $entity, $field, $instance,
  * Implements hook_field_load().
  */
 function commerce_price_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
-  // Deserialize additional data.
+  // Convert amounts to their floating point values and deserialize data arrays.
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
-      $items[$id][$delta]['data'] = !empty($items[$id][$delta]['data']) ? unserialize($items[$id][$delta]['data']) : array();
+      // Convert the loaded amount integer to a price amount based on the currency.
+      $items[$id][$delta]['amount'] = commerce_currency_integer_to_amount(
+        $items[$id][$delta]['amount'],
+        $items[$id][$delta]['currency_code']
+      );
+
+      // Unserialize the data array if necessary.
+      if (!empty($items[$id][$delta]['data'])) {
+        $items[$id][$delta]['data'] = unserialize($items[$id][$delta]['data']);
+      }
+      else {
+        $items[$id][$delta]['data'] = array();
+      }
     }
   }
 }
@@ -57,15 +69,18 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
  * Implements hook_field_presave().
  */
 function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  if ($field['type'] == 'commerce_price') {
-    // Serialize the data field before saving it to the database.
-    foreach ($items as $delta => $item) {
-      if (isset($item['data'])) {
-        $items[$delta]['data'] = serialize($item['data']);
-      }
-    }
+  // Convert amounts to integers and serialize data arrays before saving.
+  foreach ($items as $delta => $item) {
+    // Convert the price amount to an integer based on the currency.
+    $items[$delta]['amount'] = commerce_currency_amount_to_integer(
+      $items[$delta]['amount'],
+      $items[$delta]['currency_code']
+    );
 
-    // TODO: Convert prices to the appropriate integer value.
+    // Serialize an existing data array.
+    if (isset($item['data']) && is_array($item['data'])) {
+      $items[$delta]['data'] = serialize($item['data']);
+    }
   }
 }
 
