@@ -74,11 +74,11 @@ function commerce_customer_ui_menu() {
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
     // Convert underscores to hyphens for the menu item argument.
     $type_arg = strtr($type, '_', '-');
+
     $items['admin/commerce/customer-profiles/types/' . $type_arg] = array(
-      'title callback' => 'commerce_customer_profile_type_title',
-      'title arguments' => array($profile_type['name']),
+      'title' => 'Profile types',
       'page callback' => 'commerce_customer_ui_profile_type_redirect',
-      'page arguments' => array($type_arg),
+      'page arguments' => array($type),
       'access arguments' => array('administer customer profile types'),
     );
   }
@@ -121,7 +121,7 @@ function commerce_customer_ui_customer_profile_add_any_access() {
  * Redirects a customer profile type URL to its fields management page.
  */
 function commerce_customer_ui_profile_type_redirect($type) {
-  drupal_goto('admin/commerce/customer-profiles/types/' . $type . '/fields');
+  drupal_goto('admin/commerce/customer-profiles/types/' . strtr($type, '_', '-') . '/fields');
 }
 
 /**
@@ -129,7 +129,7 @@ function commerce_customer_ui_profile_type_redirect($type) {
  */
 function commerce_customer_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
-  foreach (commerce_customer_profile_types() as $type => $customer_type) {
+  foreach (commerce_customer_profile_types() as $type => $profile_type) {
     // Convert underscores to hyphens for the menu item argument.
     $type_arg = strtr($type, '_', '-');
 
@@ -219,8 +219,8 @@ function commerce_customer_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for profile fields.
   foreach ($entity_info['commerce_customer_profile']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/commerce/customer-profiles/types/'. strtr($type, array('_' => '-')),
-      'real path' => 'admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')),
+      'path' => 'admin/commerce/customer-profiles/types/' . strtr($type, '_', '-'),
+      'real path' => 'admin/commerce/customer-profiles/types/' . strtr($type, '_', '-'),
       'access arguments' => array('administer customer profile types'),
     );
   }
