@@ -90,12 +90,14 @@ function commerce_price_field_is_empty($item, $field) {
  * @param $label
  *   The label of the field instance.
  * @param $weight
- *   The default weight of the field instance widget.
+ *   The default weight of the field instance widget and display.
  * @param $calculation
  *   A string indicating the default value of the display formatter's calculation
  *     setting.
+ * @param $display
+ *   An array of default display data used for the entity's current view modes.
  */
-function commerce_price_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0, $calculation = FALSE) {
+function commerce_price_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0, $calculation = FALSE, $display = array()) {
   // If a field type we know should exist isn't found, clear the Field cache.
   if (!field_info_field_types('commerce_price')) {
     field_cache_clear();
@@ -146,12 +148,13 @@ function commerce_price_create_instance($field_name, $entity_type, $bundle, $lab
     $entity_info['view modes']['default'] = array();
 
     foreach ($entity_info['view modes'] as $view_mode => $data) {
-      $instance['display'][$view_mode] = array(
+      $instance['display'][$view_mode] = $display + array(
         'label' => 'hidden',
         'type' => 'commerce_price_formatted_amount',
         'settings' => array(
           'calculation' => $calculation,
         ),
+        'weight' => $weight,
       );
     }
 

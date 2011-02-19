@@ -477,23 +477,18 @@ function commerce_customer_configure_customer_profile_type($type) {
         'weight' => -10,
       ),
       'settings' => array(),
-
-      // Define default formatters for the teaser and full view.
-      'display' => array(
-        'default' => array(
-          'label' => 'hidden',
-          'type' => 'addressfield_default',
-        ),
-        'customer' => array(
-          'label' => 'hidden',
-          'type' => 'addressfield_default',
-        ),
-        'administrator' => array(
-          'label' => 'hidden',
-          'type' => 'addressfield_default',
-        ),
-      ),
+      'display' => array(),
     );
+
+    // Set the default display formatters for various view modes.
+    foreach (array('default', 'customer', 'administrator') as $view_mode) {
+      $instance['display'][$view_mode] = array(
+        'label' => 'hidden',
+        'type' => 'addressfield_default',
+        'weight' => -10,
+      );
+    }
+
     field_create_instance($instance);
   }
 }
