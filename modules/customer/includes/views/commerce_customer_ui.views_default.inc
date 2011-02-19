@@ -16,9 +16,9 @@ function commerce_customer_ui_views_default_views() {
   $view->name = 'commerce_customer_profiles';
   $view->description = 'A list of customer profiles of all types.';
   $view->tag = 'commerce';
-  $view->view_php = '';
   $view->base_table = 'commerce_customer_profile';
-  $view->is_cacheable = FALSE;
+  $view->human_name = '';
+  $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
@@ -45,16 +45,19 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['style_options']['info'] = array(
     'profile_id' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
     ),
     'name' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
     ),
     'type' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
     ),
@@ -65,6 +68,7 @@ function commerce_customer_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
+  $handler->display->display_options['style_options']['order'] = 'desc';
   /* Relationship: Commerce Customer Profile: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_customer_profile';
@@ -145,6 +149,25 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['tab_options']['description'] = 'Manage customer profiles and profile types in the store.';
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'management';
+  $translatables['commerce_customer_profiles'] = array(
+    t('Defaults'),
+    t('Customer profiles'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort By'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('Profile owner'),
+    t('Profile ID'),
+    t('User'),
+    t('Type'),
+    t('Operations'),
+    t('Admin page'),
+  );
 
   $views[$view->name] = $view;
 
