@@ -47,7 +47,7 @@ function commerce_checkout_rules_action_info() {
         'type' => 'text',
         'label' => t('E-mail type'),
         'description' => t("Select the e-mail based on your site's account settings to send to the user."),
-        'options list' => 'commerce_checkout_account_email_options',
+        'options list' => 'commerce_checkout_account_email_options_list',
       ),
     ),
     'group' => t('User'),
@@ -63,7 +63,7 @@ function commerce_checkout_rules_action_info() {
  *
  * @see _user_mail_notify()
  */
-function commerce_checkout_account_email_options() {
+function commerce_checkout_account_email_options_list() {
   return array(
     'register_admin_created' => t('Welcome (new user created by administrator)'),
     'register_no_approval_required' => t('Welcome (no approval required)'),
@@ -82,7 +82,7 @@ function commerce_checkout_account_email_options() {
 function commerce_checkout_action_send_account_email($account, $email_type) {
   // If we received an authenticated user account...
   if (!empty($account)) {
-    $types = commerce_checkout_account_email_options();
+    $types = commerce_checkout_account_email_options_list();
 
     // Attempt to send the account e-mail.
     $result = _user_mail_notify($email_type, $account);
@@ -103,7 +103,7 @@ function commerce_checkout_action_send_account_email($account, $email_type) {
 function commerce_checkout_rules_condition_info() {
   $conditions = array();
 
-  module_load_include('inc', 'rules', 'data.rules');
+  module_load_include('inc', 'rules', 'modules/data.rules');
 
   $conditions['entity_exists'] = array(
     'label' => t('Entity exists by property'),
@@ -111,7 +111,7 @@ function commerce_checkout_rules_condition_info() {
       'type' => array(
         'type' => 'text',
         'label' => t('Entity type'),
-        'options list' => 'commerce_checkout_entity_type_options',
+        'options list' => 'commerce_checkout_entity_type_options_list',
         'description' => t('Specifies the type of the entity that should be fetched.'),
         'restriction' => 'input',
        ),
@@ -140,7 +140,7 @@ function commerce_checkout_rules_condition_info() {
 /**
  * Returns options containing entity types having the given key set in the info.
  */
-function commerce_checkout_entity_type_options() {
+function commerce_checkout_entity_type_options_list() {
   $types = array();
 
   foreach (entity_get_info() as $type => $entity_info) {

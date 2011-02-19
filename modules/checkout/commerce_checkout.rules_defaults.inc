@@ -40,6 +40,11 @@ function commerce_checkout_default_rules_configuration() {
 
   $rule
     ->event('commerce_checkout_complete')
+    ->condition('data_is', array(
+      'data:select' => 'order:uid',
+      'op' => '==',
+      'value' => '0',
+    ))
     ->condition('entity_exists', array(
       'type' => 'user',
       'property' => 'mail',
@@ -103,6 +108,11 @@ function commerce_checkout_default_rules_configuration() {
 
   $rule
     ->event('commerce_checkout_complete')
+    ->condition('data_is', array(
+      'data:select' => 'order:uid',
+      'op' => '==',
+      'value' => '0',
+    ))
     ->condition(rules_condition('entity_exists', array(
       'type' => 'user',
       'property' => 'mail',
