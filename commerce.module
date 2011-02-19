@@ -51,6 +51,39 @@ function commerce_info_fields($field_type, $entity_type = NULL) {
 }
 
 /**
+ * Deletes the reference to a specific referenced entity from an entity
+ * reference field on the given containing entity.
+ *
+ * @param $entity_type
+ *   Entity type of the containing entity.
+ * @param $entity
+ *   The entity that contains the referenced entity.
+ * @param $field_name
+ *   The name of the entity reference field.
+ * @param $ref_entity_id
+ *   The id of the referenced entity.
+ *
+ * @return
+ *   An array of the matching fields keyed by the field name.
+ */
+function commerce_entity_reference_delete($entity_type, $entity, $field_name, $ref_entity_id) {
+  $wrapper = entity_metadata_wrapper($entity_type, $entity);
+
+  // Loop over every entity referenced by the specified field.
+  foreach ($wrapper->{$field_name} as $delta => $line_item_wrapper) {
+    $entity_type_info = entity_get_info($entity_type);
+    // If its ID matches the specified entity...
+    $entity_id_field_name = $entity_type_info['entity keys']['id'];
+    if ($line_item_wrapper->{$entity_id_field_name}->value() == $ref_entity_id) {
+      // Unset the referenced entity and return the containing updated entity.
+      $wrapper->{$field_name}->offsetUnset($delta);
+
+      return $wrapper->value();
+    }
+  }
+}
+
+/**
  * Makes any required form elements in a form unrequired.
  *
  * @param $form

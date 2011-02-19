@@ -72,6 +72,71 @@ function commerce_product_reference_form_field_ui_display_overview_form_alter(&$
 }
 
 /**
+ * Implements hook_form_FORMID_alter().
+ *
+ * When a product is being deleted. Display a message on the confirmation form
+ * saying how many times the product is referenced in all product reference
+ * fields.
+ */
+function commerce_product_reference_form_commerce_product_product_delete_form_alter(&$form, &$form_state) {
+  $count = 0;
+
+  // Check the data in every product reference field.
+  foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
+    // Query for any entity referencing the deleted product in this field.
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'product_id', $form_state['product']->product_id, '=');
+    $result = $query->execute();
+
+    // If results were returned...
+    if (!empty($result)) {
+      // Loop over results for each type of entity returned.
+      foreach ($result as $entity_type => $data) {
+        // Load the entities of the current type.
+        $entities = entity_load($entity_type, array_keys($data));
+        $count += count($entities);
+      }
+    }
+  }
+
+  if (!empty($count)) {
+    $form['description']['#markup'] .= '<p>' . format_plural($count, 'This product is referenced by 1 entity.', 'This product is referenced by @count entities.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_commerce_product_delete().
+ *
+ * Remove references to this product in product all reference field contents.
+ */
+function commerce_product_reference_commerce_product_delete($product) {
+  // Check the data in every product reference field.
+  foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
+    // Query for any entity referencing the deleted product in this field.
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'product_id', $product->product_id, '=');
+    $result = $query->execute();
+
+    // If results were returned...
+    if (!empty($result)) {
+      // Loop over results for each type of entity returned.
+      foreach ($result as $entity_type => $data) {
+        // Load the entities of the current type.
+        $entities = entity_load($entity_type, array_keys($data));
+
+        // Loop over each entity and remove the reference to the deleted product.
+        foreach ($entities as $entity_id => $entity) {
+          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $line_item->line_item_id);
+
+          // Store the changes to the entity.
+          entity_save($entity_type, $entity);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_node_view().
  *
  * This implementation adds product fields to the content array of a node on

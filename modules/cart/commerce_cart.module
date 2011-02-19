@@ -809,7 +809,7 @@ function commerce_cart_order_product_line_item_delete($order, $line_item_id, $sk
   }
 
   // Remove the line item from the line item reference field.
-  $order = commerce_line_item_reference_delete('commerce_order', $order, 'commerce_line_items', $line_item_id);
+  $order = commerce_entity_reference_delete('commerce_order', $order, 'commerce_line_items', $line_item_id);
 
   // Wrap the line item to be deleted and extract the product from it.
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
