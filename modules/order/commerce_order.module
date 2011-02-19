@@ -74,7 +74,7 @@ function commerce_order_modules_enabled($modules) {
 
       // Loop through and configure the customer profile types defined by the module.
       foreach ($customer_profile_types as $customer_profile_type) {
-        commerce_order_configure_customer_profile_type($customer_profile_type);
+        commerce_order_configure_customer_profile_type($customer_profile_type['type'], $customer_profile_type['name']);
       }
     }
   }
@@ -845,7 +845,7 @@ function commerce_order_status_update($order, $name) {
  * @param $customer_profile_type
  * 	Customer type.
  * @param $type
- * 	Bundle to appy the changes.
+ * 	Bundle to apply the changes.
  */
 function commerce_order_disable_customer_profile_type($customer_profile_type, $type = 'commerce_order') {
   $field_name = 'commerce_customer_' . $customer_profile_type['type'];
@@ -859,11 +859,11 @@ function commerce_order_disable_customer_profile_type($customer_profile_type, $t
  * @param $customer_profile_type
  * 	Customer type.
  * @param $type
- * 	Bundle to appy the changes.
+ * 	Bundle to apply the changes.
  */
-function commerce_order_configure_customer_profile_type($customer_profile_type, $type = 'commerce_order') {
+function commerce_order_configure_customer_profile_type($customer_profile_type, $customer_profile_name, $type = 'commerce_order') {
   // Add the customer profile reference fields for each profile type.
-  $field_name = 'commerce_customer_' . $customer_profile_type['type'];
+  $field_name = 'commerce_customer_' . $customer_profile_type;
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_order', $field_name, $type);
 
@@ -883,9 +883,9 @@ function commerce_order_configure_customer_profile_type($customer_profile_type, 
       'field_name' => $field_name,
       'entity_type' => 'commerce_order',
       'bundle' => $type,
-      'label' => check_plain($customer_profile_type['name']),
+      'label' => check_plain($customer_profile_name),
       'settings' => array(
-        'profile_type' => array($customer_profile_type['type']),
+        'profile_type' => array($customer_profile_type),
       ),
       'widget' => array(
         'type' => 'commerce_customer_profile_manager',
@@ -913,6 +913,12 @@ function commerce_order_configure_customer_profile_type($customer_profile_type, 
  * Ensures the line item field is present on the default order bundle.
  */
 function commerce_order_configure_order_type($type = 'commerce_order') {
+  // Add the customer profile reference fields for each profile type.
+  $entity_info = entity_get_info('commerce_customer_profile');
+  foreach ($entity_info['bundles'] as $profile_type => $data) {
+    commerce_order_configure_customer_profile_type($profile_type, $data['label']);
+  }
+
   // If a field type we know should exist isn't found, clear the Field cache.
   if (!field_info_field_types('commerce_line_item_reference') ||
     !field_info_field_types('commerce_customer_profile_reference')) {
