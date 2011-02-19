@@ -70,12 +70,18 @@ function commerce_customer_ui_menu() {
     'weight' => 0,
     'file' => 'includes/commerce_customer_ui.profile_types.inc',
   );
-  $items['admin/commerce/customer-profiles/types/%'] = array(
-    'title callback' => 'Profile types',
-    'page callback' => 'commerce_customer_ui_profile_type_redirect',
-    'page arguments' => array(4),
-    'access arguments' => array('administer customer profile types'),
-  );
+
+  foreach (commerce_customer_profile_types() as $type => $profile_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $type_arg = strtr($type, '_', '-');
+    $items['admin/commerce/customer-profiles/types/' . $type_arg] = array(
+      'title callback' => 'commerce_customer_profile_type_title',
+      'title arguments' => array($profile_type['name']),
+      'page callback' => 'commerce_customer_ui_profile_type_redirect',
+      'page arguments' => array($type_arg),
+      'access arguments' => array('administer customer profile types'),
+    );
+  }
 
   return $items;
 }
@@ -115,7 +121,7 @@ function commerce_customer_ui_customer_profile_add_any_access() {
  * Redirects a customer profile type URL to its fields management page.
  */
 function commerce_customer_ui_profile_type_redirect($type) {
-  drupal_goto('admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')) . '/fields');
+  drupal_goto('admin/commerce/customer-profiles/types/' . $type . '/fields');
 }
 
 /**
@@ -123,8 +129,14 @@ function commerce_customer_ui_profile_type_redirect($type) {
  */
 function commerce_customer_ui_menu_alter(&$items) {
   // Transform the field UI tabs into contextual links.
-  $items['admin/commerce/customer-profiles/types/%/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
-  $items['admin/commerce/customer-profiles/types/%/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  foreach (commerce_customer_profile_types() as $type => $customer_type) {
+    // Convert underscores to hyphens for the menu item argument.
+    $type_arg = strtr($type, '_', '-');
+
+    // Transform the field UI tabs into contextual links.
+    $items['admin/commerce/customer-profiles/types/' . $type_arg . '/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+    $items['admin/commerce/customer-profiles/types/' . $type_arg . '/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
+  }
 }
 
 /**
@@ -207,7 +219,7 @@ function commerce_customer_ui_entity_info_alter(&$entity_info) {
   // Expose the admin UI for profile fields.
   foreach ($entity_info['commerce_customer_profile']['bundles'] as $type => &$bundle) {
     $bundle['admin'] = array(
-      'path' => 'admin/commerce/customer-profiles/types/%',
+      'path' => 'admin/commerce/customer-profiles/types/'. strtr($type, array('_' => '-')),
       'real path' => 'admin/commerce/customer-profiles/types/' . strtr($type, array('_' => '-')),
       'access arguments' => array('administer customer profile types'),
     );

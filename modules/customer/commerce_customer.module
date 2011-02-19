@@ -253,8 +253,8 @@ function commerce_customer_profile_type_options_list() {
 /**
  * Title callback: return the human-readable customer profile type name.
  */
-function commerce_customer_profile_type_title($profile_type) {
-  return $profile_type['name'];
+function commerce_customer_profile_type_title($profile_type_name) {
+  return $profile_type_name;
 }
 
 /**
