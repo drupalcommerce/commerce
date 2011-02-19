@@ -254,10 +254,9 @@ function commerce_checkout_form_back_submit($form, &$form_state) {
  * Special submit handler for the cancel button to avoid processing orders.
  */
 function commerce_checkout_form_cancel_submit($form, &$form_state) {
-  if ($form_state['order']) {
-    // TODO: Implement order comments to do this.
-    // commerce_order_comment_save($form_state['values']['order']->order_id, 0, t('Customer cancelled this order from the checkout form.'));
-  }
+  // Set the order status back to the first step of checkout.
+  $order = commerce_order_load($form_state['order']->order_id);
+  $form_state['order'] = commerce_order_status_update($order, 'checkout_checkout');
 
   drupal_set_message(t('Checkout of your current order has been canceled and may be resumed when you are ready.'));
 
