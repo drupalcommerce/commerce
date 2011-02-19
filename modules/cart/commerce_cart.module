@@ -151,7 +151,7 @@ function commerce_cart_commerce_line_item_summary_link_info() {
 /**
  * Implements hook_form_alter().
  */
-function commerce_cart_form_alter(&$form, &$form_values, $form_id) {
+function commerce_cart_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'commerce_line_item_views_form_commerce_cart_form_') === 0) {
     // Change the Save button to say Update cart.
     $form['actions']['update']['#value'] = t('Update cart');
@@ -160,10 +160,31 @@ function commerce_cart_form_alter(&$form, &$form_values, $form_id) {
     // Change any Delete buttons to say Remove.
     if (!empty($form['edit_delete'])) {
       foreach(element_children($form['edit_delete']) as $line_item_id) {
+        // Load and wrap the line item to have the title in the submit phase.
+        $form_state['line_items'][$line_item_id]['wrapper'] = entity_metadata_wrapper('commerce_line_item', commerce_line_item_load($line_item_id));
         $form['edit_delete'][$line_item_id]['#value'] = t('Remove');
+        $form['edit_delete'][$line_item_id]['#submit'] = array_merge($form['#submit'], array('commerce_cart_line_item_delete_form_submit'));
       }
     }
   }
+}
+
+/**
+ * Submit handler to show the line item delete message.
+ */
+function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
+  // Get which delete button has been clicked.
+  $line_item_id = substr($form_state['clicked_button']['#name'], strlen('delete-line-item-'));
+
+  // Get the corresponding wrapper to show the correct title.
+  $line_item_wrapper = $form_state['line_items'][$line_item_id]['wrapper'];
+  if ($line_item_wrapper->type->value() == 'product') {
+    $title = $line_item_wrapper->commerce_product->title->value();
+  }
+  else {
+    $title = $line_item_wrapper->line_item_label->value();
+  }
+  drupal_set_message(t('%title removed from your cart.', array('%title' => $title)));
 }
 
 /**
