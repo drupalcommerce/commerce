@@ -63,6 +63,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'commerce_product_ui',
       'commerce_customer_ui',
       'commerce_payment_ui',
+      'commerce_tax_ui',
       //'rules_admin',
     );
     $payment = array(
