@@ -254,25 +254,15 @@ function commerce_cart_theme() {
 
 /**
  * Implements hook_user_login().
+ *
+ * When a user logs into the site, if they have a shopping cart order it should
+ * be updated to belong to their user account.
  */
 function commerce_cart_user_login(&$edit, $account) {
-  // Merge any items in the anonymous cart with the authenticated user's cart.
-
-  // Get the anonymous cart if it exists.
-  if ($anonymous_order = commerce_cart_order_load()) {
-    $anonymous_order_wrapper = entity_metadata_wrapper('commerce_order', $anonymous_order);
-
-    // If the anonymous user had any items in the cart, add them to the user's
-    // authenticated cart.
-    if ($anonymous_order_wrapper->commerce_line_items->count() > 0) {
-      // Add each of the anonymous cart items to the authenticated user's cart.
-      foreach ($anonymous_order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-        commerce_cart_product_add($account->uid, $line_item_wrapper->commerce_product->product_id->value(), $line_item_wrapper->quantity->value());
-      }
-
-      // Delete the anonymous order from the database and clear the reference.
-      commerce_order_delete($anonymous_order->order_id);
-    }
+  // Get the user's anonymous shopping cart order if it exists.
+  if ($order = commerce_cart_order_load()) {
+    // Convert it to an authenticated cart.
+    commerce_cart_order_convert($order, $account);
   }
 
   // Set the uid for any completed orders if they exist.
@@ -348,48 +338,7 @@ function commerce_cart_block_view($delta) {
 function commerce_cart_commerce_order_load($orders) {
   foreach ($orders as $order) {
     if (commerce_cart_order_is_cart($order)) {
-      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-      // Loop over every line item on the order...
-      foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-        // If the line item is a product line item...
-        if ($line_item_wrapper->type->value() == 'product') {
-          // Load the product unchanged from the database so any existing price
-          // adjustments aren't duplicated in this line item.
-          $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
-
-          // Create a new product line item referencing the same product as though
-          // we had not added it to the cart yet, but use the current quantity.
-          $line_item = commerce_product_line_item_new($product, $line_item_wrapper->quantity->value(), $order->order_id);
-
-          // Process the unit price through Rules so it reflects the user's actual
-          // current purchase price.
-          rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
-        }
-        else {
-          $line_item = clone($line_item_wrapper->value());
-        }
-
-        // Allow other modules alter line items on a shopping cart refresh.
-        module_invoke_all('commerce_cart_line_item_refresh', $line_item, $order_wrapper);
-
-        // Compare the refreshed unit price to the original unit price.
-        $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-
-        if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
-          $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value()) {
-          // Adjust the unit price accordingly if necessary.
-          $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
-          $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
-
-          // Save the updated line item and clear the entity cache.
-          commerce_line_item_save($line_item_wrapper->value());
-          entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
-        }
-      }
-
-      // Allow other modules to alter the entire order on a shopping cart refresh.
-      module_invoke_all('commerce_cart_order_refresh', $order_wrapper);
+      commerce_cart_order_refresh($order);
     }
   }
 }
@@ -592,6 +541,111 @@ function commerce_cart_order_is_cart($order) {
   }
 
   return $is_cart;
+}
+
+/**
+ * Converts an anonymous shopping cart order to an authenticated cart.
+ *
+ * @param $order
+ *   The anonymous order to convert to an authenticated cart.
+ * @param $account
+ *   The user account the order will belong to.
+ *
+ * @return
+ *   The updated order's wrapper or FALSE if the order was not converted,
+ *     meaning it was not an anonymous cart order to begin with.
+ */
+function commerce_cart_order_convert($order, $account) {
+  // Only convert orders that are currently anonmyous orders.
+  if ($order->uid == 0) {
+    // Update the uid and e-mail address to match the current account since
+    // there currently is no way to specify a custom e-mail address per order.
+    $order->uid = $account->uid;
+    $order->mail = $account->mail;
+
+    // Update the uid of any referenced customer profiles.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    foreach (commerce_customer_profile_types() as $type => $profile_type) {
+      $field_name = 'commerce_customer_' . $type;
+
+      if (!is_null($order_wrapper->{$field_name}->value()) &&
+        $order_wrapper->{$field_name}->uid->value() == 0) {
+        $order_wrapper->{$field_name}->uid = $account->uid;
+        $order_wrapper->{$field_name}->save();
+      }
+    }
+
+    // Allow other modules to operate on the converted order and then save.
+    module_invoke_all('commerce_cart_order_convert', $order_wrapper, $account);
+    $order_wrapper->save();
+
+    return $order_wrapper;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Refreshes the contents of a shopping cart by finding the most current prices
+ *   for any product line items on the order.
+ *
+ * @param $order
+ *   The order object whose line items should be refreshed.
+ *
+ * @return
+ *   The updated order's wrapper.
+ */
+function commerce_cart_order_refresh($order) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  // Loop over every line item on the order...
+  foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    // If the line item is a product line item...
+    if ($line_item_wrapper->type->value() == 'product') {
+      // Load the product unchanged from the database so any existing price
+      // adjustments aren't duplicated in this line item.
+      $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
+
+      // Create a new product line item referencing the same product as though
+      // we had not added it to the cart yet, but use the current quantity.
+      $line_item = commerce_product_line_item_new($product, $line_item_wrapper->quantity->value(), $order->order_id);
+
+      // Process the unit price through Rules so it reflects the user's actual
+      // current purchase price.
+      rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
+    }
+    else {
+      $line_item = clone($line_item_wrapper->value());
+    }
+
+    // Allow other modules alter line items on a shopping cart refresh.
+    module_invoke_all('commerce_cart_line_item_refresh', $line_item, $order_wrapper);
+
+    // Compare the refreshed unit price to the original unit price.
+    $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+    if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
+      $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value()) {
+      // Adjust the unit price accordingly if necessary.
+      $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
+      $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
+
+      // Save the updated line item and clear the entity cache.
+      commerce_line_item_save($line_item_wrapper->value());
+      entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
+    }
+  }
+
+  // Allow other modules to alter the entire order on a shopping cart refresh.
+  module_invoke_all('commerce_cart_order_refresh', $order_wrapper);
+
+  // Save the order once here.
+  // TODO: Uncomment once commerce_cart_order_presave() is nuked to prevent an
+  // infinite loop.
+  // $order_wrapper->save();
+
+  return $order_wrapper;
 }
 
 /**

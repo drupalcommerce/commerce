@@ -233,7 +233,16 @@ function commerce_order_order_form_submit($form, &$form_state) {
   }
 
   // Set the order's owner uid based on the supplied name.
+  $converted = FALSE;
+
   if (!empty($form_state['values']['name']) && $account = user_load_by_name($form_state['values']['name'])) {
+    // If the order is being converted to an authenticated order from an
+    // anonymous order...
+    if ($order->uid == 0) {
+      // Set the converted boolean for later processing.
+      $converted = TRUE;
+    }
+
     $order->uid = $account->uid;
 
     if (empty($form_state['values']['mail'])) {
@@ -255,14 +264,15 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   // Ensure the attached customer profiles are associated with the order owner
   // if they do not have a uid yet and the order does.
-  if ($order->uid) {
+  if ($converted) {
     $entity_info = entity_get_info('commerce_customer_profile');
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
     foreach ($entity_info['bundles'] as $profile_type => $data) {
       $field_name = 'commerce_customer_' . $profile_type;
 
-      if ($wrapper->{$field_name}->uid->value() == 0) {
+      if (!is_null($wrapper->{$field_name}->value()) &&
+        $wrapper->{$field_name}->uid->value() == 0) {
         $wrapper->{$field_name}->uid = $order->uid;
         $wrapper->{$field_name}->save();
       }
