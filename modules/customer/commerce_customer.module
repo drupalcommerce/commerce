@@ -58,14 +58,19 @@ function commerce_customer_entity_info() {
 }
 
 /**
- * Implements hook_enable().
+ * Implements hook_modules_enabled().
  */
-function commerce_customer_enable() {
-  // Add the address field to customer profile bundles.
-  $entity_info = entity_get_info('commerce_customer_profile');
-
-  foreach ($entity_info['bundles'] as $type => $data) {
-    commerce_customer_configure_customer_profile_type($type);
+function commerce_customer_modules_enabled($modules) {
+  // Loop through all the enabled modules.
+  foreach ($modules as $module) {
+    // If the module implements commerce_customer_profile_type_info()...
+    if (module_hook($module, 'commerce_customer_profile_type_info')) {
+      $customer_profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
+      // Loop through and configure the customer profile types defined by the module.
+      foreach ($customer_profile_types as $customer_profile_type) {
+        commerce_customer_configure_customer_profile_type($customer_profile_type);
+      }
+    }
   }
 }
 
@@ -139,6 +144,7 @@ function commerce_customer_commerce_customer_profile_type_info() {
     'type' => 'billing',
     'name' => t('Billing information'),
     'description' => t('The profile used to collect billing information on the checkout and order forms.'),
+    'addressfield' => TRUE,
     'help' => '',
   );
 
@@ -444,52 +450,54 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
  * Ensures the address field is present on the specified customer profile bundle.
  */
 function commerce_customer_configure_customer_profile_type($type) {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('addressfield')) {
-    field_cache_clear();
-  }
+  if ($type['addressfield']) {
+    // If a field type we know should exist isn't found, clear the Field cache.
+    if (!field_info_field_types('addressfield')) {
+      field_cache_clear();
+    }
+    // Look for or add an address field to the customer profile type.
+    $field_name = 'commerce_' . $type['type'] . '_address';
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('commerce_customer_profile', $field_name, $type['type']);
 
-  // Look for or add an address field to the customer profile type.
-  $field_name = 'commerce_' . $type . '_address';
-  $field = field_info_field($field_name);
-  $instance = field_info_instance('commerce_customer_profile', $field_name, $type);
-
-  if (empty($field)) {
-    $field = array(
-      'field_name' => $field_name,
-      'type' => 'addressfield',
-      'cardinality' => 1,
-      'entity_types' => array('commerce_customer_profile'),
-      'translatable' => FALSE,
-    );
-    $field = field_create_field($field);
-  }
-
-  if (empty($instance)) {
-    $instance = array(
-      'field_name' => $field_name,
-      'entity_type' => 'commerce_customer_profile',
-      'bundle' => $type,
-      'label' => t('Address'),
-      'required' => TRUE,
-      'widget' => array(
-        'type' => 'addressfield_standard',
-        'weight' => -10,
-      ),
-      'settings' => array(),
-      'display' => array(),
-    );
-
-    // Set the default display formatters for various view modes.
-    foreach (array('default', 'customer', 'administrator') as $view_mode) {
-      $instance['display'][$view_mode] = array(
-        'label' => 'hidden',
-        'type' => 'addressfield_default',
-        'weight' => -10,
+    if (empty($field)) {
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'addressfield',
+        'cardinality' => 1,
+        'entity_types' => array('commerce_customer_profile'),
+        'translatable' => FALSE,
       );
+
+      $field = field_create_field($field);
     }
 
-    field_create_instance($instance);
+    if (empty($instance)) {
+      $instance = array(
+        'field_name' => $field_name,
+        'entity_type' => 'commerce_customer_profile',
+        'bundle' => $type['type'],
+        'label' => t('Address'),
+        'required' => TRUE,
+        'widget' => array(
+          'type' => 'addressfield_standard',
+          'weight' => -10,
+        ),
+        'settings' => array(),
+        'display' => array(),
+      );
+
+      // Set the default display formatters for various view modes.
+      foreach (array('default', 'customer', 'administrator') as $view_mode) {
+        $instance['display'][$view_mode] = array(
+          'label' => 'hidden',
+          'type' => 'addressfield_default',
+          'weight' => -10,
+        );
+      }
+
+      field_create_instance($instance);
+    }
   }
 }
 
@@ -567,7 +575,7 @@ function commerce_customer_field_validate($entity_type, $object, $field, $instan
 
     // Prevent performance hog if there are no ids to check.
     if ($profile_ids) {
-      $profiles = commerce_customer_profile_load_multiple($profile_ids, array('type' => $field['settings']['profile_type']));
+      $profiles = commerce_customer_profile_load_multiple($profile_ids, array('type' => $instance['settings']['profile_type'][0]));
 
       foreach ($items as $delta => $item) {
         if (is_array($item)) {
@@ -713,7 +721,7 @@ function commerce_customer_options_list($field) {
 function commerce_customer_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Define the complex customer profile reference field widget.
   if ($instance['widget']['type'] == 'commerce_customer_profile_manager') {
-    $profile_type = commerce_customer_profile_type_load($field['settings']['profile_type']);
+    $profile_type = commerce_customer_profile_type_load($instance['settings']['profile_type'][0]);
 
     // Build an array of customer profile IDs from this field's values.
     $profile_ids = array();
@@ -726,7 +734,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
     $profiles = commerce_customer_profile_load_multiple($profile_ids);
 
     if (empty($profiles)) {
-      $profiles[0] = commerce_customer_profile_new('billing');
+      $profiles[0] = commerce_customer_profile_new($profile_type['type']);
     }
 
     // Update the base form element array to use the proper theme and validate
@@ -755,16 +763,17 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
       field_attach_form('commerce_customer_profile', $profile, $element['profiles'][$key], $form_state);
 
       // Tweak the form to remove the fieldset from address fields.
-      $field_name = 'commerce_' . $profile_type['type'] . '_address';
-      $language = $element['profiles'][$key][$field_name]['#language'];
+      if ($profile_type['addressfield']) {
+        $field_name = 'commerce_' . $profile_type['type'] . '_address';
+        $language = $element['profiles'][$key][$field_name]['#language'];
 
-      foreach (element_children($element['profiles'][$key][$field_name][$language]) as $delta) {
-        $element['profiles'][$key][$field_name][$language][$delta]['#type'] = 'container';
+        foreach (element_children($element['profiles'][$key][$field_name][$language]) as $delta) {
+          $element['profiles'][$key][$field_name][$language][$delta]['#type'] = 'container';
+        }
+
+        // Remove the default #parents array so the normal tree can do its thing.
+        unset($element['profiles'][$key]['#parents']);
       }
-
-      // Remove the default #parents array so the normal tree can do its thing.
-      unset($element['profiles'][$key]['#parents']);
-
       // This checkbox will be overridden with a clickable delete image.
       // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
