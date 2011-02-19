@@ -92,24 +92,27 @@ function commerce_product_ui_menu() {
       'access arguments' => array('administer product types'),
       'file' => 'includes/commerce_product_ui.types.inc',
     );
-    $items['admin/commerce/products/types/' . $type_arg . '/edit'] = array(
-      'title' => 'Edit',
-      'access callback' => 'commerce_product_ui_product_type_update_access',
-      'access arguments' => array($type),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-    );
-    $items['admin/commerce/products/types/' . $type_arg . '/delete'] = array(
-      'title' => 'Delete',
-      'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
-      'page arguments' => array($type),
-      'access callback' => 'commerce_product_ui_product_type_update_access',
-      'access arguments' => array($type),
-      'type' => MENU_LOCAL_TASK,
-      'context' => MENU_CONTEXT_INLINE,
-      'weight' => 10,
-      'file' => 'includes/commerce_product_ui.types.inc',
-    );
+
+    if ($product_type['module'] == 'commerce_product_ui') {
+      $items['admin/commerce/products/types/' . $type_arg . '/edit'] = array(
+        'title' => 'Edit',
+        'access callback' => 'commerce_product_ui_product_type_update_access',
+        'access arguments' => array($type),
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+      );
+      $items['admin/commerce/products/types/' . $type_arg . '/delete'] = array(
+        'title' => 'Delete',
+        'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
+        'page arguments' => array($type),
+        'access callback' => 'commerce_product_ui_product_type_update_access',
+        'access arguments' => array($type),
+        'type' => MENU_LOCAL_TASK,
+        'context' => MENU_CONTEXT_INLINE,
+        'weight' => 10,
+        'file' => 'includes/commerce_product_ui.types.inc',
+      );
+    }
   }
 
   return $items;
