@@ -21,6 +21,7 @@ function commerce_line_item_views_form($form, &$form_state, $view, $output) {
   }
 
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item_views_form.css';
+  $form['#attached']['js'][] = drupal_get_path('module', 'commerce_line_item') . '/commerce_line_item.js';
 
   // Wrap the form in a div so we can add CSS and javascript behaviors to it.
   $form['#prefix'] = '<div class="commerce-line-item-views-form">';
