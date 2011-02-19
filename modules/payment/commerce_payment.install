@@ -75,10 +75,9 @@ function commerce_payment_schema() {
       ),
       'amount' => array(
         'description' => 'The amount of this transaction.',
-        'type' => 'numeric',
-        'precision' => 16,
-        'scale' => 5,
+        'type' => 'int',
         'not null' => TRUE,
+        'default' => 0,
       ),
       'currency_code' => array(
         'description' => 'The currency code for the price.',
@@ -89,13 +88,13 @@ function commerce_payment_schema() {
       'status' => array(
         'description' => 'The status of this transaction (pending, success, or failure).',
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
       ),
       'remote_status' => array(
         'description' => 'The status of the transaction at the payment provider.',
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
       ),
       'payload' => array(
@@ -184,10 +183,9 @@ function commerce_payment_schema() {
       ),
       'amount' => array(
         'description' => 'The amount of this transaction.',
-        'type' => 'numeric',
-        'precision' => 16,
-        'scale' => 5,
+        'type' => 'int',
         'not null' => TRUE,
+        'default' => 0,
       ),
       'currency_code' => array(
         'description' => 'The currency code for the price.',
@@ -198,13 +196,13 @@ function commerce_payment_schema() {
       'status' => array(
         'description' => 'The status of this transaction (pending, success, or failure).',
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
       ),
       'remote_status' => array(
         'description' => 'The status of the transaction at the payment provider.',
         'type' => 'varchar',
-        'length' => '128',
+        'length' => 128,
         'not null' => TRUE,
       ),
       'log' => array(

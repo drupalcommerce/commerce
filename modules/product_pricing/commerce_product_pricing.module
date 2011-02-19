@@ -94,7 +94,7 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
       // Wrap the line item, swap in the price, and return it.
       $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-      $wrapper->commerce_unit_price->amount = $result->amount;
+      $wrapper->commerce_unit_price->amount = commerce_currency_integer_to_amount($result->amount, $result->currency_code);
       $wrapper->commerce_unit_price->currency_code = $result->currency_code;
 
       // Unserialize the saved prices data array and initialize to an empty
@@ -247,7 +247,10 @@ function commerce_product_pre_calculate_sell_prices() {
           'field_name' => 'commerce_price',
           'language' => !empty($product->language) ? $product->language : '',
           'delta' => 0,
-          'amount' => $wrapper->commerce_unit_price->amount->value(),
+          'amount' => commerce_currency_amount_to_integer(
+            $wrapper->commerce_unit_price->amount->value(),
+            $wrapper->commerce_unit_price->currency_code->value()
+          ),
           'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
           'data' => $wrapper->commerce_unit_price->data->value(),
           'created' => time(),

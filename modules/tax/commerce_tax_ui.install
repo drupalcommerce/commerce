@@ -121,14 +121,14 @@ function commerce_tax_ui_schema() {
       'rate' => array(
         'description' => 'The percentage used to calculate this tax expressed as a decimal.',
         'type' => 'varchar',
-        'length' => '32',
+        'length' => 64,
         'not null' => TRUE,
         'default' => '0',
       ),
       'type' => array(
         'description' => "The machine-name of the rate's {commerce_tax_type}.",
         'type' => 'varchar',
-        'length' => '64',
+        'length' => 64,
         'not null' => TRUE,
         'default' => '',
       ),

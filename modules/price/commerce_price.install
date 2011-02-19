@@ -60,10 +60,9 @@ function commerce_price_schema() {
       ),
       'amount' => array(
         'description' => 'The price amount.',
-        'type' => 'numeric',
-        'precision' => 16,
-        'scale' => 5,
+        'type' => 'int',
         'not null' => TRUE,
+        'default' => 0,
       ),
       'currency_code' => array(
         'description' => 'The currency code for the price.',
