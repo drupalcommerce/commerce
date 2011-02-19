@@ -269,11 +269,15 @@ function commerce_product_pre_calculate_sell_prices() {
  * @param $rule
  *   A rule configuration belonging to the commerce_product_calculate_sell_price
  *     event.
+ * @param $limit_validation
+ *   A boolean indicating whether or not the validation check should limit
+ *     itself to the conditions in this function, effectively skipping the
+ *     invocation of hook_commerce_product_valid_pre_calculation_rule().
  *
  * @return
  *   TRUE or FALSE indicating whether or not the rule configuration is valid.
  */
-function commerce_product_valid_pre_calculation_rule($rule) {
+function commerce_product_valid_pre_calculation_rule($rule, $limit_validation = FALSE) {
   // If a rule configuration doesn't have any conditions, it doesn't need to
   // unique consideration in pre-calculation, as its actions will always apply.
   if (count($rule->conditions()) == 0) {
@@ -296,8 +300,10 @@ function commerce_product_valid_pre_calculation_rule($rule) {
   }
 
   // Allow other modules to invalidate this rule configuration.
-  if (in_array(FALSE, module_invoke_all('commerce_product_valid_pre_calculation_rule', $rule))) {
-    return FALSE;
+  if (!$limit_validation) {
+    if (in_array(FALSE, module_invoke_all('commerce_product_valid_pre_calculation_rule', $rule))) {
+      return FALSE;
+    }
   }
 
   return TRUE;

@@ -105,6 +105,18 @@ function commerce_product_pricing_ui_help($path, $arg) {
 }
 
 /**
+ * Implements hook_commerce_product_valid_pre_calculation_rule().
+ */
+function commerce_product_pricing_ui_commerce_product_valid_pre_calculation_rule($rule) {
+  // If the given rule has been marked to be bypassed, return FALSE.
+  $bypass = variable_get('commerce_product_sell_price_pre_calculation_rules_bypass', array());
+
+  if (!empty($bypass[$rule->name]) && $bypass[$rule->name] == $rule->name) {
+    return FALSE;
+  }
+}
+
+/**
  * Implements hook_forms().
  */
 function commerce_product_pricing_ui_forms($form_id, $args) {

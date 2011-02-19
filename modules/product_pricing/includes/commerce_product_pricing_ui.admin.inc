@@ -91,6 +91,48 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
     '#default_value' => variable_get('commerce_product_sell_price_pre_calculation', 'disabled'),
   );
 
+  // If price pre-calculation is enabled, prevent options to bypass rules.
+  if (variable_get('commerce_product_sell_price_pre_calculation', 'disabled') != 'disabled') {
+    // Build an options list of all valid pricing rules and keep track of those
+    // that are invalid.
+    $options = array();
+    $invalid = array();
+
+    $event = rules_get_cache('event_commerce_product_calculate_sell_price');
+
+    foreach ($event as $rule) {
+      if (commerce_product_valid_pre_calculation_rule($rule, TRUE)) {
+        $options[$rule->name] = t('@label [@name]', array('@label' => $rule->label(), '@name' => $rule->name));
+      }
+      else {
+        $invalid[$rule->name] = t('@label [@name]', array('@label' => $rule->label(), '@name' => $rule->name));
+      }
+    }
+
+    if (!empty($options)) {
+      $form['commerce_product_sell_price_pre_calculation_rules_bypass'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Bypass these rules when pre-calculating sell prices'),
+        '#description' => t('When pre-calculating sell prices, all valid rules will be included in calculating the variations of every price unless specified here to be bypassed.'),
+        '#options' => $options,
+        '#default_value' => variable_get('commerce_product_sell_price_pre_calculation_rules_bypass', array()),
+      );
+    }
+
+    if (!empty($invalid)) {
+      $form['invalid_rules'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Invalid rules for pre-calculation'),
+        '#description' => t('The rules listed below are invalid for sell price pre-calculation either because they do not have any conditions (and therefore do not require pre-calculation), they reference product data in a condition data selector, or they reference non-product data in an action data selector.'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+      );
+      $form['invalid_rules']['list'] = array(
+        '#markup' => theme('item_list', array('items' => $invalid)),
+      );
+    }
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save configuration'),
@@ -107,6 +149,10 @@ function commerce_product_pre_calculation_settings_form_submit($form, &$form_sta
 
   // Save variables on the form regardless of the button pressed.
   variable_set('commerce_product_sell_price_pre_calculation', $values['commerce_product_sell_price_pre_calculation']);
+
+  if (!empty($form_state['values']['commerce_product_sell_price_pre_calculation_rules_bypass'])) {
+    variable_set('commerce_product_sell_price_pre_calculation_rules_bypass', $form_state['values']['commerce_product_sell_price_pre_calculation_rules_bypass']);
+  }
 
   // React to the management buttons if they were used to submit the form.
 
