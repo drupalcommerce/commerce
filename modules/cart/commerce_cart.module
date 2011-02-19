@@ -723,7 +723,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
 
   // Determine if the product already exists on the order and increment its
   // quantity instead of adding a new line if it does.
-  $line_item_match = NULL;
+  $line_item = NULL;
 
   // Loop through the line items looking for products.
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
@@ -732,12 +732,12 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
         $line_item_wrapper->type->value() == 'product' &&
         $line_item_wrapper->commerce_product->product_id->value() == $product_id) {
       // Exit this loop with the $line_item intact so it gets updated.
-      $line_item_match = clone($line_item_wrapper->value());
+      $line_item = $line_item_wrapper->value();
     }
   }
 
   // If no matching line item was found...
-  if (empty($line_item_match)) {
+  if (empty($line_item)) {
     // Create the new product line item.
     $line_item = commerce_product_line_item_new($product, $quantity, $order->order_id);
 
@@ -750,24 +750,22 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
 
     // Add it to the order's line item reference value.
     $order_wrapper->commerce_line_items[] = $line_item;
-
-    // Save the updated order.
-    commerce_order_save($order);
-
-    // Invoke the product add event with the newly saved line item.
-    rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item);
   }
   else {
     // Increment the quantity of the line item and save it.
-    $line_item_match->quantity += $quantity;
+    $line_item->quantity += $quantity;
+    commerce_line_item_save($line_item);
 
-    commerce_line_item_save($line_item_match);
-
-    // Invoke the product add event with the updated line item.
-    // TODO: Debug why the updated quantity isn't available to Rules when
-    // iterating over $order->commerce_line_items.
-    rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item_match);
+    // Clear the line item cache so the updated quantity will be available to
+    // the ensuing load instead of the original quantity as loaded above.
+    entity_get_controller('commerce_line_item')->resetCache();
   }
+
+  // Save the updated order.
+  commerce_order_save($order);
+
+  // Invoke the product add event with the newly saved or updated line item.
+  rules_invoke_all('commerce_cart_product_add', $order, $product, $quantity, $line_item);
 
   // Return the order.
   return $order;
