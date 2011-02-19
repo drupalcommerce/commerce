@@ -586,22 +586,37 @@ function commerce_line_item_delete_multiple($line_item_ids) {
  * Determines access to perform an operation on a particular line item.
  *
  * @param $op
- *   The operation to perform on the line item.
+ *   The operation to perform on the line item, either 'update' or 'delete'.
  * @param $line_item
  *   The line item object in question.
+ * @param $account
+ *   The user account whose access should be checked; defaults to the current
+ *   user if left NULL.
  *
  * @return
  *   TRUE or FALSE indicating whether or not access should be granted.
  */
 function commerce_line_item_access($op, $line_item, $account = NULL) {
-  if (empty($account)) {
-    global $user;
-    $account = clone($user);
+  global $user;
+  $account = isset($account) ? $account : clone($user);
+
+  // If the user has the administration permission, return TRUE now.
+  if (user_access('administer line items', $account)) {
+    return TRUE;
   }
 
-  // TODO: Implement actual access control for line items.
+  // For users who don't have the general administration permission, we have to
+  // determine access to update or delete a given line item through a connection
+  // to an Order. Because Line Item doesn't have a dependency on Order, we rely
+  // on hook_commerce_line_item_access(), returning TRUE if any implementation
+  // indicates the current user should have access.
+  foreach (module_invoke_all('commerce_line_item_access', $op, $line_item, $account) as $access) {
+    if ($access) {
+      return TRUE;
+    }
+  }
 
-  return TRUE;
+  return FALSE;
 }
 
 /**
