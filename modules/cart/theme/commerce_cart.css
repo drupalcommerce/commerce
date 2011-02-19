@@ -1,0 +1,20 @@
+/* $Id$ */
+
+.view-commerce-cart-block tr {
+  vertical-align: top;
+}
+
+.view-commerce-cart-block .views-field-quantity {
+  white-space: nowrap;
+}
+
+.view-commerce-cart-block td.price,
+.view-commerce-cart-form td.price,
+.view-commerce-cart-summary td.price {
+  white-space: nowrap;
+}
+
+.view-commerce-cart-form tr,
+.view-commerce-cart-summary tr {
+  vertical-align: top;
+}

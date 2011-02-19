@@ -43,6 +43,8 @@ function commerce_cart_view() {
     $content = theme('commerce_cart_empty_page');
   }
   else {
+    drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+
     // Add the form for editing the cart contents.
     $content = commerce_embed_view('commerce_cart_form', 'default', array($order->order_id));
   }

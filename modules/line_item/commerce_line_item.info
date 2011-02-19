@@ -13,6 +13,7 @@ files[] = includes/commerce_line_item.controller.inc
 files[] = includes/views/handlers/commerce_line_item_handler_area_line_item_summary.inc
 files[] = includes/views/handlers/commerce_line_item_handler_area_line_item_actions.inc
 files[] = includes/views/handlers/commerce_line_item_handler_argument_line_item_line_item_id.inc
+files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_title.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_type.inc
 files[] = includes/views/handlers/commerce_line_item_handler_filter_line_item_type.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_edit.inc

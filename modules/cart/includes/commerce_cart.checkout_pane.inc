@@ -44,6 +44,8 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
 function commerce_cart_contents_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
   $pane_form = array();
 
+  drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 
@@ -59,6 +61,8 @@ function commerce_cart_contents_pane_checkout_form($form, &$form_state, $checkou
  *   Review checkout pane.
  */
 function commerce_cart_contents_pane_review($form, $form_state, $checkout_pane, $order) {
+  drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 

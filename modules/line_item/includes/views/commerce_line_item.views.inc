@@ -62,9 +62,18 @@ function commerce_line_item_views_data() {
 
   // TODO: Expose the display view build mode.
 
+  // Expose the type-dependent line item title.
+  $data['commerce_line_item']['line_item_title'] = array(
+    'field' => array(
+      'title' => t('Title'),
+      'help' => t('The title of the line item determined by its type.'),
+      'handler' => 'commerce_line_item_handler_field_line_item_title',
+    ),
+  );
+
   // Expose the line item label.
   $data['commerce_line_item']['line_item_label'] = array(
-    'title' => t('Line item label'),
+    'title' => t('Label'),
     'help' => t('The label of the line item.'),
     'field' => array(
       'handler' => 'views_handler_field',

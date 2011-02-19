@@ -620,6 +620,26 @@ function commerce_line_item_access($op, $line_item, $account = NULL) {
 }
 
 /**
+ * Returns the title of a line item based on its type.
+ *
+ * Titles are returned sanitized and so do not need to be sanitized again prior
+ * to display.
+ *
+ * @param $line_item
+ *   The line item object whose title should be returned.
+ *
+ * @return
+ *   The type-dependent title of the line item.
+ */
+function commerce_line_item_title($line_item) {
+  // Find the line item type's title callback.
+  $line_item_type = commerce_line_item_type_load($line_item->type);
+  $title_callback = commerce_line_item_type_callback($line_item_type, 'title');
+
+  return $title_callback ? $title_callback($line_item) : '';
+}
+
+/**
  * Implements hook_field_info().
  */
 function commerce_line_item_field_info() {
@@ -853,13 +873,8 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#default_value' => FALSE,
       );
 
-      // The display title should come from the line item type.
-      $line_item_type = commerce_line_item_type_load($line_item->type);
-
-      $title_callback = commerce_line_item_type_callback($line_item_type, 'title');
-
       $element['line_items'][$line_item_id]['title'] = array(
-        '#markup' => $title_callback ? $title_callback($line_item) : '',
+        '#markup' => commerce_line_item_title($line_item),
       );
 
       $element['line_items'][$line_item_id]['line_item_label'] = array(
