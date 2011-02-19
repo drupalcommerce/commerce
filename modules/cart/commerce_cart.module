@@ -367,11 +367,9 @@ function commerce_cart_commerce_order_load($orders) {
           $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
           $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
 
-          // Save the updated line item; for some reason I have to call both
-          // of these functions for the changes to be fully evident on the
-          // current pageload. It could just be a static caching issue.
+          // Save the updated line item and clear the entity cache.
           commerce_line_item_save($line_item_wrapper->value());
-          $line_item_wrapper->save();
+          entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
         }
       }
 
@@ -728,7 +726,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
   // Loop through the line items looking for products.
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     // If this line item matches the product being added...
-    if (empty($line_item_match) &&
+    if (empty($line_item) &&
         $line_item_wrapper->type->value() == 'product' &&
         $line_item_wrapper->commerce_product->product_id->value() == $product_id) {
       // Exit this loop with the $line_item intact so it gets updated.
@@ -758,7 +756,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity) {
 
     // Clear the line item cache so the updated quantity will be available to
     // the ensuing load instead of the original quantity as loaded above.
-    entity_get_controller('commerce_line_item')->resetCache();
+    entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
   }
 
   // Save the updated order.
