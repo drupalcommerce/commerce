@@ -504,6 +504,16 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Paisa'),
       'major_unit' => t('Rupee'),
     ),
+    'IRR' => array(
+      'code' => 'IRR',
+      'symbol' => '﷼',
+      'name' => t('Iranian Rial'),
+      'numeric_code' => '364',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Rial'),
+      'major_unit' => t('Toman'),
+    ),
     'ISK' => array(
       'code' => 'ISK',
       'symbol' => 'Ikr',
