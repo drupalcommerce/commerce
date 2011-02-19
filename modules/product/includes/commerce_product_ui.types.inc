@@ -72,7 +72,8 @@ function theme_product_type_admin_overview($variables) {
  *
  * @see commerce_product_product_type_form()
  */
-function commerce_product_ui_product_type_form_wrapper($product_type) {
+function commerce_product_ui_product_type_form_wrapper($type) {
+  $product_type = commerce_product_type_load($type);
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
 
@@ -95,7 +96,8 @@ function commerce_product_ui_product_type_form_wrapper($product_type) {
  *
  * @see commerce_product_product_type_delete_form()
  */
-function commerce_product_ui_product_type_delete_form_wrapper($product_type) {
+function commerce_product_ui_product_type_delete_form_wrapper($type) {
+  $product_type = commerce_product_type_load($type);
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
 

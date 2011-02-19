@@ -86,10 +86,9 @@ function commerce_product_ui_menu() {
     $type_arg = strtr($type, '_', '-');
 
     $items['admin/commerce/products/types/' . $type_arg] = array(
-      'title callback' => 'commerce_product_type_title',
-      'title arguments' => array($product_type),
+      'title' => $type['name'],
       'page callback' => 'commerce_product_ui_product_type_form_wrapper',
-      'page arguments' => array($product_type),
+      'page arguments' => array($type),
       'access arguments' => array('administer product types'),
       'file' => 'includes/commerce_product_ui.types.inc',
     );
@@ -103,9 +102,9 @@ function commerce_product_ui_menu() {
     $items['admin/commerce/products/types/' . $type_arg . '/delete'] = array(
       'title' => 'Delete',
       'page callback' => 'commerce_product_ui_product_type_delete_form_wrapper',
-      'page arguments' => array($product_type),
+      'page arguments' => array($type),
       'access callback' => 'commerce_product_ui_product_type_update_access',
-      'access arguments' => array($product_type),
+      'access arguments' => array($type),
       'type' => MENU_LOCAL_TASK,
       'context' => MENU_CONTEXT_INLINE,
       'weight' => 10,
@@ -150,7 +149,8 @@ function commerce_product_ui_product_add_any_access() {
 /**
  * Access callback: determines if the user can edit or delete a product type.
  */
-function commerce_product_ui_product_type_update_access($product_type) {
+function commerce_product_ui_product_type_update_access($type) {
+  $product_type = commerce_product_type_load($type);
   if ($product_type['module'] == 'commerce_product_ui') {
     return user_access('administer product types');
   }

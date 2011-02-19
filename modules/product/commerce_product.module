@@ -304,13 +304,6 @@ function commerce_product_type_options_list() {
 }
 
 /**
- * Title callback: return the human-readable product type name.
- */
-function commerce_product_type_title($product_type) {
-  return $product_type['name'];
-}
-
-/**
  * Returns a path argument from a product type.
  */
 function commerce_product_type_to_arg($type) {
