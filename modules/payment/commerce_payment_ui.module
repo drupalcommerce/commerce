@@ -178,8 +178,7 @@ function commerce_payment_ui_forms($form_id, $args) {
  * @see commerce_payment_ui_payment_transaction_delete_form()
  */
 function commerce_payment_ui_form_commerce_payment_ui_payment_transaction_delete_form_alter(&$form, &$form_state) {
-  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment');
-
+  $form['actions']['cancel']['#href'] = 'admin/commerce/orders/' . $form_state['order']->order_id . '/payment';
   $form['#submit'][] = 'commerce_payment_ui_payment_transaction_delete_form_submit';
 }
 

@@ -234,8 +234,7 @@ function commerce_order_ui_order_form_submit($form, &$form_state) {
  * @see commerce_order_ui_order_delete_form()
  */
 function commerce_order_ui_form_commerce_order_ui_order_delete_form_alter(&$form, &$form_state) {
-  $form['actions']['cancel']['#markup'] = l(t('Cancel'), 'admin/commerce/orders');
-
+  $form['actions']['cancel']['#href'] = 'admin/commerce/orders';
   $form['#submit'][] = 'commerce_order_ui_order_delete_form_submit';
 }
 
