@@ -220,12 +220,12 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   // If the user is editing an order, load a fresh copy to merge changes to.
   if ($form_state['commerce_order']->order_id) {
-    $order = commerce_order_load($form_state['commerce_order']->order_id);
+    $form_state['commerce_order'] = commerce_order_load($form_state['commerce_order']->order_id);
   }
-  else {
-    // Otherwise use the new order stored in the form state.
-    $order = $form_state['commerce_order'];
-  }
+
+  // Merge changes into the order object in the form state so it is accessible
+  // by field handlers.
+  $order = $form_state['commerce_order'];
 
   if ($form_state['values']['revision'] || !empty($form_state['values']['log'])) {
     $order->revision = TRUE;
@@ -252,6 +252,22 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   // Notify field widgets.
   field_attach_submit('commerce_order', $order, $form, $form_state);
+
+  // Ensure the attached customer profiles are associated with the order owner
+  // if they do not have a uid yet and the order does.
+  if ($order->uid) {
+    $entity_info = entity_get_info('commerce_customer_profile');
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    foreach ($entity_info['bundles'] as $profile_type => $data) {
+      $field_name = 'commerce_customer_' . $profile_type;
+
+      if ($wrapper->{$field_name}->uid->value() == 0) {
+        $wrapper->{$field_name}->uid = $order->uid;
+        $wrapper->{$field_name}->save();
+      }
+    }
+  }
 
   // Update the order status if specified.
   if ($form_state['values']['status'] != $form_state['values']['status_original']) {
