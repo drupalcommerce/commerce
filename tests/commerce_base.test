@@ -55,6 +55,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'commerce_payment',
       'commerce_cart',
       'commerce_tax',
+      'commerce_product_pricing',
     );
     $ui = array(
       //'commerce_ui' // Already added in $api due to checkout module
@@ -63,6 +64,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'commerce_product_ui',
       'commerce_customer_ui',
       'commerce_payment_ui',
+      'commerce_product_pricing_ui',
       'commerce_tax_ui',
       //'rules_admin',
     );
@@ -133,13 +135,20 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     );
     $store_admin = array(
       'administer checkout',
+      'access checkout',
       'configure store',
       'administer customer profiles',
       'administer customer profile types',
+      'administer line items',
       'administer line item types',
       'administer orders',
+      'access orders',
+      'create orders',
+      'edit any order',
       'administer products',
       'administer product types',
+      'administer product pricing',
+      'administer payments',
     );
 
     $final_permissions = array();
@@ -467,6 +476,17 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     return $product_nodes;
   }
 
+  /**
+   * Enable extra currencies in the store.
+   *
+   * @param $currencies
+   *  Array of currency codes to be enabled
+   */
+  public function enableCurrencies($currencies) {
+    $currencies = array_merge(drupal_map_assoc($currencies), variable_get('commerce_enabled_currencies', array('USD' => 'USD')));
+    variable_set('commerce_enabled_currencies', $currencies);
+  }
+
   // =============== Helper functions ===============
 
   /**
@@ -786,5 +806,15 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
         $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $output . ' with the rounding step: ' . $rounding_step . '.');
       }
     }
+  }
+
+  /**
+   * Test enabling extra currencies.
+   */
+  public function testEnableCurrencies() {
+    // Enable Euros.
+    $this->enableCurrencies(array('EUR'));
+    // Check if Euros is enabled.
+    $this->assertTrue(in_array('EUR', variable_get('commerce_enabled_currencies', array('USD' => 'USD'))), t('Euros are enabled'));
   }
 }
