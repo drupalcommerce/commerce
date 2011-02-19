@@ -334,8 +334,6 @@ function commerce_cart_commerce_order_load($orders) {
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
       // Loop over every line item on the order...
-      $unchanged_line_items = array();
-
       foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
         // If the line item is a product line item...
         if ($line_item_wrapper->type->value() == 'product') {
