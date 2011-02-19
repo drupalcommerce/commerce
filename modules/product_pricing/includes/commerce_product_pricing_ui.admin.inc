@@ -156,10 +156,9 @@ function commerce_product_pre_calculation_settings_form_submit($form, &$form_sta
 
   // React to the management buttons if they were used to submit the form.
 
-  // TODO: Update the API to actually support a batch pre-calculation instead
-  // of doing them all at once now.
+  // If the batch calculation button was pressed, setup the batch now.
   if (!empty($values['batch_calculate']) && $values['op'] == $values['batch_calculate']) {
-    commerce_product_pre_calculate_sell_prices();
+    commerce_product_batch_pre_calculate_sell_prices();
   }
 
   // TODO: Expand the API to allow for deletion of pre-calculated prices and

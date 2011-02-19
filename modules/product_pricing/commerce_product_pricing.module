@@ -155,55 +155,90 @@ function commerce_product_pre_calculation_key() {
 }
 
 /**
+ * Returns an array of rule keys used for pre-calculating product sell prices.
+ *
+ * Rule keys represent every possible combination of rules that might alter any
+ * given product sell price. If no valid rules exist, an empty array is returned.
+ */
+function commerce_product_pre_calculation_rule_keys() {
+  static $rule_keys = NULL;
+
+  if (is_null($rule_keys)) {
+    // Load the sell price calculation event.
+    $event = rules_get_cache('event_commerce_product_calculate_sell_price');
+
+    // Build an array of the names of all rule configurations that qualify for
+    // dynamic pre-calculation.
+    $rule_names = array();
+
+    foreach ($event as $rule) {
+      if (commerce_product_valid_pre_calculation_rule($rule)) {
+        $rule_names[] = $rule->name;
+      }
+    }
+
+    // Sort to ensure the names are always in alphabetical order.
+    sort($rule_names);
+
+    // Using the array of names, generate an array that contains keys for every
+    // possible combination of these Rules applying (i.e. conditions all passing).
+    $rule_keys = array();
+
+    // First find the maximum number of combinations as a power of two.
+    $max = pow(2, count($rule_names));
+
+    // Loop through each combination expressed as an integer.
+    for ($i = 0; $i < $max; $i++) {
+      // Convert the integer to a string binary representation, reverse it (so the
+      // first bit is on the left instead of right), and split it into an array
+      // with each bit as its own value.
+      $bits = str_split(strrev(sprintf('%0' . count($rule_names) . 'b', $i)));
+
+      // Create a key of underscore delimited Rule IDs by assuming a 1 means the
+      // Rule ID in the $rule_ids array with the same key as the bit's position in
+      // the string should be assumed to have applied.
+      $key = implode('|', array_intersect_key($rule_names, array_intersect($bits, array('1'))));
+
+      $rule_keys[] = $key;
+    }
+  }
+
+  return $rule_keys;
+}
+
+/**
  * Pre-calculates sell prices for qualifying products based on valid rule
  *   configurations on the "Calculating product sell price" event.
+ *
+ * @param $from
+ *   For calculating prices for a limited number of products at a time, specify
+ *     the range's "from" amount.
+ * @param $count
+ *   For calculating prices for a limited number of products at a time, specify
+ *     the range's "count" amount.
+ *
+ * @return
+ *   The number of pre-calculated prices created.
  */
-function commerce_product_pre_calculate_sell_prices() {
+function commerce_product_pre_calculate_sell_prices($from = NULL, $count = 1) {
+  $total = 0;
+
   // Load the sell price calculation event.
   $event = rules_get_cache('event_commerce_product_calculate_sell_price');
 
   // If there are no rule configurations, leave without further processing.
   if (empty($event)) {
-    return;
+    return array();
   }
 
-  // Build an array of the names of all rule configurations that qualify for
-  // dynamic pre-calculation.
-  $rule_names = array();
-
-  foreach ($event as $rule) {
-    if (commerce_product_valid_pre_calculation_rule($rule)) {
-      $rule_names[] = $rule->name;
-    }
+  // If a range was specified, query just those products...
+  if (!is_null($from)) {
+    $query = db_query_range("SELECT product_id FROM {commerce_product}", $from, $count);
   }
-
-  // Sort to ensure the names are always in alphabetical order.
-  sort($rule_names);
-
-  // Using the array of names, generate an array that contains keys for every
-  // possible combination of these Rules applying (i.e. conditions all passing).
-  $rule_keys = array();
-
-  // First find the maximum number of combinations as a power of two.
-  $max = pow(2, count($rule_names));
-
-  // Loop through each combination expressed as an integer.
-  for ($i = 0; $i < $max; $i++) {
-    // Convert the integer to a string binary representation, reverse it (so the
-    // first bit is on the left instead of right), and split it into an array
-    // with each bit as its own value.
-    $bits = str_split(strrev(sprintf('%0' . count($rule_names) . 'b', $i)));
-
-    // Create a key of underscore delimited Rule IDs by assuming a 1 means the
-    // Rule ID in the $rule_ids array with the same key as the bit's position in
-    // the string should be assumed to have applied.
-    $key = implode('|', array_intersect_key($rule_names, array_intersect($bits, array('1'))));
-
-    $rule_keys[] = $key;
+  else {
+    // Otherwise load all products.
+    $query = db_query("SELECT product_id FROM {commerce_product}");
   }
-
-  // Load all products.
-  $query = db_query("SELECT product_id FROM {commerce_product}");
 
   while ($product_id = $query->fetchField()) {
     $product = commerce_product_load($product_id);
@@ -211,7 +246,7 @@ function commerce_product_pre_calculate_sell_prices() {
     // If the product is valid for pre-calculation...
     if (commerce_product_valid_pre_calculation_product($product)) {
       // For each rule key (i.e. set of applicable rule configurations)...
-      foreach ($rule_keys as $key) {
+      foreach (commerce_product_pre_calculation_rule_keys() as $key) {
         // Build a product line item and Rules state object.
         $line_item = commerce_product_line_item_new($product);
 
@@ -256,10 +291,15 @@ function commerce_product_pre_calculate_sell_prices() {
           'created' => time(),
         );
 
-        drupal_write_record('commerce_calculated_price', $record);
+        // Save the price and increment the total if successful.
+        if (drupal_write_record('commerce_calculated_price', $record) == SAVED_NEW) {
+          $total++;
+        }
       }
     }
   }
+
+  return $total;
 }
 
 /**
@@ -325,4 +365,87 @@ function commerce_product_valid_pre_calculation_product($product) {
   }
 
   return TRUE;
+}
+
+/**
+ * Sets a batch operation to pre-calculate product sell prices.
+ *
+ * This function prepares and sets a batch to pre-calculate product sell prices
+ * based on the number of variations for each price and the number of products
+ * to calculate. It does not call batch_process(), so if you are not calling
+ * this function from a form submit handler, you must process yourself.
+ */
+function commerce_product_batch_pre_calculate_sell_prices() {
+  // Create the batch array.
+  $batch = array(
+    'title' => t('Pre-calculating product sell prices'),
+    'operations' => array(),
+    'finished' => 'commerce_product_batch_pre_calculate_sell_prices_finished',
+  );
+
+  // Add operations based on the number of rule combinations and number of
+  // products to be pre-calculated.
+  $rule_keys = commerce_product_pre_calculation_rule_keys();
+
+  // Count the number of products.
+  $product_count = db_select('commerce_product', 'cp')
+    ->fields('cp', array('product_id'))
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+
+  // Create a "step" value based on the number of rule keys, i.e. how many
+  // products to calculate at a time. This will roughly limit the number of
+  // queries to 500 on any given batch operations.
+  if (count($rule_keys) > 500) {
+    $step = 1;
+  }
+  else {
+    $step = min(round(500 / count($rule_keys)) + 1, $product_count);
+  }
+
+  // Add batch operations to pre-calculate every price.
+  for ($i = 0; $i < $product_count; $i += $step) {
+    // Ensure the maximum step doesn't go over the total number of rows for
+    // accurate reporting later.
+    if ($i + $step > $product_count) {
+      $step = $product_count - $i;
+    }
+
+    $batch['operations'][] = array('_commerce_product_batch_pre_calculate_sell_prices', array($i, $step));
+  }
+
+  batch_set($batch);
+}
+
+/**
+ * Calculates pre-calculation using the given range values and updates the batch
+ *   with processing information.
+ */
+function _commerce_product_batch_pre_calculate_sell_prices($from, $count, &$context) {
+  // Keep track of the total number of products covered and the total number of
+  // prices created in the results array.
+  if (empty($context['results'])) {
+    $context['results'] = array(0, 0);
+  }
+
+  // Increment the number of products processed.
+  $context['results'][0] += $count;
+
+  // Increment the number of actual prices created.
+  $context['results'][1] += commerce_product_pre_calculate_sell_prices($from, $count);
+}
+
+/**
+ * Displays a message upon completion of a batched sell price pre-calculation.
+ */
+function commerce_product_batch_pre_calculate_sell_prices_finished($success, $results, $operations) {
+  if ($success) {
+    $message = format_plural($results[0], "Sell prices pre-calculated for 1 product resulting in @total prices created.", "Sell prices pre-calculated for @count products resulting in @total prices created.", array('@total' => $results[1]));
+  }
+  else {
+    $message = t('Batch pre-calculation finished with an error.');
+  }
+
+  drupal_set_message($message);
 }
