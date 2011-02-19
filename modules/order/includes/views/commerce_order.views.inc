@@ -81,11 +81,29 @@ function commerce_order_views_data() {
 
   // Expose the owner uid.
   $data['commerce_order']['uid'] = array(
-    'title' => t('Owner'),
-    'help' => t('Relate an order to its owner.'),
+    'title' => t('Uid'),
+    'help' => t("The owner's user ID."),
+    'field' => array(
+      'handler' => 'views_handler_field_user',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_user_uid',
+      'name field' => 'name', // display this field in the summary
+    ),
+    'filter' => array(
+      'title' => t('Name'),
+      'handler' => 'views_handler_filter_user_name',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
     'relationship' => array(
+      'title' => t('Owner'),
+      'help' => t("Relate this order to its owner's user account"),
       'handler' => 'views_handler_relationship',
       'base' => 'users',
+      'base field' => 'uid',
       'field' => 'uid',
       'label' => t('Order owner'),
     ),
