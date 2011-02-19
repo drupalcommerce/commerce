@@ -304,32 +304,34 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * Create a dummy order in a given status.
    *
    * @param $uid
-   * 	Id of the user that owns the order.
+   * 	 ID of the user that owns the order.
    * @param $products
-   * 	Array of products that are going to be added to the order.
+   *  	Array of products that are going to be added to the order.
    * @param $status
-   * 	Status of the order
+   * 	 Status of the order
+   *
    * @return
-   * A commerce order object in the given status.
+   *   A commerce order object in the given status.
    */
   public function createDummyOrder($uid = 1, $products = array(), $status = 'cart') {
-    // If there aren't products to add to the order, create one.
+    // If there aren't any products to add to the order, create one.
     if (empty($products)) {
       $sku = 'PROD-01';
       $product_name = 'Product One';
       $product = $this->createDummyProduct($sku, $product_name, -1, 'USD', $uid);
-      $products[]= $product;
+      $products[] = $product;
     }
 
-    // Create a new order and add the products to the cart
+    // Create a new shopping cart order and add the products to it.
     $order = commerce_order_new($uid, $status);
+
     foreach($products as $product) {
-      $order = commerce_cart_product_add($uid, $product->product_id, rand(1,100));
+      commerce_cart_product_add($uid, $product->product_id, rand(1,100));
     }
 
     // If the order should be in a different status, update it.
     if ($status <> 'cart') {
-      commerce_order_status_update($order, $status);
+      $order = commerce_order_status_update($order, $status);
     }
 
     return $order;
