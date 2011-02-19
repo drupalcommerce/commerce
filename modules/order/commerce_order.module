@@ -964,13 +964,13 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
     field_create_instance($instance);
   }
 
-  // Add the customer profile reference fields for each profile type.
-  foreach (commerce_customer_profile_types() as $customer_profile_type => $profile_type) {
-    commerce_order_configure_customer_profile_type($customer_profile_type, $profile_type['name']);
-  }
-
   // Add the order total price field.
   commerce_price_create_instance('commerce_order_total', 'commerce_order', $type, t('Order total'), -8, FALSE, array('label' => 'inline'));
+
+  // Add the customer profile reference fields for each profile type.
+  foreach (commerce_customer_profile_types() as $customer_profile_type => $profile_type) {
+    commerce_order_configure_customer_profile_type($customer_profile_type, $profile_type['name'], $type);
+  }
 }
 
 /**

@@ -79,6 +79,8 @@ function commerce_customer_modules_enabled($modules) {
 
       // Loop through and configure the customer profile types defined by the module.
       foreach ($profile_types as $type => $profile_type) {
+        // Default the addressfield property if it isn't set.
+        $profile_type = array_merge(array('addressfield' => TRUE), $profile_type);
         commerce_customer_configure_customer_profile_type($profile_type);
       }
     }
@@ -155,6 +157,7 @@ function commerce_customer_commerce_customer_profile_type_info() {
     'type' => 'billing',
     'name' => t('Billing information'),
     'description' => t('The profile used to collect billing information on the checkout and order forms.'),
+    'help' => '',
   );
 
   return $profile_types;
