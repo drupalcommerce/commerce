@@ -56,8 +56,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       $wrapper->commerce_total->currency_code = $wrapper->commerce_unit_price->currency_code->value();
 
       // Give modules the opportunity to prepare field data for saving.
-      field_attach_presave('commerce_line_item', $line_item);
       rules_invoke_all('commerce_line_item_presave', $line_item);
+      field_attach_presave('commerce_line_item', $line_item);
 
       // If this is a new line item...
       if (empty($line_item->line_item_id)) {
