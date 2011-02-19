@@ -391,6 +391,56 @@ function commerce_currency_convert($amount, $currency_code, $target_currency_cod
 }
 
 /**
+ * Converts a price amount to an integer value for storage in the database.
+ *
+ * @param $amount
+ *   The price amount to convert to an integer.
+ * @param $currency_code
+ *   The currency code of the price whose decimals value will be used to
+ *     multiply by the proper factor when converting the amount.
+ *
+ * @return
+ *   The integer value of the price amount.
+ */
+function commerce_currency_amount_to_integer($amount, $currency_code) {
+  static $factors;
+
+  // If the divisor for this currency hasn't been calculated yet...
+  if (empty($factors[$currency_code])) {
+    // Load the currency and calculate its factor as a power of 10.
+    $currency = commerce_currency_load($currency_code);
+    $factors[$currency_code] = pow(10, $currency['decimals']);
+  }
+
+  return $amount * $factors[$currency_code];
+}
+
+/**
+ * Converts an integer value to a price amount when loading from the database.
+ *
+ * @param $integer
+ *   The integer to convert to a price amount.
+ * @param $currency_code
+ *   The currency code of the price whose decimals value will be used to
+ *     divide by the proper divisor when converting the integer.
+ *
+ * @return
+ *   The price amount depending on the number of decimals the currency uses.
+ */
+function commerce_currency_integer_to_amount($integer, $currency_code) {
+  static $divisors;
+
+  // If the divisor for this currency hasn't been calculated yet...
+  if (empty($divisors[$currency_code])) {
+    // Load the currency and calculate its divisor as a power of 10.
+    $currency = commerce_currency_load($currency_code);
+    $divisors[$currency_code] = pow(10, $currency['decimals']);
+  }
+
+  return $integer / $divisors[$currency_code];
+}
+
+/**
  * Returns an associative array of month names keyed by numeric representation.
  */
 function commerce_months() {
