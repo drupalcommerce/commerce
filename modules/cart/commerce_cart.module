@@ -339,9 +339,15 @@ function commerce_cart_block_view($delta) {
  * prices of product line items and save them if any values have changed.
  */
 function commerce_cart_commerce_order_load($orders) {
+  static $refreshed = array();
+
   foreach ($orders as $order) {
-    if (commerce_cart_order_is_cart($order)) {
+    // Refresh only if this order hasn't been refreshed already.
+    if (!in_array($order->order_id, $refreshed) &&
+      commerce_cart_order_is_cart($order)) {
+      // Refresh the order and add its ID to the refreshed array.
       commerce_cart_order_refresh($order);
+      $refreshed[] = $order->order_id;
     }
   }
 }
@@ -557,11 +563,18 @@ function commerce_cart_order_refresh($order) {
     }
   }
 
+  // Store a copy of the original order to see if it changes later.
+  $original_order = clone($order_wrapper->value());
+
   // Allow other modules to alter the entire order on a shopping cart refresh.
   module_invoke_all('commerce_cart_order_refresh', $order_wrapper);
 
-  // Save the order once here.
-  $order_wrapper->save();
+  // Save the order once here if it has changed.
+  if ($order_wrapper->value() != $original_order) {
+    // Use a clone so the save doesn't interfere with price values in a live
+    // order object that would be modified on presave.
+    commerce_order_save(clone($order_wrapper->value()));
+  }
 
   return $order_wrapper;
 }
