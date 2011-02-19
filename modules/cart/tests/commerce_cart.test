@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Unit tests for the commerce cart module.
+ * Functional tests for the commerce cart module.
  */
 
 /**
@@ -441,7 +441,7 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
   /**
    * Test the add to cart functional process with attributes.
    */
-  public function AAtestCommerceCartSelectProductAdd() {
+  public function testCommerceCartSelectProductAdd() {
     // Go to product page.
     $this->drupalGet('node/' . $this->product_node->nid);
     // Set the product that we are checking.

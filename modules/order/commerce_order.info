@@ -32,4 +32,4 @@ files[] = includes/views/handlers/commerce_order_handler_filter_order_type.inc
 files[] = includes/views/handlers/commerce_order_plugin_argument_validate_user.inc
 
 ; Simple tests
-; files[] = tests/commerce_order.test
+files[] = tests/commerce_order_ui.test
