@@ -59,7 +59,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
-    '#weight' => 40,
+    '#weight' => 400,
   );
 
   // We add the form's #submit array to this button along with the actual submit
