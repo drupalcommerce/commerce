@@ -62,10 +62,8 @@ function commerce_customer_entity_info() {
  */
 function commerce_customer_enable() {
   // Add the address field to customer profile bundles.
-  $entity_info = entity_get_info('commerce_customer_profile');
-
-  foreach ($entity_info['bundles'] as $type => $data) {
-    commerce_customer_configure_customer_profile_type($type);
+  foreach (commerce_customer_profile_types() as $type => $profile_type) {
+    commerce_customer_configure_customer_profile_type($profile_type);
   }
 }
 
@@ -77,11 +75,11 @@ function commerce_customer_modules_enabled($modules) {
   foreach ($modules as $module) {
     // If the module implements hook_commerce_customer_profile_type_info()...
     if (module_hook($module, 'commerce_customer_profile_type_info')) {
-      $customer_profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
+      $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
 
       // Loop through and configure the customer profile types defined by the module.
-      foreach ($customer_profile_types as $customer_profile_type) {
-        commerce_customer_configure_customer_profile_type($customer_profile_type);
+      foreach ($profile_types as $type => $profile_type) {
+        commerce_customer_configure_customer_profile_type($profile_type);
       }
     }
   }
@@ -157,8 +155,6 @@ function commerce_customer_commerce_customer_profile_type_info() {
     'type' => 'billing',
     'name' => t('Billing information'),
     'description' => t('The profile used to collect billing information on the checkout and order forms.'),
-    'addressfield' => TRUE,
-    'help' => '',
   );
 
   return $profile_types;
@@ -196,9 +192,15 @@ function commerce_customer_profile_types() {
     // Find profile types defined by hook_commerce_customer_profile_type_info().
     foreach (module_implements('commerce_customer_profile_type_info') as $module) {
       foreach (module_invoke($module, 'commerce_customer_profile_type_info') as $type => $profile_type) {
-        // Set the module each profile type is defined by.
-        $profile_type['module'] = $module;
-        $profile_types[$type] = $profile_type;
+        // Initialize customer profile type properties if necessary.
+        $defaults = array(
+          'description' => '',
+          'help' => '',
+          'addressfield' => TRUE,
+          'module' => $module,
+        );
+
+        $profile_types[$type] = array_merge($defaults, $profile_type);
       }
     }
 
@@ -462,16 +464,17 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
 /**
  * Ensures the address field is present on the specified customer profile bundle.
  */
-function commerce_customer_configure_customer_profile_type($type) {
-  if ($type['addressfield']) {
+function commerce_customer_configure_customer_profile_type($profile_type) {
+  if ($profile_type['addressfield']) {
     // If a field type we know should exist isn't found, clear the Field cache.
     if (!field_info_field_types('addressfield')) {
       field_cache_clear();
     }
+
     // Look for or add an address field to the customer profile type.
-    $field_name = 'commerce_' . $type['type'] . '_address';
+    $field_name = 'commerce_' . $profile_type['type'] . '_address';
     $field = field_info_field($field_name);
-    $instance = field_info_instance('commerce_customer_profile', $field_name, $type['type']);
+    $instance = field_info_instance('commerce_customer_profile', $field_name, $profile_type['type']);
 
     if (empty($field)) {
       $field = array(
@@ -489,7 +492,7 @@ function commerce_customer_configure_customer_profile_type($type) {
       $instance = array(
         'field_name' => $field_name,
         'entity_type' => 'commerce_customer_profile',
-        'bundle' => $type['type'],
+        'bundle' => $profile_type['type'],
         'label' => t('Address'),
         'required' => TRUE,
         'widget' => array(
@@ -563,8 +566,8 @@ function commerce_customer_field_settings_form($field, $instance, $has_data) {
  * Implements hook_field_validate().
  *
  * Possible error codes:
- * - 'invalid_profile_id': profile_id is not valid for the field (not a
- *                           valid line item ID).
+ * - 'invalid_profile_id': profile_id is not valid for the field (not a valid
+ *   line item ID).
  */
 function commerce_customer_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
   if ($field['type'] == 'commerce_customer_profile_reference') {
@@ -588,7 +591,7 @@ function commerce_customer_field_validate($entity_type, $object, $field, $instan
 
     // Prevent performance hog if there are no ids to check.
     if ($profile_ids) {
-      $profiles = commerce_customer_profile_load_multiple($profile_ids, array('type' => $instance['settings']['profile_type'][0]));
+      $profiles = commerce_customer_profile_load_multiple($profile_ids, array('type' => $field['settings']['profile_type']));
 
       foreach ($items as $delta => $item) {
         if (is_array($item)) {
@@ -734,7 +737,7 @@ function commerce_customer_options_list($field) {
 function commerce_customer_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Define the complex customer profile reference field widget.
   if ($instance['widget']['type'] == 'commerce_customer_profile_manager') {
-    $profile_type = commerce_customer_profile_type_load($instance['settings']['profile_type'][0]);
+    $profile_type = commerce_customer_profile_type_load($field['settings']['profile_type']);
 
     // Build an array of customer profile IDs from this field's values.
     $profile_ids = array();

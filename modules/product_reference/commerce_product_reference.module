@@ -221,7 +221,7 @@ function commerce_product_reference_field_info() {
 }
 
 /**
- * Implements hook_field_settings_form().
+ * Implements hook_field_instance_settings_form().
  */
 function commerce_product_reference_field_instance_settings_form($field, $instance) {
   $settings = $instance['settings'];
