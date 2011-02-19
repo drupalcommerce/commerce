@@ -20,7 +20,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
    */
   protected $checkout_url;
 
-	/**
+  /**
    * Order object.
    */
   protected $order;
@@ -64,7 +64,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
    *  products and prepares a cart.
    */
   protected function prepareAnonymousEnviroment() {
-    // Login as admin user to grat permissions.
+    // Login as admin user to grant permissions.
     $this->drupalLogin($this->site_admin);
     user_role_change_permissions(DRUPAL_ANONYMOUS_RID, array(
       'access checkout' => TRUE,
@@ -162,10 +162,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Fill in the required information for billing pane, with a random State.
     $info = array(
       'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
     );
     $this->drupalPost(NULL, $info, t('Continue'));
 
@@ -253,14 +253,14 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Fill in the required information for billing pane, with a random State.
     $info = array(
       'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
     );
 
     // Also add the mail for the account pane.
-    $info+= array(
+    $info += array(
       'account[login][mail]' => $user_mail,
     );
 
@@ -328,10 +328,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Fill in the required information for billing pane, with a random State.
     $info = array(
       'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
     );
 
     // Also add the mail for the account pane.
