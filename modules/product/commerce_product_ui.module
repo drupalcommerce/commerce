@@ -86,7 +86,7 @@ function commerce_product_ui_menu() {
     $type_arg = strtr($type, '_', '-');
 
     $items['admin/commerce/products/types/' . $type_arg] = array(
-      'title' => $type['name'],
+      'title' => $product_type['name'],
       'page callback' => 'commerce_product_ui_product_type_form_wrapper',
       'page arguments' => array($type),
       'access arguments' => array('administer product types'),
