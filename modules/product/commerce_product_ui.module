@@ -95,7 +95,7 @@ function commerce_product_ui_menu() {
     $items['admin/commerce/products/types/' . $type_arg . '/edit'] = array(
       'title' => 'Edit',
       'access callback' => 'commerce_product_ui_product_type_update_access',
-      'access arguments' => array($product_type),
+      'access arguments' => array($type),
       'type' => MENU_DEFAULT_LOCAL_TASK,
       'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     );
@@ -148,9 +148,13 @@ function commerce_product_ui_product_add_any_access() {
 
 /**
  * Access callback: determines if the user can edit or delete a product type.
+ *
+ * @param $type
+ *   The machine-name of the product type to be edited or deleted.
  */
 function commerce_product_ui_product_type_update_access($type) {
   $product_type = commerce_product_type_load($type);
+
   if ($product_type['module'] == 'commerce_product_ui') {
     return user_access('administer product types');
   }

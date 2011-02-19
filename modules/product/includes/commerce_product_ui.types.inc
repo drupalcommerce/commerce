@@ -67,13 +67,20 @@ function theme_product_type_admin_overview($variables) {
 /**
  * Form callback wrapper: create or edit a product type.
  *
- * @param $product_type
- *   The product type array being created or edited by this form.
+ * @param $type
+ *   The machine-name of the product type being created or edited by this form
+ *     or a full product type array.
  *
  * @see commerce_product_product_type_form()
  */
 function commerce_product_ui_product_type_form_wrapper($type) {
-  $product_type = commerce_product_type_load($type);
+  if (is_array($type)) {
+    $product_type = $type;
+  }
+  else {
+    $product_type = commerce_product_type_load($type);
+  }
+
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
 
@@ -91,13 +98,20 @@ function commerce_product_ui_product_type_form_wrapper($type) {
 /**
  * Form callback wrapper: confirmation form for deleting a product type.
  *
- * @param $product_type
- *   The product type array being deleted by this form.
+ * @param $type
+ *   The machine-name of the product type being created or edited by this form
+ *     or a full product type array.
  *
  * @see commerce_product_product_type_delete_form()
  */
 function commerce_product_ui_product_type_delete_form_wrapper($type) {
-  $product_type = commerce_product_type_load($type);
+  if (is_array($type)) {
+    $product_type = $type;
+  }
+  else {
+    $product_type = commerce_product_type_load($type);
+  }
+
   // Add the breadcrumb for the form's location.
   commerce_product_ui_set_breadcrumb(TRUE);
 
