@@ -16,6 +16,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
 
     $options['show_quantity'] = array('default' => FALSE);
     $options['default_quantity'] = array('default' => 1);
+    $options['display_path'] = array('default' => FALSE);
 
     return $options;
   }
@@ -39,6 +40,12 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       '#element_validate' => array('commerce_cart_field_formatter_settings_form_quantity_validate'),
       '#size' => 16,
     );
+
+    $form['display_path'] = array(
+      '#type' => 'checkbox',
+      '#title' => t("Link products added to the cart from this View to this View's path if displayed as a page."),
+      '#default_value' => $this->options['display_path'],
+    );
   }
 
   function query() {
@@ -54,7 +61,17 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       // Generate a form ID for this add to cart form.
       $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
 
-      return drupal_render(drupal_get_form($form_id, $product_ids, $this->options['show_quantity'], $default_quantity));
+      // Generate a display URI array if this field is displayed on a page View.
+      if ($this->view->display[$this->view->current_display]->display_plugin == 'page' &&
+        $this->options['display_path']) {
+        // Use the display options array as it contains the required path key.
+        $display_uri = $this->view->display[$this->view->current_display]->display_options;
+      }
+      else {
+        $display_uri = NULL;
+      }
+
+      return drupal_render(drupal_get_form($form_id, $product_ids, $this->options['show_quantity'], $default_quantity, array(), $display_uri));
     }
   }
 }
