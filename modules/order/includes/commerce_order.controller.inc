@@ -233,9 +233,8 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
     }
 
     // Call the default attachLoad() method. This will add fields and call
-    // hook_user_load().
+    // hook_commerce_order_load().
     parent::attachLoad($queried_orders, $revision_id);
-
   }
 
   /**

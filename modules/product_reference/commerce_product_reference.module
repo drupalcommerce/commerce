@@ -49,7 +49,7 @@ function commerce_product_reference_field_extra_fields() {
 }
 
 /**
- * Implements hook_form_FORMID_alter().
+ * Implements hook_form_FORM_ID_alter().
  *
  * Override the field manage display screen to add a description to the fields
  * we embed into the target node from the product.
@@ -579,39 +579,6 @@ function commerce_product_reference_field_widget_error($element, $error) {
 }
 
 /**
- * Implements hook_field_prepare_translation().
- *
- * When preparing a translation, load any translations of existing references.
- *
-function node_reference_field_prepare_translation($entity_type, $object, $field, $instance, $langcode, &$items) {
-  $addition = array();
-  $addition[$field['field_name']] = array();
-  if (isset($object->translation_source->$field['field_name'])
-  && is_array($object->translation_source->$field['field_name'])) {
-    foreach ($object->translation_source->$field['field_name'] as $key => $reference) {
-      $reference_node = node_load($reference['nid']);
-      // Test if the referenced node type is translatable and, if so,
-      // load translations if the reference is not for the current language.
-      // We can assume the translation module is present because it invokes 'prepare translation'.
-      if (translation_supported_type($reference_node->type)
-      && !empty($reference_node->language)
-      && $reference_node->language != $node->language
-      && $translations = translation_node_get_translations($reference_node->tnid)) {
-        // If there is a translation for the current language, use it.
-        $addition[$field['field_name']][] = array(
-          'nid' => isset($translations[$node->language])
-            ? $translations[$node->language]->nid
-            : $reference['nid'],
-        );
-      }
-    }
-  }
-
-  return $addition;
-}
- */
-
-/**
  * Implements hook_options_list().
  */
 function commerce_product_reference_options_list($field) {
@@ -744,6 +711,45 @@ function commerce_product_reference_configure_line_item() {
     );
     field_create_instance($instance);
   }
+
+  // Look for or add a display path textfield to the product line item type.
+  $field_name = 'commerce_display_path';
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_line_item', $field_name, 'product');
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'text',
+      'cardinality' => 1,
+      'entity_types' => array('commerce_line_item'),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'product',
+      'label' => t('Display path'),
+      'required' => TRUE,
+      'settings' => array(),
+
+      'widget' => array(
+        'type' => 'text_textfield',
+      ),
+
+      'display' => array(
+        'display' => array(
+          'label' => 'hidden',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
 }
 
 /**
@@ -806,11 +812,14 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   The quantity to set for the product.
  * @param $order_id
  *   The ID of the order the line item belongs to (if available).
+ * @param $display_uri
+ *   A URI array as returned by entity_uri() indicating the display to link the
+ *     product line item to; defaults to NULL for no display.
  *
  * @return
  *   The fully loaded line item populated with the product data as specified.
  */
-function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0) {
+function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $display_uri = NULL) {
   // Create the new line item.
   $line_item = entity_create('commerce_line_item', array(
     'type' => 'product',
@@ -819,7 +828,7 @@ function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0) 
   ));
 
   // Populate it with the product information.
-  commerce_product_line_item_populate($line_item, $product);
+  commerce_product_line_item_populate($line_item, $product, $display_uri);
 
   // Return the line item.
   return $line_item;
@@ -832,8 +841,11 @@ function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0) 
  *   The fully loaded line item object, populated by reference.
  * @param $product
  *   The fully loaded product referenced by the line item.
+ * @param $display_uri
+ *   A URI array as returned by entity_uri() indicating the display to link the
+ *     product line item to; defaults to NULL for no display.
  */
-function commerce_product_line_item_populate($line_item, $product) {
+function commerce_product_line_item_populate($line_item, $product, $display_uri = NULL) {
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
@@ -843,6 +855,16 @@ function commerce_product_line_item_populate($line_item, $product) {
 
   // Add the product reference value to the line item for the right language.
   $line_item_wrapper->commerce_product = $product->product_id;
+
+  // Add the display URI if specified.
+  if (is_array($display_uri) && !empty($display_uri['path'])) {
+    $line_item_wrapper->commerce_display_path = $display_uri['path'];
+    $line_item->data['display_uri'] = $display_uri;
+  }
+  else {
+    $line_item_wrapper->commerce_display_path = '';
+    $line_item->data['display_uri'] = NULL;
+  }
 
   // Set the unit price amount and currency code on the line item object.
   $line_item_wrapper->commerce_unit_price->amount = $product_wrapper->commerce_price->amount->value();
@@ -890,7 +912,7 @@ function commerce_product_reference_property_info_callback(&$info, $entity_type,
 }
 
 /**
- * Defines info for the properties of the Price field data structure.
+ * Defines info for the properties of the Product reference field data structure.
  */
 function commerce_product_reference_field_data_property_info($name = NULL) {
   return array(
