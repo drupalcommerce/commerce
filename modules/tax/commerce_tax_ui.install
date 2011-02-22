@@ -11,7 +11,7 @@ function commerce_tax_ui_install() {
   $tax_type['name'] = 'sales_tax';
   $tax_type['title'] = t('Sales tax');
   $tax_type['display_title'] = t('Sales tax');
-  $tax_type['description'] = t('A basic type for taxes that do not display inclusive with product prices and do not require the context of an order to determine applicability to a product.');
+  $tax_type['description'] = t('A basic type for taxes that do not display inclusive with product prices.');
 
   commerce_tax_ui_tax_type_save($tax_type);
 
@@ -21,7 +21,7 @@ function commerce_tax_ui_install() {
   $tax_type['name'] = 'vat';
   $tax_type['title'] = t('VAT');
   $tax_type['display_title'] = t('VAT');
-  $tax_type['description'] = t('A basic type for taxes that display inclusive with product prices and do not require the context of an order to determine applicability to a product.');
+  $tax_type['description'] = t('A basic type for taxes that display inclusive with product prices.');
   $tax_type['display_inclusive'] = TRUE;
 
   commerce_tax_ui_tax_type_save($tax_type);
@@ -65,13 +65,6 @@ function commerce_tax_ui_schema() {
       ),
       'display_inclusive' => array(
         'description' => 'Boolean indicating whether or not taxes of this type display inclusively in product prices.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'order_context' => array(
-        'description' => 'Boolean indicating whether or not taxes of this type require an order context to determine applicability to a product.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,

@@ -21,9 +21,6 @@
  *   - display_inclusive: boolean indicating whether or not prices containing
  *       this tax will include the tax amount in the displayed price; defaults
  *       to FALSE
- *   - order_context: boolean indicating whether or not tax rates of this type
- *       require an order context to be calculated (i.e. sales tax based on the
- *       shipping location); defaults to FALSE
  */
 function hook_commerce_tax_type_info() {
   $tax_types = array();
@@ -80,7 +77,7 @@ function hook_commerce_tax_rate_info() {
  * @see hook_commerce_tax_rate_info()
  */
 function hook_commerce_tax_rate_info_alter(&$tax_rates) {
-  $tax_rates['ky_sales_tax']['rate'] = .0625;
+  $tax_rates['ky_sales_tax']['rate'] = .06;
 }
 
 /**
@@ -91,12 +88,10 @@ function hook_commerce_tax_rate_info_alter(&$tax_rates) {
  *   The tax type object whose rates should be calculated.
  * @param $line_item
  *   The line item to which the taxes should be applied.
- * @param $order
- *   If available, the order to which the line items belong.
  *
  * @see commerce_tax_type_calculate_rates()
  */
-function hook_commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL) {
+function hook_commerce_tax_type_calculate_rates($tax_type, $line_item) {
   // An implementation might contact a web service and apply the tax to the unit
   // price of the line item based on the returned data.
 }

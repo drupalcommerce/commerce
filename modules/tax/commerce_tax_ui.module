@@ -224,7 +224,6 @@ function commerce_tax_ui_tax_type_new() {
     'display_title' => '',
     'description' => '',
     'display_inclusive' => FALSE,
-    'order_context' => FALSE,
     'module' => 'commerce_tax_ui',
     'is_new' => TRUE,
   );

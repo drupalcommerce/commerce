@@ -385,12 +385,6 @@ function commerce_tax_ui_tax_type_form($form, &$form_state, $tax_type) {
     '#default_value' => $tax_type['display_inclusive'],
   );
 
-  $form['tax_type']['order_context'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Taxes of this type require an order context to determine applicability to a product.'),
-    '#default_value' => $tax_type['order_context'],
-  );
-
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),

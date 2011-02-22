@@ -9,16 +9,6 @@
 
 
 /**
- * Implements hook_commerce_cart_line_item_refresh().
- *
- * Because some taxes require the order context to calculate, we have to check
- * taxes when the line item is refreshed in the cart.
- */
-function commerce_tax_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
-  rules_invoke_event('commerce_tax_calculate_order', $line_item, $order_wrapper->value());
-}
-
-/**
  * Returns an array of tax type objects keyed by name.
  */
 function commerce_tax_types() {
@@ -38,7 +28,6 @@ function commerce_tax_types() {
           'display_title' => $tax_type['title'],
           'description' => '',
           'display_inclusive' => FALSE,
-          'order_context' => FALSE,
           'module' => $module,
         );
 
@@ -83,22 +72,6 @@ function commerce_tax_type_titles() {
 
   foreach (commerce_tax_types() as $name => $tax_type) {
     $titles[$name] = $tax_type['title'];
-  }
-
-  return $titles;
-}
-
-/**
- * Returns the titles of every tax type that requires an order context keyed
- *   by name.
- */
-function commerce_tax_type_order_context_titles() {
-  $titles = array();
-
-  foreach (commerce_tax_types() as $name => $tax_type) {
-    if ($tax_type['order_context']) {
-      $titles[$name] = $tax_type['title'];
-    }
   }
 
   return $titles;
@@ -177,16 +150,14 @@ function commerce_tax_rate_titles() {
 
 /**
  * Calculates taxes of a particular type by invoking any components that match
- *   the tax type and arguments passed.
+ *   the tax type.
  *
  * @param $tax_type
  *   The tax type object whose rates should be calculated.
  * @param $line_item
  *   The line item to which the taxes should be applied.
- * @param $order
- *   If available, the order to which the line items belong.
  */
-function commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL) {
+function commerce_tax_type_calculate_rates($tax_type, $line_item) {
   // Load all the rule components.
   $components = rules_get_components(FALSE, 'action');
 
@@ -198,20 +169,15 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item, $order = NULL)
 
       // If we can load the current rate's component...
       if (!empty($components[$component_name])) {
-        // Invoke it using the appropriate arguments for the type.
-        if ($tax_type['order_context']) {
-          rules_invoke_component($component_name, $line_item, $order);
-        }
-        else {
-          rules_invoke_component($component_name, $line_item);
-        }
+        // Invoke it with the line item.
+        rules_invoke_component($component_name, $line_item);
       }
     }
   }
 
   // Allow modules handling tax application on their own to apply rates of the
   // current type as well.
-  module_invoke_all('commerce_tax_type_calculate_rates', $tax_type, $line_item, $order);
+  module_invoke_all('commerce_tax_type_calculate_rates', $tax_type, $line_item);
 }
 
 /**
@@ -230,19 +196,30 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
     // Create a price data structure for the tax.
     $tax_price = array(
       'amount' => $wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'],
-      'currency_code' => $wrapper->commerce_unit_price->currency_code,
-      'data' => array(),
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(
+        'tax_rate' => $tax_rate,
+      ),
     );
 
-    // TODO: Add the tax price to the unit price's data array; requires entity
-    // property info integration for the data property.
+    // Add the tax to the unit price's data array along with a display inclusive
+    // property used to track whether or not the tax is included in the price.
+    $data = $wrapper->commerce_unit_price->data->value();
+    $data['taxes'][$tax_rate['name']] = $tax_price;
+    $data['taxes'][$tax_rate['name']]['data']['display_inclusive'] = FALSE;
 
     // If the rate specifies a valid tax type...
     if ($tax_type = commerce_tax_type_load($tax_rate['type'])) {
       // Include the tax amount in the displayed unit price if specified.
       if ($tax_type['display_inclusive']) {
         $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() + $tax_price['amount'];
+
+        // Indicate in the data array that this tax is inclusive.
+        $data['taxes'][$tax_rate['name']]['data']['display_inclusive'] = TRUE;
       }
     }
+
+    // Update the data array to our new value.
+    $wrapper->commerce_unit_price->data = $data;
   }
 }
