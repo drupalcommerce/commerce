@@ -1,0 +1,10 @@
+/* $Id$ */
+
+.field-type-commerce-price .form-item {
+  float: left;
+  margin-right: 1em;
+}
+
+.commerce-price-tax-included-clearfix {
+  clear: left;
+}
