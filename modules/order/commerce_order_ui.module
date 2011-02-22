@@ -296,5 +296,7 @@ function commerce_order_ui_order_view($order, $view_mode = 'administrator', $bre
     commerce_order_ui_set_breadcrumb();
   }
 
+  drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order.css');
+
   return commerce_order_build_content($order, $view_mode);
 }

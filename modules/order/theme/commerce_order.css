@@ -1,0 +1,11 @@
+/* $Id$ */
+
+.field-name-commerce-order-total .commerce-price-formatted-components {
+  width: 33%;
+  margin-left: auto;
+}
+
+.field-name-commerce-order-total .commerce-price-formatted-components tr.component-type-commerce-price-formatted-amount {
+  background-color: #D3E9F4;
+  font-weight: bold;
+}
