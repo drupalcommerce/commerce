@@ -41,21 +41,42 @@ function commerce_tax_ui_menu() {
     // Convert underscores to hyphens for the menu item argument.
     $name_arg = strtr($name, '_', '-');
 
-    $items['admin/commerce/config/taxes/rates/' . $name_arg] = array(
-      'title callback' => 'commerce_tax_ui_tax_rate_title',
-      'title arguments' => array($name),
-      'description' => 'Edit a tax rate.',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('commerce_tax_ui_tax_rate_form', $tax_rate),
-      'access arguments' => array('administer taxes'),
-      'file' => 'includes/commerce_tax_ui.admin.inc',
-    );
-    $items['admin/commerce/config/taxes/rates/' . $name_arg . '/edit'] = array(
-      'title' => 'Edit',
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-      'weight' => 0,
-    );
+    if ($tax_rate['module'] == 'commerce_tax_ui') {
+      $items['admin/commerce/config/taxes/rates/' . $name_arg] = array(
+        'title callback' => 'commerce_tax_ui_tax_rate_title',
+        'title arguments' => array($name),
+        'description' => 'Edit a tax rate.',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('commerce_tax_ui_tax_rate_form', $tax_rate),
+        'access arguments' => array('administer taxes'),
+        'file' => 'includes/commerce_tax_ui.admin.inc',
+      );
+      $items['admin/commerce/config/taxes/rates/' . $name_arg . '/edit'] = array(
+        'title' => 'Edit',
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+        'weight' => 0,
+      );
+      $items['admin/commerce/config/taxes/rates/' . $name_arg . '/delete'] = array(
+        'title' => 'Delete',
+        'page arguments' => array('commerce_tax_ui_tax_rate_delete_form', $tax_rate),
+        'access arguments' => array('administer taxes'),
+        'file' => 'includes/commerce_tax_ui.admin.inc',
+        'type' => MENU_LOCAL_TASK,
+        'context' => MENU_CONTEXT_INLINE,
+        'weight' => 10,
+      );
+    }
+    else {
+      $items['admin/commerce/config/taxes/rates/' . $name_arg] = array(
+        'title callback' => 'commerce_tax_ui_tax_rate_title',
+        'title arguments' => array($name),
+        'description' => 'Redirect to the tax rate list.',
+        'page callback' => 'drupal_goto',
+        'page arguments' => array('admin/commerce/config/taxes/rates'),
+        'access arguments' => array('administer taxes'),
+      );
+    }
 
     if (rules_config_load('commerce_tax_rate_' . $name)) {
       $items['admin/commerce/config/taxes/rates/' . $name_arg . '/component'] = array(
@@ -69,16 +90,6 @@ function commerce_tax_ui_menu() {
         'weight' => 5,
       );
     }
-
-    $items['admin/commerce/config/taxes/rates/' . $name_arg . '/delete'] = array(
-      'title' => 'Delete',
-      'page arguments' => array('commerce_tax_ui_tax_rate_delete_form', $tax_rate),
-      'access arguments' => array('administer taxes'),
-      'file' => 'includes/commerce_tax_ui.admin.inc',
-      'type' => MENU_LOCAL_TASK,
-      'context' => MENU_CONTEXT_INLINE,
-      'weight' => 10,
-    );
   }
 
   $items['admin/commerce/config/taxes/types'] = array(
@@ -104,21 +115,43 @@ function commerce_tax_ui_menu() {
     // Convert underscores to hyphens for the menu item argument.
     $name_arg = strtr($name, '_', '-');
 
-    $items['admin/commerce/config/taxes/types/' . $name_arg] = array(
-      'title callback' => 'commerce_tax_ui_tax_type_title',
-      'title arguments' => array($name),
-      'description' => 'Edit a tax type.',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('commerce_tax_ui_tax_type_form', $tax_type),
-      'access arguments' => array('administer taxes'),
-      'file' => 'includes/commerce_tax_ui.admin.inc',
-    );
-    $items['admin/commerce/config/taxes/types/' . $name_arg . '/edit'] = array(
-      'title' => 'Edit',
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-      'weight' => 0,
-    );
+    if ($tax_type['module'] == 'commerce_tax_ui') {
+      $items['admin/commerce/config/taxes/types/' . $name_arg] = array(
+        'title callback' => 'commerce_tax_ui_tax_type_title',
+        'title arguments' => array($name),
+        'description' => 'Edit a tax type.',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('commerce_tax_ui_tax_type_form', $tax_type),
+        'access arguments' => array('administer taxes'),
+        'file' => 'includes/commerce_tax_ui.admin.inc',
+      );
+      $items['admin/commerce/config/taxes/types/' . $name_arg . '/edit'] = array(
+        'title' => 'Edit',
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+        'weight' => 0,
+      );
+      $items['admin/commerce/config/taxes/types/' . $name_arg . '/delete'] = array(
+        'title' => 'Delete',
+        'page callback' => 'commerce_tax_ui_tax_type_delete_form_wrapper',
+        'page arguments' => array($tax_type),
+        'access arguments' => array('administer taxes'),
+        'file' => 'includes/commerce_tax_ui.admin.inc',
+        'type' => MENU_LOCAL_TASK,
+        'context' => MENU_CONTEXT_INLINE,
+        'weight' => 10,
+      );
+    }
+    else {
+      $items['admin/commerce/config/taxes/types/' . $name_arg] = array(
+        'title callback' => 'commerce_tax_ui_tax_type_title',
+        'title arguments' => array($name),
+        'description' => 'Redirect to the tax type list.',
+        'page callback' => 'drupal_goto',
+        'page arguments' => array('admin/commerce/config/taxes/types'),
+        'access arguments' => array('administer taxes'),
+      );
+    }
 
     if (rules_config_load('commerce_tax_type_' . $name)) {
       $items['admin/commerce/config/taxes/types/' . $name_arg . '/rule'] = array(
@@ -132,17 +165,6 @@ function commerce_tax_ui_menu() {
         'weight' => 5,
       );
     }
-
-    $items['admin/commerce/config/taxes/types/' . $name_arg . '/delete'] = array(
-      'title' => 'Delete',
-      'page callback' => 'commerce_tax_ui_tax_type_delete_form_wrapper',
-      'page arguments' => array($tax_type),
-      'access arguments' => array('administer taxes'),
-      'file' => 'includes/commerce_tax_ui.admin.inc',
-      'type' => MENU_LOCAL_TASK,
-      'context' => MENU_CONTEXT_INLINE,
-      'weight' => 10,
-    );
   }
 
   return $items;
@@ -215,6 +237,16 @@ function commerce_tax_ui_commerce_tax_type_info() {
 }
 
 /**
+ * Implements hook_commerce_tax_type_info_alter().
+ */
+function commerce_tax_ui_commerce_tax_type_info_alter(&$tax_types) {
+  // Default all commerce_tax_ui defined types to appear in the admin list.
+  foreach ($tax_types as $name => &$tax_type) {
+    $tax_type += array('admin_list' => ($tax_type['module'] == 'commerce_tax_ui'));
+  }
+}
+
+/**
  * Returns an initialized tax type array.
  */
 function commerce_tax_ui_tax_type_new() {
@@ -224,6 +256,7 @@ function commerce_tax_ui_tax_type_new() {
     'display_title' => '',
     'description' => '',
     'display_inclusive' => FALSE,
+    'admin_list' => TRUE,
     'module' => 'commerce_tax_ui',
     'is_new' => TRUE,
   );
@@ -253,6 +286,9 @@ function commerce_tax_ui_tax_type_save($tax_type) {
   if (!empty($tax_type['is_new']) && $op !== FALSE) {
     // Notify other modules that a new tax type has been created.
     module_invoke_all('commerce_tax_type_insert', $tax_type);
+
+    // Ensure the default rule is built.
+    entity_defaults_rebuild();
   }
   elseif ($op !== FALSE) {
     // Notify other modules that an existing tax type has been updated.
@@ -261,7 +297,7 @@ function commerce_tax_ui_tax_type_save($tax_type) {
 
   // Clear the necessary caches and rebuild the menu items.
   commerce_tax_types_reset();
-  rules_clear_cache();
+  rules_clear_cache(TRUE);
   menu_rebuild();
 
   return $op;
@@ -284,7 +320,7 @@ function commerce_tax_ui_tax_type_delete($name) {
 
   // Clear the necessary caches and rebuild the menu items.
   commerce_tax_types_reset();
-  rules_clear_cache();
+  rules_clear_cache(TRUE);
   menu_rebuild();
 
   // Notify other modules that this tax type has been deleted.
@@ -296,6 +332,16 @@ function commerce_tax_ui_tax_type_delete($name) {
  */
 function commerce_tax_ui_commerce_tax_rate_info() {
   return db_query('SELECT * FROM {commerce_tax_rate}')->fetchAllAssoc('name', PDO::FETCH_ASSOC);
+}
+
+/**
+ * Implements hook_commerce_tax_rate_info_alter().
+ */
+function commerce_tax_ui_commerce_tax_rate_info_alter(&$tax_rates) {
+  // Default all commerce_tax_ui defined rates to appear in the admin list.
+  foreach ($tax_rates as $name => &$tax_rate) {
+    $tax_rate += array('admin_list' => ($tax_rate['module'] == 'commerce_tax_ui'));
+  }
 }
 
 /**
@@ -313,6 +359,7 @@ function commerce_tax_ui_tax_rate_new($type = '') {
     'rate' => 0,
     'type' => $type,
     'component' => TRUE,
+    'admin_list' => TRUE,
     'module' => 'commerce_tax_ui',
     'is_new' => TRUE,
   );
@@ -348,9 +395,19 @@ function commerce_tax_ui_tax_rate_save($tax_rate) {
     module_invoke_all('commerce_tax_rate_update', $tax_rate);
   }
 
+  // If the rate specifies that it doesn't need a component and one already
+  // exists, delete it now.
+  if (!$tax_rate['component']) {
+    rules_config_delete(array('commerce_tax_rate_' . $tax_rate['name']));
+  }
+  else {
+    // Otherwise ensure the default component is rebuilt.
+    entity_defaults_rebuild();
+  }
+
   // Clear the necessary caches and rebuild the menu items.
   commerce_tax_rates_reset();
-  rules_clear_cache();
+  rules_clear_cache(TRUE);
   menu_rebuild();
 
   return $op;
@@ -373,7 +430,7 @@ function commerce_tax_ui_tax_rate_delete($name) {
 
   // Clear the necessary caches and rebuild the menu items.
   commerce_tax_rates_reset();
-  rules_clear_cache();
+  rules_clear_cache(TRUE);
   menu_rebuild();
 
   // Notify other modules that this tax rate has been deleted.

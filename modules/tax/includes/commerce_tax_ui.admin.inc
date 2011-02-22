@@ -30,7 +30,7 @@ function commerce_tax_ui_overview($type) {
 
   // Loop through all of the items to include in the overview.
   foreach ($items as $name => $item) {
-    if ($item['module'] == 'commerce_tax_ui') {
+    if ($item['admin_list']) {
       // Build the operation links for the current item.
       $links = menu_contextual_links('commerce-tax-' . $type, 'admin/commerce/config/taxes/' . $type, array(strtr($name, '_', '-')));
 
@@ -202,6 +202,7 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
   $form['tax_rate']['component'] = array(
     '#type' => 'checkbox',
     '#title' => t("Define a default Rules component for determining this tax rate's applicability to a product."),
+    '#description' => $tax_rate['component'] ? t('WARNING: Unchecking this box will delete the existing Rules component even if you have customized it.') : '',
     '#default_value' => $tax_rate['component'],
   );
 
