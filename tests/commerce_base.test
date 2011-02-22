@@ -149,6 +149,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer product types',
       'administer product pricing',
       'administer payments',
+      'administer taxes',
     );
 
     $final_permissions = array();

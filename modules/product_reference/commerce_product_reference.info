@@ -7,3 +7,6 @@ dependencies[] = commerce_price
 dependencies[] = commerce_product
 dependencies[] = options
 core = 7.x
+
+; Simple tests
+files[] = tests/commerce_product_reference.test

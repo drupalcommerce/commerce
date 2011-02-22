@@ -773,7 +773,7 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
 
       case 'equals':
       default:
-        $where = '(cp.sku = :match OR cp.title = :match)';
+        $where = '(cp.sku = :sku_match OR cp.title = :title_match)';
         $args['sku_match'] = $string;
         $args['title_match'] = $string;
         break;

@@ -1,0 +1,414 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Functional tests for the Product Reference module.
+ */
+class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
+  /**
+   * Products generated.
+   */
+  protected $products = array();
+
+	/**
+   * Display node type.
+   */
+  protected $display_type;
+
+	/**
+   * Product reference field name
+   */
+  protected $field_name;
+
+	/**
+   * Product reference field info.
+   */
+  protected $field;
+
+ 	/**
+   * Product reference field instance info.
+   */
+  protected $field_instance;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce product reference functional tests',
+      'description' => 'Test Product Reference admin operations for administrators',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    // Create a site admin and login.
+    $this->site_admin = $this->createSiteAdmin();
+    $this->drupalLogin($this->site_admin);
+
+    // Create a dummy product display content type without product reference
+    // fields.
+    $this->display_type = $this->createDummyProductDisplayContentType('product_display', FALSE);
+
+    // Create dummy product entities.
+    $this->products[1] = $this->createDummyProduct('PROD-01', 'Product One');
+    $this->products[2] = $this->createDummyProduct('PROD-02', 'Product Two');
+
+    // Access to the manage fields screen.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields');
+
+    // Add a new product reference field
+    $edit = array(
+      'fields[_add_new_field][label]' => 'Product',
+      'fields[_add_new_field][field_name]' => 'product',
+      'fields[_add_new_field][type]' => 'commerce_product_reference',
+      'fields[_add_new_field][widget_type]' => 'options_select',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Save the field settings, which are empty.
+    $this->drupalPost(NULL, array(), t('Save field settings'));
+
+    // Save the default field instance settings.
+    $this->drupalPost(NULL, array(), t('Save settings'));
+
+    // Clear field's cache.
+    field_cache_clear();
+
+    // Get the field information just saved.
+    $this->field_name = 'field_product';
+    $this->field = field_info_field($this->field_name);
+    $this->field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+  }
+
+
+  /**
+   * Test if the field is correctly created and attached to the product
+   * display.
+   */
+  public function testCommerceProductReferenceCreateField() {
+    // Check at database level.
+    $this->assertTrue(in_array($this->display_type->type, $this->field['bundles']['node']), t('Field is present in the product display bundle'));
+    $this->assertTrue($this->field_instance['field_name'] == $this->field_name, t('Field instance is present in the product display bundle'));
+
+    // Check in the admin page for the content display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields');
+    $this->assertText('Product', t('Reference product field label found'));
+    $this->assertText($this->field_name, t('Reference product field name found'));
+
+    // The product selector should appear in the product display creation page.
+    $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
+    $this->assertFieldById('edit-field-product-und', NULL, t('Field selector is present in product display creation'));
+  }
+
+  /**
+   * Test editing the field.
+   */
+  public function testCommerceProductReferenceEditField() {
+    // Navigate to the edit field page.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/field_product');
+
+    // Alter the field to be required and unlimited.
+    $edit = array(
+      'instance[required]' => 1,
+      'field[cardinality]' => -1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save settings'));
+
+    // Check the message of configuration saved.
+    $this->assertRaw(t('Saved %label configuration.', array('%label' => $this->field_instance['label'])), t('Message of saved field displayed'));
+
+    // Navigate again to the edit field page to check if the values have been
+    // saved.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/' . $this->field_name);
+    $this->assertFieldChecked('edit-instance-required', t('Required field is checked'));
+    $this->assertOptionSelected('edit-field-cardinality', -1, t('Field can have unlimited values'));
+    $this->assertFieldByXPath("//select[@id='edit-field-product-und' and @multiple='multiple']", NULL, t('Multiple product selector for default values'));
+
+    // Clear field's cache.
+    field_cache_clear();
+
+    // Also the product creation form should have the field required and with
+    // a multiple select widget.
+    $this->drupalGet('node/add');
+    $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
+
+    $this->assertFieldByXPath("//select[@id='edit-field-product-und' and @multiple='multiple']", NULL, t('Multiple product selector for default values'));
+  }
+
+  /**
+   * Test if the field is correctly attached to a user.
+   */
+  public function testCommerceProductReferenceAttachToUser() {
+
+    // Access user manage fields page.
+    $this->drupalGet('admin/config/people/accounts/fields');
+
+    // Add a new product reference field
+    $edit = array(
+      'fields[_add_new_field][label]' => 'Product',
+      'fields[_add_new_field][field_name]' => 'user_product',
+      'fields[_add_new_field][type]' => 'commerce_product_reference',
+      'fields[_add_new_field][widget_type]' => 'options_select',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Save the field settings, which are empty.
+    $this->drupalPost(NULL, array(), t('Save field settings'));
+
+    // Save the field instance settings.
+    $this->drupalPost(NULL, array('instance[settings][user_register_form]' => 1), t('Save settings'));
+
+    // Clear field's cache.
+    field_cache_clear();
+
+    // Check the field at database level.
+    $field = field_info_field('field_user_product');
+    $field_instance = field_info_instance('user', 'field_user_product','user');
+    $this->assertTrue(in_array('user', $field['bundles']['user']), t('Field is present in the user'));
+    $this->assertTrue($field_instance['field_name'] == 'field_user_product', t('Field instance is present in the user bundle'));
+
+    // Check in the admin page for the user display.
+    $this->drupalGet('admin/config/people/accounts/fields');
+    $this->assertText('Product', t('Reference product field label found'));
+    $this->assertText('field_user_product', t('Reference product field name found'));
+
+    // The product selector should appear in the product display creation page.
+    $this->drupalGet('admin/people/create');
+    $this->assertFieldById('edit-field-user-product-und', NULL, t('Field selector is present in user creation'));
+  }
+
+  /**
+   * Test adding some referenced products.
+   */
+  public function testCommerceProductReferenceReferenceProducts() {
+    // Add a new product
+    $new_product = $this->createDummyProduct('PROD-04', 'Product Four');
+    $product_title = t('@sku: @title', array('@sku' => $new_product->sku, '@title' => $new_product->title));
+
+    // Check at database level
+    $field_products = commerce_product_match_products($this->field_name, NULL, $new_product->sku, 'equals');
+    $this->assertFalse(empty($field_products), t('Product is in the available products of the field'));
+
+    // Check if it is in the reference field for product displays.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/' . $this->field_name);
+    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $this->assertTrue(in_array($product_title, $select_options), t('Product is available in the select'));
+
+    // Check if it is in the product display creation select form.
+    $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
+    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $this->assertTrue(in_array($product_title, $select_options), t('Product is available in the select'));
+  }
+
+  /**
+   * Test the limit of referenceable product types.
+   */
+  public function testCommerceProductReferenceTestReferenceableTypes() {
+    // Create an additional product type and a product for it.
+    $this->createDummyProductType('additional_type', 'Additional Type', '', '', FALSE);
+    $add_product = $this->createDummyProduct('ADD-01', 'Additional One', -1, 'USD', 1, 'additional_type');
+    $product_title = t('@sku: @title', array('@sku' => $add_product->sku, '@title' => $add_product->title));
+
+    // Check if the additional type is available in the product display.
+    $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
+    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $this->assertTrue(in_array($product_title, $select_options), t('Additional product is available in the select'));
+
+    // Check if the additional type is available in the product field settings.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/' . $this->field_name);
+    $this->assertFieldById('edit-instance-settings-referenceable-types-additional-type', NULL, t('Additional product type is present'));
+
+    // Select only the additional type.
+    $this->drupalPost(NULL, array('instance[settings][referenceable_types][additional_type]' => 1), t('Save settings'));
+
+    // Check the saved message and the checkbox.
+    $this->assertRaw(t('Saved %label configuration.', array('%label' => $this->field_instance['label'])), t('Message of saved field displayed'));
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/' . $this->field_name);
+    $this->assertFieldChecked('edit-instance-settings-referenceable-types-additional-type', t('Required field is checked'));
+
+    // Clear field's cache and reload field instance information just saved.
+    field_cache_clear();
+    $field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+
+    // Check field instance settings.
+    $this->assertTrue($field_instance['settings']['referenceable_types']['additional_type'] == 'additional_type', t('Product type: Additional type is referenceable'));
+    $this->assertTrue($field_instance['settings']['referenceable_types']['product'] == 0, t('Product type: Product is not referenceable'));
+
+    // TODO: As the commerce_product_reference_options_list call doesn't have
+    // $instance context, all products are being displayed at product display
+    // level, this should be fixed either at core level (hook_options_list) or
+    // a workaround in commerce.
+    // @see http://drupal.org/node/1066274
+    // @see http://drupal.org/node/1066326
+  }
+
+  /**
+   * Test the display of fields pulled from the product.
+   */
+  public function testCommerceProductReferenceDisplayFields() {
+    // Go to manage fields screen of the product display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
+    // Load all the fields that are pulled with the product and check if they
+    // are in the display screen.
+    $extra_fields = commerce_product_reference_field_extra_fields();
+    foreach ($extra_fields['node'][$this->display_type->type]['display'] as $display) {
+      $this->assertText($display['label'], t('Field %field_label is present in the manage display screen', array('%field_label' => $display['label'])));
+    }
+  }
+
+  /**
+   * Test the SKU link formatter.
+   */
+  public function testCommerceProductReferenceSKULinkFormatter() {
+    // Go to manage fields screen of the product display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
+
+    // Change the default value for SKU with link.
+    $this->drupalPost(NULL, array('fields[field_product][type]' => 'commerce_product_reference_sku_link'), t('Save'));
+
+    // Check if the value has been saved.
+    $this->assertText(t('Your settings have been saved.'), t('Settings saved message displayed'));
+    $this->assertOptionSelected('edit-fields-field-product-type', 'commerce_product_reference_sku_link', t('Correct value is selected.'));
+
+    // Clear field's cache and reload field instance information just saved.
+    field_cache_clear();
+    $field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+
+    // Check if the value has been stored in db.
+    $this->assertTrue($field_instance['display']['default']['type'] == 'commerce_product_reference_sku_link', t('Option correctly stored in db'));
+
+    // Create a product display using one product already generated.
+    $product = reset($this->products);
+    $product_node = $this->createDummyProductNode(array($product->product_id), $product->title);
+
+   // Access to the product display node.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Generate and check the expected ouptut.
+    $render = array(
+      '#type' => 'link',
+      '#title' => $product->sku,
+      '#href' => 'admin/commerce/products/' . $product->product_id,
+    );
+    $this->assertRaw(drupal_render($render), t('SKU Link is displayed correctly'));
+  }
+
+  /**
+   * Test the SKU no link formatter.
+   */
+  public function testCommerceProductReferenceSKUNoLinkFormatter() {
+    // Go to manage fields screen of the product display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
+
+    // Change the default value for SKU with link.
+    $this->drupalPost(NULL, array('fields[field_product][type]' => 'commerce_product_reference_sku_plain'), t('Save'));
+
+    // Check if the value has been saved.
+    $this->assertText(t('Your settings have been saved.'), t('Settings saved message displayed'));
+    $this->assertOptionSelected('edit-fields-field-product-type', 'commerce_product_reference_sku_plain', t('Correct value is selected.'));
+
+    // Clear field's cache and reload field instance information just saved.
+    field_cache_clear();
+    $field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+
+    // Check if the value has been stored in db.
+    $this->assertTrue($field_instance['display']['default']['type'] == 'commerce_product_reference_sku_plain', t('Option correctly stored in db'));
+
+    // Create a product display using one product already generated.
+    $product = reset($this->products);
+    $product_node = $this->createDummyProductNode(array($product->product_id), $product->title);
+
+   // Access to the product display node.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Generate and check the expected ouptut.
+    $render = array(
+    	'#markup' => check_plain($product->sku),
+    );
+    $this->assertRaw(drupal_render($render), t('SKU without link is displayed correctly'));
+  }
+
+  /**
+   * Test the title link formatter.
+   */
+  public function testCommerceProductReferenceTitleLinkFormatter() {
+    // Go to manage fields screen of the product display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
+
+    // Change the default value for SKU with link.
+    $this->drupalPost(NULL, array('fields[field_product][type]' => 'commerce_product_reference_title_link'), t('Save'));
+
+    // Check if the value has been saved.
+    $this->assertText(t('Your settings have been saved.'), t('Settings saved message displayed'));
+    $this->assertOptionSelected('edit-fields-field-product-type', 'commerce_product_reference_title_link', t('Correct value is selected.'));
+
+    // Clear field's cache and reload field instance information just saved.
+    field_cache_clear();
+    $field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+
+    // Check if the value has been stored in db.
+    $this->assertTrue($field_instance['display']['default']['type'] == 'commerce_product_reference_title_link', t('Option correctly stored in db'));
+
+    // Create a product display using one product already generated.
+    $product = reset($this->products);
+    $product_node = $this->createDummyProductNode(array($product->product_id), $product->title);
+
+   // Access to the product display node.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Generate and check the expected ouptut.
+    $render = array(
+      '#type' => 'link',
+      '#title' => $product->title,
+      '#href' => 'admin/commerce/products/' . $product->product_id,
+    );
+    $this->assertRaw(drupal_render($render), t('Title Link is displayed correctly'));
+  }
+
+  /**
+   * Test the title no link formatter.
+   */
+  public function testCommerceProductReferenceTitleNoLinkFormatter() {
+    // Go to manage fields screen of the product display.
+    $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
+
+    // Change the default value for SKU with link.
+    $this->drupalPost(NULL, array('fields[field_product][type]' => 'commerce_product_reference_title_plain'), t('Save'));
+
+    // Check if the value has been saved.
+    $this->assertText(t('Your settings have been saved.'), t('Settings saved message displayed'));
+    $this->assertOptionSelected('edit-fields-field-product-type', 'commerce_product_reference_title_plain', t('Correct value is selected.'));
+
+    // Clear field's cache and reload field instance information just saved.
+    field_cache_clear();
+    $field_instance = field_info_instance('node', $this->field_name, $this->display_type->type);
+
+    // Check if the value has been stored in db.
+    $this->assertTrue($field_instance['display']['default']['type'] == 'commerce_product_reference_title_plain', t('Option correctly stored in db'));
+
+    // Create a product display using one product already generated.
+    $product = reset($this->products);
+    $product_node = $this->createDummyProductNode(array($product->product_id), $product->title);
+
+   // Access to the product display node.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Generate and check the expected ouptut.
+    $render = array(
+    	'#markup' => check_plain($product->title),
+    );
+    $this->assertRaw(drupal_render($render), t('Title with no Link is displayed correctly'));
+  }
+}
