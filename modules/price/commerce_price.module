@@ -554,6 +554,11 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
       break;
   }
 
+  $element['data'] = array(
+    '#type' => 'value',
+    '#default_value' => !empty($items[$delta]['data']) ? $items[$delta]['data'] : array(),
+  );
+
   return $element;
 }
 
@@ -735,9 +740,11 @@ function commerce_price_component_add($price, $type, $component_price, $included
 function commerce_price_component_load($price, $type) {
   $components = array();
 
-  foreach ((array) $price['data']['components'] as $key => $component) {
-    if ($component['name'] == $type) {
-      $components[] = $component;
+  if (!empty($price['data']['components'])) {
+    foreach ($price['data']['components'] as $key => $component) {
+      if ($component['name'] == $type) {
+        $components[] = $component;
+      }
     }
   }
 

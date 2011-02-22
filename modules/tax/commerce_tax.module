@@ -266,3 +266,135 @@ function commerce_tax_rate_calculate($tax_rate, $line_item_wrapper) {
 
   return FALSE;
 }
+
+/**
+ * Implements hook_field_attach_form().
+ */
+function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // Alter price widgets on the product form to have tax inclusive price entry.
+  if ($entity_type == 'commerce_product') {
+    // Build an array of tax types that are display inclusive.
+    $inclusive_types = array();
+
+    foreach (commerce_tax_types() as $name => $tax_type) {
+      if ($tax_type['display_inclusive']) {
+        $inclusive_types[$name] = $tax_type['title'];
+      }
+    }
+
+    // Build an options array of tax rates of these types.
+    $options = array();
+
+    foreach (commerce_tax_rates() as $name => $tax_rate) {
+      if (in_array($tax_rate['type'], array_keys($inclusive_types))) {
+        $options[$inclusive_types[$tax_rate['type']]][$name] = t('Including @title', array('@title' => $tax_rate['title']));
+      }
+    }
+
+    // Only alter the form if there are available tax rates...
+    if (!empty($options)) {
+      // Get an array of price fields attached to products.
+      $fields = commerce_info_fields('commerce_price', 'commerce_product');
+
+      // Loop over each child element of the form.
+      foreach (element_children($form) as $key) {
+        // If the current element is for a price field...
+        if (in_array($key, array_keys($fields))) {
+          // Loop over each of its child items...
+          foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
+            // Find the default value for the tax included element.
+            $default = '';
+
+            if (!empty($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['components'])) {
+              foreach (array_keys($options) as $optgroup) {
+                foreach ($options[$optgroup] as $name => $title) {
+                  $tax_rate = commerce_tax_rate_load($name);
+
+                  // If this tax rates component is included in the price, it must
+                  // be the default!
+                  foreach ($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['components'] as $component) {
+                    if ($component['included'] && $component['name'] == $tax_rate['price_component']) {
+                      $default = $name;
+                    }
+                  }
+                }
+              }
+            }
+
+            // If there is only one option group, flatten the options array.
+            if (count($options) == 1) {
+              $options = reset($options);
+            }
+
+            $form[$key][$form[$key]['#language']][$delta]['currency_code']['#title'] = '&nbsp;';
+
+            $form[$key][$form[$key]['#language']][$delta]['include_tax'] = array(
+              '#type' => 'select',
+              '#title' => t('Tax included'),
+              '#options' => $options,
+              '#default_value' => $default,
+              '#required' => FALSE,
+              '#empty_value' => '',
+              '#suffix' => '<div class="commerce-price-tax-included-clearfix"></div>',
+              '#attached' => array(
+                'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.css'),
+              ),
+              '#element_validate' => array('commerce_tax_price_field_validate'),
+            );
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Validate callback for the tax inclusion select list that serves to reset the
+ *   data array based on the selected tax.
+ */
+function commerce_tax_price_field_validate($element, &$form_state) {
+  // Build an array of form parents to the price array.
+  $parents = $element['#parents'];
+  array_pop($parents);
+
+  // Get the price array from the form state.
+  $price = $form_state['values'];
+
+  foreach ($parents as $parent) {
+    $price = $price[$parent];
+  }
+
+  // If a tax was specified...
+  if (!empty($element['#value'])) {
+    // Remove the include_tax value from the price array and reset the components.
+    unset($price['include_tax']);
+    $price['data']['components'] = array();
+
+    // Load and reverse apply the tax.
+    $tax_rate = commerce_tax_rate_load($element['#value']);
+    $amount = $price['amount'] / (1 + $tax_rate['rate']);
+
+    // Add a base price to the data array.
+    $component = array(
+      'amount' => $amount,
+      'currency_code' => $price['currency_code'],
+      'data' => array(),
+    );
+
+    $price['data'] = commerce_price_component_add($price, 'base_price', $component, TRUE);
+
+    // Add the tax to the data array.
+    $component['amount'] = $price['amount'] - $amount;
+
+    $price['data'] = commerce_price_component_add($price, $tax_rate['price_component'], $component, TRUE);
+  }
+  else {
+    // Otherwise reset the components array.
+    unset($price['data']['components']);
+  }
+
+  // Add the data array to the form state.
+  $parents[] = 'data';
+
+  form_set_value(array('#parents' => $parents), $price['data'], $form_state);
+}

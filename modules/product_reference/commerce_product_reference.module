@@ -866,17 +866,8 @@ function commerce_product_line_item_populate($line_item, $product, $display_uri 
     $line_item->data['display_uri'] = NULL;
   }
 
-  // Set the unit price amount and currency code on the line item object.
-  $line_item_wrapper->commerce_unit_price->amount = $product_wrapper->commerce_price->amount->value();
-  $line_item_wrapper->commerce_unit_price->currency_code = $product_wrapper->commerce_price->currency_code->value();
-
-  // Stash the base unit price in the data array.
-  $line_item_wrapper->commerce_unit_price->data = commerce_price_component_add(
-    $line_item_wrapper->commerce_unit_price->value(),
-    'base_price',
-    $line_item_wrapper->commerce_unit_price->value(),
-    TRUE
-  );
+  // Set the unit price on the line item object.
+  $line_item_wrapper->commerce_unit_price = $product_wrapper->commerce_price->value();
 }
 
 /**
