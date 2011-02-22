@@ -39,6 +39,7 @@ class commerce_line_item_handler_field_edit_delete extends commerce_line_item_ha
     foreach (element_children($form['edit_delete']) as $line_item_id) {
       // Check for the removal of an item.
       if ($form_state['clicked_button']['#name'] == 'delete-line-item-' . $line_item_id) {
+        // TODO: Remove this dependence on the Cart module API.
         commerce_cart_order_product_line_item_delete($order, $line_item_id);
       }
     }

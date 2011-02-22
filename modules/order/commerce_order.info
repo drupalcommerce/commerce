@@ -6,6 +6,7 @@ dependencies[] = rules
 dependencies[] = commerce
 dependencies[] = commerce_customer
 dependencies[] = commerce_line_item
+dependencies[] = commerce_price
 core = 7.x
 
 ; Module includes

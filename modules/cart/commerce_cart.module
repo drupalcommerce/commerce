@@ -175,7 +175,11 @@ function commerce_cart_form_alter(&$form, &$form_state, $form_id) {
 function commerce_cart_line_item_views_form_submit($form, &$form_state) {
   // Reset the status of the order to cart.
   $order = commerce_order_load($form_state['order']->order_id);
-  $form_state['order'] = commerce_order_status_update($order, 'cart');
+  $form_state['order'] = commerce_order_status_update($order, 'cart', TRUE);
+
+  // Skip saving in the status update and manually save here to force a save
+  // even when the status doesn't actually change.
+  commerce_order_save($form_state['order']);
 
   drupal_set_message(t('Your shopping cart has been updated.'));
 }
@@ -526,6 +530,8 @@ function commerce_cart_order_refresh($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
   // Loop over every line item on the order...
+  $line_item_changed = FALSE;
+
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     // If the line item is a product line item...
     if ($line_item_wrapper->type->value() == 'product') {
@@ -548,18 +554,28 @@ function commerce_cart_order_refresh($order) {
     // Allow other modules alter line items on a shopping cart refresh.
     module_invoke_all('commerce_cart_line_item_refresh', $line_item, $order_wrapper);
 
-    // Compare the refreshed unit price to the original unit price.
+    // Compare the refreshed unit price to the original unit price looking for
+    // differences in the amount, currency code, or price components.
     $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $data = $line_item_wrapper->commerce_unit_price->data->value();
+    $current_data = $current_line_item_wrapper->commerce_unit_price->data->value();
 
     if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
-      $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value()) {
+      $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value() ||
+      $data['components'] != $current_data['components']) {
       // Adjust the unit price accordingly if necessary.
       $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
       $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
 
+      // Only migrate the price components in the data to preserve other data.
+      $data['components'] = $current_data['components'];
+      $line_item_wrapper->commerce_unit_price->data = $data;
+
       // Save the updated line item and clear the entity cache.
       commerce_line_item_save($line_item_wrapper->value());
       entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
+
+      $line_item_changed = TRUE;
     }
   }
 
@@ -569,8 +585,8 @@ function commerce_cart_order_refresh($order) {
   // Allow other modules to alter the entire order on a shopping cart refresh.
   module_invoke_all('commerce_cart_order_refresh', $order_wrapper);
 
-  // Save the order once here if it has changed.
-  if ($order_wrapper->value() != $original_order) {
+  // Save the order once here if it has changed or if a line item was changed.
+  if ($order_wrapper->value() != $original_order || $line_item_changed) {
     // Use a clone so the save doesn't interfere with price values in a live
     // order object that would be modified on presave.
     commerce_order_save(clone($order_wrapper->value()));

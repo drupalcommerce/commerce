@@ -66,6 +66,7 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
           $line_item->quantity = $form_state['values']['edit_quantity'][$line_item_id];
 
           commerce_line_item_save($line_item);
+          entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
         }
       }
     }

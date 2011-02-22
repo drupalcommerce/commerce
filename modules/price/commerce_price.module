@@ -648,3 +648,47 @@ function commerce_price_component_delete($price, $type) {
 
   return $price['data'];
 }
+
+/**
+ * Combines the price components of two prices into one components array,
+ *   merging all components of the same type into a single component.
+ *
+ * @param $price
+ *   The base price array whose full data array will be returned.
+ * @param $price2
+ *   A price array whose components will be combined with those of the base price.
+ *
+ * @return
+ *   A data array with the two sets of components combined but without any
+ *     additional data from $price2's data array.
+ */
+function commerce_price_components_combine($price, $price2) {
+  // Ensure the base price data array has a components array.
+  if (empty($price['data']['components'])) {
+    $price['data']['components'] = array();
+  }
+
+  // Loop over the components in the second price's data array.
+  foreach ($price2['data']['components'] as $key => $component) {
+    // Look for a matching component in the base price data array.
+    $matched = FALSE;
+
+    foreach ($price['data']['components'] as $base_key => $base_component) {
+      // If the component type matches the component in question...
+      if ($base_component['name'] == $component['name']) {
+        // Add the two prices together and mark this as a match.
+        $amount = commerce_currency_convert($component['price']['amount'], $component['price']['currency_code'], $price['currency_code']);
+        $price['data']['components'][$base_key]['price']['amount'] += $amount;
+
+        $matched = TRUE;
+      }
+    }
+
+    // If no match was found, bring the component in as is.
+    if (!$matched) {
+      $price['data']['components'][] = $component;
+    }
+  }
+
+  return $price['data'];
+}

@@ -232,7 +232,7 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
       // Update the data array with the tax component.
       $wrapper->commerce_unit_price->data = commerce_price_component_add(
         $wrapper->commerce_unit_price->value(),
-        'tax|' . $tax_rate['name'],
+        $tax_rate['price_component'],
         $tax_price,
         $included
       );
@@ -254,7 +254,7 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
  */
 function commerce_tax_rate_calculate($tax_rate, $line_item_wrapper) {
   // By default, do not duplicate a tax that's already on the line item.
-  if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), 'tax|' . $tax_rate['name'])) {
+  if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), $tax_rate['price_component'])) {
     return array(
       'amount' => $line_item_wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'],
       'currency_code' => $line_item_wrapper->commerce_unit_price->currency_code->value(),

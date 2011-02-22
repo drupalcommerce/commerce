@@ -84,15 +84,34 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
         $order_wrapper->commerce_order_total->currency_code = commerce_default_currency();
       }
 
+      // Next reset the data array of the order total field to only include a
+      // base price component.
+      $base_price = array(
+        'amount' => 0,
+        'currency_code' => $order_wrapper->commerce_order_total->currency_code->value(),
+        'data' => array(),
+      );
+
+      $order_wrapper->commerce_order_total->data = commerce_price_component_add($base_price, 'base_price', $base_price, TRUE);
+
       // Then loop over each line item and add its total to the order total.
       $total = 0;
 
       foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+        // TODO: Instead of just adding the total price, we should add the total
+        // of all of the total price's components.
+
         // Convert the line item's total to the order's currency for totalling.
         $total += commerce_currency_convert(
           $line_item_wrapper->commerce_total->amount->value(),
           $line_item_wrapper->commerce_total->currency_code->value(),
           $order_wrapper->commerce_order_total->currency_code->value()
+        );
+
+        // Combine the line item total's component prices into the order total.
+        $order_wrapper->commerce_order_total->data = commerce_price_components_combine(
+          $order_wrapper->commerce_order_total->value(),
+          $line_item_wrapper->commerce_total->value()
         );
       }
 
