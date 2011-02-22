@@ -339,6 +339,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       commerce_cart_product_add($uid, $product->product_id, rand(1,100));
     }
 
+    $order = commerce_cart_order_load($uid);
+
     // If the order should be in a different status, update it.
     if ($status <> 'cart') {
       $order = commerce_order_status_update($order, $status);
@@ -556,9 +558,9 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
+
   }
 }
-
 
 /**
  * Test class to test the CommerceBaseTestCase functions. All testTestFoo
@@ -595,6 +597,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
    * Sandbox for test development
    */
   public function testTestTest() {
+
   }
 
   /**

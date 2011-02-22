@@ -1038,9 +1038,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           if ($match && !empty($changed_attribute) && !empty($matching_products)) {
             reset($matching_products);
             $matching_product = $matching_products[key($matching_products)];
+            $matching_product_wrapper = entity_metadata_wrapper('commerce_product', $matching_product);
 
             foreach ($attribute_names as $key => $value) {
-              if ($product_wrapper->{$key}->value() != $matching_product->{$key}->value()) {
+              if ($product_wrapper->{$key}->value() != $matching_product_wrapper->{$key}->value()) {
                 $match = FALSE;
               }
             }

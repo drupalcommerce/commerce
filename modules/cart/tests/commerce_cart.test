@@ -6,20 +6,12 @@
  * Functional tests for the commerce cart module.
  */
 
+
 /**
- * Test cart features for a product display that only has one product attached.
+ * Abstract class for Commerce cart testing. All Commerce cart tests should
+ * extend this class.
  */
-class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
-  /**
-   * Product that is being added to the cart.
-   */
-  protected $product;
-
-  /**
-   * Product display.
-   */
-  protected $product_node;
-
+abstract class CommerceCartTestCase extends CommerceBaseTestCase {
 	/**
    * Normal user (without admin or store permissions) for testing.
    */
@@ -31,11 +23,47 @@ class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
   protected $cart_url;
 
   /**
+   * Helper function to  perform the common test tasks for cart testing.
+   * @see CommerceBaseTestCase::setUpHelper()
+   */
+  protected function setUpHelper($set = 'all', array $other_modules = array()) {
+    $modules = parent::setUpHelper($set, $other_modules);
+    parent::setUp($modules);
+
+    // Generate users for the tests, normal user has to have access checkout
+    // permission to test the cart process.
+    $this->site_admin = $this->createSiteAdmin();
+    $this->store_admin = $this->createStoreAdmin();
+    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+
+    // Get the cart url.
+    $links = commerce_line_item_summary_links();
+    $this->cart_url = $links['view_cart']['href'];
+  }
+}
+
+
+/**
+ * Test cart features for a product display that only has one product attached.
+ */
+class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
+  /**
+   * Product that is being added to the cart.
+   */
+  protected $product;
+
+  /**
+   * Product display.
+   */
+  protected $product_node;
+
+
+  /**
    * Implementation of getInfo().
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart functional tests for simple products',
+      'name' => 'Commerce cart - simple products',
       'description' => 'Tests cart features like add to cart, remove from cart, update quantities...',
       'group' => 'Drupal Commerce',
     );
@@ -45,10 +73,8 @@ class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
    * Implementation of setUp().
    */
   function setUp() {
-    $modules = parent::setUpHelper('all');
-    parent::setUp($modules);
+    parent::setUpHelper('all');
 
-    $this->site_admin = $this->createSiteAdmin();
     $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType();
@@ -61,17 +87,10 @@ class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
     $this->product_node = $this->createDummyProductNode(array($this->product->product_id), $product_name);
 
     // Log as a normal user to test cart process.
-    // User has to have the access checkout permission to check the Checkout
-    //  button integrity.
-    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
     $this->drupalLogin($this->normal_user);
 
     // Submit the add to cart form.
     $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
-
-    // Get the cart url.
-    $links = commerce_line_item_summary_links();
-    $this->cart_url = $links['view_cart']['href'];
   }
 
 	/**
@@ -171,7 +190,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceBaseTestCase {
 /**
  * Test cart features for a product display that has several products attached.
  */
-class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
+class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
   /**
    * Products that are being added to the cart.
    */
@@ -187,22 +206,12 @@ class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
    */
   protected $product_node;
 
-	/**
-   * Normal user (without admin or store permissions) for testing.
-   */
-  protected $normal_user;
-
-	/**
-   * Cart url.
-   */
-  protected $cart_url;
-
   /**
    * Implementation of getInfo().
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart functional tests with several products in a product display',
+      'name' => 'Commerce cart - several products in a product display',
       'description' => 'Tests cart features, add to cart, select other product...',
       'group' => 'Drupal Commerce',
     );
@@ -212,10 +221,8 @@ class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
    * Implementation of setUp().
    */
   function setUp() {
-    $modules = parent::setUpHelper('all');
-    parent::setUp($modules);
+    parent::setUpHelper('all');
 
-    $this->site_admin = $this->createSiteAdmin();
     $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', 2);
@@ -236,17 +243,10 @@ class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
     $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
 
     // Log as a normal user to test cart process.
-    // User has to have the access checkout permission to check the Checkout
-    //  button integrity.
-    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
     $this->drupalLogin($this->normal_user);
 
     // Submit the add to cart form.
     $this->drupalPost('node/' . $this->product_node->nid, array('product_id' => $this->products[2]->product_id), t('Add to cart'));
-
-    // Get the cart url.
-    $links = commerce_line_item_summary_links();
-    $this->cart_url = $links['view_cart']['href'];
   }
 
   /**
@@ -335,7 +335,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceBaseTestCase {
 /**
  * Test cart features for a product with attributes.
  */
-class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
+class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
   /**
    * Products that are being added to the cart.
    */
@@ -346,22 +346,12 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
    */
   protected $product_node;
 
-	/**
-   * Normal user (without admin or store permissions) for testing.
-   */
-  protected $normal_user;
-
-	/**
-   * Cart url.
-   */
-  protected $cart_url;
-
   /**
    * Implementation of getInfo().
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart functional tests with attributes',
+      'name' => 'Commerce cart - Products with attributes',
       'description' => 'Tests cart features like switch attributes, add to cart...',
       'group' => 'Drupal Commerce',
     );
@@ -371,10 +361,8 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
    * Implementation of setUp().
    */
   function setUp() {
-    $modules = parent::setUpHelper('all');
-    parent::setUp($modules);
+    parent::setUpHelper('all');
 
-    $this->site_admin = $this->createSiteAdmin();
     $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', FIELD_CARDINALITY_UNLIMITED);
@@ -420,17 +408,16 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
         $product = $this->createDummyProduct('PROD-' . $field_1_value . '-' . $field_2_value , $field_1_value.'_'.$field_2_value);
         $product->field_1[LANGUAGE_NONE][0]['value'] = $field_1_value;
         $product->field_2[LANGUAGE_NONE][0]['value'] = $field_2_value;
-        field_attach_update('commerce_product', $product);
+        $product->is_new = FALSE;
+        $product = commerce_product_save($product);
         $this->products[$product->product_id] = $product;
       }
     }
 
     // Create dummy product display node.
     $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
+
     // Log as a normal user to test cart process.
-    // User has to have the access checkout permission to check the Checkout
-    //  button integrity.
-    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
     $this->drupalLogin($this->normal_user);
 
     // Get the cart url.
@@ -444,11 +431,13 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
   public function testCommerceCartSelectProductAdd() {
     // Go to product page.
     $this->drupalGet('node/' . $this->product_node->nid);
+
     // Set the product that we are checking.
-    $product = entity_metadata_wrapper('commerce_product', $this->products[3]);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $this->products[3]);
 
     // Select one of the attributes.
-    $this->drupalPostAJAX(NULL, array('attributes[field_1]' => $product->field_1->value()), 'attributes[field_1]');
+    $this->drupalPostAJAX(NULL, array('attributes[field_1]' => $product_wrapper->field_1->value()), 'attributes[field_1]');
+
     // Add product to the cart.
     $this->drupalPost(NULL, array(), t('Add to cart'));
 
@@ -482,5 +471,94 @@ class CommerceCartTestCaseAttributes extends CommerceBaseTestCase {
 
     // Look for the Add to cart button.
     $this->assertField('edit-submit', t('Add to cart button exists'));
+  }
+}
+
+/**
+ * Test cart conversion from anonymous to authenticated.
+ */
+class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase {
+  /**
+   * Product that is being added to the cart.
+   */
+  protected $product;
+
+  /**
+   * Product display.
+   */
+  protected $product_node;
+
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Commerce cart - anonymous to authenticated cart conversion',
+      'description' => 'Tests cart conversion when an anonymous users logs in.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    parent::setUpHelper('all');
+
+    $this->drupalLogin($this->site_admin);
+    // Create a dummy product display content type.
+    $this->createDummyProductDisplayContentType();
+
+    // Create dummy product display nodes (and their corresponding product
+    //  display).
+    $sku = 'PROD-01';
+    $product_name = 'Product One';
+    $this->product = $this->createDummyProduct($sku, $product_name);
+    $this->product_node = $this->createDummyProductNode(array($this->product->product_id), $product_name);
+  }
+
+  /**
+   * Test anonymous cart conversion.
+   */
+  public function testCommerceCartAnonymousToAuthenticated() {
+    // Logout to be anonymous and force user uid.
+    $this->drupalLogout();
+    global $user;
+    $user = user_load(0);
+
+    // Submit the add to cart form.
+    $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
+
+    // Get the order just created.
+    $order_anonymous = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
+
+    // Access to the cart and check if the product is in it.
+    $this->drupalGet($this->cart_url);
+    $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
+    $this->assertText($this->product->title, t('Product was added to the cart'));
+
+    // Change the price to check if the amount gets updated when the user logs
+    // in.
+
+    $new_price = $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] + rand(2, 500);
+    $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] = commerce_currency_integer_to_amount($new_price, $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code']);
+    $this->product->is_new = FALSE;
+    $this->product = commerce_product_save($this->product);
+
+    // Log in with normal user.
+    $this->drupalPost('user', array('name' => $this->normal_user->name, 'pass' => $this->normal_user->pass_raw), t('Log in'));
+
+    // Get the order for user just logged in.
+    $order_authenticated = reset(commerce_order_load_multiple(array(), array('uid' => $this->normal_user->uid, 'status' => 'cart'), TRUE));
+
+    // Access to the cart and check if the product is in it.
+    $this->drupalGet($this->cart_url);
+    $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
+    $this->assertText($this->product->title, t('Product is still in the cart'));
+    $this->assertText(trim(commerce_currency_integer_to_amount($this->product->commerce_price[LANGUAGE_NONE][0]['amount'], $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code'])), t('Product price has been updated'));
+
+    // Check if the order is the same.
+    $this->assertTrue($order_anonymous->order_id == $order_authenticated->order_id, t('Cart has been converted successfully'));
   }
 }

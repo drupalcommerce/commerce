@@ -90,8 +90,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
 
     // Get the order for the anonymous user.
-    $order_id = reset(commerce_cart_order_session_order_ids('commerce_cart_orders'));
-    $this->order = commerce_order_load($order_id);
+    $this->order = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
   }
 
   /**
@@ -179,9 +178,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertText('Example payment', t('Check example payment method'));
 
     // Load the order to check the status.
-    $order = commerce_order_load($this->order->order_id);
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+
     // At this point we should be in Checkout Review.
-    $this->assertEqual($order->status, 'checkout_review', t('Order status is Checkout Review in the review phase.'));
+    $this->assertEqual(reset($order)->status, 'checkout_review', t('Order status is Checkout Review in the review phase.'));
 
     // Test the back & continue buttons.
     $this->drupalPost(NULL, array(), t('Back'));
