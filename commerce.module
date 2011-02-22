@@ -82,6 +82,8 @@ function commerce_entity_reference_delete($entity_type, $entity, $field_name, $r
   else {
     // Otherwise check the reference value directly.
     if ($wrapper->{$field_name}->getIdentifier() == $ref_entity_id) {
+      // TODO: Actually unset this field once http://drupal.org/node/1063898
+      // is fixed.
       $wrapper->{$field_name} = 0;
     }
   }
