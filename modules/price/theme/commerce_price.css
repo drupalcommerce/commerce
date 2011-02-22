@@ -8,3 +8,17 @@
 #edit-parameter-value .commerce-price-full {
   margin: 1em 0;
 }
+
+.commerce-price-formatted-components {
+  width: 33%;
+  margin-left: auto;
+}
+
+.commerce-price-formatted-components tr.component-type-commerce-price-formatted-amount {
+  background-color: #D3E9F4;
+  font-weight: bold;
+}
+
+.commerce-price-formatted-components .component-total {
+  text-align: right;
+}
