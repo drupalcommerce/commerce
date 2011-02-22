@@ -107,8 +107,9 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    * Test if the product has been correctly added to the cart.
    */
   public function testCommerceCartAdd() {
-    // We check the cart message.
-    $this->assertRaw($this->product_node->title.'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+    // Ensure the add to cart message is displayed.
+    $message = t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $this->product_node->title, '!cart-url' => url('cart')));
+    $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
     $this->drupalGet($this->cart_url);
@@ -275,8 +276,9 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
    *  the cart.
    */
   public function testCommerceCartSelectProductAdd() {
-    // Check the cart message.
-    $this->assertRaw($this->product_titles[1].'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+    // Ensure the add to cart message is displayed.
+    $message = t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $this->product_titles[1], '!cart-url' => url('cart')));
+    $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
     $this->drupalGet($this->cart_url);
@@ -441,8 +443,9 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
     // Add product to the cart.
     $this->drupalPost(NULL, array(), t('Add to cart'));
 
-    // We check the cart message.
-    $this->assertRaw('field_1_value_2_field_2_value_1'.'</em> added to <a href="/cart">your cart</a>', t('Message of product added to the cart'));
+    // Ensure the add to cart message is displayed.
+    $message = t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => 'field_1_value_2_field_2_value_1', '!cart-url' => url('cart')));
+    $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
     $this->drupalGet($this->cart_url);
