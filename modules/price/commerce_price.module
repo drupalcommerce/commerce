@@ -346,7 +346,7 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
         );
 
         // Allow other modules to alter the components.
-        drupal_alter('commerce_price_formatted_components', $components, $item);
+        drupal_alter('commerce_price_formatted_components', $components, $item, $object);
 
         // Sort the components by weight.
         uasort($components, 'drupal_sort_weight');

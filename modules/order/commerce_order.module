@@ -982,7 +982,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
   }
 
   // Add the order total price field.
-  commerce_price_create_instance('commerce_order_total', 'commerce_order', $type, t('Order total'), -8, FALSE, array('label' => 'inline'));
+  commerce_price_create_instance('commerce_order_total', 'commerce_order', $type, t('Order total'), -8, FALSE, array('type' => 'commerce_price_formatted_components'));
 
   // Add the customer profile reference fields for each profile type.
   foreach (commerce_customer_profile_types() as $customer_profile_type => $profile_type) {
