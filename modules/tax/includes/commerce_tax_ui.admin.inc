@@ -199,10 +199,17 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
     '#required' => TRUE,
   );
 
+  if (!empty($tax_rate['is_new']) || !$tax_rate['rules_component']) {
+    $description = t('Without a default Rules component, you are responsible for creating a product pricing rule that determines the applicability of this tax.');
+  }
+  elseif (empty($tax_rate['is_new'])) {
+    $description = t('WARNING: Unchecking this box will delete the existing Rules component even if you have customized it.');
+  }
+
   $form['tax_rate']['rules_component'] = array(
     '#type' => 'checkbox',
     '#title' => t("Define a default Rules component for determining this tax rate's applicability to a product."),
-    '#description' => $tax_rate['rules_component'] ? t('WARNING: Unchecking this box will delete the existing Rules component even if you have customized it.') : '',
+    '#description' => $description,
     '#default_value' => $tax_rate['rules_component'],
   );
 
