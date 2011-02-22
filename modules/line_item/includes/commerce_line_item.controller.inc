@@ -57,10 +57,14 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
 
       // Add the components multiplied by the quantity to the data array.
       $data = $wrapper->commerce_unit_price->data->value();
-      $components = array();
 
-      foreach ((array) $data['components'] as $key => $component) {
-        $data['components'][$key]['price']['amount'] *= $line_item->quantity;
+      if (empty($data['components'])) {
+        $data['components'] = array();
+      }
+      else {
+        foreach ($data['components'] as $key => $component) {
+          $data['components'][$key]['price']['amount'] *= $line_item->quantity;
+        }
       }
 
       // Set the updated data array to the total price.

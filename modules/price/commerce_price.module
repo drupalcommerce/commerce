@@ -70,7 +70,7 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
         $items[$id][$delta]['data'] = unserialize($items[$id][$delta]['data']);
       }
       else {
-        $items[$id][$delta]['data'] = array();
+        $items[$id][$delta]['data'] = array('components' => array());
       }
     }
   }
@@ -556,7 +556,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
   $element['data'] = array(
     '#type' => 'value',
-    '#default_value' => !empty($items[$delta]['data']) ? $items[$delta]['data'] : array(),
+    '#default_value' => !empty($items[$delta]['data']) ? $items[$delta]['data'] : array('components' => array()),
   );
 
   return $element;
@@ -592,7 +592,7 @@ function commerce_price_property_info_callback(&$info, $entity_type, $field, $in
  *   new data arrays through an entity metadata wrapper.
  */
 function commerce_price_field_data_auto_creation() {
-  return array('amount' => 0, 'currency_code' => commerce_default_currency(), 'data' => array());
+  return array('amount' => 0, 'currency_code' => commerce_default_currency(), 'data' => array('components' => array()));
 }
 
 /**
