@@ -871,8 +871,11 @@ function commerce_product_line_item_populate($line_item, $product, $display_uri 
   $line_item_wrapper->commerce_unit_price->currency_code = $product_wrapper->commerce_price->currency_code->value();
 
   // Stash the base unit price in the data array.
-  $line_item_wrapper->commerce_unit_price->data = array(
-    'base_price' => $line_item_wrapper->commerce_unit_price->value(),
+  $line_item_wrapper->commerce_unit_price->data = commerce_price_component_add(
+    $line_item_wrapper->commerce_unit_price->value(),
+    'base_price',
+    $line_item_wrapper->commerce_unit_price->value(),
+    TRUE
   );
 }
 

@@ -506,3 +506,145 @@ function commerce_price_field_data_property_info($name = NULL) {
     ),
   );
 }
+
+/**
+ * Implements hook_commerce_price_component_type_info().
+ */
+function commerce_price_commerce_price_component_type_info() {
+  return array(
+    'base_price' => array(
+      'title' => t('Base price'),
+    ),
+  );
+}
+
+/**
+ * Returns a list of all available price component types.
+ */
+function commerce_price_component_types() {
+  // First check the static cache for a components array.
+  $component_types = &drupal_static(__FUNCTION__);
+
+  // If it did not exist, fetch the types now.
+  if (!isset($component_types)) {
+    // Find components defined by hook_commerce_price_component_type_info().
+    $component_types = module_invoke_all('commerce_price_component_type_info');
+
+    // Add default values to the component type definitions.
+    foreach ($component_types as $name => &$component_type) {
+      $component_type += array(
+        'name' => $name,
+        'display_title' => $component_type['title'],
+      );
+    }
+
+    // Allow the info to be altered by other modules.
+    drupal_alter('commerce_price_component_type_info', $component_types);
+  }
+
+  return $component_types;
+}
+
+/**
+ * Returns an array of price component type titles keyed by name.
+ */
+function commerce_price_component_titles() {
+  static $titles = array();
+
+  if (empty($titles)) {
+    foreach (commerce_price_component_types() as $name => $component_type) {
+      $titles['name'] = $component_type['title'];
+    }
+  }
+
+  return $titles;
+}
+
+/**
+ * Returns a component type array.
+ *
+ * @param $name
+ *   The machine-name of the component type to return.
+ *
+ * @return
+ *   A component type array or FALSE if not found.
+ */
+function commerce_price_component_type_load($name) {
+  $component_types = commerce_price_component_types();
+  return !empty($component_types[$name]) ? $component_types[$name] : FALSE;
+}
+
+/**
+ * Adds a price component to a price's data array.
+ *
+ * @param $price
+ *   The price array the component should be added to.
+ * @param $type
+ *   The machine-name of the component type to be added to the array.
+ * @param $component_price
+ *   The price array for the component as defined by the price field.
+ * @param $included
+ *   Boolean indicating whether or not the price component has already been
+ *     included in the price the component is being added to.
+ *
+ * @return
+ *   The updated data array.
+ */
+function commerce_price_component_add($price, $type, $component_price, $included) {
+  // If no price components have been added yet, add the base price first.
+  if (empty($price['data']['components']) && $type != 'base_price') {
+    $price['data'] = commerce_price_component_add($price, 'base_price', $price, TRUE);
+  }
+
+  $price['data']['components'][] = array(
+    'name' => $type,
+    'price' => $component_price,
+    'included' => $included,
+  );
+
+  return $price['data'];
+}
+
+/**
+ * Returns every component of a particular type from a price's data array.
+ *
+ * @param $price
+ *   The price array to remove components from.
+ * @param $type
+ *   The machine-name of the component type to delete.
+ *
+ * @return
+ *   An array of components from the data array matching the type.
+ */
+function commerce_price_component_load($price, $type) {
+  $components = array();
+
+  foreach ((array) $price['data']['components'] as $key => $component) {
+    if ($component['name'] == $type) {
+      $components[] = $component;
+    }
+  }
+
+  return $components;
+}
+
+/**
+ * Remove all instances of a particular component from a price's data array.
+ *
+ * @param &$price
+ *   The price array to remove components from.
+ * @param $type
+ *   The machine-name of the component type to delete.
+ *
+ * @return
+ *   The updated data array.
+ */
+function commerce_price_component_delete($price, $type) {
+  foreach ((array) $price['data']['components'] as $key => $component) {
+    if ($component['name'] == $type) {
+      unset($price['data']['components'][$key]);
+    }
+  }
+
+  return $price['data'];
+}

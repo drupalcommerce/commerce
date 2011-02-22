@@ -133,6 +133,7 @@ function commerce_tax_ui_tax_rate_add_form_wrapper($tax_rate) {
  *     array with properties instantiated but not populated.
  */
 function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
+  drupal_set_message('<pre>'. print_r($tax_rate, TRUE) .'</pre>');
   // Store the initial tax rate in the form state.
   $form_state['tax_rate'] = $tax_rate;
 
@@ -199,11 +200,11 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
     '#required' => TRUE,
   );
 
-  $form['tax_rate']['component'] = array(
+  $form['tax_rate']['rules_component'] = array(
     '#type' => 'checkbox',
     '#title' => t("Define a default Rules component for determining this tax rate's applicability to a product."),
-    '#description' => $tax_rate['component'] ? t('WARNING: Unchecking this box will delete the existing Rules component even if you have customized it.') : '',
-    '#default_value' => $tax_rate['component'],
+    '#description' => $tax_rate['rules_component'] ? t('WARNING: Unchecking this box will delete the existing Rules component even if you have customized it.') : '',
+    '#default_value' => $tax_rate['rules_component'],
   );
 
   $form['actions'] = array(

@@ -14,7 +14,7 @@ function commerce_tax_default_rules_configuration() {
 
   // Loop over every tax rate looking for rates requiring a default component.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
-    if ($tax_rate['component']) {
+    if ($tax_rate['rules_component']) {
       // Create a new rules component.
       $rule = rule(commerce_tax_rate_component_variables());
 

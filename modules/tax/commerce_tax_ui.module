@@ -358,8 +358,10 @@ function commerce_tax_ui_tax_rate_new($type = '') {
     'description' => '',
     'rate' => 0,
     'type' => $type,
-    'component' => TRUE,
+    'rules_component' => TRUE,
+    'tax_component' => '',
     'admin_list' => TRUE,
+    'calculation_callback' => 'commerce_tax_rate_calculate',
     'module' => 'commerce_tax_ui',
     'is_new' => TRUE,
   );
@@ -397,7 +399,7 @@ function commerce_tax_ui_tax_rate_save($tax_rate) {
 
   // If the rate specifies that it doesn't need a component and one already
   // exists, delete it now.
-  if (!$tax_rate['component']) {
+  if (!$tax_rate['rules_component']) {
     rules_config_delete(array('commerce_tax_rate_' . $tax_rate['name']));
   }
   else {

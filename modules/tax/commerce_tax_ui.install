@@ -125,7 +125,7 @@ function commerce_tax_ui_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'component' => array(
+      'rules_component' => array(
         'description' => 'Boolean indicating whether or not this rate should have a default Rules component for applying it to products.',
         'type' => 'int',
         'size' => 'tiny',

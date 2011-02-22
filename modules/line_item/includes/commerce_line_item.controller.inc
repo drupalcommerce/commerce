@@ -55,6 +55,17 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       $wrapper->commerce_total->amount = $line_item->quantity * $wrapper->commerce_unit_price->amount->value();
       $wrapper->commerce_total->currency_code = $wrapper->commerce_unit_price->currency_code->value();
 
+      // Add the components multiplied by the quantity to the data array.
+      $data = $wrapper->commerce_unit_price->data->value();
+      $components = array();
+
+      foreach ((array) $data['components'] as $key => $component) {
+        $data['components'][$key]['price']['amount'] *= $line_item->quantity;
+      }
+
+      // Set the updated data array to the total price.
+      $wrapper->commerce_total->data = $data;
+
       // Give modules the opportunity to prepare field data for saving.
       rules_invoke_all('commerce_line_item_presave', $line_item);
       field_attach_presave('commerce_line_item', $line_item);
