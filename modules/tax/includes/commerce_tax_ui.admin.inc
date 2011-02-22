@@ -133,7 +133,6 @@ function commerce_tax_ui_tax_rate_add_form_wrapper($tax_rate) {
  *     array with properties instantiated but not populated.
  */
 function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
-  drupal_set_message('<pre>'. print_r($tax_rate, TRUE) .'</pre>');
   // Store the initial tax rate in the form state.
   $form_state['tax_rate'] = $tax_rate;
 
