@@ -3,7 +3,7 @@
 
 /**
  * @file
- *
+ * Tests for adding and displaying product reference fields.
  */
 
 /**
@@ -15,22 +15,22 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
    */
   protected $products = array();
 
-	/**
+  /**
    * Display node type.
    */
   protected $display_type;
 
-	/**
+  /**
    * Product reference field name
    */
   protected $field_name;
 
-	/**
+  /**
    * Product reference field info.
    */
   protected $field;
 
- 	/**
+  /**
    * Product reference field instance info.
    */
   protected $field_instance;
@@ -335,7 +335,7 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
 
     // Generate and check the expected ouptut.
     $render = array(
-    	'#markup' => check_plain($product->sku),
+      '#markup' => check_plain($product->sku),
     );
     $this->assertRaw(drupal_render($render), t('SKU without link is displayed correctly'));
   }
@@ -407,7 +407,7 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
 
     // Generate and check the expected ouptut.
     $render = array(
-    	'#markup' => check_plain($product->title),
+      '#markup' => check_plain($product->title),
     );
     $this->assertRaw(drupal_render($render), t('Title with no Link is displayed correctly'));
   }
