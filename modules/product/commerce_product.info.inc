@@ -95,14 +95,16 @@ function commerce_product_entity_property_info() {
  * Implements hook_entity_property_info_alter() on top of the Product module.
  */
 function commerce_product_entity_property_info_alter(&$info) {
-  // Move the default price property to the product by default; as it is a
-  // required default field, this makes dealing with it more convenient.
-  $properties = array();
+  if (!empty($info['commerce_product']['bundles'])) {
+    // Move the default price property to the product by default; as it is a
+    // required default field, this makes dealing with it more convenient.
+    $properties = array();
 
-  foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
-    $bundle_info += array('properties' => array());
-    $properties += $bundle_info['properties'];
+    foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
+      $bundle_info += array('properties' => array());
+      $properties += $bundle_info['properties'];
+    }
+
+    $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
   }
-
-  $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
 }
