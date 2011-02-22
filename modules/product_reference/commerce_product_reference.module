@@ -868,6 +868,16 @@ function commerce_product_line_item_populate($line_item, $product, $display_uri 
 
   // Set the unit price on the line item object.
   $line_item_wrapper->commerce_unit_price = $product_wrapper->commerce_price->value();
+
+  // Add the base price to the components array.
+  if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), 'base_price')) {
+    $line_item_wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $line_item_wrapper->commerce_unit_price->value(),
+      'base_price',
+      $line_item_wrapper->commerce_unit_price->value(),
+      TRUE
+    );
+  }
 }
 
 /**

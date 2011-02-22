@@ -97,7 +97,7 @@ function commerce_checkout_permission() {
     ),
     'access checkout' => array(
       'title' => t('Access checkout'),
-      'description' => t('Complete a purchase through the checkout form or be (or be redirected to login based on checkout settings).'),
+      'description' => t('Complete a purchase through the checkout form.'),
     ),
   );
 
