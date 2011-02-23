@@ -277,7 +277,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
       }
     }
     $values['type'] = 'product';
-    $product = entity_create('commerce_product', $values)->value();
+    $product = entity_create('commerce_product', $values);
     $this->assertTrue($product, "Created a product and set all setable values.");
 
     $wrapper = entity_metadata_wrapper('commerce_product', $product);
