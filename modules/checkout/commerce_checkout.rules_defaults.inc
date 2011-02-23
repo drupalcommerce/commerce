@@ -103,8 +103,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Create a new account for an anonymous order');
-  // TODO: Default this to TRUE once http://drupal.org/node/1044342 is fixed.
-  $rule->active = FALSE;
+  $rule->active = TRUE;
 
   $rule
     ->event('commerce_checkout_complete')
