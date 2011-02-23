@@ -206,6 +206,15 @@ function commerce_order_views_data() {
     ),
   );
 
+  // Define a handler for an area used to summarize a set of line items.
+  $data['commerce_order']['order_total'] = array(
+    'title' => t('Order total'),
+    'help' => t('Displays the order total field formatted with its components list; requires an Order ID argument.'),
+    'area' => array(
+      'handler' => 'commerce_order_handler_area_order_total',
+    ),
+  );
+
   return $data;
 }
 

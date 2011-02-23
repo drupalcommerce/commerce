@@ -93,7 +93,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['table'] = 'field_data_commerce_line_items';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['field'] = 'commerce_line_items_line_item_id';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['required'] = 1;
-  /* Field: Fields: commerce_display_path */
+  /* Field: Fields: Display path */
   $handler->display->display_options['fields']['commerce_display_path']['id'] = 'commerce_display_path';
   $handler->display->display_options['fields']['commerce_display_path']['table'] = 'field_data_commerce_display_path';
   $handler->display->display_options['fields']['commerce_display_path']['field'] = 'commerce_display_path';
@@ -136,7 +136,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['line_item_title']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['line_item_title']['hide_empty'] = 0;
   $handler->display->display_options['fields']['line_item_title']['empty_zero'] = 0;
-  /* Field: Fields: commerce_unit_price */
+  /* Field: Fields: Unit price */
   $handler->display->display_options['fields']['commerce_unit_price']['id'] = 'commerce_unit_price';
   $handler->display->display_options['fields']['commerce_unit_price']['table'] = 'field_data_commerce_unit_price';
   $handler->display->display_options['fields']['commerce_unit_price']['field'] = 'commerce_unit_price';
@@ -198,12 +198,11 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['edit_delete']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['edit_delete']['hide_empty'] = 0;
   $handler->display->display_options['fields']['edit_delete']['empty_zero'] = 0;
-  /* Field: Fields: commerce_total */
+  /* Field: Fields: Total */
   $handler->display->display_options['fields']['commerce_total']['id'] = 'commerce_total';
   $handler->display->display_options['fields']['commerce_total']['table'] = 'field_data_commerce_total';
   $handler->display->display_options['fields']['commerce_total']['field'] = 'commerce_total';
   $handler->display->display_options['fields']['commerce_total']['relationship'] = 'commerce_line_items_line_item_id';
-  $handler->display->display_options['fields']['commerce_total']['label'] = 'Price';
   $handler->display->display_options['fields']['commerce_total']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['commerce_total']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['commerce_total']['alter']['absolute'] = 0;
@@ -221,6 +220,9 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['commerce_total']['empty_zero'] = 0;
   $handler->display->display_options['fields']['commerce_total']['click_sort_column'] = 'amount';
   $handler->display->display_options['fields']['commerce_total']['type'] = 'commerce_price_formatted_amount';
+  $handler->display->display_options['fields']['commerce_total']['settings'] = array(
+    'calculation' => FALSE,
+  );
   $handler->display->display_options['fields']['commerce_total']['field_api_classes'] = 0;
   /* Sort criterion: Commerce Line Item: Line item ID */
   $handler->display->display_options['sorts']['line_item_id']['id'] = 'line_item_id';
@@ -263,6 +265,7 @@ function commerce_cart_views_default_views() {
     t('Price'),
     t('Quantity'),
     t('Remove'),
+    t('Total'),
   );
 
   $views[$view->name] = $view;
@@ -507,10 +510,11 @@ function commerce_cart_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
-  /* Footer: Commerce Line Item: Line item summary */
-  $handler->display->display_options['footer']['line_item_summary']['id'] = 'line_item_summary';
-  $handler->display->display_options['footer']['line_item_summary']['table'] = 'commerce_line_item';
-  $handler->display->display_options['footer']['line_item_summary']['field'] = 'line_item_summary';
+  /* Footer: Commerce Order: Order total */
+  $handler->display->display_options['footer']['order_total']['id'] = 'order_total';
+  $handler->display->display_options['footer']['order_total']['table'] = 'commerce_order';
+  $handler->display->display_options['footer']['order_total']['field'] = 'order_total';
+  $handler->display->display_options['footer']['order_total']['empty'] = FALSE;
   /* Relationship: Fields: Referenced line item */
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['id'] = 'commerce_line_items_line_item_id';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['table'] = 'field_data_commerce_line_items';
@@ -536,7 +540,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['line_item_title']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['line_item_title']['hide_empty'] = 0;
   $handler->display->display_options['fields']['line_item_title']['empty_zero'] = 0;
-  /* Field: Fields: commerce_unit_price */
+  /* Field: Fields: Unit price */
   $handler->display->display_options['fields']['commerce_unit_price']['id'] = 'commerce_unit_price';
   $handler->display->display_options['fields']['commerce_unit_price']['table'] = 'field_data_commerce_unit_price';
   $handler->display->display_options['fields']['commerce_unit_price']['field'] = 'commerce_unit_price';
@@ -581,12 +585,11 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['quantity']['set_precision'] = 0;
   $handler->display->display_options['fields']['quantity']['precision'] = '0';
   $handler->display->display_options['fields']['quantity']['format_plural'] = 0;
-  /* Field: Fields: commerce_total */
+  /* Field: Fields: Total */
   $handler->display->display_options['fields']['commerce_total']['id'] = 'commerce_total';
   $handler->display->display_options['fields']['commerce_total']['table'] = 'field_data_commerce_total';
   $handler->display->display_options['fields']['commerce_total']['field'] = 'commerce_total';
   $handler->display->display_options['fields']['commerce_total']['relationship'] = 'commerce_line_items_line_item_id';
-  $handler->display->display_options['fields']['commerce_total']['label'] = 'Total';
   $handler->display->display_options['fields']['commerce_total']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['commerce_total']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['commerce_total']['alter']['absolute'] = 0;
@@ -614,6 +617,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['arguments']['order_id']['id'] = 'order_id';
   $handler->display->display_options['arguments']['order_id']['table'] = 'commerce_order';
   $handler->display->display_options['arguments']['order_id']['field'] = 'order_id';
+  $handler->display->display_options['arguments']['order_id']['default_action'] = 'not found';
   $handler->display->display_options['arguments']['order_id']['style_plugin'] = 'default_summary';
   $handler->display->display_options['arguments']['order_id']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['order_id']['break_phrase'] = 0;

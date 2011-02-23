@@ -12,22 +12,9 @@ fieldset.checkout-buttons .checkout-cancel, fieldset.checkout-buttons .checkout-
   float: left;
 }
 
-table.checkout-review {
-  width: auto;
-  margin-left: auto;
-  margin-right: auto;
-  min-width: 40%;
-}
-
-fieldset.checkout-buttons.review {
-  width: 40%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 table.checkout-review .pane-title td {
+  padding-left: 1em;
   font-weight: bold;
-  text-align: center;
 }
 
 table.checkout-review tr.pane-data {
