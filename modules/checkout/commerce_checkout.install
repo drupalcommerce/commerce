@@ -23,6 +23,13 @@ function commerce_checkout_schema() {
         'not null' => TRUE,
         'default' => '1',
       ),
+      'fieldset' => array(
+        'description' => 'Boolean value indicating whether or not the pane should appear in a fieldset.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
       'collapsible' => array(
         'description' => 'Boolean value indicating whether or not the pane should appear collapsed.',
         'type' => 'int',

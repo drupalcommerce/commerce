@@ -270,6 +270,7 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
       $checkout_pane['fieldset'] = FALSE;
       $checkout_pane['collapsible'] = FALSE;
       $checkout_pane['collapsed'] = FALSE;
+      break;
     case 'default':
     default:
       $checkout_pane['fieldset'] = TRUE;
