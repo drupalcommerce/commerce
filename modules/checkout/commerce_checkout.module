@@ -311,6 +311,7 @@ function commerce_checkout_commerce_checkout_pane_info() {
     'file' => 'includes/commerce_checkout.checkout_pane.inc',
     'base' => 'commerce_checkout_review_pane',
     'page' => 'review',
+    'fieldset' => FALSE,
   );
 
   $checkout_panes['checkout_completion_message'] = array(
@@ -318,6 +319,7 @@ function commerce_checkout_commerce_checkout_pane_info() {
     'file' => 'includes/commerce_checkout.checkout_pane.inc',
     'base' => 'commerce_checkout_completion_message_pane',
     'page' => 'complete',
+    'fieldset' => FALSE,
   );
 
   return $checkout_panes;
@@ -452,6 +454,7 @@ function commerce_checkout_panes($conditions = array()) {
         'base' => $pane_id,
         'name' => $checkout_pane['title'],
         'page' => 'checkout',
+        'fieldset' => TRUE,
         'collapsible' => FALSE,
         'collapsed' => FALSE,
         'weight' => 0,

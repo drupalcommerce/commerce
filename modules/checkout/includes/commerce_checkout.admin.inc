@@ -209,8 +209,9 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
       'default' => t('Display this pane in a non-collapsible fieldset.'),
       'collapsible' => t('Display this pane in a collapsible fieldset.'),
       'collapsed' => t('Display this pane in a collapsed fieldset.'),
+      'none' => t('Do not display this pane in a fieldset.'),
     ),
-    '#default_value' => $checkout_pane['collapsible'] ? ($checkout_pane['collapsed'] ? 'collapsed' : 'collapsible') : 'default',
+    '#default_value' => $checkout_pane['fieldset'] ? ($checkout_pane['collapsible'] ? ($checkout_pane['collapsed'] ? 'collapsed' : 'collapsible') : 'default') : 'none',
   );
   $form['display']['review'] = array(
     '#type' => 'checkbox',
@@ -256,15 +257,22 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
   // Update the fieldset collapsibility variables.
   switch ($form_state['values']['collapsibility']) {
     case 'collapsible':
+      $checkout_pane['fieldset'] = TRUE;
       $checkout_pane['collapsible'] = TRUE;
       $checkout_pane['collapsed'] = FALSE;
       break;
     case 'collapsed':
+      $checkout_pane['fieldset'] = TRUE;
       $checkout_pane['collapsible'] = TRUE;
       $checkout_pane['collapsed'] = TRUE;
       break;
+    case 'none':
+      $checkout_pane['fieldset'] = FALSE;
+      $checkout_pane['collapsible'] = FALSE;
+      $checkout_pane['collapsed'] = FALSE;
     case 'default':
     default:
+      $checkout_pane['fieldset'] = TRUE;
       $checkout_pane['collapsible'] = FALSE;
       $checkout_pane['collapsed'] = FALSE;
       break;

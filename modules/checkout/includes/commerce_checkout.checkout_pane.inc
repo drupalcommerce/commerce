@@ -12,9 +12,7 @@
  *   details of the order.
  */
 function commerce_checkout_review_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
-  $pane_form = array(
-    '#type' => 'container',
-  );
+  $pane_form = array();
 
   // Otherwise add any enabled checkout panes that are visible on review.
   $pane_form['review'] = array(
