@@ -21,6 +21,7 @@ function commerce_ui_menu() {
     'access arguments' => array('access administration pages'),
     'file path' => drupal_get_path('module', 'system'),
     'file' => 'system.admin.inc',
+    'weight' => -7,
   );
   $items['admin/commerce/config'] = array(
     'title' => 'Configuration',
