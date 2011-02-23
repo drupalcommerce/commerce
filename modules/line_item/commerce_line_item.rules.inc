@@ -175,7 +175,27 @@ function commerce_line_item_rules_action_info() {
 function commerce_line_item_unit_price_add($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() + $amount;
+
+    // Calculate the updated amount and create a price array representing the
+    // difference between it and the current amount.
+    $current_amount = $wrapper->commerce_unit_price->amount->value();
+    $updated_amount = $current_amount + $amount;
+
+    $difference = array(
+      'amount' => $updated_amount - $current_amount,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(),
+    );
+
+    // Set the amount of the unit price and add the difference as a component.
+    $wrapper->commerce_unit_price->amount = $updated_amount;
+
+    $wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $wrapper->commerce_unit_price->value(),
+      'base_price',
+      $difference,
+      TRUE
+    );
   }
 }
 
@@ -185,7 +205,27 @@ function commerce_line_item_unit_price_add($line_item, $amount) {
 function commerce_line_item_unit_price_subtract($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() - $amount;
+
+    // Calculate the updated amount and create a price array representing the
+    // difference between it and the current amount.
+    $current_amount = $wrapper->commerce_unit_price->amount->value();
+    $updated_amount = $current_amount - $amount;
+
+    $difference = array(
+      'amount' => $updated_amount - $current_amount,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(),
+    );
+
+    // Set the amount of the unit price and add the difference as a component.
+    $wrapper->commerce_unit_price->amount = $updated_amount;
+
+    $wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $wrapper->commerce_unit_price->value(),
+      'base_price',
+      $difference,
+      TRUE
+    );
   }
 }
 
@@ -195,7 +235,27 @@ function commerce_line_item_unit_price_subtract($line_item, $amount) {
 function commerce_line_item_unit_price_multiply($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() * $amount;
+
+    // Calculate the updated amount and create a price array representing the
+    // difference between it and the current amount.
+    $current_amount = $wrapper->commerce_unit_price->amount->value();
+    $updated_amount = $current_amount * $amount;
+
+    $difference = array(
+      'amount' => $updated_amount - $current_amount,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(),
+    );
+
+    // Set the amount of the unit price and add the difference as a component.
+    $wrapper->commerce_unit_price->amount = $updated_amount;
+
+    $wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $wrapper->commerce_unit_price->value(),
+      'base_price',
+      $difference,
+      TRUE
+    );
   }
 }
 
@@ -205,7 +265,27 @@ function commerce_line_item_unit_price_multiply($line_item, $amount) {
 function commerce_line_item_unit_price_divide($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->commerce_unit_price->amount = $wrapper->commerce_unit_price->amount->value() / $amount;
+
+    // Calculate the updated amount and create a price array representing the
+    // difference between it and the current amount.
+    $current_amount = $wrapper->commerce_unit_price->amount->value();
+    $updated_amount = $current_amount / $amount;
+
+    $difference = array(
+      'amount' => $updated_amount - $current_amount,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(),
+    );
+
+    // Set the amount of the unit price and add the difference as a component.
+    $wrapper->commerce_unit_price->amount = $updated_amount;
+
+    $wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $wrapper->commerce_unit_price->value(),
+      'base_price',
+      $difference,
+      TRUE
+    );
   }
 }
 
@@ -215,7 +295,27 @@ function commerce_line_item_unit_price_divide($line_item, $amount) {
 function commerce_line_item_unit_price_amount($line_item, $amount) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $wrapper->commerce_unit_price->amount = $amount;
+
+    // Calculate the updated amount and create a price array representing the
+    // difference between it and the current amount.
+    $current_amount = $wrapper->commerce_unit_price->amount->value();
+    $updated_amount = $amount;
+
+    $difference = array(
+      'amount' => $updated_amount - $current_amount,
+      'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+      'data' => array(),
+    );
+
+    // Set the amount of the unit price and add the difference as a component.
+    $wrapper->commerce_unit_price->amount = $updated_amount;
+
+    $wrapper->commerce_unit_price->data = commerce_price_component_add(
+      $wrapper->commerce_unit_price->value(),
+      'base_price',
+      $difference,
+      TRUE
+    );
   }
 }
 
@@ -225,6 +325,17 @@ function commerce_line_item_unit_price_amount($line_item, $amount) {
 function commerce_line_item_unit_price_currency_code($line_item, $currency_code) {
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
   $wrapper->commerce_unit_price->currency_code = $currency_code;
+
+  // Update the currency code of the price's components.
+  $data = $wrapper->commerce_unit_price->data->value();
+
+  if (!empty($data['components'])) {
+    foreach ($data['components'] as $key => &$component) {
+      $component['price']['currency_code'] = $currency_code;
+    }
+
+    $wrapper->commerce_unit_price->data = $data;
+  }
 }
 
 /**
@@ -234,6 +345,18 @@ function commerce_line_item_unit_price_currency_convert($line_item, $currency_co
   $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
   $wrapper->commerce_unit_price->amount = commerce_currency_convert($wrapper->commerce_unit_price->amount->value(), $wrapper->commerce_unit_price->currency_code->value(), $currency_code);
   $wrapper->commerce_unit_price->currency_code = $currency_code;
+
+  // Convert the curreny code of the price's components.
+  $data = $wrapper->commerce_unit_price->data->value();
+
+  if (!empty($data['components'])) {
+    foreach ($data['components'] as $key => &$component) {
+      $component['price']['amount'] = commerce_currency_convert($component['price']['amount'], $component['currency_code'], $currency_code);
+      $component['price']['currency_code'] = $currency_code;
+    }
+
+    $wrapper->commerce_unit_price->data = $data;
+  }
 }
 
 /**
