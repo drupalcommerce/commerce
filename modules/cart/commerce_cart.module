@@ -528,22 +528,22 @@ function commerce_cart_order_refresh($order) {
   $line_item_changed = FALSE;
 
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    $line_item = clone($line_item_wrapper->value());
+
     // If the line item is a product line item...
-    if ($line_item_wrapper->type->value() == 'product') {
+    if ($line_item->type == 'product') {
       // Load the product unchanged from the database so any existing price
       // adjustments aren't duplicated in this line item.
       $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
 
-      // Create a new product line item referencing the same product as though
-      // we had not added it to the cart yet, but use the current quantity.
-      $line_item = commerce_product_line_item_new($product, $line_item_wrapper->quantity->value(), $order->order_id, $line_item_wrapper->commerce_display_path->value());
+      // Repopulate the line item array with the default values for the product
+      // as though it had not been added to the cart yet, but preserve the
+      // current quantity and display URI information.
+      commerce_product_line_item_populate($line_item, $product, $line_item->quantity, empty($line_item->data['display_uri']) ? NULL : $line_item->data['display_uri']);
 
       // Process the unit price through Rules so it reflects the user's actual
       // current purchase price.
       rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
-    }
-    else {
-      $line_item = clone($line_item_wrapper->value());
     }
 
     // Allow other modules alter line items on a shopping cart refresh.
