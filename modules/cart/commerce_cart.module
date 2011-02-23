@@ -381,13 +381,11 @@ function theme_commerce_cart_empty_page() {
  *   The fully loaded shopping cart order or FALSE if non-existent.
  */
 function commerce_cart_order_load($uid = 0) {
-  // Loaded orders will be cached keyed by $uid.
-  $cart_orders = &drupal_static(__FUNCTION__);
+  // Cart order IDs will be cached keyed by $uid.
+  $cart_order_ids = &drupal_static(__FUNCTION__);
 
-  // First return the cached order if it has been loaded already.
-  if (!isset($cart_orders[$uid])) {
-    $order_id = FALSE;
-
+  // Cache the user's cart order ID if it hasn't been set already.
+  if (!isset($cart_order_ids[$uid])) {
     // Create an array of valid shopping cart order statuses.
     $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
 
@@ -395,7 +393,7 @@ function commerce_cart_order_load($uid = 0) {
     if ($uid) {
       // Look for the user's most recent shopping cart order, although they
       // should never really have more than one.
-      $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
+      $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
     }
     else {
       // Otherwise look for a shopping cart order ID in the session.
@@ -405,20 +403,17 @@ function commerce_cart_order_load($uid = 0) {
         // else's order data. Therefore, this query restricts its search to
         // orders assigned to anonymous users using the same IP address to try
         // and mitigate risk as much as possible.
-        $order_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
+        $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
       }
-    }
-
-    // If a valid order ID was found, load the order now.
-    if ($order_id) {
-      $cart_orders[$uid] = commerce_order_load($order_id);
-    }
-    else {
-      $cart_orders[$uid] = FALSE;
     }
   }
 
-  return $cart_orders[$uid];
+  // If a valid cart order ID exists for the user, return it now.
+  if (!empty($cart_order_ids[$uid])) {
+    return commerce_order_load($cart_order_ids[$uid]);
+  }
+
+  return FALSE;
 }
 
 /**
