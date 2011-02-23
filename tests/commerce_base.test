@@ -50,15 +50,15 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'commerce_customer',
       'commerce_line_item',
       'commerce_order',
-      'commerce_ui', 'commerce_checkout',
       'commerce_product_reference',
       'commerce_payment',
-      'commerce_cart',
       'commerce_tax',
       'commerce_product_pricing',
     );
     $ui = array(
-      //'commerce_ui' // Already added in $api due to checkout module
+      'commerce_ui',
+      'commerce_checkout',
+      'commerce_cart',
       'commerce_line_item_ui',
       'commerce_order_ui',
       'commerce_product_ui',
