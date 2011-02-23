@@ -95,6 +95,19 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
   }
 
   /**
+   * Unserializes the data property of loaded products.
+   */
+  public function attachLoad(&$queried_products, $revision_id = FALSE) {
+    foreach ($queried_products as $product_id => &$product) {
+      $product->data = unserialize($product->data);
+    }
+
+    // Call the default attachLoad() method. This will add fields and call
+    // hook_commerce_product_load().
+    parent::attachLoad($queried_products, $revision_id);
+  }
+
+  /**
    * Deletes multiple products by ID.
    *
    * @param $product_ids

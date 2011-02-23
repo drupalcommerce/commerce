@@ -114,8 +114,8 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
    * Unserializes the data property of loaded line items.
    */
   public function attachLoad(&$queried_line_items, $revision_id = FALSE) {
-    foreach ($queried_line_items as $line_item_id => $line_item) {
-      $queried_line_items[$line_item_id]->data = unserialize($line_item->data);
+    foreach ($queried_line_items as $line_item_id => &$line_item) {
+      $line_item->data = unserialize($line_item->data);
     }
 
     // Call the default attachLoad() method. This will add fields and call

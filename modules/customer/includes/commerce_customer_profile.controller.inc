@@ -191,6 +191,19 @@ class CommerceCustomerProfileEntityController extends DrupalDefaultEntityControl
   }
 
   /**
+   * Unserializes the data property of loaded customer profiles.
+   */
+  public function attachLoad(&$queried_profiles, $revision_id = FALSE) {
+    foreach ($queried_profiles as $profile_id => &$profile) {
+      $profile->data = unserialize($profile->data);
+    }
+
+    // Call the default attachLoad() method. This will add fields and call
+    // hook_commerce_customer_profile_load().
+    parent::attachLoad($queried_profiles, $revision_id);
+  }
+
+  /**
    * Deletes multiple customer profiles by ID.
    *
    * @param $profile_ids

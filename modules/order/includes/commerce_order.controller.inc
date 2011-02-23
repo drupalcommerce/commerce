@@ -246,8 +246,8 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
    * Unserializes the data property of loaded orders.
    */
   public function attachLoad(&$queried_orders, $revision_id = FALSE) {
-    foreach ($queried_orders as $order_id => $order) {
-      $queried_orders[$order_id]->data = unserialize($order->data);
+    foreach ($queried_orders as $order_id => &$order) {
+      $order->data = unserialize($order->data);
     }
 
     // Call the default attachLoad() method. This will add fields and call
