@@ -1,0 +1,616 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Functional tests for the commerce product ui module.
+ */
+
+/**
+ * Test the product and product type CRUD.
+ */
+class CommerceProductUIAdminTest extends CommerceBaseTestCase {
+
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Product administration',
+      'description' => 'Tests creating, deleting and editing products and product types.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+
+    // User creation for different operations.
+    $this->store_admin = $this->createStoreAdmin();
+    $this->normal_user = $this->drupalCreateUser();
+
+    // Get the product types, and if the default product type is not present,
+    // create it.
+    $product_types = commerce_product_types();
+    if (empty($product_types['product'])) {
+      $this->createDummyProductType('product');
+      commerce_product_types_reset();
+    }
+  }
+
+  /**
+   * Test the permissions to access the product listing.
+   */
+  public function testCommerceProductAccessProductList() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the admin product list.
+    $this->drupalGet('admin/commerce/products');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product admin list page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the admin product list.
+    $this->drupalGet('admin/commerce/products');
+
+    $this->assertResponse(200, t('Store admin user can access the product admin list page'));
+
+    // Ensure that the link for create products is in place.
+    $this->assertText(t('Add a product'), t('%addproduct link is present in the admin list page', array('%addproduct' => t('Add a product'))));
+  }
+
+  /**
+   * Test the add product process.
+   */
+  public function testCommerceProductAddProduct() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the admin product creation page.
+    $this->drupalGet('admin/commerce/products/add/product');
+
+    $this->assertResponse(403, t('Normal user is not able to add a product using the admin interface'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the admin product creation page.
+    $this->drupalGet('admin/commerce/products/add/product');
+
+    $this->assertResponse(200, t('Store admin user is allowed to add a product using the admin interface'));
+
+    // Check the integrity of the add form.
+    $this->pass(t('Test the integrity of the add product form:'));
+    $this->assertFieldByName('sku', NULL, t('SKU field is present'));
+    $this->assertFieldByXPath('//input[@name="sku" and contains(@class, "required")]', NULL, t('SKU field is required'));
+    $this->assertFieldByName('title', NULL, t('Title field is present'));
+    $this->assertFieldByXPath('//input[@name="title" and contains(@class, "required")]', NULL,  t('Title field is required'));
+    $this->assertFieldByName('commerce_price[und][0][amount]', NULL, t('Price field is present'));
+    $this->assertFieldByName('status', NULL, t('Status field is present'));
+    $status_required = $this->xpath('//div[contains(@class, "form-item-status")]/label/span[contains(@class, "form-required")]');
+    $this->assertFalse(empty($status_required), t('Status field is required'));
+    $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
+    $this->assertFieldById('edit-save-continue', t('Save and add another'), t('Save an add another button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+
+    // Try to save the product and check validation messages.
+    $this->drupalPost(NULL, array(), t('Save product'));
+
+    $this->assertText(t('Product SKU field is required'), t('Validation message for SKU is displayed when tryin to submit the form with the field empty.'));
+    $this->assertText(t('Title field is required'), t('Validation message for title is displayed when tryin to submit the form with the field empty.'));
+
+    // Create the product.
+    $edit = array(
+      'sku' => 'PROD-01',
+      'title' => $this->randomName(10),
+      'commerce_price[und][0][amount]' => rand(2, 500),
+      'status' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save product'));
+
+    // Check the product in database
+    $product = commerce_product_load_by_sku($edit['sku']);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $this->pass(t('Test the product creation in database:'));
+    $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
+    $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
+    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+    $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
+
+    // Check the product listing
+    $this->pass(t('Test the product listing after saving a product'));
+    $this->assertTrue($this->url == url('admin/commerce/products', array('absolute' => TRUE)), t('Landing page after save is the list of products'));
+    $this->assertText(t('Product saved.'), t('%message message is present', array('%message' => t('Product saved'))));
+    $this->assertText($edit['sku'], t('SKU of the product is present'));
+    $this->assertText($edit['title'], t('Title of the product is present'));
+  }
+
+
+  /**
+   * Test the save and add another product.
+   */
+  public function testCommerceProductSaveAndAddAnother() {
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the admin product creation page.
+    $this->drupalGet('admin/commerce/products/add/product');
+
+    // Create the product.
+    $edit = array(
+      'sku' => 'PROD-01',
+      'title' => $this->randomName(10),
+      'commerce_price[und][0][amount]' => rand(2, 500),
+      'status' => 1,
+    );
+    // Save and add another.
+    $this->drupalPost(NULL, $edit, t('Save and add another'));
+
+    // Check the product in database
+    $product = commerce_product_load_by_sku($edit['sku']);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $this->pass(t('Test the product creation in database:'));
+    $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
+    $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
+    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+    $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
+
+    // Check if we are in the product creation page.
+    $this->assertTrue($this->url == url('admin/commerce/products/add/product', array('absolute' => TRUE)), t('Landing page after save and add another is the product creation page'));
+  }
+
+  /**
+   * Test the edit process for a product.
+   */
+  public function testCommerceProductEditProduct() {
+    // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the edit product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/edit');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product edit page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the edit product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/edit');
+
+    $this->assertResponse(200, t('Store admin user can access the product edit page'));
+
+    // Check the fields and buttons for the edit product form.
+    $this->pass(t('Test the integrity of the edit product form:'));
+    $this->assertFieldByName('sku', $product_wrapper->sku->value(), t('SKU field is present'));
+    $this->assertFieldByName('title', $product_wrapper->title->value(), t('Title field is present'));
+    $this->assertFieldByName('commerce_price[und][0][amount]', commerce_currency_integer_to_amount($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value()), t('Price field is present'));
+    $this->assertFieldByName('status', $product->status, t('Status field is present'));
+    $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+
+    // Change the product values.
+    $edit = array(
+      'sku' => 'PROD-02',
+      'title' => $this->randomName(10),
+      'commerce_price[und][0][amount]' => rand(2, 500),
+      'status' => 0,
+    );
+    $this->drupalPost(NULL, $edit, t('Save product'));
+
+    // Check the product in database
+    $product = commerce_product_load_by_sku($edit['sku']);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $this->pass(t('Test the product edit in database:'));
+    $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
+    $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
+    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+    $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
+
+    // Check the product listing
+    $this->pass(t('Test the product form after editing a product'));
+    $this->assertTrue($this->url == url('admin/commerce/products/' . $product->product_id . '/edit', array('absolute' => TRUE)), t('Landing page after save is the list of products'));
+    $this->assertText(t('Product saved.'), t('%message message is present', array('%message' => t('Product saved'))));
+    $this->assertFieldByName('sku', $edit['sku'], t('SKU field has the correct value'));
+    $this->assertFieldByName('title', $edit['title'], t('Title field has the correct value'));
+    $this->assertFieldByName('commerce_price[und][0][amount]', $edit['commerce_price[und][0][amount]'], t('Price field has the correct value'));
+    $this->assertFieldByName('status', $edit['status'], t('Status field is present'));
+    $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+  }
+
+  /**
+   * Test the delete link in the product form.
+   */
+  public function testCommerceProductCancelEditProduct() {
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the admin product list.
+    $this->drupalGet('admin/commerce/products/add/product');
+
+    // Click on cancel link.
+    $this->clickLink(t('Cancel'));
+
+    $this->assertTrue($this->url == url('admin/commerce/products', array('absolute' => TRUE)), t('Landing page after cancel is the product listing page'));
+  }
+
+  /**
+   * Test deleting a product.
+   */
+  public function testCommerceProductDeleteProduct() {
+    // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the delete product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product deletion page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the delete product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
+
+    $this->assertResponse(200, t('Store admin user can access the product delete page'));
+
+    // Check the integrity of the product delete confirmation form.
+    $this->pass('Test the product delete confirmation form:');
+    $this->assertTitle(t('Are you sure you want to delete !title?', array('!title' => $product->title)) . ' | Drupal', t('The confirmation message is displayed'));
+    $this->assertText($product->sku, t('SKU of the product is present'));
+    $this->assertText($product->title, t('Title of the product is present'));
+    $this->assertText(t('Deleting this product cannot be undone.', array('@sku' => $product->sku)), t('A warning notifying the user about the action can\'t be undone is displayed.'));
+    $this->assertFieldById('edit-submit', t('Delete'), t('Delete button is present'));
+    $this->assertText(t('Cancel'), t('Cancel is present'));
+
+    // Delete the product
+    $this->drupalPost(NULL, array(), t('Delete'));
+
+    // Check for the product in database.
+    $this->assertFalse(commerce_product_load($product->product_id), t('After deleting it, the product is no more in database'));
+
+    $this->assertTrue($this->url == url('admin/commerce/products', array('absolute' => TRUE)), t('Landing page after deleting a product is the product listing page'));
+
+    // Check if the product is present in the product listing.
+    $this->assertRaw(t('%title has been deleted.', array('%title' => $product->title)), t('\'Product has been deleted\' message is displayed'));
+    $this->assertNoText($product->sku, t('Product SKU is not present'));
+    $this->assertText(t('No products have been created yet.'), t('Empty product listing message is displayed'));
+  }
+
+
+  /**
+   * Test trying to delete a product associated with a Line Item.
+   */
+  public function testCommerceProductDeleteProductLineItem() {
+    // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+
+    // Associate the product in an order.
+    $order = $this->createDummyOrder($this->normal_user->uid, array($product));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the edit product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
+
+    $this->pass('Assertions for trying to delete a product associated to a line item:');
+    $this->assertText(t('This product is referenced by a line item and therefore cannot be deleted. Disable it instead.'), t('Product delete restriction message is displayed correctly'));
+    $this->assertFieldByXPath('//input[@id="edit-submit" and @disabled="disabled"]', NULL, t('Delete button is present and is disabled'));
+  }
+
+  /**
+   * Test the access to the product types listing page.
+   */
+  public function testCommerceProductAccessProductTypes() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the product types listing.
+    $this->drupalGet('admin/commerce/products/types');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product types listing page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the product types listing.
+    $this->drupalGet('admin/commerce/products/types');
+
+    $this->assertResponse(200, t('Store admin user can access the product types listing page'));
+
+    // Ensure that the link for create product types is in place.
+    $this->assertText(t('Add product type'), t('\'Add product type\' link is present in the admin list page'));
+
+    // Get all the product types and check if they are listed.
+    $product_types = commerce_product_types();
+    foreach ($product_types as $type) {
+      $this->assertText($type['name'], t('%type is present in the product type listing', array('%type' => $type['name'])));
+    }
+  }
+
+  /**
+   * Test adding a new product type.
+   */
+  public function testCommerceProductAddProductType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the product types add form.
+    $this->drupalGet('admin/commerce/products/types/add');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product types add page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the product types add form.
+    $this->drupalGet('admin/commerce/products/types/add');
+
+    $this->assertResponse(200, t('Store admin user can access the product types add page'));
+
+    // Create an additional product type.
+    $edit = array(
+      'product_type[name]' => 'New Product Type',
+      'product_type[type]' => 'new_product_type',
+    );
+    $this->drupalPost(NULL, $edit, t('Save product type'));
+
+    // Load all product types.
+    commerce_product_types_reset();
+    $product_types = commerce_product_types();
+
+    // Check if the product type has been created in database and if it appears
+    // in the product types listing.
+    $this->assertTrue(!empty($product_types[$edit['product_type[type]']]), t('Product type has been correctly created'));
+    $this->assertEqual($this->url, url('admin/commerce/products/types', array('absolute' => TRUE)), t('Redirect page after creating a product type is the product types listing'));
+    $this->assertText(t('Product type saved'), t('Message after saving a new product type is displayed'));
+    $this->assertText($edit['product_type[name]'], t('Product type just created appears in product types listing'));
+
+    // Test the Add and save fields.
+    // Access to the product types add form.
+    $this->drupalGet('admin/commerce/products/types/add');
+    $edit = array(
+      'product_type[name]' => 'Additional Product Type',
+      'product_type[type]' => 'additional_product_type',
+    );
+    $this->drupalPost(NULL, $edit, t('Save and add fields'));
+
+    $this->assertEqual($this->url, url('admin/commerce/products/types/' . strtr($edit['product_type[type]'], '_', '-') . '/fields', array('absolute' => TRUE)), t('Redirect page after creating a product type using \'Save and add fields\' button is the product type field manage screen'));
+    $this->assertText(t('Product type saved'), t('Message after saving a new product type is displayed'));
+    $this->assertText(t('Product SKU'), t('SKU field is present in the product type manage fields screen'));
+    $this->assertText(t('Title'), t('Title field is present in the product type manage fields screen'));
+    $this->assertText(t('Status'), t('Status field is present in the product type manage fields screen'));
+
+    // Check the field instances for that content type.
+    field_cache_clear();
+    $field_instances = field_info_instances('commerce_product', $edit['product_type[type]']);
+    foreach ($field_instances as $instance) {
+      $this->assertText($instance['label'], t('Field %field is present in the product type manage fields screen', array('%field' => $instance['label'])));
+    }
+  }
+
+  /**
+   * Edit a product type.
+   */
+  public function testCommerceProductEditProductType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the product types edit form.
+    $this->drupalGet('admin/commerce/products/types/product/edit');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product types edit page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the product types edit form.
+    $this->drupalGet('admin/commerce/products/types/product/edit');
+
+    $this->assertResponse(200, t('Store admin user can access the product types edit page'));
+
+    // Load all product types.
+    $product_types = commerce_product_types();
+
+    $this->assertFieldById('edit-product-type-name', $product_types['product']['name'], t('Product type name appears in the correct field of product type edit form'));
+    $this->assertFieldById('edit-product-type-description', $product_types['product']['description'], t('Product type description appears in the correct field of product type edit form'));
+  }
+
+  /**
+   * Delete a product type.
+   */
+  public function testCommerceProductDeleteProductType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the delete page for a product type.
+    $this->drupalGet('admin/commerce/products/types/product/delete');
+
+    $this->assertResponse(403, t('Normal user is not able to access delete page for the product type'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the delete page for a product type.
+    $this->drupalGet('admin/commerce/products/types/product/delete');
+
+    $this->assertResponse(200, t('Store admin can access delete page for the product type'));
+
+    // Load all product types.
+    $product_types = commerce_product_types();
+
+    // Check the integrity of the product type delete confirmation form.
+    $this->pass('Test the product type delete confirmation form:');
+    $this->assertTitle(t('Are you sure you want to delete the !name product type?', array('!name' => $product_types['product']['name'])) . ' | Drupal', t('The confirmation message is displayed'));
+    $this->assertText(t('This action cannot be undone'), t('A warning notifying the user about the action can\'t be undone is displayed.'));
+    $this->assertFieldById('edit-submit', t('Delete'), t('Delete button is present'));
+    $this->assertText(t('Cancel'), t('Cancel is present'));
+
+    // Delete the product type
+    $this->drupalPost(NULL, array(), t('Delete'));
+
+    $this->assertTrue($this->url == url('admin/commerce/products/types', array('absolute' => TRUE)), t('Landing page after deleting a product is the product types listing page'));
+
+    // Check if the product is present in the product listing.
+    $this->assertRaw(t('The product type %name has been deleted.', array('%name' => $product_types['product']['name'])), t('\'Product type has been deleted\' message is displayed'));
+
+    // Reload all product types.
+    commerce_product_types_reset();
+    $product_types = commerce_product_types();
+    // Look for the product type.
+    $this->assertTrue(empty($product_types['product']), t('Product type doesn\'t exist anymore after deletion'));
+  }
+
+  /**
+   * Delete a product type that already has products.
+   */
+  public function testCommerceProductDeleteProductTypeWithProducts() {
+    // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the delete page for a product type.
+    $this->drupalGet('admin/commerce/products/types/product/delete');
+
+    // Load product types.
+    $product_types = commerce_product_types();
+
+    // As the product type has at least one product, it souldn't permit to be
+    // deleted.
+    $this->pass(t('Product type has at least one product, test the validation messages:'));
+    $this->assertTitle(t('Cannot delete the !name product type', array('!name' => $product_types['product']['name'])) . ' | Drupal', t('Validation title of the page displayed correctly.'));
+    // Get the count of products of the type
+    $count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_types['product']['type']))->rowCount();
+    $message = format_plural($count,
+      'There is 1 product of this type. It cannot be deleted.',
+      'There are @count products of this type. It cannot be deleted.'
+    );
+    $this->assertText($message, t('Display the reason why the product type cannot be deleted and show the number of products related to it'));
+  }
+
+  /**
+   * Access to the manage fields admin screen.
+   */
+  public function testCommerceProductProductTypeManageFields() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the product type manage fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/fields');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product type manage fields screen'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the product type manage fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/fields');
+
+    $this->assertResponse(200, t('Store admin user can access the product type manage fields screen'));
+  }
+
+  /**
+   * Access to the display fields admin screen.
+   */
+  public function testCommerceProductProductTypeDisplayFields() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access to the product type display fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/display');
+
+    $this->assertResponse(403, t('Normal user is not able to access the product type display fields screen'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the product type display fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/display');
+
+    $this->assertResponse(200, t('Store admin user can access the product type display fields screen'));
+  }
+
+  /**
+   * Test the admin breadcrumbs for product types.
+   */
+  public function testCommerceProductAdminBreadcrumbs() {
+  // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Get the usual breadcrumb.
+    commerce_product_ui_set_breadcrumb();
+    $breadcrumb = drupal_get_breadcrumb();
+
+    // Access to the admin product creation page.
+    $this->drupalGet('admin/commerce/products/add/product');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Add product page has correct breadcrumb'));
+
+    // Access to the edit product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/edit');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Edit product page has correct breadcrumb'));
+
+    // Access to the delete product page.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Delete product page has correct breadcrumb'));
+
+    // Access to the product types listing.
+    // TODO: Main listings doesn't seem to have right breadcrumb in tests.
+    // $this->drupalGet('admin/commerce/products/types');
+    // $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Product types list has correct breadcrumb'));
+
+    // Product list has one level less of breadcrumb.
+    // TODO: Main listings doesn't seem to have right breadcrumb in tests.
+    //array_pop($breadcrumb);
+    // Access to the admin product list.
+    //$this->drupalGet('admin/commerce/products');
+    //$this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Product list page has correct breadcrumb'));
+
+    // The admin screens below have the Product types addition to the
+    // breadcrumb.
+    commerce_product_ui_set_breadcrumb(TRUE);
+    $breadcrumb = drupal_get_breadcrumb();
+
+    // Access to the product types add form.
+    $this->drupalGet('admin/commerce/products/types/add');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Add product type page has correct breadcrumb'));
+
+    // Access to the product types edit form.
+    $this->drupalGet('admin/commerce/products/types/product/edit');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Edit product type page has correct breadcrumb'));
+
+    // Access to the delete page for a product type.
+    $this->drupalGet('admin/commerce/products/types/product/delete');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Delete product type page has correct breadcrumb'));
+
+    // Access to the product type display fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/display');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Display fields for product type has correct breadcrumb'));
+
+    // Access to the product type manage fields screen.
+    $this->drupalGet('admin/commerce/products/types/product/fields');
+    $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Manage fields for product type has correct breadcrumb'));
+  }
+}
