@@ -859,6 +859,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
         // Remove the default #parents array so the normal tree can do its thing.
         unset($element['profiles'][$key]['#parents']);
       }
+
       // This checkbox will be overridden with a clickable delete image.
       // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
@@ -866,6 +867,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
           '#type' => 'checkbox',
           '#title' => t('Delete this profile'),
           '#default_value' => FALSE,
+          '#access' => commerce_customer_profile_access('delete', $profile),
         );
       }
 
