@@ -82,7 +82,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     // Order creation, in cart status.
     $this->order = $this->createDummyOrder($this->normal_user->uid);
 
-    // Access to checkout page.
+    // Go to checkout page.
     $this->drupalGet($this->checkout_url);
 
     // Check if the page resolves and if the default panes are present.
@@ -131,6 +131,52 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Check if the completion message has been displayed.
     $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Checkout process completed successfully'));
+  }
+
+  /**
+   * Test the adding payments using administration pages.
+   */
+  public function testCommercePaymentAdministration() {
+    // Log in as normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Order creation, in cart status.
+    $this->order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Log in as administrator user.
+    $this->drupalLogin($this->store_admin);
+
+    // Go to payment administration page.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/payment');
+
+    $this->assertResponse(200);
+    $this->assertText(t('Payment'), t('Payment text found on the page.'));
+
+    // Check order balance.
+    $balance = commerce_payment_order_balance($this->order);
+    $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format($balance['amount'], $balance['currency_code']) . '</td>', t('Order balance is equal to order amount'));
+
+    // Add a payment for half of balance.
+    $this->drupalPostAJAX(NULL, array('payment_method' => 'commerce_payment_example|commerce_payment_commerce_payment_example'), array('op' => t('Add payment')));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-amount')]", NULL, t('Amount field is present'));
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-currency-code')]", NULL, t('Currency code field is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-name')]", NULL, t('Name text field from payment example module is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-submit')]", NULL, t('Save button is present'));
+    $post_data = array(
+      'amount' => ($balance['amount'] / 2),
+      'currency_code' => 'USD',
+      'payment_details[name]' => $this->randomName(),
+    );
+    $this->drupalPost(NULL, $post_data, t('Save'));
+
+    // Reload the order.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+
+    // Check order balance, it should be half of total now.
+    $new_balance = commerce_payment_order_balance($order);
+    $this->assertEqual($new_balance['amount'], ($balance['amount'] - $post_data['amount']), t('Order balance is now half order amount'));
+    $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($post_data['amount'], $post_data['currency_code']) . '</td>', t('Total paid now reflects the new payment'));
+    $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format($new_balance['amount'], $new_balance['currency_code']) . '</td>', t('Order balance is displayed correctly'));
   }
 
 }
