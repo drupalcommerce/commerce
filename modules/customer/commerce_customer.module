@@ -423,6 +423,39 @@ function commerce_customer_profile_delete_multiple($profile_ids) {
 }
 
 /**
+ * Implements hook_commerce_customer_profile_delete().
+ *
+ * Remove references to this customer profile in all customer profile reference
+ * field contents.
+ */
+function commerce_customer_commerce_customer_profile_delete($profile) {
+  // Check the data in every customer profile reference field.
+  foreach (commerce_info_fields('commerce_customer_profile_reference') as $field_name => $field) {
+    // Query for any entity referencing the deleted profile in this field.
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=');
+    $result = $query->execute();
+
+    // If results were returned...
+    if (!empty($result)) {
+      // Loop over results for each type of entity returned.
+      foreach ($result as $entity_type => $data) {
+        // Load the entities of the current type.
+        $entities = entity_load($entity_type, array_keys($data));
+
+        // Loop over each entity and remove the reference to the deleted profile.
+        foreach ($entities as $entity_id => $entity) {
+          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $profile->profile_id);
+
+          // Store the changes to the entity.
+          entity_save($entity_type, $entity);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Checks customer profile access for various operations.
  *
  * @param $op

@@ -79,9 +79,9 @@ function commerce_customer_ui_customer_profile_form_wrapper($profile) {
  *
  * @see commerce_customer_customer_profile_delete_form()
  */
-function commerce_profile_ui_customer_profile_delete_form_wrapper($profile) {
+function commerce_customer_ui_customer_profile_delete_form_wrapper($profile) {
   // Add the breadcrumb for the form's location.
-  commerce_profile_ui_set_breadcrumb(TRUE);
+  commerce_customer_ui_set_breadcrumb(TRUE);
 
   // Include the forms file from the Customer module.
   module_load_include('inc', 'commerce_customer', 'includes/commerce_customer_profile.forms');

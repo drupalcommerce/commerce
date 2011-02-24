@@ -178,7 +178,7 @@ function commerce_customer_customer_profile_delete_form($form, &$form_state, $pr
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
 
-  $form['#submit'][] = 'commerce_customer_profile_delete_form_submit';
+  $form['#submit'][] = 'commerce_customer_customer_profile_delete_form_submit';
 
   $form = confirm_form($form,
     t('Are you sure you want to delete this profile?'),

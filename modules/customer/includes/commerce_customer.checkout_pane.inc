@@ -144,7 +144,12 @@ function commerce_customer_profile_pane_review($form, $form_state, $checkout_pan
     $profile = commerce_customer_profile_load($order->data['profiles'][$checkout_pane['pane_id']]);
   }
 
-  $content = commerce_customer_profile_build_content($profile, 'customer');
+  if ($profile) {
+    $content = commerce_customer_profile_build_content($profile, 'customer');
 
-  return drupal_render($content);
+    return drupal_render($content);
+  }
+  else {
+    return t('No information');
+  }
 }
