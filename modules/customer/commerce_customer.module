@@ -475,7 +475,7 @@ function commerce_customer_configure_customer_profile_type($profile_type) {
     }
 
     // Look for or add an address field to the customer profile type.
-    $field_name = 'commerce_' . $profile_type['type'] . '_address';
+    $field_name = 'commerce_customer_address';
     $field = field_info_field($field_name);
     $instance = field_info_instance('commerce_customer_profile', $field_name, $profile_type['type']);
 
@@ -783,7 +783,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
 
       // Tweak the form to remove the fieldset from address fields.
       if ($profile_type['addressfield']) {
-        $field_name = 'commerce_' . $profile_type['type'] . '_address';
+        $field_name = 'commerce_customer_address';
         $language = $element['profiles'][$key][$field_name]['#language'];
 
         foreach (element_children($element['profiles'][$key][$field_name][$language]) as $delta) {

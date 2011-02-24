@@ -69,6 +69,12 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
   $handler->display->display_options['style_options']['order'] = 'desc';
+  /* Empty text: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = FALSE;
+  $handler->display->display_options['empty']['area']['content'] = 'No customer profiles have been created yet.';
   /* Relationship: Commerce Customer Profile: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_customer_profile';
@@ -89,6 +95,28 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['profile_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['profile_id']['empty_zero'] = 0;
   $handler->display->display_options['fields']['profile_id']['link_to_profile'] = 1;
+  /* Field: Fields: Address */
+  $handler->display->display_options['fields']['commerce_customer_address']['id'] = 'commerce_customer_address';
+  $handler->display->display_options['fields']['commerce_customer_address']['table'] = 'field_data_commerce_customer_address';
+  $handler->display->display_options['fields']['commerce_customer_address']['field'] = 'commerce_customer_address';
+  $handler->display->display_options['fields']['commerce_customer_address']['label'] = 'Name';
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['commerce_customer_address']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['commerce_customer_address']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['commerce_customer_address']['click_sort_column'] = 'country';
+  $handler->display->display_options['fields']['commerce_customer_address']['type'] = 'addressfield_name';
+  $handler->display->display_options['fields']['commerce_customer_address']['field_api_classes'] = 0;
   /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
@@ -122,6 +150,26 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['type']['hide_empty'] = 0;
   $handler->display->display_options['fields']['type']['empty_zero'] = 0;
   $handler->display->display_options['fields']['type']['link_to_profile'] = 0;
+  /* Field: Commerce Customer Profile: Status */
+  $handler->display->display_options['fields']['status']['id'] = 'status';
+  $handler->display->display_options['fields']['status']['table'] = 'commerce_customer_profile';
+  $handler->display->display_options['fields']['status']['field'] = 'status';
+  $handler->display->display_options['fields']['status']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['status']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['status']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['status']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['status']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['status']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['status']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['status']['type'] = 'active-disabled';
+  $handler->display->display_options['fields']['status']['not'] = 0;
   /* Field: Commerce Customer Profile: Edit link */
   $handler->display->display_options['fields']['edit_customer_profile']['id'] = 'edit_customer_profile';
   $handler->display->display_options['fields']['edit_customer_profile']['table'] = 'commerce_customer_profile';
@@ -161,10 +209,13 @@ function commerce_customer_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
+    t('No customer profiles have been created yet.'),
     t('Profile owner'),
     t('Profile ID'),
+    t('Name'),
     t('User'),
     t('Type'),
+    t('Status'),
     t('Operations'),
     t('Admin page'),
   );

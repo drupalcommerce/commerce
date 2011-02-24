@@ -76,7 +76,7 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   field_attach_form('commerce_customer_profile', $profile, $pane_form, $form_state);
 
   // Tweak the form to remove the fieldset from address fields.
-  $field_name = 'commerce_' . $type . '_address';
+  $field_name = 'commerce_customer_address';
   $language = $pane_form[$field_name]['#language'];
 
   foreach (element_children($pane_form[$field_name][$language]) as $delta) {
