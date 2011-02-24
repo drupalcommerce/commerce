@@ -1,0 +1,431 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *
+ */
+
+/**
+ * Functional tests for the commerce order UI module.
+ */
+class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
+  /**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+  /**
+   * Dummy product for adding to the orders.
+   */
+  protected $product;
+
+  /**
+   * Order created and manipulated in the process.
+   */
+  protected $order;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Order administration',
+      'description' => 'Test creating, editing and deleting an order through the order administration user interface.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    // User creation for different operations.
+    $this->store_admin = $this->createStoreAdmin();
+    $this->normal_user = $this->drupalCreateUser(array('view own orders'));
+
+    // Create dummy product.
+    $this->product = $this->createDummyProduct('PROD-01', 'Product One');
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the order administration page.
+    $this->drupalGet('admin/commerce/orders/add');
+
+    // Fill in the billing address information
+    $country_field = 'commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][country]';
+    $this->drupalPostAJAX(NULL, array($country_field => 'US'), $country_field);
+
+    // Create the base order for the rest of tests. Assign it to the normal
+    // user.
+    $this->drupalPost(NULL, array('name' => $this->normal_user->name), t('Save order', array(), array('context' => 'a drupal commerce order')));
+
+    // Load the order from database for later use.
+    $this->order = reset(commerce_order_load_multiple(array(), array('uid' => $this->normal_user->uid)));
+
+    // Enable an additional currency.
+    $this->enableCurrencies(array('EUR'));
+  }
+
+  /**
+   * Test if an order gets correctly created.
+   */
+  public function testCommerceOrderUICreateOrder() {
+    // First, check if the order has been created in the database.
+    $this->assertTrue(is_object($this->order), t('Order has been created in database'));
+    // Also, the user owning the order should match.
+    $this->assertTrue($this->order->uid == $this->normal_user->uid, t('Order owner match'));
+  }
+
+  /**
+   * Test general edit form fields of an order.
+   */
+  public function testCommerceOrderUIEditOrder() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+    // Navigate to the order edit page, it shouldn't be accessible.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
+
+    $this->assertResponse(403, t('Normal user is not able to access the order edit admin screen'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+    // Access the edit page of the order.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
+
+    $this->assertResponse(200, t('Store admin user can access the order edit admin screen'));
+
+    // Update some values, like the owner of the order, datestamp, etc.
+    $timestamp = REQUEST_TIME;
+    $edit = array(
+      'name' => '',
+      'log' => $this->randomName(),
+      'date' => format_date($timestamp, 'custom', 'Y-m-d H:i:s O'),
+      'status' => 'completed',
+    );
+
+    // Save the order.
+    $this->drupalPost(NULL, $edit, t('Save order', array(), array('context' => 'a drupal commerce order')));
+
+    // Reload the order from database.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Check the order properties.
+    $this->pass(t('Order in database assertions:'));
+    $this->assertTrue($order_wrapper->uid->value() == 0, t('Order owner correctly updated'));
+    $this->assertTrue($order->log == $edit['log'], t('Order log correctly updated'));
+    $this->assertTrue($order_wrapper->created->value() == $timestamp, t('Order created date correctly updated'));
+    $this->assertTrue($order_wrapper->status->value() == $edit['status'], t('Order status correctly updated'));
+
+    // Check if the values have been changed. Log is not checked because it
+    // is a message for each revision.
+    $this->pass(t('Order in screen assertions:'));
+    $this->assertFieldById('edit-name', $edit['name'], t('Name correctly modified'));
+    $this->assertFieldById('edit-date', $edit['date'], t('Date changed correctly'));
+    $this->assertOptionSelected('edit-status', $edit['status'], t('Status changed'));
+  }
+
+  /**
+   * Test adding products to an order via Admin UI.
+   */
+  public function testCommerceOrderUIAddProductsToOrder() {
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the edit page of the order.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
+
+    // Add a product line item to the order.
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][line_item_type]' => 'product'), array('op' => t('Add line item')));
+
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-commerce-line-items-und-actions-product-id')]", NULL, t('Product select form is present in the order admin screen'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-commerce-line-items-und-actions-save-line-item')]", NULL, t('Add product button is present in the order admin screen'));
+
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_id]' => $this->product->product_id), array('op' => t('Add product')));
+    $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
+
+    // Reload the order directly from db.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+
+    // Check if the product has been added to the order.
+    foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+       if ($line_item_wrapper->type->value() == 'product') {
+         $product = $line_item_wrapper->commerce_product->value();
+         $products[$product->product_id]= $product;
+       }
+    }
+    $this->assertTrue(in_array($this->product->product_id, array_keys($products)), t('Added product is inclued in the order at database level'));
+
+    // Access the edit page of the order and check if the product is present.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
+    $this->assertText($this->product->sku, t('SKU from product is present in the order edit screen'));
+    $this->assertText($this->product->title, t('Product title is present in the order edit screen'));
+  }
+
+  /**
+   * Test updating line items within an order.
+   */
+  public function testCommerceOrderUIUpdateLineItems() {
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the edit page of the order.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
+
+    // Add a product line item to the order.
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][line_item_type]' => 'product'), array('op' => t('Add line item')));
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_id]' => $this->product->product_id), array('op' => t('Add product')));
+    $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
+
+    // Reload the order directly from db and wrap it to get the line item ids.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Also wrap the product to access easier to its price.
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $this->product);
+
+    // Get the first line item id.
+    $line_item_id = $order_wrapper->commerce_line_items->get(0)->value()->line_item_id;
+
+    // Format the price based in the currency.
+    $price = commerce_currency_integer_to_amount($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
+
+    // Check the existance of the fields for quantity and price of the line
+    // item just created.
+    $this->pass(t('Check the existance of quantiy, price and currency code fields'));
+    $this->assertFieldById('edit-commerce-line-items-und-line-items-' . $line_item_id . '-quantity', 1, t('Quantity field is present and has value 1'));
+    $this->assertFieldById('edit-commerce-line-items-und-line-items-' . $line_item_id . '-commerce-unit-price-und-0-amount', $price, t('Price of the product is correct'));
+    $this->assertOptionSelected('edit-commerce-line-items-und-line-items-' . $line_item_id . '-commerce-unit-price-und-0-currency-code', $product_wrapper->commerce_price->currency_code->value(), t('Currency code is valid'));
+
+    // Generate new quantity and prices and save them.
+    $new_qty = rand(0,99);
+    $new_currency_code = 'EUR';
+    $new_price = commerce_currency_integer_to_amount(rand(2, 500), $new_currency_code);
+    $edit = array(
+      'commerce_line_items[und][line_items][' . $line_item_id . '][quantity]' => $new_qty,
+      'commerce_line_items[und][line_items][' . $line_item_id . '][commerce_unit_price][und][0][amount]' => $new_price,
+      'commerce_line_items[und][line_items][' . $line_item_id . '][commerce_unit_price][und][0][currency_code]' => $new_currency_code,
+    );
+    $this->drupalPost(NULL, $edit, t('Save order', array(), array('context' => 'a drupal commerce order')));
+
+    // Check if the modifications have been correctly done.
+    $this->assertFieldById('edit-commerce-line-items-und-line-items-' . $line_item_id . '-quantity', $new_qty, t('Quantity field has been correctly modified'));
+    $this->assertFieldById('edit-commerce-line-items-und-line-items-' . $line_item_id . '-commerce-unit-price-und-0-amount', $new_price, t('Price of the product has been correctly modified'));
+    $this->assertOptionSelected('edit-commerce-line-items-und-line-items-' . $line_item_id . '-commerce-unit-price-und-0-currency-code', $new_currency_code, t('Currency code has been correctly modified'));
+  }
+
+  /**
+   * Check the integrity of the order admin page and also if a given order is
+   * displayed correctly.
+   */
+  public function testCommerceOrderUIViewOrderAdmin() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Navigate to the order management page, it shouldn't be accessible.
+    $this->drupalGet('admin/commerce/orders');
+
+    $this->assertResponse(403, t('Normal user is not able to access the order admin screen'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the order management page and check if the order data is
+    // really there.
+    $this->drupalGet('admin/commerce/orders');
+
+    $this->assertResponse(200, t('Store admin user can access the order admin screen'));
+
+    $this->pass(t('Order admin screen assertions:'));
+    // Check if the create an order link is present.
+    $this->assertText(t('Create an order'), t('%create text is present', array('%create' => t('Create an order'))));
+
+    // Get the current status of the order.
+    $status = commerce_order_status_load($this->order->status);
+
+    // Check if there is at least an order created and the correct one is
+    // present.
+    $this->assertNoText(t('No orders have been created yet.'), t('Order admin screen has at least one order'));
+    $this->assertText($this->order->order_number, t('The order number for the created order is present'));
+    $this->assertText($status['title'], t('The order status for the created order is present'));
+    $this->assertText($this->normal_user->name, t('The name of the order owner for the created order is present'));
+
+    // Check if the links for editing the order are present.
+    $links = menu_contextual_links('commerce-order', 'admin/commerce/orders', array($this->order->order_id));
+    $this->assertRaw((theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline', 'operations'))))), t('Links for orders are present'));
+
+    $this->drupalGet('admin/commerce/orders/'. $this->order->order_id . '/view');
+    $this->assertResponse(200, t('Store admin user can access the order view page'));
+  }
+
+  /**
+   * Test if the owner of the order can see it correctly.
+   */
+  public function testCommerceOrderUIViewOrderUser() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the order profile menu page.
+    $this->drupalGet('user/' . $this->normal_user->uid . '/orders');
+    $this->assertResponse(200, t('Users can access to their own orders listing'));
+
+    // Access the order just created for the user.
+    $this->drupalGet('user/' . $this->normal_user->uid . '/orders/' . $this->order->order_id);
+    $this->assertResponse(200, t('Users can access their own order details'));
+    $this->assertTitle(t('Order @number', array('@number' => $this->order->order_number)) . ' | Drupal', t('The order number accessed by the user matches the order from URL'));
+  }
+
+
+  /**
+   * Test if one user can access orders belonging to other user.
+   */
+  public function testCommerceOrderUIViewOrderOtherUser() {
+    // Create an additional user.
+    $this->other_user = $this->drupalCreateUser();
+
+    // Log in as the additional user.
+    $this->drupalLogin($this->other_user);
+
+    // Access the order profile menu page.
+    $this->drupalGet('user/' . $this->normal_user->uid . '/orders');
+    $this->assertResponse(404, t('Users are not able to access other user\'s orders listing'));
+
+    // Access the order details.
+    $this->drupalGet('user/' . $this->normal_user->uid . '/orders/' . $this->order->order_id);
+    $this->assertResponse(403, t('Users are not able to access other user\'s order details'));
+  }
+
+  /**
+   * Test the deletion of an order.
+   */
+  public function testCommerceOrderUIDeleteOrder() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Navigate to the page to delete the order.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/delete');
+
+    $this->assertResponse(403, t('Normal user is not able to delete orders'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the page to delete the order.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/delete');
+
+    // The confirmation page is accesible and the form is ok.
+    $this->assertResponse(200, t('Store admin user can access the order deletion page'));
+    $this->assertText(t('Deleting this order cannot be undone.'), t('The confirmation message for order delete is displayed'));
+
+    // Delete the order.
+    $this->drupalPost(NULL, array(), t('Delete'));
+
+    // Reload the order from database.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $this->assertFalse($order, t('Order has been deleted from database'));
+
+    // Check if the confirmation message is displayed.
+    $this->assertText(t('Order @number has been deleted.', array('@number' => $this->order->order_number)), t('Order message for deletion is displayed with the correct order number'));
+    // Check if the order is present in the page.
+    $this->assertText(t('No orders have been created yet.'), t('After deleting the only order created, there is no order left in the order admin screen'));
+  }
+
+  /**
+   * Test the helper text of an order.
+   */
+  public function testCommerceOrderUIHelpText() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Navigate to the page to configure the helper text.
+    $this->drupalGet('admin/commerce/config/order');
+
+    $this->assertResponse(403, t('Normal user is not able to configure the helper text for orders'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the page to configure the helper text.
+    $this->drupalGet('admin/commerce/config/order');
+
+    $this->assertResponse(200, t('Store admin user can configure the helper text for orders'));
+
+    // Check the integrity of the form.
+    $this->assertFieldById('edit-commerce-order-help-text', NULL, t('Order help text textarea is available'));
+
+    // Save a random content for the help text.
+    $edit = array(
+      'commerce_order_help_text' => $this->randomName(),
+    );
+    $this->drupalPost(NULL, $edit, t('Save configuration'));
+
+    // Check if the text has been stored
+    $this->assertText(t('The configuration options have been saved.'), t('Confirmation message for saving the helper text is displayed'));
+    $this->assertFieldById('edit-commerce-order-help-text', $edit['commerce_order_help_text'], t('Order help text textarea displays the stored helper text'));
+    $this->assertTrue(variable_get('commerce_order_help_text', '') == $edit['commerce_order_help_text'], t('Order help text saved in database'));
+
+    // Check if the text is displayed in the order creation page.
+    $this->drupalGet('admin/commerce/orders/add');
+    $this->assertText($edit['commerce_order_help_text'], t('Order help text message displayed in the order creation page'));
+  }
+
+  /**
+   * Test the integrity of manage fields Order UI form pages.
+   */
+  public function testCommerceOrderAdminUIManageFields() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Navigate to the manage fields screen for the order type.
+    $this->drupalGet('admin/commerce/config/order/fields');
+
+    $this->assertResponse(403, t('Normal user is not able to access the manage fields screen for the order type'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the manage fields screen for the order type.
+    $this->drupalGet('admin/commerce/config/order/fields');
+
+    $this->assertResponse(200, t('Store admin user can access the manage fields screen for the order type'));
+
+    // Get the instances attached to the commerce order bundle and assert if
+    // they are present in the form.
+    $field_instances = field_info_instances('commerce_order', 'commerce_order');
+    foreach ($field_instances as $instance) {
+      $this->assertText($instance['label'], t('%instance is present in the manage fields screen', array('%instance' => $instance['label'])));
+    }
+  }
+
+  /**
+   * Test the integrity of display fields Order UI form pages.
+   */
+  public function testCommerceOrderAdminUIDisplayFields() {
+    // Log in as a normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Navigate to the display fields screen for the order type.
+    $this->drupalGet('admin/commerce/config/order/display');
+
+    $this->assertResponse(403, t('Normal user is not able to access the display fields screen for the order type'));
+
+    // Log in as store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Navigate to the display fields screen for the order type.
+    $this->drupalGet('admin/commerce/config/order/display');
+
+    $this->assertResponse(200, t('Store admin user can access the display fields screen for the order type'));
+
+    // Assert the field instances for the display.
+    $field_instances = field_info_instances('commerce_order', 'commerce_order');
+    foreach ($field_instances as $instance) {
+      $this->assertText($instance['label'], t('%instance is present in the display fields screen', array('%instance' => $instance['label'])));
+    }
+  }
+}
