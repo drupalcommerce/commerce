@@ -18,11 +18,67 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_customer') . '/includes/commerce_customer_profile.forms.inc';
 
+  // Ensure the owner name is accessible if the uid is set.
+  if (!empty($profile->uid) && $owner = user_load($profile->uid)) {
+    $profile->name = $owner->name;
+  }
+
+  if (empty($profile->created)) {
+    $profile->date = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s O');
+  }
+
   // Add the field related form elements.
   $form_state['customer_profile'] = $profile;
   field_attach_form('commerce_customer_profile', $profile, $form, $form_state);
 
-  $form['status'] = array(
+  $form['additional_settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 99,
+  );
+
+  // Add the user account and e-mail fields.
+  $form['user'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User information'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'commerce_customer') . '/commerce_customer.js',
+        array(
+          'type' => 'setting',
+          'data' => array('anonymous' => variable_get('anonymous', t('Anonymous'))),
+        ),
+      ),
+    ),
+    '#weight' => 20,
+  );
+  $form['user']['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Owned by'),
+    '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+    '#maxlength' => 60,
+    '#autocomplete_path' => 'user/autocomplete',
+    '#default_value' => !empty($profile->name) ? $profile->name : '',
+    '#weight' => -1,
+  );
+
+  // Add the status of the profile.
+  $form['profile_status'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Status'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'commerce_customer') . '/commerce_customer.js',
+      ),
+    ),
+    '#weight' => 30,
+  );
+  $form['profile_status']['status'] = array(
     '#type' => 'radios',
     '#title' => t('Status'),
     '#description' => t('Disabled profiles will not be visible to customers.'),
@@ -38,7 +94,7 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
-    '#weight' => 40,
+    '#weight' => 100,
   );
 
   // We add the form's #submit array to this button along with the actual submit
@@ -68,6 +124,13 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
 function commerce_customer_customer_profile_form_validate($form, &$form_state) {
   $profile = $form_state['customer_profile'];
 
+  // Validate the "owned by" field.
+  if (!empty($form_state['values']['name']) && !($account = user_load_by_name($form_state['values']['name']))) {
+    // The use of empty() is mandatory in the context of usernames as the empty
+    // string denotes an anonymous user.
+    form_set_error('name', t('The username %name does not exist.', array('%name' => $form_state['values']['name'])));
+  }
+
   // Notify field widgets to validate their data.
   field_attach_form_validate('commerce_customer_profile', $profile, $form, $form_state);
 }
@@ -83,9 +146,12 @@ function commerce_customer_customer_profile_form_submit($form, &$form_state) {
   // Save default parameters back into the $profile object.
   $profile->status = $form_state['values']['status'];
 
-  // Set the profile's uid if it's being created at this time.
-  if (empty($profile->profile_id)) {
-    $profile->uid = $user->uid;
+  // Set the profile's owner uid based on the supplied name.
+  if (!empty($form_state['values']['name']) && $account = user_load_by_name($form_state['values']['name'])) {
+    $profile->uid = $account->uid;
+  }
+  else {
+    $profile->uid = 0;
   }
 
   // Notify field widgets.
