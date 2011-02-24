@@ -102,7 +102,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Check if the country has been selected correctly, this uses XPath as the
     // ajax call replaces the element and the id may change.
-    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-customer-profile-billing-commerce-billing-address')]//option[@selected='selected']", 'US', t('Country selected'));
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-customer-profile-billing-commerce-customer-address')]//option[@selected='selected']", 'US', t('Country selected'));
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
