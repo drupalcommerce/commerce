@@ -854,7 +854,7 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
     $element += array(
       '#theme' => 'commerce_line_item_manager',
       '#element_validate' => array('commerce_line_item_manager_validate'),
-      '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Qty'), t('Unit Price'), t('Total')),
+      '#header' => array(t('Remove'), t('Title'), t('SKU'), t('Unit price'), t('Quantity'), t('Total')),
       '#empty' => t('No line items found.'),
       'line_items' => array(),
     );
@@ -881,14 +881,6 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#markup' => check_plain($line_item->line_item_label),
       );
 
-      $element['line_items'][$line_item_id]['quantity'] = array(
-        '#type' => 'textfield',
-        '#datatype' => 'integer',
-        '#default_value' => round($line_item->quantity),
-        '#size' => 4,
-        '#maxlength' => 8,
-      );
-
       // Retrieve the widget form for just the unit price.
       $widget_form = _field_invoke_default('form', 'commerce_line_item', $line_item, $form, $form_state, array('field_name' => 'commerce_unit_price'));
 
@@ -898,6 +890,14 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       unset($widget_form['commerce_unit_price'][$language][0]['amount']['#description']);
 
       $element['line_items'][$line_item_id]['commerce_unit_price'] = $widget_form['commerce_unit_price'];
+
+      $element['line_items'][$line_item_id]['quantity'] = array(
+        '#type' => 'textfield',
+        '#datatype' => 'integer',
+        '#default_value' => round($line_item->quantity),
+        '#size' => 4,
+        '#maxlength' => 8,
+      );
 
       // Wrap the line item and add its formatted total to the form.
       $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
@@ -995,8 +995,8 @@ function theme_commerce_line_item_manager($variables) {
       drupal_render($form['line_items'][$line_item_id]['remove']),
       drupal_render($form['line_items'][$line_item_id]['title']),
       drupal_render($form['line_items'][$line_item_id]['line_item_label']),
-      drupal_render($form['line_items'][$line_item_id]['quantity']),
       drupal_render($form['line_items'][$line_item_id]['commerce_unit_price']),
+      drupal_render($form['line_items'][$line_item_id]['quantity']),
       drupal_render($form['line_items'][$line_item_id]['commerce_total']),
     );
 
