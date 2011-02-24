@@ -454,7 +454,7 @@ function commerce_currency_amount_to_integer($amount, $currency_code) {
   // Ensure the amount has the proper number of decimal places for the currency.
   $amount = commerce_currency_round($amount, commerce_currency_load($currency_code));
 
-  return (int) $amount * $factors[$currency_code];
+  return (int) ($amount * $factors[$currency_code]);
 }
 
 /**
