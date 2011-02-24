@@ -580,19 +580,6 @@ function commerce_product_replace_sku_tokens($sku, $product) {
 }
 
 /**
- * Validates a SKU string for acceptable characters.
- *
- * @param $sku
- *   The SKU string to validate.
- *
- * @return
- *   TRUE or FALSE indicating whether or not the SKU contains valid characters.
- */
-function commerce_product_validate_sku_characters($sku) {
-  return preg_match('!^[A-Za-z0-9_-]+$!', $sku);
-}
-
-/**
  * Checks to see if a given SKU already exists for another product.
  *
  * @param $sku

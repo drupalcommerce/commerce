@@ -101,11 +101,6 @@ function commerce_product_product_form_validate($form, &$form_state) {
     form_set_error('sku', t('The SKU contains invalid tokens.'));
   }
   else {
-    // Validate the remaining characters of the string.
-    if (!commerce_product_validate_sku_characters($sku)) {
-      form_set_error('sku', t('The SKU must contain only letters, numbers, hyphens, and underscores.'));
-    }
-
     // Ensure the proposed SKU is unique.
     if (!commerce_product_validate_sku_unique($sku, $product->product_id)) {
       form_set_error('sku', t('This SKU is already in use and must be unique. Please supply another value.'));
