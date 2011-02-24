@@ -37,14 +37,23 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'profile_id' => 'profile_id',
+    'commerce_customer_address' => 'commerce_customer_address',
     'name' => 'name',
     'type' => 'type',
+    'status' => 'status',
     'edit_customer_profile' => 'edit_customer_profile',
+    'delete_customer_profile' => 'edit_customer_profile',
   );
   $handler->display->display_options['style_options']['default'] = 'profile_id';
   $handler->display->display_options['style_options']['info'] = array(
     'profile_id' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+    ),
+    'commerce_customer_address' => array(
+      'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
@@ -61,7 +70,17 @@ function commerce_customer_ui_views_default_views() {
       'align' => '',
       'separator' => '',
     ),
+    'status' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+    ),
     'edit_customer_profile' => array(
+      'align' => '',
+      'separator' => '&nbsp;&nbsp;&nbsp;',
+    ),
+    'delete_customer_profile' => array(
       'align' => '',
       'separator' => '',
     ),
@@ -188,6 +207,24 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['html'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['hide_empty'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['empty_zero'] = 0;
+  /* Field: Commerce Customer Profile: Delete link */
+  $handler->display->display_options['fields']['delete_customer_profile']['id'] = 'delete_customer_profile';
+  $handler->display->display_options['fields']['delete_customer_profile']['table'] = 'commerce_customer_profile';
+  $handler->display->display_options['fields']['delete_customer_profile']['field'] = 'delete_customer_profile';
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['delete_customer_profile']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['delete_customer_profile']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['delete_customer_profile']['empty_zero'] = 0;
 
   /* Display: Admin page */
   $handler = $view->new_display('page', 'Admin page', 'page_1');
@@ -220,6 +257,7 @@ function commerce_customer_ui_views_default_views() {
     t('Type'),
     t('Status'),
     t('Operations'),
+    t('Delete link'),
     t('Admin page'),
   );
 
