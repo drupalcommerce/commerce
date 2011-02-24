@@ -40,8 +40,8 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce product reference functional tests',
-      'description' => 'Test Product Reference admin operations for administrators',
+      'name' => 'Product reference',
+      'description' => 'Test adding and configuring product reference fields.',
       'group' => 'Drupal Commerce',
     );
   }

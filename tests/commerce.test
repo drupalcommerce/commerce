@@ -16,7 +16,7 @@ class CommerceTestCase extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
       'name' => t('Commerce module'),
-      'description' => t('Tests the basic functionality of Commerce module'),
+      'description' => t('Test the basic functionality of Commerce module.'),
       'group' => t('Drupal Commerce'),
     );
   }

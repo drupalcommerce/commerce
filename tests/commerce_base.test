@@ -538,7 +538,7 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => t('Commerce sandbox tests'),
+      'name' => t('Commerce sandbox'),
       'description' => t('Sandbox for trying new things with tests. Eases development so only one test has to run at a time.'),
       'group' => t('Drupal Commerce'),
     );
@@ -577,8 +577,8 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => t('Commerce base class module'),
-      'description' => t('Tests the functionality of the base test class. Essentially, these are meta-tests.'),
+      'name' => t('Commerce base'),
+      'description' => t('Test the functionality of the base test class. Essentially, these are meta-tests.'),
       'group' => t('Drupal Commerce'),
     );
   }

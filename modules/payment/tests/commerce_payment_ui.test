@@ -97,7 +97,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $address_info = $this->generateAddressInformation();
 
     // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
 
     // Check if the country has been selected correctly, this uses XPath as the
@@ -106,11 +106,11 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
-      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
     $this->drupalPost(NULL, $info, t('Continue'));
 
@@ -205,10 +205,10 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->assertText(t('Example payment'), t('Example payment rule is present'));
 
     // Go to edit example payment rule.
-    $this->clickLink(t('Example payment')); 
+    $this->clickLink(t('Example payment'));
 
     // Adding a new condition.
-    $this->clickLink(t('Add condition')); 
+    $this->clickLink(t('Add condition'));
 
     // Create new data comparison condition for amount > $50.
     $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
@@ -219,7 +219,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->assertText(t('Your changes have been saved.'), t('New condition was successfully added'));
 
     // Adding a new action to enable the payment method if conditions are met.
-    $this->clickLink(t('Add action')); 
+    $this->clickLink(t('Add action'));
     $this->drupalPost(NULL, array('element_name' => 'commerce_payment_enable_commerce_payment_example'), t('Continue'));
     $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'order'), t('Save'));
     $this->assertText(t('Your changes have been saved.'), t('New action was successfully added'));

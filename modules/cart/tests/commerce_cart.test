@@ -63,8 +63,8 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart - simple products',
-      'description' => 'Tests cart features like add to cart, remove from cart, update quantities...',
+      'name' => 'Shopping cart',
+      'description' => 'Test cart features like adding products to the cart, removing products from the cart and updating quantities.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -212,8 +212,8 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart - several products in a product display',
-      'description' => 'Tests cart features, add to cart, select other product...',
+      'name' => 'Shopping cart multiple',
+      'description' => 'Test adding products to cart from a product display node with multiple products, using the product select add to cart form.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -353,8 +353,8 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart - Products with attributes',
-      'description' => 'Tests cart features like switch attributes, add to cart...',
+      'name' => 'Shopping cart attributes',
+      'description' => 'Test adding products to cart from a product with multiple attributes, using the add to cart form product attribute select.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -497,8 +497,8 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce cart - anonymous to authenticated cart conversion',
-      'description' => 'Tests cart conversion when an anonymous users logs in.',
+      'name' => 'Shopping cart anonymous to authenticated',
+      'description' => 'Test cart conversion from anonymous to authenticated when an anonymous users logs in.',
       'group' => 'Drupal Commerce',
     );
   }

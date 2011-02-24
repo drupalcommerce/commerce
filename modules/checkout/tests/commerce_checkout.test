@@ -30,8 +30,8 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Commerce checkout process functional tests',
-      'description' => 'Tests the checkout process.',
+      'name' => 'Checkout process',
+      'description' => 'Test the entire checkout process. Including anonymous checkout and checkout panes functionality.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -151,7 +151,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $address_info = $this->generateAddressInformation();
 
     // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
 
     // Check if the country has been selected correctly, this uses XPath as the
@@ -160,11 +160,11 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
-      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
     $this->drupalPost(NULL, $info, t('Continue'));
 
@@ -224,9 +224,9 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Test the validation of Billing Information pane.
     $callback = commerce_checkout_pane_callback($panes['customer_profile_billing'], 'checkout_form');
     $pane_form = drupal_get_form($callback, $panes['customer_profile_billing'], $this->order);
-    foreach (element_children($pane_form['commerce_billing_address'][LANGUAGE_NONE][0]) as $key) {
-      if ($pane_form['commerce_billing_address'][LANGUAGE_NONE][0][$key]['#required']) {
-        $this->assertText(t('!pane_message field is required', array('!pane_message' => $pane_form['commerce_billing_address'][LANGUAGE_NONE][0][$key]['#title'])), t('Check required billing information pane messages'));
+    foreach (element_children($pane_form['commerce_customer_address'][LANGUAGE_NONE][0]) as $key) {
+      if ($pane_form['commerce_customer_address'][LANGUAGE_NONE][0][$key]['#required']) {
+        $this->assertText(t('!pane_message field is required', array('!pane_message' => $pane_form['commerce_customer_address'][LANGUAGE_NONE][0][$key]['#title'])), t('Check required billing information pane messages'));
       }
     }
 
@@ -247,16 +247,16 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
 
     // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
-      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
 
     // Also add the mail for the account pane.
@@ -318,7 +318,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $address_info = $this->generateAddressInformation();
 
     // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
 
     // Check if the country has been selected correctly, this uses XPath as the
@@ -327,11 +327,11 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
-      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-      'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-      'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-      'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-      'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
 
     // Also add the mail for the account pane.
@@ -416,7 +416,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $address_info = $this->generateAddressInformation();
 
     // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_billing_address]')]");
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
 
     // Check if the country has been selected correctly, this uses XPath as the
@@ -425,11 +425,11 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
-      'customer_profile_billing[commerce_billing_address][und][0][name_line]' => $address_info['name_line'],
-    	'customer_profile_billing[commerce_billing_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
-    	'customer_profile_billing[commerce_billing_address][und][0][locality]' => $address_info['locality'],
-    	'customer_profile_billing[commerce_billing_address][und][0][administrative_area]' => 'KY',
-    	'customer_profile_billing[commerce_billing_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+    	'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+    	'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+    	'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+    	'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
     $this->drupalPost(NULL, $info, t('Continue'));
 

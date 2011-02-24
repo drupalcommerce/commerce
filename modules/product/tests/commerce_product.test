@@ -12,8 +12,8 @@
 class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
-      'name' => 'Commerce product CRUD',
-      'description' => 'Tests the product CRUD functions.',
+      'name' => 'Product CRUD',
+      'description' => 'Test the product CRUD functions.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -200,8 +200,8 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Commerce product rules integration',
-      'description' => 'Tests the commerce product rules integration',
+      'name' => 'Product rules integration',
+      'description' => 'Tests the product rules integration.',
       'group' => 'Drupal Commerce',
     );
   }
