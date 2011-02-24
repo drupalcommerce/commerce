@@ -73,14 +73,18 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
   }
 
   /**
-   * Test the payment on checkout process using an authenticated user.
+   * Create a dummy order and go to checkout payment page.
    */
-  public function testCommercePaymentCheckout() {
+  protected function createOrderAndGoToPayment($user = NULL, $products = array()) {
+    if (empty($user)) {
+      $user = $this->normal_user;
+    }
+
     // Log in as normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($user);
 
     // Order creation, in cart status.
-    $this->order = $this->createDummyOrder($this->normal_user->uid);
+    $this->order = $this->createDummyOrder($user->uid, $products);
 
     // Go to checkout page.
     $this->drupalGet($this->checkout_url);
@@ -112,6 +116,14 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Check for default panes and information in this checkout phase.
     $this->assertTitle(t('Review order') . ' | Drupal', t('Review order page successfully loaded'));
+  }
+
+  /**
+   * Test the payment on checkout process using an authenticated user.
+   */
+  public function testCommercePaymentCheckout() {
+    $this->createOrderAndGoToPayment();
+
     $this->assertText('Example payment', t('Example payment method panel is present'));
 
     // Test payment information validation. Payment example module name field
@@ -177,6 +189,60 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->assertEqual($new_balance['amount'], ($balance['amount'] - $post_data['amount']), t('Order balance is now half order amount'));
     $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($post_data['amount'], $post_data['currency_code']) . '</td>', t('Total paid now reflects the new payment'));
     $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format($new_balance['amount'], $new_balance['currency_code']) . '</td>', t('Order balance is displayed correctly'));
+  }
+
+  /**
+   * Test payment method rules conditions.
+   */
+  public function testCommercePaymentMethodsAdministration() {
+    // Log in as store administrator user.
+    $this->drupalLogin($this->store_admin);
+
+    // Go to payment methods page.
+    $this->drupalGet('admin/commerce/config/payment-methods');
+    $this->assertResponse(200);
+    $this->assertTitle(t('Payment methods') . ' | Drupal', t('We are now in the payment methods page'));
+    $this->assertText(t('Example payment'), t('Example payment rule is present'));
+
+    // Go to edit example payment rule.
+    $this->clickLink(t('Example payment')); 
+
+    // Adding a new condition.
+    $this->clickLink(t('Add condition')); 
+
+    // Create new data comparison condition for amount > $50.
+    $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
+    $this->assertText(t('Compare two data values of the same type with each other.'), t('Second step page for adding a condition was successfully loaded'));
+    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'order:commerce-order-total:amount'), t('Continue'));
+    $this->assertText(t('The data to be compared, specified by using a data selector, e.g. "node:author:name".'), t('Third step page for adding a condition was successfully loaded'));
+    $this->drupalPost(NULL, array('parameter[op][settings][op]' => '>', 'parameter[value][settings][value]' => 50), t('Save'));
+    $this->assertText(t('Your changes have been saved.'), t('New condition was successfully added'));
+
+    // Adding a new action to enable the payment method if conditions are met.
+    $this->clickLink(t('Add action')); 
+    $this->drupalPost(NULL, array('element_name' => 'commerce_payment_enable_commerce_payment_example'), t('Continue'));
+    $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'order'), t('Save'));
+    $this->assertText(t('Your changes have been saved.'), t('New action was successfully added'));
+
+
+    // Create a less than $50 order.
+    $products = array(
+       // We set price here to 1 cent, since createDummyProduct sets line item
+       // quantity ramdomly up to 100. So we need to ensure the order total will
+       // not be more than $50.
+       $this->createDummyProduct($this->randomName(), $this->randomName(), .01, 'USD', $this->store_admin->uid),
+    );
+    $this->createOrderAndGoToPayment($this->normal_user, $products);
+    // Check that the payment method example is *not* there.
+    $this->assertNoText('Example payment', t('Example payment method panel is not present'));
+
+    // Create a more than $50 order.
+    $products = array(
+       $this->createDummyProduct($this->randomName(), $this->randomName(), 60, 'USD', $this->store_admin->uid),
+    );
+    $this->createOrderAndGoToPayment($this->normal_user, $products);
+    // Check that the payment method example is there.
+    $this->assertText('Example payment', t('Example payment method panel is present'));
   }
 
 }
