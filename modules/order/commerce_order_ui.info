@@ -1,4 +1,3 @@
-; $Id$
 name = Order UI
 description = Exposes a default UI for Orders through order edit forms and default Views.
 package = Commerce

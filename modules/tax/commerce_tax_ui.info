@@ -1,4 +1,3 @@
-; $Id$
 name = Tax UI
 description = Provides a UI for creating simple tax types and rates.
 package = Commerce

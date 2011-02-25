@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to translate a line item type into its readable form.

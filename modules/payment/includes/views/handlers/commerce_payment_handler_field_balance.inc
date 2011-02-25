@@ -1,5 +1,4 @@
 <?php
-//$Id$
 
 /**
  * Field handler to be able to show the balance order with currency.

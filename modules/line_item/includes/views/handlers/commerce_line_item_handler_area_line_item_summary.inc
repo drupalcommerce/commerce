@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Defines a line item summary area handler so the summary can be plugged into

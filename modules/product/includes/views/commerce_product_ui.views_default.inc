@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Views for the default product UI.

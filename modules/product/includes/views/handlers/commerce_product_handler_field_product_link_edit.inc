@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to present a product edit link.

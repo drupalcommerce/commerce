@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Argument handler to display product titles in View using product arguments.

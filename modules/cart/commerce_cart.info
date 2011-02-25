@@ -1,4 +1,3 @@
-; $Id$
 name = Cart
 description = Implements the shopping cart system and add to cart features.
 package = Commerce

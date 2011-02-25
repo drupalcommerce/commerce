@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Provide shopping cart related Views integration.

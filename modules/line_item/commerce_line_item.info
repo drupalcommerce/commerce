@@ -1,4 +1,3 @@
-; $Id$
 name = Line Item
 description = Defines the Line Item entity and associated features.
 package = Commerce

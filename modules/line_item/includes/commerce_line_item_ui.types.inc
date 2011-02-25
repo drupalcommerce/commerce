@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Menu callback: display an overview of available types.

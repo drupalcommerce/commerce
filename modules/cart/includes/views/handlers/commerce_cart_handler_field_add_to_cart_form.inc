@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to present an add to cart form for the product..

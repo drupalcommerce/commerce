@@ -1,4 +1,3 @@
-; $Id$
 name = Tax
 description = Define tax rates and configure tax rules for applicability and display.
 package = Commerce

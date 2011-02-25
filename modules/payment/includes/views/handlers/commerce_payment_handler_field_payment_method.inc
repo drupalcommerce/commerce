@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to translate a payment method ID into its readable form.

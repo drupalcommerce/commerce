@@ -1,4 +1,3 @@
-; $Id$
 name = Price
 description = Defines the price field and a price alteration system.
 package = Commerce

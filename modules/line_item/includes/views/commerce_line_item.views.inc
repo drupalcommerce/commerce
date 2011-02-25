@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Export Drupal Commerce line items to Views.

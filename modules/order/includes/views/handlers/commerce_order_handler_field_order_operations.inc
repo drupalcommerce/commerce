@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to present an order's operations links.

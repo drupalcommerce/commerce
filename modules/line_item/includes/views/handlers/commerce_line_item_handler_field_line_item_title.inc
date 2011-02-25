@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to return a line item's title.

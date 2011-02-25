@@ -1,4 +1,3 @@
-; $Id$
 name = Payment
 description = Implement core payment features for Drupal commerce.
 package = Commerce

@@ -1,4 +1,3 @@
-; $Id$
 name = Commerce
 description = Defines features and functions common to the Commerce modules.
 package = Commerce

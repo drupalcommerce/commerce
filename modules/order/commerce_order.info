@@ -1,4 +1,3 @@
-; $Id$
 name = Order
 description = Defines the Order entity and associated features.
 package = Commerce

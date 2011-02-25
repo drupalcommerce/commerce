@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to translate an order type into its readable form.

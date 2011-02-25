@@ -1,4 +1,3 @@
-; $Id$
 name = Product Pricing
 description = Enables Rules based product sell price calculation for dynamic product pricing.
 package = Commerce

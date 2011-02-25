@@ -1,4 +1,3 @@
-; $Id$
 name = Product UI
 description = Exposes a default UI for Products through product edit forms and default Views.
 package = Commerce

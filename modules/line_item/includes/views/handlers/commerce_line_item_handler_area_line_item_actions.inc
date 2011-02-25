@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Defines a line item actions area handler so the action buttons can be plugged

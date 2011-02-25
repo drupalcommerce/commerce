@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to translate a customer profile type into its readable form.

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Defines a handler area that provides payment totals, the order balance, and

@@ -1,4 +1,3 @@
-; $Id$
 name = Payment Method Example
 description = Provides an example payment method for testing and development.
 package = Commerce

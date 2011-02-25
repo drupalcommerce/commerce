@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Defines an order total area handler that shows the order total field with its

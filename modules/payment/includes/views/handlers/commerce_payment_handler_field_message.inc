@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Field handler to display a transaction message with variable replacement.
