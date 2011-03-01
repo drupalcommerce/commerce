@@ -19,6 +19,6 @@
  *
  * @see commerce_price_field_formatter_view()
  */
-function hook_commerce_price_formatted_components(&$components, $price, $entity) {
+function hook_commerce_price_formatted_components_alter(&$components, $price, $entity) {
   // No example.
 }
