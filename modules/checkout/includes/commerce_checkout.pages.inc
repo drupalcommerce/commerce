@@ -255,7 +255,11 @@ function commerce_checkout_form_back_submit($form, &$form_state) {
 function commerce_checkout_form_cancel_submit($form, &$form_state) {
   // Set the order status back to the first step of checkout.
   $order = commerce_order_load($form_state['order']->order_id);
-  $form_state['order'] = commerce_order_status_update($order, 'checkout_checkout');
+  $form_state['order'] = commerce_order_status_update($order, 'checkout_checkout', TRUE);
+
+  // Skip saving in the status update and manually save here to force a save
+  // even when the status doesn't actually change.
+  commerce_order_save($form_state['order']);
 
   drupal_set_message(t('Checkout of your current order has been canceled and may be resumed when you are ready.'));
 
