@@ -178,11 +178,11 @@ function commerce_order_commerce_order_state_info() {
     'default_status' => 'pending',
   );
   $order_states['completed'] = array(
-    'name' => 'complete',
+    'name' => 'completed',
     'title' => t('Completed'),
     'description' => t('Orders in this state have been completed as far as the customer is concerned.'),
     'weight' => 10,
-    'default_status' => 'complete',
+    'default_status' => 'completed',
   );
 
   return $order_states;
@@ -843,7 +843,6 @@ function commerce_order_status_update($order, $name, $skip_save = FALSE) {
   // Do not update the status if the order is already at it.
   if ($order->status != $name) {
     $order->status = $name;
-
     // TODO: Alert modules via a hook / Rules that the order was updated.
 
     if (!$skip_save) {
