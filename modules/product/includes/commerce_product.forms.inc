@@ -154,10 +154,12 @@ function commerce_product_product_delete_form($form, &$form_state, $product) {
 
   $form['#submit'][] = 'commerce_product_product_delete_form_submit';
 
+  $content = commerce_product_build_content($product);
+
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),
     '',
-    drupal_render(commerce_product_build_content($product)) . '<p>' . t('Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
+    drupal_render($content) . '<p>' . t('Deleting this product cannot be undone.', array('@sku' => $product->sku)) . '</p>',
     t('Delete'),
     t('Cancel'),
     'confirm'

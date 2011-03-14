@@ -70,7 +70,9 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
         $display_uri = NULL;
       }
 
-      return drupal_render(drupal_get_form($form_id, $product_ids, $this->options['show_quantity'], $default_quantity, array(), $display_uri));
+      $form = drupal_get_form($form_id, $product_ids, $this->options['show_quantity'], $default_quantity, array(), $display_uri);
+
+      return drupal_render($form);
     }
   }
 }

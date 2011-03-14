@@ -719,8 +719,10 @@ function commerce_customer_field_formatter_view($entity_type, $object, $field, $
         $profile = commerce_customer_profile_load($item['profile_id']);
 
         if ($profile) {
+          $content = commerce_customer_profile_build_content($profile, 'customer');
+
           $result[$delta] = array(
-            '#markup' => drupal_render(commerce_customer_profile_build_content($profile, 'customer')),
+            '#markup' => drupal_render($content),
           );
         }
       }

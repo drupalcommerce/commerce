@@ -44,9 +44,9 @@ class commerce_order_handler_area_order_total extends views_handler_area {
             );
 
             // Render the order's order total field with the current display.
-            $field = drupal_render(field_view_field('commerce_order', $order, 'commerce_order_total', $display));
+            $field = field_view_field('commerce_order', $order, 'commerce_order_total', $display);
 
-            return '<div class="commerce-order-handler-area-order-total">' . $field . '</div>';
+            return '<div class="commerce-order-handler-area-order-total">' . drupal_render($field) . '</div>';
           }
         }
       }
