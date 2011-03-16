@@ -735,9 +735,9 @@ function commerce_price_component_add($price, $type, $component_price, $included
  * Returns every component of a particular type from a price's data array.
  *
  * @param $price
- *   The price array to remove components from.
+ *   The price array to load components from.
  * @param $type
- *   The machine-name of the component type to delete.
+ *   The machine-name of the component type to load.
  *
  * @return
  *   An array of components from the data array matching the type.

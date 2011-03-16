@@ -1,0 +1,23 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Helper module for the customer profile tests.
+ */
+
+/**
+ * Implements hook_commerce_customer_profile_type_info().
+ */
+function commerce_customer_profile_dummy_type_commerce_customer_profile_type_info() {
+  $profile_types = array();
+
+  $profile_types['dummy'] = array(
+    'type' => 'dummy',
+    'name' => t('Dummy profile type'),
+    'description' => t('Dummy profile type used for testing purposes.'),
+    'help' => '',
+  );
+
+  return $profile_types;
+}

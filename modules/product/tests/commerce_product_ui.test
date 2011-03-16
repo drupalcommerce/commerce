@@ -33,7 +33,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
 
     // User creation for different operations.
     $this->store_admin = $this->createStoreAdmin();
-    $this->normal_user = $this->drupalCreateUser();
+    $this->store_customer = $this->createStoreCustomer();
 
     // Get the product types, and if the default product type is not present,
     // create it.
@@ -47,9 +47,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the permissions to access the product listing.
    */
-  public function testCommerceProductAccessProductList() {
+  public function testCommerceProductUIAccessProductList() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the admin product list.
     $this->drupalGet('admin/commerce/products');
@@ -71,9 +71,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the add product process.
    */
-  public function testCommerceProductAddProduct() {
+  public function testCommerceProductUIAddProduct() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the admin product creation page.
     $this->drupalGet('admin/commerce/products/add/product');
@@ -89,7 +89,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertResponse(200, t('Store admin user is allowed to add a product using the admin interface'));
 
     // Check the integrity of the add form.
-    $this->pass(t('Test the integrity of the add product form:'));
+    $this->pass(t('Test the integrity of the product add form:'));
     $this->assertFieldByName('sku', NULL, t('SKU field is present'));
     $this->assertFieldByXPath('//input[@name="sku" and contains(@class, "required")]', NULL, t('SKU field is required'));
     $this->assertFieldByName('title', NULL, t('Title field is present'));
@@ -117,9 +117,11 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     );
     $this->drupalPost(NULL, $edit, t('Save product'));
 
-    // Check the product in database
+    // Load the product and wrap it.
     $product = commerce_product_load_by_sku($edit['sku']);
     $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+
+    // Check the product in database
     $this->pass(t('Test the product creation in database:'));
     $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
     $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
@@ -132,13 +134,16 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertText(t('Product saved.'), t('%message message is present', array('%message' => t('Product saved'))));
     $this->assertText($edit['sku'], t('SKU of the product is present'));
     $this->assertText($edit['title'], t('Title of the product is present'));
+
+    // Assert the product creation.
+    $this->assertProductCreated($product, $this->store_admin);
   }
 
 
   /**
    * Test the save and add another product.
    */
-  public function testCommerceProductSaveAndAddAnother() {
+  public function testCommerceProductUISaveAndAddAnother() {
     // Login with store admin.
     $this->drupalLogin($this->store_admin);
 
@@ -171,13 +176,13 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the edit process for a product.
    */
-  public function testCommerceProductEditProduct() {
+  public function testCommerceProductUIEditProduct() {
     // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
     $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
 
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the edit product page.
     $this->drupalGet('admin/commerce/products/' . $product->product_id . '/edit');
@@ -234,7 +239,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the delete link in the product form.
    */
-  public function testCommerceProductCancelEditProduct() {
+  public function testCommerceProductUICancelEditProduct() {
     // Login with store admin.
     $this->drupalLogin($this->store_admin);
 
@@ -250,12 +255,12 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test deleting a product.
    */
-  public function testCommerceProductDeleteProduct() {
+  public function testCommerceProductUIDeleteProduct() {
     // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the delete product page.
     $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
@@ -297,12 +302,12 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test trying to delete a product associated with a Line Item.
    */
-  public function testCommerceProductDeleteProductLineItem() {
+  public function testCommerceProductUIDeleteProductLineItem() {
     // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 
     // Associate the product in an order.
-    $order = $this->createDummyOrder($this->normal_user->uid, array($product));
+    $order = $this->createDummyOrder($this->store_customer->uid, array($product));
 
     // Login with store admin.
     $this->drupalLogin($this->store_admin);
@@ -318,9 +323,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the access to the product types listing page.
    */
-  public function testCommerceProductAccessProductTypes() {
+  public function testCommerceProductUIAccessProductTypes() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the product types listing.
     $this->drupalGet('admin/commerce/products/types');
@@ -348,9 +353,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test adding a new product type.
    */
-  public function testCommerceProductAddProductType() {
+  public function testCommerceProductUIAddProductType() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the product types add form.
     $this->drupalGet('admin/commerce/products/types/add');
@@ -409,9 +414,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Edit a product type.
    */
-  public function testCommerceProductEditProductType() {
+  public function testCommerceProductUIEditProductType() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the product types edit form.
     $this->drupalGet('admin/commerce/products/types/product/edit');
@@ -436,9 +441,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Delete a product type.
    */
-  public function testCommerceProductDeleteProductType() {
+  public function testCommerceProductUIDeleteProductType() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the delete page for a product type.
     $this->drupalGet('admin/commerce/products/types/product/delete');
@@ -481,7 +486,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Delete a product type that already has products.
    */
-  public function testCommerceProductDeleteProductTypeWithProducts() {
+  public function testCommerceProductUIDeleteProductTypeWithProducts() {
     // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 
@@ -510,9 +515,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Access to the manage fields admin screen.
    */
-  public function testCommerceProductProductTypeManageFields() {
+  public function testCommerceProductUIProductTypeManageFields() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the product type manage fields screen.
     $this->drupalGet('admin/commerce/products/types/product/fields');
@@ -531,9 +536,9 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Access to the display fields admin screen.
    */
-  public function testCommerceProductProductTypeDisplayFields() {
+  public function testCommerceProductUIProductTypeDisplayFields() {
     // Login with normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Access to the product type display fields screen.
     $this->drupalGet('admin/commerce/products/types/product/display');
@@ -552,7 +557,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
   /**
    * Test the admin breadcrumbs for product types.
    */
-  public function testCommerceProductAdminBreadcrumbs() {
+  public function testCommerceProductUIAdminBreadcrumbs() {
   // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 

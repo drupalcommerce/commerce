@@ -2,24 +2,13 @@
 
 /**
  * @file
- * Functional tests for the commerce payment module.
+ * Functional tests for the commerce payment module user interface.
  */
 
 /**
- * Test checkout process.
+ * Test payment user interface.
  */
 class CommercePaymentUITest extends CommerceBaseTestCase {
-
-  /**
-   * Normal user (without admin or store permissions) for testing.
-   */
-  protected $normal_user;
-
-  /**
-   * Checkout url.
-   */
-  protected $checkout_url;
-
   /**
    * Order object.
    */
@@ -44,31 +33,14 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     parent::setUp($modules);
 
     // User creation for different operations.
-    $this->site_admin = $this->createSiteAdmin();
     $this->store_admin = $this->createStoreAdmin();
-    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
+    $this->store_customer = $this->createStoreCustomer();
 
     // The rule that sends a mail after checkout completion should be disabled
     //  as it returns an error caused by how mail messages are stored.
     $rules_config = rules_config_load('commerce_checkout_order_email');
     $rules_config->active = FALSE;
     $rules_config->save();
-
-    // Get the checkout url.
-    $links = commerce_line_item_summary_links();
-    $this->checkout_url = $links['checkout']['href'];
-  }
-
-  /**
-   * Generate random valid information for Address information.
-   */
-  protected function generateAddressInformation() {
-    $address_info['name_line'] = $this->randomName();
-    $address_info['thoroughfare'] = $this->randomName();
-    $address_info['locality'] = $this->randomName();
-    $address_info['postal_code'] = rand(00000, 99999);
-
-    return $address_info;
   }
 
   /**
@@ -76,7 +48,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
    */
   protected function createOrderAndGoToPayment($user = NULL, $products = array()) {
     if (empty($user)) {
-      $user = $this->normal_user;
+      $user = $this->store_customer;
     }
 
     // Log in as normal user.
@@ -86,10 +58,10 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->order = $this->createDummyOrder($user->uid, $products);
 
     // Go to checkout page.
-    $this->drupalGet($this->checkout_url);
+    $this->drupalGet($this->getCommerceUrl('checkout'));
 
     // Check if the page resolves and if the default panes are present.
-    $this->assertResponse(200);
+    $this->assertResponse(200, t('Store customer user is able to access the checkout page'));
     $this->assertTitle(t('Checkout') . ' | Drupal', t('Checkout page successfully loaded'));
 
     // Generate random information, as city, postal code, etc.
@@ -108,7 +80,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
       'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
       'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
       'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
-      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => $address_info['administrative_area'],
       'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
     $this->drupalPost(NULL, $info, t('Continue'));
@@ -123,7 +95,22 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
   public function testCommercePaymentCheckout() {
     $this->createOrderAndGoToPayment();
 
-    $this->assertText('Example payment', t('Example payment method panel is present'));
+    $this->assertText('Example payment', t('Example payment method pane is present'));
+
+    // Test validation messages not filling any information.
+    $this->drupalPost(NULL, array(), t('Continue'));
+
+    // Get all panes from the system to get their forms.
+    $panes = commerce_checkout_panes();
+
+    // Check the validation message for the example payment pane.
+    $callback = commerce_checkout_pane_callback($panes['commerce_payment'], 'checkout_form');
+    $pane_form = drupal_get_form($callback, $panes['commerce_payment'], $this->order);
+    foreach (element_children($pane_form['payment_details']) as $key) {
+      if ($pane_form['payment_details'][$key]['#required']) {
+        $this->assertText(t('!pane_message field is required', array('!pane_message' => $pane_form['payment_details'][$key]['#title'])), t('Check required payment pane message'));
+      }
+    }
 
     // Test payment information validation. Payment example module name field
     // will fail for single character value.
@@ -148,11 +135,8 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
    * Test the adding payments using administration pages.
    */
   public function testCommercePaymentAdministration() {
-    // Log in as normal user.
-    $this->drupalLogin($this->normal_user);
-
     // Order creation, in cart status.
-    $this->order = $this->createDummyOrder($this->normal_user->uid);
+    $this->order = $this->createDummyOrder($this->store_customer->uid);
 
     // Log in as administrator user.
     $this->drupalLogin($this->store_admin);
@@ -160,7 +144,6 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     // Go to payment administration page.
     $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/payment');
 
-    $this->assertResponse(200);
     $this->assertText(t('Payment'), t('Payment text found on the page.'));
 
     // Check order balance.
@@ -188,6 +171,28 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->assertEqual($new_balance['amount'], ($balance['amount'] - $post_data['amount']), t('Order balance is now half order amount'));
     $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($post_data['amount'], $post_data['currency_code']) . '</td>', t('Total paid now reflects the new payment'));
     $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format($new_balance['amount'], $new_balance['currency_code']) . '</td>', t('Order balance is displayed correctly'));
+
+    // Add a payment for another half.
+    $this->drupalPostAJAX(NULL, array('payment_method' => 'commerce_payment_example|commerce_payment_commerce_payment_example'), array('op' => t('Add payment')));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-amount')]", NULL, t('Amount field is present'));
+    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-currency-code')]", NULL, t('Currency code field is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-name')]", NULL, t('Name text field from payment example module is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-submit')]", NULL, t('Save button is present'));
+    $post_data = array(
+      'amount' => $new_balance['amount'],
+      'currency_code' => 'USD',
+      'payment_details[name]' => $this->randomName(),
+    );
+    $this->drupalPost(NULL, $post_data, t('Save'));
+
+    // Reload the order.
+    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+
+    // Check order balance, it should be half of total now.
+    $new_balance = commerce_payment_order_balance($order);
+    $this->assertEqual($new_balance['amount'], 0, t('Order balance is now zero'));
+    $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($balance['amount'], $balance['currency_code']) . '</td>', t('Total paid is now equal to order total'));
+    $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format(0, $new_balance['currency_code']) . '</td>', t('Balance is displayed as zero'));
   }
 
   /**
@@ -199,7 +204,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Go to payment methods page.
     $this->drupalGet('admin/commerce/config/payment-methods');
-    $this->assertResponse(200);
+
     $this->assertTitle(t('Payment methods') . ' | Drupal', t('We are now in the payment methods page'));
     $this->assertText(t('Example payment'), t('Example payment rule is present'));
 
@@ -223,7 +228,6 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'order'), t('Save'));
     $this->assertText(t('Your changes have been saved.'), t('New action was successfully added'));
 
-
     // Create a less than $50 order.
     $products = array(
        // We set price here to 1 cent, since createDummyProduct sets line item
@@ -231,7 +235,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
        // not be more than $50.
        $this->createDummyProduct($this->randomName(), $this->randomName(), .01, 'USD', $this->store_admin->uid),
     );
-    $this->createOrderAndGoToPayment($this->normal_user, $products);
+    $this->createOrderAndGoToPayment($this->store_customer, $products);
     // Check that the payment method example is *not* there.
     $this->assertNoText('Example payment', t('Example payment method panel is not present'));
 
@@ -239,9 +243,43 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $products = array(
        $this->createDummyProduct($this->randomName(), $this->randomName(), 60, 'USD', $this->store_admin->uid),
     );
-    $this->createOrderAndGoToPayment($this->normal_user, $products);
+    $this->createOrderAndGoToPayment($this->store_customer, $products);
     // Check that the payment method example is there.
     $this->assertText('Example payment', t('Example payment method panel is present'));
+  }
+
+  /**
+   * Test the access to the payment/payment methods administration pages.
+   */
+  public function testCommercePaymentAccessPaymentAdministration() {
+    // Login with normal user.
+    $this->drupalLogin($this->store_customer);
+
+    // Order creation, in cart status.
+    $this->order = $this->createDummyOrder($this->store_customer->uid);
+
+    // Access payment administration page.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/payment');
+
+    $this->assertResponse(403, t('Normal user is not able to access the payment administration page'));
+
+    // Access to the payment methods administration page.
+    $this->drupalGet('admin/commerce/config/payment-methods');
+
+    $this->assertResponse(403, t('Normal user is not able to access the payment methods administration page'));
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access payment administration page.
+    $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/payment');
+
+    $this->assertResponse(200, t('Store admin user can access the payment administration page'));
+
+    // Access to the payment methods administration page
+    $this->drupalGet('admin/commerce/config/payment-methods');
+
+    $this->assertResponse(200, t('Store admin user can access the payment methods administration page'));
   }
 
 }
