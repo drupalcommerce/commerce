@@ -20,7 +20,7 @@
  *   Possible attributes for each sub-array are:
  *   - code: The uppercase alphabetic currency code.
  *      For example USD.
- *   - numeric_code: The nummeric currceny code. According to ISO4217 this code
+ *   - numeric_code: The numeric currency code. According to ISO4217 this code
  *     consists of three digits and first digit can be a zero.
  *   - symbol: The currency symbol. For example $.
  *   - name: The name of the currency. Translatable.
