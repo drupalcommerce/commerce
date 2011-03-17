@@ -11,15 +11,6 @@
  * extend this class.
  */
 abstract class CommerceCartTestCase extends CommerceBaseTestCase {
-	/**
-   * Normal user (without admin or store permissions) for testing.
-   */
-  protected $normal_user;
-
-	/**
-   * Cart url.
-   */
-  protected $cart_url;
 
   /**
    * Helper function to  perform the common test tasks for cart testing.
@@ -29,15 +20,8 @@ abstract class CommerceCartTestCase extends CommerceBaseTestCase {
     $modules = parent::setUpHelper($set, $other_modules);
     parent::setUp($modules);
 
-    // Generate users for the tests, normal user has to have access checkout
-    // permission to test the cart process.
-    $this->site_admin = $this->createSiteAdmin();
     $this->store_admin = $this->createStoreAdmin();
-    $this->normal_user = $this->drupalCreateUser(array('access checkout'));
-
-    // Get the cart url.
-    $links = commerce_line_item_summary_links();
-    $this->cart_url = $links['view_cart']['href'];
+    $this->store_customer = $this->createStoreCustomer();
   }
 }
 
@@ -73,8 +57,6 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    */
   function setUp() {
     parent::setUpHelper('all');
-
-    $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType();
 
@@ -86,7 +68,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
     $this->product_node = $this->createDummyProductNode(array($this->product->product_id), $product_name);
 
     // Log as a normal user to test cart process.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Submit the add to cart form.
     $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
@@ -111,7 +93,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
     $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
 
     // Test if the page resolves and there is something in the cart.
     $this->assertResponse(200);
@@ -126,7 +108,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
     // Check if the form is present and it has the quantity field, remove and
     //  submit buttons.
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
 
     // Check remove button.
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-delete')]", NULL, t('Remove button present'));
@@ -145,7 +127,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    */
   public function testCommerceCartOrder() {
     // Load the current order of the user.
-    $order = commerce_cart_order_load($this->normal_user->uid);
+    $order = commerce_cart_order_load($this->store_customer->uid);
     $products = array();
     $this->assertTrue(commerce_cart_order_is_cart($order), t('User has currently an order in cart status.'));
     // Get the products out of the order and store them in an array.
@@ -164,12 +146,12 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    */
   public function testCommerceCartChangeQty() {
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
     // Change quantity in the cart view form.
     // We search for the first quantity field in the html and change the
     //   amount there.
     $qty = $this->xpath("//input[starts-with(@name, 'edit_quantity')]");
-    $this->drupalPost($this->cart_url, array((string) $qty[0]['name'] => 2), t('Update cart'));
+    $this->drupalPost($this->getCommerceUrl('cart'), array((string) $qty[0]['name'] => 2), t('Update cart'));
     // Check if the amount has been really changed.
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 2, t('Cart updated with new quantity'));
   }
@@ -179,9 +161,9 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
    */
   public function testCommerceCartRemove() {
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
     // Remove the product from the cart.
-    $this->drupalPost($this->cart_url, array(), t('Remove'));
+    $this->drupalPost(NULL, array(), t('Remove'));
     // Test if the page resolves and there is something in the cart.
     $this->assertText(t('Your shopping cart is empty.'), t('Removed product and cart is empty'));
   }
@@ -222,8 +204,6 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
    */
   function setUp() {
     parent::setUpHelper('all');
-
-    $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', 2);
 
@@ -243,7 +223,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
     $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
 
     // Log as a normal user to test cart process.
-    $this->drupalLogin($this->normal_user);
+    $this->drupalLogin($this->store_customer);
 
     // Submit the add to cart form.
     $this->drupalPost('node/' . $this->product_node->nid, array('product_id' => $this->products[2]->product_id), t('Add to cart'));
@@ -280,7 +260,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
     $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
 
     // Test if the page resolves and there is something in the cart.
     $this->assertResponse(200);
@@ -295,7 +275,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
     // Check if the form is present and it has the quantity field, remove and
     //  submit buttons.
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
 
     // Check remove button.
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-delete')]", NULL, t('Remove button present'));
@@ -315,7 +295,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
   public function testCommerceCartOrder() {
     $products_in_cart = array();
     // Load the current order of the user.
-    $order = commerce_cart_order_load($this->normal_user->uid);
+    $order = commerce_cart_order_load($this->store_customer->uid);
 
     // Check if the user has at least one order in cart status.
     $this->assertTrue(commerce_cart_order_is_cart($order), t('User has currently an order in cart status.'));
@@ -363,8 +343,6 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
    */
   function setUp() {
     parent::setUpHelper('all');
-
-    $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType('product_display', TRUE, 'field_product', FIELD_CARDINALITY_UNLIMITED);
 
@@ -419,11 +397,7 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
     $this->product_node = $this->createDummyProductNode(array_keys($this->products), 'Combined Product');
 
     // Log as a normal user to test cart process.
-    $this->drupalLogin($this->normal_user);
-
-    // Get the cart url.
-    $links = commerce_line_item_summary_links();
-    $this->cart_url = $links['view_cart']['href'];
+    $this->drupalLogin($this->store_customer);
   }
 
   /**
@@ -447,7 +421,7 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
     $this->assertRaw($message, t('Product add to cart message displayed.'));
 
     // Go to cart url.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
 
     // Test if the page resolves and there is something in the cart.
     $this->assertResponse(200);
@@ -507,8 +481,6 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
    */
   function setUp() {
     parent::setUpHelper('all');
-
-    $this->drupalLogin($this->site_admin);
     // Create a dummy product display content type.
     $this->createDummyProductDisplayContentType();
 
@@ -536,26 +508,25 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
     $order_anonymous = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
 
     // Access to the cart and check if the product is in it.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
     $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
     $this->assertText($this->product->title, t('Product was added to the cart'));
 
     // Change the price to check if the amount gets updated when the user logs
     // in.
-
     $new_price = $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] + rand(2, 500);
     $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] = commerce_currency_integer_to_amount($new_price, $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code']);
     $this->product->is_new = FALSE;
     $this->product = commerce_product_save($this->product);
 
     // Log in with normal user.
-    $this->drupalPost('user', array('name' => $this->normal_user->name, 'pass' => $this->normal_user->pass_raw), t('Log in'));
+    $this->drupalPost('user', array('name' => $this->store_customer->name, 'pass' => $this->store_customer->pass_raw), t('Log in'));
 
     // Get the order for user just logged in.
-    $order_authenticated = reset(commerce_order_load_multiple(array(), array('uid' => $this->normal_user->uid, 'status' => 'cart'), TRUE));
+    $order_authenticated = reset(commerce_order_load_multiple(array(), array('uid' => $this->store_customer->uid, 'status' => 'cart'), TRUE));
 
     // Access to the cart and check if the product is in it.
-    $this->drupalGet($this->cart_url);
+    $this->drupalGet($this->getCommerceUrl('cart'));
     $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
     $this->assertText($this->product->title, t('Product is still in the cart'));
     $this->assertText(trim(commerce_currency_integer_to_amount($this->product->commerce_price[LANGUAGE_NONE][0]['amount'], $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code'])), t('Product price has been updated'));
@@ -563,4 +534,5 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
     // Check if the order is the same.
     $this->assertTrue($order_anonymous->order_id == $order_authenticated->order_id, t('Cart has been converted successfully'));
   }
+
 }

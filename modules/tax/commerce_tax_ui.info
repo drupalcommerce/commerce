@@ -4,3 +4,6 @@ package = Commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_tax
 core = 7.x
+
+; Simple tests
+files[] = tests/commerce_tax_ui.test

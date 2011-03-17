@@ -1,0 +1,7 @@
+;$Id$
+name = "Commerce customer module tests"
+description = "Support module for customer profile related testing."
+package = Testing
+version = VERSION
+core = 7.x
+hidden = TRUE

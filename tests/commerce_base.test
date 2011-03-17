@@ -151,6 +151,11 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer taxes',
       'administer rules',
     );
+    $store_customer = array(
+      'access content',
+      'access checkout',
+      'view own orders',
+    );
 
     $final_permissions = array();
 
@@ -161,6 +166,9 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
           break;
         case 'store admin':
           $final_permissions = array_merge($final_permissions, $store_admin);
+          break;
+        case 'store customer':
+          $final_permissions = array_merge($final_permissions, $store_customer);
           break;
       }
     }
@@ -196,6 +204,27 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    */
   protected function createStoreAdmin() {
     return $this->createUserWithPermissionHelper('store admin');
+  }
+
+  /**
+   * Returns a store customer. It's a regular user with some Commerce
+   * permissions as access to checkout.
+   */
+  protected function createStoreCustomer() {
+    return $this->createUserWithPermissionHelper('store customer');
+  }
+
+  /**
+   * Return one of the Commerce configured urls.
+   */
+  protected function getCommerceUrl($element = 'cart') {
+    $links = commerce_line_item_summary_links();
+    if ($element == 'cart') {
+      return $links['view_cart']['href'];
+    }
+    if ($element == 'checkout') {
+      return $links['checkout']['href'];
+    }
   }
 
   /**
@@ -323,28 +352,31 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    * @return
    *   A commerce order object in the given status.
    */
-  public function createDummyOrder($uid = 1, $products = array(), $status = 'cart') {
+  public function createDummyOrder($uid = 1, $products = array(), $status = 'cart', $customer_profile_id = NULL) {
     // If there aren't any products to add to the order, create one.
     if (empty($products)) {
-      $sku = 'PROD-01';
-      $product_name = 'Product One';
-      $product = $this->createDummyProduct($sku, $product_name, -1, 'USD', $uid);
+      $product = $this->createDummyProduct('PROD-01', 'Product One', -1, 'USD', $uid);
       $products[] = $product;
     }
 
-    // Create a new shopping cart order and add the products to it.
-    $order = commerce_order_new($uid, $status);
-
+    // Create a new shopping cart order by adding the products to it.
     foreach($products as $product) {
-      commerce_cart_product_add($uid, $product->product_id, rand(1,100));
+      commerce_cart_product_add($uid, $product->product_id, rand(1,10));
     }
 
+    // Load the order for returning it.
     $order = commerce_cart_order_load($uid);
+
+    if (!empty($customer_profile_id)) {
+      $order->commerce_customer_billing[LANGUAGE_NONE][0]['profile_id'] = $customer_profile_id;
+    }
 
     // If the order should be in a different status, update it.
     if ($status <> 'cart') {
-      $order = commerce_order_status_update($order, $status);
+      $order = commerce_order_status_update($order, $status, TRUE);
     }
+
+    $order = commerce_order_save($order);
 
     return $order;
   }
@@ -450,11 +482,11 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       node_save($node);
       return $node;
     } else {
-      $this->fail('Cannot use use createProductNode because the product module is not enabled.');
+      $this->fail(t('Cannot use use createProductNode because the product module is not enabled.'));
     }
   }
 
-  /**
+  	/**
      * Create a full product node without worrying about the earlier steps in
      * the process.
      *
@@ -477,6 +509,100 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       $product_nodes[$i] = $product_node;
     }
     return $product_nodes;
+  }
+
+	/**
+ 	 * Create a dummy tax type.
+ 	 *
+ 	 * @param $tax_type
+ 	 * 	Array with the specific elements for the tax type, all the elements not
+ 	 * 	specified and required will be generated randomly.
+ 	 * 	@see hook_commerce_tax_type_info
+ 	 *
+ 	 * @return
+ 	 *  The tax type array just created or FALSE if it wasn't created.
+ 	 */
+  public function createDummyTaxType($tax_type = array()) {
+    $defaults = array(
+      'name' => 'example_tax_type',
+    	'title' => t('Example tax type'),
+    	'display_title' => t('Example tax type'),
+      'description' => t('Example tax type for testing purposes'),
+    );
+    // Generate a tax type array based on defaults and specific elements.
+    $tax_type = array_merge(commerce_tax_ui_tax_type_new(), $defaults, $tax_type);
+    if (commerce_tax_ui_tax_type_save($tax_type)) {
+      return commerce_tax_type_load($tax_type['name']);
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+	/**
+ 	 * Create a dummy tax rate.
+ 	 *
+ 	 * @param $tax_type
+ 	 * 	Array with the specific elements for the tax rate, all elements not
+ 	 * 	specified and required will be generated randomly.
+ 	 *	@see hook_commerce_tax_rate_info
+ 	 *
+ 	 * @return
+ 	 *  The tax type array just created or FALSE if it wasn't created.
+ 	 */
+  public function createDummyTaxRate($tax_rate = array()) {
+    $defaults = array(
+    	'name' => 'example_tax_rate',
+    	'title' => t('Example tax rate'),
+    	'display_title' => t('Example tax rate'),
+      'rate' => rand(1,100)/1000,
+      'type' => 'example_tax_type',
+    );
+    // Generate a tax type array based on defaults and specific elements.
+    $tax_rate = array_merge(commerce_tax_ui_tax_rate_new(), $defaults, $tax_rate);
+    if (commerce_tax_ui_tax_rate_save($tax_rate)) {
+      return commerce_tax_rate_load($tax_rate['name']);
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Create a customer profile.
+   *
+   *  @param $type
+   *  	Type of the customer profile, default billing.
+   *  @param $uid
+   *  	User id that will own the profile, by default anonymous.
+   *  @param $address_info
+   *  	Address information, associative array keyed by the field name.
+   *  	i.e. 'commerce_customer_address'.
+   *
+   *  @return
+   *  	The customer profile created or FALSE if the profile wasn't created.
+   */
+  public function createDummyCustomerProfile($type = 'billing', $uid = 0, $address_info = array()) {
+    variable_set('site_default_country', 'US');
+    // Initialize the profile.
+    $profile = commerce_customer_profile_new($type, $uid);
+
+    // Set the defaults.
+    $defaults['name_line'] = $this->randomName();
+    $defaults = array_merge($defaults, addressfield_default_values(), $this->generateAddressInformation());
+
+    // Get all the fields for the given type, by default billing.
+    $instances = field_info_instances('commerce_customer_profile', $type);
+    foreach ($instances as $name => $instance) {
+      $info_field = field_info_field($name);
+      if ($info_field['type'] == 'addressfield') {
+        $values = !empty($address_info[$name]) ? array_merge($defaults, $address_info[$name]) : $defaults;
+        $values['data'] = serialize($values['data']);
+        $profile->{$name}[LANGUAGE_NONE][] = $values;
+      }
+    }
+    $profile = commerce_customer_profile_save($profile);
+    return !empty($profile) ? $profile : FALSE;
   }
 
   /**
@@ -513,14 +639,84 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Adds <pre> around a print_r of a var and returns it for use in a debug()
-   * call. NOTE: It returns it instead of calling debug() itself so the debug
-   * call will show the proper line that called it.
-   * Usage: debug($this->pre_r($var));
+   * Generate random valid information for Address information.
    */
-  public function pre_r($var) {
-    return '<pre>'. print_r($var, TRUE) .'</pre>';
+  protected function generateAddressInformation() {
+    $address_info['name_line'] = $this->randomName();
+    $address_info['thoroughfare'] = $this->randomName();
+    $address_info['locality'] = $this->randomName();
+    $address_info['postal_code'] = rand(00000, 99999);
+    $address_info['administrative_area'] = 'KY';
+
+    return $address_info;
   }
+
+  /**
+   * Assertions for Drupal Commerce.
+   */
+
+  /**
+   * Asserts that a product has been added to the cart.
+   *
+   * @param $order
+   *  A full loaded commerce_order object.
+   * @param $product
+   *  A full loaded commerce_product object.
+   * @param $user
+   * 	User that owns the cart.
+   *
+   * @return TRUE if the product is in the cart, FALSE otherwise.
+   */
+  public function assertProductAddedToCart($order, $product, $user = NULL) {
+    // The order should be in cart status.
+    $this->assertTrue(commerce_cart_order_is_cart($order), t('The order checked is in cart status'));
+
+    $product_is_in_cart = FALSE;
+    // Loop through the line items looking for products.
+    foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+      // If this line item matches the product checked...
+      if ($line_item_wrapper->type->value() == 'product' &&
+          $line_item_wrapper->commerce_product->product_id->value() == $product->product_id) {
+            $product_is_in_cart = TRUE;
+      }
+    }
+
+    $this->assertTrue($product_is_in_cart, t('Product !product_title is present in the cart', array('!product_title' => $product->title)));
+
+    // Access to the cart page to check if the product is there.
+    if (empty($user)) {
+      $user = $this->createStoreCustomer();
+    }
+    $this->drupalLogin($user);
+    $this->drupalGet($this->getCommerceUrl('cart'));
+    $this->assertText($product->title, t('Product !product_title is present in the cart view', array('!product_title' => $product->title)));
+  }
+
+  /**
+   *	Asserts that a product has been created.
+   *
+   * @param $product
+   *  A full loaded commerce_product object.
+   * @param $user
+   * 	User that access the admin pages. Optional, if not informed, the check
+   * 	is done with the store admin.
+   */
+  public function assertProductCreated($product, $user = NULL) {
+    // Check if the product is not empty and reload it from database.
+    $this->assertFalse(empty($product), t('Product object is not empty'));
+    $product = commerce_product_load($product->product_id);
+    $this->assertFalse(empty($product), t('Product object is correctly loaded from database'));
+
+    // Access to the admin page for the product and check if the product is there.
+    if (empty($user)) {
+      $user = $this->createStoreAdmin();
+    }
+    $this->drupalLogin($user);
+    $this->drupalGet('admin/commerce/products/' . $product->product_id);
+    $this->assertFieldById('edit-sku', $product->sku, t('When editing the product in the administration interface, the SKU is informed correctly'));
+    $this->assertFieldById('edit-title', $product->title, t('When editing the product in the administration interface, the Title is informed correctly'));
+  }
+
 }
 
 
@@ -551,6 +747,7 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
+    $this->store_customer = $this->createStoreCustomer();
     cache_clear_all(); // Just in case
   }
 
@@ -560,6 +757,29 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
   public function testTestTest() {
 
   }
+
+  /**
+   * Test the createDummyCustomerProfile function.
+   */
+  public function testTestCreateDummyCustomerProfile() {
+    $store_admin = $this->createStoreAdmin();
+    // Create a new customer profile for the store admin.
+    $profile = $this->createDummyCustomerProfile('billing', $store_admin->uid);
+
+    // Load profile reseting cache.
+    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+
+    $this->assertFalse(empty($profile), t('Profile can be loaded from database'));
+
+    // Login with store admin user and navigate to the profile listing page.
+    $this->drupalLogin($store_admin);
+    $this->drupalGet('admin/commerce/customer-profiles');
+
+    $this->assertText($profile->commerce_customer_address[LANGUAGE_NONE][0]['name_line'], t('\'Name line\' field for the profile created is present in the customer profile listing'));
+    $type = commerce_customer_profile_type_load($profile->type);
+    $this->assertText($type['name'], t('The type of the profile is informed in the profile listing page'));
+  }
+
 }
 
 /**
@@ -594,13 +814,6 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   }
 
   /**
-   * Sandbox for test development
-   */
-  public function testTestTest() {
-
-  }
-
-  /**
    * Ensure that all of the Commerce modules (and their dependencies) are
    * enabled in the test environment.
    */
@@ -619,6 +832,8 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-commerce-commerce-price-enable',
       'edit-modules-commerce-commerce-product-enable',
       'edit-modules-commerce-commerce-product-reference-enable',
+      'edit-modules-commerce-commerce-product-pricing-enable',
+      'edit-modules-commerce-commerce-tax-enable',
 
       'edit-modules-commerce-commerce-payment-example-enable',
 
@@ -627,7 +842,9 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
       'edit-modules-commerce-commerce-line-item-ui-enable',
       'edit-modules-commerce-commerce-order-ui-enable',
       'edit-modules-commerce-commerce-payment-ui-enable',
+      'edit-modules-commerce-commerce-product-pricing-ui-enable',
       'edit-modules-commerce-commerce-product-ui-enable',
+      'edit-modules-commerce-commerce-tax-ui-enable',
 
       'edit-modules-fields-addressfield-enable',
       'edit-modules-other-entity-enable',
@@ -655,50 +872,46 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
   }
 
   /**
-   * Make a test product type
+   * Make a test product type.
    */
   public function testTestCreateDummyProductType() {
     $product_type = $this->createDummyProductType();
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
     $this->drupalGet('admin/commerce/products/types');
-    $this->assertText($product_type['name'], 'Dummy product type name found on admin/commerce/products/types');
+    $this->assertText($product_type['name'], t('Dummy product type name found on admin/commerce/products/types'));
   }
 
   /**
-   * Make a test product
+   * Make a test product.
    */
   public function testTestCreateDummyProduct() {
-    //cache_clear_all();
-    $this->drupalLogin($this->site_admin);
-    // Silly hack to workaround a current bug in views that prevents users from
-    //  seeing the admin/commerce/products page.
-    $this->drupalPost('admin/modules', array(), 'Save configuration');
-
+    // Create the product.
     $product = $this->createDummyProduct();
+
+    // Login with the store admin.
     $store_admin = $this->createStoreAdmin();
     $this->drupalLogin($store_admin);
-    //$super_admin = $this->createUserWithPermissionHeper(array('site admin', 'store admin'));
-    //$this->drupalLogin($super_admin);
+
+    // Assert that the product is in the product listing.
     $this->drupalGet('admin/commerce/products');
-    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products');
+    $this->assertText($product->title, t('Dummy product found on admin page at admin/commerce/products'));
     $this->drupalGet('admin/commerce/products/list');
-    $this->assertText($product->title, 'Dummy product found on admin page at admin/commerce/products/list');
-    $this->drupalGet('admin/commerce/products/add/product');
+    $this->assertText($product->title, t('Dummy product found on admin page at admin/commerce/products/list'));
   }
 
   /**
    * Test the creation of a product_display content type and add a product
-   * reference field to the content typ.
+   * reference field to the content type.
    */
   public function testTestCreateDummyProductDisplayAndRefField() {
     $this->createDummyProductDisplayContentType();
 
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('node/add/product-display');
-    $this->assertText('product_display', 'product_display content type successfully created and accessible.');
+    $this->assertText('product_display', t('product_display content type successfully created and accessible.'));
     //$this->assertOptionSelected('edit-field-product-und', '_none', 'Dummy Product Display reference field shows up on node add page');
-    $this->assertFieldById('edit-field-product-und', '', 'Product reference field found on Dummy Product Display.');
+    $this->assertFieldById('edit-field-product-und', '', t('Product reference field found on Dummy Product Display.'));
 
     // Try to add the same field a second time and see if any errors pop up.
     //  If uncommented, this will product an error. Basically, this should be
@@ -721,8 +934,8 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $product_node = $this->createDummyProductNode(array($product->product_id), $product_name);
 
     $this->drupalLogin($this->site_admin);
-    $this->drupalGet('node/1');
-    $this->assertText($product_name, "Product <code>$product_name</code> created successfully");
+    $this->drupalGet("node/{$product_node->nid}");
+    $this->assertText($product_name, t('Product !product_name created successfully', array('!product_name' => $product_name)));
   }
 
   /**
@@ -733,7 +946,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->drupalLogin($this->site_admin);
     $product_node = $product_nodes[1];
     $this->drupalGet("node/{$product_node->nid}");
-    $this->assertText($product_node->title, "Product <em>{$product_node->title}</em> node page exists!");
+    $this->assertText($product_node->title, t('Product !product_title node page exists', array('product_title' => $product_node->title)));
   }
 
   /**
@@ -752,8 +965,8 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->assertTrue(commerce_cart_order_is_cart($order), t('Order is in cart status'));
     $this->drupalGet('checkout');
 
-    $this->assertTitle(t('Checkout'). ' | Drupal', t('Checkout accesible for the order.'));
-    $this->assertText($product_name, t('Product is added to the order.'));
+    $this->assertTitle(t('Checkout'). ' | Drupal', t('Checkout accesible for the order'));
+    $this->assertText($product_name, t('Product is added to the order'));
   }
 
   /**
@@ -807,7 +1020,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
         $currency = array('decimals' => 2, 'rounding_step' => $rounding_step);
 
         $result = commerce_currency_round($input, $currency);
-        $this->assertEqual($result, $output, 'Rounding ' . $input . ' to ' . $output . ' with the rounding step: ' . $rounding_step . '.');
+        $this->assertEqual($result, $output, t('Rounding !input to !output with the rounding step: !rounding_step', array('!input' => $input, '!output' => $output, '!rounding_step' => $rounding_step)));
       }
     }
   }
@@ -821,4 +1034,42 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     // Check if Euros is enabled.
     $this->assertTrue(in_array('EUR', variable_get('commerce_enabled_currencies', array('USD' => 'USD'))), t('Euros are enabled'));
   }
+
+  /**
+   * Test creating a new tax type.
+   */
+  public function testTestCreateDummyTaxType() {
+    // Create a dummy tax type.
+    $tax_type = $this->createDummyTaxType();
+
+    // Create and login with a store admin user.
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+
+    // Access to the tax type listing page and assert that the dummy tax type
+    // is present.
+    $this->drupalGet('admin/commerce/config/taxes/types');
+    $this->assertText($tax_type['display_title'], t('Dummy tax type found on admin page at admin/commerce/config/taxes/types'));
+  }
+
+  /**
+   * Test creating a new tax rate.
+   */
+  public function testTestCreateDummyTaxRate() {
+    // Create a dummy tax type.
+    $tax_type = $this->createDummyTaxType();
+
+    // Create a dummy tax rate.
+    $tax_rate = $this->createDummyTaxRate();
+
+    // Create and login with a store admin user.
+    $store_admin = $this->createStoreAdmin();
+    $this->drupalLogin($store_admin);
+
+    // Access to the tax type listing page and assert that the dummy tax type
+    // is present.
+    $this->drupalGet('admin/commerce/config/taxes/rates');
+    $this->assertText($tax_rate['display_title'], t('Dummy tax rate found on admin page at admin/commerce/config/taxes/rates'));
+  }
+
 }

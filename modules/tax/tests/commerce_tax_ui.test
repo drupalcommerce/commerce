@@ -1,0 +1,753 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ ** Functional tests for the commerce tax UI module.
+ */
+
+/**
+ * Functional tests for the commerce tax UI module.
+ */
+class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
+  /**
+   * Normal user (without admin or store permissions) for testing.
+   */
+  protected $normal_user;
+
+  /**
+   * Tax type.
+   */
+  protected $tax_type;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Tax administration',
+      'description' => 'Test creating, editing and deleting tax rates and tax types using the tax administration user interface.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    // User creation for different operations.
+    $this->store_admin = $this->createStoreAdmin();
+    $this->normal_user = $this->drupalCreateUser(array('access checkout', 'view own orders'));
+
+    // Create a dummy tax type for testing.
+    $this->tax_type = $this->createDummyTaxType();
+  }
+
+  /**
+   * Go through the checkout process.
+   */
+  protected function commerceTaxHelperCompleteCheckout() {
+    // Get the checkout url and navigate to it.
+    $links = commerce_line_item_summary_links();
+    $this->checkout_url = $links['checkout']['href'];
+    $this->drupalGet($this->checkout_url);
+
+    // The rule that sends a mail after checkout completion should be disabled
+    //  as it returns an error caused by how mail messages are stored.
+    $rules_config = rules_config_load('commerce_checkout_order_email');
+    $rules_config->active = FALSE;
+    $rules_config->save();
+
+    // Complete the order process.
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
+    $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+    $info = array(
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $this->randomName(),
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $this->randomName(),
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $this->randomName(),
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => rand(00000, 99999),
+    );
+    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+  }
+
+  /**
+   * Test access to tax rates listing.
+   */
+  public function testCommerceTaxUIAccessTaxRates() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the Tax rates listing.
+    $this->drupalGet('admin/commerce/config/taxes');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax rates listing page'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the Tax rates listing.
+    $this->drupalGet('admin/commerce/config/taxes');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax rates listing page'));
+
+    // Check if the add link is there.
+    $this->assertText(t('Add a tax rate'), t('%link link is present in the tax rates listing page', array('%link' => t('Add a tax rate'))));
+
+    // There shouldn't be any tax rate yet.
+    $this->assertRaw(t('There are no tax rates yet. <a href="@link">Add a tax rate</a>.', array('@link' => url('admin/commerce/config/taxes/rates/add'))), t('Empty tax rate listing message is displayed'));
+  }
+
+  /**
+   * Test the creation of a tax rate.
+   */
+  public function testCommerceTaxUICreateTaxRate() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the creation page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/add');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the creation page for tax rates'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the creation page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/add');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the creation page for tax rates'));
+
+    // Check the integrity of the tax rate form.
+    $this->pass(t('Test the integrity of the tax rate add form:'));
+    $this->assertFieldByXPath('//input[@id="edit-tax-rate-title" and contains(@class, "required")]', NULL, t('Tax rate title field is present and is required'));
+    $this->assertFieldById('edit-tax-rate-display-title', NULL, t('Tax rate display title field is present'));
+    $this->assertFieldById('edit-tax-rate-description', NULL, t('Tax rate description is present'));
+    $this->assertFieldByXPath('//input[@id="edit-tax-rate-rate" and contains(@class, "required")]', 0, t('Tax rate rate field is present, has 0 as default value and is required'));
+    $this->assertFieldByXPath('//select[@id="edit-tax-rate-type" and contains(@class, "required")]', NULL, t('Tax rate type field is present and is required'));
+
+    $tax_select_types = $this->xpath('//select[@id="edit-tax-rate-type"]//option');
+    foreach (commerce_tax_types() as $tax_type) {
+      $this->assertTrue(in_array($tax_type['display_title'], (array)$tax_select_types), t('Tax rate type %type is available for the rate', array('%type' => $tax_type['display_title'])));
+    }
+
+    $this->assertFieldChecked('edit-tax-rate-rules-component', t('Define a rules component checkbox is present and checked'));
+    $this->assertFieldById('edit-submit', t('Save tax rate'), t('\'Save tax rate\' button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes'), t('Cancel link is present'));
+
+    // Fill the tax rate information and save tax rate.
+    $edit = array(
+      'tax_rate[title]' => 'Example tax rate',
+    	'tax_rate[name]' => 'example_tax_rate',
+    	'tax_rate[display_title]' => 'Example tax rate',
+    	'tax_rate[description]' => 'Example tax rate for testing',
+    	'tax_rate[rate]' => rand(1,100)/1000,
+    	'tax_rate[type]' => 'example_tax_type',
+    );
+    $this->drupalPost(NULL, $edit, t('Save tax rate'));
+
+    // Check the url after creation and if the values have been saved.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes', array('absolute' => TRUE)), t('After saving a tax rate we are in the list of tax rates'));
+    $this->assertText($edit['tax_rate[title]'], t('Title of the tax rate is present in the tax rates listing'));
+    $this->assertText($edit['tax_rate[name]'], t('Machine name of the tax rate is present in the tax rates listing'));
+    $this->assertText($edit['tax_rate[description]'], t('Description of the tax rate is present in the tax rates listing'));
+    $this->assertText(trim($edit['tax_rate[rate]']), t('Rate value of the tax rate is present in the tax rates listing'));
+
+    // Check in database if the tax rate has been created.
+    commerce_tax_rates_reset();
+    $tax_rate = commerce_tax_rate_load($edit['tax_rate[name]']);
+    $this->assertFalse(empty($tax_rate), t('Tax is stored in database'));
+  }
+
+  /**
+   * Test editing a tax rate.
+   */
+  public function testCommerceTaxUIEditTaxRate() {
+    // Create a tax rate.
+    $tax_rate = $this->createDummyTaxRate();
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the edit page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/' . strtr($tax_rate['name'], '_', '-') . '/edit');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax rate edit page'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the edit page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/' . strtr($tax_rate['name'], '_', '-') . '/edit');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax rate edit page'));
+
+    // Check if the data loaded in the edit form matches with the tax rate.
+    $this->pass(t('Test if the rate is correctly loaded in the edit form:'));
+    $this->assertFieldById('edit-tax-rate-title', $tax_rate['title'], t('Title field corresponds with tax rate'));
+    $this->assertText($tax_rate['name'], t('Machine name field corresponds with tax rate'));
+    $this->assertFieldById('edit-tax-rate-display-title', $tax_rate['display_title'], t('Display title field corresponds with tax rate'));
+    $this->assertFieldById('edit-tax-rate-rate', $tax_rate['rate'], t('Rate field corresponds with tax rate'));
+    $this->assertOptionSelected('edit-tax-rate-type', $tax_rate['type'], t('Type select value corresponds with tax rate'));
+    $this->assertFieldById('edit-submit', t('Save tax rate'), t('\'Save tax rate\' button is present'));
+    $this->assertFieldById('edit-delete', t('Delete tax rate'), t('Delete button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes'), t('Cancel link is present'));
+
+    // Modify tax rate information and save the form.
+    $edit = array(
+      'tax_rate[title]' => 'Altered tax rate',
+    	'tax_rate[display_title]' => 'Altered tax rate',
+    	'tax_rate[description]' => 'Altered tax rate for testing',
+    	'tax_rate[rate]' => $tax_rate['rate'] + rand(1,100)/1000,
+    	'tax_rate[type]' => 'vat',
+    );
+    $this->drupalPost(NULL, $edit, t('Save tax rate'));
+
+    // Check the url after edit and if the values have been loaded.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes', array('absolute' => TRUE)), t('After saving a tax rate we are in the list of tax rates'));
+    $this->assertText($edit['tax_rate[title]'], t('Title of the tax rate is present in the tax rates listing'));
+    $this->assertText($edit['tax_rate[description]'], t('Description of the tax rate is present in the tax rates listing'));
+    $this->assertText(trim($edit['tax_rate[rate]']), t('Rate value of the tax rate is present in the tax rates listing'));
+    $this->assertText(t('Tax rate saved.'), t('\'Tax rate saved\' message is displayed'));
+
+    // Check in database if the tax rate has been correctly modified.
+    commerce_tax_rates_reset();
+    $tax_rate = commerce_tax_rate_load($tax_rate['name']);
+    $this->assertFalse(empty($tax_rate), t('Tax is present in database'));
+    $this->assertTrue($tax_rate['title'] = $edit['tax_rate[title]'], t('Tax title is correctly saved in database'));
+    $this->assertTrue($tax_rate['display_title'] = $edit['tax_rate[display_title]'], t('Tax display title is correctly saved in database'));
+    $this->assertTrue($tax_rate['description'] = $edit['tax_rate[description]'], t('Tax description is correctly saved in database'));
+    $this->assertTrue($tax_rate['rate'] = $edit['tax_rate[rate]'], t('Tax rate is correctly saved in database'));
+    $this->assertTrue($tax_rate['type'] = $edit['tax_rate[type]'], t('Tax type is correctly saved in database'));
+  }
+
+  /**
+   * Test deleting a tax rate.
+   */
+  public function testCommerceTaxUIDeleteTaxRate() {
+    // Create a tax rate.
+    $tax_rate = $this->createDummyTaxRate();
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the deletion page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/' . strtr($tax_rate['name'], '_', '-') . '/delete');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the delete form of a tax rate'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the deletion page for tax rates.
+    $this->drupalGet('admin/commerce/config/taxes/rates/' . strtr($tax_rate['name'], '_', '-') . '/delete');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the delete form of a tax rate'));
+
+    // Check the integrity of the tax rate delete confirmation form.
+    $this->pass('Test the tax rate delete confirmation form:');
+    $this->assertTitle(t('Are you sure you want to delete the !title tax rate?', array('!title' => $tax_rate['title'])) . ' | Drupal', t('The confirmation message is displayed'));
+    $this->assertText(t('This action cannot be undone'), t('A warning notifying the user about the action can\'t be undone is displayed.'));
+    $this->assertFieldById('edit-submit', t('Delete'), t('Delete button is present'));
+    $this->assertText(t('Cancel'), t('Cancel is present'));
+
+    // Confirm delete.
+    $this->drupalPost(NULL, array(), t('Delete'));
+
+    // Check the url after deleting and if the tax rate has been deleted in
+    // database.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes', array('absolute' => TRUE)), t('Landing page after deleting a tax rate is the tax rates listing page'));
+    $this->assertRaw(t('The tax rate %title has been deleted.', array('%title' => $tax_rate['title'])), t('\'Tax rate has been deleted\' message is displayed'));
+    $this->assertRaw(t('There are no tax rates yet. <a href="@link">Add a tax rate</a>.', array('@link' => url('admin/commerce/config/taxes/rates/add'))), t('Empty tax rate listing message is displayed'));
+
+    commerce_tax_rates_reset();
+    $tax_rate = commerce_tax_rate_load($tax_rate['name']);
+    $this->assertTrue(empty($tax_rate), t('Tax is correctly deleted from database'));
+  }
+
+  /**
+   * Test configuring a tax rate.
+   */
+  public function testCommerceTaxUIConfigureTaxRate() {
+    // Create a tax rate.
+    $tax_rate = $this->createDummyTaxRate();
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the configure component page for tax rates.
+    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the component configure page for a tax rate'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the configure component page for tax rates.
+    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the component configure page for a tax rate'));
+
+    // Add a condition
+    $this->assertLink(t('Add condition'), 0, t('Add condition link is present'));
+    $this->clickLink(t('Add condition'));
+
+    // Select a basic condition as at this step we're only testing if the
+    // saving process is working.
+    $this->drupalPost(NULL, array('element_name' => 'entity_is_of_type'), t('Continue'));
+
+    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
+
+    // Check that after saving the url is correct and the condition has been
+    // added.
+    $this->assertTrue($this->url == url('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name'], array('absolute' => TRUE)), t('After adding a new condition component the landing page is the edit components one'));
+    $this->assertText(t('Entity is of type'), t('Condition was added correctly'));
+  }
+
+  /**
+   * Test access to tax types listing.
+   */
+  public function testCommerceTaxUIAccessTaxTypes() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the tax rate types listing.
+    $this->drupalGet('admin/commerce/config/taxes/types');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax types listing'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate types listing.
+    $this->drupalGet('admin/commerce/config/taxes/types');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax types listing'));
+
+    // Load the tax rate types and check that all of them are in the page.
+    $tax_types = commerce_tax_types();
+    foreach ($tax_types as $tax_type) {
+      $this->assertText($tax_type['display_title'], t('Tax type !name is present in the tax types listing page', array('!name' => $tax_type['display_title'])));
+    }
+
+    // Look for the Add tax type link.
+    $this->assertText(t('Add a tax type'), t('%link link is present in the tax rates listing page', array('%link' => t('Add a tax type'))));
+  }
+
+  /**
+   * Test the creation of a tax type.
+   */
+  public function testCommerceTaxUICreateTaxType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the tax rate types create page.
+    $this->drupalGet('admin/commerce/config/taxes/types/add');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax type creation'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate types create page.
+    $this->drupalGet('admin/commerce/config/taxes/types/add');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax type creation'));
+
+    // Check the integrity of the creation form.
+    $this->pass(t('Test the integrity of the tax type add form:'));
+    $this->assertFieldByXPath('//input[@id="edit-tax-type-title" and contains(@class, "required")]', NULL, t('Tax type title field is present and is required'));
+    $this->assertFieldById('edit-tax-type-display-title', NULL, t('Tax type display title is present'));
+    $this->assertFieldById('edit-tax-type-description', NULL, t('Tax type description is present'));
+    $this->assertFieldById('edit-tax-type-display-inclusive', NULL, t('Tax type checkbox for configure inclusive taxes is present'));
+    $this->assertFieldById('edit-submit', t('Save tax type'), t('\'Save tax type\' button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
+
+    // Save the tax type.
+    $edit = array(
+      'tax_type[title]' => 'Additional tax type',
+    	'tax_type[name]' => 'additional_tax_rate',
+    	'tax_type[display_title]' => 'Additional tax rate',
+    	'tax_type[description]' => 'Additional tax rate for testing',
+    	'tax_type[display_inclusive]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save tax type'));
+
+    // Check the url after saving and if the tax type loads in the form.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes/types', array('absolute' => TRUE)), t('After saving a tax type we are in the list of tax types'));
+    $this->assertText($edit['tax_type[title]'], t('Title of the tax type is present in the tax rates listing'));
+    $this->assertText($edit['tax_type[name]'], t('Machine name of the tax type is present in the tax rates listing'));
+    $this->assertText($edit['tax_type[description]'], t('Description of the tax type is present in the tax rates listing'));
+
+    // Check in database if the tax rate has been created.
+    commerce_tax_types_reset();
+    $tax_type = commerce_tax_type_load($edit['tax_type[name]']);
+    $this->assertFalse(empty($tax_type), t('Tax type is stored in database'));
+
+    // Create a tax rate and check that the new tax type is there.
+    $this->drupalGet('admin/commerce/config/taxes/rates/add');
+    $tax_select_types = $this->xpath('//select[@id="edit-tax-rate-type"]//option');
+    $this->assertTrue(in_array($this->tax_type['display_title'], $tax_select_types), t('Tax type is available in the tax rate creation form'));
+  }
+
+  /**
+   * Test editing a tax type.
+   */
+  public function testCommerceTaxUIEditTaxType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the tax rate type edit page.
+    $this->drupalGet('admin/commerce/config/taxes/types/' . strtr($this->tax_type['name'], '_', '-') . '/edit');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax type edit page'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate type edit page.
+    $this->drupalGet('admin/commerce/config/taxes/types/' . strtr($this->tax_type['name'], '_', '-') . '/edit');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax type edit page'));
+
+    // Check if the data loaded in the edit form matches with the tax type.
+    $this->pass(t('Test if the type is correctly loaded in the edit form:'));
+    $this->assertFieldById('edit-tax-type-title', $this->tax_type['title'], t('Title field corresponds with tax type'));
+    $this->assertText($this->tax_type['name'], t('Machine name field corresponds with tax type'));
+    $this->assertFieldById('edit-tax-type-display-title', $this->tax_type['display_title'], t('Display title field corresponds with tax type'));
+    $this->assertFieldById('edit-submit', t('Save tax type'), t('\'Save tax rate\' button is present'));
+    $this->assertFieldById('edit-delete', t('Delete tax type'), t('Delete button is present'));
+    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
+
+    // Modify the tax type and save it.
+    $edit = array(
+      'tax_type[title]' => 'Additional tax type',
+    	'tax_type[display_title]' => 'Additional tax rate',
+    	'tax_type[description]' => 'Additional tax rate for testing',
+    	'tax_type[display_inclusive]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Save tax type'));
+
+    // Check the url after edit and if the values have been loaded.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes/types', array('absolute' => TRUE)), t('After saving a tax type we are in the list of tax types'));
+    $this->assertText($edit['tax_type[title]'], t('Title of the tax type is present in the tax types listing'));
+    $this->assertText($edit['tax_type[description]'], t('Description of the tax type is present in the tax types listing'));
+    $this->assertText(t('Tax type saved.'), t('\'Tax type saved\' message is displayed'));
+
+    // Check in database if the tax rate has been correctly modified.
+    commerce_tax_types_reset();
+    $tax_type = commerce_tax_type_load($this->tax_type['name']);
+    $this->assertTrue($tax_type['title'] == $edit['tax_type[title]'], t('Title of the tax type has been correctly modified in the database'));
+    $this->assertTrue($tax_type['display_title'] == $edit['tax_type[display_title]'], t('Display title of the tax type has been correctly modified in the database'));
+    $this->assertTrue($tax_type['description'] == $edit['tax_type[description]'], t('Description of the tax type has been correctly modified in the database'));
+    $this->assertTrue($tax_type['display_inclusive'] == $edit['tax_type[display_inclusive]'], t('Display inclusive option of the tax type has been correctly modified in the database'));
+  }
+
+  /**
+   * Test adding a condition to a tax type.
+   */
+  public function testCommerceTaxUIConfigureTaxType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the tax rate type configure rule page.
+    $this->drupalGet('admin/config/workflow/rules/reaction/manage/commerce_tax_type_' . $this->tax_type['name']);
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate type configure rule page.
+    $this->drupalGet('admin/config/workflow/rules/reaction/manage/commerce_tax_type_' . $this->tax_type['name']);
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the'));
+
+    // Add a condition
+    $this->assertLink(t('Add condition'), 0, t('Add condition link is present'));
+    $this->clickLink(t('Add condition'));
+
+    // Select a basic condition as at this step we're only testing if the
+    // saving process is working.
+    $this->drupalPost(NULL, array('element_name' => 'entity_is_of_type'), t('Continue'));
+
+    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
+
+    // Check that after saving the url is correct and the condition has been
+    // added.
+    $this->assertTrue($this->url == url('admin/config/workflow/rules/reaction/manage/commerce_tax_type_' . $this->tax_type['name'], array('absolute' => TRUE)), t('After adding a new condition component the landing page is the edit components one'));
+    $this->assertText(t('Entity is of type'), t('Condition was added correctly'));
+  }
+
+  /**
+   * Test deleting a tax type.
+   */
+  public function testCommerceTaxUIDeleteTaxType() {
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Access the tax rate type delete page.
+    $this->drupalGet('admin/commerce/config/taxes/types/' . strtr($this->tax_type['name'], '_', '-') . '/delete');
+
+    // It should return a 403.
+    $this->assertResponse(403, t('Normal user is not able to access the tax type delete page'));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate type delete page.
+    $this->drupalGet('admin/commerce/config/taxes/types/' . strtr($this->tax_type['name'], '_', '-') . '/delete');
+
+    // It should return a 200.
+    $this->assertResponse(200, t('Store admin user can access the tax type delete page'));
+
+    // Check the integrity of the tax type delete confirmation form.
+    $this->pass('Test the tax type delete confirmation form:');
+    $this->assertTitle(t('Are you sure you want to delete the !title tax type?', array('!title' => $this->tax_type['title'])) . ' | Drupal', t('The confirmation message for deleting a tax type is displayed'));
+    $this->assertText(t('This action cannot be undone'), t('A warning notifying the user about the action can\'t be undone is displayed.'));
+    $this->assertFieldById('edit-submit', t('Delete'), t('Delete button is present'));
+    $this->assertText(t('Cancel'), t('Cancel is present'));
+
+    // Delete the tax type.
+    $this->drupalPost(NULL, array(), t('Delete'));
+
+   // Check the url after deleting and if the tax type has been deleted in
+    // database.
+    $this->assertTrue($this->url == url('admin/commerce/config/taxes/types', array('absolute' => TRUE)), t('Landing page after deleting a tax type is the tax types listing page'));
+    $this->assertRaw(t('The tax type %title has been deleted.', array('%title' => $this->tax_type['title'])), t('\'Tax type has been deleted\' message is displayed'));
+
+    commerce_tax_types_reset();
+    $tax_type = commerce_tax_rate_load($this->tax_type['name']);
+    $this->assertTrue(empty($tax_type), t('Tax type is correctly deleted from database'));
+  }
+
+  /**
+   * Text the deletion of a tax type that already has rates.
+   */
+  public function testCommerceTaxUIDeleteTaxTypeWithRates() {
+    // Create a tax rate associated with the type.
+    $tax_rate = $this->createDummyTaxRate();
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the tax rate type delete page.
+    $this->drupalGet('admin/commerce/config/taxes/types/' . strtr($this->tax_type['name'], '_', '-') . '/delete');
+
+    // Check that the tax can't be deleted as it has a rate associated to it.
+    $this->assertTitle(t('Cannot delete the !title tax type', array('!title' => $this->tax_type['title'])) . ' | Drupal', t('Page title for tax type deletion with rates associated to it is correct'));
+    $this->assertText(t('There is a tax rate of this type. It cannot be deleted.'), t('A message that prevents user from deleting a tax type with rates associated to it is displayed'));
+  }
+
+  /**
+   * Check if a 'Salex tax' rate is correctly applied in a given order.
+   */
+  public function testCommerceTaxUIApplySalesTax() {
+    // Create a tax rate of Salex Type.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'sales_tax'));
+
+    // Create a dummy order in cart status.
+    $order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Get the checkout url and navigate to it.
+    $links = commerce_line_item_summary_links();
+    $this->checkout_url = $links['checkout']['href'];
+    $this->drupalGet($this->checkout_url);
+
+    // Check in database if the tax is applied.
+    $order = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order_wrapper = entity_metadata_wrapper('commerce_order', reset($order));
+    $order_data = $order_wrapper->commerce_order_total->value();
+    $tax_component = reset(commerce_price_component_load($order_data, $tax_rate['price_component']));
+    $this->assertFalse(empty($tax_component), t('Tax is applied in the order'));
+
+    // Tax should be applied in Checkout Review with the correct quantity.
+    $this->assertText($tax_rate['display_title'], t('Tax appears in the order summary'));
+    $this->assertText(trim(commerce_currency_format($order_data['amount'], $order_data['currency_code'])), t('Tax amount applied appears in the order summary'));
+  }
+
+  /**
+   * Check if a 'VAT' tax type is correctly applied in a given product.
+   */
+  public function testCommerceTaxUIApplyVAT() {
+    // Create a tax rate VAT Type.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'vat'));
+
+    // Create a new product and product display.
+    $this->createDummyProductDisplayContentType();
+    $product = $this->createDummyProduct();
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $product_node = $this->createDummyProductNode(array($product->product_id));
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Go to the product display and check if the tax is applied.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Check the tax applied in database and product display.
+    $product = reset(commerce_product_load_multiple(array($product->product_id), array(), TRUE));
+    $price_component = commerce_product_calculate_sell_price($product);
+    $this->assertText(trim(commerce_currency_format($price_component['amount'], $price_component['currency_code'])), t('Amount with taxes corresponds with the amount displayed in the product display page'));
+    $tax_component = reset(commerce_price_component_load($price_component, $tax_rate['price_component']));
+    $this->assertFalse(empty($tax_component), t('Tax component is set in the product.'));
+  }
+
+  /**
+   * Check if a 'VAT' tax type is correctly applied in a given product.
+   */
+  public function testCommerceTaxUIApplyVATInclusive() {
+    // Create a tax rate VAT Type.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'vat'));
+
+    // Create a new product and product display.
+    $this->createDummyProductDisplayContentType();
+    $product = $this->createDummyProduct();
+    $product_node = $this->createDummyProductNode(array($product->product_id));
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Edit the product to be VAT tax inclusive.
+    $this->drupalGet('admin/commerce/products/' . $product->product_id . '/edit');
+    $this->drupalPost(NULL, array('commerce_price[und][0][include_tax]' => $tax_rate['name']), t('Save product'));
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Go to the product display and check if the tax is applied.
+    $this->drupalGet('node/' . $product_node->nid);
+
+    // Check the tax applied in database and in the product display.
+    $product = reset(commerce_product_load_multiple(array($product->product_id), array(), TRUE));
+    $price_component = commerce_product_calculate_sell_price($product);
+    $this->assertText(trim(commerce_currency_format($price_component['amount'], $price_component['currency_code'])), t('Amount with taxes included corresponds with the amount displayed in the product display page'));
+    $tax_component = reset(commerce_price_component_load($price_component, $tax_rate['price_component']));
+    $this->assertFalse(empty($tax_component), t('Tax component is set in the product.'));
+    $this->assertTrue($tax_component['included'], t('Tax component is configured to be included in the price'));
+  }
+
+  /**
+   * A tax rate with no matching condition doesn't get applied.
+   */
+  public function testCommerceTaxUITaxNoMatchingCondition() {
+    // Create a tax rate of Salex Type.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'sales_tax'));
+
+    // Create a dummy order in cart status.
+    $order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Modify the tax rate to no match condition.
+    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+    $this->clickLink(t('Add condition'));
+    $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
+    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'line-item:commerce-total:amount'), t('Continue'));
+    $this->drupalPost(NULL, array('parameter[op][settings][op]' => '<', 'parameter[value][settings][value]' => '0'), t('Save'));
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Get the checkout url and navigate to it.
+    $links = commerce_line_item_summary_links();
+    $this->checkout_url = $links['checkout']['href'];
+    $this->drupalGet($this->checkout_url);
+
+    // As the condition is impossible to match, tax rate shouldn't be applied.
+    $this->assertNoText($tax_rate['display_title'], t('Tax rate doesn\'t match the conditions and is not present in the cart review pane.'));
+    // Also check it at database level.
+    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+    $this->assertTrue(empty($tax_component), t('Tax component is not set in the order.'));
+  }
+
+  /**
+   * Check the taxes applied in the order that a normal user can view.
+   */
+  public function testCommerceTaxUIUserOrderView() {
+    // Create a tax rate.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'sales_tax'));
+
+    // Create new order and products associated to it.
+    $order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Go through the complete order process.
+    $this->commerceTaxHelperCompleteCheckout();
+
+    // Access the View orders page and view the order just created.
+    $this->drupalGet('user/' . $this->normal_user->uid . '/orders/' . $order->order_id);
+
+    // Reload the order directly from db.
+    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+
+    // Check the taxes applied.
+    $this->assertText($tax_rate['display_title'], t('Tax display title is displayed in the user view of an order.'));
+    $this->assertText(trim(commerce_currency_format($tax_component['price']['amount'], $tax_component['price']['currency_code'])), t('Tax amount is displayed in the user view of an order.'));
+  }
+
+  /**
+   * Check the taxes applied in the order admin view.
+   */
+  public function testCommerceTaxUIAdminOrder() {
+    // Create a tax rate.
+    $tax_rate = $this->createDummyTaxRate(array('type' => 'sales_tax'));
+
+    // Create new order and products associated to it.
+    $order = $this->createDummyOrder($this->normal_user->uid);
+
+    // Login with normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Go through the complete order process.
+    $this->commerceTaxHelperCompleteCheckout();
+
+    // Login with store admin user.
+    $this->drupalLogin($this->store_admin);
+
+    // Access the admin order edit page.
+    $this->drupalGet('admin/commerce/orders/' . $order->order_id);
+
+    // Reload the order directly from db.
+    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+
+    // Check the taxes applied.
+    $this->assertText($tax_rate['display_title'], t('Tax display title is displayed in the admin view of an order.'));
+    $this->assertText(trim(commerce_currency_format($tax_component['price']['amount'], $tax_component['price']['currency_code'])), t('Tax amount is displayed in the admin view of an order.'));
+  }
+
+}
