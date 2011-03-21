@@ -40,11 +40,21 @@ class commerce_payment_handler_field_amount extends views_handler_field {
     );
   }
 
+  /**
+   * Convert the amount integer to a price decimal amount.
+   *
+   * No point in using $this->get_value() because we are also setting the
+   * value as well, and there's no set_value().
+   */
+  function pre_render(&$values) {
+    foreach ($values as $key => &$value) {
+      $value->{$this->field_alias} = commerce_currency_integer_to_amount($value->{$this->field_alias}, $value->{$this->aliases['currency_code']});
+    }
+  }
+
   function render($values) {
     $value = $this->get_value($values);
     $currency_code = $this->get_value($values, 'currency_code');
-    // Convert the amount integer to a price decimal amount.
-    $value = commerce_currency_integer_to_amount($value, $currency_code);
 
     switch ($this->options['display_format']) {
       case 'formatted':
