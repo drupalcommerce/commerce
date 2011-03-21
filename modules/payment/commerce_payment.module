@@ -272,7 +272,7 @@ function commerce_payment_commerce_payment_totals_row_info($totals, $order) {
  */
 function commerce_payment_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_payment') . '/includes/views',
   );
 }

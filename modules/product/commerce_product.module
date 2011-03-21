@@ -142,7 +142,7 @@ function commerce_product_field_extra_fields() {
  */
 function commerce_product_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_product') . '/includes/views',
   );
 }

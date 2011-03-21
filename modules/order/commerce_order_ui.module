@@ -251,7 +251,7 @@ function commerce_order_ui_order_delete_form_submit($form, &$form_state) {
  */
 function commerce_order_ui_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_order_ui') . '/includes/views',
   );
 }
