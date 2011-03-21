@@ -49,14 +49,6 @@ class commerce_customer_handler_field_customer_profile extends views_handler_fie
       $profile_id = $this->get_value($values, 'profile_id');
       $this->options['alter']['make_link'] = TRUE;
       $this->options['alter']['path'] = 'admin/commerce/customer-profiles/' . $profile_id;
-
-      if (isset($this->aliases['language'])) {
-        $languages = language_list();
-        $language = $this->get_value($values, 'language');
-        if (isset($languages[$language])) {
-          $this->options['alter']['language'] = $languages[$language];
-        }
-      }
     }
 
     return $data;
