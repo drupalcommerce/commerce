@@ -11,8 +11,10 @@ class commerce_payment_handler_field_message extends views_handler_field {
   }
 
   function render($values) {
-    $variables = unserialize($values->{$this->aliases['message_variables']});
+    $variables = $this->get_value($values, 'message_variables');
+    $variables = unserialize($variables);
+    $value = $this->get_value($values);
 
-    return t($values->{$this->field_alias}, is_array($variables) ? $variables : array());
+    return t($value, is_array($variables) ? $variables : array());
   }
 }

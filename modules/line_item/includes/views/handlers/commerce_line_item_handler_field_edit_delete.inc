@@ -13,7 +13,7 @@
 class commerce_line_item_handler_field_edit_delete extends commerce_line_item_handler_field_edit {
 
   function render($values) {
-    $line_item_id = $values->{$this->aliases['line_item_id']};
+    $line_item_id = $this->get_value($values, 'line_item_id');
 
     // Add form that will be used for replacing the placeholder generated bellow
     // at form rendering phase in commerce_line_item_views_post_render().

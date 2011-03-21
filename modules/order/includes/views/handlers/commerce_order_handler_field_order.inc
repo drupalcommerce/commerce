@@ -52,14 +52,17 @@ class commerce_order_handler_field_order extends views_handler_field {
    * Data should be made XSS safe prior to calling this function.
    */
   function render_link($data, $values) {
+    $uid = $this->get_value($values, 'uid');
+    $order_id = $this->get_value($values, 'order_id');
+
     if (!empty($this->options['link_to_order']) && $data !== NULL && $data !== '') {
-      if ($this->options['link_to_order'] == 'customer' && $values->{$this->aliases['uid']}) {
+      if ($this->options['link_to_order'] == 'customer' && $uid) {
         $this->options['alter']['make_link'] = TRUE;
-        $this->options['alter']['path'] = 'user/' . $values->{$this->aliases['uid']} . '/orders/' . $values->{$this->aliases['order_id']};
+        $this->options['alter']['path'] = 'user/' . $uid . '/orders/' . $order_id;
       }
       elseif ($this->options['link_to_order'] == 'admin') {
         $this->options['alter']['make_link'] = TRUE;
-        $this->options['alter']['path'] = 'admin/commerce/orders/' . $values->{$this->aliases['order_id']};
+        $this->options['alter']['path'] = 'admin/commerce/orders/' . $order_id;
       }
     }
 
@@ -67,6 +70,7 @@ class commerce_order_handler_field_order extends views_handler_field {
   }
 
   function render($values) {
-    return $this->render_link(check_plain($values->{$this->field_alias}), $values);
+    $value = $this->get_value($values);
+    return $this->render_link($this->sanitize_value($value), $values);
   }
 }

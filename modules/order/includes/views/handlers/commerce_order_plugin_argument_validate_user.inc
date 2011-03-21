@@ -29,7 +29,6 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
       '#options' => user_roles(TRUE),
       '#default_value' => $this->options['roles'],
       '#multiple' => TRUE,
-      '#process' => array('form_process_checkboxes', 'ctools_dependent_process'),
       '#dependency' => array(
         'edit-options-argument-validate-current-user-or-role-restrict-roles' => array(1),
       ),

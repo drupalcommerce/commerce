@@ -5,11 +5,12 @@
  */
 class commerce_order_handler_field_order_status extends commerce_order_handler_field_order {
   function render($values) {
-    $value = commerce_order_status_get_title($values->{$this->field_alias});
+    $name = $this->get_value($values);
+    $value = commerce_order_status_get_title($name);
 
     // Only attempt to render a valid order status.
     if (!is_array($value)) {
-      return $this->render_link((check_plain($value)), $values);
+      return $this->render_link($this->sanitize_value($value), $values);
     }
   }
 }

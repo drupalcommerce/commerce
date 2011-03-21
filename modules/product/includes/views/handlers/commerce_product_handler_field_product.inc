@@ -50,14 +50,16 @@ class commerce_product_handler_field_product extends views_handler_field {
    */
   function render_link($data, $values) {
     if (!empty($this->options['link_to_product']) && $data !== NULL && $data !== '') {
+      $product_id = $this->get_value($values, 'product_id');
+      $language = $this->get_value($values, 'language');
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/commerce/products/' . $values->{$this->aliases['product_id']};
+      $this->options['alter']['path'] = 'admin/commerce/products/' . $product_id;
 
-      if (isset($this->aliases['language'])) {
+      if ($language) {
         $languages = language_list();
 
-        if (isset($languages[$values->{$this->aliases['language']}])) {
-          $this->options['alter']['language'] = $languages[$values->{$this->aliases['language']}];
+        if (isset($languages[$language])) {
+          $this->options['alter']['language'] = $languages[$language];
         }
       }
     }
@@ -66,6 +68,7 @@ class commerce_product_handler_field_product extends views_handler_field {
   }
 
   function render($values) {
-    return $this->render_link(check_plain($values->{$this->field_alias}), $values);
+    $value = $this->get_value($values);
+    return $this->render_link($this->sanitize_value($value), $values);
   }
 }

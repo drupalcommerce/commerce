@@ -53,8 +53,9 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
   }
 
   function render($values) {
-    if (!empty($values->{$this->aliases['product_id']})) {
-      $product_ids = array($values->{$this->aliases['product_id']});
+    $product_id = $this->get_value($values, 'product_id');
+    if ($product_id) {
+      $product_ids = array($product_id);
       $default_quantity = $this->options['default_quantity'] <= 0 ? 1 : $this->options['default_quantity'];
 
       // Generate a form ID for this add to cart form.

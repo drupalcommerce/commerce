@@ -17,8 +17,8 @@ class commerce_payment_handler_field_payment_transaction_operations extends view
   }
 
   function render($values) {
-    $transaction_id = $values->{$this->aliases['transaction_id']};
-    $order_id = $values->{$this->aliases['order_id']};
+    $transaction_id = $this->get_value($values, 'transaction_id');
+    $order_id = $this->get_value($values, 'order_id');
 
     $links = menu_contextual_links('commerce-payment-transaction', 'admin/commerce/orders/' . $order_id . '/payment', array($transaction_id));
 

@@ -16,8 +16,7 @@ class commerce_order_handler_field_order_operations extends views_handler_field 
   }
 
   function render($values) {
-    $order_id = $values->{$this->aliases['order_id']};
-
+    $order_id = $this->get_value($values, 'order_id');
     $links = menu_contextual_links('commerce-order', 'admin/commerce/orders', array($order_id));
 
     if (!empty($links)) {

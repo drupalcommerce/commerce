@@ -35,7 +35,7 @@ class commerce_order_handler_field_order_link extends views_handler_field {
 
   function render($values) {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
-    $order_id = $values->{$this->aliases['order_id']};
+    $order_id = $this->get_value($values, 'order_id');
 
     return l($text, 'admin/commerce/orders/' . $order_id, array('query' => drupal_get_destination()));
   }

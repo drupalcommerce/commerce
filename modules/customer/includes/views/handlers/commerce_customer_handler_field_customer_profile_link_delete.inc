@@ -14,9 +14,9 @@ class commerce_customer_handler_field_customer_profile_link_delete extends comme
   function render($values) {
     // Ensure the user has access to delete this profile.
     $profile = commerce_customer_profile_new();
-    $profile->profile_id = $values->{$this->aliases['profile_id']};
-    $profile->type = $values->{$this->aliases['type']};
-    $profile->uid = $values->{$this->aliases['uid']};
+    $profile->profile_id = $this->get_value($values, 'profile_id');
+    $profile->type = $this->get_value($values, 'type');
+    $profile->uid = $this->get_value($values, 'uid');
 
     if (!commerce_customer_profile_access('update', $profile)) {
       return;

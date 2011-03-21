@@ -36,8 +36,8 @@ class commerce_payment_handler_field_payment_transaction_link extends views_hand
 
   function render($values) {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
-    $transaction_id = $values->{$this->aliases['transaction_id']};
-    $order_id = $values->{$this->aliases['order_id']};
+    $transaction_id = $this->get_value($values, 'transaction_id');
+    $order_id = $this->get_value($values, 'order_id');
 
     return l($text, 'admin/commerce/orders/' . $order_id . '/payment');
   }
