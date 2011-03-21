@@ -7,7 +7,7 @@
 /**
  * Implements hook_views_data()
  */
-function commerce_cart_views_data() {
+function commerce_cart_views_data_alter() {
   $data = array();
 
   $data['commerce_product']['add_to_cart_form'] = array(
