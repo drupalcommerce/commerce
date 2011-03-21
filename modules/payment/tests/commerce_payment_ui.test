@@ -20,7 +20,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Payment user interface',
-      'description' => 'Test the payment user and administrator interfaces.',
+      'description' => 'Test the payment user and administrator interface.',
       'group' => 'Drupal Commerce',
     );
   }
@@ -283,3 +283,72 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
   }
 
 }
+
+/**
+ * Test payment user interface.
+ */
+class CommercePaymentOffsiteTest extends CommerceBaseTestCase {
+  /**
+   * Order object.
+   */
+  protected $order;
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Payment Offsite',
+      'description' => 'Test the payment offsite process.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    $modules[] = 'commerce_payment_dummy_offsite';
+    parent::setUp($modules);
+
+    // User creation for different operations.
+    $this->store_admin = $this->createStoreAdmin();
+    $this->store_customer = $this->createStoreCustomer();
+  }
+
+  /**
+   * Test an Offsite payment method.
+   */
+  public function testCommercePaymentOffsitePayment() {
+    // Create a new customer profile.
+    $profile = $this->createDummyCustomerProfile('billing', $this->store_customer->uid);
+    $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
+    // Create an order for store customer.
+    $order = $this->createDummyOrder($this->store_customer->uid, array(), 'cart', $profile->profile_id);
+
+    // Login with store admin.
+    $this->drupalLogin($this->store_admin);
+
+    // Access to the payment methods administration page.
+    $this->drupalGet('admin/commerce/config/payment-methods');
+
+    // Check if the payment method exists and it's listed.
+    $this->assertText(t('Dummy Payment Method Offsite'), t('Offsite example payment method is listed in the payment methods administration page'));
+
+    // Login with store customer and access to checkout.
+    $this->drupalLogin($this->store_customer);
+    $this->drupalGet($this->getCommerceUrl('checkout'));
+
+    // Process the order and check if the offsite payment is working.
+    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->assertText(t('Dummy Payment Method Offsite'), t('Offsite example payment method is listed in the checkout process form'));
+    $this->drupalPostAJAX(NULL, array('commerce_payment[payment_method]' => 'commerce_payment_dummy_offsite|commerce_payment_commerce_payment_dummy_offsite'), 'commerce_payment[payment_method]');
+    $this->drupalPost(NULL, array(), t('Continue'));
+
+    $this->assertFieldById('edit-submit', t('Redirect to Offsite platform'), t('Redirection button to offsite payment platform is present'));
+    // We can't really test further than this.
+  }
+
+}
+

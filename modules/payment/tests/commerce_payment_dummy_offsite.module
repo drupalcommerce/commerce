@@ -1,0 +1,38 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Helper module for the customer payment tests.
+ */
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_payment_dummy_offsite_commerce_payment_method_info() {
+  $payment_methods = array();
+
+  $payment_methods['commerce_payment_dummy_offsite'] = array(
+    'title' => t('Dummy Payment Method Offsite'),
+    'short_title' => t('Dummy'),
+    'description' => t('Dummy Payment Method with offsite enabled'),
+    'terminal' => FALSE,
+    'offsite' => TRUE,
+  	'active' => TRUE,
+  );
+
+  return $payment_methods;
+}
+
+/**
+ * Payment method callback: redirect form.
+ */
+function commerce_payment_dummy_offsite_redirect_form($form, &$form_state, $order, $payment_method) {
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Redirect to Offsite platform'),
+  );
+
+  return $form;
+}
