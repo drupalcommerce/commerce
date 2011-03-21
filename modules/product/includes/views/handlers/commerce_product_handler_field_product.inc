@@ -55,11 +55,14 @@ class commerce_product_handler_field_product extends views_handler_field {
       $this->options['alter']['make_link'] = TRUE;
       $this->options['alter']['path'] = 'admin/commerce/products/' . $product_id;
 
-      if ($language) {
-        $languages = language_list();
+      if (module_exists('translation')) {
+        $language = $this->get_value($values, 'language');
+        if ($language) {
+          $languages = language_list();
 
-        if (isset($languages[$language])) {
-          $this->options['alter']['language'] = $languages[$language];
+          if (isset($languages[$language])) {
+            $this->options['alter']['language'] = $languages[$language];
+          }
         }
       }
     }
