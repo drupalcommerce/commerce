@@ -98,6 +98,18 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Paisa'),
       'major_unit' => t('Taka'),
     ),
+   'BGN' => array(
+     'code' => 'BGN',
+     'symbol' => 'лв',
+     'name' => t('Bulgarian lev'),
+     'thousands_separator' => ' ',
+     'decimal_separator' => ',',
+     'symbol_placement' => 'after',
+     'code_placement' => '',
+     'numeric_code' => '975',
+     'minor_unit' => t('Stotinka'),
+     'major_unit' => t('Lev'),
+    ),
     'BHD' => array(
       'code' => 'BHD',
       'symbol' => 'BD',
