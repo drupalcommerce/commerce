@@ -8,19 +8,10 @@
  * argument's title to the username.
  */
 class commerce_order_plugin_argument_validate_user extends views_plugin_argument_validate_user {
-  function option_definition() {
-    $options = parent::option_definition();
-    return $options;
-  }
-
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
-    $form['restrict_roles'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('If the current user does not match the argument, validate the argument for users with specific roles.'),
-      '#default_value' => $this->options['restrict_roles'],
-    );
+    $form['restrict_roles']['#title'] = t('If the current user does not match the argument, validate the argument for users with specific roles.');
 
     $form['roles'] = array(
       '#type' => 'checkboxes',
@@ -28,12 +19,10 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
       '#description' => t('If no roles are selected, additional access will not be granted.'),
       '#options' => user_roles(TRUE),
       '#default_value' => $this->options['roles'],
-      '#multiple' => TRUE,
-      '#process' => array('form_process_checkboxes', 'ctools_dependent_process'),
       '#dependency' => array(
-        'edit-options-argument-validate-current-user-or-role-restrict-roles' => array(1),
+        'edit-options-validate-options-current-user-or-role-restrict-roles' => array(1),
       ),
-      '#prefix' => '<div id="edit-options-argument-validate-current-user-or-role-roles-wrapper">',
+      '#prefix' => '<div id="edit-options-validate-options-current-user-or-role-roles-wrapper">',
       '#suffix' => '</div>',
     );
   }

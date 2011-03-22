@@ -13,8 +13,8 @@ class commerce_order_handler_field_order_link_delete extends commerce_order_hand
   function render($values) {
     // Ensure the user has access to delete this order.
     $order = commerce_order_new();
-    $order->order_id = $values->{$this->aliases['order_id']};
-    $order->uid = $values->{$this->aliases['uid']};
+    $order->order_id = $this->get_value($values, 'order_id');
+    $order->uid = $this->get_value($values, 'uid');
 
     if (!commerce_order_access('update', $order)) {
       return;

@@ -167,7 +167,7 @@ function template_preprocess_commerce_line_item_summary(&$variables) {
  */
 function commerce_line_item_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_line_item') . '/includes/views',
   );
 }

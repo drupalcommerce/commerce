@@ -349,7 +349,7 @@ function commerce_customer_ui_customer_profile_delete_form_submit($form, &$form_
  */
 function commerce_customer_ui_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_customer_ui') . '/includes/views',
   );
 }

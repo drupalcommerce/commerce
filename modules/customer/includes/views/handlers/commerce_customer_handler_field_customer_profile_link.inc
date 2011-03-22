@@ -35,7 +35,7 @@ class commerce_customer_handler_field_customer_profile_link extends views_handle
 
   function render($values) {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
-    $profile_id = $values->{$this->aliases['profile_id']};
+    $profile_id = $this->get_value($values, 'profile_id');
 
     return l($text, 'admin/commerce/customer-profiles/' . $profile_id);
   }

@@ -272,7 +272,7 @@ function commerce_cart_commerce_order_delete($order) {
  */
 function commerce_cart_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_cart') . '/includes/views',
   );
 }

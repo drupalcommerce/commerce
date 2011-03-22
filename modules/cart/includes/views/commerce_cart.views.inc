@@ -7,9 +7,7 @@
 /**
  * Implements hook_views_data()
  */
-function commerce_cart_views_data() {
-  $data = array();
-
+function commerce_cart_views_data_alter(&$data) {
   $data['commerce_product']['add_to_cart_form'] = array(
     'field' => array(
       'title' => t('Add to Cart form'),
@@ -17,6 +15,4 @@ function commerce_cart_views_data() {
       'handler' => 'commerce_cart_handler_field_add_to_cart_form',
     ),
   );
-
-  return $data;
 }

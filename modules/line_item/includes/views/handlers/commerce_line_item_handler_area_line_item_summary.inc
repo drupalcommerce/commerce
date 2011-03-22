@@ -60,24 +60,39 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
     );
   }
 
+  /**
+   * Get a value used for rendering.
+   *
+   * @param $values
+   *   An object containing all retrieved values.
+   * @param $field
+   *   Optional name of the field where the value is stored.
+   */
+  function get_value($values, $field = NULL) {
+    // Find the alias for the line_item_id field.
+    $field_alias = '';
+
+    foreach ($this->view->query->fields as $key => $value) {
+      if ($value['field'] == 'line_item_id') {
+        $field_alias = $value['alias'];
+      }
+    }
+
+    if (isset($values->{$field_alias})) {
+      return $values->{$field_alias};
+    }
+  }
+
   function render($empty = FALSE) {
     if (!$empty) {
       // Build an array of line item IDs from the View results that we will load
       // and use for calculating totals.
       $line_item_ids = array();
 
-      // Find the alias for the line_item_id field.
-      $field_alias = '';
-
-      foreach ($this->view->query->fields as $key => $value) {
-        if ($value['field'] == 'line_item_id') {
-          $field_alias = $value['alias'];
-        }
-      }
-
       foreach ($this->view->result as $result) {
-        if (!empty($result->{$field_alias})) {
-          $line_item_ids[] = $result->{$field_alias};
+        $line_item_id = $this->get_value($result);
+        if ($line_item_id) {
+          $line_item_ids[] = $line_item_id;
         }
       }
 

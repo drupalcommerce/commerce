@@ -91,7 +91,7 @@ function commerce_customer_modules_enabled($modules) {
  */
 function commerce_customer_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_customer') . '/includes/views',
   );
 }

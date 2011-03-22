@@ -14,10 +14,6 @@ class commerce_product_handler_field_product extends views_handler_field {
 
     if (!empty($this->options['link_to_product'])) {
       $this->additional_fields['product_id'] = 'product_id';
-
-      if (module_exists('translation')) {
-        $this->additional_fields['language'] = array('table' => 'commerce_product', 'field' => 'language');
-      }
     }
   }
 
@@ -50,22 +46,16 @@ class commerce_product_handler_field_product extends views_handler_field {
    */
   function render_link($data, $values) {
     if (!empty($this->options['link_to_product']) && $data !== NULL && $data !== '') {
+      $product_id = $this->get_value($values, 'product_id');
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = 'admin/commerce/products/' . $values->{$this->aliases['product_id']};
-
-      if (isset($this->aliases['language'])) {
-        $languages = language_list();
-
-        if (isset($languages[$values->{$this->aliases['language']}])) {
-          $this->options['alter']['language'] = $languages[$values->{$this->aliases['language']}];
-        }
-      }
+      $this->options['alter']['path'] = 'admin/commerce/products/' . $product_id;
     }
 
     return $data;
   }
 
   function render($values) {
-    return $this->render_link(check_plain($values->{$this->field_alias}), $values);
+    $value = $this->get_value($values);
+    return $this->render_link($this->sanitize_value($value), $values);
   }
 }

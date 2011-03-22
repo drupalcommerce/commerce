@@ -37,8 +37,9 @@ class commerce_payment_handler_field_currency_code extends views_handler_field {
   }
 
   function render($values) {
-    $currency = commerce_currency_load($values->{$this->field_alias});
+    $currency_code = $this->get_value($values);
+    $currency = commerce_currency_load($currency_code);
 
-    return check_plain($currency[$this->options['display_format']]);
+    return $this->sanitize_value($currency[$this->options['display_format']]);
   }
 }

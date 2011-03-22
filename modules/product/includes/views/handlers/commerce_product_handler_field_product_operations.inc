@@ -16,7 +16,7 @@ class commerce_product_handler_field_product_operations extends views_handler_fi
   }
 
   function render($values) {
-    $product_id = $values->{$this->aliases['product_id']};
+    $product_id = $this->get_value($values, 'product_id');
 
     $links = menu_contextual_links('commerce-product', 'admin/commerce/products', array($product_id));
 

@@ -5,8 +5,9 @@
  */
 class commerce_order_handler_field_order_type extends commerce_order_handler_field_order {
   function render($values) {
-    if (!empty($values->{$this->field_alias})) {
-      return commerce_order_type_get_name($values->{$this->field_alias});
+    $type = $this->get_value($values);
+    if ($type) {
+      return commerce_order_type_get_name($type);
     }
   }
 }

@@ -132,7 +132,7 @@ function commerce_payment_ui_help($path, $arg) {
  */
 function commerce_payment_ui_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_payment_ui') . '/includes/views',
   );
 }

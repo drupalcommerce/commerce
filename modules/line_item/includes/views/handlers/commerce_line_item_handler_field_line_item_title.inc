@@ -17,7 +17,8 @@ class commerce_line_item_handler_field_line_item_title extends views_handler_fie
 
   function render($values) {
     // Load the line item and return its title.
-    $line_item = commerce_line_item_load($values->{$this->aliases['line_item_id']});
+    $line_item_id = $this->get_value($values, 'line_item_id');
+    $line_item = commerce_line_item_load($line_item_id);
     return commerce_line_item_title($line_item);
   }
 }

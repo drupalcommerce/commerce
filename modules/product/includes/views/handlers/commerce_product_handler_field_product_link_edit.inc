@@ -14,9 +14,9 @@ class commerce_product_handler_field_product_link_edit extends commerce_product_
   function render($values) {
     // Ensure the user has access to edit this product.
     $product = commerce_product_new();
-    $product->product_id = $values->{$this->aliases['product_id']};
-    $product->type = $values->{$this->aliases['type']};
-    $product->uid = $values->{$this->aliases['uid']};
+    $product->product_id = $this->get_value($values, 'product_id');
+    $product->type = $this->get_value($values, 'type');
+    $product->uid = $this->get_value($values, 'uid');
 
     if (!commerce_product_access('update', $product)) {
       return;

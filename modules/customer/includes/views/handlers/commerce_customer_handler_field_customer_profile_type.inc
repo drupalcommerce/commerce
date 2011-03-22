@@ -5,8 +5,9 @@
  */
 class commerce_customer_handler_field_customer_profile_type extends commerce_customer_handler_field_customer_profile {
   function render($values) {
-    $value = commerce_customer_profile_type_get_name($values->{$this->field_alias});
+    $type = $this->get_value($values);
+    $value = commerce_customer_profile_type_get_name($type);
 
-    return $this->render_link((check_plain($value)), $values);
+    return $this->render_link($this->sanitize_value($value), $values);
   }
 }

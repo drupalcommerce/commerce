@@ -35,7 +35,7 @@ class commerce_product_handler_field_product_link extends views_handler_field {
 
   function render($values) {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
-    $product_id = $values->{$this->aliases['product_id']};
+    $product_id = $this->get_value($values, 'product_id');
 
     return l($text, 'admin/commerce/products/' . $product_id);
   }

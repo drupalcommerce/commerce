@@ -91,7 +91,7 @@ function commerce_line_item_ui_form_alter(&$form, &$form_state, $form_id) {
  *
 function commerce_line_item_ui_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'commerce_line_item_ui') . '/includes/views',
   );
 }*/
