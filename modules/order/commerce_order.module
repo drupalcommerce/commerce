@@ -835,11 +835,17 @@ function commerce_order_status_options_list() {
  * @param $skip_save
  *   TRUE to skip saving the order after updating the status; used when the
  *     order would be saved elsewhere after the update.
+ * @param $revision
+ *   TRUE or FALSE indicating whether or not a new revision should be created
+ *     for the order if it is saved as part of the status update. Defaults to TRUE.
+ * @param $log
+ *   If a new revision is created for the update, the log message that will be
+ *     used for the revision.
  *
  * @return
  *   The updated order.
  */
-function commerce_order_status_update($order, $name, $skip_save = FALSE) {
+function commerce_order_status_update($order, $name, $skip_save = FALSE, $revision = TRUE, $log = '') {
   // Do not update the status if the order is already at it.
   if ($order->status != $name) {
     $order->status = $name;
@@ -847,6 +853,13 @@ function commerce_order_status_update($order, $name, $skip_save = FALSE) {
     // TODO: Alert modules via a hook / Rules that the order was updated.
 
     if (!$skip_save) {
+      // If the status update should create a new revision, update the order
+      // object to reflect this and include a log message.
+      if ($revision) {
+        $order->revision = TRUE;
+        $order->log = $log;
+      }
+
       $order = commerce_order_save($order);
     }
   }
