@@ -828,6 +828,12 @@ function commerce_order_status_options_list() {
 /**
  * Updates the status of an order to the specified status.
  *
+ * While there is no explicit Rules event or hook devoted to an order status
+ * being updated, you can use the commerce_order_updated event / hook to check
+ * for a changed order status by comparing $order->original->status to the
+ * $order->status. If they are different, this will alert you that the order
+ * status for the given order was just changed.
+ *
  * @param $order
  *   The fully loaded order object to update.
  * @param $name
@@ -849,8 +855,6 @@ function commerce_order_status_update($order, $name, $skip_save = FALSE, $revisi
   // Do not update the status if the order is already at it.
   if ($order->status != $name) {
     $order->status = $name;
-
-    // TODO: Alert modules via a hook / Rules that the order was updated.
 
     if (!$skip_save) {
       // If the status update should create a new revision, update the order
