@@ -16,7 +16,8 @@ function commerce_payment_ui_views_default_views() {
   $view->description = 'Display and total an order\'s payment transaction history.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_payment_transaction';
-  $view->is_cacheable = FALSE;
+  $view->human_name = '';
+  $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
@@ -37,36 +38,43 @@ function commerce_payment_ui_views_default_views() {
     'remote_id' => 'remote_id',
     'message' => 'message',
     'amount' => 'amount',
+    'operations' => 'operations',
   );
   $handler->display->display_options['style_options']['default'] = 'created';
   $handler->display->display_options['style_options']['info'] = array(
     'status' => array(
       'sortable' => 0,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-center',
       'separator' => '',
     ),
     'created' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-left',
       'separator' => '',
     ),
     'payment_method' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-left',
       'separator' => '',
     ),
     'remote_id' => array(
       'sortable' => 0,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-left',
       'separator' => '',
     ),
     'message' => array(
       'sortable' => 0,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-left',
       'separator' => '',
     ),
     'amount' => array(
       'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => 'views-align-right',
       'separator' => '',
     ),
@@ -90,11 +98,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['status']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['status']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['status']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['external'] = 0;
   $handler->display->display_options['fields']['status']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['status']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['status']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['status']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['status']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['status']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['status']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['status']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['status']['hide_empty'] = 0;
   $handler->display->display_options['fields']['status']['empty_zero'] = 0;
   /* Field: Commerce Payment Transaction: Created date */
@@ -105,11 +117,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
   $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['created']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['created']['hide_empty'] = 0;
   $handler->display->display_options['fields']['created']['empty_zero'] = 0;
   $handler->display->display_options['fields']['created']['date_format'] = 'custom';
@@ -122,11 +138,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['payment_method']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['payment_method']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['payment_method']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['payment_method']['alter']['external'] = 0;
   $handler->display->display_options['fields']['payment_method']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['payment_method']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['payment_method']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['payment_method']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['payment_method']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['payment_method']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['payment_method']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['payment_method']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['payment_method']['hide_empty'] = 0;
   $handler->display->display_options['fields']['payment_method']['empty_zero'] = 0;
   /* Field: Commerce Payment Transaction: Remote ID */
@@ -136,11 +156,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['remote_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['remote_id']['alter']['external'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['remote_id']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['remote_id']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['remote_id']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['remote_id']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['remote_id']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['remote_id']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['remote_id']['empty'] = '-';
   $handler->display->display_options['fields']['remote_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['remote_id']['empty_zero'] = 0;
@@ -152,11 +176,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['message']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['message']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['message']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['external'] = 0;
   $handler->display->display_options['fields']['message']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['message']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['message']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['message']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['message']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['message']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['message']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['message']['empty'] = '-';
   $handler->display->display_options['fields']['message']['hide_empty'] = 0;
   $handler->display->display_options['fields']['message']['empty_zero'] = 0;
@@ -167,11 +195,15 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['amount']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['amount']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['amount']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['amount']['alter']['external'] = 0;
   $handler->display->display_options['fields']['amount']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['amount']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['amount']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['amount']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['amount']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['amount']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['amount']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['amount']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['amount']['hide_empty'] = 0;
   $handler->display->display_options['fields']['amount']['empty_zero'] = 0;
   /* Field: Commerce Payment Transaction: Operations links */
@@ -182,22 +214,46 @@ function commerce_payment_ui_views_default_views() {
   $handler->display->display_options['fields']['operations']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['operations']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['operations']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['external'] = 0;
   $handler->display->display_options['fields']['operations']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['operations']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['operations']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['operations']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['operations']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['operations']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['operations']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
-  /* Argument: Commerce Payment Transaction: Order ID */
+  /* Contextual filter: Commerce Payment Transaction: Order ID */
   $handler->display->display_options['arguments']['order_id']['id'] = 'order_id';
   $handler->display->display_options['arguments']['order_id']['table'] = 'commerce_payment_transaction';
   $handler->display->display_options['arguments']['order_id']['field'] = 'order_id';
   $handler->display->display_options['arguments']['order_id']['default_action'] = 'empty';
-  $handler->display->display_options['arguments']['order_id']['style_plugin'] = 'default_summary';
   $handler->display->display_options['arguments']['order_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['order_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['order_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['order_id']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['order_id']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['order_id']['not'] = 0;
+  $translatables['commerce_payment_order'] = array(
+    t('Defaults'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Status'),
+    t('Date'),
+    t('Method'),
+    t('Remote ID'),
+    t('-'),
+    t('Result message'),
+    t('Amount'),
+    t('Operations'),
+    t('All'),
+  );
 
   $views[$view->name] = $view;
 

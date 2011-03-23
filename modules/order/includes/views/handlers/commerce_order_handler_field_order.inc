@@ -52,7 +52,7 @@ class commerce_order_handler_field_order extends views_handler_field {
    * Data should be made XSS safe prior to calling this function.
    */
   function render_link($data, $values) {
-    if (!empty($this->options['link_to_order']) && $data !== NULL && $data !== '') {
+    if (!empty($this->options['link_to_order']) && in_array($this->options['link_to_order'], array('customer', 'admin')) && $data !== NULL && $data !== '') {
       $uid = $this->get_value($values, 'uid');
       $order_id = $this->get_value($values, 'order_id');
 

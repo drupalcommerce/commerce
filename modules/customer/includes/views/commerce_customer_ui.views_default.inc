@@ -87,7 +87,7 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
   $handler->display->display_options['style_options']['order'] = 'desc';
-  /* Empty text: Global: Text area */
+  /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -105,11 +105,15 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['profile_id']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['profile_id']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['profile_id']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['profile_id']['alter']['external'] = 0;
   $handler->display->display_options['fields']['profile_id']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['profile_id']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['profile_id']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['profile_id']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['profile_id']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['profile_id']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['profile_id']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['profile_id']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['profile_id']['hide_empty'] = 0;
   $handler->display->display_options['fields']['profile_id']['empty_zero'] = 0;
   $handler->display->display_options['fields']['profile_id']['link_to_profile'] = 1;
@@ -147,11 +151,15 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['name']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['name']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['name']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['name']['alter']['external'] = 0;
   $handler->display->display_options['fields']['name']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['name']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['name']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['name']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['name']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['name']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['name']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['name']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['name']['hide_empty'] = 0;
   $handler->display->display_options['fields']['name']['empty_zero'] = 0;
   $handler->display->display_options['fields']['name']['link_to_user'] = 1;
@@ -163,11 +171,15 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['type']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['type']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['type']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['external'] = 0;
   $handler->display->display_options['fields']['type']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['type']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['type']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['type']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['type']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['type']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['type']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['type']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['type']['hide_empty'] = 0;
   $handler->display->display_options['fields']['type']['empty_zero'] = 0;
   $handler->display->display_options['fields']['type']['link_to_profile'] = 0;
@@ -199,11 +211,15 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['edit_customer_profile']['alter']['external'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['edit_customer_profile']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['ellipsis'] = 1;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['edit_customer_profile']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['edit_customer_profile']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['edit_customer_profile']['hide_empty'] = 0;
   $handler->display->display_options['fields']['edit_customer_profile']['empty_zero'] = 0;
   /* Field: Commerce Customer Profile: Delete link */
@@ -242,7 +258,7 @@ function commerce_customer_ui_views_default_views() {
     t('more'),
     t('Apply'),
     t('Reset'),
-    t('Sort By'),
+    t('Sort by'),
     t('Asc'),
     t('Desc'),
     t('Items per page'),
