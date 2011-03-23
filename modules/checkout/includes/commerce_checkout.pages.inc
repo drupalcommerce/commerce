@@ -215,7 +215,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
     // If there is another checkout page...
     if ($checkout_page['next_page']) {
       // Update the order status to reflect the next checkout page.
-      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page['next_page']);
+      $order = commerce_order_status_update($order, 'checkout_' . $checkout_page['next_page'], FALSE, TRUE, t('Customer continued to the next checkout page via a submit button.'));
 
       // If it happens to be the complete page, process completion now.
       if ($checkout_page['next_page'] == 'complete') {
@@ -245,7 +245,7 @@ function commerce_checkout_form_back_submit($form, &$form_state) {
     }
 
     // Update the order status for the checkout step.
-    $form_state['order'] = commerce_order_status_update($order, 'checkout_' . $previous_page['page_id']);
+    $form_state['order'] = commerce_order_status_update($order, 'checkout_' . $previous_page['page_id'], FALSE, TRUE, t('Customer returned to the previous checkout page via a submit button.'));
   }
 }
 
@@ -259,6 +259,9 @@ function commerce_checkout_form_cancel_submit($form, &$form_state) {
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.
+  $form_state['order']->revision = TRUE;
+  $form_state['order']->log = t('Customer manually canceled the checkout process.');
+
   commerce_order_save($form_state['order']);
 
   drupal_set_message(t('Checkout of your current order has been canceled and may be resumed when you are ready.'));
