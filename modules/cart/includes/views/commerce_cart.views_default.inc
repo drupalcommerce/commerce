@@ -16,7 +16,7 @@ function commerce_cart_views_default_views() {
   $view->description = 'Display a shopping cart update form.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = '';
+  $view->human_name = 'Shopping cart form';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -276,7 +276,7 @@ function commerce_cart_views_default_views() {
   $view->description = 'Display a list of line items addded to cart.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = '';
+  $view->human_name = 'Shopping cart block';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -480,7 +480,7 @@ function commerce_cart_views_default_views() {
   $view->description = 'Cart line item summary displayed during checkout.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = '';
+  $view->human_name = 'Shopping cart summary';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

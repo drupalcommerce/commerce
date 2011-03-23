@@ -16,7 +16,7 @@ function commerce_payment_ui_views_default_views() {
   $view->description = 'Display and total an order\'s payment transaction history.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_payment_transaction';
-  $view->human_name = '';
+  $view->human_name = 'Order payments';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

@@ -16,7 +16,7 @@ function commerce_product_ui_views_default_views() {
   $view->description = 'Display a list of products for store admin.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_product';
-  $view->human_name = '';
+  $view->human_name = 'Products';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

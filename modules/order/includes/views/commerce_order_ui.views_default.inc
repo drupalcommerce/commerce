@@ -16,7 +16,7 @@ function commerce_order_ui_views_default_views() {
   $view->description = 'Display a list of orders for the store admin.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = '';
+  $view->human_name = 'Orders';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -311,7 +311,7 @@ function commerce_order_ui_views_default_views() {
   $view->description = 'Display a list of completed orders for a user.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_order';
-  $view->human_name = 'User Orders';
+  $view->human_name = 'User orders';
   $view->core = 7;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

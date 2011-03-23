@@ -16,7 +16,7 @@ function commerce_line_item_views_default_views() {
   $view->description = 'Display a set of line items in a table.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_line_item';
-  $view->human_name = '';
+  $view->human_name = 'Line items';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */

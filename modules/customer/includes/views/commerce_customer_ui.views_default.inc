@@ -16,7 +16,7 @@ function commerce_customer_ui_views_default_views() {
   $view->description = 'A list of customer profiles of all types.';
   $view->tag = 'commerce';
   $view->base_table = 'commerce_customer_profile';
-  $view->human_name = '';
+  $view->human_name = 'Customer profiles';
   $view->core = 0;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
