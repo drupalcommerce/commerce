@@ -338,7 +338,7 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
 
   // Invoke the custom format callback if specified.
   if (!empty($currency['format_callback'])) {
-    return $currency['format_callback']($price, $currency, $entity);
+    return $currency['format_callback']($price, $currency, $object);
   }
 
   // Separate the negative symbol from the number itself.
