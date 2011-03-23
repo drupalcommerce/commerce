@@ -14,8 +14,8 @@
  * will be returned.
  */
 function commerce_line_item_views_form($form, &$form_state, $view, $output) {
-  // Require the existence of an order_id argument.
-  if (empty($view->argument['order_id'])) {
+  // Require the existence of an order_id argument (and its value).
+  if (empty($view->argument['order_id']) || empty($view->argument['order_id']->value)) {
     return array();
   }
 
@@ -119,6 +119,11 @@ function commerce_line_item_views_form_submit($form, &$form_state) {
  */
 function theme_commerce_line_item_views_form($variables) {
   $form = $variables['form'];
+
+  // No View provided, abort.
+  if (empty($form['view'])) {
+    return;
+  }
 
   // Extract the form arguments from the form array.
   $view = $form['view']['#value'];
