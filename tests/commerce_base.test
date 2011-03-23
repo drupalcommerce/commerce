@@ -747,7 +747,6 @@ class CommerceSandboxTestCase extends CommerceBaseTestCase {
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
-    $this->store_customer = $this->createStoreCustomer();
     cache_clear_all(); // Just in case
   }
 

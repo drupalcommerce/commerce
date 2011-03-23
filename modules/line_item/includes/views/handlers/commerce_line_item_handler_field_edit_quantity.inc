@@ -42,7 +42,7 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
   function edit_form_validate($form, &$form_state) {
     foreach (element_children($form['edit_quantity']) as $line_item_id) {
       // Ensure the quantity is actually a numeric value.
-      if (!is_numeric($form_state['values']['edit_quantity'][$line_item_id]) || $form_state['values']['edit_quantity'][$line_item_id] <= 0) {
+      if (!is_numeric($form_state['values']['edit_quantity'][$line_item_id]) || $form_state['values']['edit_quantity'][$line_item_id] < 0) {
         form_set_error('edit_quantity][' . $line_item_id, t('You must specify a positive number for the quantity'));
       }
 
@@ -61,11 +61,18 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
       if ($line_item = commerce_line_item_load($line_item_id)) {
         // And the quantity on the form is different...
         if ($form_state['values']['edit_quantity'][$line_item_id] != $line_item->quantity) {
-          // Change the quantity and save the line item.
-          $line_item->quantity = $form_state['values']['edit_quantity'][$line_item_id];
+          if ($form_state['values']['edit_quantity'][$line_item_id] == 0) {
+            // If the quantity specified is 0, the line item is deleted.
+            $order = commerce_order_load($form_state['order']->order_id);
+            commerce_cart_order_product_line_item_delete($order, $line_item_id);
+          }
+          else {
+            // Change the quantity and save the line item.
+            $line_item->quantity = $form_state['values']['edit_quantity'][$line_item_id];
 
-          commerce_line_item_save($line_item);
-          entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
+            commerce_line_item_save($line_item);
+            entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
+          }
         }
       }
     }
