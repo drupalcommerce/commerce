@@ -332,8 +332,8 @@ function commerce_cart_views_default_views() {
     'checkout' => 'checkout',
   );
   $handler->display->display_options['footer']['line_item_summary']['info'] = array(
-    'quantity' => 0,
-    'total' => 0,
+    'quantity' => 'quantity',
+    'total' => 'total',
   );
   /* Relationship: Fields: Referenced line item */
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['id'] = 'commerce_line_items_line_item_id';
