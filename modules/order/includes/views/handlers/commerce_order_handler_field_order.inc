@@ -38,7 +38,7 @@ class commerce_order_handler_field_order extends views_handler_field {
       '#title' => t('Link this field to'),
       '#description' => t('If Customer or Administrator are selected, this will override any other link you have set.'),
       '#options' => array(
-        'none' => t('Nothing unless specified above'),
+        'none' => t('Nothing, unless specified in <em>Rewrite results</em> below'),
         'customer' => t('The customer view page'),
         'admin' => t('The administrator view page'),
       ),
