@@ -11,17 +11,18 @@
  */
 function commerce_product_pricing_ui_sell_price_rules() {
   RulesPluginUI::$basePath = 'admin/commerce/config/product-pricing/rules';
+  $options = array('show plugin' => FALSE);
 
   $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled sell price calculation rules') . '</h3>';
 
   $conditions = array('event' => 'commerce_product_calculate_sell_price', 'plugin' => 'reaction rule', 'active' => TRUE);
-  $content['enabled']['rules'] = RulesPluginUI::overviewTable($conditions);
+  $content['enabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
   $content['enabled']['rules']['#empty'] = t('There are no active sell price calculation rules.');
 
   $content['disabled']['title']['#markup'] = '<h3>' . t('Disabled sell price calculation rules') . '</h3>';
 
   $conditions['active'] = FALSE;
-  $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions);
+  $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
   $content['disabled']['rules']['#empty'] = t('There are no disabled sell price calculation rules.');
 
   return $content;
