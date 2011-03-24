@@ -336,7 +336,7 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
     $product_ids[$item['product_id']] = $item['product_id'];
   }
 
-  $products = _commerce_product_reference_get_product_data($product_ids);
+  $products = commerce_product_load_multiple($product_ids, array('status' => 1));
 
   switch ($display['type']) {
     case 'commerce_product_reference_sku_link':
@@ -345,13 +345,13 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
         if ($display['type'] == 'commerce_product_reference_sku_link') {
           $result[$delta] = array(
             '#type' => 'link',
-            '#title' => $products[$item['product_id']]['sku'],
+            '#title' => $products[$item['product_id']]->sku,
             '#href' => 'admin/commerce/products/' . $item['product_id'],
           );
         }
         else {
           $result[$delta] = array(
-            '#markup' => check_plain($products[$item['product_id']]['sku']),
+            '#markup' => check_plain($products[$item['product_id']]->sku),
           );
         }
       }
@@ -363,13 +363,13 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
         if ($display['type'] == 'commerce_product_reference_title_link') {
           $result[$delta] = array(
             '#type' => 'link',
-            '#title' => $products[$item['product_id']]['title'],
+            '#title' => $products[$item['product_id']]->title,
             '#href' => 'admin/commerce/products/' . $item['product_id'],
           );
         }
         else {
           $result[$delta] = array(
-            '#markup' => check_plain($products[$item['product_id']]['title']),
+            '#markup' => check_plain($products[$item['product_id']]->title),
           );
         }
       }
@@ -378,66 +378,6 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
 
   return $result;
 }
-
-/**
- * Loads and caches product SKUs and titles for the current request.
- *
- * @param $product_ids
- *   An array of product IDs to load.
- * @param $known_products
- *   An array of product data to cache at this time. Should be in the format of
- *     an array keyed by product_id with the value being an array with the keys
- *     'sku' and 'title'.
- *
- * @return
- *   An array of product data keyed by product_id with the value being an array
- *     with the keys 'sku' and 'title'.
- */
-function _commerce_product_reference_get_product_data($product_ids, $known_products = array()) {
-  $products = &drupal_static(__FUNCTION__, array());
-
-  // Save titles we receive.
-  $products += $known_products;
-
-  // Collect product_ids to retrieve from database.
-  $product_ids_query = array();
-
-  foreach ($product_ids as $product_id) {
-    if (!isset($products[$product_id])) {
-      $product_ids_query[] = $product_id;
-    }
-  }
-
-  // If there are unknown product IDs...
-  if ($product_ids_query) {
-    // Load the specified products.
-    $query = db_select('commerce_product', 'cp')
-      ->fields('cp', array('product_id', 'sku', 'title'))
-      ->condition('cp.product_id', $product_ids);
-
-    $data = $query->execute()->fetchAll();
-
-    foreach ($data as $product) {
-      $products[$product->product_id] = array(
-        'sku' => $product->sku,
-        'title' => $product->title,
-      );
-    }
-  }
-
-  // Build the results array.
-  $return = array();
-
-  foreach ($product_ids as $product_id) {
-    $return[$product_id] = array(
-      'sku' => isset($products[$product_id]['sku']) ? $products[$product_id]['sku'] : '',
-      'title' => isset($products[$product_id]['title']) ? $products[$product_id]['title'] : '',
-    );
-  }
-
-  return $return;
-}
-
 
 /**
  * Implements hook_field_widget_info().

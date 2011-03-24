@@ -970,7 +970,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
   );
 
   // Load all the products intended for sale on this form.
-  $products = commerce_product_load_multiple($product_ids);
+  $products = commerce_product_load_multiple($product_ids, array('status' => 1));
 
   // If no products were returned...
   if (count($products) == 0) {
