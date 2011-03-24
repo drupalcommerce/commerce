@@ -321,7 +321,7 @@ function commerce_checkout_complete_rules() {
   RulesPluginUI::$basePath = 'admin/commerce/config/checkout/rules';
   $options = array('show plugin' => FALSE);
 
-  $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled checkout complete rules') . '</h3>';
+  $content['enabled']['title']['#markup'] = '<h3>' . t('Enabled checkout completion rules') . '</h3>';
 
   $conditions = array('event' => 'commerce_checkout_complete', 'plugin' => 'reaction rule', 'active' => TRUE);
   $content['enabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
