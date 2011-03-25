@@ -342,17 +342,19 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
     case 'commerce_product_reference_sku_link':
     case 'commerce_product_reference_sku_plain':
       foreach ($items as $delta => $item) {
-        if ($display['type'] == 'commerce_product_reference_sku_link') {
-          $result[$delta] = array(
-            '#type' => 'link',
-            '#title' => $products[$item['product_id']]->sku,
-            '#href' => 'admin/commerce/products/' . $item['product_id'],
-          );
-        }
-        else {
-          $result[$delta] = array(
-            '#markup' => check_plain($products[$item['product_id']]->sku),
-          );
+        if (!empty($products[$item['product_id']])) {
+          if ($display['type'] == 'commerce_product_reference_sku_link') {
+            $result[$delta] = array(
+              '#type' => 'link',
+              '#title' => $products[$item['product_id']]->sku,
+              '#href' => 'admin/commerce/products/' . $item['product_id'],
+            );
+          }
+          else {
+            $result[$delta] = array(
+              '#markup' => check_plain($products[$item['product_id']]->sku),
+            );
+          }
         }
       }
       break;
@@ -360,17 +362,19 @@ function commerce_product_reference_field_formatter_view($entity_type, $object, 
     case 'commerce_product_reference_title_link':
     case 'commerce_product_reference_title_plain':
       foreach ($items as $delta => $item) {
-        if ($display['type'] == 'commerce_product_reference_title_link') {
-          $result[$delta] = array(
-            '#type' => 'link',
-            '#title' => $products[$item['product_id']]->title,
-            '#href' => 'admin/commerce/products/' . $item['product_id'],
-          );
-        }
-        else {
-          $result[$delta] = array(
-            '#markup' => check_plain($products[$item['product_id']]->title),
-          );
+        if (!empty($products[$item['product_id']])) {
+          if ($display['type'] == 'commerce_product_reference_title_link') {
+            $result[$delta] = array(
+              '#type' => 'link',
+              '#title' => $products[$item['product_id']]->title,
+              '#href' => 'admin/commerce/products/' . $item['product_id'],
+            );
+          }
+          else {
+            $result[$delta] = array(
+              '#markup' => check_plain($products[$item['product_id']]->title),
+            );
+          }
         }
       }
       break;
