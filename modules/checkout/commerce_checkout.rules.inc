@@ -124,7 +124,7 @@ function commerce_checkout_rules_condition_info() {
         'type' => 'text',
         'label' => t('Value'),
         'description' => t('The property value of the entity to be fetched.'),
-       ),
+      ),
     ),
     'group' => t('Entities'),
     'base' => 'commerce_checkout_condition_entity_exists',

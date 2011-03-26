@@ -84,6 +84,150 @@ function commerce_order_rules_access($type, $name) {
 }
 
 /**
+ * Implements hook_rules_condition_info().
+ */
+function commerce_order_rules_condition_info() {
+  $conditions = array();
+
+  $conditions['commerce_order_compare_address'] = array(
+    'label' => t('Order address component comparison'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+      ),
+      'address_field' => array(
+        'type' => 'text',
+        'label' => t('Address'),
+        'options list' => 'commerce_order_address_field_options_list',
+        'description' => t('The address associated with this order whose component you want to compare.'),
+        'restriction' => 'input',
+      ),
+      'address_component' => array(
+        'type' => 'text',
+        'label' => t('Address component'),
+        'options list' => 'commerce_order_address_component_options_list',
+        'description' => t('The address associated with this order whose component you want to compare.'),
+        'restriction' => 'input',
+      ),
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The comparison operator.'),
+        'optional' => TRUE,
+        'default value' => 'equals',
+        'options list' => 'commerce_order_address_comparison_operator_options_list',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Value'),
+        'description' => t('The value to compare against the address component.'),
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_compare_address',
+    ),
+  );
+
+  return $conditions;
+}
+
+/**
+ * Options list callback: address fields for the address comparison condition.
+ */
+function commerce_order_address_field_options_list() {
+  $options = array();
+
+  // Retrieve a list of all address fields on customer profile bundles.
+  $address_fields = commerce_info_fields('addressfield', 'commerce_customer_profile');
+
+  // Loop over every customer profile reference field on orders.
+  foreach (commerce_info_fields('commerce_customer_profile_reference', 'commerce_order') as $field_name => $field) {
+    // Retrieve the type of customer profile referenced by this field.
+    $type = $field['settings']['profile_type'];
+
+    // Loop over every address field looking for any attached to this bundle.
+    foreach ($address_fields as $address_field_name => $address_field) {
+      if (in_array($type, $address_field['bundles']['commerce_customer_profile'])) {
+        // Add it to the options list.
+        $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', $type);
+
+        $options[commerce_customer_profile_type_get_name($type)][$field_name . '|' . $address_field_name] = check_plain($instance['label']);
+      }
+    }
+  }
+
+  if (empty($options)) {
+    drupal_set_message(t('No order addresses could be found for comparison.'), 'error');
+  }
+
+  return $options;
+}
+
+/**
+ * Options list callback: components for the address comparison condition.
+ */
+function commerce_order_address_component_options_list() {
+  return array(
+    'country' => t('Country'),
+    'name_line' => t('Full name'),
+    'first_name' => t('First name'),
+    'last_name' => t('Last name'),
+    'organisation_name' => t('Company name'),
+    'administrative_area' => t('Administrative area'),
+    'sub_administrative_area' => t('Sub-administrative area'),
+    'locality' => t('Locality'),
+    'dependent_locality' => t('Dependent locality'),
+    'postal_code' => t('Postal code'),
+    'thoroughfare' => t('Thoroughfare'),
+    'premise' => t('Premise'),
+    'sub_premise' => t('Sub-premise'),
+  );
+}
+
+/**
+ * Options list callback: operators for the address comparison condition.
+ */
+function commerce_order_address_comparison_operator_options_list() {
+  return array(
+    'equals' => t('equals'),
+    'begins with' => t('begins with'),
+    'contains' => t('contains'),
+  );
+}
+
+/**
+ * Condition callback: compares an address component against the given value.
+ */
+function commerce_order_rules_compare_address($order, $address_field, $component, $operator, $value) {
+  list($field_name, $address_field_name) = explode('|', $address_field);
+
+  // If we actually received a valid order...
+  if (!empty($order)) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // And if we can actually find the requested address data...
+    if (!empty($wrapper->{$field_name}) && !empty($wrapper->{$field_name}->{$address_field_name})) {
+      $address = $wrapper->{$field_name}->{$address_field_name}->value();
+
+      // Make a comparison based on the operator.
+      switch ($operator) {
+        case 'equals':
+          return $address[$component] == $value;
+        case 'begins with':
+          return strpos($address[$component], $value) === 0;
+        case 'contains':
+          return strpos($address[$component], $value) !== FALSE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
  * Implements hook_rules_action_info().
  */
 function commerce_order_rules_action_info() {

@@ -35,7 +35,7 @@ function commerce_permission() {
 function commerce_info_fields($field_type, $entity_type = NULL) {
   $fields = array();
 
-  // Loop through the fields looking for any product reference fields.
+  // Loop through the fields looking for any fields of the specified type.
   foreach (field_info_fields() as $field_name => $field) {
     if ($field['type'] == $field_type) {
       // Add this field to the return array if no entity type was specified or
