@@ -225,9 +225,14 @@ function commerce_product_ui_help($path, $arg) {
       return '<p>' . t('Individual product types can have different fields assigned to them.') . '</p>';
   }
 
-  // Return the user defined help text per product type when adding products.
+  // Return the user defined help text per product type when adding or editing products.
   if ($arg[1] == 'commerce' && $arg[2] == 'products' && $arg[3] == 'add' && $arg[4]) {
     $product_type = commerce_product_type_load($arg[4]);
+    return (!empty($product_type['help']) ? '<p>' . filter_xss_admin($product_type['help']) . '</p>' : '');
+  }
+  elseif ($arg[1] == 'commerce' && $arg[2] == 'products' && is_numeric($arg[3])) {
+    $product = commerce_product_load($arg[3]);
+    $product_type = commerce_product_type_load($product->type);
     return (!empty($product_type['help']) ? '<p>' . filter_xss_admin($product_type['help']) . '</p>' : '');
   }
 }
