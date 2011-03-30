@@ -295,9 +295,15 @@ function commerce_order_new($uid = 0, $status = '', $type = 'commerce_order') {
  * Creation callback for the Entity module.
  */
 function _commerce_order_create($values = array()) {
+  $uid = 0;
+
+  if (!empty($values['uid'])) {
+    $uid = $values['uid'];
+    unset($values['uid']);
+  }
+
   // Create a new order owned by the specified user.
-  $order = commerce_order_new($values['uid']);
-  unset($values['uid']);
+  $order = commerce_order_new($uid);
 
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
@@ -822,7 +828,16 @@ function commerce_order_status_get_title($name = NULL) {
  * Wraps commerce_order_status_get_title() for use by the Entity module.
  */
 function commerce_order_status_options_list() {
-  return commerce_order_status_get_title();
+  // Build an array of order status options grouped by order state.
+  $options = array();
+
+  foreach (commerce_order_state_get_title() as $name => $title) {
+    foreach (commerce_order_statuses(array('state' => $name)) as $order_status) {
+      $options[check_plain($title)][$order_status['name']] = check_plain($order_status['title']);
+    }
+  }
+
+  return $options;
 }
 
 /**
