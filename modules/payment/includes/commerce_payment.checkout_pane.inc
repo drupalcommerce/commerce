@@ -190,8 +190,8 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
     // Check for a validate handler on return.
     $validate_callback = commerce_payment_method_callback($payment_method, 'redirect_form_validate');
 
-    // If there is no validate handler or if there is and it passess...
-    if (!$validate_callback || $validate_callback($order, $payment_method)) {
+    // If there is no validate handler or if there is and it isn't FALSE...
+    if (!$validate_callback || $validate_callback($order, $payment_method) !== FALSE) {
       // Perform any submit functions if necessary.
       if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form_submit')) {
         $callback($order, $payment_method);
