@@ -8,6 +8,6 @@ class commerce_product_handler_field_product_type extends commerce_product_handl
     $type = $this->get_value($values);
     $value = commerce_product_type_get_name($type);
 
-    return $this->render_link($this->sanitize_value($type), $values);
+    return $this->render_link($this->sanitize_value($value), $values);
   }
 }
