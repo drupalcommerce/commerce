@@ -408,11 +408,11 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   // If this is a new tax rate and the insert did not fail...
   if (!empty($tax_rate['is_new']) && $op !== FALSE) {
     // Notify other modules that a new tax rate has been created.
-    module_invoke_all('commerce_tax_rate_insert', $tax_rate);
+    module_invoke_all('commerce_tax_rate_insert', $tax_rate, $skip_reset);
   }
   elseif ($op !== FALSE) {
     // Notify other modules that an existing tax rate has been updated.
-    module_invoke_all('commerce_tax_rate_update', $tax_rate);
+    module_invoke_all('commerce_tax_rate_update', $tax_rate, $skip_reset);
   }
 
   // If the rate specifies that it doesn't need a component and one already
