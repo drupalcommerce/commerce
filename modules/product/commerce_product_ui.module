@@ -338,13 +338,18 @@ function commerce_product_ui_product_type_new() {
  * @param $configure
  *   Boolean indicating whether or not product type configuration should be
  *     performed in the event of a new product type being saved.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this save should result in product types
+ *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *     when you intend to perform many saves at once, as menu rebuilding is very
+ *     costly in terms of performance.
  *
  * @return
  *   The return value of the call to drupal_write_record() to save the product
  *     type, either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating
  *     the type of query performed to save the product type.
  */
-function commerce_product_ui_product_type_save($product_type, $configure = TRUE) {
+function commerce_product_ui_product_type_save($product_type, $configure = TRUE, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_product_type', $product_type, empty($product_type['is_new']) ? 'type' : array());
 
   // If this is a new product type and the insert did not fail...
@@ -358,15 +363,18 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE)
     }
 
     // Notify other modules that a new product type has been created.
-    module_invoke_all('commerce_product_type_insert', $product_type);
+    module_invoke_all('commerce_product_type_insert', $product_type, $skip_reset);
   }
   elseif ($op !== FALSE) {
     // Notify other modules that an existing product type has been updated.
-    module_invoke_all('commerce_product_type_update', $product_type);
+    module_invoke_all('commerce_product_type_update', $product_type, $skip_reset);
   }
 
-  commerce_product_types_reset();
-  menu_rebuild();
+  // Rebuild the menu to get add this type's product add menu item.
+  if (!$skip_reset) {
+    commerce_product_types_reset();
+    menu_rebuild();
+  }
 
   return $op;
 }
@@ -376,8 +384,13 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE)
  *
  * @param $type
  *   The machine-readable name of the product type.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this delete should result in product
+ *     types being reset and the menu being rebuilt; defaults to FALSE. This is
+ *     useful when you intend to perform many saves at once, as menu rebuilding
+ *     is very costly in terms of performance.
  */
-function commerce_product_ui_product_type_delete($type) {
+function commerce_product_ui_product_type_delete($type, $skip_reset = FALSE) {
   $product_type = commerce_product_type_load($type);
 
   db_delete('commerce_product_type')
@@ -385,14 +398,16 @@ function commerce_product_ui_product_type_delete($type) {
     ->execute();
 
   // Rebuild the menu to get rid of this type's product add menu item.
-  commerce_product_types_reset();
-  menu_rebuild();
+  if (!$skip_reset) {
+    commerce_product_types_reset();
+    menu_rebuild();
+  }
 
   // Notify the field API that this bundle has been destroyed.
   field_attach_delete_bundle('commerce_product', $type);
 
   // Notify other modules that this product type has been deleted.
-  module_invoke_all('commerce_product_type_delete', $product_type);
+  module_invoke_all('commerce_product_type_delete', $product_type, $skip_reset);
 }
 
 /**

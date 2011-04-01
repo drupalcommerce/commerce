@@ -272,32 +272,39 @@ function commerce_tax_ui_tax_type_new() {
  * @param $tax_type
  *   The tax type array containing the basic properties as initialized in
  *     commerce_tax_ui_tax_type_new().
+ * @param $skip_reset
+ *   Boolean indicating whether or not this save should result in tax types
+ *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *     when you intend to perform many saves at once, as menu rebuilding is very
+ *     costly in terms of performance.
  *
  * @return
  *   The return value of the call to drupal_write_record() to save the tax type,
  *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the type
  *     of query performed to save the tax type.
  */
-function commerce_tax_ui_tax_type_save($tax_type) {
+function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_type', $tax_type, empty($tax_type['is_new']) ? 'name' : array());
 
   // If this is a new tax type and the insert did not fail...
   if (!empty($tax_type['is_new']) && $op !== FALSE) {
     // Notify other modules that a new tax type has been created.
-    module_invoke_all('commerce_tax_type_insert', $tax_type);
+    module_invoke_all('commerce_tax_type_insert', $tax_type, $skip_reset);
 
     // Ensure the default rule is built.
     entity_defaults_rebuild();
   }
   elseif ($op !== FALSE) {
     // Notify other modules that an existing tax type has been updated.
-    module_invoke_all('commerce_tax_type_update', $tax_type);
+    module_invoke_all('commerce_tax_type_update', $tax_type, $skip_reset);
   }
 
   // Clear the necessary caches and rebuild the menu items.
-  commerce_tax_types_reset();
-  rules_clear_cache(TRUE);
-  menu_rebuild();
+  if (!$skip_reset) {
+    commerce_tax_types_reset();
+    rules_clear_cache(TRUE);
+    menu_rebuild();
+  }
 
   return $op;
 }
@@ -307,8 +314,13 @@ function commerce_tax_ui_tax_type_save($tax_type) {
  *
  * @param $name
  *   The machine-name of the tax type.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this delete should result in tax types
+ *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *     when you intend to perform many saves at once, as menu rebuilding is very
+ *     costly in terms of performance.
  */
-function commerce_tax_ui_tax_type_delete($name) {
+function commerce_tax_ui_tax_type_delete($name, $skip_reset = FALSE) {
   $tax_type = commerce_tax_type_load($name);
 
   db_delete('commerce_tax_type')
@@ -318,12 +330,14 @@ function commerce_tax_ui_tax_type_delete($name) {
   rules_config_delete(array('commerce_tax_type_' . $name));
 
   // Clear the necessary caches and rebuild the menu items.
-  commerce_tax_types_reset();
-  rules_clear_cache(TRUE);
-  menu_rebuild();
+  if (!$skip_reset) {
+    commerce_tax_types_reset();
+    rules_clear_cache(TRUE);
+    menu_rebuild();
+  }
 
   // Notify other modules that this tax type has been deleted.
-  module_invoke_all('commerce_tax_type_delete', $tax_type);
+  module_invoke_all('commerce_tax_type_delete', $tax_type, $skip_reset);
 }
 
 /**
@@ -377,13 +391,18 @@ function commerce_tax_ui_tax_rate_new($type = '') {
  * @param $tax_rate
  *   The tax rate array containing the basic properties as initialized in
  *     commerce_tax_ui_tax_rate_new().
+ * @param $skip_reset
+ *   Boolean indicating whether or not this save should result in tax rates
+ *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *     when you intend to perform many saves at once, as menu rebuilding is very
+ *     costly in terms of performance.
  *
  * @return
  *   The return value of the call to drupal_write_record() to save the tax rate,
  *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the rate
  *     of query performed to save the tax rate.
  */
-function commerce_tax_ui_tax_rate_save($tax_rate) {
+function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_rate', $tax_rate, empty($tax_rate['is_new']) ? 'name' : array());
 
   // If this is a new tax rate and the insert did not fail...
@@ -407,9 +426,11 @@ function commerce_tax_ui_tax_rate_save($tax_rate) {
   }
 
   // Clear the necessary caches and rebuild the menu items.
-  commerce_tax_rates_reset();
-  rules_clear_cache(TRUE);
-  menu_rebuild();
+  if (!$skip_reset) {
+    commerce_tax_rates_reset();
+    rules_clear_cache(TRUE);
+    menu_rebuild();
+  }
 
   return $op;
 }
@@ -419,8 +440,13 @@ function commerce_tax_ui_tax_rate_save($tax_rate) {
  *
  * @param $name
  *   The machine-name of the tax rate.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this delete should result in tax rates
+ *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *     when you intend to perform many saves at once, as menu rebuilding is very
+ *     costly in terms of performance.
  */
-function commerce_tax_ui_tax_rate_delete($name) {
+function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   $tax_rate = commerce_tax_rate_load($name);
 
   db_delete('commerce_tax_rate')
@@ -430,10 +456,12 @@ function commerce_tax_ui_tax_rate_delete($name) {
   rules_config_delete(array('commerce_tax_rate_' . $name));
 
   // Clear the necessary caches and rebuild the menu items.
-  commerce_tax_rates_reset();
-  rules_clear_cache(TRUE);
-  menu_rebuild();
+  if (!$skip_reset) {
+    commerce_tax_rates_reset();
+    rules_clear_cache(TRUE);
+    menu_rebuild();
+  }
 
   // Notify other modules that this tax rate has been deleted.
-  module_invoke_all('commerce_tax_rate_delete', $tax_rate);
+  module_invoke_all('commerce_tax_rate_delete', $tax_rate, $skip_save);
 }
