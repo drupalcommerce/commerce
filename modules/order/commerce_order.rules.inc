@@ -95,6 +95,7 @@ function commerce_order_rules_condition_info() {
       'order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
+        'description' => t('The order containing the profile reference with the address in question. In most cases, you will use line-item:order.'),
       ),
       'address_field' => array(
         'type' => 'text',
@@ -107,7 +108,7 @@ function commerce_order_rules_condition_info() {
         'type' => 'text',
         'label' => t('Address component'),
         'options list' => 'commerce_order_address_component_options_list',
-        'description' => t('The address associated with this order whose component you want to compare.'),
+        'description' => t('The actual address component you want to compare. Common names of address components are given in parentheses.'),
         'restriction' => 'input',
       ),
       'operator' => array(
@@ -122,7 +123,7 @@ function commerce_order_rules_condition_info() {
       'value' => array(
         'type' => 'text',
         'label' => t('Value'),
-        'description' => t('The value to compare against the address component.'),
+        'description' => t('The value to compare against the address component. Bear in mind that addresses using select lists for various components may use a value different from the option you select. For example, countries are selected by name, but the value is the two letter abbreviation.'),
       ),
     ),
     'group' => t('Commerce Order'),
