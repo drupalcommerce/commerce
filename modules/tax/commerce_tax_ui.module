@@ -463,5 +463,5 @@ function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   }
 
   // Notify other modules that this tax rate has been deleted.
-  module_invoke_all('commerce_tax_rate_delete', $tax_rate, $skip_save);
+  module_invoke_all('commerce_tax_rate_delete', $tax_rate, $skip_reset);
 }
