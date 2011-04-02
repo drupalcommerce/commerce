@@ -130,6 +130,12 @@ function commerce_product_ui_product_type_form_submit($form, &$form_state) {
   $product_type = $form_state['product_type'];
   $updated = !empty($product_type['type']);
 
+  // If a type is set, we should still check to see if a row for the type exists
+  // in the database; this is done to accomodate types defined by Features.
+  if ($updated) {
+    $updated = db_query('SELECT 1 FROM {commerce_product_type} WHERE type = :type', array(':type' => $product_type['type']))->fetchField();
+  }
+
   foreach ($form_state['values']['product_type'] as $key => $value) {
     $product_type[$key] = $value;
   }
