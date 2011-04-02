@@ -176,14 +176,14 @@ function commerce_order_address_component_options_list() {
     'first_name' => t('First name'),
     'last_name' => t('Last name'),
     'organisation_name' => t('Company name'),
-    'administrative_area' => t('Administrative area'),
-    'sub_administrative_area' => t('Sub-administrative area'),
-    'locality' => t('Locality'),
-    'dependent_locality' => t('Dependent locality'),
+    'thoroughfare' => t('Thoroughfare (Street address)'),
+    'premise' => t('Premise (Building)'),
+    'sub_premise' => t('Sub-premise (Suite)'),
+    'locality' => t('Locality (City)'),
+    'dependent_locality' => t('Dependent locality (Town)'),
+    'administrative_area' => t('Administrative area (State / Province)'),
+    'sub_administrative_area' => t('Sub-administrative area (District)'),
     'postal_code' => t('Postal code'),
-    'thoroughfare' => t('Thoroughfare'),
-    'premise' => t('Premise'),
-    'sub_premise' => t('Sub-premise'),
   );
 }
 
