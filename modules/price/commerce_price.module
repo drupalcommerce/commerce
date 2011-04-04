@@ -299,7 +299,7 @@ function commerce_price_field_formatter_prepare_view($entity_type, $entities, $f
 /**
  * Implements hook_field_formatter_view().
  */
-function commerce_price_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+function commerce_price_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
 
   // Loop through each price value in this field.
@@ -314,7 +314,7 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
 
       case 'commerce_price_formatted_amount':
         $element[$delta] = array(
-          '#markup' => commerce_currency_format($item['amount'], $item['currency_code'], $object),
+          '#markup' => commerce_currency_format($item['amount'], $item['currency_code'], $entity),
         );
         break;
 
@@ -351,7 +351,7 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
         );
 
         // Allow other modules to alter the components.
-        drupal_alter('commerce_price_formatted_components', $components, $item, $object);
+        drupal_alter('commerce_price_formatted_components', $components, $item, $entity);
 
         // Sort the components by weight.
         uasort($components, 'drupal_sort_weight');
@@ -361,7 +361,7 @@ function commerce_price_field_formatter_view($object_type, $object, $field, $ins
           $component['formatted_price'] = commerce_currency_format(
             $component['price']['amount'],
             $component['price']['currency_code'],
-            $object
+            $entity
           );
         }
 

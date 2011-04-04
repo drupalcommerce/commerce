@@ -251,7 +251,7 @@ function commerce_product_reference_field_instance_settings_form($field, $instan
  * - 'invalid_product_id': product_id is not valid for the field (not a valid
  *                         product id, or the product is not referenceable).
  */
-function commerce_product_reference_field_validate($entity_type, $object, $field, $instance, $langcode, $items, &$errors) {
+function commerce_product_reference_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   // Extract product_ids to check.
   $product_ids = array();
 
@@ -326,7 +326,7 @@ function commerce_product_reference_field_formatter_info() {
 /**
  * Implements hook_field_formatter_view().
  */
-function commerce_product_reference_field_formatter_view($entity_type, $object, $field, $instance, $langcode, $items, $display) {
+function commerce_product_reference_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $result = array();
 
   // Collect the list of product IDs.
