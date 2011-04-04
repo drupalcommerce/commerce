@@ -1374,7 +1374,12 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   $product = $form_state['products'][$product_id];
 
   // Add the product to the specified shopping cart.
-  commerce_cart_product_add($form_state['values']['uid'], $product_id, $form_state['values']['quantity'], $form_state['values']['display_uri']);
+  $form_state['line_item'] = commerce_cart_product_add(
+    $form_state['values']['uid'],
+    $product_id,
+    $form_state['values']['quantity'],
+    $form_state['values']['display_uri']
+  );
 
   // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
   // display the product title or the product display node title?
