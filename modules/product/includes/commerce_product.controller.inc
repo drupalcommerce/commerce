@@ -50,7 +50,9 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       $product->changed = REQUEST_TIME;
 
       // Give modules the opportunity to prepare field data for saving.
+      module_invoke_all('entity_presave', $product, 'commerce_product');
       rules_invoke_all('commerce_product_presave', $product);
+
       field_attach_presave('commerce_product', $product);
 
       // If this is a new product...
