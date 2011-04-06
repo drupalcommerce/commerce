@@ -4,6 +4,7 @@ package = Commerce
 dependencies[] = rules
 dependencies[] = commerce_line_item
 dependencies[] = commerce_price
+dependencies[] = commerce_product_pricing
 core = 7.x
 
 ; Simple tests
