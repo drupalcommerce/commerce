@@ -854,7 +854,10 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
         $language = $element['profiles'][$key][$field_name]['#language'];
 
         foreach (element_children($element['profiles'][$key][$field_name][$language]) as $delta) {
-          $element['profiles'][$key][$field_name][$language][$delta]['#type'] = 'container';
+          // Don't mess with the "Add another item" button that could be present.
+          if ($element['profiles'][$key][$field_name][$language][$delta]['#type'] != 'submit') {
+            $element['profiles'][$key][$field_name][$language][$delta]['#type'] = 'container';
+          }
         }
 
         // Remove the default #parents array so the normal tree can do its thing.

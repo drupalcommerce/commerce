@@ -79,7 +79,10 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   $language = $pane_form[$field_name]['#language'];
 
   foreach (element_children($pane_form[$field_name][$language]) as $delta) {
-    $pane_form[$field_name][$language][$delta]['#type'] = 'container';
+    // Don't mess with the "Add another item" button that could be present.
+    if ($pane_form[$field_name][$language][$delta]['#type'] != 'submit') {
+      $pane_form[$field_name][$language][$delta]['#type'] = 'container';
+    }
   }
 
   return $pane_form;
