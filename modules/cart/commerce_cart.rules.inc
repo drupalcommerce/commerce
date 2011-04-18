@@ -109,5 +109,35 @@ function commerce_cart_rules_order_is_cart($order) {
 }
 
 /**
+ * Implements hook_rules_action_info().
+ */
+function commerce_cart_rules_action_info() {
+  $actions = array();
+
+  $actions['commerce_cart_empty'] = array(
+    'label' => t('Remove all products from an order'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order to empty'),
+      ),
+    ),
+    'group' => t('Commerce Cart'),
+    'callbacks' => array(
+      'execute' => 'commerce_cart_rules_empty',
+    ),
+  );
+
+  return $actions;
+}
+
+/**
+ * Rules action: empties a cart order.
+ */
+function commerce_cart_rules_empty($order) {
+  commerce_cart_order_empty($order);
+}
+
+/**
  * @}
  */
