@@ -597,10 +597,8 @@ function commerce_cart_order_refresh($order) {
       $data['components'] = $current_data['components'];
       $line_item_wrapper->commerce_unit_price->data = $data;
 
-      // Save the updated line item and clear the entity cache. Use a clone so
-      // the save doesn't interfere with price values in a live line item object
-      // that would be modified on presave.
-      commerce_line_item_save(clone($line_item_wrapper->value()));
+      // Save the updated line item and clear the entity cache.
+      commerce_line_item_save($line_item_wrapper->value());
       entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
 
       $line_item_changed = TRUE;
@@ -617,7 +615,7 @@ function commerce_cart_order_refresh($order) {
   if ($order_wrapper->value() != $original_order || $line_item_changed) {
     // Use a clone so the save doesn't interfere with price values in a live
     // order object that would be modified on presave.
-    commerce_order_save(clone($order_wrapper->value()));
+    commerce_order_save($order_wrapper->value());
   }
 
   return $order_wrapper;

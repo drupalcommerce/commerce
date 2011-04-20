@@ -41,7 +41,7 @@ function commerce_price_field_info() {
  */
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
   // Ensure only numeric values are entered in price fields.
-  foreach ($items as $delta => $item) {
+  foreach ($items as $delta => &$item) {
     if (!empty($item['amount']) && !is_numeric($item['amount'])) {
       $errors[$field['field_name']][$langcode][$delta][] = array(
         'error' => 'price_numeric',
@@ -58,12 +58,6 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
   // Convert amounts to their floating point values and deserialize data arrays.
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
-      // Convert the loaded amount integer to a price amount based on the currency.
-      $items[$id][$delta]['amount'] = commerce_currency_integer_to_amount(
-        $items[$id][$delta]['amount'],
-        $items[$id][$delta]['currency_code']
-      );
-
       // Unserialize the data array if necessary.
       if (!empty($items[$id][$delta]['data'])) {
         $items[$id][$delta]['data'] = unserialize($items[$id][$delta]['data']);
@@ -81,17 +75,81 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
 function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   // Convert amounts to integers and serialize data arrays before saving.
   foreach ($items as $delta => $item) {
-    // Convert the price amount to an integer based on the currency.
-    $items[$delta]['amount'] = commerce_currency_amount_to_integer(
-      $items[$delta]['amount'],
-      $items[$delta]['currency_code']
-    );
-
     // Serialize an existing data array.
     if (isset($item['data']) && is_array($item['data'])) {
       $items[$delta]['data'] = serialize($item['data']);
     }
   }
+}
+
+/**
+ * Converts saved price field data columns back to arrays for use in the rest of
+ *   the current page request execution.
+ *
+ * @param $entity_type
+ *   The entity type variable passed through hook_field_attach_*().
+ * @param $entity
+ *   The entity variable passed through hook_field_attach_*().
+ */
+function _commerce_price_field_attach_unserialize_data($entity_type, $entity) {
+  $options = array(
+    'default' => FALSE,
+    'deleted' => FALSE,
+    'language' => NULL,
+  );
+
+  // Determine the list of instances to iterate on.
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $instances = _field_invoke_get_instances($entity_type, $bundle, $options);
+
+  // Iterate through the instances and collect results.
+  $return = array();
+  foreach ($instances as $instance) {
+    $field_name = $instance['field_name'];
+    $field = field_info_field($field_name);
+
+    // If the instance is a price field with data...
+    if ($field['type'] == 'commerce_price' && isset($entity->{$field_name})) {
+      // Iterate over the items arrays for each language.
+      foreach (array_keys($entity->{$field_name}) as $langcode) {
+        $items = isset($entity->{$field_name}[$langcode]) ? $entity->{$field_name}[$langcode] : array();
+
+        // For each item in the array, unserialize or initialize its data array.
+        foreach ($items as $delta => $item) {
+          if (!empty($item['data']) && !is_array($item['data'])) {
+            $entity->{$field_name}[$langcode][$delta]['data'] = unserialize($item['data']);
+          }
+          elseif (!is_array($item['data'])) {
+            $entity->{$field_name}[$langcode][$delta]['data'] = array('components' => array());
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_insert().
+ *
+ * This hook is used to unserialize the price field's data array after it has
+ * been inserted, because the data array is serialized before it is saved and
+ * must be unserialized for compatibility with API requests performed during the
+ * same request after the insert occurs.
+ */
+function commerce_price_field_attach_insert($entity_type, $entity) {
+  _commerce_price_field_attach_unserialize_data($entity_type, $entity);
+}
+
+/**
+ * Implements hook_field_update().
+ *
+ * This hook is used to unserialize the price field's data array after it has
+ * been updated, because the data array is serialized before it is saved and
+ * must be unserialized for compatibility with API requests performed during the
+ * same request after the update occurs.
+ */
+function commerce_price_field_attach_update($entity_type, $entity) {
+  _commerce_price_field_attach_unserialize_data($entity_type, $entity);
 }
 
 /**
@@ -471,8 +529,8 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
   if (isset($items[$delta]['amount'])) {
     $currency = commerce_currency_load($items[$delta]['currency_code']);
 
-    // Round the default value.
-    $default_amount = round($items[$delta]['amount'], 2);
+    // Convert the price amount to a user friendly decimal value.
+    $default_amount = commerce_currency_amount_to_decimal($items[$delta]['amount'], $currency['code']);
 
     // Run it through number_format() to add the decimal places in if necessary.
     if (strpos($default_amount, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency['decimals']) {
@@ -564,7 +622,17 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     '#default_value' => !empty($items[$delta]['data']) ? $items[$delta]['data'] : array('components' => array()),
   );
 
+  $element['#element_validate'][] = 'commerce_price_field_widget_validate';
+
   return $element;
+}
+
+/**
+ * Implements hook_field_widget_validate().
+ */
+function commerce_price_field_widget_validate($element, &$form_state) {
+  // Convert the decimal amount value entered to an integer based amount value.
+  form_set_value($element['amount'], commerce_currency_decimal_to_amount($element['amount']['#value'], $element['currency_code']['#value']), $form_state);
 }
 
 /**

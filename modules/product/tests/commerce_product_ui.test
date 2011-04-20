@@ -201,7 +201,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->pass(t('Test the integrity of the edit product form:'));
     $this->assertFieldByName('sku', $product_wrapper->sku->value(), t('SKU field is present'));
     $this->assertFieldByName('title', $product_wrapper->title->value(), t('Title field is present'));
-    $this->assertFieldByName('commerce_price[und][0][amount]', commerce_currency_integer_to_amount($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value()), t('Price field is present'));
+    $this->assertFieldByName('commerce_price[und][0][amount]', commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value()), t('Price field is present'));
     $this->assertFieldByName('status', $product->status, t('Status field is present'));
     $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
     $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));

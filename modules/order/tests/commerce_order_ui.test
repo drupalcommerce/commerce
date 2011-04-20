@@ -188,7 +188,7 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $line_item_id = $order_wrapper->commerce_line_items->get(0)->value()->line_item_id;
 
     // Format the price based in the currency.
-    $price = commerce_currency_integer_to_amount($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
+    $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
 
     // Check the existance of the fields for quantity and price of the line
     // item just created.
@@ -200,7 +200,7 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     // Generate new quantity and prices and save them.
     $new_qty = rand(0,99);
     $new_currency_code = 'EUR';
-    $new_price = commerce_currency_integer_to_amount(rand(2, 500), $new_currency_code);
+    $new_price = commerce_currency_amount_to_decimal(rand(2, 500), $new_currency_code);
     $edit = array(
       'commerce_line_items[und][line_items][' . $line_item_id . '][quantity]' => $new_qty,
       'commerce_line_items[und][line_items][' . $line_item_id . '][commerce_unit_price][und][0][amount]' => $new_price,

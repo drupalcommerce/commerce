@@ -29,6 +29,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
       '#type' => 'fieldset',
       '#title' => t('Payment terminal: @title', array('@title' => $payment_method['title'])),
       '#attributes' => array('class' => array('payment-terminal')),
+      '#element_validate' => array('commerce_payment_order_transaction_add_form_payment_terminal_validate'),
     );
 
     // Establish defaults for the amount if possible.
@@ -44,7 +45,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
     $form['payment_terminal']['amount'] = array(
       '#type' => 'textfield',
       '#title' => t('Amount'),
-      '#default_value' => $default_amount,
+      '#default_value' => commerce_currency_amount_to_decimal($default_amount, $default_currency_code),
       '#size' => 10,
       '#prefix' => '<div class="payment-terminal-amount">',
     );
@@ -163,6 +164,22 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
  */
 function commerce_payment_order_transaction_add_form_add_refresh($form, $form_state) {
   return $form;
+}
+
+/**
+ * Validation callback for the payment terminal to check the amount data type
+ *   and convert it to a proper integer amount on input.
+ */
+function commerce_payment_order_transaction_add_form_payment_terminal_validate($element, &$form_state) {
+  // If a payment method has already been selected...
+  if (!empty($form_state['payment_method']) && !empty($form_state['values']['amount'])) {
+    if (!is_numeric($form_state['values']['amount'])) {
+      form_set_error('amount', t('You must enter a numeric amount value.'));
+    }
+    else {
+      form_set_value($element['amount'], commerce_currency_decimal_to_amount($form_state['values']['amount'], $form_state['values']['currency_code']), $form_state);
+    }
+  }
 }
 
 /**

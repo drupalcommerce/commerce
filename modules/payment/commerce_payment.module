@@ -603,15 +603,7 @@ function _commerce_payment_transaction_create($values = array()) {
  *   The saved transaction object.
  */
 function commerce_payment_transaction_save($transaction) {
-  // Convert the transaction amount to an integer.
-  $transaction->amount = commerce_currency_amount_to_integer($transaction->amount, $transaction->currency_code);
-
-  $transaction = entity_get_controller('commerce_payment_transaction')->save($transaction);
-
-  // Convert the amount back from an integer.
-  $transaction->amount = commerce_currency_integer_to_amount($transaction->amount, $transaction->currency_code);
-
-  return $transaction;
+  return entity_get_controller('commerce_payment_transaction')->save($transaction);
 }
 
 /**
@@ -639,18 +631,7 @@ function commerce_payment_transaction_load($transaction_id) {
  *   An array of transaction objects indexed by transaction_id.
  */
 function commerce_payment_transaction_load_multiple($transaction_ids = array(), $conditions = array(), $reset = FALSE) {
-  $transactions = entity_load('commerce_payment_transaction', $transaction_ids, $conditions, $reset);
-
-  // Convert the loaded amount integers to price decimal amounts.
-  foreach ($transactions as $transaction_id => &$transaction) {
-    // Ensure it happens only once per entity.
-    if (empty($transaction->amount_converted)) {
-      $transaction->amount = commerce_currency_integer_to_amount($transaction->amount, $transaction->currency_code);
-      $transaction->amount_converted = TRUE;
-    }
-  }
-
-  return $transactions;
+  return entity_load('commerce_payment_transaction', $transaction_ids, $conditions, $reset);
 }
 
 /**
@@ -855,7 +836,7 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
  */
 function commerce_payment_order_balance($order, $totals = array()) {
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $order_total = commerce_line_items_total($wrapper->commerce_line_items);
+  $order_total = $wrapper->commerce_order_total->value();
 
   // Calculate the transaction totals if not supplied.
   if (empty($totals)) {

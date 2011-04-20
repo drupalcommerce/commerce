@@ -180,3 +180,171 @@ function commerce_order_schema() {
 
   return $schema;
 }
+
+/**
+ * Between 7.x-1.0-beta2 and 7.x-1.0-beta3 we determined we needed to revise the
+ * way we handled price amounts, preferring to preserve integer amounts as
+ * loaded from the database until formatting them as decimal values upon display
+ * instead of converting them to decimals upon loading. The initial reasons and
+ * related issues are outlined in http://drupal.org/node/1124416.
+ *
+ * While the fix did not involve changing the database schema at all, it did
+ * change the way price amounts were stored in the components array of a price's
+ * data array. Therefore, the following update functions are responsible for
+ * loading and resaving entities the change will affect, primarily to result in
+ * a recalculated order total components array./
+ */
+
+/**
+ * Loads and resaves all the products on the site, updating the default price
+ * field to have proper component price amount values.
+ */
+function commerce_order_update_7100(&$sandbox) {
+  // Ensure there are no stale prices in the field cache.
+  field_cache_clear();
+
+  // Establish the progress variables.
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_product_id'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(DISTINCT product_id) FROM {commerce_product}")->fetchField();
+  }
+
+  // Load the next 50 products.
+  $products = db_select('commerce_product', 'cp')
+    ->fields('cp', array('product_id'))
+    ->condition('product_id', $sandbox['current_product_id'], '>')
+    ->range(0, 50)
+    ->orderBy('product_id', 'ASC')
+    ->execute();
+
+  // Loop over the products, loading, adjusting, and resaving each one.
+  foreach ($products as $product) {
+    $product = commerce_product_load($product->product_id);
+
+    // If the commerce_price field has a components array, multiply its price
+    // amounts by the proper value for its currency.
+    if (!empty($product->commerce_price)) {
+      foreach ($product->commerce_price as $langcode => &$data) {
+        foreach ($data as $delta => &$item) {
+          if (!empty($item['data']['components'])) {
+            foreach ($item['data']['components'] as $key => &$component) {
+              $component['price']['amount'] = commerce_currency_decimal_to_amount($component['price']['amount'], $component['price']['currency_code'], FALSE);
+            }
+          }
+        }
+      }
+    }
+
+    commerce_product_save($product);
+
+    $sandbox['progress']++;
+    $sandbox['current_product_id'] = $product->product_id;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t('All products have been loaded and saved with updated price component arrays.');
+}
+
+/**
+ * Loads and resaves all the line items on the site, updating the unit price
+ * field to have proper component price amount values.
+ */
+function commerce_order_update_7101(&$sandbox) {
+  // Ensure there are no stale prices in the field cache.
+  field_cache_clear();
+
+  // Establish the progress variables.
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_line_item_id'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(DISTINCT line_item_id) FROM {commerce_line_item}")->fetchField();
+  }
+
+  // Load the next 50 line items.
+  $line_items = db_select('commerce_line_item', 'cli')
+    ->fields('cli', array('line_item_id'))
+    ->condition('line_item_id', $sandbox['current_line_item_id'], '>')
+    ->range(0, 50)
+    ->orderBy('line_item_id', 'ASC')
+    ->execute();
+
+  // Loop over the line items, loading, adjusting, and resaving each one.
+  foreach ($line_items as $line_item) {
+    $line_item = commerce_line_item_load($line_item->line_item_id);
+
+    // If the commerce_unit_price field has a components array, multiply its
+    // amounts by the proper value for its currency.
+    if (!empty($line_item->commerce_unit_price)) {
+      foreach ($line_item->commerce_unit_price as $langcode => &$data) {
+        foreach ($data as $delta => &$item) {
+          if (!empty($item['data']['components'])) {
+            foreach ($item['data']['components'] as $key => &$component) {
+              $component['price']['amount'] = commerce_currency_decimal_to_amount($component['price']['amount'], $component['price']['currency_code'], FALSE);
+            }
+          }
+        }
+      }
+    }
+
+    commerce_line_item_save($line_item);
+
+    $sandbox['progress']++;
+    $sandbox['current_line_item_id'] = $line_item->line_item_id;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t('All line items have been loaded and saved with updated price component arrays.');
+}
+
+/**
+ * Loads and resaves all the orders on the site to rebuild the order total price
+ * component arrays.
+ */
+function commerce_order_update_7102(&$sandbox) {
+  // Ensure there are no stale prices in the field cache.
+  field_cache_clear();
+
+  // Establish the progress variables.
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_order_id'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(DISTINCT order_id) FROM {commerce_order}")->fetchField();
+  }
+
+  // Load the next 50 orders.
+  $orders = db_select('commerce_order', 'co')
+    ->fields('co', array('order_id'))
+    ->condition('order_id', $sandbox['current_order_id'], '>')
+    ->range(0, 50)
+    ->orderBy('order_id', 'ASC')
+    ->execute();
+
+  // Loop over the orders, loading and resaving each one.
+  foreach ($orders as $order) {
+    $order = commerce_order_load($order->order_id);
+
+    // Save the order as a new revision with an update log message.
+    $order->revision = TRUE;
+    $order->log = t('Order updated for 7.0-1.0-beta3 price component changes.');
+
+    commerce_order_save($order);
+
+    $sandbox['progress']++;
+    $sandbox['current_order_id'] = $order->order_id;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t('All orders have been loaded and saved with updated price component arrays.');
+}
+
+/**
+ * Truncates the pre-calculated price table.
+ */
+function commerce_order_update_7103() {
+  db_query("TRUNCATE TABLE {commerce_calculated_price}");
+  return t('The calculated price table has been cleared. If your site uses product sell price pre-calculation, you will need to recalculate these prices.');
+}

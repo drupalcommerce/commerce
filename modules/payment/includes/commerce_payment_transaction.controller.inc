@@ -77,6 +77,9 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       $transaction->revision_timestamp = REQUEST_TIME;
       $update_transaction = TRUE;
 
+      // Round the amount to ensure it's an integer for storage.
+      $transaction->amount = round($transaction->amount);
+
       // Give modules the opportunity to prepare field data for saving.
       rules_invoke_all('commerce_payment_transaction_presave', $transaction);
       field_attach_presave('commerce_payment_transaction', $transaction);

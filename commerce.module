@@ -323,35 +323,43 @@ function commerce_currency_get_symbol($currency_code = NULL) {
  * Formats a price for a particular currency.
  *
  * @param $price
- *   A numeric price value.
+ *   A numeric price amount value.
  * @param $currency_code
  *   The three character code of the currency.
  * @param $object
  *   When present, the object to which the price is attached.
+ * @param $convert
+ *   Boolean indicating whether or not the amount needs to be converted to a
+ *   decimal price amount when formatting.
  *
  * @return
  *   A fully formatted currency.
  */
-function commerce_currency_format($price, $currency_code, $object = NULL) {
+function commerce_currency_format($amount, $currency_code, $object = NULL, $convert = TRUE) {
   // First load the currency array.
   $currency = commerce_currency_load($currency_code);
 
+  // Then convert the price amount to the currency's major unit decimal value.
+  if ($convert = TRUE) {
+    $amount = commerce_currency_amount_to_decimal($amount, $currency_code);
+  }
+
   // Invoke the custom format callback if specified.
   if (!empty($currency['format_callback'])) {
-    return $currency['format_callback']($price, $currency, $object);
+    return $currency['format_callback']($amount, $currency, $object);
   }
 
   // Separate the negative symbol from the number itself.
-  if ($price < 0) {
+  if ($amount < 0) {
     $negative = TRUE;
-    $price = abs($price);
+    $price = abs($amount);
   }
   else {
     $negative = FALSE;
   }
 
   // Format the price as a number.
-  $price = number_format(commerce_currency_round($price, $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
+  $price = number_format(commerce_currency_round($amount, $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
 
   // Establish the replacement values to format this price for its currency.
   $replacements = array(
@@ -363,7 +371,7 @@ function commerce_currency_format($price, $currency_code, $object = NULL) {
     '@negative' => $negative ? '-' : '',
   );
 
-  return t('@code_before @negative@symbol_before@price @symbol_after @code_after', $replacements);
+  return trim(t('@code_before @negative@symbol_before@price @symbol_after @code_after', $replacements));
 }
 
 /**
@@ -431,16 +439,19 @@ function commerce_currency_convert($amount, $currency_code, $target_currency_cod
 /**
  * Converts a price amount to an integer value for storage in the database.
  *
- * @param $amount
- *   The price amount to convert to an integer.
+ * @param $decimal
+ *   The decimal amount to convert to a price amount.
  * @param $currency_code
  *   The currency code of the price whose decimals value will be used to
- *     multiply by the proper factor when converting the amount.
+ *     multiply by the proper factor when converting the decimal amount.
+ * @param $round
+ *   Whether or not the return value should be rounded and cast to an integer;
+ *     defaults to TRUE as necessary for standard price amount column storage.
  *
  * @return
- *   The integer value of the price amount.
+ *   The appropriate price amount based on the currency's decimals value.
  */
-function commerce_currency_amount_to_integer($amount, $currency_code) {
+function commerce_currency_decimal_to_amount($decimal, $currency_code, $round = TRUE) {
   static $factors;
 
   // If the divisor for this currency hasn't been calculated yet...
@@ -451,24 +462,28 @@ function commerce_currency_amount_to_integer($amount, $currency_code) {
   }
 
   // Ensure the amount has the proper number of decimal places for the currency.
-  $amount = commerce_currency_round($amount, commerce_currency_load($currency_code));
-
-  return (int) ($amount * $factors[$currency_code]);
+  if ($round) {
+    $decimal = commerce_currency_round($decimal, commerce_currency_load($currency_code));
+    return (int) ($decimal * $factors[$currency_code]);
+  }
+  else {
+    return $decimal * $factors[$currency_code];
+  }
 }
 
 /**
- * Converts an integer value to a price amount when loading from the database.
+ * Converts a price amount to a decimal value based on the currency.
  *
- * @param $integer
- *   The integer to convert to a price amount.
+ * @param $amount
+ *   The price amount to convert to a decimal value.
  * @param $currency_code
  *   The currency code of the price whose decimals value will be used to
- *     divide by the proper divisor when converting the integer.
+ *     divide by the proper divisor when converting the amount.
  *
  * @return
- *   The price amount depending on the number of decimals the currency uses.
+ *   The decimal amount depending on the number of places the currency uses.
  */
-function commerce_currency_integer_to_amount($integer, $currency_code) {
+function commerce_currency_amount_to_decimal($amount, $currency_code) {
   static $divisors;
 
   // If the divisor for this currency hasn't been calculated yet...
@@ -478,7 +493,7 @@ function commerce_currency_integer_to_amount($integer, $currency_code) {
     $divisors[$currency_code] = pow(10, $currency['decimals']);
   }
 
-  return $integer / $divisors[$currency_code];
+  return $amount / $divisors[$currency_code];
 }
 
 /**

@@ -515,7 +515,7 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
     // Change the price to check if the amount gets updated when the user logs
     // in.
     $new_price = $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] + rand(2, 500);
-    $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] = commerce_currency_integer_to_amount($new_price, $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code']);
+    $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] = commerce_currency_amount_to_decimal($new_price, $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code']);
     $this->product->is_new = FALSE;
     $this->product = commerce_product_save($this->product);
 
@@ -529,7 +529,7 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
     $this->drupalGet($this->getCommerceUrl('cart'));
     $this->assertNoText(t('Your shopping cart is empty.'), t('Cart is not empty'));
     $this->assertText($this->product->title, t('Product is still in the cart'));
-    $this->assertText(trim(commerce_currency_integer_to_amount($this->product->commerce_price[LANGUAGE_NONE][0]['amount'], $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code'])), t('Product price has been updated'));
+    $this->assertText(trim(commerce_currency_amount_to_decimal($this->product->commerce_price[LANGUAGE_NONE][0]['amount'], $this->product->commerce_price[LANGUAGE_NONE][0]['currency_code'])), t('Product price has been updated'));
 
     // Check if the order is the same.
     $this->assertTrue($order_anonymous->order_id == $order_authenticated->order_id, t('Cart has been converted successfully'));
