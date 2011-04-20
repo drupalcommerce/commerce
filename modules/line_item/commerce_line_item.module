@@ -186,14 +186,17 @@ function commerce_line_item_enable() {
  * Implements hook_modules_enabled().
  */
 function commerce_line_item_modules_enabled($modules) {
+  // Reset the line item cache to get the default options and callbacks.
+  commerce_line_item_types_reset();
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_line_item_type_info()...
     if (module_hook($module, 'commerce_line_item_type_info')) {
-      $line_item_types = module_invoke($module, 'commerce_line_item_type_info');
-
       // Loop through and configure the line item types defined by the module.
-      foreach ($line_item_types as $line_item_type) {
+      foreach (module_invoke($module, 'commerce_line_item_type_info') as $type => $line_item_type) {
+        // Load the line item type to ensure we have callbacks set.
+        $line_item_type = commerce_line_item_type_load($type);
         commerce_line_item_configure_line_item_type($line_item_type);
       }
     }

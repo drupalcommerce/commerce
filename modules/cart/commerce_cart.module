@@ -613,8 +613,6 @@ function commerce_cart_order_refresh($order) {
 
   // Save the order once here if it has changed or if a line item was changed.
   if ($order_wrapper->value() != $original_order || $line_item_changed) {
-    // Use a clone so the save doesn't interfere with price values in a live
-    // order object that would be modified on presave.
     commerce_order_save($order_wrapper->value());
   }
 
