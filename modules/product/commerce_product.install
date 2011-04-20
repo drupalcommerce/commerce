@@ -78,7 +78,7 @@ function commerce_product_schema() {
     ),
     'primary key' => array('product_id'),
     'indexes' => array(
-      'type' => array('type'),
+      'product_type' => array('type'),
     ),
     'unique keys' => array(
       'sku' => array('sku'),
@@ -92,4 +92,16 @@ function commerce_product_schema() {
   );
 
   return $schema;
+}
+
+
+/**
+ * Changes the name of the 'type' index on the commerce_product table to ensure
+ * compatibility with sqlite despite http://drupal.org/node/1008128.
+ */
+function commerce_product_update_7100() {
+  if (db_index_exists('commerce_product', 'type')) {
+    db_drop_index('commerce_product', 'type');
+  }
+  db_add_index('commerce_product', 'product_type', array('type'));
 }
