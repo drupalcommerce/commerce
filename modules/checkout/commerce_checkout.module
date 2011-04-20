@@ -441,6 +441,13 @@ function commerce_checkout_panes($conditions = array()) {
       foreach (module_invoke($module, 'commerce_checkout_pane_info') as $pane_id => $checkout_pane) {
         $checkout_pane['pane_id'] = $pane_id;
         $checkout_pane['module'] = $module;
+
+        // Update the pane with saved data.
+        if (!empty($saved_panes[$pane_id])) {
+          $checkout_pane = array_merge($checkout_pane, $saved_panes[$pane_id]);
+          $checkout_pane['saved'] = TRUE;
+        }
+
         $checkout_panes[$pane_id] = $checkout_pane;
       }
     }
@@ -449,12 +456,6 @@ function commerce_checkout_panes($conditions = array()) {
 
     // Merge in defaults.
     foreach ($checkout_panes as $pane_id => $checkout_pane) {
-      // Update the pane with saved data.
-      if (!empty($saved_panes[$pane_id])) {
-        $checkout_pane = array_merge($checkout_pane, $saved_panes[$pane_id]);
-        $checkout_pane['saved'] = TRUE;
-      }
-
       // Set some defaults for the checkout pane.
       $defaults = array(
         'base' => $pane_id,
