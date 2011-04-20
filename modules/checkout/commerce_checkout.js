@@ -8,7 +8,7 @@
     attach: function (context, settings) {
       // When the buttons to move from page to page in the checkout process are
       // clicked we disable them so they are not accidently clicked twice.
-      $('input.checkout-continue', context).click(function() {
+      $('input.checkout-continue:not(.checkout-processed)', context).addClass('checkout-processed').click(function() {
         var $this = $(this);
         $this.clone().insertAfter(this).attr('disabled', true).after(Drupal.theme('checkoutProcessing'));
         $this.hide();
