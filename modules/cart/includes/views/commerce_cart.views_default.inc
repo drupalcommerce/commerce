@@ -679,3 +679,15 @@ function commerce_cart_views_default_views() {
 
   return $views;
 }
+
+/**
+ * Implements hook_views_default_views_alter().
+ *
+ * Add the cart state as a filter on the default commerce_orders (admin)
+ * view.
+ */
+function commerce_cart_views_default_views_alter(&$views) {
+  if(isset($views['commerce_orders'])) {
+    $views['commerce_orders']->display['default']->display_options['filters']['state']['value']['cart'] = 'cart';
+  }
+}

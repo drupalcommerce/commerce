@@ -256,10 +256,6 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['filters']['state']['table'] = 'commerce_order';
   $handler->display->display_options['filters']['state']['field'] = 'state';
   $handler->display->display_options['filters']['state']['operator'] = 'not in';
-  $handler->display->display_options['filters']['state']['value'] = array(
-    'cart' => 'cart',
-    'checkout' => 'checkout',
-  );
   $handler->display->display_options['filters']['state']['expose']['label'] = 'Order state';
   $handler->display->display_options['filters']['state']['expose']['use_operator'] = 1;
   $handler->display->display_options['filters']['state']['expose']['operator'] = 'state_op';
