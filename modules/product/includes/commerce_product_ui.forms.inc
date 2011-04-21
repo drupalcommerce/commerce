@@ -66,12 +66,15 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
   );
 
   if (module_exists('entity_translation')) {
-    $form['product_type']['language_product_type'] = array(
+    $form['product_type']['multilingual'] = array(
       '#type' => 'radios',
       '#title' => t('Multilingual support'),
+      '#description' => t('If <em>Entity translation</em> is enabled it will be possible to provide a different version of the same product for each available language.') . '<br />' . t('Existing products will not be affected by changing this option.'),
+      '#options' => array(
+        0 => t('Disabled'),
+        ENTITY_TRANSLATION_ENABLED => t('Enabled via <em>Entity translation</em>'),
+      ),
       '#default_value' => variable_get('language_product_type_' . $product_type['type'], 0),
-      '#options' => array(0 => t('Disabled'), ENTITY_TRANSLATION_ENABLED => t('Enabled, with entity translation')),
-      '#description' => t('Enable multilingual support for this product type. If <em>entity translation</em> is enabled it will be possible to provide a different version of the same product for each available language. Existing products will not be affected by changing this option.'),
     );
   }
 
@@ -154,9 +157,9 @@ function commerce_product_ui_product_type_form_submit($form, &$form_state) {
   $product_type['is_new'] = !$updated;
   commerce_product_ui_product_type_save($product_type);
 
-  // Save
+  // Set the multingual value for the product type if entity translation is enabled.
   if (module_exists('entity_translation')) {
-  	variable_set('language_product_type_' . $product_type['type'], $form_state['values']['product_type']['language_product_type']);
+    variable_set('language_product_type_' . $product_type['type'], $product_type['multilingual']);
   }
 
   // Redirect based on the button clicked.
