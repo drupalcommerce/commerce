@@ -480,18 +480,19 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
   // Add a submit handler to the save button to add a redirect.
   $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_form_submit';
 
-  // If translation support is enabled - provide the suitable languages
+  // If translation support is enabled, provide the suitable languages
   if (module_exists('entity_translation') && entity_translation_enabled('commerce_product')) {
-  	$form['language'] = array(
+    $form['language'] = array(
       '#type' => 'select',
       '#title' => t('Language'),
       '#default_value' => (isset($form_state['commerce_product']->language) ? $form_state['commerce_product']->language : ''),
       '#options' => array(LANGUAGE_NONE => t('Language neutral')) + locale_language_list('name'),
       '#weight' => -10,
     );
-    // Since this function may changes the language of the submitted form
-    // values it has to be the first called.
-    array_unshift($form['actions']['submit']['#submit'], 'commerce_product_ui_product_form_translation_processing');
+
+    // Since this function may change the language of the submitted form values,
+    // it has to be the first called.
+    array_unshift($form['actions']['submit']['#submit'], 'commerce_product_ui_product_form_translation_submit');
   }
 
   // Add the save and continue button for new products.
@@ -525,29 +526,29 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
 }
 
 /**
- * Special submit callback for commerce_product_ui_product_form().
+ * Submit callback for commerce_product_ui_product_form().
  *
- * Checks if translation is enabled and handle possible language changes.
- * Since this handler may changes the language of submitted form values it
- * should be invoked as the first submit handler.
+ * Checks if translation is enabled for the product and handles language changes.
+ * Since this handler may change the language of submitted form values it should
+ * be the first submit handler called.
+ *
+ * @see commerce_product_ui_form_commerce_product_ui_product_form_alter()
  */
-function commerce_product_ui_product_form_translation_processing($form, &$form_state) {
-  // If translation support is enabled - make sure language changes are handled.
-  if (module_exists('entity_translation') && entity_translation_enabled('commerce_product')) {
-    $available_languages = field_content_languages();
-    list(, , $bundle) = entity_extract_ids('commerce_product', $form_state['commerce_product']);
+function commerce_product_ui_product_form_translation_submit($form, &$form_state) {
+  // Get an array of available languages.
+  $available_languages = field_content_languages();
+  list(, , $bundle) = entity_extract_ids('commerce_product', $form_state['commerce_product']);
 
-    foreach (field_info_instances('commerce_product', $bundle) as $instance) {
-      $field_name = $instance['field_name'];
-      $field = field_info_field($field_name);
-      $previous_language = $form[$field_name]['#language'];
+  foreach (field_info_instances('commerce_product', $bundle) as $instance) {
+    $field_name = $instance['field_name'];
+    $field = field_info_field($field_name);
+    $previous_language = $form[$field_name]['#language'];
 
-      // Handle a possible language change: new language values are inserted,
-      // previous ones are deleted.
-      if ($field['translatable'] && $previous_language != $form_state['values']['language']) {
-        $form_state['values'][$field_name][$form_state['values']['language']] = $form_state['commerce_product']->{$field_name}[$previous_language];
-        $form_state['values'][$field_name][$previous_language] = array();
-      }
+    // Handle a possible language change; new language values are inserted and
+    // the previous values are deleted.
+    if ($field['translatable'] && $previous_language != $form_state['values']['language']) {
+      $form_state['values'][$field_name][$form_state['values']['language']] = $form_state['commerce_product']->{$field_name}[$previous_language];
+      $form_state['values'][$field_name][$previous_language] = array();
     }
   }
 }

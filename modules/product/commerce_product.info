@@ -19,8 +19,8 @@ files[] = includes/views/handlers/commerce_product_handler_field_product_link_ed
 files[] = includes/views/handlers/commerce_product_handler_field_product_operations.inc
 files[] = includes/views/handlers/commerce_product_handler_filter_product_type.inc
 
+; Translation handler
+files[] = includes/commerce_product.translation_handler.inc
+
 ; Simple tests
 files[] = tests/commerce_product.test
-
-; Translation handler
-files[] = includes/translation.handler.commerce_product.inc

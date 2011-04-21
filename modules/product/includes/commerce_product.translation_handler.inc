@@ -1,20 +1,17 @@
 <?php
-// $Id$
 
 /**
  * @file
- * Commerce product translation handler for the translation module.
+ * Translation handler for the Commerce Product entity.
  */
 
 /**
- * Commerce product translation handler.
+ * Commerce Product translation handler.
  *
- * Override the default behaviours to provide the needed commerce product
- * properties.
+ * This class is registered in commerce_product.module using the translation
+ * property the Entity Translation module uses via hook_entity_info().
  *
- * This class is registered in the commerce_product.module using the
- * translation property in hook_entity_info.
- * @see commerce_product.module
+ * @see commerce_product_entity_info()
  */
 class EntityTranslationCommerceProductHandler extends EntityTranslationDefaultHandler {
 
@@ -30,21 +27,21 @@ class EntityTranslationCommerceProductHandler extends EntityTranslationDefaultHa
   }
 
   /**
-   * Returns the original language of the commerce product.
+   * Returns the original language of the product.
    */
   public function getLanguage() {
     return $this->entity->language;
   }
 
   /**
-   * Checks whether the current user has access to this commerce product.
+   * Checks whether the current user has access to this product.
    */
   public function getAccess($op) {
     return commerce_product_access($op, $this->entity);
   }
 
   /**
-   * Returns whether the commerce product is active (TRUE) or disabled (FALSE).
+   * Returns whether the product is active (TRUE) or disabled (FALSE).
    */
   protected function getStatus() {
     return (boolean) $this->entity->status;
