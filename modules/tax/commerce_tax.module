@@ -329,7 +329,8 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
 
             $form[$key][$form[$key]['#language']][$delta]['include_tax'] = array(
               '#type' => 'select',
-              '#title' => t('Tax included'),
+              '#title' => t('Include tax in this price'),
+              '#description' => t('Saving prices tax inclusive will bypass later calculations for the specified tax.'),
               '#options' => $options,
               '#default_value' => $default,
               '#required' => FALSE,
