@@ -1,6 +1,7 @@
 name = Cart
 description = Implements the shopping cart system and add to cart features.
 package = Commerce
+dependencies[] = commerce
 dependencies[] = commerce_checkout
 dependencies[] = commerce_line_item
 dependencies[] = commerce_order

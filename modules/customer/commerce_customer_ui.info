@@ -4,6 +4,7 @@ package = Commerce
 core = 7.x
 dependencies[] = contextual
 dependencies[] = field_ui
+dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_customer
 dependencies[] = views

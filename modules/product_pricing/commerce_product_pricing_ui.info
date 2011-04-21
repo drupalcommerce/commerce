@@ -2,6 +2,7 @@ name = Product Pricing UI
 description = Exposes a UI for managing product pricing rules and pre-calculation settings.
 package = Commerce
 dependencies[] = rules_admin
+dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_price
 dependencies[] = commerce_product_pricing

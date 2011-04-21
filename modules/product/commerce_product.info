@@ -2,6 +2,7 @@ name = Product
 description = Defines the Product entity and associated features.
 package = Commerce
 dependencies[] = rules
+dependencies[] = commerce
 dependencies[] = commerce_price
 core = 7.x
 

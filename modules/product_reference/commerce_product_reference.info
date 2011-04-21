@@ -1,6 +1,7 @@
 name = Product Reference
 description = Defines a product reference field and default display formatters.
 package = Commerce
+dependencies[] = commerce
 dependencies[] = commerce_line_item
 dependencies[] = commerce_price
 dependencies[] = commerce_product
