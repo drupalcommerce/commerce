@@ -45,12 +45,6 @@ function commerce_product_entity_property_info() {
     'required' => TRUE,
     'query callback' => 'entity_metadata_table_query',
   );
-  $properties['edit_url'] = array(
-    'label' => t('Edit URL'),
-    'description' => t("The URL of the product's edit page."),
-    'getter callback' => 'commerce_product_get_properties',
-    'type' => 'uri',
-  );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the product was created.'),

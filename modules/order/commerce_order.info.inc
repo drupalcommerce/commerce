@@ -27,24 +27,6 @@ function commerce_order_entity_property_info() {
     'query callback' => 'entity_metadata_table_query',
     'required' => TRUE,
   );
-  $properties['view_url'] = array(
-    'type' => 'uri',
-    'label' => t('View URL'),
-    'description' => t('The URL a customer can visit to view the order.'),
-    'getter callback' => 'commerce_order_get_properties',
-  );
-  $properties['admin_url'] = array(
-    'type' => 'uri',
-    'label' => t('Admin URL'),
-    'description' => t("The URL of the order's administrative view page."),
-    'getter callback' => 'commerce_order_get_properties',
-  );
-  $properties['edit_url'] = array(
-    'type' => 'uri',
-    'label' => t('Edit URL'),
-    'description' => t("The URL of the order's edit page."),
-    'getter callback' => 'commerce_order_get_properties',
-  );
   $properties['status'] = array(
     'type' => 'text',
     'label' => t('Status'),

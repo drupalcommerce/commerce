@@ -35,10 +35,6 @@ function commerce_product_token_info() {
     'name' => t('Title'),
     'description' => t('The title of the product.'),
   );
-  $product['edit-url'] = array(
-    'name' => t('Edit URL'),
-    'description' => t("The URL of the product's edit page."),
-  );
 
   // Chained tokens for products.
   $product['creator'] = array(
@@ -101,10 +97,6 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
 
         case 'title':
           $replacements[$original] = $sanitize ? check_plain($product->title) : $product->title;
-          break;
-
-        case 'edit-url':
-          $replacements[$original] = url('admin/commerce/products/' . $product->product_id . '/edit', $url_options);
           break;
 
         // Default values for the chained tokens handled below.

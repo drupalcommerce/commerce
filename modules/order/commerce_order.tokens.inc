@@ -59,14 +59,6 @@ function commerce_order_token_info() {
     'name' => t('Order state title'),
     'description' => t('The human-readable title of the order state.'),
   );
-  $order['url'] = array(
-    'name' => t('URL'),
-    'description' => t('The URL of the order.'),
-  );
-  $order['edit-url'] = array(
-    'name' => t('Edit URL'),
-    'description' => t("The URL of the order's edit page."),
-  );
 
   // Chained tokens for orders.
   $order['owner'] = array(
@@ -158,13 +150,6 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
           $replacements[$original] = $sanitize ? check_plain(commerce_order_state_get_title($order_status['state'])) : commerce_order_state_get_title($order_status['state']);
           break;
 
-        case 'url':
-          $replacements[$original] = url('user/' . $order->uid . '/orders/' . $order->order_id, $url_options);
-          break;
-
-        case 'edit-url':
-          $replacements[$original] = url('admin/commerce/orders/' . $order->order_id . '/edit', $url_options);
-          break;
 
         // Default values for the chained tokens handled below.
         case 'owner':

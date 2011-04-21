@@ -1029,11 +1029,11 @@ function commerce_order_get_properties($order, array $options, $name) {
   switch ($name) {
     case 'owner':
       return $order->uid;
-    case 'view-url':
-      return url('order/' . $order->order_id, $options);
-    case 'admin-url':
+    case 'view_url':
+      return url('user/' . $order->uid . '/orders/' . $order->order_id, $options);
+    case 'admin_url':
       return url('admin/commerce/orders/' . $order->order_id, $options);
-    case 'edit-url':
+    case 'edit_url':
       return url('admin/commerce/orders/' . $order->order_id . '/edit', $options);
     case 'state':
       $order_status = commerce_order_status_load($order->status);
