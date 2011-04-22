@@ -31,7 +31,7 @@ class commerce_line_item_handler_field_edit_quantity extends commerce_line_item_
       '#datatype' => 'integer',
       '#default_value' => round($quantity),
       '#size' => 4,
-      '#maxlength' => 8,
+      '#maxlength' => max(4, strlen($quantity)),
     );
 
     // Return the placeholder that will be used as token for replacing itself
