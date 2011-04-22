@@ -287,6 +287,15 @@ function commerce_order_order_form_submit($form, &$form_state) {
 
   // Save the order.
   $order = commerce_order_save($order);
+
+  // Ensure the attached line items are associated with the order if they do not
+  // have an order_id set yet.
+  foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+    if ($line_item_wrapper->order_id->value() == 0) {
+      $line_item_wrapper->order_id = $order->order_id;
+      $line_item_wrapper->save();
+    }
+  }
 }
 
 /**
