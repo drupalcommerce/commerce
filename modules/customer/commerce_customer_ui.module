@@ -378,3 +378,11 @@ function commerce_customer_ui_set_breadcrumb($profile_types = FALSE) {
 
   drupal_set_breadcrumb($breadcrumb);
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_customer_ui_form_entity_translation_admin_form_alter(&$form, &$form_state, $form_id) {
+  // Hide the commerce_customer_profile option from entity translation.
+  unset($form['entity_translation_entity_types']['#options']['commerce_customer_profile']);
+}

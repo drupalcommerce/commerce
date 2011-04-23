@@ -96,6 +96,14 @@ function commerce_line_item_ui_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_line_item_ui_form_entity_translation_admin_form_alter(&$form, &$form_state, $form_id) {
+  // Hide the commerce_line_item option from entity translation.
+  unset($form['entity_translation_entity_types']['#options']['commerce_line_item']);
+}
+
+/**
  * Implements hook_views_api().
  *
 function commerce_line_item_ui_views_api() {

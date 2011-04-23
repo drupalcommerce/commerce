@@ -67,9 +67,32 @@ function commerce_product_entity_info() {
       'deletion callback' => 'commerce_product_delete',
       'access callback' => 'commerce_product_access',
       'token type' => 'product',
+
+      // Add entity translation support.
       'translation' => array(
         'entity_translation' => array(
           'class' => 'EntityTranslationCommerceProductHandler',
+        ),
+      ),
+
+      // Add title replacement support for translations.
+      'field replacement' => array(
+        'title' => array(
+          'field' => array(
+            'type' => 'text',
+            'cardinality' => 1,
+            'translatable' => TRUE,
+          ),
+          'instance' => array(
+            'label' => t('Title'),
+            'required' => TRUE,
+            'settings' => array(
+              'text_processing' => 0,
+            ),
+            'widget' => array(
+              'weight' => -5,
+            ),
+          ),
         ),
       ),
     ),
@@ -806,10 +829,10 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
 }
 
 /**
- * Access callback: determins access to a product's translation tab.
+ * Access callback: determines access to a product's translation tab.
  */
 function commerce_product_entity_translation_tab_access($product) {
-  if ($product->language != LANGUAGE_NONE) {
+  if (!empty($product->language) && $product->language != LANGUAGE_NONE) {
     if (commerce_product_entity_translation_supported_type($product->type)) {
       return entity_translation_tab_access('commerce_product');
     }

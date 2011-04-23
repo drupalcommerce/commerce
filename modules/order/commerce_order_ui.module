@@ -299,3 +299,11 @@ function commerce_order_ui_order_view($order, $view_mode = 'administrator', $bre
 
   return commerce_order_build_content($order, $view_mode);
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_order_ui_form_entity_translation_admin_form_alter(&$form, &$form_state, $form_id) {
+  // Hide the commerce_order option from entity translation.
+  unset($form['entity_translation_entity_types']['#options']['commerce_order']);
+}
