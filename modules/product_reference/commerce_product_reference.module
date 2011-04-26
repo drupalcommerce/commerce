@@ -95,7 +95,20 @@ function commerce_product_reference_form_commerce_product_product_delete_form_al
           // For line item references, display a message about the inability of
           // the product to be deleted and disable the submit button.
           if ($entity_type == 'commerce_line_item') {
-            $form['description']['#markup'] .= '<p>' . t('This product is referenced by a line item and therefore cannot be deleted. Disable it instead.') . '</p>';
+            // Load the referencing line item.
+            $line_item = reset($data);
+            $line_item = commerce_line_item_load($line_item->line_item_id);
+
+            // Implement a soft dependency on the Order module to show a little
+            // more information in the non-deletion message.
+            if (!empty($line_item->order_id) && $order = commerce_order_load($line_item->order_id)) {
+              $description = t('This product is referenced by a line item on Order @order_number and therefore cannot be deleted. Disable it instead.', array('@order_number' => $order->order_number));
+            }
+            else {
+              $description = t('This product is referenced by a line item and therefore cannot be deleted. Disable it instead.');
+            }
+
+            $form['description']['#markup'] .= '<p>' . $description . '</p>';
             $form['actions']['submit']['#disabled'] = TRUE;
             return;
           }
