@@ -345,6 +345,6 @@ function commerce_order_update_7102(&$sandbox) {
  * Truncates the pre-calculated price table.
  */
 function commerce_order_update_7103() {
-  db_query("TRUNCATE TABLE {commerce_calculated_price}");
+  db_truncate('commerce_calculated_price')->execute();
   return t('The calculated price table has been cleared. If your site uses product sell price pre-calculation, you will need to recalculate these prices.');
 }

@@ -119,8 +119,7 @@ function commerce_checkout_builder_form_save_submit($form, &$form_state) {
  */
 function commerce_checkout_builder_form_reset_submit($form, &$form_state) {
   // Empty the checkout pane table of configuration data.
-  db_query("TRUNCATE TABLE {commerce_checkout_pane}");
-
+  db_truncate('commerce_checkout_pane')->execute();
   drupal_set_message(t('Checkout pane positions reset.'));
 }
 
