@@ -151,7 +151,9 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
 
         // Save the order number.
         // TODO: Provide token support for order number patterns.
-        $order->order_number = $order->order_id;
+        if (empty($order->order_number)) {
+          $order->order_number = $order->order_id;
+        }
 
         db_update('commerce_order')
           ->fields(array('order_number' => $order->order_number))
