@@ -11,3 +11,7 @@
   float: left;
   padding: 3px 10px 0 0;
 }
+
+#line-item-manager .form-submit {
+  float: left;
+}

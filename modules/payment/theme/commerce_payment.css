@@ -20,7 +20,11 @@
 }
 
 .add-payment .form-item-payment-method {
-  display: inline;
+  float: left;
+}
+.add-payment .form-submit {
+  float: left;
+  margin: 5px;
 }
 
 .views-field-operations .links.operations {

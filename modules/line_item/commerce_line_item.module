@@ -1020,7 +1020,7 @@ function theme_commerce_line_item_manager($variables) {
 
   $output = theme('table', $table_variables) . drupal_render($form['actions']);
 
-  return '<div id="line-item-manager">' . $output . '</div>';
+  return '<div id="line-item-manager" class="clearfix">' . $output . '</div>';
 }
 
 /**
