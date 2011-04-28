@@ -55,15 +55,15 @@
 function hook_commerce_currency_info() {
   return array (
     'CHF' => array(
-        'code' => 'CHF',
-        'numeric_code' => '756',
-        'symbol' => 'Fr.',
-        'name' => t('Swiss Franc'),
-        'symbol_placement' => 'before',
-        'code_placement' => 'before',
-        'minor_unit' => t('Rappen'),
-        'major_unit' => t('Franc'),
-        'rounding_step' => '0.05',
+      'code' => 'CHF',
+      'numeric_code' => '756',
+      'symbol' => 'Fr.',
+      'name' => t('Swiss Franc'),
+      'symbol_placement' => 'before',
+      'code_placement' => 'before',
+      'minor_unit' => t('Rappen'),
+      'major_unit' => t('Franc'),
+      'rounding_step' => '0.05',
     ),
   );
 }
