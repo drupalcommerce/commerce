@@ -16,7 +16,8 @@ function commerce_line_item_ui_types_overview() {
   // Loop through all defined line item types.
   foreach (commerce_line_item_types() as $type => $line_item_type) {
     // Build the operation links for the current line item type.
-    $links = menu_contextual_links('commerce-line-item-type', 'admin/commerce/config/line-items', array($type));
+    $type_arg = strtr($type, '_', '-');
+    $links = menu_contextual_links('commerce-line-item-type', 'admin/commerce/config/line-items', array($type_arg));
 
     // Add the line item type's row to the table's rows array.
     $rows[] = array(
