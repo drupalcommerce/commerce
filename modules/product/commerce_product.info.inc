@@ -18,6 +18,7 @@ function commerce_product_entity_property_info() {
     'label' => t('Product ID'),
     'description' => t('The internal numeric ID of the product.'),
     'type' => 'integer',
+    'schema field' => 'product_id',
   );
   $properties['sku'] = array(
     'label' => t('SKU'),
@@ -25,7 +26,7 @@ function commerce_product_entity_property_info() {
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'sku',
   );
   $properties['type'] = array(
     'label' => t('Type'),
@@ -35,7 +36,7 @@ function commerce_product_entity_property_info() {
     'setter permission' => 'administer products',
     'options list' => 'commerce_product_type_options_list',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'type',
   );
   $properties['title'] = array(
     'label' => t('Title'),
@@ -43,23 +44,23 @@ function commerce_product_entity_property_info() {
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'title',
   );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the product was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer products',
+    'schema field' => 'created',
   );
   $properties['changed'] = array(
     'label' => t('Date changed'),
     'description' => t('The date the product was most recently updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer products',
+    'schema field' => 'changed',
   );
   $properties['uid'] = array(
     'label' => t("Creator ID"),
@@ -68,7 +69,7 @@ function commerce_product_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer products',
     'clear' => array('creator'),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'uid',
   );
   $properties['creator'] = array(
     'label' => t("Creator"),

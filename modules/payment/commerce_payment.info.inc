@@ -18,6 +18,7 @@ function commerce_payment_entity_property_info() {
     'label' => t('Transaction ID'),
     'description' => t('The internal numeric ID of the transaction.'),
     'type' => 'integer',
+    'schema field' => 'transaction_id',
   );
   $properties['uid'] = array(
     'label' => t('User ID'),
@@ -26,7 +27,7 @@ function commerce_payment_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer payment transactions',
     'clear' => array('user'),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'uid',
   );
   $properties['user'] = array(
     'label' => t('User'),
@@ -45,7 +46,7 @@ function commerce_payment_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer payment transactions',
     'clear' => array('order'),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'order_id',
   );
   $properties['order'] = array(
     'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
@@ -65,41 +66,41 @@ function commerce_payment_entity_property_info() {
     'setter permission' => 'administer payment transactions',
     'options list' => 'commerce_payment_method_options_list',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'payment_method',
   );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the payment was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer payment transactions',
+    'schema field' => 'created',
   );
   $properties['changed'] = array(
     'label' => t('Date updated'),
     'description' => t('The date the payment was last updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer payment transactions',
+    'schema field' => 'changed',
   );
   $properties['remote_id'] = array(
     'label' => t('Remote id'),
     'description' => t('The remote identifier for this transaction.'),
     'type' => 'text',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'remote_id',
   );
   $properties['amount'] = array(
     'label' => t('Amount'),
     'description' => t('The amount for this transaction.'),
     'type' => 'decimal',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'amount',
   );
   $properties['currency_code'] = array(
     'label' => t('Currency Code'),
     'description' => t('The currency code for this transaction.'),
     'type' => 'text',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'currency_code',
   );
   $properties['message'] = array(
     'label' => t('Message'),
@@ -112,16 +113,16 @@ function commerce_payment_entity_property_info() {
     'description' => t('Status of the payment transaction.'),
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer payment transactions',
+    'schema field' => 'status',
   );
   $properties['remote_status'] = array(
     'label' => t('Remote status'),
     'description' => t('Remote status of the payment transaction.'),
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer payment transactions',
+    'schema field' => 'remote_status',
   );
 
   return $info;

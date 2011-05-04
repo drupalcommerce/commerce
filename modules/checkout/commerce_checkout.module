@@ -160,16 +160,8 @@ function commerce_checkout_theme() {
 
 /**
  * Implements hook_entity_property_info_alter().
- *
- * Currently the Entity module does not add query callbacks for various core
- * entity properties. Checkout depends on being able to load a user account by
- * e-mail address, so we must alter in the callback until Entity is updated.
- *
- * @see http://drupal.org/node/1044312
  */
 function commerce_checkout_entity_property_info_alter(&$info) {
-  $info['user']['properties']['mail']['query callback'] = 'entity_metadata_table_query';
-
   // TODO: Remove this once http://drupal.org/node/1044332 is fixed.
   if (empty($info['user']['properties']['status'])) {
     $info['user']['properties']['status'] = array(

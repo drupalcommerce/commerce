@@ -18,23 +18,24 @@ function commerce_order_entity_property_info() {
     'type' => 'integer',
     'label' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The internal numeric ID of the order.'),
+    'schema field' => 'order_id',
   );
   $properties['order_number'] = array(
     'type' => 'text',
     'label' => t('Order number', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The order number displayed to the customer.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'required' => TRUE,
+    'schema field' => 'order_number',
   );
   $properties['status'] = array(
     'type' => 'text',
     'label' => t('Status'),
     'description' => t('The current status of the order.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'options list' => 'commerce_order_status_options_list',
     'required' => TRUE,
+    'schema field' => 'status',
   );
   $properties['state'] = array(
     'type' => 'token',
@@ -42,6 +43,7 @@ function commerce_order_entity_property_info() {
     'description' => t('The state of the order derived from its status.'),
     'getter callback' => 'commerce_order_get_properties',
     'options list' => 'commerce_order_state_options_list',
+    'schema field' => 'state',
   );
   $properties['created'] = array(
     'type' => 'date',
@@ -49,7 +51,7 @@ function commerce_order_entity_property_info() {
     'description' => t('The date the order was created.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer orders',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'created',
   );
   $properties['changed'] = array(
     'type' => 'date',
@@ -57,16 +59,16 @@ function commerce_order_entity_property_info() {
     'description' => t('The date the order was most recently updated.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer orders',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'changed',
   );
   $properties['type'] = array(
     'type' => 'text',
     'label' => t('Type'),
     'description' => t('The human readable name of the order type.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'options list' => 'commerce_order_type_options_list',
     'required' => TRUE,
+    'schema field' => 'type',
   );
   $properties['uid'] = array(
     'type' => 'integer',
@@ -74,8 +76,8 @@ function commerce_order_entity_property_info() {
     'description' => t("The unique ID of the order owner."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer orders',
-    'query callback' => 'entity_metadata_table_query',
     'clear' => array('owner'),
+    'schema field' => 'uid',
   );
   $properties['owner'] = array(
     'type' => 'user',
@@ -92,7 +94,7 @@ function commerce_order_entity_property_info() {
     'description' => t('The e-mail address associated with this order.'),
     'setter callback' => 'entity_property_verbatim_set',
     'validation callback' => 'valid_email_address',
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'mail',
   );
 
   return $info;

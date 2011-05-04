@@ -18,6 +18,7 @@ function commerce_customer_entity_property_info() {
     'label' => t('Profile ID'),
     'description' => t('The internal numeric ID of the profile.'),
     'type' => 'integer',
+    'schema field' => 'profile_id',
   );
   $properties['type'] = array(
     'label' => t('Type'),
@@ -27,7 +28,7 @@ function commerce_customer_entity_property_info() {
     'setter permission' => 'administer customer profiles',
     'options list' => 'commerce_customer_profile_type_options_list',
     'required' => TRUE,
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'type',
   );
   $properties['uid'] = array(
     'label' => t('User ID'),
@@ -36,7 +37,7 @@ function commerce_customer_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer customer profiles',
     'clear' => array('user'),
-    'query callback' => 'entity_metadata_table_query',
+    'schema field' => 'uid',
   );
   $properties['user'] = array(
     'label' => t('User'),
@@ -53,24 +54,24 @@ function commerce_customer_entity_property_info() {
     'description' => t('Whether the profile is active.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer customer profiles',
-    'query callback' => 'entity_metadata_table_query',
     'type' => 'boolean',
+    'schema field' => 'status',
   );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the product was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer customer profiles',
+    'schema field' => 'created',
   );
   $properties['changed'] = array(
     'label' => t('Date updated'),
     'description' => t('The date the product was last updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer customer profiles',
+    'schema field' => 'changed',
   );
 
   return $info;
