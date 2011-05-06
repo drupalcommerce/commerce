@@ -132,6 +132,70 @@ function commerce_order_rules_condition_info() {
     ),
   );
 
+  $conditions['commerce_order_contains_product'] = array(
+    'label' => t('Order contains a particular product'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+        'description' => t('The order whose line items should be checked for the specified product. In most cases, you will use line-item:order. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
+      ),
+      'product_id' => array(
+        'type' => 'text',
+        'label' => t('Product SKU'),
+        'description' => t('The SKU of the product to look for on the order.'),
+        'restriction' => 'input',
+      ),
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The operator used with the quantity value below to compare the quantity of the specified product on the order.'),
+        'default value' => 'at least',
+        'options list' => 'commerce_order_product_quantity_operator_options_list',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Quantity'),
+        'default value' => 1,
+        'description' => t('The value to compare against the quantity of the specified product on the order.'),
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_contains_product',
+    ),
+  );
+
+  $conditions['commerce_order_compare_total_product_quantity'] = array(
+    'label' => t('Total product quantity comparison'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+        'description' => t('The order whose product line item quantities should be totalled. In most cases, you will use line-item:order. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
+      ),
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The comparison operator to use against the total number of products on the order.'),
+        'default value' => 'at least',
+        'options list' => 'commerce_order_product_quantity_operator_options_list',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Quantity'),
+        'default value' => 1,
+        'description' => t('The value to compare against the total quantity of products on the order.'),
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_compare_total_quantity',
+    ),
+  );
+
   return $conditions;
 }
 
@@ -223,6 +287,98 @@ function commerce_order_rules_compare_address($order, $address_field, $component
           return strpos($address[$component], $value) !== FALSE;
       }
     }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Options list callback: operators for the address comparison condition.
+ */
+function commerce_order_product_quantity_operator_options_list() {
+  return array(
+    'less than' => t('less than'),
+    'no more than' => t('no more than'),
+    'equals' => t('equals'),
+    'at least' => t('at least'),
+    'more than' => t('more than'),
+  );
+}
+
+/**
+ * Condition callback: checks to see if a particular product exists on an order
+ * in the specified quantity.
+ */
+function commerce_order_rules_contains_product($order, $sku, $operator, $value) {
+  $products = array($sku => 0);
+
+  // If we actually received a valid order...
+  if (!empty($order)) {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Populate the array of the quantities of the products on the order.
+    foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+      if ($line_item_wrapper->type->value() == 'product') {
+        // Extract a product ID and quantity from the line item.
+        $line_item_sku = $line_item_wrapper->commerce_product->sku->value();
+        $quantity = $line_item_wrapper->quantity->value();
+
+        // Update the product's quantity value.
+        if (empty($products[$line_item_sku])) {
+          $products[$line_item_sku] = $quantity;
+        }
+        else {
+          $products[$line_item_sku] += $quantity;
+        }
+      }
+    }
+  }
+
+  // Make a quantity comparison based on the operator.
+  switch ($operator) {
+    case 'less than':
+      return $product[$sku] < $value;
+    case 'no more than':
+      return $product[$sku] <= $value;
+    case 'equals':
+      return $products[$sku] == $value;
+    case 'at least':
+      return $products[$sku] >= $value;
+    case 'more than':
+      return $products[$sku] > $value;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Condition callback: compares the total quantity of products on an order
+ * against the specified quantity.
+ */
+function commerce_order_rules_compare_total_quantity($order, $operator, $value) {
+  $quantity = 0;
+
+  // If we received an order, get the total quantity of products on it.
+  if (!empty($order)) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    if (!empty($wrapper->commerce_line_items)) {
+      $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, 'product');
+    }
+  }
+
+  // Make a quantity comparison based on the operator.
+  switch ($operator) {
+    case 'less than':
+      return $quantity < $value;
+    case 'no more than':
+      return $quantity <= $value;
+    case 'equals':
+      return $quantity == $value;
+    case 'at least':
+      return $quantity >= $value;
+    case 'more than':
+      return $quantity > $value;
   }
 
   return FALSE;
