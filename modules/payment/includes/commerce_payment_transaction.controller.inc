@@ -81,6 +81,7 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       $transaction->amount = round($transaction->amount);
 
       // Give modules the opportunity to prepare field data for saving.
+      module_invoke_all('entity_presave', $transaction, 'commerce_payment_transaction');
       rules_invoke_all('commerce_payment_transaction_presave', $transaction);
       field_attach_presave('commerce_payment_transaction', $transaction);
 

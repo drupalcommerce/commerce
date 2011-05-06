@@ -70,6 +70,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       $wrapper->commerce_total->data = $data;
 
       // Give modules the opportunity to prepare field data for saving.
+      module_invoke_all('entity_presave', $line_item, 'commerce_line_item');
       rules_invoke_all('commerce_line_item_presave', $line_item);
       field_attach_presave('commerce_line_item', $line_item);
 
@@ -80,17 +81,19 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
 
         // Save the new line item and fields.
         drupal_write_record('commerce_line_item', $line_item);
-        field_attach_insert('commerce_line_item', $line_item);
 
         $op = 'insert';
       }
       else {
         // Save the updated line item and fields.
         drupal_write_record('commerce_line_item', $line_item, 'line_item_id');
-        field_attach_update('commerce_line_item', $line_item);
 
         $op = 'update';
       }
+
+      // Save fields.
+      $function = 'field_attach_' . $op;
+      $function('commerce_line_item', $line_item);
 
       module_invoke_all('commerce_line_item_' . $op, $line_item);
       module_invoke_all('entity_' . $op, $line_item, 'commerce_line_item');

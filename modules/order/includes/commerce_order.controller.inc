@@ -116,6 +116,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $order_wrapper->commerce_order_total->amount = $total;
 
       // Give modules the opportunity to prepare field data for saving.
+      module_invoke_all('entity_presave', $order, 'commerce_order');
       rules_invoke_all('commerce_order_presave', $order);
       field_attach_presave('commerce_order', $order);
 
@@ -166,8 +167,6 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
         $op = 'insert';
       }
       else {
-        // Invoke presave to let modules react before the save.
-        rules_invoke_all('commerce_order_presave', $order);
         // Save the updated order.
         drupal_write_record('commerce_order', $order, 'order_id');
 
