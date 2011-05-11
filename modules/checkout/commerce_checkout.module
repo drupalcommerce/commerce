@@ -762,3 +762,11 @@ function commerce_checkout_views_api() {
     'path' => drupal_get_path('module', 'commerce_checkout') . '/includes/views',
   );
 }
+
+/**
+ * Returns the default checkout completion message.
+ */
+function commerce_checkout_completion_message_default() {
+  return t('Your order is number [order:order-number]. You can <a href="[order:url]">view your order</a> on your account page when logged in.')
+    . "\n\n" . t('<a href="[site:url]">Return to the front page.</a>');
+}

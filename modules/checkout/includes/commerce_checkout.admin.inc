@@ -286,7 +286,17 @@ function commerce_checkout_pane_settings_form_save_submit($form, &$form_state) {
   // Save this checkout pane's settings as if this was a system settings form.
   if (!empty($form['settings'])) {
     foreach (element_children($form['settings']) as $field) {
-      variable_set($field, $form_state['values'][$field]);
+      // Provide support for containers one level deep.
+      if (in_array($form['settings'][$field]['#type'], array('container', 'fieldset'))) {
+        foreach (element_children($form['settings'][$field]) as $nested_field) {
+          if (isset($form_state['values'][$nested_field])) {
+            variable_set($nested_field, $form_state['values'][$nested_field]);
+          }
+        }
+      }
+      elseif (isset($form_state['values'][$field])) {
+        variable_set($field, $form_state['values'][$field]);
+      }
     }
   }
 
@@ -306,7 +316,15 @@ function commerce_checkout_pane_settings_form_reset_submit($form, &$form_state) 
   // Reset this checkout pane's settings as if this was a system settings form.
   if (!empty($form['settings'])) {
     foreach (element_children($form['settings']) as $field) {
-      variable_del($field);
+      // Provide support for containers one level deep.
+      if (in_array($form['settings'][$field]['#type'], array('container', 'fieldset'))) {
+        foreach (element_children($form['settings'][$field]) as $nested_field) {
+          variable_del($nested_field);
+        }
+      }
+      else {
+        variable_del($field);
+      }
     }
   }
 

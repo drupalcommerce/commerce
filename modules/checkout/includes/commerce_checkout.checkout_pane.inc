@@ -8,7 +8,7 @@
 
 /**
  * Checkout pane callback: returns a pane allowing the customer to review the
- *   details of the order.
+ * details of the order.
  */
 function commerce_checkout_review_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
   $pane_form = array();
@@ -45,17 +45,92 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
 }
 
 /**
+ * Checkout pane callback: returns the settings form elements for the checkout
+ * completion message.
+ */
+function commerce_checkout_completion_message_pane_settings_form($checkout_pane) {
+  $form = array();
+
+  // Find our default message and text format values.
+  if (!is_null(variable_get('commerce_checkout_completion_message', NULL))) {
+    $data = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
+
+    $message = $data['value'];
+    $text_format = $data['format'];
+  }
+  else {
+    $message = commerce_checkout_completion_message_default();
+    $text_format = 'filtered_html';
+  }
+
+  $form['commerce_checkout_completion_message_override'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Override the default checkout completion message. This may interfere with translation on multilingual sites.'),
+    '#default_value' => variable_get('commerce_checkout_completion_message_override', FALSE),
+    '#access' => filter_access(filter_format_load($text_format)),
+  );
+
+  // Use a container to hide completion message settings unless overriden.
+  $form['container'] = array(
+    '#type' => 'container',
+    '#access' => filter_access(filter_format_load($text_format)),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="commerce_checkout_completion_message_override"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+
+  $form['container']['commerce_checkout_completion_message'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Checkout completion message'),
+    '#default_value' => $message,
+    '#format' => $text_format,
+  );
+
+  $var_info = array(
+    'site' => array(
+      'type' => 'site',
+      'label' => t('Site information'),
+      'description' => t('Site-wide settings and other global information.'),
+    ),
+    'order' => array(
+      'label' => t('Order'),
+      'type' => 'commerce_order',
+    ),
+  );
+
+  $form['container']['commerce_checkout_completion_message_help'] = RulesTokenEvaluator::help($var_info);
+
+  return $form;
+}
+
+/**
  * Checkout pane callback: presents a completion message on the complete page.
  */
 function commerce_checkout_completion_message_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
   $pane_form = array();
 
-  $pane_form['message'] = array(
-    '#markup' => '<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $order->order_number)) . '</div>',
-  );
+  // Load the appropriate default completion message.
+  if (variable_get('commerce_checkout_completion_message_override', FALSE)) {
+    $data = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
 
-  $pane_form['link'] = array(
-    '#markup' => '<div class="checkout-completion-link">' . l(t('Return to the front page.'), '<front>') . '</div>',
+    $message = $data['value'];
+    $text_format = $data['format'];
+  }
+  else {
+    $message = commerce_checkout_completion_message_default();
+    $text_format = 'filtered_html';
+  }
+
+  // Perform token replacement.
+  $message = token_replace($message, array('order' => $order));
+
+  // Apply the proper text format.
+  $message = check_markup($message, $text_format);
+
+  $pane_form['message'] = array(
+    '#markup' => '<div class="checkout-completion-message">' . $message . '</div>',
   );
 
   return $pane_form;
