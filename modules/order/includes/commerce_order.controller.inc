@@ -64,7 +64,7 @@ class CommerceOrderEntityController extends DrupalDefaultEntityController {
       $order->is_new = empty($order->order_id);
 
       // Set the timestamp fields.
-      if (empty($order->created)) {
+      if (!isset($order->created)) {
         $order->created = REQUEST_TIME;
         $order->hostname = ip_address();
       }

@@ -57,7 +57,7 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
       // If this is a new product...
       if ((isset($product->is_new) && $product->is_new) || empty($product->product_id)) {
         // Set the creation timestamp if not set.
-        if (!isset($product->created) || empty($product->created)) {
+        if (!isset($product->created)) {
           $product->created = REQUEST_TIME;
         }
 

@@ -58,7 +58,7 @@ class CommerceCustomerProfileEntityController extends DrupalDefaultEntityControl
       $profile->is_new = empty($profile->profile_id);
 
       // Set the timestamp fields.
-      if (empty($profile->created)) {
+      if (!isset($profile->created)) {
         $profile->created = REQUEST_TIME;
       }
 
