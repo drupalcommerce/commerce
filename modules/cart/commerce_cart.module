@@ -1129,10 +1129,24 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             // qualifying fields.
             $properties = _options_properties('select', FALSE, TRUE, TRUE);
 
+            // Try to fetch localized names.
+            if (module_exists('i18n_field')) {
+              if (($translate = i18n_field_type_info($field['type'], 'translate_options'))) {
+                $allowed_values = $translate($field);
+                $allowed_values = _options_prepare_options($allowed_values, $properties);
+              }
+              else {
+                $allowed_values = _options_get_options($field, $instance, $properties);
+              }
+            }
+            else {
+              $allowed_values = _options_get_options($field, $instance, $properties);
+            }
+
             $qualifying_fields[$name] = array(
               'field' => $field,
               'instance' => $instance,
-              'options' => _options_get_options($field, $instance, $properties),
+              'options' => $allowed_values,
               'weight' => $instance['widget']['weight'],
             );
           }
