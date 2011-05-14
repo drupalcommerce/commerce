@@ -1130,16 +1130,18 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             $properties = _options_properties('select', FALSE, TRUE, TRUE);
 
             // Try to fetch localized names.
+            $allowed_values = NULL;
+
+            // Prepare translated options if using the i18n_field module.
             if (module_exists('i18n_field')) {
               if (($translate = i18n_field_type_info($field['type'], 'translate_options'))) {
                 $allowed_values = $translate($field);
-                $allowed_values = _options_prepare_options($allowed_values, $properties);
-              }
-              else {
-                $allowed_values = _options_get_options($field, $instance, $properties);
+                _options_prepare_options($allowed_values, $properties);
               }
             }
-            else {
+
+            // Otherwise just use the base language values.
+            if (empty($allowed_values)) {
               $allowed_values = _options_get_options($field, $instance, $properties);
             }
 
