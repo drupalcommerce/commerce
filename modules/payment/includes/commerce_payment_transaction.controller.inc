@@ -68,7 +68,7 @@ class CommercePaymentTransactionEntityController extends DrupalDefaultEntityCont
       $transaction->is_new = empty($transaction->transaction_id);
 
       // Set the timestamp fields.
-      if (!isset($transaction->created)) {
+      if (empty($transaction->created)) {
         $transaction->created = REQUEST_TIME;
       }
 
