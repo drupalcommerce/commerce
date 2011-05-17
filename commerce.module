@@ -515,3 +515,10 @@ function commerce_months() {
     '12' => t('December'),
   );
 }
+
+/**
+ * Returns an array of numerical comparison operators for use in Rules.
+ */
+function commerce_numeric_comparison_operator_options_list() {
+  return drupal_map_assoc(array('<', '<=', '=', '>=', '>'));
+}

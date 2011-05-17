@@ -150,14 +150,14 @@ function commerce_order_rules_condition_info() {
         'type' => 'text',
         'label' => t('Operator'),
         'description' => t('The operator used with the quantity value below to compare the quantity of the specified product on the order.'),
-        'default value' => 'at least',
-        'options list' => 'commerce_order_product_quantity_operator_options_list',
+        'default value' => '>=',
+        'options list' => 'commerce_numeric_comparison_operator_options_list',
         'restriction' => 'input',
       ),
       'value' => array(
         'type' => 'text',
         'label' => t('Quantity'),
-        'default value' => 1,
+        'default value' => '1',
         'description' => t('The value to compare against the quantity of the specified product on the order.'),
       ),
     ),
@@ -293,19 +293,6 @@ function commerce_order_rules_compare_address($order, $address_field, $component
 }
 
 /**
- * Options list callback: operators for the address comparison condition.
- */
-function commerce_order_product_quantity_operator_options_list() {
-  return array(
-    'less than' => t('less than'),
-    'no more than' => t('no more than'),
-    'equals' => t('equals'),
-    'at least' => t('at least'),
-    'more than' => t('more than'),
-  );
-}
-
-/**
  * Condition callback: checks to see if a particular product exists on an order
  * in the specified quantity.
  */
@@ -336,15 +323,15 @@ function commerce_order_rules_contains_product($order, $sku, $operator, $value) 
 
   // Make a quantity comparison based on the operator.
   switch ($operator) {
-    case 'less than':
+    case '<':
       return $product[$sku] < $value;
-    case 'no more than':
+    case '<=':
       return $product[$sku] <= $value;
-    case 'equals':
+    case '=':
       return $products[$sku] == $value;
-    case 'at least':
+    case '>=':
       return $products[$sku] >= $value;
-    case 'more than':
+    case '>':
       return $products[$sku] > $value;
   }
 

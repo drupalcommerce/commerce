@@ -89,6 +89,75 @@ function commerce_payment_rules_access($type, $name) {
   }
 }
 
+/**
+ * Implements hook_rules_condition_info().
+ */
+function commerce_payment_rules_condition_info() {
+  $conditions = array();
+
+  if (module_exists('commerce_order')) {
+    $conditions['commerce_payment_order_balance_comparison'] = array(
+      'label' => t('Order balance comparison'),
+      'parameter' => array(
+        'order' => array(
+          'type' => 'commerce_order',
+          'label' => t('Order'),
+          'description' => t('The order whose balance should be compared (calculated as the order total minus completed payment amounts).'),
+        ),
+        'operator' => array(
+          'type' => 'text',
+          'label' => t('Operator'),
+          'description' => t('The comparison operator.'),
+          'optional' => TRUE,
+          'default value' => '<=',
+          'options list' => 'commerce_numeric_comparison_operator_options_list',
+          'restriction' => 'input',
+        ),
+        'value' => array(
+          'type' => 'text',
+          'label' => t('Value'),
+          'description' => t('The value to compare against the order balance. An order balance less than or equal to 0 indicates the order has been paid in full.'),
+          'default value' => '0',
+        ),
+      ),
+      'group' => t('Commerce Payment'),
+      'callbacks' => array(
+        'execute' => 'commerce_payment_rules_compare_balance',
+      ),
+    );
+  }
+
+  return $conditions;
+}
+
+/**
+ * Condition callback: checks the unpaid balance of an order.
+ */
+function commerce_payment_rules_compare_balance($order, $operator, $value) {
+  // Check the balance of the order.
+  $balance = commerce_payment_order_balance($order);
+
+  // If the balance was incalculable, set the balance to the order total.
+  if ($balance === FALSE) {
+    $balance = entity_metadata_wrapper('commerce_order', $order)->commerce_order_total->value();
+  }
+
+  // Make a quantity comparison based on the operator.
+  switch ($operator) {
+    case '<':
+      return $balance['amount'] < $value;
+    case '<=':
+      return $balance['amount'] <= $value;
+    case '=':
+      return $balance['amount'] == $value;
+    case '>=':
+      return $balance['amount'] >= $value;
+    case '>':
+      return $balance['amount'] > $value;
+  }
+
+  return FALSE;
+}
 
 /**
  * Implements hook_rules_action_info().
