@@ -3,9 +3,31 @@
 /**
  * @file
  * Defines the Price field with widgets and formatters used to add prices with
- *   currency codes to various Commerce entities.
+ * currency codes to various Commerce entities.
  */
 
+
+/**
+ * Implements hook_hook_info().
+ */
+function commerce_price_hook_info() {
+  $hooks = array(
+    'commerce_price_field_calculation_options' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_price_component_type_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_price_component_type_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_price_formatted_components_alter' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
 
 /**
  * Implements hook_theme().

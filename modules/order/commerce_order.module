@@ -54,6 +54,42 @@ function commerce_order_entity_info() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_order_hook_info() {
+  $hooks = array(
+    'commerce_order_view' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_state_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_state_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_status_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_status_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_presave' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_delete' => array(
+      'group' => 'commerce',
+    ),
+  );
+  return $hooks;
+}
+
+/**
  * Implements hook_enable().
  */
 function commerce_order_enable() {

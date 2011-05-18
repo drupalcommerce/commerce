@@ -72,8 +72,7 @@ function hook_commerce_line_item_summary_link_info_alter(&$links) {
 }
 
 /**
- * Allows you to prepare line item data before it is saved for the first time,
- *   i.e. on insert.
+ * Allows you to prepare line item data before it is saved on insert or update.
  *
  * @param $line_item
  *   The line item object to be saved.
@@ -81,17 +80,5 @@ function hook_commerce_line_item_summary_link_info_alter(&$links) {
  * @see rules_invoke_all()
  */
 function hook_commerce_line_item_presave_insert(&$line_item) {
-  // No example.
-}
-
-/**
- * Allows you to prepare line item data before subsequent saves, i.e. on update.
- *
- * @param $line_item
- *   The line item object to be saved.
- *
- * @see rules_invoke_all()
- */
-function hook_commerce_line_item_presave_update(&$line_item) {
   // No example.
 }

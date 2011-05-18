@@ -95,6 +95,49 @@ function commerce_payment_entity_info() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_payment_hook_info() {
+  $hooks = array(
+    'commerce_payment_method_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_method_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_transaction_status_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_transaction_view' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_transaction_access' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_totals_row_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_totals_row_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_transaction_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_transaction_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_transaction_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_order_paid_in_full' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Implements hook_permission().
  */
 function commerce_payment_permission() {

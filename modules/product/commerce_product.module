@@ -24,6 +24,46 @@ function commerce_product_menu() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_product_hook_info() {
+  $hooks = array(
+    'commerce_product_view' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_type_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_type_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_type_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_type_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_type_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_presave' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_delete' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Implements hook_entity_info().
  */
 function commerce_product_entity_info() {

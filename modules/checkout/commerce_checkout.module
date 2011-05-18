@@ -85,6 +85,31 @@ function commerce_checkout_menu() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_checkout_hook_info() {
+  $hooks = array(
+    'commerce_checkout_page_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_checkout_page_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_checkout_pane_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_checkout_pane_info_alter' => array(
+      'group' => 'commerce',
+    ),
+	  'commerce_checkout_router' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Implements hook_permission().
  */
 function commerce_checkout_permission() {

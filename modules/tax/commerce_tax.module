@@ -8,6 +8,49 @@
 
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_tax_hook_info() {
+  $hooks = array(
+    'commerce_tax_type_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_type_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_type_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_type_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_type_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_rate_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_rate_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_rate_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_rate_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_rate_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_tax_type_calculate_rates' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Returns an array of tax type objects keyed by name.
  */
 function commerce_tax_types() {

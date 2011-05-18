@@ -22,6 +22,22 @@ function commerce_permission() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_hook_info() {
+  $hooks = array(
+    'commerce_currency_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_currency_info_alter' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Finds all fields of a particular field type.
  *
  * @param $field_type

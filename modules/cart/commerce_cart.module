@@ -66,6 +66,28 @@ function commerce_cart_menu_item_title() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_cart_hook_info() {
+  $hooks = array(
+    'commerce_cart_order_is_cart' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_order_convert' => array(
+      'group' => 'commerce',
+    ),
+	  'commerce_cart_line_item_refresh' => array(
+      'group' => 'commerce',
+    ),
+	  'commerce_cart_order_refresh' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Implements hook_commerce_order_state_info().
  */
 function commerce_cart_commerce_order_state_info() {

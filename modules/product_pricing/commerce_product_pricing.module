@@ -5,6 +5,21 @@
  * Enables Rules based product sell price calculation for dynamic product pricing.
  */
 
+/**
+ * Implements hook_hook_info().
+ */
+function commerce_product_pricing_hook_info() {
+  $hooks = array(
+    'commerce_product_valid_pre_calculation_rule' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_valid_pre_calculation_product' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
 
 /**
  * Implements hook_commerce_price_field_calculation_options().

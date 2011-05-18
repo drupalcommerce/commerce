@@ -50,6 +50,37 @@ function commerce_line_item_entity_info() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function commerce_line_item_hook_info() {
+  $hooks = array(
+    'commerce_line_item_type_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_access' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_summary_link_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_summary_link_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_insert' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_delete' => array(
+      'group' => 'commerce',
+    ),
+  );
+
+  return $hooks;
+}
+
+/**
  * Implements hook_field_extra_fields().
  */
 function commerce_line_item_field_extra_fields() {
