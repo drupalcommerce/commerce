@@ -42,6 +42,7 @@ function commerce_order_entity_info() {
           'custom settings' => FALSE,
         ),
       ),
+      'uri callback' => 'commerce_order_uri',
       'creation callback' => '_commerce_order_create',
       'save callback' => 'commerce_order_save',
       'deletion callback' => 'commerce_order_delete',
@@ -54,10 +55,30 @@ function commerce_order_entity_info() {
 }
 
 /**
+ * Entity uri callback: gives modules a chance to specify a path for an order.
+ */
+function commerce_order_uri($order) {
+  // Allow modules to specify a path, returning the first one found.
+  foreach (module_implements('commerce_order_uri') as $module) {
+    $uri = module_invoke($module, 'commerce_order_uri', $order);
+
+    // If the implementation returned data, use that now.
+    if (!empty($uri)) {
+      return $uri;
+    }
+  }
+
+  return NULL;
+}
+
+/**
  * Implements hook_hook_info().
  */
 function commerce_order_hook_info() {
   $hooks = array(
+    'commerce_order_uri' => array(
+      'group' => 'commerce',
+    ),
     'commerce_order_view' => array(
       'group' => 'commerce',
     ),

@@ -126,6 +126,39 @@ function commerce_payment_ui_help($path, $arg) {
       return t('After setting the label for this rule configuration, you will be redirected to its empty edit page. There you must add an action enabling a particular payment method for use and any conditions that must be met for a customer to be able to choose the payment method during checkout.');
   }
 }
+/**
+ * Implements hook_entity_info_alter().
+ */
+function commerce_payment_ui_entity_info_alter(&$entity_info) {
+  // Add a URI callback to the profile entity.
+  $entity_info['commerce_payment_transaction']['uri callback'] = 'commerce_payment_ui_payment_transaction_uri';
+}
+
+/**
+ * Entity uri callback: points to the admin view page of the given payment
+ * transaction.
+ */
+function commerce_payment_ui_payment_transaction_uri($transaction) {
+  // First look for a return value in the default entity uri callback.
+  $uri = commerce_payment_transaction_uri($transaction);
+
+  // If a value was found, return it now.
+  if (!empty($uri)) {
+    return $uri;
+  }
+
+  // Only return a value if the transaction references an order and the user has
+  // permission to view the payment transaction.
+  if ($order = commerce_order_load($transaction->order_id)) {
+    if (commerce_payment_transaction_access('view', $order, $transaction)) {
+      return array(
+        'path' => 'admin/commerce/orders/' . $order->order_id . '/payment/' . $transaction->transaction_id . '/view',
+      );
+    }
+  }
+
+  return NULL;
+}
 
 /**
  * Implements hook_views_api().

@@ -273,7 +273,7 @@ function commerce_product_ui_theme() {
  */
 function commerce_product_ui_entity_info_alter(&$entity_info) {
   // Add a URI callback to the product entity.
-  $entity_info['commerce_product']['uri callback'] = 'commerce_product_ui_uri';
+  $entity_info['commerce_product']['uri callback'] = 'commerce_product_ui_product_uri';
 
   // Add callbacks and urls for administer translations.
   $entity_info['commerce_product']['translation']['entity_translation'] = array(
@@ -296,7 +296,7 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
  * Entity uri callback: points to the edit form of the given product if no other
  *   URI is specified.
  */
-function commerce_product_ui_uri($product) {
+function commerce_product_ui_product_uri($product) {
   // First look for a return value in the default entity uri callback.
   $uri = commerce_product_uri($product);
 
@@ -311,6 +311,8 @@ function commerce_product_ui_uri($product) {
       'path' => 'admin/commerce/products/' . $product->product_id,
     );
   }
+
+  return NULL;
 }
 
 /**

@@ -232,6 +232,14 @@ function commerce_customer_ui_entity_info_alter(&$entity_info) {
  * Entity uri callback: points to the edit form of the given profile.
  */
 function commerce_customer_ui_customer_profile_uri($profile) {
+  // First look for a return value in the default entity uri callback.
+  $uri = commerce_customer_profile_uri($profile);
+
+  // If a value was found, return it now.
+  if (!empty($uri)) {
+    return $uri;
+  }
+
   // Only return a value if the user has permission to view the profile.
   if (commerce_customer_profile_access('view', $profile)) {
     return array(

@@ -152,7 +152,7 @@ function commerce_order_ui_help($path, $arg) {
  */
 function commerce_order_ui_entity_info_alter(&$entity_info) {
   // Add a URI callback to the order entity.
-  $entity_info['commerce_order']['uri callback'] = 'commerce_order_ui_uri';
+  $entity_info['commerce_order']['uri callback'] = 'commerce_order_ui_order_uri';
 
   // Expose the order UI for order fields.
   $entity_info['commerce_order']['bundles']['commerce_order']['admin'] = array(
@@ -165,7 +165,15 @@ function commerce_order_ui_entity_info_alter(&$entity_info) {
 /**
  * Entity uri callback: points to the admin view page of the given order.
  */
-function commerce_order_ui_uri($order) {
+function commerce_order_ui_order_uri($order) {
+  // First look for a return value in the default entity uri callback.
+  $uri = commerce_order_uri($order);
+
+  // If a value was found, return it now.
+  if (!empty($uri)) {
+    return $uri;
+  }
+
   // Only return a value if the user has permission to view the order.
   if (commerce_order_access('view', $order)) {
     return array(

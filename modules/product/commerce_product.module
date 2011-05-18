@@ -28,6 +28,9 @@ function commerce_product_menu() {
  */
 function commerce_product_hook_info() {
   $hooks = array(
+    'commerce_product_uri' => array(
+      'group' => 'commerce',
+    ),
     'commerce_product_view' => array(
       'group' => 'commerce',
     ),
@@ -160,6 +163,8 @@ function commerce_product_uri($product) {
       return $uri;
     }
   }
+
+  return NULL;
 }
 
 /**
