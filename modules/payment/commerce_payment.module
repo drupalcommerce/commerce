@@ -268,6 +268,47 @@ function commerce_payment_commerce_payment_totals_row_info($totals, $order) {
 }
 
 /**
+ * Implements hook_commerce_payment_transaction_insert().
+ *
+ * When a new payment transaction is inserted that is already completed, check
+ * the order balance and invoke a Rules event if the order is paid in full.
+ */
+function commerce_order_commerce_payment_transaction_insert($transaction) {
+  // If the inserted transaction was marked as a success and placed against a
+  // valid order...
+  if ($transaction->status == COMMERCE_PAYMENT_STATUS_SUCCESS &&
+    $order = commerce_order_load($transaction->order_id)) {
+    // Then check to make sure the event hasn't been invoked for this order.
+    if (empty($order->data['commerce_payment_order_paid_in_full_invoked'])) {
+      // Check the order balance and invoke the event.
+      $balance = commerce_payment_order_balance($order);
+
+      if ($balance['amount'] <= 0) {
+        // Invoke the event including a hook of the same name.
+        rules_invoke_all('commerce_payment_order_paid_in_full', $order, $transaction);
+
+        // Update the order's data array to indicate this just happened.
+        $order->data['commerce_payment_order_paid_in_full_invoked'] = TRUE;
+
+        // Save the updated order.
+        commerce_order_save($order);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_commerce_payment_transaction_update().
+ *
+ * When an existing transaction is updated from an incomplete status to
+ * completed, check the order balance and invoke a Rules event if the order is
+ * paid in full.
+ */
+function commerce_order_commerce_payment_transaction_update($transaction) {
+  commerce_order_commerce_payment_transaction_insert($transaction);
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_payment_views_api() {

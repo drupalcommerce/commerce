@@ -112,3 +112,23 @@ function hook_commerce_payment_methods(&$order) {
 function hook_commerce_payment_transaction_presave(&$transaction) {
   // No example.
 }
+
+/**
+ * Allows you to respond when an order is first considered paid in full.
+ *
+ * The unpaid balance of an order is calculated by subtracting the total amount
+ * of all successful payment transactions referencing the order from the order's
+ * total. If the balance is less than or equal to zero, it is considered paid in
+ * full. The first time an order's balance falls to or below zero, this hook is
+ * invoked to allow modules to perform special maintenance as necessary. This
+ * hook is invoked after the "When an order is first paid in full" Rules event.
+ *
+ * Through the administration of payment transactions, it is possible for an
+ * order's balance to go above zero. It is then possible for the balance to go
+ * back down to or below zero. In either of these cases, no further action is
+ * taken. At present, this hook and Rules event are only meant to be invoked the
+ * first time an order is considered paid in full.
+ */
+function hook_commerce_payment_order_paid_in_full($transaction) {
+  // No example.
+}

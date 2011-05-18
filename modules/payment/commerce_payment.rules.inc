@@ -45,6 +45,18 @@ function commerce_payment_rules_event_info() {
     'access callback' => 'commerce_payment_rules_access',
   );
 
+  $variables = array_merge(
+    commerce_order_rules_event_variables(t('Order', array(), array('context' => 'a drupal commerce order')), TRUE, TRUE),
+    commerce_payment_rules_event_variables(t('Last completed transaction'), TRUE)
+  );
+
+  $events['commerce_payment_order_paid_in_full'] = array(
+    'label' => t('When an order is first paid in full'),
+    'group' => t('Commerce Payment'),
+    'variables' => $variables,
+    'access callback' => 'commerce_payment_rules_access',
+  );
+
   return $events;
 }
 
@@ -95,37 +107,35 @@ function commerce_payment_rules_access($type, $name) {
 function commerce_payment_rules_condition_info() {
   $conditions = array();
 
-  if (module_exists('commerce_order')) {
-    $conditions['commerce_payment_order_balance_comparison'] = array(
-      'label' => t('Order balance comparison'),
-      'parameter' => array(
-        'order' => array(
-          'type' => 'commerce_order',
-          'label' => t('Order'),
-          'description' => t('The order whose balance should be compared (calculated as the order total minus completed payment amounts).'),
-        ),
-        'operator' => array(
-          'type' => 'text',
-          'label' => t('Operator'),
-          'description' => t('The comparison operator.'),
-          'optional' => TRUE,
-          'default value' => '<=',
-          'options list' => 'commerce_numeric_comparison_operator_options_list',
-          'restriction' => 'input',
-        ),
-        'value' => array(
-          'type' => 'text',
-          'label' => t('Value'),
-          'description' => t('The value to compare against the order balance. An order balance less than or equal to 0 indicates the order has been paid in full.'),
-          'default value' => '0',
-        ),
+  $conditions['commerce_payment_order_balance_comparison'] = array(
+    'label' => t('Order balance comparison'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+        'description' => t('The order whose balance should be compared (calculated as the order total minus completed payment amounts).'),
       ),
-      'group' => t('Commerce Payment'),
-      'callbacks' => array(
-        'execute' => 'commerce_payment_rules_compare_balance',
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The comparison operator.'),
+        'optional' => TRUE,
+        'default value' => '<=',
+        'options list' => 'commerce_numeric_comparison_operator_options_list',
+        'restriction' => 'input',
       ),
-    );
-  }
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Value'),
+        'description' => t('The value to compare against the order balance. An order balance less than or equal to 0 indicates the order has been paid in full.'),
+        'default value' => '0',
+      ),
+    ),
+    'group' => t('Commerce Payment'),
+    'callbacks' => array(
+      'execute' => 'commerce_payment_rules_compare_balance',
+    ),
+  );
 
   return $conditions;
 }
