@@ -480,7 +480,7 @@ function commerce_currency_decimal_to_amount($decimal, $currency_code, $round = 
   // Ensure the amount has the proper number of decimal places for the currency.
   if ($round) {
     $decimal = commerce_currency_round($decimal, commerce_currency_load($currency_code));
-    return (int) ($decimal * $factors[$currency_code]);
+    return (int) round($decimal * $factors[$currency_code]);
   }
   else {
     return $decimal * $factors[$currency_code];
