@@ -165,7 +165,7 @@ function commerce_product_ui_product_type_form_submit($form, &$form_state) {
   // Redirect based on the button clicked.
   drupal_set_message(t('Product type saved.'));
 
-  if ($form_state['clicked_button']['#parents'][0] == 'save_continue') {
+  if ($form_state['triggering_element']['#parents'][0] == 'save_continue') {
     $form_state['redirect'] = 'admin/commerce/products/types/' . strtr($product_type['type'], '_', '-') . '/fields';
   }
   else {

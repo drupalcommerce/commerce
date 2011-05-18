@@ -242,7 +242,7 @@ function commerce_cart_line_item_views_form_submit($form, &$form_state) {
  */
 function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   // Get which delete button has been clicked.
-  $line_item_id = substr($form_state['clicked_button']['#name'], strlen('delete-line-item-'));
+  $line_item_id = substr($form_state['triggering_element']['#name'], strlen('delete-line-item-'));
 
   // Get the corresponding wrapper to show the correct title.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_items'][$line_item_id]);
