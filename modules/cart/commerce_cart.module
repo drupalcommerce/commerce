@@ -1078,7 +1078,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               continue;
             }
 
-            if ($product_wrapper->{$key}->value() != $value) {
+            if ($product_wrapper->{$key}->raw() != $value) {
               $match = FALSE;
             }
           }
@@ -1093,7 +1093,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             $matching_product_wrapper = entity_metadata_wrapper('commerce_product', $matching_product);
 
             foreach ($attribute_names as $key => $value) {
-              if ($product_wrapper->{$key}->value() != $matching_product_wrapper->{$key}->value()) {
+              if ($product_wrapper->{$key}->raw() != $matching_product_wrapper->{$key}->raw()) {
                 $match = FALSE;
               }
             }
@@ -1198,14 +1198,14 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
                 continue;
               }
 
-              if ($product_wrapper->{$used_field_name}->value() != $form['attributes'][$used_field_name]['#default_value']) {
+              if ($product_wrapper->{$used_field_name}->raw() != $form['attributes'][$used_field_name]['#default_value']) {
                 continue 2;
               }
             }
 
             // With our hard dependency on widgets provided by the Options
             // module, we can make assumptions about where the data is stored.
-            $used_options[$field_name][] = $product_wrapper->{$field_name}->value();
+            $used_options[$field_name][] = $product_wrapper->{$field_name}->raw();
           }
 
           // If for some reason no options for this field are used, remove it
@@ -1218,7 +1218,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               '#type' => 'select',
               '#title' => check_plain($data['instance']['label']),
               '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options[$field_name])),
-              '#default_value' => $default_product_wrapper->{$field_name}->value(),
+              '#default_value' => $default_product_wrapper->{$field_name}->raw(),
               '#weight' => $data['instance']['widget']['weight'],
               '#ajax' => array(
                 'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
@@ -1226,7 +1226,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
             );
             $form['unchanged_attributes'][$field_name] = array(
               '#type' => 'value',
-              '#value' => $default_product_wrapper->{$field_name}->value(),
+              '#value' => $default_product_wrapper->{$field_name}->raw(),
             );
           }
         }
@@ -1251,7 +1251,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               $match = TRUE;
 
               foreach (element_children($form['attributes']) as $field_name) {
-                if ($product_wrapper->{$field_name}->value() != $form['attributes'][$field_name]['#default_value']) {
+                if ($product_wrapper->{$field_name}->raw() != $form['attributes'][$field_name]['#default_value']) {
                   $match = FALSE;
                 }
               }
