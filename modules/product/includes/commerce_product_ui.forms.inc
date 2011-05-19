@@ -31,7 +31,6 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
     '#description' => t('The human-readable name of this product type. It is recommended that this name begin with a capital letter and contain only letters, numbers, and spaces. This name must be unique.'),
     '#required' => TRUE,
     '#size' => 32,
-    '#field_suffix' => ' <small id="edit-product-type-name-suffix">' . t('Machine name: @type', array('@type' => $product_type['type'])) . '</small>',
   );
 
   if (empty($product_type['type'])) {
