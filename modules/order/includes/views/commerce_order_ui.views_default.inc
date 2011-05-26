@@ -93,6 +93,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['empty']['text']['field'] = 'area';
   $handler->display->display_options['empty']['text']['empty'] = FALSE;
   $handler->display->display_options['empty']['text']['content'] = 'No orders have been created yet.';
+  $handler->display->display_options['empty']['text']['format'] = 'filtered_html';
   /* Relationship: Commerce Order: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_order';
@@ -372,6 +373,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['empty']['text']['field'] = 'area';
   $handler->display->display_options['empty']['text']['empty'] = FALSE;
   $handler->display->display_options['empty']['text']['content'] = 'You have not placed any orders with us yet.';
+  $handler->display->display_options['empty']['text']['format'] = 'filtered_html';
   /* Field: Commerce Order: Order number */
   $handler->display->display_options['fields']['order_number']['id'] = 'order_number';
   $handler->display->display_options['fields']['order_number']['table'] = 'commerce_order';
