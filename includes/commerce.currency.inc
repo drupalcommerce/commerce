@@ -1194,6 +1194,8 @@ function commerce_commerce_currency_info() {
       'symbol' => 'R',
       'name' => t('South African Rand'),
       'numeric_code' => '710',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Cent'),
       'major_unit' => t('Rand'),
     ),
