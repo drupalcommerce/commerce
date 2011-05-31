@@ -674,6 +674,7 @@ function commerce_product_reference_create_instance($field_name, $entity_type, $
       'display' => array(
         'display' => array(
           'label' => 'hidden',
+          'weight' => $weight,
         ),
       ),
     );
@@ -719,11 +720,13 @@ function commerce_product_reference_configure_line_item() {
 
       'widget' => array(
         'type' => 'text_textfield',
+        'weight' => 0,
       ),
 
       'display' => array(
         'display' => array(
           'label' => 'hidden',
+          'weight' => 0,
         ),
       ),
     );
