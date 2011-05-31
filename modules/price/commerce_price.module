@@ -138,10 +138,13 @@ function _commerce_price_field_attach_unserialize_data($entity_type, $entity) {
 
         // For each item in the array, unserialize or initialize its data array.
         foreach ($items as $delta => $item) {
+          // If we have a non-array $item['data'], unserialize it.
           if (!empty($item['data']) && !is_array($item['data'])) {
             $entity->{$field_name}[$langcode][$delta]['data'] = unserialize($item['data']);
           }
-          elseif (!is_array($item['data'])) {
+          // If we have no data element (or an existing empty), create an empty
+          // array.
+          elseif (empty($item['data'])) {
             $entity->{$field_name}[$langcode][$delta]['data'] = array('components' => array());
           }
         }
