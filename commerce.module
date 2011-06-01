@@ -365,9 +365,6 @@ function commerce_currency_format($amount, $currency_code, $object = NULL, $conv
     return $currency['format_callback']($amount, $currency, $object);
   }
 
-  // Separate the negative symbol from the number itself.
-  $negative = $amount < 0;
-
   // Format the price as a number.
   $price = number_format(commerce_currency_round(abs($amount), $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
 
@@ -378,7 +375,7 @@ function commerce_currency_format($amount, $currency_code, $object = NULL, $conv
     '@price' => $price,
     '@symbol_after' => $currency['symbol_placement'] == 'after' ? $currency['symbol'] : '',
     '@code_after' => $currency['code_placement'] == 'after' ? $currency['code'] : '',
-    '@negative' => $negative ? '-' : '',
+    '@negative' => $amount < 0 ? '-' : '',
   );
 
   return trim(t('@code_before @negative@symbol_before@price @symbol_after @code_after', $replacements));
