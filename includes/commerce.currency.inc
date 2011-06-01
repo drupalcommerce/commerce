@@ -897,6 +897,8 @@ function commerce_commerce_currency_info() {
       'code' => 'RUB',
       'symbol' => 'руб.',
       'name' => t('Russian Ruble'),
+      'thousands_separator' => ' ',
+      'decimal_separator' => ',',
       'numeric_code' => '643',
       'symbol_placement' => 'after',
       'code_placement' => '',
