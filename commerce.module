@@ -366,16 +366,10 @@ function commerce_currency_format($amount, $currency_code, $object = NULL, $conv
   }
 
   // Separate the negative symbol from the number itself.
-  if ($amount < 0) {
-    $negative = TRUE;
-    $price = abs($amount);
-  }
-  else {
-    $negative = FALSE;
-  }
+  $negative = $amount < 0;
 
   // Format the price as a number.
-  $price = number_format(commerce_currency_round($amount, $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
+  $price = number_format(commerce_currency_round(abs($amount), $currency), $currency['decimals'], $currency['decimal_separator'], $currency['thousands_separator']);
 
   // Establish the replacement values to format this price for its currency.
   $replacements = array(
