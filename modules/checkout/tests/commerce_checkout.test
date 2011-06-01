@@ -180,7 +180,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertEqual(reset($order)->status, 'pending', t('Order status is \'Pending\' after completing checkout'));
     // Check if the completion message has been displayed.
     $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Title of the page is \'Checkout complete\' when finishing the checkout process'));
-    $this->assertRaw('<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $this->order->order_number)) . '</div>', t('Completion message for the checkout is correctly displayed'));
+    $this->assertText(t('Your order is number @order-number.', array('@order-number' => $this->order->order_number)), t('Completion message for the checkout is correctly displayed'));
   }
 
   /**
@@ -335,7 +335,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Check if the completion message has been displayed.
     $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Title of the page is \'Checkout complete\' when finishing the checkout process'));
     // Check completion message.
-    $this->assertRaw('<div class="checkout-completion-message">' . t('Thank you for your order. Your order number is @order-number.', array('@order-number' => $this->order->order_number)) . '</div>', t('Completion message for the checkout is correctly displayed'));
+    $this->assertText(t('Your order is number @order-number.', array('@order-number' => $this->order->order_number)), t('Completion message for the checkout is correctly displayed'));
 
   }
 
