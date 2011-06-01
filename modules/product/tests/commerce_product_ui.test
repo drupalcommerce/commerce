@@ -109,10 +109,11 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertText(t('Title field is required'), t('Validation message for title is displayed when tryin to submit the form with the field empty.'));
 
     // Create the product.
+    $price = rand(2,500);
     $edit = array(
       'sku' => 'PROD-01',
       'title' => $this->randomName(10),
-      'commerce_price[und][0][amount]' => rand(2, 500),
+      'commerce_price[und][0][amount]' => commerce_currency_amount_to_decimal($price, 'USD'),
       'status' => 1,
     );
     $this->drupalPost(NULL, $edit, t('Save product'));
@@ -125,7 +126,8 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->pass(t('Test the product creation in database:'));
     $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
     $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
-    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+
+    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $price, t('Amount stored in database correctly set'));
     $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
 
     // Check the product listing
@@ -151,10 +153,11 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/commerce/products/add/product');
 
     // Create the product.
+    $price = rand(2, 500);
     $edit = array(
       'sku' => 'PROD-01',
       'title' => $this->randomName(10),
-      'commerce_price[und][0][amount]' => rand(2, 500),
+      'commerce_price[und][0][amount]' => commerce_currency_amount_to_decimal($price, 'USD'),
       'status' => 1,
     );
     // Save and add another.
@@ -166,7 +169,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->pass(t('Test the product creation in database:'));
     $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
     $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
-    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+    $this->assertTrue($product_wrapper->commerce_price->amount->value() == $price, t('Amount stored in database correctly set'));
     $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
 
     // Check if we are in the product creation page.
@@ -207,10 +210,11 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
 
     // Change the product values.
+    $price = rand(2, 500);
     $edit = array(
       'sku' => 'PROD-02',
       'title' => $this->randomName(10),
-      'commerce_price[und][0][amount]' => rand(2, 500),
+      'commerce_price[und][0][amount]' => commerce_currency_amount_to_decimal($price, 'USD'),
       'status' => 0,
     );
     $this->drupalPost(NULL, $edit, t('Save product'));
@@ -221,7 +225,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->pass(t('Test the product edit in database:'));
     $this->assertTrue($product_wrapper->sku->value()  == $edit['sku'], t('SKU stored in database correctly set'));
     $this->assertTrue($product_wrapper->title->value()  == $edit['title'], t('Title stored in database correctly set'));
-    $this->assertTrue($product_wrapper->commerce_price->amount->value()  == $edit['commerce_price[und][0][amount]'], t('Amount stored in database correctly set'));
+    $this->assertTrue($product_wrapper->commerce_price->amount->value() == $price, t('Amount stored in database correctly set'));
     $this->assertTrue($product->status  == $edit['status'], t('Status stored in database correctly set'));
 
     // Check the product listing
@@ -316,7 +320,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
 
     $this->pass('Assertions for trying to delete a product associated to a line item:');
-    $this->assertText(t('This product is referenced by a line item and therefore cannot be deleted. Disable it instead.'), t('Product delete restriction message is displayed correctly'));
+    $this->assertText(t('This product is referenced by a line item on Order @order_num and therefore cannot be deleted. Disable it instead.', array('@order_num' => $order->order_id)), t('Product delete restriction message is displayed correctly'));
     $this->assertFieldByXPath('//input[@id="edit-submit" and @disabled="disabled"]', NULL, t('Delete button is present and is disabled'));
   }
 
