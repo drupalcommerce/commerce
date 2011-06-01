@@ -30,6 +30,10 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $modules = parent::setUpHelper('all');
     parent::setUp($modules);
 
+    // Set a clean starting point. $_GET can be different between the UI test
+    // runner and the command line one. As a consequence, the 'active' classes
+    // on the links can end up being different.
+    $_GET['q'] = '';
 
     // User creation for different operations.
     $this->store_admin = $this->createStoreAdmin();
@@ -562,7 +566,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
    * Test the admin breadcrumbs for product types.
    */
   public function testCommerceProductUIAdminBreadcrumbs() {
-  // Create dummy product.
+    // Create dummy product.
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 
     // Login with store admin.
