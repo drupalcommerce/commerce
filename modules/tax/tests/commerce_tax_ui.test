@@ -138,7 +138,6 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
       $this->assertTrue(in_array($tax_type['display_title'], (array)$tax_select_types), t('Tax rate type %type is available for the rate', array('%type' => $tax_type['display_title'])));
     }
 
-    $this->assertFieldChecked('edit-tax-rate-rules-component', t('Define a rules component checkbox is present and checked'));
     $this->assertFieldById('edit-submit', t('Save tax rate'), t('\'Save tax rate\' button is present'));
     $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes'), t('Cancel link is present'));
 
