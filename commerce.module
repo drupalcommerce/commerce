@@ -338,7 +338,7 @@ function commerce_currency_get_symbol($currency_code = NULL) {
 /**
  * Formats a price for a particular currency.
  *
- * @param $price
+ * @param $amount
  *   A numeric price amount value.
  * @param $currency_code
  *   The three character code of the currency.

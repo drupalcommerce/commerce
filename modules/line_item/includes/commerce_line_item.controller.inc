@@ -31,6 +31,7 @@ class CommerceLineItemEntityController extends DrupalDefaultEntityController {
       'quantity' => 1,
       'created' => '',
       'changed' => '',
+      'data' => array(),
     );
   }
 
