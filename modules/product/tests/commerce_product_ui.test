@@ -588,18 +588,6 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/commerce/products/' . $product->product_id . '/delete');
     $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Delete product page has correct breadcrumb'));
 
-    // Access to the product types listing.
-    // TODO: Main listings doesn't seem to have right breadcrumb in tests.
-    // $this->drupalGet('admin/commerce/products/types');
-    // $this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Product types list has correct breadcrumb'));
-
-    // Product list has one level less of breadcrumb.
-    // TODO: Main listings doesn't seem to have right breadcrumb in tests.
-    //array_pop($breadcrumb);
-    // Access to the admin product list.
-    //$this->drupalGet('admin/commerce/products');
-    //$this->assertRaw(theme('breadcrumb', array('breadcrumb' => $breadcrumb)), t('Product list page has correct breadcrumb'));
-
     // The admin screens below have the Product types addition to the
     // breadcrumb.
     commerce_product_ui_set_breadcrumb(TRUE);
