@@ -23,30 +23,6 @@ function commerce_payment_rules_event_info() {
     'variables' => entity_rules_events_variables('commerce_order', t('Order', array(), array('context' => 'a drupal commerce order'))),
     'access callback' => 'commerce_order_rules_access',
   );
-  $events['commerce_payment_transaction_presave'] = array(
-    'label' => t('Before saving a payment transaction'),
-    'group' => t('Commerce Payment'),
-    'variables' => commerce_payment_rules_event_variables(t('Payment transaction'), TRUE, TRUE),
-    'access callback' => 'commerce_payment_rules_access',
-  );
-  $events['commerce_payment_transaction_insert'] = array(
-    'label' => t('After saving a new payment transaction'),
-    'group' => t('Commerce Payment'),
-    'variables' => commerce_payment_rules_event_variables(t('Created payment transaction'), TRUE),
-    'access callback' => 'commerce_payment_rules_access',
-  );
-  $events['commerce_payment_transaction_update'] = array(
-    'label' => t('After updating an existing payment transaction'),
-    'group' => t('Commerce Payment'),
-    'variables' => commerce_payment_rules_event_variables(t('Updated payment transaction'), TRUE),
-    'access callback' => 'commerce_payment_rules_access',
-  );
-  $events['commerce_payment_transaction_delete'] = array(
-    'label' => t('After deleting a payment transaction'),
-    'group' => t('Commerce Payment'),
-    'variables' => commerce_payment_rules_event_variables(t('Deleted payment transaction')),
-    'access callback' => 'commerce_payment_rules_access',
-  );
 
   $variables = array_merge(
     entity_rules_events_variables('commerce_order', t('Order', array(), array('context' => 'a drupal commerce order')), TRUE, TRUE),
@@ -61,47 +37,6 @@ function commerce_payment_rules_event_info() {
   );
 
   return $events;
-}
-
-/**
- * Returns a variables array for payment transaction events.
- *
- * @param $label
- *   The label for the primary payment transaction variable.
- * @param $unchanged
- *   Boolean indicating whether or not to include the unchanged transaction.
- * @param $skip_save
- *   Boolean indicating whether or not the primary transaction variable should
- *     skip saving after event execution.
- */
-function commerce_payment_rules_event_variables($label, $unchanged = FALSE, $skip_save = FALSE) {
-  $variables = array(
-    'payment_transaction' => array(
-      'type' => 'commerce_payment_transaction',
-      'label' => $label,
-      'skip save' => $skip_save,
-    ),
-  );
-
-  if ($unchanged) {
-    $variables['payment_transaction_unchanged'] = array(
-      'type' => 'commerce_payment_transaction',
-      'label' => t('Unchanged payment transaction'),
-      'skip save' => TRUE,
-      'handler' => 'rules_events_entity_unchanged',
-    );
-  }
-
-  return $variables;
-}
-
-/**
- * Rules integration access callback.
- */
-function commerce_payment_rules_access($type, $name) {
-  if ($type == 'event' || $type == 'condition') {
-    return TRUE;
-  }
 }
 
 /**

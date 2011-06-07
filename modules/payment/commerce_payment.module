@@ -78,11 +78,9 @@ function commerce_payment_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_payment_transaction_uri',
-      'creation callback' => '_commerce_payment_transaction_create',
-      'save callback' => 'commerce_payment_transaction_save',
-      'deletion callback' => 'commerce_payment_transaction_delete',
       'access callback' => 'commerce_payment_transaction_access',
-      'token type' => 'payment',
+      'token type' => 'commerce-payment-transaction',
+      'metadata controller class' => '',
     ),
   );
 
@@ -703,24 +701,10 @@ function commerce_payment_transaction_status_load($status) {
  *   A transaction object with all default fields initialized.
  */
 function commerce_payment_transaction_new($method_id = '', $order_id = 0) {
-  return entity_get_controller('commerce_payment_transaction')->create($method_id, $order_id);
-}
-
-/**
- * Creation callback for the Entity module.
- */
-function _commerce_payment_transaction_create($values = array()) {
-  // Create a new transaction of the specified type.
-  $transaction = commerce_payment_transaction_new($values['method_id']);
-  unset($values['method_id']);
-
-  $wrapper = entity_metadata_wrapper('commerce_payment_transaction', $transaction);
-
-  foreach ($values as $name => $value) {
-    $wrapper->$name->set($value);
-  }
-
-  return $wrapper->value();
+  return entity_get_controller('commerce_payment_transaction')->create(array(
+    'method_id' => $method_id,
+    'order_id' => $order_id,
+  ));
 }
 
 /**
