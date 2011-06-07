@@ -13,7 +13,7 @@ function commerce_customer_item_token_info() {
   $type = array(
     'name' => t('Customer profiles'),
     'description' => t('Tokens related to customer profiles.'),
-    'needs-data' => 'customer-profile',
+    'needs-data' => 'commerce-customer-profile',
   );
 
   // Tokens for customer profiles.
@@ -53,8 +53,8 @@ function commerce_customer_item_token_info() {
   );
 
   return array(
-    'types' => array('customer-profile' => $type),
-    'tokens' => array('customer-profile' => $profile),
+    'types' => array('commerce-customer-profile' => $type),
+    'tokens' => array('commerce-customer-profile' => $profile),
   );
 }
 
@@ -76,8 +76,8 @@ function commerce_customer_tokens($type, $tokens, array $data = array(), array $
 
   $replacements = array();
 
-  if ($type == 'customer-profile' && !empty($data['customer-profile'])) {
-    $profile = $data['customer-profile'];
+  if ($type == 'commerce-customer-profile' && !empty($data['commerce-customer-profile'])) {
+    $profile = $data['commerce-customer-profile'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

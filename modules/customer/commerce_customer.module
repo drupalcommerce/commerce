@@ -39,11 +39,9 @@ function commerce_customer_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_customer_profile_uri',
-      'creation callback' => '_commerce_customer_profile_create',
-      'save callback' => 'commerce_customer_profile_save',
-      'deletion callback' => 'commerce_customer_profile_delete',
       'access callback' => 'commerce_customer_profile_access',
-      'token type' => 'customer',
+      'token type' => 'commerce-customer-profile',
+      'metadata controller class' => '',
     ),
   );
 
@@ -372,24 +370,10 @@ function commerce_customer_profile_type_to_arg($type) {
  *   A customer profile object with all default fields initialized.
  */
 function commerce_customer_profile_new($type = '', $uid = 0) {
-  return entity_get_controller('commerce_customer_profile')->create($type, $uid);
-}
-
-/**
- * Creation callback for the Entity module.
- */
-function _commerce_customer_profile_create($values = array()) {
-  // Create a new customer profile for the specified user.
-  $profile = commerce_customer_profile_new($values['type'], $values['uid']);
-  unset($values['type'], $values['uid']);
-
-  $wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
-
-  foreach ($values as $name => $value) {
-    $wrapper->$name->set($value);
-  }
-
-  return $wrapper->value();
+  return entity_get_controller('commerce_customer_profile')->create(array(
+    'type' => $type,
+    'uid' => $uid,
+  ));
 }
 
 /**
@@ -400,7 +384,8 @@ function _commerce_customer_profile_create($values = array()) {
  *     a new customer profile will be created.
  *
  * @return
- *   The saved customer profile object.
+ *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
+ *   performed.
  */
 function commerce_customer_profile_save($profile) {
   return entity_get_controller('commerce_customer_profile')->save($profile);

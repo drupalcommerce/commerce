@@ -601,8 +601,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
         $profile->{$name}[LANGUAGE_NONE][] = $values;
       }
     }
-    $profile = commerce_customer_profile_save($profile);
-    return !empty($profile) ? $profile : FALSE;
+    commerce_customer_profile_save($profile);
+    return $profile;
   }
 
   /**
