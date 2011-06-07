@@ -6,3 +6,5 @@ core = 7.x
 ; Tests
 files[] = tests/commerce_base.test
 
+; Central Entity Controller.
+files[] = includes/commerce.controller.inc
