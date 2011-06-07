@@ -82,11 +82,6 @@ function commerce_cart_views_default_views() {
     'quantity' => 0,
     'total' => 'total',
   );
-  /* Footer: Commerce Line Item: Line item actions */
-  $handler->display->display_options['footer']['line_item_actions']['id'] = 'line_item_actions';
-  $handler->display->display_options['footer']['line_item_actions']['table'] = 'commerce_line_item';
-  $handler->display->display_options['footer']['line_item_actions']['field'] = 'line_item_actions';
-  $handler->display->display_options['footer']['line_item_actions']['label'] = 'Cart actions';
   /* Relationship: Fields: Referenced line item */
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['id'] = 'commerce_line_items_line_item_id';
   $handler->display->display_options['relationships']['commerce_line_items_line_item_id']['table'] = 'field_data_commerce_line_items';

@@ -80,6 +80,51 @@ function commerce_line_item_hook_info() {
   return $hooks;
 }
 
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Alter the views form with functionality specific to line items.
+ * This form currently only supports line items from a single order, and it
+ * determines which order the line items are for based on a Views argument.
+ */
+function commerce_line_item_form_alter(&$form, &$form_state, $form_id) {
+  $line_item_form = FALSE;
+  // Is this a views form?
+  if (strpos($form_id, 'views_form_') === 0) {
+    $view = $form_state['build_info']['args'][0];
+    // Does the view contain one of the line item edit fields?
+    foreach ($view->field as $field_name => $field) {
+      if (is_a($field, 'commerce_line_item_handler_field_edit_delete') || is_a($field, 'commerce_line_item_handler_field_edit_quantity')) {
+        $line_item_form = TRUE;
+      }
+    }
+  }
+  // This is not the form we are looking for.
+  if (!$line_item_form) {
+    return;
+  }
+  // Require the existence of an order_id argument (and its value).
+  if (empty($view->argument['order_id']) || empty($view->argument['order_id']->value)) {
+    return;
+  }
+
+  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item_views_form.css';
+  $form['#attached']['js'][] = drupal_get_path('module', 'commerce_line_item') . '/commerce_line_item.js';
+  $form['#submit'][] = 'commerce_line_item_line_item_views_form_submit';
+
+  // Wrap the form in a div so we can add CSS and javascript behaviors to it.
+  $form['#prefix'] = '<div class="commerce-line-item-views-form">';
+  $form['#suffix'] = '</div>';
+
+  // Add an additional class to the actions wrapper.
+  $form['actions']['#attributes']['class'][] = 'commerce-line-item-actions';
+
+  // Load the order from the Views argument.
+  $order = commerce_order_load($view->argument['order_id']->value[0]);
+  $form_state['order'] = $order;
+}
+
 /**
  * Implements hook_field_extra_fields().
  */
@@ -131,45 +176,7 @@ function commerce_line_item_theme() {
       'path' => drupal_get_path('module', 'commerce_line_item') . '/theme',
       'template' => 'commerce-line-item-summary',
     ),
-    'commerce_line_item_views_form' => array(
-      'render element' => 'form',
-    ),
-    'commerce_line_item_actions' => array(
-      'variables' => array('buttons' => NULL),
-    ),
   );
-}
-
-/**
- * Implements hook_forms().
- *
- * To provide distinct form IDs for line item Views forms, the View name and
- * specific display name are appended to the base ID,
- * commerce_line_item_views_form. When such a form is built or submitted, this
- * function will return the proper callback function to use for the given form.
- */
-function commerce_line_item_forms($form_id, $args) {
-  if (strpos($form_id, 'commerce_line_item_views_form_') === 0) {
-    return array(
-      $form_id => array(
-        'callback' => 'commerce_line_item_views_form',
-      ),
-    );
-  }
-}
-
-/**
- * Returns a form ID for a line item Views form using the name and display of
- *   the View used to build the form.
- */
-function commerce_line_item_views_form_id($view) {
-  $parts = array(
-    'commerce_line_item_views_form',
-    $view->name,
-    $view->current_display,
-  );
-
-  return implode('_', $parts);
 }
 
 /**
@@ -347,13 +354,6 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
   if (!empty($line_item_ids)) {
     commerce_line_item_delete_multiple($line_item_ids);
   }
-}
-
-/**
- * Theme line item edit form actions.
- */
-function theme_commerce_line_item_actions($variables) {
-  return '<div class="commerce-line-item-actions">' . $variables['buttons'] . '</div>';
 }
 
 /**

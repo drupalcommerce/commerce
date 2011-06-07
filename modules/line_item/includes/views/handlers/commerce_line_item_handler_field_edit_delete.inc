@@ -10,34 +10,56 @@
 /**
  * Field handler to present a button to delete a line item.
  */
-class commerce_line_item_handler_field_edit_delete extends commerce_line_item_handler_field_edit {
+class commerce_line_item_handler_field_edit_delete extends views_handler_field {
 
-  function render($values) {
-    $line_item_id = $this->get_value($values, 'line_item_id');
+  function construct() {
+    parent::construct();
+    $this->additional_fields['line_item_id'] = 'line_item_id';
 
-    // Add form that will be used for replacing the placeholder generated bellow
-    // at form rendering phase in commerce_line_item_views_post_render().
-    $this->form[$line_item_id] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete'),
-      '#name' => 'delete-line-item-' . $line_item_id,
-      '#attributes' => array('class' => array('delete-line-item')),
-    );
-
-    // Add a default delete submit handler.
-    $this->form[$line_item_id]['#submit'] = array('commerce_line_item_line_item_views_delete_form_submit');
-
-    // Return the placeholder that will be used as token for replacing itself
-    // with the rendered form field created above.
-    return '<!--post-commerce-line-item-edit_delete-' . $line_item_id . '-->';
+    // Set real_field in order to make it generate a field_alias.
+    $this->real_field = 'line_item_id';
   }
 
-  function edit_form_submit($form, &$form_state) {
-    $order = commerce_order_load($form_state['order']->order_id);
+  function render($values) {
+    return '<!--form-item-' . $this->options['id'] . '--' . $this->view->row_index . '-->';
+  }
 
-    foreach (element_children($form['edit_delete']) as $line_item_id) {
+  /**
+   * Returns the form which replaces the placeholder from render().
+   */
+  function views_form(&$form, &$form_state) {
+    // The view is empty, abort.
+    if (empty($this->view->result)) {
+      return;
+    }
+
+    $form[$this->options['id']] = array(
+      '#tree' => TRUE,
+    );
+    // At this point, the query has already been run, so we can access the results
+    // in order to get the base key value (for example, nid for nodes).
+    foreach ($this->view->result as $row_id => $row) {
+      $line_item_id = $this->get_value($row);
+
+      $form[$this->options['id']][$row_id] = array(
+        '#type' => 'submit',
+        '#value' => t('Delete'),
+        '#name' => 'delete-line-item-' . $row_id,
+        '#attributes' => array('class' => array('delete-line-item')),
+        '#line_item_id' => $line_item_id,
+        '#submit' => array_merge($form['#submit'], array('commerce_line_item_line_item_views_delete_form_submit')),
+      );
+    }
+  }
+
+  function views_form_submit($form, &$form_state) {
+    $order = commerce_order_load($form_state['order']->order_id);
+    $field_name = $this->options['id'];
+
+    foreach (element_children($form[$field_name]) as $row_id) {
       // Check for the removal of an item.
-      if ($form_state['triggering_element']['#name'] == 'delete-line-item-' . $line_item_id) {
+      if ($form_state['triggering_element']['#name'] == 'delete-line-item-' . $row_id) {
+        $line_item_id = $form[$field_name][$row_id]['#line_item_id'];
         // TODO: Remove this dependence on the Cart module API.
         commerce_cart_order_product_line_item_delete($order, $line_item_id);
       }

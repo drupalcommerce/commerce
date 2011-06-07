@@ -195,15 +195,6 @@ function commerce_line_item_views_data() {
     ),
   );
 
-  // Define an area handler for displaying line item action buttons.
-  $data['commerce_line_item']['line_item_actions'] = array(
-    'title' => t('Line item actions'),
-    'help' => t('Display buttons to act on line items.'),
-    'area' => array(
-      'handler' => 'commerce_line_item_handler_area_line_item_actions',
-    ),
-  );
-
   return $data;
 }
 
