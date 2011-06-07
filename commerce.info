@@ -5,4 +5,4 @@ core = 7.x
 
 ; Tests
 files[] = tests/commerce_base.test
-files[] = tests/commerce.test
+
