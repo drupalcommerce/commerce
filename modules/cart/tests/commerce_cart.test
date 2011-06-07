@@ -392,7 +392,7 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
         $product->field_1[LANGUAGE_NONE][0]['value'] = $field_1_value;
         $product->field_2[LANGUAGE_NONE][0]['value'] = $field_2_value;
         $product->is_new = FALSE;
-        $product = commerce_product_save($product);
+        commerce_product_save($product);
         $this->products[$product->product_id] = $product;
       }
     }
@@ -521,7 +521,7 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
     $new_price = $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] + rand(2, 500);
     $this->product->commerce_price[LANGUAGE_NONE][0]['amount'] = $new_price;
     $this->product->is_new = FALSE;
-    $this->product = commerce_product_save($this->product);
+    commerce_product_save($this->product);
 
     // Log in with normal user.
     $this->drupalPost('user', array('name' => $this->store_customer->name, 'pass' => $this->store_customer->pass_raw), t('Log in'));

@@ -6,32 +6,32 @@
  */
 
 /**
- * The controller class for products contains methods for the product CRUD
- * operations. The load method is inherited from the default controller.
+ * The controller class for products contains methods for the product CRUD operations.
+ *
+ * Mainly relies on the EntityAPIController class provided by the Entity
+ * module, just overrides specific features.
  */
-class CommerceProductEntityController extends DrupalDefaultEntityController {
+class CommerceProductEntityController extends DrupalCommerceEntityController {
 
   /**
    * Create a default product.
    *
-   * @param $type
-   *   The machine-readable type of the product.
-   *
+   * @param array $values
+   *   An array of values to set, keyed by property name.
    * @return
    *   A product object with all default fields initialized.
    */
-  public function create($type = '') {
-    return (object) array(
+  public function create(array $values = array()) {
+    return (object) ($values + array(
       'product_id' => '',
       'is_new' => TRUE,
       'sku' => '',
-      'type' => $type,
       'title' => '',
       'uid' => '',
       'status' => 1,
       'created' => '',
       'changed' => '',
-    );
+    ));
   }
 
   /**
@@ -39,57 +39,26 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *
    * @param $product
    *   The full product object to save.
+   * @param $transaction
+   *   An optional transaction object.
    *
    * @return
    *   The saved product object.
    */
-  public function save($product) {
-    $transaction = db_transaction();
+  public function save($entity, DatabaseTransaction $transaction = NULL) {
+    $transaction = isset($transaction) ? $transaction : db_transaction();
 
-    try {
-      $product->changed = REQUEST_TIME;
+    // Hardcode the changed time.
+    $entity->changed = REQUEST_TIME;
 
-      // Give modules the opportunity to prepare field data for saving.
-      module_invoke_all('entity_presave', $product, 'commerce_product');
-      rules_invoke_all('commerce_product_presave', $product);
-      field_attach_presave('commerce_product', $product);
-
-      // If this is a new product...
-      if ((isset($product->is_new) && $product->is_new) || empty($product->product_id)) {
-        // Set the creation timestamp if not set.
-        if (empty($product->created)) {
-          $product->created = REQUEST_TIME;
-        }
-
-        // Save the new product and fields.
-        drupal_write_record('commerce_product', $product);
-        field_attach_insert('commerce_product', $product);
-
-        $op = 'insert';
+    if (empty($entity->{$this->idKey}) || !empty($entity->is_new)) {
+      // Set the creation timestamp if not set, for new entities.
+      if (empty($entity->created)) {
+        $entity->created = REQUEST_TIME;
       }
-      else {
-        // Save the updated product and fields.
-        drupal_write_record('commerce_product', $product, 'product_id');
-        field_attach_update('commerce_product', $product);
-
-        $op = 'update';
-      }
-
-      module_invoke_all('commerce_product_' . $op, $product);
-      module_invoke_all('entity_' . $op, $product, 'commerce_product');
-      rules_invoke_event('commerce_product_' . $op, $product);
-
-      // Ignore slave server temporarily to give time for the
-      // saved product to be propagated to the slave.
-      db_ignore_slave();
-
-      return $product;
     }
-    catch (Exception $e) {
-      $transaction->rollback();
-      watchdog_exception('commerce_product', $e);
-      throw $e;
-    }
+
+    return parent::save($entity);
   }
 
   /**
@@ -110,11 +79,13 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
    *
    * @param $product_ids
    *   An array of product IDs to delete.
+   * @param $transaction
+   *   An optional transaction object.
    *
    * @return
    *   TRUE on success, FALSE otherwise.
    */
-  public function delete($product_ids) {
+  public function delete($product_ids, DatabaseTransaction $transaction = NULL) {
     if (!empty($product_ids)) {
       $products = $this->load($product_ids, array());
 
@@ -130,34 +101,11 @@ class CommerceProductEntityController extends DrupalDefaultEntityController {
         return FALSE;
       }
 
-      $transaction = db_transaction();
-
-      try {
-        db_delete('commerce_product')
-          ->condition('product_id', $product_ids, 'IN')
-          ->execute();
-
-        foreach ($products as $product_id => $product) {
-          module_invoke_all('commerce_product_delete', $product);
-          field_attach_delete('commerce_product', $product);
-          rules_invoke_event('commerce_product_delete', $product);
-        }
-
-        // Ignore slave server temporarily to give time for the
-        // saved product to be propagated to the slave.
-        db_ignore_slave();
-      }
-      catch (Exception $e) {
-        $transaction->rollback();
-        watchdog_exception('commerce_product', $e);
-        throw $e;
-      }
-
-      // Clear the page and block and product_load_multiple caches.
-      cache_clear_all();
-      $this->resetCache();
+      parent::delete($product_ids, $transaction);
+      return TRUE;
     }
-
-    return TRUE;
+    else {
+      return FALSE;
+    }
   }
 }

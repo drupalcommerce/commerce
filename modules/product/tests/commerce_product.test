@@ -114,11 +114,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $new_product->sku = $sku = $this->randomName(10);
     $new_product->type = $type = 'product';
     $new_product->title = $title = $this->randomName(10);
-    $new_product->uid = $uid = 1;
+    $new_product->uid = 1;
 
-    // Ensure commerce_product_save() returns TRUE when saving a new product
+    // Ensure commerce_product_save() returns SAVED_NEW when saving a new product
     $return = commerce_product_save($new_product);
-    $this->assertNotEqual($return, FALSE, 'commerce_product_save() successfully saved the new product.');
+    $this->assertIdentical($return, SAVED_NEW, 'commerce_product_save() successfully saved the new product.');
 
     // Ensure commerce_product_load() loaded the saved product.
     $loaded_product = commerce_product_load($new_product->product_id);
@@ -128,6 +128,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 
     $this->assertTrue($loaded_product->created > 0, 'commerce_product_save() added a created date to the product');
     $this->assertTrue($loaded_product->changed > 0, 'commerce_product_save() added a changed date to the product');
+
+    // Ensure commerce_product_save() returns SAVED_UPDATED when saving an existing product.
+    $loaded_product->uid = 0;
+    $return = commerce_product_save($loaded_product);
+    $this->assertIdentical($return, SAVED_UPDATED, 'commerce_product_save() successfully updated the product.');
 
     // Ensure commerce_product_load_by_sku() can load a product by SKU.
     $loaded_product_by_sku = commerce_product_load_by_sku($sku);
@@ -178,17 +183,18 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $product->sku = $this->randomName(10);
     $product->title = $this->randomName(10);
     $product->uid = $creator->uid;
-    $product = commerce_product_save($product);
+    commerce_product_save($product);
 
-    $this->assertEqual(token_replace('[product:product-id]', array('product' => $product)), $product->product_id, '[product:product-id] was replaced with the product ID.');
-    $this->assertEqual(token_replace('[product:sku]', array('product' => $product)), $product->sku, '[product:sku] was replaced with the SKU.');
-    $this->assertEqual(token_replace('[product:type]', array('product' => $product)), commerce_product_type_get_name($product->type), '[product:type] was replaced with the product type.');
-    $this->assertEqual(token_replace('[product:title]', array('product' => $product)), $product->title, '[product:title] was replaced with the title.');
-    $this->assertNotIdentical(strpos(token_replace('[product:edit-url]', array('product' => $product)), url('admin/commerce/products/' . $product->product_id . '/edit')), FALSE, '[product:edit-url] was replaced with the edit URL.');
-    $this->assertEqual(token_replace('[product:creator:uid]', array('product' => $product)), $product->uid, '[product:creator:uid] was replaced with the uid of the creator.');
-    $this->assertEqual(token_replace('[product:creator:name]', array('product' => $product)), check_plain(format_username($creator)), '[product:creator:name] was replaced with the name of the author.');
-    $this->assertEqual(token_replace('[product:created]', array('product' => $product)), format_date($product->created, 'medium'), '[product:created] was replaced with the created date.');
-    $this->assertEqual(token_replace('[product:changed]', array('product' => $product)), format_date($product->changed, 'medium'), '[product:changed] was replaced with the changed date.');
+    $this->assertEqual(token_replace('[commerce-product:product-id]', array('commerce-product' => $product)), $product->product_id, '[commerce-product:product-id] was replaced with the product ID.');
+    $this->assertEqual(token_replace('[commerce-product:sku]', array('commerce-product' => $product)), $product->sku, '[commerce-product:sku] was replaced with the SKU.');
+    $this->assertEqual(token_replace('[commerce-product:type]', array('commerce-product' => $product)), $product->type, '[commerce-product:type] was replaced with the product type.');
+    $this->assertEqual(token_replace('[commerce-product:type-name]', array('commerce-product' => $product)), commerce_product_type_get_name($product->type), '[commerce-product:type-name] was replaced with the product type.');
+    $this->assertEqual(token_replace('[commerce-product:title]', array('commerce-product' => $product)), $product->title, '[commerce-product:title] was replaced with the title.');
+    $this->assertNotIdentical(strpos(token_replace('[commerce-product:edit-url]', array('commerce-product' => $product)), url('admin/commerce/products/' . $product->product_id . '/edit')), FALSE, '[commerce-product:edit-url] was replaced with the edit URL.');
+    $this->assertEqual(token_replace('[commerce-product:creator:uid]', array('commerce-product' => $product)), $product->uid, '[commerce-product:creator:uid] was replaced with the uid of the creator.');
+    $this->assertEqual(token_replace('[commerce-product:creator:name]', array('commerce-product' => $product)), check_plain(format_username($creator)), '[commerce-product:creator:name] was replaced with the name of the author.');
+    $this->assertEqual(token_replace('[commerce-product:created]', array('commerce-product' => $product)), format_date($product->created, 'medium'), '[commerce-product:created] was replaced with the created date.');
+    $this->assertEqual(token_replace('[commerce-product:changed]', array('commerce-product' => $product)), format_date($product->changed, 'medium'), '[commerce-product:changed] was replaced with the changed date.');
   }
 }
 

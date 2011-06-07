@@ -50,7 +50,7 @@ function commerce_cart_rules_event_variables($line_item = FALSE) {
       'type' => 'commerce_order',
       'label' => t('Shopping cart order'),
     ),
-    'product' => array(
+    'commerce_product' => array(
       'label' => t('Product'),
       'type' => 'commerce_product',
     ),

@@ -13,7 +13,7 @@ function commerce_product_token_info() {
   $type = array(
     'name' => t('Products'),
     'description' => t('Tokens related to individual products.'),
-    'needs-data' => 'product',
+    'needs-data' => 'commerce-product',
   );
 
   // Tokens for products.
@@ -29,6 +29,10 @@ function commerce_product_token_info() {
   );
   $product['type'] = array(
     'name' => t('Type'),
+    'description' => t('The machine name of the product type.'),
+  );
+  $product['type-name'] = array(
+    'name' => t('Type name'),
     'description' => t('The human readable name of the product type.'),
   );
   $product['title'] = array(
@@ -54,8 +58,8 @@ function commerce_product_token_info() {
   );
 
   return array(
-    'types' => array('product' => $type),
-    'tokens' => array('product' => $product),
+    'types' => array('commerce-product' => $type),
+    'tokens' => array('commerce-product' => $product),
   );
 }
 
@@ -77,8 +81,8 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
 
   $replacements = array();
 
-  if ($type == 'product' && !empty($data['product'])) {
-    $product = $data['product'];
+  if ($type == 'commerce-product' && !empty($data['commerce-product'])) {
+    $product = $data['commerce-product'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -92,6 +96,10 @@ function commerce_product_tokens($type, $tokens, array $data = array(), array $o
           break;
 
         case 'type':
+          $replacements[$original] = $sanitize ? check_plain($product->type) : $product->type;
+          break;
+
+        case 'type-name':
           $replacements[$original] = $sanitize ? check_plain(commerce_product_type_get_name($product->type)) : commerce_product_type_get_name($product->type);
           break;
 

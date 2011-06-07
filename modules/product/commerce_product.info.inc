@@ -62,6 +62,14 @@ function commerce_product_entity_property_info() {
     'setter permission' => 'administer products',
     'schema field' => 'changed',
   );
+  $properties['changed'] = array(
+    'label' => t('Date updated'),
+    'description' => t('The date the product was changed.'),
+    'type' => 'date',
+    'setter callback' => 'entity_property_verbatim_set',
+    'query callback' => 'entity_metadata_table_query',
+    'setter permission' => 'administer products',
+  );
   $properties['uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',

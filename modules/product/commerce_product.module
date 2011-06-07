@@ -72,7 +72,7 @@ function commerce_product_hook_info() {
 function commerce_product_entity_info() {
   $return = array(
     'commerce_product' => array(
-      'label' => t('Product'),
+      'label' => t('Commerce Product'),
       'controller class' => 'CommerceProductEntityController',
       'base table' => 'commerce_product',
       'fieldable' => TRUE,
@@ -105,11 +105,9 @@ function commerce_product_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_product_uri',
-      'creation callback' => '_commerce_product_create',
-      'save callback' => 'commerce_product_save',
-      'deletion callback' => 'commerce_product_delete',
       'access callback' => 'commerce_product_access',
-      'token type' => 'product',
+      'metadata controller class' => '',
+      'token type' => 'commerce-product',
 
       // Add entity translation support.
       'translation' => array(
@@ -399,24 +397,7 @@ function commerce_product_configure_product_type($type) {
  *   A product object with all default fields initialized.
  */
 function commerce_product_new($type = '') {
-  return entity_get_controller('commerce_product')->create($type);
-}
-
-/**
- * Creation callback for the Entity module.
- */
-function _commerce_product_create($values = array()) {
-  // Create a new product of the specified type.
-  $product = commerce_product_new($values['type']);
-  unset($values['type']);
-
-  $wrapper = entity_metadata_wrapper('commerce_product', $product);
-
-  foreach ($values as $name => $value) {
-    $wrapper->$name->set($value);
-  }
-
-  return $wrapper->value();
+  return entity_get_controller('commerce_product')->create(array('type' => $type));
 }
 
 /**
@@ -426,7 +407,8 @@ function _commerce_product_create($values = array()) {
  *   The full product object to save.
  *
  * @return
- *   The saved product object.
+ *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
+ *   performed.
  */
 function commerce_product_save($product) {
   return entity_get_controller('commerce_product')->save($product);
