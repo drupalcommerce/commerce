@@ -19,7 +19,7 @@ function commerce_tax_rules_action_info() {
     $actions['commerce_tax_rate_apply'] = array(
       'label' => t('Apply a tax rate to a line item'),
       'parameter' => array(
-        'line_item' => array(
+        'commerce_line_item' => array(
           'type' => 'commerce_line_item',
           'label' => t('Line item'),
         ),
@@ -40,7 +40,7 @@ function commerce_tax_rules_action_info() {
     $actions['commerce_tax_calculate_by_type'] = array(
       'label' => t('Calculate taxes for a line item'),
       'parameter' => array(
-        'line_item' => array(
+        'commerce_line_item' => array(
           'type' => 'commerce_line_item',
           'label' => t('Line item'),
         ),

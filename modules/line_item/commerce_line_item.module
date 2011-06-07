@@ -12,7 +12,7 @@
 function commerce_line_item_entity_info() {
   $return = array(
     'commerce_line_item' => array(
-      'label' => t('Line item'),
+      'label' => t('Commerce Line item'),
       'controller class' => 'CommerceLineItemEntityController',
       'base table' => 'commerce_line_item',
       'fieldable' => TRUE,
@@ -32,11 +32,9 @@ function commerce_line_item_entity_info() {
           'custom settings' => FALSE,
         ),
       ),
-      'creation callback' => '_commerce_line_item_create',
-      'save callback' => 'commerce_line_item_save',
-      'deletion callback' => 'commerce_line_item_delete',
       'access callback' => 'commerce_line_item_access',
-      'token type' => 'line_item',
+      'metadata controller class' => '',
+      'token type' => 'commerce-line-item',
     ),
   );
 
@@ -528,24 +526,10 @@ function commerce_line_item_type_callback($line_item_type, $callback) {
  *   A line item object with all default fields initialized.
  */
 function commerce_line_item_new($type = '', $order_id = 0) {
-  return entity_get_controller('commerce_line_item')->create($type, $order_id);
-}
-
-/**
- * Creation callback for the Entity module.
- */
-function _commerce_line_item_create($values = array()) {
-  // Create a new line item of the specified type.
-  $line_item = commerce_line_item_new($values['type']);
-  unset($values['type']);
-
-  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-
-  foreach ($values as $name => $value) {
-    $wrapper->$name->set($value);
-  }
-
-  return $wrapper->value();
+  return entity_get_controller('commerce_line_item')->create(array(
+    'type' => $type,
+    'order_id' => $order_id,
+  ));
 }
 
 /**
@@ -555,7 +539,8 @@ function _commerce_line_item_create($values = array()) {
  *   The full line item object to save.
  *
  * @return
- *   The saved line item object.
+ *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
+ *   performed.
  */
 function commerce_line_item_save($line_item) {
   return entity_get_controller('commerce_line_item')->save($line_item);
@@ -1156,7 +1141,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
         // If we didn't end up with any errors...
         if (empty($error)) {
           // Save it and add it to the line item reference field's values array.
-          $line_item = commerce_line_item_save($line_item);
+          commerce_line_item_save($line_item);
 
           // If the item is saved, we set a variable to notify the user the
           // need of saving the order.

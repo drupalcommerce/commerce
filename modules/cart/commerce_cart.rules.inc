@@ -62,11 +62,11 @@ function commerce_cart_rules_event_variables($line_item = FALSE) {
 
   if ($line_item) {
     $variables += array(
-      'line_item' => array(
+      'commerce_line_item' => array(
         'label' => t('Product line item'),
         'type' => 'commerce_line_item',
       ),
-      'line_item_unchanged' => array(
+      'commerce_line_item_unchanged' => array(
         'label' => t('Unchanged product line item'),
         'type' => 'commerce_line_item',
         'skip save' => TRUE,

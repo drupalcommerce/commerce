@@ -13,7 +13,7 @@ function commerce_line_item_token_info() {
   $type = array(
     'name' => t('Line items'),
     'description' => t('Tokens related to individual line items.'),
-    'needs-data' => 'line_item',
+    'needs-data' => 'commerce-line-item',
   );
 
   // Tokens for line items.
@@ -58,8 +58,8 @@ function commerce_line_item_token_info() {
   );
 
   return array(
-    'types' => array('line_item' => $type),
-    'tokens' => array('line_item' => $line_item),
+    'types' => array('commerce-line-item' => $type),
+    'tokens' => array('commerce-line-item' => $line_item),
   );
 }
 
@@ -81,8 +81,8 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
 
   $replacements = array();
 
-  if ($type == 'line_item' && !empty($data['line_item'])) {
-    $line_item = $data['line_item'];
+  if ($type == 'commerce-line-item' && !empty($data['commerce-line-item'])) {
+    $line_item = $data['commerce-line-item'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

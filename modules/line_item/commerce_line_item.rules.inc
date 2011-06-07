@@ -9,73 +9,6 @@
  */
 
 /**
- * Implements hook_rules_event_info().
- */
-function commerce_line_item_rules_event_info() {
-  $events = array();
-
-  $events['commerce_line_item_presave'] = array(
-    'label' => t('Before saving a line item'),
-    'group' => t('Commerce Line Item'),
-    'variables' => commerce_line_item_rules_event_variables(t('Line item'), TRUE, TRUE),
-    'access callback' => 'commerce_line_item_rules_access',
-  );
-  $events['commerce_line_item_insert'] = array(
-    'label' => t('After saving a new line item'),
-    'group' => t('Commerce Line Item'),
-    'variables' => commerce_line_item_rules_event_variables(t('Created line item'), TRUE),
-    'access callback' => 'commerce_line_item_rules_access',
-  );
-  $events['commerce_line_item_update'] = array(
-    'label' => t('After updating an existing line item'),
-    'group' => t('Commerce Line Item'),
-    'variables' => commerce_line_item_rules_event_variables(t('Updated line item'), TRUE),
-    'access callback' => 'commerce_line_item_rules_access',
-  );
-  $events['commerce_line_item_delete'] = array(
-    'label' => t('After deleting a line item'),
-    'group' => t('Commerce Line Item'),
-    'variables' => commerce_line_item_rules_event_variables(t('Deleted line item')),
-    'access callback' => 'commerce_line_item_rules_access',
-  );
-
-  return $events;
-}
-
-/**
- * Returns a variables array for line item events.
- *
- * @param $label
- *   The label for the primary line item variable.
- * @param $unchanged
- *   Boolean indicating whether or not to include the unchanged line item.
- * @param $skip_save
- *   Boolean indicating whether or not the primary line item variable should
- *     skip saving after event execution.
- */
-function commerce_line_item_rules_event_variables($label, $unchanged = FALSE, $skip_save = FALSE) {
-  $variables = array(
-    'line_item' => array(
-      'type' => 'commerce_line_item',
-      'label' => $label,
-      'skip save' => $skip_save,
-    ),
-  );
-
-  // Include the unchanged line item if specified.
-  if ($unchanged) {
-    $variables['line_item_unchanged'] = array(
-      'type' => 'commerce_line_item',
-      'label' => t('Unchanged line item'),
-      'skip save' => TRUE,
-      'handler' => 'rules_events_entity_unchanged',
-    );
-  }
-
-  return $variables;
-}
-
-/**
  * Rules integration access callback.
  */
 function commerce_line_item_rules_access($type, $name) {
@@ -119,7 +52,7 @@ function commerce_line_item_rules_action_info() {
     $actions[$key] = array(
       'label' => $value['label'],
       'parameter' => array(
-        'line_item' => array(
+        'commerce_line_item' => array(
           'type' => 'commerce_line_item',
           'label' => t('Line item'),
         ),
@@ -136,7 +69,7 @@ function commerce_line_item_rules_action_info() {
   $actions['commerce_line_item_unit_price_currency_code'] = array(
     'label' => t("Set the unit price's currency code"),
     'parameter' => array(
-      'line_item' => array(
+      'commerce_line_item' => array(
         'type' => 'commerce_line_item',
         'label' => t('Line item'),
       ),
@@ -152,7 +85,7 @@ function commerce_line_item_rules_action_info() {
   $actions['commerce_line_item_unit_price_currency_convert'] = array(
     'label' => t("Convert the unit price to a different currency"),
     'parameter' => array(
-      'line_item' => array(
+      'commerce_line_item' => array(
         'type' => 'commerce_line_item',
         'label' => t('Line item'),
       ),

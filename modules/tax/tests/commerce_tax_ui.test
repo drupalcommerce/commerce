@@ -308,7 +308,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     // saving process is working.
     $this->drupalPost(NULL, array('element_name' => 'entity_is_of_type'), t('Continue'));
 
-    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
+    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'commerce-line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
 
     // Check that after saving the url is correct and the condition has been
     // added.
@@ -491,7 +491,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     // saving process is working.
     $this->drupalPost(NULL, array('element_name' => 'entity_is_of_type'), t('Continue'));
 
-    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
+    $this->drupalPost(NULL, array('parameter[entity][settings][entity:select]' => 'commerce-line-item', 'parameter[type][settings][type]' => 'commerce_line_item'), t('Save'));
 
     // Check that after saving the url is correct and the condition has been
     // added.
@@ -667,7 +667,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
     $this->clickLink(t('Add condition'));
     $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
-    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'line-item:commerce-total:amount'), t('Continue'));
+    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'commerce-line-item:commerce-total:amount'), t('Continue'));
     $this->drupalPost(NULL, array('parameter[op][settings][op]' => '<', 'parameter[value][settings][value]' => '0'), t('Save'));
 
     // Login with normal user.

@@ -22,7 +22,7 @@ function commerce_tax_default_rules_configuration() {
       // Add the action to apply the current tax.
       $rule
         ->action('commerce_tax_rate_apply', array(
-          'line_item:select' => 'line-item',
+          'commerce_line_item:select' => 'commerce-line-item',
           'tax_rate_name' => $name,
         ));
 
@@ -43,7 +43,7 @@ function commerce_tax_default_rules_configuration() {
     $rule
       ->event('commerce_product_calculate_sell_price')
       ->action('commerce_tax_calculate_by_type', array(
-          'line_item:select' => 'line-item',
+          'commerce_line_item:select' => 'commerce-line-item',
           'tax_type_name' => $name,
         ));
 
@@ -58,7 +58,7 @@ function commerce_tax_default_rules_configuration() {
  */
 function commerce_tax_rate_component_variables() {
   return array(
-    'line_item' => array(
+    'commerce_line_item' => array(
       'type' => 'commerce_line_item',
       'label' => t('Line item'),
     ),

@@ -20,7 +20,7 @@ function commerce_order_rules_condition_info() {
       'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
-        'description' => t('The order containing the profile reference with the address in question. In most cases, you will use line-item:order.'),
+        'description' => t('The order containing the profile reference with the address in question.'),
       ),
       'address_field' => array(
         'type' => 'text',
@@ -63,7 +63,7 @@ function commerce_order_rules_condition_info() {
       'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
-        'description' => t('The order whose line items should be checked for the specified product. In most cases, you will use line-item:order. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
+        'description' => t('The order whose line items should be checked for the specified product. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
       ),
       'product_id' => array(
         'type' => 'text',
@@ -98,7 +98,7 @@ function commerce_order_rules_condition_info() {
       'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
-        'description' => t('The order whose product line item quantities should be totalled. In most cases, you will use line-item:order. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
+        'description' => t('The order whose product line item quantities should be totalled. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
       ),
       'operator' => array(
         'type' => 'text',

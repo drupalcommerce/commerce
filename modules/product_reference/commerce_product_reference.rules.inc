@@ -23,12 +23,12 @@ function commerce_product_reference_rules_event_info() {
     'label' => t('Calculating the sell price of a product'),
     'group' => t('Commerce Product'),
     'variables' => array(
-      'line_item' => array(
+      'commerce_line_item' => array(
         'label' => t('Product line item'),
         'type' => 'commerce_line_item',
         'skip save' => TRUE,
       ),
-      'line_item_unchanged' => array(
+      'commerce_line_item_unchanged' => array(
         'label' => t('Unchanged product line item'),
         'type' => 'commerce_line_item',
         'skip save' => TRUE,
