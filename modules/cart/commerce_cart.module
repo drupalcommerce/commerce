@@ -1087,6 +1087,12 @@ function commerce_cart_forms($form_id, $args) {
 function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show_quantity = FALSE, $default_quantity = 1, $context = array(), $display_uri = NULL) {
   global $user;
 
+  // If we don't have a list of products to load, just bail out early.
+  // There is nothing we can or have to do in that case.
+  if (!$product_ids) {
+    return array();
+  }
+
   // Store the form ID as a class of the form to avoid the incrementing form ID
   // from causing the AJAX refresh not to work.
   $form['#attributes']['class'][] = drupal_html_class(commerce_cart_add_to_cart_form_id($product_ids, $default_quantity));
