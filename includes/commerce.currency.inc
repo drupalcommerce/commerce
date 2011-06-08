@@ -221,13 +221,6 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Rappen'),
       'major_unit' => t('Franc'),
     ),
-    'CLE' => array(
-      'code' => 'CLE',
-      'symbol' => 'Eº',
-      'name' => t('Chilean Escudo'),
-      'minor_unit' => t('Centésimo'),
-      'major_unit' => t('Escudo'),
-    ),
     'CLP' => array(
       'code' => 'CLP',
       'symbol' => 'CL$',
@@ -1140,7 +1133,6 @@ function commerce_commerce_currency_info() {
       'name' => t('Vanuatu Vatu'),
       'decimals' => 0,
       'numeric_code' => '548',
-      'minor_unit' => t('None'),
       'major_unit' => t('Vatu'),
     ),
     'WST' => array(
