@@ -12,7 +12,7 @@ function commerce_order_ui_token_info() {
     'description' => t('The URL of the order.'),
   );
   return array(
-    'tokens' => array('order' => $order),
+    'tokens' => array('commerce-order' => $order),
   );
 }
 
@@ -30,8 +30,8 @@ function commerce_order_ui_tokens($type, $tokens, array $data = array(), array $
 
   $replacements = array();
 
-  if ($type == 'order' && !empty($data['order'])) {
-    $order = $data['order'];
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $order = $data['commerce-order'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

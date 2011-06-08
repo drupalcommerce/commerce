@@ -12,7 +12,7 @@
 function commerce_order_entity_info() {
   $return = array(
     'commerce_order' => array(
-      'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
+      'label' => t('Commerce Order', array(), array('context' => 'a drupal commerce order')),
       'controller class' => 'CommerceOrderEntityController',
       'base table' => 'commerce_order',
       'revision table' => 'commerce_order_revision',
@@ -43,11 +43,9 @@ function commerce_order_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_order_uri',
-      'creation callback' => '_commerce_order_create',
-      'save callback' => 'commerce_order_save',
-      'deletion callback' => 'commerce_order_delete',
       'access callback' => 'commerce_order_access',
-      'token type' => 'order',
+      'token type' => 'commerce-order',
+      'metadata controller class' => '',
     ),
   );
 
@@ -338,37 +336,18 @@ function commerce_order_type_options_list() {
  * @return
  *   An order object with all default fields initialized.
  */
-function commerce_order_new($uid = 0, $status = '', $type = 'commerce_order') {
+function commerce_order_new($uid = 0, $status = NULL, $type = 'commerce_order') {
   // If no status was specified, use the default Pending status.
-  if (empty($status)) {
+  if (!isset($status)) {
     $order_state = commerce_order_state_load('pending');
     $status = $order_state['default_status'];
   }
 
-  return entity_get_controller('commerce_order')->create($uid, $status, $type);
-}
-
-/**
- * Creation callback for the Entity module.
- */
-function _commerce_order_create($values = array()) {
-  $uid = 0;
-
-  if (!empty($values['uid'])) {
-    $uid = $values['uid'];
-    unset($values['uid']);
-  }
-
-  // Create a new order owned by the specified user.
-  $order = commerce_order_new($uid);
-
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-  foreach ($values as $name => $value) {
-    $wrapper->$name->set($value);
-  }
-
-  return $wrapper->value();
+  return entity_get_controller('commerce_order')->create(array(
+    'uid' => $uid,
+    'status' => $status,
+    'type' => $type,
+  ));
 }
 
 /**
@@ -379,7 +358,8 @@ function _commerce_order_create($values = array()) {
  *     will be created.
  *
  * @return
- *   The saved order object.
+ *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
+ *   performed.
  */
 function commerce_order_save($order) {
   return entity_get_controller('commerce_order')->save($order);
@@ -534,6 +514,36 @@ function commerce_order_access($op, $order = NULL, $account = NULL) {
   }
 
   return FALSE;
+}
+
+/**
+ * Rules integration access callback.
+ */
+function commerce_order_rules_access($type, $name) {
+  if ($type == 'event' || $type == 'condition') {
+    return commerce_order_access('view');
+  }
+}
+
+/**
+ * Implements hook_commerce_order_insert().
+ */
+function commerce_order_commerce_order_insert($order) {
+  // Save the order number.
+  // TODO: Provide token support for order number patterns.
+
+  if (empty($order->order_number)) {
+    $order->order_number = $order->order_id;
+
+    db_update('commerce_order')
+      ->fields(array('order_number' => $order->order_number))
+      ->condition('order_id', $order->order_id)
+      ->execute();
+    db_update('commerce_order_revision')
+      ->fields(array('order_number' => $order->order_number))
+      ->condition('order_id', $order->order_id)
+      ->execute();
+  }
 }
 
 /**
@@ -936,7 +946,7 @@ function commerce_order_status_update($order, $name, $skip_save = FALSE, $revisi
         $order->log = $log;
       }
 
-      $order = commerce_order_save($order);
+      commerce_order_save($order);
     }
   }
 

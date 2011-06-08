@@ -21,7 +21,7 @@ function commerce_payment_default_rules_configuration() {
     $rule
       ->event('commerce_payment_methods')
       ->action('commerce_payment_enable_' . $method_id, array(
-        'commerce_order:select' => 'order',
+        'commerce_order:select' => 'commerce-order',
         'payment_method' => $method_id,
       ));
 

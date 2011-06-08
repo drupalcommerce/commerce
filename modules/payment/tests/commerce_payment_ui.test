@@ -218,7 +218,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     // Create new data comparison condition for amount > $50.
     $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
     $this->assertText(t('Compare two data values of the same type with each other.'), t('Second step page for adding a condition was successfully loaded'));
-    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'order:commerce-order-total:amount'), t('Continue'));
+    $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'commerce-order:commerce-order-total:amount'), t('Continue'));
     $this->assertText(t('The data to be compared, specified by using a data selector, e.g. "node:author:name".'), t('Third step page for adding a condition was successfully loaded'));
     $this->drupalPost(NULL, array('parameter[op][settings][op]' => '>', 'parameter[value][settings][value]' => 50), t('Save'));
     $this->assertText(t('Your changes have been saved.'), t('New condition was successfully added'));
@@ -226,7 +226,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     // Adding a new action to enable the payment method if conditions are met.
     $this->clickLink(t('Add action'));
     $this->drupalPost(NULL, array('element_name' => 'commerce_payment_enable_commerce_payment_example'), t('Continue'));
-    $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'order'), t('Save'));
+    $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'commerce-order'), t('Save'));
     $this->assertText(t('Your changes have been saved.'), t('New action was successfully added'));
 
     // Create a less than $50 order.

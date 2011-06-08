@@ -286,7 +286,7 @@ function commerce_order_order_form_submit($form, &$form_state) {
   }
 
   // Save the order.
-  $order = commerce_order_save($order);
+  commerce_order_save($order);
 
   // Ensure the attached line items are associated with the order if they do not
   // have an order_id set yet.
@@ -340,6 +340,6 @@ function commerce_order_order_delete_form_submit($form, &$form_state) {
     watchdog('commerce_order', 'Deleted order @number.', array('@number' => $order->order_number), WATCHDOG_NOTICE);
   }
   else {
-    drupal_set_message(t('Order @number could not be deleted.', array('@number' => $order-->order_number)), 'error');
+    drupal_set_message(t('Order @number could not be deleted.', array('@number' => $order->order_number)), 'error');
   }
 }

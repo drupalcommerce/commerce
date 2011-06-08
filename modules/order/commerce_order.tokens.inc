@@ -13,7 +13,7 @@ function commerce_order_token_info() {
   $type = array(
     'name' => t('Orders', array(), array('context' => 'a drupal commerce order')),
     'description' => t('Tokens related to individual orders.'),
-    'needs-data' => 'order',
+    'needs-data' => 'commerce-order',
   );
 
   // Tokens for orders.
@@ -78,8 +78,8 @@ function commerce_order_token_info() {
   );
 
   return array(
-    'types' => array('order' => $type),
-    'tokens' => array('order' => $order),
+    'types' => array('commerce-order' => $type),
+    'tokens' => array('commerce-order' => $order),
   );
 }
 
@@ -101,8 +101,8 @@ function commerce_order_tokens($type, $tokens, array $data = array(), array $opt
 
   $replacements = array();
 
-  if ($type == 'order' && !empty($data['order'])) {
-    $order = $data['order'];
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $order = $data['commerce-order'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

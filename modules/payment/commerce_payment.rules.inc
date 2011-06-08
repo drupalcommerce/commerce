@@ -12,12 +12,15 @@
  * Implements hook_rules_event_info().
  */
 function commerce_payment_rules_event_info() {
+  // So that we can use the entity_rules_events_variables() helper function.
+  module_load_include('inc', 'entity', 'entity.rules');
+
   $events = array();
 
   $events['commerce_payment_methods'] = array(
     'label' => t('Select available payment methods for an order'),
     'group' => t('Commerce Payment'),
-    'variables' => commerce_order_rules_event_variables(t('Order', array(), array('context' => 'a drupal commerce order'))),
+    'variables' => entity_rules_events_variables('commerce_order', t('Order', array(), array('context' => 'a drupal commerce order'))),
     'access callback' => 'commerce_order_rules_access',
   );
   $events['commerce_payment_transaction_presave'] = array(
@@ -46,8 +49,8 @@ function commerce_payment_rules_event_info() {
   );
 
   $variables = array_merge(
-    commerce_order_rules_event_variables(t('Order', array(), array('context' => 'a drupal commerce order')), TRUE, TRUE),
-    commerce_payment_rules_event_variables(t('Last completed transaction'), TRUE)
+    entity_rules_events_variables('commerce_order', t('Order', array(), array('context' => 'a drupal commerce order')), TRUE, TRUE),
+    entity_rules_events_variables('commerce_payment_transaction', t('Last completed transaction'), TRUE)
   );
 
   $events['commerce_payment_order_paid_in_full'] = array(
@@ -110,7 +113,7 @@ function commerce_payment_rules_condition_info() {
   $conditions['commerce_payment_order_balance_comparison'] = array(
     'label' => t('Order balance comparison'),
     'parameter' => array(
-      'order' => array(
+      'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
         'description' => t('The order whose balance should be compared (calculated as the order total minus completed payment amounts).'),

@@ -376,7 +376,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       $order = commerce_order_status_update($order, $status, TRUE);
     }
 
-    $order = commerce_order_save($order);
+    commerce_order_save($order);
 
     return $order;
   }

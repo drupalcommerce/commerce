@@ -22,7 +22,7 @@ function commerce_cart_default_rules_configuration() {
     ->event('commerce_cart_product_add')
     ->event('commerce_cart_product_remove')
     ->action('commerce_order_update_status', array(
-      'order:select' => 'order',
+      'commerce_order:select' => 'commerce-order',
       'order_status' => 'cart',
     ));
 

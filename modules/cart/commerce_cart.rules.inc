@@ -46,7 +46,7 @@ function commerce_cart_rules_event_info() {
  */
 function commerce_cart_rules_event_variables($line_item = FALSE) {
   $variables = array(
-    'order' => array(
+    'commerce_order' => array(
       'type' => 'commerce_order',
       'label' => t('Shopping cart order'),
     ),
@@ -117,7 +117,7 @@ function commerce_cart_rules_action_info() {
   $actions['commerce_cart_empty'] = array(
     'label' => t('Remove all products from an order'),
     'parameter' => array(
-      'order' => array(
+      'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order to empty'),
       ),

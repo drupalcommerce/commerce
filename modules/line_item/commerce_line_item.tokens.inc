@@ -44,7 +44,7 @@ function commerce_line_item_token_info() {
   $line_item['order'] = array(
     'name' => t('Order'),
     'description' => t('Order associated with the line item'),
-    'type' => 'order',
+    'type' => 'commerce-order',
   );
   $line_item['created'] = array(
     'name' => t('Date created'),
@@ -127,7 +127,7 @@ function commerce_line_item_tokens($type, $tokens, array $data = array(), array 
 
     if ($order_tokens = token_find_with_prefix($tokens, 'order')) {
       $order = commerce_order_load($line_item->order_id);
-      $replacements += token_generate('order', $order_tokens, array('order' => $order), $options);
+      $replacements += token_generate('commerce-order', $order_tokens, array('commerce-order' => $order), $options);
     }
 
     foreach (array('created', 'changed') as $date) {

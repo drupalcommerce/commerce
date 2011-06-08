@@ -18,7 +18,7 @@ function commerce_checkout_rules_event_info() {
     'label' => t('Completing the checkout process'),
     'group' => t('Commerce Checkout'),
     'variables' => array(
-      'order' => array(
+      'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Completed order', array(), array('context' => 'a drupal commerce order')),
       ),

@@ -75,7 +75,7 @@ function commerce_payment_token_info() {
   $transaction['order'] = array(
     'name' => t('Order'),
     'description' => t('The order related to the payment transaction.'),
-    'type' => 'order',
+    'type' => 'commerce-order',
   );
   $transaction['creator'] = array(
     'name' => t('Creator'),
@@ -207,7 +207,7 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
 
     if ($order_tokens = token_find_with_prefix($tokens, 'order')) {
       $order = commerce_order_load($transaction->order_id);
-      $replacements += token_generate('order', $order_tokens, array('order' => $order), $options);
+      $replacements += token_generate('commerce-order', $order_tokens, array('commerce-order' => $order), $options);
     }
 
     if ($creator_tokens = token_find_with_prefix($tokens, 'creator')) {

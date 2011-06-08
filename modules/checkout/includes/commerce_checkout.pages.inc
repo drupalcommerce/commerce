@@ -201,7 +201,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
   $form_errors = array();
 
   // Save the updated order object.
-  $order = commerce_order_save($order);
+  commerce_order_save($order);
 
   // If a pane failed validation or the form state has otherwise been altered to
   // initiate a rebuild, return without moving to the next checkout page.

@@ -562,7 +562,7 @@ function commerce_cart_order_new($uid = 0) {
   $order->log = t('Created as a shopping cart order.');
 
   // Save it so it gets an order ID and return the full object.
-  $order = commerce_order_save($order);
+  commerce_order_save($order);
 
   // Reset the cart cache
   commerce_cart_order_ids_reset();
