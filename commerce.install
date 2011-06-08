@@ -231,3 +231,38 @@ function _commerce_map_rules_selector_tokens() {
     'transaction-unchanged' => 'commerce-transaction-unchanged',
   );
 }
+
+/**
+ * Utility function: rename a set of permissions.
+ */
+function commerce_update_rename_permissions($map) {
+  // Easy part: rename the permissions in {role_permission}.
+  foreach ($map as $old_name => $new_name) {
+    db_update('role_permission')
+      ->fields(array('permission' => $new_name))
+      ->condition('permission', $old_name)
+      ->execute();
+  }
+
+  // Trickier: rename the permission for the in-database Views.
+  foreach (views_get_all_views() as $view) {
+    if ($view->type == t('Default')) {
+      continue;
+    }
+
+    $save_view = FALSE;
+    foreach ($view->display as $display_name => $display) {
+      if (!empty($display->display_options['access']['type']) && $display->display_options['access']['type'] == 'perm') {
+        $permission_name = $display->display_options['access']['perm'];
+        if (isset($map[$permission_name])) {
+          $display->display_options['access']['perm'] = $map[$permission_name];
+          $save_view = TRUE;
+        }
+      }
+    }
+
+    if ($save_view) {
+      $view->save();
+    }
+  }
+}

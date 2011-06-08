@@ -529,3 +529,235 @@ function commerce_months() {
 function commerce_numeric_comparison_operator_options_list() {
   return drupal_map_assoc(array('<', '<=', '=', '>=', '>'));
 }
+
+/**
+ * Generic access control for Drupal Commerce entities.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create' or
+ *   'delete'.
+ * @param $entity
+ *   Optionally an entity to check access for. If no entity is given, it will be
+ *   determined whether access is allowed for all entities of the given type.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the global user.
+ * @param $entity_type
+ *   The entity type of the entity to check for.
+ *
+ * @see entity_access()
+ */
+function commerce_entity_access($op, $entity, $account, $entity_type) {
+  global $user;
+  $account = isset($account) ? $account : $user;
+
+  $info = entity_get_info($entity_type);
+
+  if ($op == 'view') {
+    if (isset($entity)) {
+      // When trying to figure out access to an entity, query the base table using
+      // our access control tag.
+      if (!empty($info['access arguments']['access tag']) && module_implements('query_' . $info['access arguments']['access tag'] . '_alter')) {
+        $query = db_select($info['base table']);
+        $query->addExpression('1');
+        return (bool) $query
+          ->addTag($info['access arguments']['access tag'])
+          ->addMetaData('account', $account)
+          ->condition($info['entity keys']['id'], $entity->{$info['entity keys']['id']})
+          ->range(0, 1)
+          ->execute()
+          ->fetchField();
+      }
+      else {
+        return TRUE;
+      }
+    }
+    else {
+      return user_access('view any ' . $entity_type . ' entity', $account);
+    }
+  }
+  else {
+    // We grant access to the entity if both of the following conditions are met:
+    // - No modules say to deny access
+    // - At least one module says to grant access
+    // If no module specified either allow or deny, we fall back to the logic
+    // below.
+    $access_results = module_invoke_all('commerce_entity_access', $op, $entity, $account, $entity_type);
+    if (in_array(FALSE, $access_results, TRUE)) {
+      return FALSE;
+    }
+    elseif (in_array(TRUE, $access_results, TRUE)) {
+      return TRUE;
+    }
+
+    // Generic administrator-level access.
+    if (user_access('administer ' . $entity_type . ' entities', $account)) {
+      return TRUE;
+    }
+
+    if ($op == 'create') {
+      if (isset($entity) && !empty($entity_info['entity keys']['bundle'])) {
+        // If the entity is passed in and we have a bundle, do bundle-level
+        // access control.
+        return user_access('create ' . $entity_type . ' entities of bundle ' . $entity, $account);
+      }
+      else {
+        // Else, but is that really possible? do entity type-level access control.
+        return user_access('create ' . $entity_type . ' entities', $account);
+      }
+    }
+    else {
+      if (!empty($entity_info['access arguments']['user key']) && isset($entity->{$entity_info['access arguments']['user key']}) && $entity->{$entity_info['access arguments']['user key']} == $account->uid) {
+        if (user_access('edit own ' . $entity_type . ' entities', $account)) {
+          return TRUE;
+        }
+      }
+      if (user_access('edit any ' . $entity_type . ' entity', $account)) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Return permission names for a given entity type.
+ */
+function commerce_entity_access_permissions($entity_type) {
+  $entity_info = entity_get_info($entity_type);
+
+  $permissions = array();
+
+  // General 'administer' permission.
+  $permissions['administer ' . $entity_type . ' entities'] = array(
+    'title' => t('Administer entities of type %type', array('%type' => $entity_info['label'])),
+    'description' => t('Allows users to perform any action on those entities.'),
+    'restrict access' => TRUE,
+  );
+
+  // Generic create and edit permissions.
+  $permissions['create ' . $entity_type . ' entities'] = array(
+    'title' => t('Create entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+  );
+  if (!empty($entity_info['access arguments']['user key'])) {
+    $permissions['edit own ' . $entity_type . ' entities'] = array(
+      'title' => t('Edit own entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+    );
+  }
+  $permissions['edit any ' . $entity_type . ' entity'] = array(
+    'title' => t('Edit any entity of type %type of any bundle', array('%type' => $entity_info['label'])),
+  );
+  if (!empty($entity_info['access arguments']['user key'])) {
+    $permissions['view own ' . $entity_type . ' entities'] = array(
+      'title' => t('View own entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+    );
+  }
+  $permissions['view any ' . $entity_type . ' entity'] = array(
+    'title' => t('View any entity of type %type of any bundle', array('%type' => $entity_info['label'])),
+  );
+
+  // Per-bundle create and edit permissions.
+  if (!empty($entity_info['entity keys']['bundle'])) {
+    foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+      $permissions['create ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
+        'title' => t('Create entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+      );
+      if (!empty($entity_info['access arguments']['user key'])) {
+        $permissions['edit own ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
+          'title' => t('Edit own entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+        );
+      }
+      $permissions['edit any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
+        'title' => t('Edit any entity of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+      );
+      if (!empty($entity_info['access arguments']['user key'])) {
+        $permissions['view own ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
+          'title' => t('View own entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+        );
+      }
+      $permissions['view any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
+        'title' => t('View any entity of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+      );
+    }
+  }
+
+  return $permissions;
+}
+
+/**
+ * Generic implementation of hook_query_alter() for Drupal Commerce entities.
+ */
+function commerce_entity_access_query_alter($query, $entity_type, $base_table = NULL, $account = NULL) {
+  global $user;
+
+  // Read the meta-data from the query.
+  if (!isset($account) && !$account = $query->getMetaData('account')) {
+    $account = $user;
+  }
+  if (!isset($base_table) && !$base_table = $query->getMetaData('base table')) {
+    // Assume that the base table if the first table if not set. It will result
+    // in an invalid query if the first table is not the table we expect,
+    // forcing the caller to actually properly pass a base table in that case.
+    $tables = &$query->getTables();
+    $base_table = key($tables);
+  }
+
+  // Blanket access control.
+  if (user_access('administer ' . $entity_type . ' entities', $account)
+   || user_access('view any ' . $entity_type . ' entity', $account)) {
+    return;
+  }
+
+  $entity_info = entity_get_info($entity_type);
+
+  $conditions = db_or();
+
+  // Perform 'view entities of type x and bundle y'.
+  $really_restricted = FALSE;
+  foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+    if (user_access('view any ' . $entity_type . ' entities of bundle ' . $bundle_name, $account)) {
+      $conditions->condition($base_table . '.' . $entity_info['entity keys']['bundle'], $bundle_name);
+    }
+    else if (!empty($entity_info['access arguments']['user key']) && user_access('view own ' . $entity_type . ' entity of bundle ' . $bundle_name, $account)) {
+      $really_restricted = TRUE;
+      $conditions->condition(db_and()
+        ->condition($base_table . '.' . $entity_info['entity keys']['bundle'], $bundle_name)
+        ->condition($base_table . '.' . $entity_info['access arguments']['user key'], $account->uid)
+      );
+    }
+    else {
+      $really_restricted = TRUE;
+    }
+  }
+
+  // Don't bother, the user has the permission to view all the bundles of the entity.
+  if (!$really_restricted) {
+    return;
+  }
+
+  if (!empty($entity_info['access arguments']['user key'])) {
+    // Perform 'view own' access control.
+    if (user_access('view own ' . $entity_type . ' entities', $account)) {
+      $conditions->condition($base_table . '.' . $entity_info['access arguments']['user key'], $account->uid);
+    }
+  }
+
+  $hooks = array(
+    'commerce_entity_access_condition_' . $entity_type,
+    'commerce_entity_access_condition'
+  );
+  $context = array(
+    'account' => $account,
+    'entity_type' => $entity_type,
+    'base_table' => $base_table
+  );
+  drupal_alter($hooks, $conditions, $context);
+
+  if (count($conditions)) {
+    $query->condition($conditions);
+  }
+  else {
+    // No condition can match.
+    $query->where('1 = 0');
+  }
+}
