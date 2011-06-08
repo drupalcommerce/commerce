@@ -134,7 +134,7 @@ function commerce_product_ui_product_title($product) {
  */
 function commerce_product_ui_product_add_any_access() {
   // Grant automatic access to users with administer products permission.
-  if (user_access('administer products')) {
+  if (user_access('administer commerce_product entities')) {
     return TRUE;
   }
 

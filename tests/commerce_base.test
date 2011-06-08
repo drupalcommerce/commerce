@@ -144,7 +144,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'access orders',
       'create orders',
       'edit any order',
-      'administer products',
+      'administer commerce_product entities',
       'administer product types',
       'administer product pricing',
       'administer payments',
@@ -162,13 +162,13 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     foreach ($sets as $set) {
       switch ($set) {
         case 'site admin':
-          $final_permissions = array_merge($final_permissions, $site_admin);
+          $final_permissions = array_unique(array_merge($final_permissions, $site_admin));
           break;
         case 'store admin':
-          $final_permissions = array_merge($final_permissions, $store_admin);
+          $final_permissions = array_unique(array_merge($final_permissions, $store_admin));
           break;
         case 'store customer':
-          $final_permissions = array_merge($final_permissions, $store_customer);
+          $final_permissions = array_unique(array_merge($final_permissions, $store_customer));
           break;
       }
     }

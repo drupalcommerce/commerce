@@ -33,7 +33,7 @@ function commerce_product_entity_property_info() {
     'description' => t('The type of the product.'),
     'type' => 'token',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
     'options list' => 'commerce_product_type_options_list',
     'required' => TRUE,
     'schema field' => 'type',
@@ -51,7 +51,7 @@ function commerce_product_entity_property_info() {
     'description' => t('The date the product was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
     'schema field' => 'created',
   );
   $properties['changed'] = array(
@@ -59,7 +59,7 @@ function commerce_product_entity_property_info() {
     'description' => t('The date the product was most recently updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
     'schema field' => 'changed',
   );
   $properties['changed'] = array(
@@ -68,14 +68,14 @@ function commerce_product_entity_property_info() {
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
   );
   $properties['uid'] = array(
     'label' => t("Creator ID"),
     'type' => 'integer',
     'description' => t("The unique ID of the product creator."),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
     'clear' => array('creator'),
     'schema field' => 'uid',
   );
@@ -85,7 +85,7 @@ function commerce_product_entity_property_info() {
     'description' => t("The creator of the product."),
     'getter callback' => 'commerce_product_get_properties',
     'setter callback' => 'commerce_product_set_properties',
-    'setter permission' => 'administer products',
+    'setter permission' => 'administer commerce_product entities',
     'required' => TRUE,
     'clear' => array('uid'),
   );

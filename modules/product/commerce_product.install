@@ -105,3 +105,24 @@ function commerce_product_update_7100() {
   }
   db_add_index('commerce_product', 'product_type', array('type'));
 }
+
+/**
+ * Rename permissions for better consistency.
+ */
+function commerce_product_update_7101() {
+  // Load utility functions.
+  module_load_install('commerce');
+
+  $map = array(
+    'administer products' => 'administer commerce_product entities',
+    'access products' => 'view any commerce_product entity',
+  );
+  $entity_info = entity_get_info('commerce_product');
+  foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+    $map['create ' . $bundle_name . ' products'] = 'create commerce_product entities of bundle ' . $bundle_name;
+    $map['edit any ' . $bundle_name . ' product'] = 'edit any commerce_product entity of bundle ' . $bundle_name;
+    $map['edit own ' . $bundle_name . ' products'] = 'edit own commerce_product entities of bundle ' . $bundle_name;
+  }
+
+  commerce_update_rename_permissions($permissions);
+}

@@ -52,8 +52,8 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
     $modules = parent::setUpHelper('all');
     parent::setUp($modules);
 
-    // Create a site admin and login.
-    $this->site_admin = $this->createSiteAdmin();
+    // Create a site admin + store admin user and login.
+    $this->site_admin = $this->createUserWithPermissionHelper(array('site admin', 'store admin'));
     $this->drupalLogin($this->site_admin);
 
     // Create a dummy product display content type without product reference

@@ -16,7 +16,7 @@ function commerce_product_menu() {
   $items['commerce_product/autocomplete'] = array(
     'title' => 'commerce_product autocomplete',
     'page callback' => 'commerce_product_autocomplete',
-    'access arguments' => array('access products'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
@@ -105,9 +105,13 @@ function commerce_product_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_product_uri',
-      'access callback' => 'commerce_product_access',
       'metadata controller class' => '',
       'token type' => 'commerce-product',
+      'access callback' => 'commerce_entity_access',
+      'access arguments' => array(
+        'user key' => 'uid',
+        'access tag' => 'commerce_product_access',
+      ),
 
       // Add entity translation support.
       'translation' => array(
@@ -223,36 +227,14 @@ function commerce_product_views_api() {
  */
 function commerce_product_permission() {
   $permissions = array(
-    'administer products' => array(
-      'title' => t('Administer products'),
-      'description' => t('Allows users to perform any action on products of any type.'),
-      'restrict access' => TRUE,
-    ),
     'administer product types' => array(
       'title' => t('Administer product types'),
       'description' => t('Allows users to configure product types and their fields.'),
       'restrict access' => TRUE,
     ),
-    'access products' => array(
-      'title' => t('Access products'),
-      'description' => t('Allows users to view lists of products in the Store admin and reference lists.'),
-    ),
   );
 
-  // Add product type specific permissions. Note that users with administer
-  // products permission should have access to do anything the permissions below
-  // grant a user to do.
-  foreach (commerce_product_type_get_name() as $type => $name) {
-    $permissions['create ' . $type . ' products'] = array(
-      'title' => t('Create %type products', array('%type' => $name)),
-    );
-    $permissions['edit any ' . $type . ' product'] = array(
-      'title' => t('Edit or delete any %type product', array('%type' => $name)),
-    );
-    $permissions['edit own ' . $type . ' products'] = array(
-      'title' => t('Edit or delete own %type products', array('%type' => $name)),
-    );
-  }
+  $permissions += commerce_entity_access_permissions('commerce_product');
 
   return $permissions;
 }
@@ -560,33 +542,14 @@ function commerce_product_delete_multiple($product_ids) {
  *   The user to check for. Leave it to NULL to check for the current user.
  */
 function commerce_product_access($op, $product = NULL, $account = NULL) {
-  global $user;
-  $account = isset($account) ? $account : $user;
+  return commerce_entity_access($op, $product, $account, 'commerce_product');
+}
 
-  if (user_access('administer products', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'view' && user_access('access products', $account)) {
-    return TRUE;
-  }
-
-  if (isset($product) && is_string($product) && $op == 'create' && user_access('create ' . $product . ' products', $account)) {
-    return TRUE;
-  }
-
-  if (isset($product) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any ' . $product->type . ' product', $account)) {
-      return TRUE;
-    }
-
-    // Others either don't have any access or must match the product uid.
-    if ($account->uid && user_access('edit own ' . $product->type . ' products', $account) && $product->uid == $account->uid) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
+/**
+ * Implementation of hook_query_commerce_product_access_alter().
+ */
+function commerce_product_query_commerce_product_access_alter(QueryAlterableInterface $query) {
+  return commerce_entity_access_query_alter($query, 'commerce_product');
 }
 
 /**
@@ -779,7 +742,8 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
  */
 function _commerce_product_match_products_standard($instance, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
   // Build the query object with the necessary fields.
-  $query = db_select('commerce_product', 'cp');
+  $query = db_select('commerce_product', 'cp')
+    ->addTag('commerce_product_access');
   $product_id_alias = $query->addField('cp', 'product_id');
   $product_sku_alias = $query->addField('cp', 'sku');
   $product_title_alias = $query->addField('cp', 'title');
