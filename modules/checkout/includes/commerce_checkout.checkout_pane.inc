@@ -30,13 +30,17 @@ function commerce_checkout_review_pane_checkout_form($form, &$form_state, $check
     foreach (commerce_checkout_panes(array('page' => $page_id, 'enabled' => TRUE, 'review' => TRUE)) as $pane_id => $checkout_pane_local) {
       // If the pane has a valid review callback...
       if ($callback = commerce_checkout_pane_callback($checkout_pane_local, 'review')) {
-        // Add a row for it in the review data.
-        $pane_form['review']['#data'][$pane_id] = array(
-          'title' => $checkout_pane_local['title'],
-        );
-
         // Get the review data for this pane.
-        $pane_form['review']['#data'][$pane_id]['data'] = $callback($form, $form_state, $checkout_pane_local, $order);
+        $pane_data = $callback($form, $form_state, $checkout_pane_local, $order);
+
+        // Only display the pane if there is data in the pane.
+        if (!empty($pane_data)) {
+          // Add a row for it in the review data.
+          $pane_form['review']['#data'][$pane_id] = array(
+            'title' => $checkout_pane_local['title'],
+            'data' => $pane_data,
+          );
+        }
       }
     }
   }
