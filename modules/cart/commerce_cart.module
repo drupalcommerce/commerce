@@ -483,7 +483,7 @@ function theme_commerce_cart_empty_page() {
  *
  * @param $uid
  *   The uid of the customer whose cart to load. If left 0, attempts to load
- *     an anonymous order from the session.
+ *   an anonymous order from the session.
  *
  * @return
  *   The fully loaded shopping cart order or FALSE if non-existent.
@@ -494,26 +494,7 @@ function commerce_cart_order_load($uid = 0) {
 
   // Cache the user's cart order ID if it hasn't been set already.
   if (!isset($cart_order_ids[$uid])) {
-    // Create an array of valid shopping cart order statuses.
-    $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
-
-    // If a customer uid was specified...
-    if ($uid) {
-      // Look for the user's most recent shopping cart order, although they
-      // should never really have more than one.
-      $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
-    }
-    else {
-      // Otherwise look for a shopping cart order ID in the session.
-      if (commerce_cart_order_session_exists()) {
-        // We can't trust a user's session to contain only their order IDs, as
-        // they could've edited their session to try and gain access to someone
-        // else's order data. Therefore, this query restricts its search to
-        // orders assigned to anonymous users using the same IP address to try
-        // and mitigate risk as much as possible.
-        $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
-      }
-    }
+    $cart_order_ids[$uid] = commerce_cart_order_id($uid);
   }
 
   // If a valid cart order ID exists for the user, return it now.
@@ -525,11 +506,44 @@ function commerce_cart_order_load($uid = 0) {
 }
 
 /**
+ * Returns the current cart order ID for the given user.
+ *
+ * @param $uid
+ *   The uid of the customer whose cart to load. If left 0, attempts to load
+ *   an anonymous order from the session.
+ *
+ * @return
+ *   The requested cart order ID.
+ */
+function commerce_cart_order_id($uid = 0) {
+  // Create an array of valid shopping cart order statuses.
+  $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
+  // If a customer uid was specified...
+  if ($uid) {
+    // Look for the user's most recent shopping cart order, although they
+    // should never really have more than one.
+    return db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
+  }
+  else {
+    // Otherwise look for a shopping cart order ID in the session.
+    if (commerce_cart_order_session_exists()) {
+      // We can't trust a user's session to contain only their order IDs, as
+      // they could've edited their session to try and gain access to someone
+      // else's order data. Therefore, this query restricts its search to
+      // orders assigned to anonymous users using the same IP address to try
+      // and mitigate risk as much as possible.
+      return db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
+    }
+  }
+}
+
+/**
  * Resets the cached array of shopping cart orders.
  */
-function commerce_cart_orders_reset() {
-  $cart_orders = &drupal_static('commerce_cart_order_load');
-  $cart_orders = NULL;
+function commerce_cart_order_ids_reset() {
+  $cart_order_ids = &drupal_static('commerce_cart_order_load');
+  $cart_order_ids = NULL;
 }
 
 /**
@@ -551,7 +565,7 @@ function commerce_cart_order_new($uid = 0) {
   $order = commerce_order_save($order);
 
   // Reset the cart cache
-  commerce_cart_orders_reset();
+  commerce_cart_order_ids_reset();
 
   // If the user is not logged in, ensure the order ID is stored in the session.
   if (!$uid) {
