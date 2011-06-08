@@ -898,3 +898,12 @@ function commerce_product_entity_translation_tab_access($product) {
 function commerce_product_entity_translation_supported_type($type) {
   return variable_get('language_product_type_' . $type, 0) == ENTITY_TRANSLATION_ENABLED;
 }
+
+/**
+ * Implements hook_file_download_access().
+ */
+function commerce_product_file_download_access($field, $entity_type, $entity) {
+  if ($entity_type == 'commerce_product') {
+    return commerce_product_access('view', $entity);
+  }
+}
