@@ -288,6 +288,56 @@ function commerce_cart_form_commerce_order_ui_order_form_alter(&$form, &$form_st
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alters the Field UI field edit form to add per-instance settings for fields
+ * on product types governing the use of product fields as attribute selection
+ * fields on the Add to Cart form.
+ */
+function commerce_cart_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  // Extract the instance info from the form.
+  $instance = $form['#instance'];
+
+  // If the current field instance is not locked, is attached to a product type,
+  // and of a field type that defines an options list...
+  if (empty($form['locked']) && $instance['entity_type'] == 'commerce_product' &&
+    function_exists($form['#field']['module'] . '_options_list')) {
+    // Get the current instance's attribute settings for use as default values.
+    $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
+
+    $form['instance']['commerce_cart_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Attribute field settings'),
+      '#description' => t('Single value fields attached to products can function as attribute selection fields on Add to Cart forms. When an Add to Cart form contains multiple products, attribute field data can be used to allow customers to select a product based on the values of the field instead of just from a list of product titles.'),
+      '#weight' => 5,
+      '#collapsible' => FALSE,
+    );
+    $form['instance']['commerce_cart_settings']['attribute_field'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable this field to function as an attribute field on Add to Cart forms.'),
+      '#default_value' => $commerce_cart_settings['attribute_field'],
+    );
+    $form['instance']['commerce_cart_settings']['attribute_widget'] = array(
+      '#type' => 'radios',
+      '#title' => t('Attribute selection widget'),
+      '#description' => t('The type of element used to select an option if used on an Add to Cart form.'),
+      '#options' => array(
+        'select' => t('Select list'),
+        'radios' => t('Radio buttons'),
+      ),
+      '#default_value' => $commerce_cart_settings['attribute_widget'],
+      '#states' => array(
+        'visible' => array(
+          ':input[name="instance[commerce_cart_settings][attribute_field]"]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+
+    $form['field']['cardinality']['#description'] .= '<br />' . t('Must be 1 for this field to function as an attribute selection field on Add to Cart forms.');
+  }
+}
+
+/**
  * Implements hook_commerce_order_delete().
  */
 function commerce_cart_commerce_order_delete($order) {
@@ -912,6 +962,61 @@ function commerce_cart_order_empty($order) {
 }
 
 /**
+ * Determines whether or not the given field is eligible to function as a
+ * product attribute field on the Add to Cart form.
+ *
+ * @param $field
+ *   The info array of the field whose eligibility you want to determine.
+ *
+ * @return
+ *   TRUE or FALSE indicating the field's eligibility.
+ */
+function commerce_cart_field_attribute_eligible($field) {
+  // Returns TRUE if the field is single value (i.e. has a cardinality of 1) and
+  // is defined by a module implementing hook_options_list() to provide an array
+  // of allowed values structured as human-readable option names keyed by value.
+  return $field['cardinality'] == 1 && function_exists($field['module'] . '_options_list');
+}
+
+/**
+ * Returns an array of attribute settings for a field instance.
+ *
+ * Fields attached to product types may be used as product attribute fields with
+ * selection widgets on Add to Cart forms. This function returns the default
+ * values for a given field instance.
+ *
+ * @param $instance
+ *   The info array of the field instance whose attribute settings should be
+ *   retrieved.
+ *
+ * @return
+ *   An array of attribute settings including:
+ *   - attribute_field: boolean indicating whether or not the instance should
+ *     be used as a product attribute field on the Add to Cart form; defaults
+ *     to FALSE
+ *   - attribute_widget: string indicating the type of form element to use on
+ *     the Add to Cart form for customers to select the attribute option;
+ *     defaults to 'select', may also be 'radios'
+ */
+function commerce_cart_field_instance_attribute_settings($instance) {
+  if (empty($instance['commerce_cart_settings']) || !is_array($instance['commerce_cart_settings'])) {
+    $commerce_cart_settings = array();
+  }
+  else {
+    $commerce_cart_settings = $instance['commerce_cart_settings'];
+  }
+
+  // Supply default values for the cart settings pertaining here to
+  // product attribute fields.
+  $commerce_cart_settings += array(
+    'attribute_field' => FALSE,
+    'attribute_widget' => 'select',
+  );
+
+  return $commerce_cart_settings;
+}
+
+/**
  * Builds an appropriate cart form ID based on the products on the form.
  *
  * @see commerce_cart_forms().
@@ -1145,7 +1250,13 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           // currently restricted to fields defined by the options module.
           $field = field_info_field($instance['field_name']);
 
-          if ($field['cardinality'] == 1 && $instance['required'] && $instance['widget']['module'] == 'options') {
+          // Get the array of Cart settings pertaining to this instance.
+          $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
+
+          // If the instance is of a field type that is eligible to function as
+          // a product attribute field and if its attribute field settings
+          // specify that this functionality is enabled...
+          if (commerce_cart_field_attribute_eligible($field) && $commerce_cart_settings['attribute_field']) {
             // Get the options properties from the options module and store the
             // options for the instance in select list format in the array of
             // qualifying fields.
@@ -1167,12 +1278,18 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
               $allowed_values = _options_get_options($field, $instance, $properties);
             }
 
-            $qualifying_fields[$name] = array(
-              'field' => $field,
-              'instance' => $instance,
-              'options' => $allowed_values,
-              'weight' => $instance['widget']['weight'],
-            );
+            // Only consider this field a qualifying attribute field if we could
+            // derive a set of options for it.
+            if (!empty($allowed_values)) {
+              $qualifying_fields[$name] = array(
+                'field' => $field,
+                'instance' => $instance,
+                'commerce_cart_settings' => $commerce_cart_settings,
+                'options' => $allowed_values,
+                'weight' => $instance['widget']['weight'],
+                'required' => $instance['required'],
+              );
+            }
           }
         }
       }
@@ -1215,7 +1332,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
           }
           else {
             $form['attributes'][$field_name] = array(
-              '#type' => 'select',
+              '#type' => $data['commerce_cart_settings']['attribute_widget'],
               '#title' => check_plain($data['instance']['label']),
               '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options[$field_name])),
               '#default_value' => $default_product_wrapper->{$field_name}->raw(),
@@ -1224,6 +1341,13 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
                 'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
               ),
             );
+
+            // Add the empty value if the field is not required and products on
+            // the form include the empty value.
+            if (!$data['required'] && in_array('', $used_options[$field_name])) {
+              $form['attributes'][$field_name]['#empty_value'] = '';
+            }
+
             $form['unchanged_attributes'][$field_name] = array(
               '#type' => 'value',
               '#value' => $default_product_wrapper->{$field_name}->raw(),

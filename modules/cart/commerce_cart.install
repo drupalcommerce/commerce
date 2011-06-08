@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Make all fields that were previously eligible for attribute selection on tne
+ * Add to Cart form continue to use the attribute selection widget.
+ */
+function commerce_cart_update_7100() {
+  // Loop over all the field isntances on product bundles.
+  foreach (field_info_instances('commerce_product') as $bundle_name => $instances) {
+    foreach ($instances as $instance) {
+      $field = field_info_field_by_id($instance['field_id']);
+
+      // If the field meets attribute eligibility, it should continue to use the
+      // select widget as an attribute field on the Add to Cart form.
+      if (commerce_cart_field_attribute_eligible($field)) {
+        $instance['commerce_cart_settings'] = array(
+          'attribute_field' => TRUE,
+          'attribute_widget' => 'select',
+        );
+      }
+
+      // Save the updated field instance.
+      field_update_instance($instance);
+    }
+  }
+
+  return t('All eligible product attribute fields have been updated to continue using the attribute selection widget.');
+}
