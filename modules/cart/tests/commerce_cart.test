@@ -377,6 +377,10 @@ class CommerceCartTestCaseAttributes extends CommerceCartTestCase {
           'module' => 'options',
           'type' => 'options_select',
         ),
+        'commerce_cart_settings' => array(
+          'attribute_field' => TRUE,
+          'attribute_widget' => 'select',
+        ),
       );
       field_create_instance($instance);
     }
