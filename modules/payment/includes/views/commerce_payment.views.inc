@@ -16,6 +16,7 @@ function commerce_payment_views_data() {
     'field' => 'transaction_id',
     'title' => t('Commerce Payment Transaction'),
     'help' => t('The receipt of a payment transaction.'),
+    'access query tag' => 'commerce_payment_transaction_access',
   );
 
   // Expose the transaction ID.

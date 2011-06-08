@@ -16,6 +16,7 @@ function commerce_line_item_views_data() {
     'field' => 'line_item_id',
     'title' => t('Commerce Line Item'),
     'help' => t('A line item referenced by another entity.'),
+    'access query tag' => 'commerce_line_item_access',
   );
 
   // Expose the line item ID.
