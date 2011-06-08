@@ -406,6 +406,7 @@ function commerce_payment_methods() {
         'active' => FALSE,
         'terminal' => TRUE,
         'offsite' => FALSE,
+        'offsite_autoredirect' => FALSE,
         'callbacks' => array(),
       );
 

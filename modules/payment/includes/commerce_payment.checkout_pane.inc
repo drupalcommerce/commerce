@@ -214,6 +214,13 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
     $order->data['payment_redirect_key'] = drupal_hash_base64(time());
     commerce_order_save($order);
 
+    // If the payment method has the 'offsite_autoredirect' option enabled, add
+    // the redirection behavior.
+    if (!empty($payment_method['offsite_autoredirect'])) {
+      $form['#attached']['js'][] = drupal_get_path('module', 'commerce_payment') . '/commerce_payment.js';
+      $form['help']['#markup'] = '<div class="checkout-help">' . t('Please wait while you are redirected to the payment server. If nothing happens within 10 seconds, please click on the button below.') . '</div>';
+    }
+
     // Merge the new form into the current form array, preserving the help text
     // if it exists. We also add a wrapper so the form can be easily submitted.
     $form += drupal_get_form($callback, $order, $payment_method);
