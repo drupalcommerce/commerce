@@ -43,9 +43,13 @@ function commerce_order_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_order_uri',
-      'access callback' => 'commerce_order_access',
       'token type' => 'commerce-order',
       'metadata controller class' => '',
+      'access callback' => 'commerce_entity_access',
+      'access arguments' => array(
+        'user key' => 'uid',
+        'access tag' => 'commerce_order_access',
+      ),
     ),
   );
 
@@ -166,33 +170,7 @@ function commerce_order_views_api() {
  * Implements hook_permission().
  */
 function commerce_order_permission() {
-  $permissions = array(
-    'administer orders' => array(
-      'title' => t('Administer orders'),
-      'restrict access' => TRUE,
-    ),
-    'access orders' => array(
-      'title' => t('Access lists of orders, primarily for viewing and referencing'),
-      'restrict access' => TRUE,
-    ),
-    'create orders' => array(
-      'title' => t('Create orders'),
-      'restrict access' => TRUE,
-    ),
-    'edit any order' => array(
-      'title' => t('Edit any order'),
-      'restrict access' => TRUE,
-    ),
-    'edit own orders' => array(
-      'title' => t('Edit own orders'),
-      'restrict access' => TRUE,
-    ),
-    'view own orders' => array(
-      'title' => t('View own orders'),
-    ),
-  );
-
-  return $permissions;
+  return commerce_entity_access_permissions('commerce_order');
 }
 
 /**
@@ -479,41 +457,14 @@ function commerce_order_delete_multiple($order_ids) {
  *   The user to check for. Leave it to NULL to check for the current user.
  */
 function commerce_order_access($op, $order = NULL, $account = NULL) {
-  global $user;
-  $account = isset($account) ? $account : clone($user);
+  return commerce_entity_access($op, $order, $account, 'commerce_order');
+}
 
-  // Grant access to any operation for any order for administrators.
-  if (user_access('administer orders', $account)) {
-    return TRUE;
-  }
-
-  // Grant view access to users with the administrative access orders permission
-  // or to a user's own orders with the view own orders permission.
-  if ($op == 'view') {
-    if (user_access('access orders', $account)) {
-      return TRUE;
-    }
-    elseif (user_access('view own orders', $account) && $order->uid == $account->uid) {
-      return TRUE;
-    }
-  }
-
-  if ($op == 'create' && user_access('create orders', $account)) {
-    return TRUE;
-  }
-
-  if (isset($order) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any order', $account)) {
-      return TRUE;
-    }
-
-    // Others either don't have any access or must match the order uid.
-    if ($account->uid && user_access('edit own orders', $account) && $order->uid == $account->uid) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
+/**
+ * Implementation of hook_query_commerce_order_access_alter().
+ */
+function commerce_product_query_commerce_order_access_alter(QueryAlterableInterface $query) {
+  commerce_entity_access_query_alter($query, 'commerce_order');
 }
 
 /**

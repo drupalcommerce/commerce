@@ -348,3 +348,22 @@ function commerce_order_update_7103() {
   db_truncate('commerce_calculated_price')->execute();
   return t('The calculated price table has been cleared. If your site uses product sell price pre-calculation, you will need to recalculate these prices.');
 }
+
+/**
+ * Rename permissions of the Order entity.
+ */
+function commerce_order_update_7104() {
+  // Load utility functions.
+  module_load_install('commerce');
+
+  $map = array(
+    'administer orders' => 'administer commerce_order entities',
+    'access orders' => 'view any commerce_order entity',
+    'create orders' => 'create commerce_order entities',
+    'edit any order' => 'edit any commerce_order entity',
+    'edit own orders' => 'edit own commerce_order entities',
+    'view own orders' => 'view own commerce_order entities',
+  );
+
+  commerce_update_rename_permissions($permissions);
+}

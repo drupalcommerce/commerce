@@ -92,7 +92,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#title' => t('User information'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#access' => user_access('administer orders'),
+    '#access' => user_access('administer commerce_order entities'),
     '#group' => 'additional_settings',
     '#attached' => array(
       'js' => array(
@@ -138,7 +138,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#title' => t('Create new revision on update'),
     '#description' => t('If an update log message is entered, a revision will be created even if this is unchecked.'),
     '#default_value' => TRUE,
-    '#access' => user_access('administer orders'),
+    '#access' => user_access('administer commerce_order entities'),
   );
   $form['order_history']['date'] = array(
     '#type' => 'textfield',

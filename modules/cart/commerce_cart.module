@@ -591,6 +591,21 @@ function commerce_cart_order_is_cart($order) {
 }
 
 /**
+ * Implementation of hook_commerce_entity_access_condition_commerce_order_alter().
+ *
+ * Allow visitors to access their own shopping carts.
+ */
+function commerce_cart_commerce_entity_access_condition_commerce_order_alter(&$conditions, $context) {
+  if ($current_order_id = commerce_cart_order_id($context['account']->uid)) {
+    $conditions->condition($context['base_table'] . '.order_id', $current_order_id);
+  }
+
+  if ($completed_order_ids = commerce_cart_order_session_order_ids(TRUE)) {
+    $conditions->condition($context['base_table'] . '.order_id', $completed_order_ids, 'IN');
+  }
+}
+
+/**
  * Converts an anonymous shopping cart order to an authenticated cart.
  *
  * @param $order

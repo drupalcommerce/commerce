@@ -50,7 +50,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Date created'),
     'description' => t('The date the order was created.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer orders',
+    'setter permission' => 'administer commerce_order entities',
     'schema field' => 'created',
   );
   $properties['changed'] = array(
@@ -58,7 +58,7 @@ function commerce_order_entity_property_info() {
     'label' => t('Date changed'),
     'description' => t('The date the order was most recently updated.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer orders',
+    'setter permission' => 'administer commerce_order entities',
     'schema field' => 'changed',
   );
   $properties['type'] = array(
@@ -75,7 +75,7 @@ function commerce_order_entity_property_info() {
     'label' => t("Owner ID"),
     'description' => t("The unique ID of the order owner."),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer orders',
+    'setter permission' => 'administer commerce_order entities',
     'clear' => array('owner'),
     'schema field' => 'uid',
   );
@@ -85,7 +85,7 @@ function commerce_order_entity_property_info() {
     'description' => t("The owner of the order."),
     'getter callback' => 'commerce_order_get_properties',
     'setter callback' => 'commerce_order_set_properties',
-    'setter permission' => 'administer orders',
+    'setter permission' => 'administer commerce_order entities',
     'clear' => array('uid'),
     'required' => TRUE,
   );

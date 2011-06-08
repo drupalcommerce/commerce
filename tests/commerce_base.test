@@ -140,10 +140,10 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer customer profile types',
       'administer line items',
       'administer line item types',
-      'administer orders',
-      'access orders',
-      'create orders',
-      'edit any order',
+      'administer commerce_order entities',
+      'view any commerce_order entity',
+      'create commerce_order entities',
+      'edit any commerce_order entity',
       'administer commerce_product entities',
       'administer product types',
       'administer product pricing',
@@ -154,7 +154,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     $store_customer = array(
       'access content',
       'access checkout',
-      'view own orders',
+      'view own commerce_order entities',
     );
 
     $final_permissions = array();

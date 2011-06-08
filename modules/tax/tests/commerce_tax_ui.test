@@ -39,7 +39,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
 
     // User creation for different operations.
     $this->store_admin = $this->createStoreAdmin();
-    $this->normal_user = $this->drupalCreateUser(array('access checkout', 'view own orders'));
+    $this->normal_user = $this->drupalCreateUser(array('access checkout', 'view own commerce_order entities'));
 
     // Create a dummy tax type for testing.
     $this->tax_type = $this->createDummyTaxType();
