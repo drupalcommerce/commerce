@@ -118,7 +118,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 1, t('Quantity field has correct number of items'));
 
     // Check if the Update cart and Checkout buttons are present.
-    $this->assertField("edit-update", t('Update cart button present'));
+    $this->assertField("edit-submit", t('Update cart button present'));
     $this->assertField("edit-checkout", t('Checkout button present'));
   }
 
@@ -285,7 +285,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 1, t('Quantity field has correct number of items'));
 
     // Check if the Update cart and Checkout buttons are present.
-    $this->assertField("edit-update", t('Update cart button present'));
+    $this->assertField("edit-submit", t('Update cart button present'));
     $this->assertField("edit-checkout", t('Checkout button present'));
   }
 
