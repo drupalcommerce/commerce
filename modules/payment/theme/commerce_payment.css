@@ -27,6 +27,10 @@
   margin: 5px;
 }
 
+.add-payment .ajax-progress .message {
+  display:none;
+}
+
 .views-field-operations .links.operations {
   text-transform: lowercase;
   margin-left: 0;

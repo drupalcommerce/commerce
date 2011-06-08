@@ -15,3 +15,7 @@
 #line-item-manager .form-submit {
   float: left;
 }
+
+#line-item-manager .ajax-progress .message {
+  display:none;
+}
