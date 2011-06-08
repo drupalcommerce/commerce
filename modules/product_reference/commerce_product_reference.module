@@ -751,12 +751,27 @@ function commerce_product_line_item_title($line_item) {
  */
 function commerce_product_line_item_add_form() {
   $form = array();
+  $options = array();
 
-  $form['product_id'] = array(
-    '#type' => 'select',
-    '#title' => t('Product'),
-    '#options' => commerce_product_reference_options_list(array('field_name' => 'line_item_product_selector')),
-  );
+  // Get a an options list
+  $options = commerce_product_reference_options_list(array('field_name' => 'line_item_product_selector'));
+
+  // Ensure we have a list of options before we present a select list.
+  if (!empty($options)) {
+    $form['product_id'] = array(
+      '#type' => 'select',
+      '#title' => t('Product'),
+      '#options' => $options,
+    );
+  }
+  else {
+    // Take over the default save button, with an error message.
+    $form['save_line_item'] = array(
+      '#prefix' => '<div>',
+      '#markup' => t('You must add products before you can add a product line item.'),
+      '#suffix' => '</div>',
+    );
+  }
 
   return $form;
 }

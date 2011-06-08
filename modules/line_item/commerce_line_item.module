@@ -966,12 +966,14 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       }
 
       // Add a default save button.
-      $element['actions']['save_line_item'] = array(
-        '#type' => 'submit',
-        '#value' => !empty($line_item_type['add_form_submit_value']) ? $line_item_type['add_form_submit_value'] : t('Save'),
-        '#ajax' => array(
-          'callback' => 'commerce_line_item_manager_refresh',
-          'wrapper' => 'line-item-manager',
+      $element['actions'] += array(
+        'save_line_item' => array(
+          '#type' => 'submit',
+          '#value' => !empty($line_item_type['add_form_submit_value']) ? $line_item_type['add_form_submit_value'] : t('Save'),
+          '#ajax' => array(
+            'callback' => 'commerce_line_item_manager_refresh',
+            'wrapper' => 'line-item-manager',
+          ),
         ),
       );
 
