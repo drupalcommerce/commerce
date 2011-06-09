@@ -870,8 +870,12 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
 function commerce_payment_transaction_access($op, $order, $transaction = NULL, $account = NULL) {
   global $user;
 
+  if (empty($account)) {
+    $account = clone($user);
+  }
+
   // Grant administrators access to do anything.
-  if (user_access('administer payments')) {
+  if (user_access('administer payments', $account)) {
     return TRUE;
   }
 
@@ -879,14 +883,10 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
     $order = commerce_order_load($transaction->order_id);
   }
 
-  if (empty($account)) {
-    $account = clone($user);
-  }
-
   switch ($op) {
     // Creating new payment transactions.
     case 'create':
-      if (user_access('create payments')) {
+      if (user_access('create payments', $account)) {
         if (commerce_order_access('update', $order, $account)) {
           return TRUE;
         }
@@ -895,7 +895,7 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
 
     // Viewing payment transactions.
     case 'view':
-      if (user_access('view payments')) {
+      if (user_access('view payments', $account)) {
         if (commerce_order_access('view', $order, $account)) {
           return TRUE;
         }
@@ -903,13 +903,13 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
       break;
 
     case 'update':
-      if (user_access('update payments')) {
+      if (user_access('update payments', $account)) {
         if (commerce_order_access('view', $order, $account)) {
           return TRUE;
         }
       }
     case 'delete':
-      if (user_access('delete payments')) {
+      if (user_access('delete payments', $account)) {
         if (commerce_order_access('update', $order, $account)) {
           return TRUE;
         }
