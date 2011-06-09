@@ -166,3 +166,24 @@ function commerce_customer_field_schema($field) {
     );
   }
 }
+
+/**
+ * Rename permissions for customer profiles.
+ */
+function commerce_customer_profile_update_7000() {
+  // Load utility functions.
+  module_load_install('commerce');
+
+  $map = array(
+    'administer customer profiles' => 'administer commerce_customer_profile entities',
+    'access customer profiles' => 'view any commerce_customer_profile entity',
+  );
+  $entity_info = entity_get_info('commerce_product');
+  foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+    $map['create ' . $bundle_name . ' customer profiles'] = 'create commerce_customer_profile entities of bundle ' . $bundle_name;
+    $map['edit any ' . $bundle_name . ' customer profile'] = 'edit any commerce_customer_profile entity of bundle ' . $bundle_name;
+    $map['edit own ' . $bundle_name . ' customer profiles'] = 'edit own commerce_customer_profile entities of bundle ' . $bundle_name;
+  }
+
+  commerce_update_rename_permissions($permissions);
+}

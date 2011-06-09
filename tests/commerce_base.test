@@ -136,7 +136,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer checkout',
       'access checkout',
       'configure store',
-      'administer customer profiles',
+      'administer commerce_customer_profile entities',
       'administer customer profile types',
       'administer line items',
       'administer line item types',

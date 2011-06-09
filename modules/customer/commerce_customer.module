@@ -39,9 +39,13 @@ function commerce_customer_entity_info() {
         ),
       ),
       'uri callback' => 'commerce_customer_profile_uri',
-      'access callback' => 'commerce_customer_profile_access',
       'token type' => 'commerce-customer-profile',
       'metadata controller class' => '',
+      'access callback' => 'commerce_entity_access',
+      'access arguments' => array(
+        'user key' => 'uid',
+        'access tag' => 'commerce_customer_profile_access',
+      ),
     ),
   );
 
@@ -145,36 +149,14 @@ function commerce_customer_views_api() {
  */
 function commerce_customer_permission() {
   $permissions = array(
-    'administer customer profiles' => array(
-      'title' => t('Administer customer profiles'),
-      'description' => t('Allows users to perform any action on customer profiles of any type.'),
-      'restrict access' => TRUE,
-    ),
     'administer customer profile types' => array(
       'title' => t('Administer customer profile types'),
       'description' => t('Allows users to add customer profile types and configure their fields.'),
       'restrict access' => TRUE,
     ),
-    'access customer profiles' => array(
-      'title' => t('Access customer profiles'),
-      'description' => t('Allows users to view lists of customer profiles in the Store admin and reference lists.'),
-    ),
   );
 
-  // Add profile type specific permissions. Note that users with administer
-  // customer profiles permission should have access to do anything the
-  //  permissions below grant a user to do.
-  foreach (commerce_customer_profile_type_get_name() as $type => $name) {
-    $permissions['create ' . $type . ' customer profiles'] = array(
-      'title' => t('Create %type customer profiles', array('%type' => $name)),
-    );
-    $permissions['edit any ' . $type . ' customer profile'] = array(
-      'title' => t('Edit or delete any %type customer profile', array('%type' => $name)),
-    );
-    $permissions['edit own ' . $type . ' customer profiles'] = array(
-      'title' => t('Edit or delete own %type customer profiles', array('%type' => $name)),
-    );
-  }
+  $permissions += commerce_entity_access_permissions('commerce_customer_profile');
 
   return $permissions;
 }
@@ -531,33 +513,14 @@ function commerce_customer_commerce_customer_profile_delete($profile) {
  *   The user to check for. Leave it to NULL to check for the current user.
  */
 function commerce_customer_profile_access($op, $profile = NULL, $account = NULL) {
-  global $user;
-  $account = isset($account) ? $account : $user;
+  return commerce_entity_access($op, $profile, $account, 'commerce_customer_profile');
+}
 
-  if (user_access('administer customer profiles', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'view' && user_access('access customer profiles', $account)) {
-    return TRUE;
-  }
-
-  if (isset($profile) && is_string($profile) && $op == 'create' && user_access('create ' . $profile . ' customer profiles', $account)) {
-    return TRUE;
-  }
-
-  if (isset($profile) && ($op == 'update' || $op == 'delete')) {
-    if (user_access('edit any ' . $profile->type . ' customer profile', $account)) {
-      return TRUE;
-    }
-
-    // Others either don't have any access or must match the profile uid.
-    if ($account->uid && user_access('edit own ' . $profile->type . ' customer profiles', $account) && $profile->uid == $account->uid) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
+/**
+ * Implementation of hook_query_commerce_customer_profile_access_alter().
+ */
+function commerce_customer_profile_query_commerce_customer_profile_access_alter(QueryAlterableInterface $query) {
+  return commerce_entity_access_query_alter($query, 'commerce_customer_profile');
 }
 
 /**

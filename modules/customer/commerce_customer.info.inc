@@ -25,7 +25,7 @@ function commerce_customer_entity_property_info() {
     'description' => t('The type of the profile.'),
     'type' => 'token',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'options list' => 'commerce_customer_profile_type_options_list',
     'required' => TRUE,
     'schema field' => 'type',
@@ -35,7 +35,7 @@ function commerce_customer_entity_property_info() {
     'type' => 'integer',
     'description' => t("The unique ID of the user the customer profile belongs to."),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'clear' => array('user'),
     'schema field' => 'uid',
   );
@@ -45,7 +45,7 @@ function commerce_customer_entity_property_info() {
     'description' => t("The user the customer profile belongs to."),
     'getter callback' => 'commerce_customer_profile_get_properties',
     'setter callback' => 'commerce_customer_profile_set_properties',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'required' => TRUE,
     'clear' => array('uid'),
   );
@@ -53,7 +53,7 @@ function commerce_customer_entity_property_info() {
     'label' => t('Status'),
     'description' => t('Whether the profile is active.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'type' => 'boolean',
     'schema field' => 'status',
   );
@@ -62,7 +62,7 @@ function commerce_customer_entity_property_info() {
     'description' => t('The date the product was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'schema field' => 'created',
   );
   $properties['changed'] = array(
@@ -70,7 +70,7 @@ function commerce_customer_entity_property_info() {
     'description' => t('The date the product was last updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer customer profiles',
+    'setter permission' => 'administer commerce_customer_profile entities',
     'schema field' => 'changed',
   );
 

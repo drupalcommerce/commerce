@@ -105,7 +105,7 @@ function commerce_customer_ui_customer_profile_title($profile) {
  */
 function commerce_customer_ui_customer_profile_add_any_access() {
   // Grant automatic access to users with administer customer profiles permission.
-  if (user_access('administer customer profiles')) {
+  if (user_access('administer commerce_customer_profile entities')) {
     return TRUE;
   }
 
