@@ -28,7 +28,7 @@ class commerce_order_handler_area_order_total extends views_handler_area {
     if (!$empty) {
       // First look for an order_id argument.
       foreach ($this->view->argument as $name => $argument) {
-        if (is_a($argument, 'commerce_order_handler_argument_order_order_id')) {
+        if ($argument instanceof commerce_order_handler_argument_order_order_id) {
           // If it is single value...
           if (count($argument->value) == 1) {
             // Load the order.

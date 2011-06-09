@@ -208,7 +208,7 @@ function commerce_line_item_views_post_render(&$view, &$output, &$cache) {
     $has_form_fields = FALSE;
 
     foreach ($view->field as $field_name => $field) {
-      if(is_a($field, 'commerce_line_item_handler_field_edit')) {
+      if ($field instanceof commerce_line_item_handler_field_edit) {
         $has_form_fields = TRUE;
       }
     }

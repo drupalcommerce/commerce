@@ -95,7 +95,7 @@ function commerce_line_item_form_alter(&$form, &$form_state, $form_id) {
     $view = $form_state['build_info']['args'][0];
     // Does the view contain one of the line item edit fields?
     foreach ($view->field as $field_name => $field) {
-      if (is_a($field, 'commerce_line_item_handler_field_edit_delete') || is_a($field, 'commerce_line_item_handler_field_edit_quantity')) {
+      if ($field instanceof commerce_line_item_handler_field_edit_delete || $field instanceof commerce_line_item_handler_field_edit_quantity) {
         $line_item_form = TRUE;
       }
     }
@@ -1243,7 +1243,7 @@ function commerce_line_items_quantity($line_items, $type = '') {
   $quantity = 0;
 
   foreach ($line_items as $line_item) {
-    if (!is_a($line_item, 'EntityMetadataWrapper')) {
+    if (!$line_item instanceof EntityMetadataWrapper) {
       $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
     }
 
@@ -1274,7 +1274,7 @@ function commerce_line_items_total($line_items, $type = '') {
   $currency_code = '';
 
   foreach ($line_items as $line_item) {
-    if (!is_a($line_item, 'EntityMetadataWrapper')) {
+    if (!$line_item instanceof EntityMetadataWrapper) {
       $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
     }
 

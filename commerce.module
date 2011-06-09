@@ -84,7 +84,7 @@ function commerce_entity_reference_delete($entity_type, $entity, $field_name, $r
   $wrapper = entity_metadata_wrapper($entity_type, $entity);
 
   // If the reference field is multiple value...
-  if (is_a($wrapper->{$field_name}, 'EntityListWrapper')) {
+  if ($wrapper->{$field_name} instanceof EntityListWrapper) {
     // Loop over every entity referenced by the specified field.
     foreach ($wrapper->{$field_name} as $delta => $ref_entity_wrapper) {
       // If its ID matches the specified entity...
