@@ -1060,7 +1060,7 @@ function commerce_order_configure_order_type($type = 'commerce_order') {
     // Set the default display formatters for various view modes.
     foreach (array('default', 'customer', 'administrator') as $view_mode) {
       $instance['display'][$view_mode] = array(
-        'label' => 'above',
+        'label' => 'hidden',
         'type' => 'commerce_line_item_reference_view',
         'weight' => -10,
       );
