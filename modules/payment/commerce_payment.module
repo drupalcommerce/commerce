@@ -164,6 +164,11 @@ function commerce_payment_hook_info() {
  */
 function commerce_payment_permission() {
   return array(
+    'administer payment methods' => array(
+      'title' => t('Administer payment methods'),
+      'description' => t('Allows users to configure enabled payment methods.'),
+      'restrict access' => TRUE,
+    ),
     'administer payments' => array(
       'title' => t('Administer payments'),
       'description' => t('Allows users to perform any payment action for any order and view transaction payloads.'),
@@ -394,7 +399,18 @@ function commerce_payment_methods() {
 
   // If the payment methods haven't been defined yet, do so now.
   if (!isset($payment_methods)) {
-    $payment_methods = module_invoke_all('commerce_payment_method_info');
+    $payment_methods = array();
+
+    // Build the payment methods array, including module names for the purpose
+    // of including files if necessary.
+    foreach (module_implements('commerce_payment_method_info') as $module) {
+      foreach (module_invoke($module, 'commerce_payment_method_info') as $method_id => $payment_method) {
+        $payment_method['method_id'] = $method_id;
+        $payment_method['module'] = $module;
+        $payment_methods[$method_id] = $payment_method;
+      }
+    }
+
     drupal_alter('commerce_payment_method_info', $payment_methods);
 
     foreach ($payment_methods as $method_id => &$payment_method) {
@@ -408,6 +424,7 @@ function commerce_payment_methods() {
         'offsite' => FALSE,
         'offsite_autoredirect' => FALSE,
         'callbacks' => array(),
+        'file' => '',
       );
 
       $payment_method += $defaults;
@@ -519,6 +536,12 @@ function commerce_payment_method_options_list() {
  *     not be found.
  */
 function commerce_payment_method_callback($payment_method, $callback) {
+  // Include the payment method file if specified.
+  if (!empty($payment_method['file'])) {
+    $parts = explode('.', $payment_method['file']);
+    module_load_include(array_pop($parts), $payment_method['module'], implode('.', $parts));
+  }
+
   // If the specified callback function exists, return it.
   if (!empty($payment_method['callbacks'][$callback]) &&
       function_exists($payment_method['callbacks'][$callback])) {

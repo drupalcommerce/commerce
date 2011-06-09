@@ -485,6 +485,7 @@ function commerce_checkout_panes($conditions = array()) {
         'enabled' => TRUE,
         'review' => TRUE,
         'callbacks' => array(),
+        'file' => '',
       );
       $checkout_pane += $defaults;
 
