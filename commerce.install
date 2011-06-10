@@ -1,0 +1,233 @@
+<?php
+
+/**
+ * Update Rules to use new prefixed parameter names and tokens.
+ */
+function commerce_update_7100() {
+  drupal_flush_all_caches();
+
+  // Loop over all defined Rules configurations.
+  foreach (rules_config_load_multiple(FALSE) as $rule) {
+    $events = FALSE;
+
+    if ($rule instanceof RulesContainerPlugin) {
+      if ($rule instanceof RulesReactionRule) {
+        $events = $rule->events();
+      }
+
+      _commerce_update_rule_container_tokens($rule, $events);
+    }
+    else {
+      _commerce_update_rule_tokens($rule, $events);
+    }
+  }
+
+  return t('Rules updated to match new parameter names and token names.');
+}
+
+/**
+ * Iterates over a container's children to recursively find non-container
+ * plugins whose parameters should be updated.
+ */
+function _commerce_update_rule_container_tokens($rule, $events) {
+  foreach ($rule->getIterator() as $child) {
+    if ($child instanceof RulesContainerPlugin) {
+      if ($rule instanceof RulesReactionRule) {
+        $events = $rule->events();
+      }
+
+      _commerce_update_rule_container_tokens($child, $events);
+    }
+    else {
+      _commerce_update_rule_tokens($child, $events);
+    }
+  }
+}
+
+/**
+ * Given a Rule configuration, iterates over its settings to update parameter
+ * names to use the new prefixed names and parameter values to use the new
+ * prefixed tokens that match the new event variable names.
+ */
+function _commerce_update_rule_tokens($rule, $events) {
+  $save = FALSE;
+
+  // Determine if this rule configuration requires parameters.
+  $info = $rule->info();
+
+  if (!empty($info['parameter'])) {
+    // Get the map of old parameter names to new parameter names.
+    $map_parameters_old_new = _commerce_map_rules_parameters_old_new();
+    $map_parameters_new_old = array_flip($map_parameters_old_new);
+
+    // Iterate over the parameters of the configuration.
+    foreach ($info['parameter'] as $parameter_key => $parameter_info) {
+      // If the current parameter maps to an old parameter name...
+      if (!empty($map_parameters_new_old[$parameter_key])) {
+        $old_parameter = $map_parameters_new_old[$parameter_key];
+
+        // Loop over the settings array.
+        foreach ($rule->settings as $settings_key => $settings_value) {
+          // Get the parameter name of the setting.
+          $parts = explode(':', $settings_key, 2);
+
+          // If it equals the old parameter name our current parameter maps to...
+          if ($parts[0] == $old_parameter) {
+            // Recreate the setting with the new parameter name.
+            $new_settings_key = $parameter_key . ':' . $parts[1];
+            $rule->settings[$new_settings_key] = $settings_value;
+
+            // Unset the setting with the old parameter name.
+            unset($rule->settings[$settings_key]);
+
+            // Save the updated configuration.
+            $save = TRUE;
+          }
+        }
+      }
+    }
+  }
+
+  // If this plugin was ultimately derived from a reaction rule with a set of
+  // events...
+  if (!empty($events)) {
+    // Get the map of old data selector values to new data selector values.
+    $map_selector_tokens = _commerce_map_rules_selector_tokens();
+
+    $event_info = rules_fetch_data('event_info');
+
+    // Loop over each event that this plugin's parent item uses.
+    foreach ($events as $event) {
+      // If the event has variables...
+      if (!empty($event_info[$event]['variables'])) {
+        // Loop over the variables on the event looking for any new Commerce
+        // variable names...
+        foreach ($event_info[$event]['variables'] as $variable_name => $variable_info) {
+          // If the variable name matches one whose tokens need to be updated
+          // in this plugin...
+          if (in_array($variable_name, _commerce_event_entity_variables())) {
+            // Loop over this plugin's settings looking for data selectors.
+            foreach ($rule->settings as $settings_key => &$settings_value) {
+              if (substr($settings_key, -7) == ':select') {
+                // Break apart the selector value looking for tokens not using
+                // the prefixed name.
+                $parts = explode(':', $settings_value);
+
+                // Only check the first part of the data selector, as anything
+                // deeper is a property name that needn't be changed.
+                $parts[0] = strtr($parts[0], '_', '-');
+
+                // If the current part has been mapped to a new token name...
+                if (!empty($map_selector_tokens[$parts[0]])) {
+                  // Replace it now and mark this rule for saving.
+                  $parts[0] = $map_selector_tokens[$parts[0]];
+                  $settings_value = implode(':', $parts);
+                  $save = TRUE;
+                }
+              }
+              elseif (is_string($settings_value)) {
+                // Otherwise this setting's value might contain a token that
+                // needs to be updated.
+                $changed_tokens = array();
+                $value_tokens = array();
+
+                foreach (token_scan($settings_value) as $token_type => $tokens) {
+                  $value_tokens += array_values($tokens);
+                }
+
+                if (!empty($value_tokens)) {
+                  // Loop over the tokens we found in the value looking for any
+                  // that need updating.
+                  foreach ($value_tokens as $value_token) {
+                    $parts = explode(':', trim($value_token, '[]'));
+                    $changed = FALSE;
+
+                    // Consider each part of the token in turn, attempting to
+                    // translate the part to a new value.
+                    foreach ($parts as $index => &$part) {
+                      if (!empty($map_selector_tokens[strtr($part, '_', '-')])) {
+                        $part = $map_selector_tokens[strtr($part, '_', '-')];
+                        $changed = TRUE;
+                      }
+                    }
+
+                    // Because a part of this token changed, add it to our array
+                    // of all changed tokens.
+                    if ($changed) {
+                      $changed_tokens[$value_token] = '[' . implode(':', $parts) . ']';
+                    }
+                  }
+                }
+
+                // Translate the settings value overall with changed tokens.
+                if (!empty($changed_tokens)) {
+                  $settings_value = strtr($settings_value, $changed_tokens);
+                  $save = TRUE;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Save the rule configuration now if specified.
+  if ($save) {
+    $rule->save();
+  }
+}
+
+/**
+ * Maps old action and condition parameter names to new prefixed names.
+ */
+function _commerce_map_rules_parameters_old_new() {
+  return array(
+    'order' => 'commerce_order',
+    'order_unchanged' => 'commerce_order_unchanged',
+    'product' => 'commerce_product',
+    'product_unchanged' => 'commerce_product_unchanged',
+    'line_item' => 'commerce_line_item',
+    'line_item_unchanged' => 'commerce_line_item_unchanged',
+    'customer_profile' => 'commerce_customer_profile',
+    'customer_profile_unchanged' => 'commerce_customer_profile_unchanged',
+    'payment_transaction' => 'commerce_payment_transaction',
+    'payment_transaction_unchanged' => 'commerce_payment_transaction_unchanged',
+  );
+}
+
+/**
+ * Returns an array of newly prefixed Commerce entity event variable names.
+ */
+function _commerce_event_entity_variables() {
+  return array(
+    'commerce_order',
+    'commerce_order_unchanged',
+    'commerce_product',
+    'commerce_product_unchanged',
+    'commerce_line_item',
+    'commerce_line_item_unchanged',
+    'commerce_customer_profile',
+    'commerce_customer_profile_unchanged',
+    'commerce_payment_transaction',
+    'commerce_payment_transaction_unchanged',
+  );
+}
+
+/**
+ * Maps old data selector values for event variables to new prefixed values.
+ */
+function _commerce_map_rules_selector_tokens() {
+  return array(
+    'order' => 'commerce-order',
+    'order-unchanged' => 'commerce-order-unchanged',
+    'product' => 'commerce-product',
+    'product-unchanged' => 'commerce-product-unchanged',
+    'line-item' => 'commerce-line-item',
+    'line-item-unchanged' => 'commerce-line-item-unchanged',
+    'customer' => 'commerce-customer-profile',
+    'customer-unchanged' => 'commerce-customer-unchanged',
+    'transaction' => 'commerce-payment-transaction',
+    'transaction-unchanged' => 'commerce-transaction-unchanged',
+  );
+}
