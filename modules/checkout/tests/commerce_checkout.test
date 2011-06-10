@@ -206,8 +206,9 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $callback = commerce_checkout_pane_callback($panes['customer_profile_billing'], 'checkout_form');
     $pane_form = drupal_get_form($callback, $panes['customer_profile_billing'], $this->order);
     foreach (element_children($pane_form['commerce_customer_address'][LANGUAGE_NONE][0]) as $key) {
-      if ($pane_form['commerce_customer_address'][LANGUAGE_NONE][0][$key]['#required']) {
-        $this->assertText(t('!pane_message field is required', array('!pane_message' => $pane_form['commerce_customer_address'][LANGUAGE_NONE][0][$key]['#title'])), t('Check required billing information pane messages'));
+      $element = $pane_form['commerce_customer_address'][LANGUAGE_NONE][0][$key];
+      if ($element['#required'] && empty($element['#default_value'])) {
+        $this->assertText(t('!pane_message field is required', array('!pane_message' => $element['#title'])), t('Check required billing information pane messages'));
       }
     }
 
