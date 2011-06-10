@@ -87,7 +87,7 @@ function commerce_cart_rules_condition_info() {
   $conditions['commerce_order_is_cart'] = array(
     'label' => t('Order is a shopping cart'),
     'parameter' => array(
-      'order' => array(
+      'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Order'),
       ),

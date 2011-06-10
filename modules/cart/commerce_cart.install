@@ -5,7 +5,7 @@
  * Add to Cart form continue to use the attribute selection widget.
  */
 function commerce_cart_update_7100() {
-  // Loop over all the field isntances on product bundles.
+  // Loop over all the field instances on product bundles.
   foreach (field_info_instances('commerce_product') as $bundle_name => $instances) {
     foreach ($instances as $instance) {
       $field = field_info_field_by_id($instance['field_id']);
