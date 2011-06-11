@@ -1688,14 +1688,17 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
     $settings = $display['settings'];
 
-    $result[] = array(
-      '#arguments' => array(
-        'form_id' => commerce_cart_add_to_cart_form_id($product_ids),
-        'product_ids' => $product_ids,
-        'show_quantity' => $settings['show_quantity'],
-        'default_quantity' => $settings['default_quantity'],
-      ),
-    );
+    // Check to ensure products are referenced, before returning results.
+    if (!empty($product_ids)) {
+      $result[] = array(
+        '#arguments' => array(
+          'form_id' => commerce_cart_add_to_cart_form_id($product_ids),
+          'product_ids' => $product_ids,
+          'show_quantity' => $settings['show_quantity'],
+          'default_quantity' => $settings['default_quantity'],
+        ),
+      );
+    }
   }
 
   return $result;
