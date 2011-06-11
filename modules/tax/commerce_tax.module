@@ -363,18 +363,13 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
               }
             }
 
-            // If there is only one option group, flatten the options array.
-            if (count($options) == 1) {
-              $options = reset($options);
-            }
-
             $form[$key][$form[$key]['#language']][$delta]['currency_code']['#title'] = '&nbsp;';
 
             $form[$key][$form[$key]['#language']][$delta]['include_tax'] = array(
               '#type' => 'select',
               '#title' => t('Include tax in this price'),
               '#description' => t('Saving prices tax inclusive will bypass later calculations for the specified tax.'),
-              '#options' => $options,
+              '#options' => count($options) == 1 ? reset($options) : $options,
               '#default_value' => $default,
               '#required' => FALSE,
               '#empty_value' => '',
