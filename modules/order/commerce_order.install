@@ -350,7 +350,7 @@ function commerce_order_update_7103() {
 }
 
 /**
- * Rename permissions of the Order entity.
+ * Update permission names for order entity management.
  */
 function commerce_order_update_7104() {
   // Load utility functions.
@@ -366,4 +366,6 @@ function commerce_order_update_7104() {
   );
 
   commerce_update_rename_permissions($permissions);
+
+  return t('Role and custom View permissions updated for order entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }

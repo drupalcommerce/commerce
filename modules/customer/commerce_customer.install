@@ -168,9 +168,9 @@ function commerce_customer_field_schema($field) {
 }
 
 /**
- * Rename permissions for customer profiles.
+ * Update permission names for customer profile entity management.
  */
-function commerce_customer_profile_update_7000() {
+function commerce_customer_update_7000() {
   // Load utility functions.
   module_load_install('commerce');
 
@@ -186,4 +186,6 @@ function commerce_customer_profile_update_7000() {
   }
 
   commerce_update_rename_permissions($permissions);
+
+  return t('Role and custom View permissions updated for order entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }

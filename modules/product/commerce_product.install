@@ -107,7 +107,7 @@ function commerce_product_update_7100() {
 }
 
 /**
- * Rename permissions for better consistency.
+ * Update permission names for product entity management.
  */
 function commerce_product_update_7101() {
   // Load utility functions.
@@ -125,4 +125,6 @@ function commerce_product_update_7101() {
   }
 
   commerce_update_rename_permissions($permissions);
+
+  return t('Role and custom View permissions updated for product entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }
