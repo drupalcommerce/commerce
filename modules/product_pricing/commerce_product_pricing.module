@@ -121,9 +121,6 @@ function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
     }
   }
 
-  // First create a pseudo product line item that we will pass to Rules.
-  $line_item = commerce_product_line_item_new($product);
-
   // Pass the line item to Rules.
   rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
