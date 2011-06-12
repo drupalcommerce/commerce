@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * @file
+ * Unit tests for order rules.
+ */
+
+/**
+ * Test order rules.
+ */
+class CommerceOrderRulesTest extends CommerceBaseTestCase {
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Order Rules',
+      'description' => 'Test the rules provided by the order module.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+  }
+
+  /**
+   * Test conditions on payment.
+   */
+  function testOrderConditions() {
+    // Create a $100 product.
+    $product = $this->createDummyProduct('', '', 100, 'USD');
+    // Create a $50 product.
+    $product2 = $this->createDummyProduct('', '', 50, 'USD');
+    // Create an order with two products, total quantity 7.
+    $order = $this->createDummyOrder(1, array($product->product_id => 2, $product2->product_id => 5));
+
+    // Create an additional $10 product that is not in the order.
+    $product3 = $this->createDummyProduct('', '', 50, 'USD');
+
+    // "Order contains product".
+    $condition = rules_condition('commerce_order_contains_product');
+    $tests = array(
+      array('product_id' => $product->sku,  'operator' => '=', 'value' => 2, 'result' => TRUE),
+      array('product_id' => $product2->sku, 'operator' => '=', 'value' => 5, 'result' => TRUE),
+      array('product_id' => $product3->sku, 'operator' => '=', 'value' => 0, 'result' => TRUE),
+
+      array('product_id' => $product->sku, 'operator' => '>=', 'value' => 1, 'result' => TRUE),
+      array('product_id' => $product->sku, 'operator' => '>=', 'value' => 2, 'result' => TRUE),
+      array('product_id' => $product->sku, 'operator' => '>=', 'value' => 3, 'result' => FALSE),
+
+      array('product_id' => $product->sku, 'operator' => '>',  'value' => 1, 'result' => TRUE),
+      array('product_id' => $product->sku, 'operator' => '>',  'value' => 2, 'result' => FALSE),
+      array('product_id' => $product->sku, 'operator' => '>',  'value' => 3, 'result' => FALSE),
+
+      array('product_id' => $product->sku, 'operator' => '<=', 'value' => 1, 'result' => FALSE),
+      array('product_id' => $product->sku, 'operator' => '<=', 'value' => 2, 'result' => TRUE),
+      array('product_id' => $product->sku, 'operator' => '<=', 'value' => 3, 'result' => TRUE),
+
+      array('product_id' => $product->sku, 'operator' => '<',  'value' => 1, 'result' => FALSE),
+      array('product_id' => $product->sku, 'operator' => '<',  'value' => 2, 'result' => FALSE),
+      array('product_id' => $product->sku, 'operator' => '<',  'value' => 3, 'result' => TRUE),
+    );
+
+    foreach ($tests as $test) {
+      $this->assert($test['result'] == $condition->executeByArgs(array('commerce_order' => $order, 'product_id' => $test['product_id'], 'operator' => $test['operator'], 'value' => $test['value'])), t('Order contains product @product_id @operator @value.', array('@operator' => $test['operator'], '@product_id' => $test['product_id'], '@value' => $test['value'])));
+    }
+
+    // "Total product quantity comparison".
+    $condition = rules_condition('commerce_order_compare_total_product_quantity');
+    $tests = array(
+      array('operator' => '=', 'value' => 6, 'result' => FALSE),
+      array('operator' => '=', 'value' => 7, 'result' => TRUE),
+      array('operator' => '=', 'value' => 8, 'result' => FALSE),
+
+      array('operator' => '>=', 'value' => 6, 'result' => TRUE),
+      array('operator' => '>=', 'value' => 7, 'result' => TRUE),
+      array('operator' => '>=', 'value' => 8, 'result' => FALSE),
+
+      array('operator' => '>',  'value' => 6, 'result' => TRUE),
+      array('operator' => '>',  'value' => 7, 'result' => FALSE),
+      array('operator' => '>',  'value' => 8, 'result' => FALSE),
+
+      array('operator' => '<=', 'value' => 6, 'result' => FALSE),
+      array('operator' => '<=', 'value' => 7, 'result' => TRUE),
+      array('operator' => '<=', 'value' => 8, 'result' => TRUE),
+
+      array('operator' => '<',  'value' => 6, 'result' => FALSE),
+      array('operator' => '<',  'value' => 7, 'result' => FALSE),
+      array('operator' => '<',  'value' => 8, 'result' => TRUE),
+    );
+
+    foreach ($tests as $test) {
+      $this->assert($test['result'] == $condition->executeByArgs(array('commerce_order' => $order, 'operator' => $test['operator'], 'value' => $test['value'])), t('Order total products @operator @value.', array('@operator' => $test['operator'], '@value' => $test['value'])));
+    }
+
+  }
+}
+

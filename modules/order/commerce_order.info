@@ -32,3 +32,5 @@ files[] = includes/views/handlers/commerce_order_handler_filter_order_type.inc
 ; Views plugins
 files[] = includes/views/handlers/commerce_order_plugin_argument_validate_user.inc
 
+; Tests
+files[] = tests/commerce_order.rules.test

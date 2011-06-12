@@ -104,7 +104,7 @@ function commerce_order_rules_condition_info() {
         'type' => 'text',
         'label' => t('Operator'),
         'description' => t('The comparison operator to use against the total number of products on the order.'),
-        'default value' => 'at least',
+        'default value' => '>=',
         'options list' => 'commerce_numeric_comparison_operator_options_list',
         'restriction' => 'input',
       ),
@@ -249,9 +249,9 @@ function commerce_order_rules_contains_product($order, $sku, $operator, $value) 
   // Make a quantity comparison based on the operator.
   switch ($operator) {
     case '<':
-      return $product[$sku] < $value;
+      return $products[$sku] < $value;
     case '<=':
-      return $product[$sku] <= $value;
+      return $products[$sku] <= $value;
     case '=':
       return $products[$sku] == $value;
     case '>=':
@@ -281,15 +281,15 @@ function commerce_order_rules_compare_total_quantity($order, $operator, $value) 
 
   // Make a quantity comparison based on the operator.
   switch ($operator) {
-    case 'less than':
+    case '<':
       return $quantity < $value;
-    case 'no more than':
+    case '<=':
       return $quantity <= $value;
-    case 'equals':
+    case '=':
       return $quantity == $value;
-    case 'at least':
+    case '>=':
       return $quantity >= $value;
-    case 'more than':
+    case '>':
       return $quantity > $value;
   }
 
