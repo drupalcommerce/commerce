@@ -105,7 +105,7 @@ function commerce_order_rules_condition_info() {
         'label' => t('Operator'),
         'description' => t('The comparison operator to use against the total number of products on the order.'),
         'default value' => 'at least',
-        'options list' => 'commerce_order_product_quantity_operator_options_list',
+        'options list' => 'commerce_numeric_comparison_operator_options_list',
         'restriction' => 'input',
       ),
       'value' => array(

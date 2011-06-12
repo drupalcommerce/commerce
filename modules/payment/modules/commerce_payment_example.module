@@ -23,7 +23,7 @@ function commerce_payment_example_commerce_payment_method_info() {
 }
 
 /**
- * Payment method callback: checkout form.
+ * Payment method callback: submit form.
  */
 function commerce_payment_example_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
   $form = array();
@@ -50,7 +50,7 @@ function commerce_payment_example_submit_form($payment_method, $pane_values, $ch
 }
 
 /**
- * Payment method callback: checkout form validation.
+ * Payment method callback: submit form validation.
  */
 function commerce_payment_example_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
   // Throw an error if a long enough name was not provided.
@@ -65,7 +65,7 @@ function commerce_payment_example_submit_form_validate($payment_method, $pane_fo
 }
 
 /**
- * Payment method callback: checkout form submission.
+ * Payment method callback: submit form submission.
  */
 function commerce_payment_example_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
   $order->data['commerce_payment_example'] = $pane_values;
