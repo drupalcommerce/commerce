@@ -229,22 +229,15 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array('parameter[commerce_order][settings][commerce_order:select]' => 'commerce-order'), t('Save'));
     $this->assertText(t('Your changes have been saved.'), t('New action was successfully added'));
 
-    // Create a less than $50 order.
-    $products = array(
-       // We set price here to 1 cent, since createDummyProduct sets line item
-       // quantity ramdomly up to 100. So we need to ensure the order total will
-       // not be more than $50.
-       $this->createDummyProduct($this->randomName(), $this->randomName(), .01, 'USD', $this->store_admin->uid),
-    );
-    $this->createOrderAndGoToPayment($this->store_customer, $products);
+    // Create a less than $50 order (20 products $2 each).
+    $product = $this->createDummyProduct($this->randomName(), $this->randomName(), 2, 'USD', $this->store_admin->uid);
+    $this->createOrderAndGoToPayment($this->store_customer, array($product->product_id => 20));
     // Check that the payment method example is *not* there.
     $this->assertNoText('Example payment', t('Example payment method panel is not present'));
 
-    // Create a more than $50 order.
-    $products = array(
-       $this->createDummyProduct($this->randomName(), $this->randomName(), 60, 'USD', $this->store_admin->uid),
-    );
-    $this->createOrderAndGoToPayment($this->store_customer, $products);
+    // Create a more than $50 order (40 products $2 each).
+    $product = $this->createDummyProduct($this->randomName(), $this->randomName(), 2, 'USD', $this->store_admin->uid);
+    $this->createOrderAndGoToPayment($this->store_customer, array($product->product_id => 40));
     // Check that the payment method example is there.
     $this->assertText('Example payment', t('Example payment method panel is present'));
   }

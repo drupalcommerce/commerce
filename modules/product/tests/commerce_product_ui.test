@@ -315,7 +315,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $product = $this->createDummyProduct('PROD-01', 'Product One');
 
     // Associate the product in an order.
-    $order = $this->createDummyOrder($this->store_customer->uid, array($product));
+    $order = $this->createDummyOrder($this->store_customer->uid, array($product->product_id => 1));
 
     // Login with store admin.
     $this->drupalLogin($this->store_admin);

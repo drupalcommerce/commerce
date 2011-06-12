@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Unit tests for payment rules.
+ */
+
+/**
+ * Test payment user interface.
+ */
+class CommercePaymentRulesTest extends CommerceBaseTestCase {
+
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Payment Rules',
+      'description' => 'Test the rules provided by the payment module.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+  }
+
+  /**
+   * Test conditions on payment.
+   */
+  function testPaymentConditions() {
+    // Create a $100 product.
+    $product = $this->createDummyProduct('', '', 100, 'USD');
+    // Create an order with this product.
+    $order = $this->createDummyOrder(1, array($product->product_id => 1));
+
+    // Order balance.
+    $condition = rules_condition('commerce_payment_order_balance_comparison');
+
+    $tests = array(
+      array('operator' => '=', 'value' => '100', 'result' => TRUE),
+      array('operator' => '=', 'value' => '99.99', 'result' => FALSE),
+      array('operator' => '=', 'value' => '100.01', 'result' => FALSE),
+      array('operator' => '>=', 'value' => '100', 'result' => TRUE),
+      array('operator' => '>=', 'value' => '100.01', 'result' => FALSE),
+      array('operator' => '>', 'value' => '100', 'result' => FALSE),
+      array('operator' => '>', 'value' => '99.99', 'result' => TRUE),
+      array('operator' => '<=', 'value' => '100', 'result' => TRUE),
+      array('operator' => '<=', 'value' => '99.99', 'result' => FALSE),
+      array('operator' => '<', 'value' => '100', 'result' => FALSE),
+      array('operator' => '<', 'value' => '100.01', 'result' => TRUE),
+    );
+
+    foreach ($tests as $test) {
+      $this->assert($test['result'] == $condition->executeByArgs(array('commerce_order' => $order, 'operator' => $test['operator'], 'value' => $test['value'])), t('Order balance is @operator $@value.', array('@operator' => $test['operator'], '@value' => $test['value'])));
+    }
+  }
+}
+
