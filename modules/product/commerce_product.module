@@ -91,18 +91,6 @@ function commerce_product_entity_info() {
           'label' => t('Admin display'),
           'custom settings' => FALSE,
         ),
-        'node_teaser' => array(
-          'label' => t('Node: Teaser'),
-          'custom settings' => TRUE,
-        ),
-        'node_full' => array(
-          'label' => t('Node: Full content'),
-          'custom settings' => FALSE,
-        ),
-        'node_rss' => array(
-          'label' => t('Node: RSS'),
-          'custom settings' => FALSE,
-        ),
       ),
       'uri callback' => 'commerce_product_uri',
       'metadata controller class' => '',
@@ -447,7 +435,7 @@ function commerce_product_load_multiple($product_ids = array(), $conditions = ar
  *   A fully loaded product object.
  * @param $view_mode
  *   The view mode for displaying the product, 'full', 'node_full',
- *     'node_teaser', or 'node_rss'.
+ *     'node_teaser', 'node_rss'...
  *
  * @return
  *   An array as expected by drupal_render().

@@ -1721,20 +1721,19 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
   foreach ($output as $field_name => $element) {
     if (!empty($element['#formatter']) && $element['#formatter'] == 'commerce_cart_add_to_cart_form') {
       // Prepare the context information needed by the cart form.
-      $context = array();
+      $cart_context = $context;
       $display_uri = NULL;
 
-      // Add the context for displaying product fields in the context of a node
+      // Add the context for displaying product fields in the context of an entity
       // that references the product by looking at the entity this product
       // reference field is attached to.
-      if ($element['#entity_type'] == 'node') {
-        $context = array(
-          'class_prefix' => 'node-' . $element['#object']->nid,
-          'view_mode' => 'node_' . $element['#view_mode'],
-        );
+      list($id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
+      $cart_context += array(
+        'class_prefix' => $context['entity_type'] . '-' . $id,
+        'view_mode' => $context['entity_type'] . '_' . $element['#view_mode'],
+      );
 
-        $display_uri = entity_uri('node', $element['#object']);
-      }
+      $display_uri = entity_uri($context['entity_type'], $element['#object']);
 
       foreach (element_children($element) as $key) {
         // Extract the drupal_get_form() arguments array from the element.
@@ -1743,7 +1742,7 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
         // Replace the array containing the arguments with the return value of
         // drupal_get_form(). It will be rendered when the rest of the object is
         // rendered for display.
-        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['product_ids'], $arguments['show_quantity'], $arguments['default_quantity'], $context, $display_uri);
+        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['product_ids'], $arguments['show_quantity'], $arguments['default_quantity'], $cart_context, $display_uri);
       }
     }
   }

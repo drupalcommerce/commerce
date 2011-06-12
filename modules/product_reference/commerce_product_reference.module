@@ -26,19 +26,25 @@ function commerce_product_reference_commerce_product_uri($product) {
 function commerce_product_reference_field_extra_fields() {
   $extra = array();
 
-  // Loop through the product reference fields attached to node bundles.
-  foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
-    foreach ($field['bundles']['node'] as $bundle_name) {
-      // Attach "extra fields" to the bundle representing fields on products
-      // that may be visible on the bundle.
+  // Loop through the product reference fields.
+  foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
+    foreach ($field['bundles'] as $entity_type => $bundles) {
+      if ($entity_type == 'commerce_line_item' || $entity_type == 'commerce_product') {
+        // It would make no sense to merge the product fields into those.
+        continue;
+      }
 
-      foreach (field_info_instances('commerce_product') as $product_bundle_name => $product_fields) {
-        foreach ($product_fields as $product_field_name => $product_field) {
-          $extra['node'][$bundle_name]['display']['product:' . $product_field_name] = array(
-            'label' => t('Product: @label', array('@label' => $product_field['label'])),
-            'description' => t('Field from a referenced product.'),
-            'weight' => $product_field['widget']['weight'],
-          );
+      foreach ($bundles as $bundle_name) {
+        // Attach "extra fields" to the bundle representing fields on products
+        // that may be visible on the bundle.
+        foreach (field_info_instances('commerce_product') as $product_bundle_name => $product_fields) {
+          foreach ($product_fields as $product_field_name => $product_field) {
+            $extra[$entity_type][$bundle_name]['display']['product:' . $product_field_name] = array(
+              'label' => t('Product: @label', array('@label' => $product_field['label'])),
+              'description' => t('Field from a referenced product.'),
+              'weight' => $product_field['widget']['weight'],
+            );
+          }
         }
       }
     }
@@ -161,19 +167,22 @@ function commerce_product_reference_commerce_product_delete($product) {
 }
 
 /**
- * Implements hook_node_view().
+ * Implements hook_entity_view().
  *
- * This implementation adds product fields to the content array of a node on
+ * This implementation adds product fields to the content array of an entity on
  * display if the product contains a non-empty product reference field.
  */
-function commerce_product_reference_node_view($node, $view_mode = 'full') {
-  $wrapper = entity_metadata_wrapper('node', $node);
+function commerce_product_reference_entity_view($entity, $entity_type, $view_mode, $langcode) {
+  $wrapper = entity_metadata_wrapper($entity_type, $entity);
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
 
-  // Loop through product reference fields to see if any exist on this node
-  // type's bundle that is either hidden or displayed with the Add to Cart form
-  // display formatter.
-  foreach (commerce_info_fields('commerce_product_reference', 'node') as $field_name => $field) {
-    if (in_array($node->type, $field['bundles']['node'])) {
+  $instances = field_info_instances($entity_type, $bundle);
+
+  // Loop through product reference fields to see if any exist on this entity
+  // bundle that is either hidden or displayed with the Add to Cart form display
+  // formatter.
+  foreach (commerce_info_fields('commerce_product_reference', $entity_type) as $field_name => $field) {
+    if (isset($instances[$field_name])) {
       // Find the default product based on the cardinality of the field.
       if ($field['cardinality'] == 1) {
         $product = $wrapper->{$field_name}->value();
@@ -184,26 +193,26 @@ function commerce_product_reference_node_view($node, $view_mode = 'full') {
 
       // If a product was found and the reference field is either hidden or set
       // to display as an Add to Cart form...
-      if (!empty($product) && (!isset($node->content[$field_name]) ||
-        $node->content[$field_name]['#formatter'] == 'commerce_cart_add_to_cart_form')) {
+      $display = field_get_display($instances[$field_name], $view_mode, $entity);
+      if (!empty($product) && ($display['type'] == 'hidden' || $display['type'] == 'commerce_cart_add_to_cart_form')) {
 
         // Add the display context for these field to the product.
         $product->display_context = array(
-          'entity_type' => 'node',
-          'entity' => $node,
+          'entity_type' => $entity_type,
+          'entity' => $entity,
         );
 
         // Loop through the fields on the referenced product's type.
         foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
-          // Add the product field to the node's content array.
-          $node->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, 'node_' . $view_mode);
+          // Add the product field to the entity's content array.
+          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $entity_type . '_' . $view_mode);
 
           // For multiple value references, add context information so the cart
           // form can do dynamic replacement of fields.
           if ($field['cardinality'] != 1) {
-            $class = array('node', $node->nid, 'product', $product_field_name);
+            $class = array($entity_type, $id, 'product', $product_field_name);
 
-            $node->content['product:' . $product_field_name] += array(
+            $entity->content['product:' . $product_field_name] += array(
               '#prefix' => '<span class="' . drupal_html_class(implode('-', $class)) . '">',
               '#suffix' => '</span>',
             );
@@ -577,13 +586,33 @@ function commerce_product_reference_commerce_line_item_type_info() {
 /**
  * Implements hook_entity_info_alter().
  *
- * Adds the line item view mode to the product.
+ * Adds the line item and the product display-specific views mode to the product.
  */
 function commerce_product_reference_entity_info_alter(&$entity_info) {
   $entity_info['commerce_product']['view modes']['line_item'] = array(
     'label' => t('Line item'),
     'custom settings' => TRUE,
   );
+
+  // Query the field tables directly to avoid creating a loop in the Field API:
+  // it is not legal to call any of the field_info_*() in
+  // hook_entity_info(), as field_read_instances() calls entity_get_info().
+  $query = db_select('field_config_instance', 'fci', array('fetch' => PDO::FETCH_ASSOC));
+  $query->join('field_config', 'fc', 'fc.id = fci.field_id');
+  $query->fields('fci');
+  $query->condition('fc.type', 'commerce_product_reference');
+
+  foreach ($query->execute() as $instance) {
+    $entity_type = $instance['entity_type'];
+    foreach ($entity_info[$entity_type]['view modes'] as $view_mode => $view_mode_info) {
+      $entity_info['commerce_product']['view modes'][$entity_type . '_' . $view_mode] = array(
+        'label' => t('@entity_type: @view_mode', array('@entity_type' => $entity_info[$entity_type]['label'], '@view_mode' => $view_mode_info['label'])),
+
+        // UX: Enable the 'Node: teaser' mode by default, if present.
+        'custom settings' => $entity_type == 'node' && $view_mode == 'teaser',
+      );
+    }
+  }
 }
 
 /**
