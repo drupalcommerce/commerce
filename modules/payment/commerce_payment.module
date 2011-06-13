@@ -55,7 +55,7 @@ define('COMMERCE_CREDIT_VOID', 'void');
 function commerce_payment_entity_info() {
   $return = array(
     'commerce_payment_transaction' => array(
-      'label' => t('Payment transaction'),
+      'label' => t('Commerce Payment transaction'),
       'controller class' => 'CommercePaymentTransactionEntityController',
       'base table' => 'commerce_payment_transaction',
       'revision table' => 'commerce_payment_transaction_revision',

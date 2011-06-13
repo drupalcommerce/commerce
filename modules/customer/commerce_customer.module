@@ -12,7 +12,7 @@
 function commerce_customer_entity_info() {
   $return = array(
     'commerce_customer_profile' => array(
-      'label' => t('Customer profile'),
+      'label' => t('Commerce Customer profile'),
       'controller class' => 'CommerceCustomerProfileEntityController',
       'base table' => 'commerce_customer_profile',
       'revision table' => 'commerce_customer_profile_revision',
