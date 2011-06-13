@@ -191,10 +191,8 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         $product = $wrapper->{$field_name}->get(0)->value();
       }
 
-      // If a product was found and the reference field is either hidden or set
-      // to display as an Add to Cart form...
-      $display = field_get_display($instances[$field_name], $view_mode, $entity);
-      if (!empty($product) && ($display['type'] == 'hidden' || $display['type'] == 'commerce_cart_add_to_cart_form')) {
+      // If we found a product and the reference field enables field injection...
+      if (!empty($product) && $instances[$field_name]['settings']['field_injection']) {
 
         // Add the display context for these field to the product.
         $product->display_context = array(
@@ -232,7 +230,7 @@ function commerce_product_reference_field_info() {
       'label' => t('Product reference'),
       'description' => t('This field stores the ID of a related product as an integer value.'),
       'settings' => array(),
-      'instance_settings' => array('referenceable_types' => array()),
+      'instance_settings' => array('referenceable_types' => array(), 'field_injection' => TRUE),
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_product_reference_title_link',
       'property_type' => 'commerce_product',
@@ -246,10 +244,19 @@ function commerce_product_reference_field_info() {
  */
 function commerce_product_reference_field_instance_settings_form($field, $instance) {
   $settings = $instance['settings'];
-  $options = array();
   $form = array();
 
+  $form['field_injection'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Render fields from the referenced products when viewing this entity.'),
+    '#description' => t('If enabled, the appearance of product fields on this entity is governed by the display settings for the fields on the product type.'),
+    '#default_value' => isset($settings['field_injection']) ? $settings['field_injection'] : TRUE,
+    '#weight' => -9,
+  );
+
   // Build an options array of the product types.
+  $options = array();
+
   foreach (commerce_product_type_get_name() as $type => $name) {
     $options[$type] = check_plain($name);
   }
@@ -261,6 +268,7 @@ function commerce_product_reference_field_instance_settings_form($field, $instan
     '#options' => $options,
     '#default_value' => is_array($settings['referenceable_types']) ? $settings['referenceable_types'] : array(),
     '#multiple' => TRUE,
+    '#weight' => -3,
   );
 
   return $form;
