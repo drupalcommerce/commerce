@@ -1,10 +1,11 @@
 name = Line Item UI
 description = Exposes a default UI for Line Items through line item type forms and default Views.
 package = Commerce
-core = 7.x
 dependencies[] = contextual
 dependencies[] = field_ui
 dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_line_item
 dependencies[] = views
+core = 7.x
+configure = admin/commerce/config/line-items

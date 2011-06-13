@@ -1,13 +1,14 @@
 name = Product UI
 description = Exposes a default UI for Products through product edit forms and default Views.
 package = Commerce
-core = 7.x
 dependencies[] = contextual
 dependencies[] = field_ui
 dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_product
 dependencies[] = views
+core = 7.x
+configure = admin/commerce/products/types
 
 ; Simple tests
 files[] = tests/commerce_product_ui.test

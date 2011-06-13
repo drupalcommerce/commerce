@@ -5,6 +5,7 @@ dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_order
 core = 7.x
+configure = admin/commerce/config/checkout
 
 ; Simple tests
 files[] = tests/commerce_checkout.test

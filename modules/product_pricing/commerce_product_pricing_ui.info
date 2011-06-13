@@ -8,3 +8,4 @@ dependencies[] = commerce_price
 dependencies[] = commerce_product_pricing
 dependencies[] = commerce_product_reference
 core = 7.x
+configure = admin/commerce/config/product-pricing
