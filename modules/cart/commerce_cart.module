@@ -961,7 +961,11 @@ function commerce_cart_order_product_line_item_delete($order, $line_item_id, $sk
   // Delete the actual line item.
   commerce_line_item_delete($line_item->line_item_id);
 
-  return $skip_save ? $order : commerce_order_save($order);
+  if (!$skip_save) {
+    commerce_order_save($order);
+  }
+
+  return $order;
 }
 
 /**
@@ -992,7 +996,9 @@ function commerce_cart_order_empty($order) {
     $order = commerce_cart_order_product_line_item_delete($order, $line_item_id, TRUE);
   }
 
-  return commerce_order_save($order);
+  commerce_order_save($order);
+
+  return $order;
 }
 
 /**
