@@ -185,7 +185,7 @@ function commerce_customer_update_7000() {
     $map['edit own ' . $bundle_name . ' customer profiles'] = 'edit own commerce_customer_profile entities of bundle ' . $bundle_name;
   }
 
-  commerce_update_rename_permissions($permissions);
+  commerce_update_rename_permissions($map);
 
   return t('Role and custom View permissions updated for order entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }

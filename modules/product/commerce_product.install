@@ -124,7 +124,7 @@ function commerce_product_update_7101() {
     $map['edit own ' . $bundle_name . ' products'] = 'edit own commerce_product entities of bundle ' . $bundle_name;
   }
 
-  commerce_update_rename_permissions($permissions);
+  commerce_update_rename_permissions($map);
 
   return t('Role and custom View permissions updated for product entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }

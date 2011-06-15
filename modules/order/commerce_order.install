@@ -365,7 +365,7 @@ function commerce_order_update_7104() {
     'view own orders' => 'view own commerce_order entities',
   );
 
-  commerce_update_rename_permissions($permissions);
+  commerce_update_rename_permissions($map);
 
   return t('Role and custom View permissions updated for order entity management. Access checks in modules and permissions on default Views must be updated manually.');
 }
