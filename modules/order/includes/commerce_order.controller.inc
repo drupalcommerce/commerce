@@ -78,16 +78,16 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
       // Update the order total field's value.
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-      // First set the currency to the site default if this is a new order.
-      if ($order->is_new || $order_wrapper->commerce_order_total->currency_code->value() == NULL) {
-        $order_wrapper->commerce_order_total->currency_code = commerce_default_currency();
+      // Reset the data array of the order total field to only include a
+      // base price component, set the currency code from any line item.
+      // This is needed in some cases where base price component currency should change.
+      $initial_base_currency = commerce_default_currency();
+      if (count($order_wrapper->commerce_line_items)) {
+        $initial_base_currency = $order_wrapper->commerce_line_items[0]->commerce_total->currency_code->value();
       }
-
-      // Next reset the data array of the order total field to only include a
-      // base price component.
       $base_price = array(
         'amount' => 0,
-        'currency_code' => $order_wrapper->commerce_order_total->currency_code->value(),
+        'currency_code' => $initial_base_currency,
         'data' => array(),
       );
 
@@ -95,15 +95,37 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
 
       // Then loop over each line item and add its total to the order total.
       $total = 0;
+      $order_total_currency_code = '';
+      $same_currency = TRUE;
 
       foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
         // Convert the line item's total to the order's currency for totalling.
         $component_total = commerce_price_component_total($line_item_wrapper->commerce_total->value());
 
+        // Set the order total currency code to be the currency if the first line item.
+        if ($order_total_currency_code === '') {
+          $order_total_currency_code = $component_total['currency_code'];
+        }
+
+        // If we get a mix of currencies, convert to default currency code.
+        // This only need to happen once, if currencies are mixed we always
+        // use the defalt currency code.
+        if ($order_total_currency_code !== $component_total['currency_code'] && $same_currency) {
+          $same_currency = FALSE;
+          // Convert the total to default currency code.
+          $total = commerce_currency_convert(
+            $total,
+            $order_total_currency_code,
+            commerce_default_currency()
+          );
+          $order_total_currency_code = commerce_default_currency();
+        }
+
+        // Add the totals.
         $total += commerce_currency_convert(
           $component_total['amount'],
           $component_total['currency_code'],
-          $order_wrapper->commerce_order_total->currency_code->value()
+          $order_total_currency_code
         );
 
         // Combine the line item total's component prices into the order total.
@@ -113,7 +135,28 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
         );
       }
 
+      // We need to recreate the price component to make it match the order total
+      if ($same_currency === FALSE) {
+        $base_price = array(
+          'amount' => 0,
+          'currency_code' => $order_total_currency_code,
+          'data' => array(),
+        );
+
+        $order_wrapper->commerce_order_total->data = commerce_price_component_add($base_price, 'base_price', $base_price, TRUE);
+
+        foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+          // Combine the line item total's component prices into the order total.
+          $order_wrapper->commerce_order_total->data = commerce_price_components_combine(
+            $order_wrapper->commerce_order_total->value(),
+            $line_item_wrapper->commerce_total->value()
+          );
+        }
+      }
+
+      // Update the commerce_order_total with the result from the loop above.
       $order_wrapper->commerce_order_total->amount = $total;
+      $order_wrapper->commerce_order_total->currency_code = $order_total_currency_code;
 
       if ($order->is_new || !empty($order->revision)) {
         // When inserting either a new order or revision, $order->log must be set
