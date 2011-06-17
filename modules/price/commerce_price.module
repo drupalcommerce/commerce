@@ -811,13 +811,16 @@ function commerce_price_component_type_load($name) {
  * @param $included
  *   Boolean indicating whether or not the price component has already been
  *   included in the price the component is being added to.
+ * @param $add_base_price
+ *   Boolean indicating whether or not to add the base price component if it is
+ *   missing.
  *
  * @return
  *   The updated data array.
  */
-function commerce_price_component_add($price, $type, $component_price, $included) {
+function commerce_price_component_add($price, $type, $component_price, $included, $add_base_price = TRUE) {
   // If no price components have been added yet, add the base price first.
-  if (empty($price['data']['components']) && $type != 'base_price') {
+  if ($add_base_price && empty($price['data']['components']) && $type != 'base_price') {
     $price['data'] = commerce_price_component_add($price, 'base_price', $price, TRUE);
   }
 
