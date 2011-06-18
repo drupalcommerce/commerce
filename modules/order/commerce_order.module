@@ -910,6 +910,8 @@ function commerce_order_status_update($order, $name, $skip_save = FALSE, $revisi
  *
  * @param $order
  *   The order object whose order total should be calculated.
+ *
+ * @see commerce_line_items_total()
  */
 function commerce_order_calculate_total($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);

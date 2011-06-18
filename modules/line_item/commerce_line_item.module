@@ -1269,41 +1269,75 @@ function commerce_line_items_quantity($line_items, $type = '') {
 }
 
 /**
- * Returns the total price and currency of an array of line items.
+ * Returns the total price amount and currency of an array of line items.
  *
  * @param $line_items
  *   The array of line items whose quantities you want to count; also accepts an
- *     EntityListWrapper of a line item reference field.
+ *   EntityListWrapper of a line item reference field.
  * @param $type
  *   Optional type string to filter line items by type before counting.
  *
  * @return
  *   An associative array of containing the total 'amount' and 'currency_code'
- *     the line items.
+ *   the line items.
+ *
+ * @see commerce_order_calculate_total()
  */
 function commerce_line_items_total($line_items, $type = '') {
-  // Sum up the total price of all matching line items.
-  $total = 0;
-  $currency_code = '';
+  // First determine the currency to use for the order total. This code has
+  // been copied and modifed from commerce_order_calculate_total(). It is worth
+  // considering abstracting this code into a separate API function that both
+  // functions can use.
+  $currency_code = commerce_default_currency();
+  $currencies = array();
 
-  foreach ($line_items as $line_item) {
-    if (!$line_item instanceof EntityMetadataWrapper) {
-      $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
+  // Populate an array of how many line items on the order use each currency.
+  foreach ($line_items as $delta => $line_item_wrapper) {
+    // Convert the line item to a wrapper if necessary.
+    if (!$line_item_wrapper instanceof EntityMetadataWrapper) {
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_wrapper);
     }
 
-    if (empty($type) || $line_item->type->value() == $type) {
-      // Set the initial currency code.
-      if (empty($currency_code)) {
-        $currency_code = $line_item->commerce_total->currency_code->value();
-      }
-      else {
-        // Check to see if the line items are of a mixed currency.
-        if ($currency_code != $line_item->commerce_total->currency_code->value()) {
-          // TODO: Figure out what to do then!
-        }
-      }
+    $line_item_currency_code = $line_item_wrapper->commerce_total->currency_code->value();
 
-      $total += $line_item->commerce_total->amount->value();
+    if (!in_array($line_item_currency_code, array_keys($currencies))) {
+      $currencies[$line_item_currency_code] = 1;
+    }
+    else {
+      $currencies[$line_item_currency_code]++;
+    }
+  }
+
+  reset($currencies);
+
+  // If only one currency is present, use that to calculate the total.
+  if (count($currencies) == 1) {
+    $currency_code = key($currencies);
+  }
+  elseif (in_array(commerce_default_currency(), array_keys($currencies))) {
+    // Otherwise use the site default currency if it's in the array.
+    $currency_code = commerce_default_currency();
+  }
+  elseif (count($currencies) > 1) {
+    // Otherwise use the first currency in the array.
+    $currency_code = key($currencies);
+  }
+
+  // Sum up the total price of all matching line items.
+  $total = 0;
+
+  foreach ($line_items as $line_item_wrapper) {
+    // Convert the line item to a wrapper if necessary.
+    if (!$line_item_wrapper instanceof EntityMetadataWrapper) {
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_wrapper);
+    }
+
+    if (empty($type) || $line_item_wrapper->type->value() == $type) {
+      $total += commerce_currency_convert(
+        $line_item_wrapper->commerce_total->amount->value(),
+        $line_item_wrapper->commerce_total->currency_code->value(),
+        $currency_code
+      );
     }
   }
 
