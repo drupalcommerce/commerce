@@ -893,6 +893,12 @@ function commerce_price_components_combine($price, $price2) {
 
   // Loop over the components in the second price's data array.
   foreach ($price2['data']['components'] as $key => $component) {
+    // Convert the component to the proper currency first.
+    if ($component['price']['currency_code'] != $price['currency_code']) {
+      $component['price']['amount'] = commerce_currency_convert($component['price']['amount'], $component['price']['currency_code'], $price['currency_code']);
+      $component['price']['currency_code'] = $price['currency_code'];
+    }
+
     // Look for a matching component in the base price data array.
     $matched = FALSE;
 
@@ -900,8 +906,7 @@ function commerce_price_components_combine($price, $price2) {
       // If the component type matches the component in question...
       if ($base_component['name'] == $component['name']) {
         // Add the two prices together and mark this as a match.
-        $amount = commerce_currency_convert($component['price']['amount'], $component['price']['currency_code'], $price['currency_code']);
-        $price['data']['components'][$base_key]['price']['amount'] += $amount;
+        $price['data']['components'][$base_key]['price']['amount'] += $component['price']['amount'];
 
         $matched = TRUE;
       }
