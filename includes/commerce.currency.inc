@@ -281,11 +281,15 @@ function commerce_commerce_currency_info() {
     ),
     'CZK' => array(
       'code' => 'CZK',
-      'symbol' => 'Kc',
+      'symbol' => 'Kč',
       'name' => t('Czech Republic Koruna'),
       'numeric_code' => '203',
-      'minor_unit' => t('Halér'),
-      'major_unit' => t('Koruny'),
+      'thousands_separator' => ' ',
+      'decimal_separator' => ',',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Haléř'),
+      'major_unit' => t('Koruna'),
     ),
     'DJF' => array(
       'code' => 'DJF',
