@@ -12,7 +12,7 @@ function commerce_cart_update_7100() {
 
       // If the field meets attribute eligibility, it should continue to use the
       // select widget as an attribute field on the Add to Cart form.
-      if (commerce_cart_field_attribute_eligible($field)) {
+      if ($field['cardinality'] == 1 && function_exists($field['module'] . '_options_list')) {
         $instance['commerce_cart_settings'] = array(
           'attribute_field' => TRUE,
           'attribute_widget' => 'select',
