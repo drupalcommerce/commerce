@@ -79,3 +79,35 @@ function hook_commerce_cart_order_convert($order_wrapper, $account) {
 function hook_commerce_cart_order_refresh($order_wrapper) {
   // No example.
 }
+
+/**
+ * Allows modules to add arbitrary AJAX commands to the array returned from the
+ * Add to Cart form attributes refresh.
+ *
+ * When a product selection widget's value is changed, whether it is a product
+ * select list or a product attribute field widget, the Add to Cart form gets
+ * an AJAX refresh. The form will be rebuilt using the new form state and the
+ * AJAX callback of the element that was changed will be called. For this form
+ * it is commerce_cart_add_to_cart_form_attributes_refresh().
+ *
+ * The cart form's particular AJAX refresh function returns an array of AJAX
+ * commands that perform HTML replacement on the page. However, other modules
+ * may want to interact with the refreshed form. They can use this hook to
+ * add additional items to the commands array, which is passed to the hook by
+ * reference. Note that the form array and form state cannot be altered, just
+ * the array of commands.
+ *
+ * @param $form
+ *   The rebuilt form array.
+ * @param $form_state
+ *   The form state array from the form.
+ * @param &$commands
+ *   The array of AJAX commands used to refresh the cart form with updated form
+ *   elements and to replace product fields rendered on the page to match the
+ *   currently selected product.
+ *
+ * @see commerce_cart_add_to_cart_form_attributes_refresh()
+ */
+function hook_commerce_cart_attributes_refresh_alter($form, $form_state, &$commands) {
+  // No example.
+}

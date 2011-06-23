@@ -1573,6 +1573,9 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
     }
   }
 
+  // Allow other modules to add arbitrary AJAX commands on the refresh.
+  drupal_alter('commerce_cart_attributes_refresh', $commands, $form, $form_state);
+
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 
