@@ -354,9 +354,6 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Generate random information.
     $address_info = $this->generateAddressInformation();
 
-    // Use the e-mail address of an existing user.
-    debug($this->store_customer);
-
     // Fill in the billing address information
     $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
@@ -371,7 +368,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     );
 
     // Also add the mail for the account pane.
-    $info+= array(
+    $info += array(
       'account[login][mail]' => $this->store_customer->mail,
     );
 
