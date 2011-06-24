@@ -13,8 +13,9 @@ function commerce_cart_checkout_router() {
   global $user;
 
   // Load the shopping cart order.
-  $order = commerce_cart_order_load($user->uid);
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  if ($order = commerce_cart_order_load($user->uid)) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  }
 
   // If no shopping cart order could be found, redirect away from checkout.
   // TODO: Redirect to the cart page instead which would then appear as an
