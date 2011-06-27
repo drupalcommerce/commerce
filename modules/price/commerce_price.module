@@ -774,7 +774,7 @@ function commerce_price_component_titles() {
 
   if (empty($titles)) {
     foreach (commerce_price_component_types() as $name => $component_type) {
-      $titles['name'] = $component_type['title'];
+      $titles[$name] = $component_type['title'];
     }
   }
 

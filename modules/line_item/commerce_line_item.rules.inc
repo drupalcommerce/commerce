@@ -61,6 +61,13 @@ function commerce_line_item_rules_action_info() {
           'label' => t('Amount'),
           'description' => $value['amount description'],
         ),
+        'component_name' => array(
+          'type' => 'text',
+          'label' => t('Price component type'),
+          'description' => t('Price components track changes to prices made during the price calculation process, and they are carried over from the unit price to the total price of a line item. When an order total is calculated, it combines all the components of every line item on the order. When the unit price is altered by this action, the selected type of price component will be added to its data array and reflected in the order total display when it is formatted with components showing. Defaults to base price, which displays as the order Subtotal.'),
+          'options list' => 'commerce_line_item_price_component_options_list',
+          'default value' => 'base_price',
+        ),
       ),
       'group' => t('Commerce Line Item'),
     );
@@ -102,9 +109,16 @@ function commerce_line_item_rules_action_info() {
 }
 
 /**
+ * Options list callback: price component selection list.
+ */
+function commerce_line_item_price_component_options_list() {
+  return commerce_price_component_titles();
+}
+
+/**
  * Rules action: add an amount to the unit price.
  */
-function commerce_line_item_unit_price_add($line_item, $amount) {
+function commerce_line_item_unit_price_add($line_item, $amount, $component_name) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
@@ -124,7 +138,7 @@ function commerce_line_item_unit_price_add($line_item, $amount) {
 
     $wrapper->commerce_unit_price->data = commerce_price_component_add(
       $wrapper->commerce_unit_price->value(),
-      'base_price',
+      $component_name,
       $difference,
       TRUE
     );
@@ -134,7 +148,7 @@ function commerce_line_item_unit_price_add($line_item, $amount) {
 /**
  * Rules action: subtract an amount from the unit price.
  */
-function commerce_line_item_unit_price_subtract($line_item, $amount) {
+function commerce_line_item_unit_price_subtract($line_item, $amount, $component_name) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
@@ -154,7 +168,7 @@ function commerce_line_item_unit_price_subtract($line_item, $amount) {
 
     $wrapper->commerce_unit_price->data = commerce_price_component_add(
       $wrapper->commerce_unit_price->value(),
-      'base_price',
+      $component_name,
       $difference,
       TRUE
     );
@@ -164,7 +178,7 @@ function commerce_line_item_unit_price_subtract($line_item, $amount) {
 /**
  * Rules action: multiply the unit price by some amount.
  */
-function commerce_line_item_unit_price_multiply($line_item, $amount) {
+function commerce_line_item_unit_price_multiply($line_item, $amount, $component_name) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
@@ -184,7 +198,7 @@ function commerce_line_item_unit_price_multiply($line_item, $amount) {
 
     $wrapper->commerce_unit_price->data = commerce_price_component_add(
       $wrapper->commerce_unit_price->value(),
-      'base_price',
+      $component_name,
       $difference,
       TRUE
     );
@@ -194,7 +208,7 @@ function commerce_line_item_unit_price_multiply($line_item, $amount) {
 /**
  * Rules action: divide the unit price by some amount.
  */
-function commerce_line_item_unit_price_divide($line_item, $amount) {
+function commerce_line_item_unit_price_divide($line_item, $amount, $component_name) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
@@ -214,7 +228,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount) {
 
     $wrapper->commerce_unit_price->data = commerce_price_component_add(
       $wrapper->commerce_unit_price->value(),
-      'base_price',
+      $component_name,
       $difference,
       TRUE
     );
@@ -224,7 +238,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount) {
 /**
  * Rules action: set the unit price to a specific amount.
  */
-function commerce_line_item_unit_price_amount($line_item, $amount) {
+function commerce_line_item_unit_price_amount($line_item, $amount, $component_name) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
@@ -244,7 +258,7 @@ function commerce_line_item_unit_price_amount($line_item, $amount) {
 
     $wrapper->commerce_unit_price->data = commerce_price_component_add(
       $wrapper->commerce_unit_price->value(),
-      'base_price',
+      $component_name,
       $difference,
       TRUE
     );
