@@ -97,17 +97,18 @@ function hook_commerce_cart_order_refresh($order_wrapper) {
  * reference. Note that the form array and form state cannot be altered, just
  * the array of commands.
  *
- * @param $form
- *   The rebuilt form array.
- * @param $form_state
- *   The form state array from the form.
  * @param &$commands
  *   The array of AJAX commands used to refresh the cart form with updated form
  *   elements and to replace product fields rendered on the page to match the
  *   currently selected product.
+ * @param $form
+ *   The rebuilt form array.
+ * @param $form_state
+ *   The form state array from the form.
  *
  * @see commerce_cart_add_to_cart_form_attributes_refresh()
  */
-function hook_commerce_cart_attributes_refresh_alter($form, $form_state, &$commands) {
-  // No example.
+function hook_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_state) {
+  // Display an alert message showing the new default product ID.
+  $commands[] = ajax_command_alert(t('Now defaulted to product @product_id.', array('@product_id' => $form['product_id']['#value'])));
 }
