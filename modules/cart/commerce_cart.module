@@ -455,11 +455,11 @@ function commerce_cart_commerce_order_load($orders) {
 
   foreach ($orders as $order) {
     // Refresh only if this order hasn't been refreshed already.
-    if (!in_array($order->order_id, $refreshed) &&
+    if (!isset($refreshed[$order->order_id]) &&
       commerce_cart_order_is_cart($order)) {
       // Refresh the order and add its ID to the refreshed array.
+      $refreshed[$order->order_id] = TRUE;
       commerce_cart_order_refresh($order);
-      $refreshed[] = $order->order_id;
     }
   }
 }
