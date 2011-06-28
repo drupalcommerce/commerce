@@ -735,6 +735,10 @@ function commerce_price_commerce_price_component_type_info() {
       'display_title' => t('Subtotal'),
       'weight' => -50,
     ),
+    'discount' => array(
+      'title' => t('Discount'),
+      'weight' => -10,
+    ),
   );
 }
 
