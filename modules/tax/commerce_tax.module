@@ -333,17 +333,16 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
       }
     }
 
-    // Only alter the form if there are available tax rates...
-    if (!empty($options)) {
-      // Get an array of price fields attached to products.
-      $fields = commerce_info_fields('commerce_price', 'commerce_product');
+    // Get an array of price fields attached to products.
+    $fields = commerce_info_fields('commerce_price', 'commerce_product');
 
-      // Loop over each child element of the form.
-      foreach (element_children($form) as $key) {
-        // If the current element is for a price field...
-        if (in_array($key, array_keys($fields))) {
-          // Loop over each of its child items...
-          foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
+    // Loop over each child element of the form.
+    foreach (element_children($form) as $key) {
+      // If the current element is for a price field...
+      if (in_array($key, array_keys($fields))) {
+        // Loop over each of its child items...
+        foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
+          if (!empty($options)) {
             // Find the default value for the tax included element.
             $default = '';
 
@@ -378,12 +377,12 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
                 'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.css'),
               ),
             );
-
-            // Append a validation handler to the price field's element validate
-            // array to add the included tax price component after the price has
-            // been converted from a decimal.
-            $form[$key][$form[$key]['#language']][$delta]['#element_validate'][] = 'commerce_tax_price_field_validate';
           }
+
+          // Append a validation handler to the price field's element validate
+          // array to add the included tax price component after the price has
+          // been converted from a decimal.
+          $form[$key][$form[$key]['#language']][$delta]['#element_validate'][] = 'commerce_tax_price_field_validate';
         }
       }
     }

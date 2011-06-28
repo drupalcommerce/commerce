@@ -47,7 +47,7 @@
  *   - format_callback: Custom callback function to format a price value.
  *   - conversion_rate: The conversion rate of this currency calculated against
  *     the base currency, expressed as a decimal value denoting the value of
- *     one majur unit of this currency when converted to the base currency.
+ *     one major unit of this currency when converted to the base currency.
  *     Default: 1
  *
  * @see hook_commerce_currency_info_alter()
