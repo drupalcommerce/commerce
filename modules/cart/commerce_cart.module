@@ -665,10 +665,10 @@ function commerce_cart_order_refresh($order) {
   $line_item_changed = FALSE;
 
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-    $line_item = clone($line_item_wrapper->value());
+    $cloned_line_item = clone($line_item_wrapper->value());
 
     // If the line item is a product line item...
-    if ($line_item->type == 'product') {
+    if ($cloned_line_item->type == 'product') {
       // Load the product unchanged from the database so any existing price
       // adjustments aren't duplicated in this line item.
       $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
@@ -676,19 +676,19 @@ function commerce_cart_order_refresh($order) {
       // Repopulate the line item array with the default values for the product
       // as though it had not been added to the cart yet, but preserve the
       // current quantity and display URI information.
-      commerce_product_line_item_populate($line_item, $product, $line_item->quantity, empty($line_item->data['display_uri']) ? NULL : $line_item->data['display_uri']);
+      commerce_product_line_item_populate($cloned_line_item, $product, $cloned_line_item->quantity, empty($cloned_line_item->data['display_uri']) ? NULL : $cloned_line_item->data['display_uri']);
 
       // Process the unit price through Rules so it reflects the user's actual
       // current purchase price.
-      rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
+      rules_invoke_event('commerce_product_calculate_sell_price', $cloned_line_item);
     }
 
     // Allow other modules alter line items on a shopping cart refresh.
-    module_invoke_all('commerce_cart_line_item_refresh', $line_item, $order_wrapper);
+    module_invoke_all('commerce_cart_line_item_refresh', $cloned_line_item, $order_wrapper);
 
     // Compare the refreshed unit price to the original unit price looking for
     // differences in the amount, currency code, or price components.
-    $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $cloned_line_item);
     $data = $line_item_wrapper->commerce_unit_price->data->value();
     $current_data = $current_line_item_wrapper->commerce_unit_price->data->value();
 
@@ -841,6 +841,8 @@ function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE
  * @param $display_uri
  *   A URI array as returned by entity_uri() indicating the display to link the
  *     product line item to; defaults to NULL for no display.
+ * @param $data
+ *   An array of data values to include in the created line item
  * @param $combine
  *   Boolean indicating whether or not to combine like products on the same line
  *     item, incrementing an existing line item's quantity instead of adding a
@@ -1096,40 +1098,53 @@ function commerce_cart_forms($form_id, $args) {
 /**
  * Builds an Add to Cart form for a set of products.
  *
- * @param $product_ids
- *   An array of product IDs that will be included in the form.
+ * @param $line_item
+ *   A fully formed product line item whose data will be used in the following
+ *   ways by the form on build:
+ *   - $line_item->data['context']['product_ids']: an array of product IDs to
+ *     include on the form.
+ *   - $line_item->quantity: the default value for the quantity widget if
+ *     included (determined by the $show_quantity parameter).
+ *   - $line_item->commerce_product: the value of this field will be used as the
+ *     default product ID when the form is built for multiple products.
  * @param $show_quantity
- *   Boolean indicating whether or not the quantity field should be shown;
- *     defaults to FALSE resulting in a hidden field.
- * @param $default_quantity
- *   The value to place in the quantity field, defaults to 1.
+ *   Boolean indicating whether or not to show the quantity widget; defaults to
+ *   FALSE resulting in a hidden field holding the quantity.
  * @param $context
  *   Information on the context of the form's placement, allowing it to update
- *     product fields on the page based on the currently selected default
- *     product. Should be an associative array containing the following keys:
- *     - class_prefix: a prefix used to target HTML containers for replacement
- *       with rendered fields as the default product is updated. For example,
- *       nodes display product fields in their context wrapped in spans with the
- *       class node-#-product-field_name.  The class_prefix for the add to cart
- *       form displayed on a node would be node-# with this form's AJAX refresh
- *       adding the suffix -product-field_name.
- *     - view_mode: a product view mode that tells the AJAX refresh how to
- *       render the replacement fields.
- *     If no context is specified, AJAX replacement of rendered fields will not
- *     happen. This parameter only affects forms containing multiple products.
+ *   product fields on the page based on the currently selected default product.
+ *   Should be an associative array containing the following keys:
+ *   - class_prefix: a prefix used to target HTML containers for replacement
+ *     with rendered fields as the default product is updated. For example,
+ *     nodes display product fields in their context wrapped in spans with the
+ *     class node-#-product-field_name.  The class_prefix for the add to cart
+ *     form displayed on a node would be node-# with this form's AJAX refresh
+ *     adding the suffix -product-field_name.
+ *   - view_mode: a product view mode that tells the AJAX refresh how to render
+ *     the replacement fields.
+ *   If no context is specified, AJAX replacement of rendered fields will not
+ *   happen. This parameter only affects forms containing multiple products.
  * @param $display_uri
  *   A URI array as returned by entity_uri() indicating the display to link the
- *     product line item to; defaults to NULL for no display.
+ *   product line item to; defaults to NULL for no display.
  *
  * @return
  *   The form array.
  */
-function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show_quantity = FALSE, $default_quantity = 1, $context = array(), $display_uri = NULL) {
+function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_quantity = FALSE, $context = array(), $display_uri = NULL) {
   global $user;
+
+  // Store the line item passed to the form builder for reference on submit.
+  $form_state['line_item'] = $line_item;
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+  // Initialize some default variables based on the line item we receive.
+  $product_ids = $line_item->data['context']['product_ids'];
+  $default_quantity = $line_item->quantity;
 
   // If we don't have a list of products to load, just bail out early.
   // There is nothing we can or have to do in that case.
-  if (!$product_ids) {
+  if (empty($product_ids)) {
     return array();
   }
 
@@ -1147,7 +1162,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
     '#value' => $user->uid,
   );
 
-  // Load all the products intended for sale on this form.
+  // Load all the active products intended for sale on this form.
   $products = commerce_product_load_multiple($product_ids, array('status' => 1));
 
   // If no products were returned...
@@ -1159,8 +1174,6 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
     );
   }
   else {
-    $form_state['products'] = $products;
-
     // If the form is for a single product, store the product_id in a hidden
     // form field for use by the submit handler.
     if (count($products) == 1) {
@@ -1174,8 +1187,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       // use smart select boxes for the product selection. If the products are
       // all of the same type and there are qualifying fields on that product
       // type, display their options for customer selection.
-      $same_type = TRUE;
       $qualifying_fields = array();
+      $same_type = TRUE;
       $type = '';
 
       // Find the default product so we know how to set default options on the
@@ -1263,8 +1276,15 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $product_ids, $show
       if (empty($matching_products)) {
         // If a product ID value was passed in, use that product if it exists.
         if (!empty($form_state['values']['product_id']) &&
-            !empty($products[$form_state['values']['product_id']])) {
+          !empty($products[$form_state['values']['product_id']])) {
           $default_product = $products[$form_state['values']['product_id']];
+        }
+        elseif (empty($form_state['values']) &&
+          !empty($line_item_wrapper->commerce_product) &&
+          !empty($products[$line_item_wrapper->commerce_product->raw()])) {
+          // If this is the first time the form is built, attempt to use the
+          // product specified by the line item.
+          $default_product = $products[$line_item_wrapper->commerce_product->raw()];
         }
         else {
           reset($products);
@@ -1587,19 +1607,22 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
  */
 function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
   $product_id = $form_state['values']['product_id'];
-  $product = $form_state['products'][$product_id];
+  $product = commerce_product_load($product_id);
 
-  // Add the product to the specified shopping cart.
-  $form_state['line_item'] = commerce_cart_product_add(
-    $form_state['values']['uid'],
-    $product_id,
-    $form_state['values']['quantity'],
-    $form_state['values']['display_uri']
-  );
+  // If the line item passed to the function is new, create it now.
+  if (empty($form_state['line_item']->line_item_id)) {
+    // Add the product to the specified shopping cart.
+    $form_state['line_item'] = commerce_cart_product_add(
+      $form_state['values']['uid'],
+      $product_id,
+      $form_state['values']['quantity'],
+      $form_state['values']['display_uri']
+    );
 
-  // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
-  // display the product title or the product display node title?
-  drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
+    // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
+    // display the product title or the product display node title?
+    drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
+  }
 }
 
 /**
@@ -1694,20 +1717,25 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
   $product_ids = array();
 
   foreach ($items as $delta => $item) {
-    $product_ids[$item['product_id']] = $item['product_id'];
+    $product_ids[] = $item['product_id'];
   }
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
     $settings = $display['settings'];
 
+    // Load the referenced products.
+    $products = commerce_product_load_multiple($product_ids);
+
     // Check to ensure products are referenced, before returning results.
-    if (!empty($product_ids)) {
+    if (!empty($products)) {
+      $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity']);
+      $line_item->data['context']['product_ids'] = array_keys($products);
+
       $result[] = array(
         '#arguments' => array(
           'form_id' => commerce_cart_add_to_cart_form_id($product_ids),
-          'product_ids' => $product_ids,
+          'line_item' => $line_item,
           'show_quantity' => $settings['show_quantity'],
-          'default_quantity' => $settings['default_quantity'],
         ),
       );
     }
@@ -1754,7 +1782,7 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
         // Replace the array containing the arguments with the return value of
         // drupal_get_form(). It will be rendered when the rest of the object is
         // rendered for display.
-        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['product_ids'], $arguments['show_quantity'], $arguments['default_quantity'], $cart_context, $display_uri);
+        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['line_item'], $arguments['show_quantity'], $cart_context, $display_uri);
       }
     }
   }
