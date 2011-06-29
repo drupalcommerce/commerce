@@ -81,6 +81,22 @@ function hook_commerce_cart_order_refresh($order_wrapper) {
 }
 
 /**
+ * Allows modules to perform additional processing when emptying a shopping cart
+ * order.
+ *
+ * Modules that implement this hook do not need to save changes to the order, as
+ * the Cart module will save the order after invoking the hook.
+ *
+ * @param $order
+ *   The order being emptied.
+ *
+ * @see commerce_cart_order_empty()
+ */
+function hook_commerce_cart_order_empty($order) {
+  // No example.
+}
+
+/**
  * Allows modules to add arbitrary AJAX commands to the array returned from the
  * Add to Cart form attributes refresh.
  *

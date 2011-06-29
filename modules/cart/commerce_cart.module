@@ -986,9 +986,7 @@ function commerce_cart_order_empty($order) {
   $line_item_ids = array();
 
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-    if ($line_item_wrapper->type->value() == 'product') {
-      $line_item_ids[] = $line_item_wrapper->line_item_id->value();
-    }
+    $line_item_ids[] = $line_item_wrapper->line_item_id->value();
   }
 
   // Delete each line item one by one from the order. This is done this way
@@ -998,6 +996,10 @@ function commerce_cart_order_empty($order) {
     $order = commerce_cart_order_product_line_item_delete($order, $line_item_id, TRUE);
   }
 
+  // Allow other modules to update the order on empty prior to save.
+  module_invoke_all('commerce_cart_order_empty', $order);
+
+  // Save and return the order.
   commerce_order_save($order);
 
   return $order;
