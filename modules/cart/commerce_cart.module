@@ -1193,6 +1193,8 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     // If the form is for a single product, store the product_id in a hidden
     // form field for use by the submit handler.
     if (count($products) == 1) {
+      $form_state['default_product'] = reset($products);
+
       $form['product_id'] = array(
         '#type' => 'hidden',
         '#value' => key($products),
