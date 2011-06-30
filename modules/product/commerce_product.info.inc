@@ -46,6 +46,14 @@ function commerce_product_entity_property_info() {
     'required' => TRUE,
     'schema field' => 'title',
   );
+  $properties['status'] = array(
+    'label' => t('Status'),
+    'description' => t('Boolean indicating whether the product is active or disabled.'),
+    'type' => 'integer',
+    'setter callback' => 'entity_property_verbatim_set',
+    'setter permission' => 'administer commerce_product entities',
+    'schema field' => 'status',
+  );
   $properties['created'] = array(
     'label' => t('Date created'),
     'description' => t('The date the product was created.'),
