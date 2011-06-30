@@ -1136,10 +1136,27 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
   // Store the line item passed to the form builder for reference on submit.
   $form_state['line_item'] = $line_item;
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-
-  // Initialize some default variables based on the line item we receive.
-  $product_ids = $line_item->data['context']['product_ids'];
   $default_quantity = $line_item->quantity;
+
+  // Retrieve the array of product IDs from the line item's context data array.
+  $product_ids = array();
+
+  // If the product IDs setting tells us to use entity values...
+  if ($line_item->data['context']['product_ids'] == 'entity' &&
+    is_array($line_item->data['context']['entity'])) {
+    $entity_data = $line_item->data['context']['entity'];
+
+    // Load the specified entity.
+    $entity = entity_load_single($entity_data['entity_type'], $entity_data['entity_id']);
+
+    // Extract the product IDs from the specified product reference field.
+    if (!empty($entity->{$entity_data['product_reference_field_name']})) {
+      $product_ids = entity_metadata_wrapper($entity_data['entity_type'], $entity)->{$entity_data['product_reference_field_name']}->raw();
+    }
+  }
+  elseif (is_array($line_item->data['context']['product_ids'])) {
+    $product_ids = $line_item->data['context']['product_ids'];
+  }
 
   // If we don't have a list of products to load, just bail out early.
   // There is nothing we can or have to do in that case.
@@ -1780,6 +1797,12 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
           'entity_id' => $entity_id,
           'product_reference_field_name' => $field_name,
         );
+
+        // Update the product_ids variable to point to the entity data if we're
+        // referencing multiple products.
+        if (count($arguments['line_item']->data['context']['product_ids']) > 1) {
+          $arguments['line_item']->data['context']['product_ids'] = 'entity';
+        }
 
         // Replace the array containing the arguments with the return value of
         // drupal_get_form(). It will be rendered when the rest of the object is
