@@ -98,7 +98,7 @@ function commerce_checkout_completion_message_pane_settings_form($checkout_pane)
       'label' => t('Site information'),
       'description' => t('Site-wide settings and other global information.'),
     ),
-    'order' => array(
+    'commerce_order' => array(
       'label' => t('Order'),
       'type' => 'commerce_order',
     ),
