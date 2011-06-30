@@ -55,6 +55,26 @@ function commerce_product_reference_field_extra_fields() {
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_product_reference_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  // Alter the form if the user has selected to not display a widget for a
+  // product reference field.
+  if ($form['#instance']['widget']['type'] == 'commerce_product_reference_hidden') {
+    // Add a help message to the top of the page.
+    $form['hidden_product_reference_help'] = array(
+      '#markup' => '<div class="messages status">' . t('This field has been configured to not display a widget. There is no way to enter values for this field via the user interface, so you must have some alternate way of adding data to these fields. The settings for the field will still govern what type of products can be referenced and whether or not their fields will be rendered into the referencing entity on display.') . '</div>',
+      '#weight' => -20,
+    );
+
+    // Hide options from the form that pertain to UI based data entry.
+    $form['instance']['description']['#access'] = FALSE;
+    $form['instance']['required']['#access'] = FALSE;
+    $form['instance']['default_value_widget']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
  *
  * Override the field manage display screen to add a description to the fields
  * we embed into the target node from the product.
@@ -438,6 +458,17 @@ function commerce_product_reference_field_widget_info() {
     ),
   );
 
+  // Do not show the widget on forms; useful in cases where reference fields
+  // have a lot of data that is maintained automatically.
+  $widgets['commerce_product_reference_hidden'] = array(
+    'label' => t('Do not show a widget'),
+    'description' => t('Will not display the product reference field on forms. Use only if you maintain product references some other way.'),
+    'field types' => array('commerce_product_reference'),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+    ),
+  );
+
   return $widgets;
 }
 
@@ -514,6 +545,9 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
       '#maxlength' => 1024,
       '#element_validate' => array('commerce_product_reference_autocomplete_validate'),
     );
+  }
+  elseif ($instance['widget']['type'] == 'commerce_product_reference_hidden') {
+    return array();
   }
 }
 
