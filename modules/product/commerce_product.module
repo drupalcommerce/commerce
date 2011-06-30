@@ -101,8 +101,9 @@ function commerce_product_entity_info() {
         'access tag' => 'commerce_product_access',
       ),
 
-      // Add entity translation support.
+      // Add translation support.
       'translation' => array(
+        'locale' => TRUE,
         'entity_translation' => array(
           'class' => 'EntityTranslationCommerceProductHandler',
         ),
