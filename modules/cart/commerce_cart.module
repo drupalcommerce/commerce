@@ -676,7 +676,7 @@ function commerce_cart_order_refresh($order) {
       // Repopulate the line item array with the default values for the product
       // as though it had not been added to the cart yet, but preserve the
       // current quantity and display URI information.
-      commerce_product_line_item_populate($cloned_line_item, $product, $cloned_line_item->quantity, empty($cloned_line_item->data['display_uri']) ? NULL : $cloned_line_item->data['display_uri']);
+      commerce_product_line_item_populate($cloned_line_item, $product);
 
       // Process the unit price through Rules so it reflects the user's actual
       // current purchase price.
@@ -838,20 +838,18 @@ function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE
  *   The ID of the product to add to the cart.
  * @param $quantity
  *   The quantity of this product to add to the cart.
- * @param $display_uri
- *   A URI array as returned by entity_uri() indicating the display to link the
- *     product line item to; defaults to NULL for no display.
  * @param $data
- *   An array of data values to include in the created line item
+ *   An array of data values to include in the created line item or to merge
+ *   into an updated line item.
  * @param $combine
  *   Boolean indicating whether or not to combine like products on the same line
- *     item, incrementing an existing line item's quantity instead of adding a
- *     new line item to the cart order.
+ *   item, incrementing an existing line item's quantity instead of adding a
+ *   new line item to the cart order.
  *
  * @return
  *   The new or updated line item object or FALSE on failure.
  */
-function commerce_cart_product_add($uid, $product_id, $quantity, $display_uri = NULL, $combine = TRUE) {
+function commerce_cart_product_add($uid, $product_id, $quantity, $data = array(), $combine = TRUE) {
   // Load and validate the specified product ID.
   $product = commerce_product_load($product_id);
 
@@ -894,7 +892,7 @@ function commerce_cart_product_add($uid, $product_id, $quantity, $display_uri = 
   // If no matching line item was found...
   if (empty($line_item)) {
     // Create the new product line item.
-    $line_item = commerce_product_line_item_new($product, $quantity, $order->order_id, $display_uri);
+    $line_item = commerce_product_line_item_new($product, $quantity, $order->order_id, $data);
 
     // Process the unit price through Rules so it reflects the user's actual
     // purchase price.
@@ -1102,13 +1100,15 @@ function commerce_cart_forms($form_id, $args) {
  *
  * @param $line_item
  *   A fully formed product line item whose data will be used in the following
- *   ways by the form on build:
+ *   ways by the form:
  *   - $line_item->data['context']['product_ids']: an array of product IDs to
  *     include on the form.
  *   - $line_item->quantity: the default value for the quantity widget if
  *     included (determined by the $show_quantity parameter).
  *   - $line_item->commerce_product: the value of this field will be used as the
  *     default product ID when the form is built for multiple products.
+ *   The line item's data array will be used on submit to set the data array of
+ *   the product line item created by the form.
  * @param $show_quantity
  *   Boolean indicating whether or not to show the quantity widget; defaults to
  *   FALSE resulting in a hidden field holding the quantity.
@@ -1126,14 +1126,11 @@ function commerce_cart_forms($form_id, $args) {
  *     the replacement fields.
  *   If no context is specified, AJAX replacement of rendered fields will not
  *   happen. This parameter only affects forms containing multiple products.
- * @param $display_uri
- *   A URI array as returned by entity_uri() indicating the display to link the
- *   product line item to; defaults to NULL for no display.
  *
  * @return
  *   The form array.
  */
-function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_quantity = FALSE, $context = array(), $display_uri = NULL) {
+function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_quantity = FALSE, $context = array()) {
   global $user;
 
   // Store the line item passed to the form builder for reference on submit.
@@ -1527,11 +1524,6 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       );
     }
 
-    $form['display_uri'] = array(
-      '#type' => 'value',
-      '#value' => $display_uri,
-    );
-
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Add to cart'),
@@ -1618,7 +1610,7 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
       $form_state['values']['uid'],
       $product_id,
       $form_state['values']['quantity'],
-      $form_state['values']['display_uri']
+      $form_state['line_item']->data
     );
 
     // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
@@ -1764,27 +1756,35 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
     if (!empty($element['#formatter']) && $element['#formatter'] == 'commerce_cart_add_to_cart_form') {
       // Prepare the context information needed by the cart form.
       $cart_context = $context;
-      $display_uri = NULL;
 
       // Add the context for displaying product fields in the context of an entity
       // that references the product by looking at the entity this product
       // reference field is attached to.
-      list($id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
+      list($entity_id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
       $cart_context += array(
-        'class_prefix' => $context['entity_type'] . '-' . $id,
+        'class_prefix' => $context['entity_type'] . '-' . $entity_id,
         'view_mode' => $context['entity_type'] . '_' . $element['#view_mode'],
       );
 
-      $display_uri = entity_uri($context['entity_type'], $element['#object']);
+      $entity_uri = entity_uri($context['entity_type'], $element['#object']);
 
       foreach (element_children($element) as $key) {
         // Extract the drupal_get_form() arguments array from the element.
         $arguments = $element[$key]['#arguments'];
 
+        // Add the display path and referencing entity data to the line item.
+        $arguments['line_item']->data['context']['display_path'] = $entity_uri['path'];
+
+        $arguments['line_item']->data['context']['entity'] = array(
+          'entity_type' => $context['entity_type'],
+          'entity_id' => $entity_id,
+          'product_reference_field_name' => $field_name,
+        );
+
         // Replace the array containing the arguments with the return value of
         // drupal_get_form(). It will be rendered when the rest of the object is
         // rendered for display.
-        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['line_item'], $arguments['show_quantity'], $cart_context, $display_uri);
+        $output[$field_name][$key] = drupal_get_form($arguments['form_id'], $arguments['line_item'], $arguments['show_quantity'], $cart_context);
       }
     }
   }

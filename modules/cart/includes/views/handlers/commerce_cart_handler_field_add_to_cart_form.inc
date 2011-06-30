@@ -68,18 +68,22 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       // Generate a form ID for this add to cart form.
       $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
 
-      // Generate a display URI array if this field is displayed on a page View.
+      // Add the display path to the line item's context data array if specified.
       if ($this->view->display[$this->view->current_display]->display_plugin == 'page' &&
         $this->options['display_path']) {
-        // Use the display options array as it contains the required path key.
-        $display_uri = $this->view->display[$this->view->current_display]->display_options;
-      }
-      else {
-        $display_uri = NULL;
+        $line_item->data['context']['display_path'] = $this->view->display[$this->view->current_display]->display_options['path'];
       }
 
+      // Store the View data in the context data array as well.
+      $line_item->data['context']['view'] = array(
+        'view_name' => $this->view->name,
+        'display_name' => $this->view->current_display,
+        'human_name' => $this->view->human_name,
+        'page' => $this->view->current_page,
+      );
+
       // Build the Add to Cart form using the prepared values.
-      $form = drupal_get_form($form_id, $line_item, $this->options['show_quantity'], array(), $display_uri);
+      $form = drupal_get_form($form_id, $line_item, $this->options['show_quantity'], array());
 
       return drupal_render($form);
     }

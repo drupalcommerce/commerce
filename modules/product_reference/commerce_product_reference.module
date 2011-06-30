@@ -888,23 +888,26 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   The quantity to set for the product.
  * @param $order_id
  *   The ID of the order the line item belongs to (if available).
- * @param $display_uri
- *   A URI array as returned by entity_uri() indicating the display to link the
- *     product line item to; defaults to NULL for no display.
+ * @param $data
+ *   A data array to set on the new line item. The following information in the
+ *   data array may be used on line item creation:
+ *   - $data['context']['display_path']: if present will be used to set the line
+ *     item's display_path field value.
  *
  * @return
  *   The fully loaded line item populated with the product data as specified.
  */
-function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $display_uri = NULL) {
+function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $data = array()) {
   // Create the new line item.
   $line_item = entity_create('commerce_line_item', array(
     'type' => 'product',
     'order_id' => $order_id,
     'quantity' => $quantity,
+    'data' => $data,
   ));
 
   // Populate it with the product information.
-  commerce_product_line_item_populate($line_item, $product, $display_uri);
+  commerce_product_line_item_populate($line_item, $product);
 
   // Return the line item.
   return $line_item;
@@ -917,11 +920,8 @@ function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, 
  *   The fully loaded line item object, populated by reference.
  * @param $product
  *   The fully loaded product referenced by the line item.
- * @param $display_uri
- *   A URI array as returned by entity_uri() indicating the display to link the
- *     product line item to; defaults to NULL for no display.
  */
-function commerce_product_line_item_populate($line_item, $product, $display_uri = NULL) {
+function commerce_product_line_item_populate($line_item, $product) {
   // Set the label to be the product SKU.
   $line_item->line_item_label = $product->sku;
 
@@ -933,13 +933,11 @@ function commerce_product_line_item_populate($line_item, $product, $display_uri 
   $line_item_wrapper->commerce_product = $product->product_id;
 
   // Add the display URI if specified.
-  if (is_array($display_uri) && !empty($display_uri['path'])) {
-    $line_item_wrapper->commerce_display_path = $display_uri['path'];
-    $line_item->data['display_uri'] = $display_uri;
+  if (!empty($line_item->data['context']['display_path'])) {
+    $line_item_wrapper->commerce_display_path = $line_item->data['context']['display_path'];
   }
   else {
     $line_item_wrapper->commerce_display_path = '';
-    $line_item->data['display_uri'] = NULL;
   }
 
   // Set the unit price on the line item object.
