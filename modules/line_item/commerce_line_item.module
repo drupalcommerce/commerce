@@ -162,6 +162,21 @@ function commerce_line_item_field_extra_fields() {
 }
 
 /**
+ * Implements hook_field_access().
+ */
+function commerce_line_item_field_access($op, $field, $entity_type, $entity, $account) {
+  // Block field edit access to line item fields that are computed only.
+  if ($op == 'edit' && $entity_type == 'commerce_line_item') {
+    // Build an array of computed field names.
+    $computed_fields = array('commerce_total');
+
+    if (in_array($field['field_name'], $computed_fields)) {
+      return FALSE;
+    }
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_line_item_theme() {

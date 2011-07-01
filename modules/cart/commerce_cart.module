@@ -340,6 +340,27 @@ function commerce_cart_form_field_ui_field_edit_form_alter(&$form, &$form_state)
 
     $form['field']['cardinality']['#description'] .= '<br />' . t('Must be 1 for this field to function as an attribute selection field on Add to Cart forms.');
   }
+
+  // If the current field instance is not locked and is attached to a product
+  // line item type...
+  if (empty($form['locked']) && $instance['entity_type'] == 'commerce_line_item' &&
+    $instance['bundle'] == 'product') {
+    // Get the current instance's line item form settings for use as default values.
+    $commerce_cart_settings = commerce_cart_field_instance_access_settings($instance);
+
+    $form['instance']['commerce_cart_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Add to Cart form settings'),
+      '#description' =>t('Fields attached to product line item types can be included in the Add to Cart form to collect additional information from customers in conjunction with their purchase of particular products.'),
+      '#weight' => 5,
+      '#collapsible' => FALSE,
+    );
+    $form['instance']['commerce_cart_settings']['field_access'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Include this field on Add to Cart forms for line items of this type.'),
+      '#default_value' => $commerce_cart_settings['field_access'],
+    );
+  }
 }
 
 /**
@@ -1059,6 +1080,41 @@ function commerce_cart_field_instance_attribute_settings($instance) {
 }
 
 /**
+ * Returns an array of cart form field access settings for a field instance.
+ *
+ * Fields attached to line item types can be included on the Add to Cart form so
+ * customers can supply additional information for the line item when it is
+ * added to the cart. Certain fields will not be exposed based on line item
+ * field access integration, such as the total price field which is always
+ * computationally generated on line item save.
+ *
+ * @param $instance
+ *   The info array of the field instance whose field access settings should be
+ *   retrieved.
+ *
+ * @return
+ *   An array of field access settings including:
+ *   - field_access: boolean indicating whether or not this field instance
+ *     should appear on the Add to Cart form.
+ */
+function commerce_cart_field_instance_access_settings($instance) {
+  if (empty($instance['commerce_cart_settings']) || !is_array($instance['commerce_cart_settings'])) {
+    $commerce_cart_settings = array();
+  }
+  else {
+    $commerce_cart_settings = $instance['commerce_cart_settings'];
+  }
+
+  // Supply default values for the cart settings pertaining here to field access
+  // on the Add to Cart form.
+  $commerce_cart_settings += array(
+    'field_access' => FALSE,
+  );
+
+  return $commerce_cart_settings;
+}
+
+/**
  * Builds an appropriate cart form ID based on the products on the form.
  *
  * @see commerce_cart_forms().
@@ -1543,10 +1599,31 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       );
     }
 
+    // Add the line item's fields to a container on the form.
+    $form['line_item_fields'] = array(
+      '#type' => 'container',
+      '#parents' => array('line_item_fields'),
+      '#weight' => 10,
+      '#tree' => TRUE,
+    );
+
+    field_attach_form('commerce_line_item', $form_state['line_item'], $form['line_item_fields'], $form_state);
+
+    // Loop over the fields we just added and remove any that haven't been
+    // marked for inclusion on this form. We do this instead of just setting
+    // '#access' => FALSE to avoid specifying empty values for hidden fields.
+    foreach (element_children($form['line_item_fields']) as $field_name) {
+      $info = field_info_instance('commerce_line_item', $field_name, $form_state['line_item']->type);
+
+      if (empty($info['commerce_cart_settings']['field_access'])) {
+        unset($form['line_item_fields'][$field_name]);
+      }
+    }
+
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Add to cart'),
-      '#weight' => 10,
+      '#weight' => 15,
     );
   }
 
@@ -1579,6 +1656,9 @@ function commerce_cart_add_to_cart_form_validate($form, &$form_state) {
   if (!empty($form_state['values']['attributes']['product_select'])) {
     form_set_value($form['product_id'], $form_state['values']['attributes']['product_select'], $form_state);
   }
+
+  // Validate any line item fields that may have been included on the form.
+  field_attach_form_validate('commerce_line_item', $form_state['line_item'], $form['line_item_fields'], $form_state);
 }
 
 /**
@@ -1631,6 +1711,12 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
       $form_state['values']['quantity'],
       $form_state['line_item']->data
     );
+
+    // Add field data to the line item.
+    if (!empty($form_state['values']['line_item_fields'])) {
+      field_attach_submit('commerce_line_item', $form_state['line_item'], $form['line_item_fields'], $form_state);
+      commerce_line_item_save($form_state['line_item']);
+    }
 
     // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
     // display the product title or the product display node title?
