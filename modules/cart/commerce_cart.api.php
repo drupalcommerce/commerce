@@ -128,3 +128,18 @@ function hook_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_st
   // Display an alert message showing the new default product ID.
   $commands[] = ajax_command_alert(t('Now defaulted to product @product_id.', array('@product_id' => $form['product_id']['#value'])));
 }
+
+/**
+ * Allows modules to add additional property names to an array of comparison
+ * properties used to determine whether or not a product line item can be
+ * combined into an existing line item when added to the cart.
+ *
+ * @param &$comparison_properties
+ *   The array of property names (including field names) that map to properties
+ *   on the line item wrappers being compared to check for combination.
+ */
+function hook_commerce_cart_product_comparison_properties_alter(&$comparison_properties) {
+  // Force separate line items when the same product is added to the cart from
+  // different display paths.
+  $comparison_properties[] = 'commerce_display_path';
+}

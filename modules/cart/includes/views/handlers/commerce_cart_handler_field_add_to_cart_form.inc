@@ -15,6 +15,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
 
     $options['show_quantity'] = array('default' => FALSE);
     $options['default_quantity'] = array('default' => 1);
+    $options['combine'] = array('default' => TRUE);
     $options['display_path'] = array('default' => FALSE);
 
     return $options;
@@ -38,6 +39,13 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       '#default_value' => $this->options['default_quantity'] <= 0 ? 1 : $this->options['default_quantity'],
       '#element_validate' => array('commerce_cart_field_formatter_settings_form_quantity_validate'),
       '#size' => 16,
+    );
+
+    $form['combine'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Attempt to combine like products on the same line item in the cart.'),
+      '#description' => t('The line item type, referenced product, and data from fields exposed on the Add to Cart form must all match to combine.'),
+      '#default_value' => $this->options['combine'],
     );
 
     $form['display_path'] = array(
@@ -64,6 +72,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       // Build the line item we'll pass to the Add to Cart form.
       $line_item = commerce_product_line_item_new($product, $default_quantity);
       $line_item->data['context']['product_ids'] = $product_ids;
+      $line_item->data['context']['add_to_cart_combine'] = $this->options['combine'];
 
       // Generate a form ID for this add to cart form.
       $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
