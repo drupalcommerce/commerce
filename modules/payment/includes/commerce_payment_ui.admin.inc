@@ -48,7 +48,7 @@ function commerce_payment_ui_payment_transaction_view($order, $transaction, $vie
     commerce_payment_ui_set_order_breadcrumb($order, $view_mode);
   }
 
-  return commerce_payment_transaction_build_content($order, $transaction, $view_mode);
+  return entity_view('commerce_payment_transaction', array($transaction->transaction_id => $transaction), $view_mode);
 }
 
 /**

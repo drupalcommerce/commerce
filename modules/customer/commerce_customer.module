@@ -32,10 +32,14 @@ function commerce_customer_entity_info() {
         'administrator' => array(
           'label' => t('Administrator'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
         'customer' => array(
           'label' => t('Customer'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
       ),
       'uri callback' => 'commerce_customer_profile_uri',
@@ -411,34 +415,10 @@ function commerce_customer_profile_load_multiple($profile_ids = array(), $condit
  *
  * @return
  *   An array as expected by drupal_render().
+ * @deprecated since 7.x-1.0-rc1
  */
 function commerce_customer_profile_build_content($profile, $view_mode = 'administrator') {
-  // Populate $profile->content with a render() array.
-  // Remove previously built content, if it exists.
-  $profile->content = array();
-
-  // Build fields content.
-  field_attach_prepare_view('commerce_customer_profile', array($profile->profile_id => $profile), $view_mode);
-  entity_prepare_view('commerce_customer_profile', array($profile->profile_id => $profile));
-  $profile->content += field_attach_view('commerce_customer_profile', $profile, $view_mode);
-
-  // Allow modules to make their own additions to the customer profile content.
-  module_invoke_all('commerce_customer_profile_view', $profile, $view_mode);
-
-  // Remove the content array from the profile to avoid duplicate rendering.
-  $build = $profile->content;
-  unset($profile->content);
-
-  $build += array(
-    '#theme' => 'commerce_customer_profile',
-    '#profile' => $profile,
-    '#view_mode' => $view_mode,
-  );
-
-  // Allow modules to modify the final build array.
-  drupal_alter('commerce_customer_profile_view', $build);
-
-  return $build;
+  return entity_get_controller('commerce_customer_profile')->view(array($profile->profile_id => $profile), $view_mode);
 }
 
 /**
@@ -713,7 +693,7 @@ function commerce_customer_field_formatter_view($entity_type, $entity, $field, $
         $profile = commerce_customer_profile_load($item['profile_id']);
 
         if ($profile) {
-          $content = commerce_customer_profile_build_content($profile, 'customer');
+          $content = entity_view('commerce_customer_profile', array($profile->profile_id => $profile), 'customer', $langcode);
 
           $result[$delta] = array(
             '#markup' => drupal_render($content),

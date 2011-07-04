@@ -36,10 +36,14 @@ function commerce_order_entity_info() {
         'administrator' => array(
           'label' => t('Administrator'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
         'customer' => array(
           'label' => t('Customer'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
       ),
       'uri callback' => 'commerce_order_uri',
@@ -389,34 +393,10 @@ function commerce_order_load_multiple($order_ids = array(), $conditions = array(
  *
  * @return
  *   An array as expected by drupal_render().
+ * @deprecated since 7.x-1.0-rc1
  */
 function commerce_order_build_content($order, $view_mode = 'administrator') {
-  // Populate $order->content with a render() array.
-  // Remove previously built content, if it exists.
-  $order->content = array();
-
-  // Build fields content.
-  field_attach_prepare_view('commerce_order', array($order->order_id => $order), $view_mode);
-  entity_prepare_view('commerce_order', array($order->order_id => $order));
-  $order->content += field_attach_view('commerce_order', $order, $view_mode);
-
-  // Allow modules to make their own additions to the order content.
-  module_invoke_all('commerce_order_view', $order, $view_mode);
-
-  // Remove the content array from the order to avoid duplicate rendering.
-  $build = $order->content;
-  unset($order->content);
-
-  $build += array(
-    '#theme' => 'commerce_order',
-    '#order' => $order,
-    '#view_mode' => $view_mode,
-  );
-
-  // Allow modules to modify the final build array.
-  drupal_alter('commerce_order_view', $build);
-
-  return $build;
+  return entity_get_controller('commerce_order')->view(array($order->order_id => $order), $view_mode);
 }
 
 /**

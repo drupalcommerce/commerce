@@ -163,7 +163,7 @@ function commerce_product_product_delete_form($form, &$form_state, $product) {
 
   $form['#submit'][] = 'commerce_product_product_delete_form_submit';
 
-  $content = commerce_product_build_content($product);
+  $content = entity_view('commerce_product', array($product->product_id => $product));
 
   $form = confirm_form($form,
     t('Are you sure you want to delete %title?', array('%title' => $product->title)),

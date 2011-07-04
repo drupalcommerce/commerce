@@ -150,7 +150,7 @@ function commerce_customer_profile_pane_review($form, $form_state, $checkout_pan
   }
 
   if ($profile) {
-    $content = commerce_customer_profile_build_content($profile, 'customer');
+    $content = entity_view('commerce_customer_profile', array($profile->profile_id => $profile), 'customer');
 
     return drupal_render($content);
   }

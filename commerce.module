@@ -190,6 +190,23 @@ function commerce_embed_view($view_id, $display_id, $arguments) {
 }
 
 /**
+ * Implement hook_preprocess_entity().
+ *
+ * Set the 'page' flag based on the view mode of our entities.
+ *
+ * @todo Reconsider when http://drupal.org/node/1208864 is moving.
+ */
+function commerce_preprocess_entity(&$variables) {
+  $entity_info = entity_get_info($variables['entity_type']);
+  $view_mode = $variables['view_mode'];
+
+  if ((entity_get_controller($variables['entity_type']) instanceof DrupalCommerceEntityController)
+     && isset($entity_info['view modes'][$view_mode]['page'])) {
+    $variables['page'] = $entity_info['view modes'][$view_mode]['page'];
+  }
+}
+
+/**
  * Returns the e-mail address from which to send commerce related e-mails.
  *
  * Currently this is just using the site's e-mail address, but this may be

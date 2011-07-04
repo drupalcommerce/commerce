@@ -129,6 +129,71 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
     // Call the default attachLoad() method. This will add fields and call
     // hook_user_load().
     parent::attachLoad($queried_transactions, $revision_id);
+  }
 
+  /**
+   * Builds a structured array representing the entity's content.
+   *
+   * The content built for the entity will vary depending on the $view_mode
+   * parameter.
+   *
+   * @param $entity
+   *   An entity object.
+   * @param $view_mode
+   *   View mode, e.g. 'full', 'teaser'...
+   * @param $langcode
+   *   (optional) A language code to use for rendering. Defaults to the global
+   *   content language of the current request.
+   * @return
+   *   The renderable array.
+   */
+  public function buildContent($transaction, $view_mode = 'full', $langcode = NULL, $content = array()) {
+    // Load the order this transaction is attached to.
+    $order = commerce_order_load($transaction->order_id);
+
+    // Add the default fields inherent to the transaction entity.
+    if (!empty($transaction->instance_id) && $payment_method = commerce_payment_method_instance_load($transaction->instance_id)) {
+      list($method_id, $rule_name) = explode('|', $payment_method['instance_id']);
+      $title = l(check_plain($payment_method['title']), 'admin/config/workflow/rules/reaction/manage/' . $rule_name);
+    }
+    else {
+      $payment_method = commerce_payment_method_load($transaction->payment_method);
+      $title = check_plain($payment_method['title']);
+    }
+
+    $transaction_statuses = commerce_payment_transaction_statuses();
+
+    $rows = array(
+      array(t('Transaction ID'), $transaction->transaction_id),
+      array(t('Order', array(), array('context' => 'a drupal commerce order')), l(check_plain($order->order_number), 'admin/commerce/orders/' . $order->order_id)),
+      array(t('Payment method'), $title),
+      array(t('Remote ID'), check_plain($transaction->remote_id)),
+      array(t('Message'), t($transaction->message, $transaction->message_variables)),
+      array(t('Amount'), commerce_currency_format($transaction->amount, $transaction->currency_code)),
+      array(t('Status'), check_plain($transaction_statuses[$transaction->status]['title'])),
+      array(t('Remote status'), check_plain($transaction->remote_status)),
+      array(t('Created'), format_date($transaction->created)),
+    );
+
+    if ($transaction->changed > $transaction->created) {
+      $rows[] = array(t('Last changed'), format_date($transaction->changed));
+    }
+
+    if (user_access('administer payments')) {
+      if (!empty($transaction->payload)) {
+        $rows[] = array(t('Payload'), '<pre>' . check_plain(print_r($transaction->payload, TRUE)) . '</pre>');
+      }
+    }
+
+    $content['transaction_table'] = array(
+      '#attached' => array(
+        'css' => array(
+          drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css',
+        ),
+      ),
+      '#markup' => theme('table', array('rows' => $rows, 'attributes' => array('class' => array('payment-transaction')))),
+    );
+
+    return parent::buildContent($product, $view_mode, $langcode, $content);
   }
 }

@@ -30,6 +30,8 @@ function commerce_line_item_entity_info() {
         'display' => array(
           'label' => t('Display'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
       ),
       'access callback' => 'commerce_line_item_access',

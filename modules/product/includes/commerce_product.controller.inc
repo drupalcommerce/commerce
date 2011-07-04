@@ -108,4 +108,48 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       return FALSE;
     }
   }
+
+  /**
+   * Builds a structured array representing the entity's content.
+   *
+   * The content built for the entity will vary depending on the $view_mode
+   * parameter.
+   *
+   * @param $entity
+   *   An entity object.
+   * @param $view_mode
+   *   View mode, e.g. 'full', 'teaser'...
+   * @param $langcode
+   *   (optional) A language code to use for rendering. Defaults to the global
+   *   content language of the current request.
+   * @return
+   *   The renderable array.
+   */
+  public function buildContent($product, $view_mode = 'full', $langcode = NULL, $content = array()) {
+    // Prepare a reusable array representing the CSS file to attach to the view.
+    $attached = array(
+      'css' => array(drupal_get_path('module', 'commerce_product_ui') . '/theme/commerce_product.css'),
+    );
+
+    // Add the default fields inherent to the product entity.
+    $content['sku'] = array(
+      '#markup' => theme('commerce_product_sku', array('sku' => check_plain($product->sku), 'label' => t('SKU:'), 'product' => $product)),
+      '#attached' => $attached,
+    );
+
+    // Only display the title and status on the full page view.
+    if ($view_mode == 'full') {
+      $content['title'] = array(
+        '#markup' => theme('commerce_product_title', array('title' => check_plain($product->title), 'label' => t('Title:'), 'product' => $product)),
+        '#attached' => $attached,
+      );
+
+      $content['status'] = array(
+        '#markup' => theme('commerce_product_status', array('status' => $product->status ? t('Active') : t('Disabled'), 'label' => t('Status:'), 'product' => $product)),
+        '#attached' => $attached,
+      );
+    }
+
+    return parent::buildContent($product, $view_mode, $langcode, $content);
+  }
 }

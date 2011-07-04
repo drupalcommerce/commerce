@@ -259,7 +259,13 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
    * @return
    *   The renderable array.
    */
-  public function view($entities, $view_mode = 'full', $langcode = NULL) {
+  public function view($entities, $view_mode = '', $langcode = NULL) {
+    if (!isset($this->entityInfo['view modes'][$view_mode])) {
+      // Use the first view mode as the default if unspecified.
+      reset($this->entityInfo['view modes']);
+      $view_mode = key($this->entityInfo['view modes']);
+    }
+
     if (!empty($this->entityInfo['fieldable'])) {
       // Field API assumes queried entities are keyed by the idkey, thus
       // adapt the array accordingly for it.
@@ -272,14 +278,15 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
     foreach ($entities as $key => $entity) {
       $build = entity_build_content($this->entityType, $entity, $view_mode, $langcode);
       $build += array(
-      // If the entity type provides an implementation, use this instead the
-      // generic one.
+        // If the entity type provides an implementation, use this instead the
+        // generic one.
         '#theme' => 'entity',
         '#entity_type' => $this->entityType,
         '#entity' => $entity,
         '#view_mode' => $view_mode,
         '#language' => $langcode,
       );
+
       // Allow modules to modify the structured entity.
       drupal_alter(array($this->entityType . '_view', 'entity_view'), $build, $this->entityType);
       $view[$this->entityType][$key] = $build;

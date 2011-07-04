@@ -90,6 +90,8 @@ function commerce_product_entity_info() {
         'full' => array(
           'label' => t('Admin display'),
           'custom settings' => FALSE,
+          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
+          'page' => TRUE,
         ),
       ),
       'uri callback' => 'commerce_product_uri',
@@ -440,56 +442,10 @@ function commerce_product_load_multiple($product_ids = array(), $conditions = ar
  *
  * @return
  *   An array as expected by drupal_render().
+ * @deprecated since 7.x-1.0-rc1
  */
-function commerce_product_build_content($product, $view_mode = 'full', $breadcrumb = TRUE) {
-  // Remove previously built content, if it exists.
-  $product->content = array();
-
-  // Prepare a reusable array representing the CSS file to attach to the view.
-  $attached = array(
-    'css' => array(drupal_get_path('module', 'commerce_product_ui') . '/theme/commerce_product.css'),
-  );
-
-  // Add the default fields inherent to the product entity.
-  $product->content['sku'] = array(
-    '#markup' => theme('commerce_product_sku', array('sku' => check_plain($product->sku), 'label' => t('SKU:'), 'product' => $product)),
-    '#attached' => $attached,
-  );
-
-  // Only display the title and status on the full page view.
-  if ($view_mode == 'full') {
-    $product->content['title'] = array(
-      '#markup' => theme('commerce_product_title', array('title' => check_plain($product->title), 'label' => t('Title:'), 'product' => $product)),
-      '#attached' => $attached,
-    );
-
-    $product->content['status'] = array(
-      '#markup' => theme('commerce_product_status', array('status' => $product->status ? t('Active') : t('Disabled'), 'label' => t('Status:'), 'product' => $product)),
-      '#attached' => $attached,
-    );
-  }
-
-  // Build fields content.
-  field_attach_prepare_view('commerce_product', array($product->product_id => $product), $view_mode);
-  entity_prepare_view('commerce_product', array($product->product_id => $product));
-  $product->content += field_attach_view('commerce_product', $product, $view_mode);
-
-  // Allow modules to make their own additions to the product content.
-  module_invoke_all('commerce_product_view', $product, $view_mode);
-
-  // Remove the content array from the product to avoid duplicate rendering.
-  $build = $product->content;
-  unset($product->content);
-
-  $build += array(
-    '#product' => $product,
-    '#view_mode' => $view_mode,
-  );
-
-  // Allow modules to modify the final build array.
-  drupal_alter('commerce_product_view', $build);
-
-  return $build;
+function commerce_product_build_content($product, $view_mode = 'full') {
+  return entity_get_controller('commerce_product')->view(array($product->product_id => $product), $view_mode);
 }
 
 /**
