@@ -710,8 +710,8 @@ function commerce_order_state_options_list() {
  *
  * @param $conditions
  *   An array of conditions to filter the returned list by; for example, if you
- *     specify 'state' => 'cart' in the array, then only order statuses in the
- *     cart state would be included.
+ *   specify 'state' => 'cart' in the array, then only order statuses in the
+ *   cart state would be included.
  *
  * @return
  *   The array of order status objects, keyed by status name.

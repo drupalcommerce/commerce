@@ -178,7 +178,7 @@ function commerce_price_field_attach_update($entity_type, $entity) {
 }
 
 /**
- * Implementation of hook_field_is_empty().
+ * Implements of hook_field_is_empty().
  */
 function commerce_price_field_is_empty($item, $field) {
   return !isset($item['amount']) || (string) $item['amount'] == '';

@@ -59,7 +59,7 @@ function commerce_cart_menu_item_title() {
 
   // Count the number of product line items on the order.
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, 'product');
+  $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types());
 
   // Return the title with an item count appended.
   return format_plural($quantity, 'Shopping cart (1 item)', 'Shopping cart (@count items)');
@@ -253,7 +253,7 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_items'][$line_item_id]);
 
   // If the deleted line item is a product...
-  if ($line_item_wrapper->type->value() == 'product') {
+  if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
     $title = $line_item_wrapper->commerce_product->title->value();
 
     // Invoke the Rules event for removing an item from the cart so the order
@@ -344,7 +344,7 @@ function commerce_cart_form_field_ui_field_edit_form_alter(&$form, &$form_state)
   // If the current field instance is not locked and is attached to a product
   // line item type...
   if (empty($form['locked']) && $instance['entity_type'] == 'commerce_line_item' &&
-    $instance['bundle'] == 'product') {
+    in_array($instance['bundle'], commerce_product_line_item_types())) {
     // Get the current instance's line item form settings for use as default values.
     $commerce_cart_settings = commerce_cart_field_instance_access_settings($instance);
 
@@ -689,7 +689,7 @@ function commerce_cart_order_refresh($order) {
     $cloned_line_item = clone($line_item_wrapper->value());
 
     // If the line item is a product line item...
-    if ($cloned_line_item->type == 'product') {
+    if (in_array($cloned_line_item->type, commerce_product_line_item_types())) {
       // Load the product unchanged from the database so any existing price
       // adjustments aren't duplicated in this line item.
       $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
@@ -863,6 +863,9 @@ function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE
  *   - $line_item->data: data array that is saved with the line item if the line
  *     item is added to the cart as a new item; merged into an existing line
  *     item if combination is possible.
+ *   - $line_item->order_id: this property does not need to be set when calling
+ *     this function, as it will be set to the specified user's current cart
+ *     order ID.
  *   Additional field data on the line item may be considered when determining
  *   whether or not line items can be combined in the cart. This includes the
  *   line item type, referenced product, and any line item fields that have been
@@ -994,7 +997,7 @@ function commerce_cart_order_product_line_item_delete($order, $line_item_id, $sk
   $line_item = commerce_line_item_load($line_item_id);
 
   // Check to ensure the line item exists and is a product line item.
-  if (!$line_item || $line_item->type != 'product') {
+  if (!$line_item || !in_array($line_item->type, commerce_product_line_item_types())) {
     return $order;
   }
 

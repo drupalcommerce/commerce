@@ -691,6 +691,9 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
  *   not given).
  * @param $limit
  *   If non-zero, limit the size of the result set.
+ * @param $access_tag
+ *   Boolean indicating whether or not an access control tag should be added to
+ *   the query to find matching product data. Defaults to FALSE.
  *
  * @return
  *   An array of valid products in the form:
@@ -703,7 +706,7 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
  *     ...
  *   )
  */
-function commerce_product_match_products($field, $instance = NULL, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
+function commerce_product_match_products($field, $instance = NULL, $string = '', $match = 'contains', $ids = array(), $limit = NULL, $access_tag = FALSE) {
   $results = &drupal_static(__FUNCTION__, array());
 
   // Create unique id for static cache.
@@ -715,7 +718,7 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
   ));
 
   if (!isset($results[$cid])) {
-    $matches = _commerce_product_match_products_standard($instance, $string, $match, $ids, $limit);
+    $matches = _commerce_product_match_products_standard($instance, $string, $match, $ids, $limit, $access_tag);
 
     // Store the results.
     $results[$cid] = !empty($matches) ? $matches : array();
@@ -729,10 +732,15 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
  *
  * Returns an array of products matching the specific parameters.
  */
-function _commerce_product_match_products_standard($instance, $string = '', $match = 'contains', $ids = array(), $limit = NULL) {
+function _commerce_product_match_products_standard($instance, $string = '', $match = 'contains', $ids = array(), $limit = NULL, $access_tag = FALSE) {
   // Build the query object with the necessary fields.
-  $query = db_select('commerce_product', 'cp')
-    ->addTag('commerce_product_access');
+  $query = db_select('commerce_product', 'cp');
+
+  // Add the access control tag if specified.
+  if ($access_tag) {
+    $query->addTag('commerce_product_access');
+  }
+
   $product_id_alias = $query->addField('cp', 'product_id');
   $product_sku_alias = $query->addField('cp', 'sku');
   $product_title_alias = $query->addField('cp', 'title');

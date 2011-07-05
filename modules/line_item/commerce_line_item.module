@@ -383,6 +383,7 @@ function commerce_line_item_types() {
 
     foreach ($line_item_types as $type => &$line_item_type) {
       $defaults = array(
+        'product' => FALSE,
         'base' => $type,
         'callbacks' => array(),
       );
@@ -1259,14 +1260,14 @@ function commerce_line_item_property_info_callback(&$info, $entity_type, $field,
  *
  * @param $line_items
  *   The array of line items whose quantities you want to count; also accepts an
- *     EntityListWrapper of a line item reference field.
- * @param $type
- *   Optional type string to filter line items by type before counting.
+ *   EntityListWrapper of a line item reference field.
+ * @param $types
+ *   An array of line item types to filter by before counting.
  *
  * @return
  *   The total quantity of all the matching line items.
  */
-function commerce_line_items_quantity($line_items, $type = '') {
+function commerce_line_items_quantity($line_items, $types = array()) {
   // Sum up the quantity of all matching line items.
   $quantity = 0;
 
@@ -1275,7 +1276,7 @@ function commerce_line_items_quantity($line_items, $type = '') {
       $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
     }
 
-    if (empty($type) || $line_item->type->value() == $type) {
+    if (empty($type) || in_array($line_item->type->value(), $types)) {
       $quantity += $line_item->quantity->value();
     }
   }
@@ -1290,7 +1291,7 @@ function commerce_line_items_quantity($line_items, $type = '') {
  *   The array of line items whose quantities you want to count; also accepts an
  *   EntityListWrapper of a line item reference field.
  * @param $type
- *   Optional type string to filter line items by type before counting.
+ *   An array of line item types to filter by before totaling.
  *
  * @return
  *   An associative array of containing the total 'amount' and 'currency_code'
@@ -1298,7 +1299,7 @@ function commerce_line_items_quantity($line_items, $type = '') {
  *
  * @see commerce_order_calculate_total()
  */
-function commerce_line_items_total($line_items, $type = '') {
+function commerce_line_items_total($line_items, $types = array()) {
   // First determine the currency to use for the order total. This code has
   // been copied and modifed from commerce_order_calculate_total(). It is worth
   // considering abstracting this code into a separate API function that both
@@ -1347,7 +1348,7 @@ function commerce_line_items_total($line_items, $type = '') {
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_wrapper);
     }
 
-    if (empty($type) || $line_item_wrapper->type->value() == $type) {
+    if (empty($type) || in_array($line_item_wrapper->type->value(), $types)) {
       $total += commerce_currency_convert(
         $line_item_wrapper->commerce_total->amount->value(),
         $line_item_wrapper->commerce_total->currency_code->value(),

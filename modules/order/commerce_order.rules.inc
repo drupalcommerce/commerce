@@ -230,7 +230,7 @@ function commerce_order_rules_contains_product($order, $sku, $operator, $value) 
 
     // Populate the array of the quantities of the products on the order.
     foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-      if ($line_item_wrapper->type->value() == 'product') {
+      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
         // Extract a product ID and quantity from the line item.
         $line_item_sku = $line_item_wrapper->commerce_product->sku->value();
         $quantity = $line_item_wrapper->quantity->value();
@@ -275,7 +275,7 @@ function commerce_order_rules_compare_total_quantity($order, $operator, $value) 
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
     if (!empty($wrapper->commerce_line_items)) {
-      $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, 'product');
+      $quantity = commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types());
     }
   }
 

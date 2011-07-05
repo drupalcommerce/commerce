@@ -7,6 +7,95 @@
 
 
 /**
+ * Defines line item types that serve as bundles of the line item entity type.
+ *
+ * The Line Item module uses this hook to collect information on the line item
+ * types enabled on the site. A line item is any aspect of an order that adds to
+ * (or subtracts from) the order total. Each line item must be of one of the
+ * defined line item types, which defines how it interacts with the shopping
+ * cart, order edit interface, and other parts of Commerce.
+ *
+ * When modules are enabled that implement hook_commerce_line_item_type_info(),
+ * the Line Item module will detect it and perform initial configuration of the
+ * line item type by adding locked unit price and total price fields to the new
+ * bundle. It then allows the module defining the line item type to perform any
+ * additional configuration through the use of a special callback defined in the
+ * line item type’s definition. Any additional fields required by line items of
+ * this type can be added here, such as the product reference and display path
+ * fields added to the core Product line item type.
+ *
+ * Core line item types include:
+ * - Product: defined by the Product Reference module, this line item type
+ *   references a product and uses the SKU and special view modes for display
+ *   in line item interfaces.
+ *
+ * A single line item type array is referred to as $line_item_type.
+ * An array of line item type arrays keyed is referred to as $line_item_types.
+ * The type value of a line item type is referred to as $type.
+ *
+ * @return
+ *   An array of line item type info arrays keyed by the type string. Line item
+ *   type info arrays are associative arrays containing the following keys:
+ *   - type: string containing the machine-name of the line item type; should
+ *     only include lowercase letters, numbers, -, and _.
+ *   - name: the translatable name of the line item type, used in administrative
+ *     interfaces including the “Add line item” form on the order edit page.
+ *   - description: a translatable description of the intended use of line items
+ *     of this type.
+ *   - product: boolean indicating whether or not this line item type functions
+ *     as a product in various systems, such as the Add to Cart form. If set to
+ *     TRUE, the line item type must also contain the fields added to the base
+ *     product line item type, commerce_product and commerce_display_path. To
+ *     achieve this the line item type can reuse the configuration callback
+ *     of the Product line item type, commerce_product_line_item_configuration().
+ *   - add_form_submit_value: the translatable value of the submit button used
+ *     for adding line items of this type to an order.
+ *   - base: string used as the base for the magically constructed callback
+ *     names, each of which will be defaulted to [base]_[callback] unless
+ *     explicitly set in the callbacks array; defaults to the type.
+ *   - callbacks: an array of callback function names for the various types of
+ *     callback required for all the line item type operations (arguments per
+ *     callback in parentheses):
+ *     - configuration(): configures the line item type for use, typically by
+ *       adding additional fields to the line item type.
+ *     - title($line_item): returns a sanitized title of the line item for use
+ *       in Views and other displays.
+ *     - add_form(): returns the form elements necessary to add a line item of
+ *       this type to an order via a line item manager widget.
+ *     - add_form_submit(&$line_item, $element, &$form_state, $form): processes
+ *       the input from the "Add line item" form elements for this line item
+ *       type, adding data to the new line item object; should return an error
+ *       message if the line item should not be added for some reason.
+ *
+ * @see hook_commerce_line_item_type_info_alter()
+ */
+function hook_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types['product'] = array(
+    'type' => 'product',
+    'name' => t('Product'),
+    'description' => t('References a product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
+ * Allows modules to alter the line item types info array.
+ *
+ * @param &$line_item_types
+ *   An array of line item type info arrays keyed by type.
+ */
+function hook_commerce_line_item_type_info_alter(&$line_item_types) {
+  // No example.
+}
+
+
+/**
  * Defines links for use in line item summary area handlers on Views.
  *
  * The line item summary area handler totals the value of the various line items

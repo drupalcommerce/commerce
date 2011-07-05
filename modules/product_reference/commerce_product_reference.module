@@ -242,6 +242,16 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function commerce_product_reference_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'commerce_product_reference') . '/includes/views',
+  );
+}
+
+/**
  * Implements hook_field_info().
  */
 function commerce_product_reference_field_info() {
@@ -608,24 +618,6 @@ function commerce_product_reference_options_list($field) {
 }
 
 /**
- * Implements hook_commerce_line_item_type_info().
- */
-function commerce_product_reference_commerce_line_item_type_info() {
-  return array(
-    'product' => array(
-      'type' => 'product',
-      'name' => t('Product'),
-      'description' => t('References a product and displays it with the SKU as the label.'),
-      'add_form_submit_value' => t('Add product'),
-      'base' => 'commerce_product_line_item',
-      'callbacks' => array(
-        'configuration' => 'commerce_product_reference_configure_line_item',
-      ),
-    ),
-  );
-}
-
-/**
  * Implements hook_entity_info_alter().
  *
  * Adds the line item and the product display-specific views mode to the product.
@@ -652,79 +644,6 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
 
         // UX: Enable the 'Node: teaser' mode by default, if present.
         'custom settings' => $entity_type == 'node' && $view_mode == 'teaser',
-      );
-    }
-  }
-}
-
-/**
- * Implements hook_field_views_data().
- */
-function commerce_product_reference_field_views_data($field) {
-  $data = field_views_field_default_views_data($field);
-
-  // Add a join to commerce_product so that it can be used by the inverse relationship.
-  $data[_field_sql_storage_tablename($field)]['table']['join']['commerce_product'] = array(
-    'left_field' => 'product_id',
-    'field' => $field['field_name'] . '_product_id',
-    'extra' => array(
-      array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
-    ),
-  );
-
-  // Build an array of bundles the product reference field appears on.
-  $bundles = array();
-
-  foreach ($field['bundles'] as $entity => $bundles) {
-    $bundles[] = $entity . ' (' . implode(', ', $bundles) . ')';
-  }
-
-  foreach ($data as $table_name => $table_data) {
-    foreach ($table_data as $field_name => $field_data) {
-      if (isset($field_data['filter']['field_name']) && $field_name != 'delta') {
-        $data[$table_name][$field_name]['relationship'] = array(
-          'title' => t('Referenced product'),
-          'help' => t('Appears in: @bundles', array('@bundles' => implode(', ', $bundles))),
-          'base' => 'commerce_product',
-          'base field' => 'product_id',
-          'handler' => 'views_handler_relationship',
-          'label' => t('Product'),
-        );
-      }
-    }
-  }
-
-  return $data;
-}
-
-/**
- * Implements hook_views_data_alter().
- *
- * Adds inverse relationships between the product and entity types referencing
- * it (for example, nodes).
- */
-function commerce_product_reference_views_data_alter(&$data) {
-  foreach (field_info_fields() as $field_name => $field) {
-    if ($field['type'] !== 'commerce_product_reference') {
-      continue;
-    }
-
-    foreach ($field['bundles'] as $entity_type => $bundles) {
-      if ($entity_type == 'commerce_line_item') {
-        continue;
-      }
-
-      $entity_info = entity_get_info($entity_type);
-      $data['commerce_product'][$field['field_name']]['relationship'] = array(
-        'handler' => 'views_handler_relationship',
-        'base' => $entity_info['base table'],
-        'base field' => $entity_info['entity keys']['id'],
-        'relationship table' => _field_sql_storage_tablename($field),
-        'relationship field' => 'entity_id',
-
-        'label' => t('!entity_type referencing products from !field_name', array('!entity_type' => $entity_info['label'], '!field_name' => $field['field_name'])),
-        'title' => t('!entity_type referencing products from !field_name', array('!entity_type' => $entity_info['label'],  '!field_name' => $field['field_name'])),
-        'help' => t('Relate a product to the !entity_type referencing it.', array('!entity_type' => strtolower($entity_info['label']))),
       );
     }
   }
@@ -796,19 +715,41 @@ function commerce_product_reference_create_instance($field_name, $entity_type, $
 }
 
 /**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function commerce_product_reference_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types['product'] = array(
+    'type' => 'product',
+    'name' => t('Product'),
+    'description' => t('References a product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
  * Ensures the product line item type contains a product reference field.
  *
  * This function is called by the line item module when it is enabled or this
  * module is enabled. It invokes this function using the configuration_callback
- * as specified above.
+ * as specified above. Other modules defining product line item types should
+ * use this function to ensure their types have the required fields.
+ *
+ * @param $type
+ *   The machine-name of the line item type being configured.
  */
-function commerce_product_reference_configure_line_item() {
-  commerce_product_reference_create_instance('commerce_product', 'commerce_line_item', 'product', t('Product'));
+function commerce_product_line_item_configuration($type = 'product') {
+  commerce_product_reference_create_instance('commerce_product', 'commerce_line_item', $type, t('Product'));
 
   // Look for or add a display path textfield to the product line item type.
   $field_name = 'commerce_display_path';
   $field = field_info_field($field_name);
-  $instance = field_info_instance('commerce_line_item', $field_name, 'product');
+  $instance = field_info_instance('commerce_line_item', $field_name, $type);
 
   if (empty($field)) {
     $field = array(
@@ -826,7 +767,7 @@ function commerce_product_reference_configure_line_item() {
     $instance = array(
       'field_name' => $field_name,
       'entity_type' => 'commerce_line_item',
-      'bundle' => 'product',
+      'bundle' => $type,
       'label' => t('Display path'),
       'required' => TRUE,
       'settings' => array(),
@@ -927,14 +868,19 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   data array may be used on line item creation:
  *   - $data['context']['display_path']: if present will be used to set the line
  *     item's display_path field value.
+ * @param $type
+ *   The type of product line item to create. Must be a product line item as
+ *   defined in the line item type info array, and the line item type must
+ *   include the expected product related fields. Defaults to the base product
+ *   line item type defined by the Product Reference module.
  *
  * @return
  *   The fully loaded line item populated with the product data as specified.
  */
-function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $data = array()) {
+function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $data = array(), $type = 'product') {
   // Create the new line item.
   $line_item = entity_create('commerce_line_item', array(
-    'type' => 'product',
+    'type' => $type,
     'order_id' => $order_id,
     'quantity' => $quantity,
     'data' => $data,
@@ -989,6 +935,21 @@ function commerce_product_line_item_populate($line_item, $product) {
 }
 
 /**
+ * Returns an array of product line item types.
+ */
+function commerce_product_line_item_types() {
+  $types = array();
+
+  foreach (commerce_line_item_types() as $type => $line_item_type) {
+    if (!empty($line_item_type['product'])) {
+      $types[] = $type;
+    }
+  }
+
+  return $types;
+}
+
+/**
  * Implements hook_commerce_product_can_delete().
  */
 function commerce_product_reference_commerce_product_can_delete($product) {
@@ -998,7 +959,7 @@ function commerce_product_reference_commerce_product_can_delete($product) {
 
   $query
     ->entityCondition('entity_type', 'commerce_line_item', '=')
-    ->entityCondition('bundle', 'product', '=')
+    ->entityCondition('bundle', commerce_product_line_item_types(), 'IN')
     ->fieldCondition('commerce_product', 'product_id', $product->product_id, '=')
     ->count();
 
