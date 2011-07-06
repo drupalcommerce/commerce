@@ -383,6 +383,7 @@ function commerce_line_item_types() {
 
     foreach ($line_item_types as $type => &$line_item_type) {
       $defaults = array(
+        'type' => $type,
         'product' => FALSE,
         'base' => $type,
         'callbacks' => array(),
@@ -484,7 +485,7 @@ function commerce_line_item_configure_line_item_type($line_item_type) {
   // If this line item type specifies a configuration callback...
   if ($callback = commerce_line_item_type_callback($line_item_type, 'configuration')) {
     // Invoke it now.
-    $callback();
+    $callback($line_item_type);
   }
 }
 

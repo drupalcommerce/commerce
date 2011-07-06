@@ -1736,8 +1736,8 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
 
   // If the line item passed to the function is new...
   if (empty($form_state['line_item']->line_item_id)) {
-    // Create the new product line item.
-    $line_item = commerce_product_line_item_new($product, $form_state['values']['quantity'], 0, $form_state['line_item']->data);
+    // Create the new product line item of the same type.
+    $line_item = commerce_product_line_item_new($product, $form_state['values']['quantity'], 0, $form_state['line_item']->data, $form_state['line_item']->type);
 
     // Add field data to the line item.
     field_attach_submit('commerce_line_item', $line_item, $form['line_item_fields'], $form_state);
@@ -1781,6 +1781,7 @@ function commerce_cart_field_formatter_info() {
         'show_quantity' => FALSE,
         'default_quantity' => 1,
         'combine' => TRUE,
+        'line_item_type' => 'product',
       ),
     ),
   );
@@ -1791,18 +1792,11 @@ function commerce_cart_field_formatter_info() {
  */
 function commerce_cart_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
-  $settings = $display['settings'];
+  $settings = array_merge(field_info_formatter_settings($display['type']), $display['settings']);
 
   $element = array();
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
-    // Initialize the settings array so it contains all possible values.
-    $settings += array(
-      'show_quantity' => FALSE,
-      'default_quantity' => 1,
-      'combine' => TRUE,
-    );
-
     $element['show_quantity'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display a textfield quantity widget on the add to cart form.'),
@@ -1823,6 +1817,24 @@ function commerce_cart_field_formatter_settings_form($field, $instance, $view_mo
       '#description' => t('The line item type, referenced product, and data from fields exposed on the Add to Cart form must all match to combine.'),
       '#default_value' => $settings['combine'],
     );
+
+    // Add a conditionally visible line item type element.
+    $types = commerce_product_line_item_types();
+
+    if (count($types) > 1) {
+      $element['line_item_type'] = array(
+        '#type' => 'select',
+        '#title' => t('Add to Cart line item type'),
+        '#options' => array_intersect_key(commerce_line_item_type_get_name(), drupal_map_assoc($types)),
+        '#default_value' => $settings['line_item_type'],
+      );
+    }
+    else {
+      $element['line_item_type'] = array(
+        '#type' => 'hidden',
+        '#value' => key($types),
+      );
+    }
   }
 
   return $element;
@@ -1842,23 +1854,20 @@ function commerce_cart_field_formatter_settings_form_quantity_validate($element,
  */
 function commerce_cart_field_formatter_settings_summary($field, $instance, $view_mode) {
   $display = $instance['display'][$view_mode];
-  $settings = $display['settings'];
+  $settings = array_merge(field_info_formatter_settings($display['type']), $display['settings']);
 
   $summary = array();
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
-    // Initialize the settings array so it contains all possible values.
-    $settings += array(
-      'show_quantity' => FALSE,
-      'default_quantity' => 1,
-      'combine' => TRUE,
-    );
-
     $summary = array(
       t('Quantity widget: !status', array('!status' => $settings['show_quantity'] ? t('Enabled') : t('Disabled'))),
       t('Default quantity: @quantity', array('@quantity' => $settings['default_quantity'])),
       t('Combine like items: !status', array('!status' => $settings['combine'] ? t('Enabled') : t('Disabled'))),
     );
+
+    if (count(commerce_product_line_item_types()) > 1) {
+      $summary[] = t('Add to Cart line item type: @type', array('@type' => commerce_line_item_type_get_name($settings['line_item_type'])));
+    }
   }
 
   return implode('<br />', $summary);
@@ -1868,7 +1877,7 @@ function commerce_cart_field_formatter_settings_summary($field, $instance, $view
  * Implements hook_field_formatter_view().
  */
 function commerce_cart_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-  $settings = $display['settings'];
+  $settings = array_merge(field_info_formatter_settings($display['type']), $display['settings']);
   $result = array();
 
   // Collect the list of product IDs.
@@ -1879,19 +1888,12 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
   }
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
-    // Initialize the settings array so it contains all possible values.
-    $settings += array(
-      'show_quantity' => FALSE,
-      'default_quantity' => 1,
-      'combine' => TRUE,
-    );
-
     // Load the referenced products.
     $products = commerce_product_load_multiple($product_ids);
 
     // Check to ensure products are referenced, before returning results.
     if (!empty($products)) {
-      $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity']);
+      $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity'], 0, array(), $settings['line_item_type']);
       $line_item->data['context']['product_ids'] = array_keys($products);
       $line_item->data['context']['add_to_cart_combine'] = $settings['combine'];
 

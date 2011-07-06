@@ -624,7 +624,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['commerce_total']['empty_zero'] = 0;
   $handler->display->display_options['fields']['commerce_total']['hide_alter_empty'] = 0;
   $handler->display->display_options['fields']['commerce_total']['click_sort_column'] = 'amount';
-  $handler->display->display_options['fields']['commerce_total']['type'] = 'commerce_price_formatted_components';
+  $handler->display->display_options['fields']['commerce_total']['type'] = 'commerce_price_formatted_amount';
   $handler->display->display_options['fields']['commerce_total']['settings'] = array(
     'calculation' => FALSE,
   );

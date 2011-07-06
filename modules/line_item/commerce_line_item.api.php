@@ -56,8 +56,8 @@
  *   - callbacks: an array of callback function names for the various types of
  *     callback required for all the line item type operations (arguments per
  *     callback in parentheses):
- *     - configuration(): configures the line item type for use, typically by
- *       adding additional fields to the line item type.
+ *     - configuration($line_item_type): configures the line item type for use,
+ *       typically by adding additional fields to the line item type.
  *     - title($line_item): returns a sanitized title of the line item for use
  *       in Views and other displays.
  *     - add_form(): returns the form elements necessary to add a line item of

@@ -54,7 +54,10 @@ function theme_line_item_type_admin_overview($variables) {
 
   $output = check_plain($line_item_type['name']);
   $output .= ' <small> (Machine name: ' . check_plain($line_item_type['type']) . ')</small>';
-  $output .= '<div class="description">' . filter_xss_admin($line_item_type['description']) . '</div>';
+
+  if (!empty($line_item_type['description'])) {
+    $output .= '<div class="description">' . filter_xss_admin($line_item_type['description']) . '</div>';
+  }
 
   return $output;
 }

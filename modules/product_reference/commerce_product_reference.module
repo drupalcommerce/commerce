@@ -721,7 +721,6 @@ function commerce_product_reference_commerce_line_item_type_info() {
   $line_item_types = array();
 
   $line_item_types['product'] = array(
-    'type' => 'product',
     'name' => t('Product'),
     'description' => t('References a product and displays it with the SKU as the label.'),
     'product' => TRUE,
@@ -740,10 +739,13 @@ function commerce_product_reference_commerce_line_item_type_info() {
  * as specified above. Other modules defining product line item types should
  * use this function to ensure their types have the required fields.
  *
- * @param $type
- *   The machine-name of the line item type being configured.
+ * @param $line_item_type
+ *   The info array of the line item type being configured.
  */
-function commerce_product_line_item_configuration($type = 'product') {
+function commerce_product_line_item_configuration($line_item_type) {
+  $type = $line_item_type['type'];
+
+  // Create the product reference field for the line item type.
   commerce_product_reference_create_instance('commerce_product', 'commerce_line_item', $type, t('Product'));
 
   // Look for or add a display path textfield to the product line item type.
