@@ -16,12 +16,14 @@ function commerce_order_entity_info() {
       'controller class' => 'CommerceOrderEntityController',
       'base table' => 'commerce_order',
       'revision table' => 'commerce_order_revision',
+      'load hook' => 'commerce_order_load',
+      'uri callback' => 'commerce_order_uri',
+      'label callback' => 'commerce_order_label',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'order_id',
-        'bundle' => 'type',
         'revision' => 'revision_id',
-        'label' => 'order_number',
+        'bundle' => 'type',
       ),
       'bundle keys' => array(
         'bundle' => 'type',
@@ -31,7 +33,6 @@ function commerce_order_entity_info() {
           'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
         ),
       ),
-      'load hook' => 'commerce_order_load',
       'view modes' => array(
         'administrator' => array(
           'label' => t('Administrator'),
@@ -46,7 +47,6 @@ function commerce_order_entity_info() {
           'page' => TRUE,
         ),
       ),
-      'uri callback' => 'commerce_order_uri',
       'token type' => 'commerce-order',
       'metadata controller class' => '',
       'access callback' => 'commerce_entity_access',
@@ -75,6 +75,13 @@ function commerce_order_uri($order) {
   }
 
   return NULL;
+}
+
+/**
+ * Entity label callback: returns the label for an individual order.
+ */
+function commerce_order_label($entity, $entity_type) {
+  return t('Order @number', array('@number' => $entity->order_number));
 }
 
 /**
@@ -393,6 +400,7 @@ function commerce_order_load_multiple($order_ids = array(), $conditions = array(
  *
  * @return
  *   An array as expected by drupal_render().
+ *
  * @deprecated since 7.x-1.0-rc1
  */
 function commerce_order_build_content($order, $view_mode = 'administrator') {

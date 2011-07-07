@@ -233,16 +233,17 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
     if (!empty($this->entityInfo['fieldable'])) {
       $entity->content += field_attach_view($this->entityType, $entity, $view_mode, $langcode);
     }
+
     // Invoke hook_ENTITY_view() to allow modules to add their additions.
-    if (module_exists('rules')) {
-      rules_invoke_all($this->entityType . '_view', $entity, $view_mode, $langcode);
-    }
-    else {
-      module_invoke_all($this->entityType . '_view', $entity, $view_mode, $langcode);
-    }
+    rules_invoke_all($this->entityType . '_view', $entity, $view_mode, $langcode);
+
+    // Invoke the more generic hook_entity_view() to allow the same.
     module_invoke_all('entity_view', $entity, $this->entityType, $view_mode, $langcode);
+
+    // Remove the build array information from the entity and return it.
     $build = $entity->content;
     unset($entity->content);
+
     return $build;
   }
 
@@ -260,26 +261,29 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
    *   The renderable array.
    */
   public function view($entities, $view_mode = '', $langcode = NULL) {
+    // If no view mode is specified, use the first one available..
     if (!isset($this->entityInfo['view modes'][$view_mode])) {
-      // Use the first view mode as the default if unspecified.
       reset($this->entityInfo['view modes']);
       $view_mode = key($this->entityInfo['view modes']);
     }
 
+    // Field API assumes queried entities are keyed by the idkey, thus adapt the
+    // array accordingly for it.
     if (!empty($this->entityInfo['fieldable'])) {
-      // Field API assumes queried entities are keyed by the idkey, thus
-      // adapt the array accordingly for it.
       field_attach_prepare_view($this->entityType, $entities, $view_mode);
     }
+
     entity_prepare_view($this->entityType, $entities);
     $langcode = isset($langcode) ? $langcode : $GLOBALS['language_content']->language;
-
     $view = array();
+
+    // Build the content array for each entity passed in.
     foreach ($entities as $key => $entity) {
       $build = entity_build_content($this->entityType, $entity, $view_mode, $langcode);
+
+      // Add default properties to the array to ensure the content is passed
+      // through the theme layer.
       $build += array(
-        // If the entity type provides an implementation, use this instead the
-        // generic one.
         '#theme' => 'entity',
         '#entity_type' => $this->entityType,
         '#entity' => $entity,
@@ -291,6 +295,7 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       drupal_alter(array($this->entityType . '_view', 'entity_view'), $build, $this->entityType);
       $view[$this->entityType][$key] = $build;
     }
+
     return $view;
   }
 

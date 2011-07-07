@@ -140,14 +140,14 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
    * @param $entity
    *   An entity object.
    * @param $view_mode
-   *   View mode, e.g. 'full', 'teaser'...
+   *   View mode, e.g. 'administrator'
    * @param $langcode
    *   (optional) A language code to use for rendering. Defaults to the global
    *   content language of the current request.
    * @return
    *   The renderable array.
    */
-  public function buildContent($transaction, $view_mode = 'full', $langcode = NULL, $content = array()) {
+  public function buildContent($transaction, $view_mode = 'administrator', $langcode = NULL, $content = array()) {
     // Load the order this transaction is attached to.
     $order = commerce_order_load($transaction->order_id);
 
@@ -194,6 +194,6 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
       '#markup' => theme('table', array('rows' => $rows, 'attributes' => array('class' => array('payment-transaction')))),
     );
 
-    return parent::buildContent($product, $view_mode, $langcode, $content);
+    return parent::buildContent($transaction, $view_mode, $langcode, $content);
   }
 }

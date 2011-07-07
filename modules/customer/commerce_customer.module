@@ -29,17 +29,16 @@ function commerce_customer_entity_info() {
       'bundles' => array(),
       'load hook' => 'commerce_customer_profile_load',
       'view modes' => array(
+        // Neither of these provide a full view of the profile but rather give
+        // the summary of field data as seen on the checkout form or in the
+        // customer profile reference field's display formatter.
         'administrator' => array(
           'label' => t('Administrator'),
           'custom settings' => FALSE,
-          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
-          'page' => TRUE,
         ),
         'customer' => array(
           'label' => t('Customer'),
           'custom settings' => FALSE,
-          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
-          'page' => TRUE,
         ),
       ),
       'uri callback' => 'commerce_customer_profile_uri',
@@ -415,6 +414,7 @@ function commerce_customer_profile_load_multiple($profile_ids = array(), $condit
  *
  * @return
  *   An array as expected by drupal_render().
+ *
  * @deprecated since 7.x-1.0-rc1
  */
 function commerce_customer_profile_build_content($profile, $view_mode = 'administrator') {

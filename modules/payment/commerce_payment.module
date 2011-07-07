@@ -787,6 +787,7 @@ function commerce_payment_transaction_delete_multiple($transaction_ids) {
  *
  * @return
  *   An array as expected by drupal_render().
+ *
  * @deprecated since 7.x-1.0-rc1
  */
 function commerce_payment_transaction_build_content($order, $transaction, $view_mode = 'administrator') {
