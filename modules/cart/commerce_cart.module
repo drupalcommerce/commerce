@@ -1893,7 +1893,8 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
 
     // Check to ensure products are referenced, before returning results.
     if (!empty($products)) {
-      $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity'], 0, array(), $settings['line_item_type']);
+      $type = !empty($settings['line_item_type']) ? $settings['line_item_type'] : 'product';
+      $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity'], 0, array(), $type);
       $line_item->data['context']['product_ids'] = array_keys($products);
       $line_item->data['context']['add_to_cart_combine'] = $settings['combine'];
 

@@ -880,6 +880,11 @@ function commerce_product_line_item_add_form_submit(&$line_item, $element, &$for
  *   The fully loaded line item populated with the product data as specified.
  */
 function commerce_product_line_item_new($product, $quantity = 1, $order_id = 0, $data = array(), $type = 'product') {
+  // Ensure a default product line item type.
+  if (empty($type)) {
+    $type = 'product';
+  }
+
   // Create the new line item.
   $line_item = entity_create('commerce_line_item', array(
     'type' => $type,
