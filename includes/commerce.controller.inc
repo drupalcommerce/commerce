@@ -267,8 +267,6 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       $view_mode = key($this->entityInfo['view modes']);
     }
 
-    // Field API assumes queried entities are keyed by the idkey, thus adapt the
-    // array accordingly for it.
     if (!empty($this->entityInfo['fieldable'])) {
       field_attach_prepare_view($this->entityType, $entities, $view_mode);
     }
