@@ -741,8 +741,8 @@ function commerce_order_statuses($conditions = array()) {
       $valid = TRUE;
 
       foreach ($conditions as $property => $value) {
-        // If the current value for the specified property on the pane does not
-        // match the filter value...
+        // If the current value for the specified property on the status does
+        // not match the filter value...
         if ($order_status[$property] != $value) {
           // Do not add it to the temporary array.
           $valid = FALSE;

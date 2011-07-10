@@ -161,13 +161,32 @@ function hook_commerce_line_item_summary_link_info_alter(&$links) {
 }
 
 /**
- * Allows you to prepare line item data before it is saved on insert or update.
+ * Allows you to add additional components to a line item's unit price when the
+ * price is being rebased due to a manual adjustment.
  *
+ * When a line item's unit price is adjusted via the line item manager widget,
+ * its components need to be recalculated using the given price as the new base
+ * price. Otherwise old component data will be used when calculating the total
+ * of the order, causing it not to match with the actual line item total.
+ *
+ * The function that invokes this hook first sets the base price to the new unit
+ * price amount and currency code and allows other modules to add additional
+ * components to the new components array as required based on the components of
+ * the price from before the edit.
+ *
+ * @param &$price
+ *   A price array representing the new unit price. New components should be
+ *   added to this price's data array.
+ * @param $old_components
+ *   The old unit price components array extracted from the line item before the
+ *   hook is invoked. The unit price on the line item will already be reset at
+ *   this time, so the components must be preserved in this array.
  * @param $line_item
- *   The line item object to be saved.
+ *   The line item object whose unit price is being rebased.
  *
- * @see rules_invoke_all()
+ * @see commerce_line_item_rebase_unit_price()
+ * @see commerce_price_component_add()
  */
-function hook_commerce_line_item_presave_insert(&$line_item) {
+function hook_commerce_line_item_rebase_unit_price(&$price, $old_components, $line_item) {
   // No example.
 }

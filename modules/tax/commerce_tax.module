@@ -131,6 +131,7 @@ function commerce_tax_commerce_price_component_type_info() {
       $components[$tax_rate['price_component']] = array(
         'title' => $tax_rate['title'],
         'display_title' => $tax_rate['display_title'],
+        'tax_rate' => $name,
       );
     }
   }
@@ -296,6 +297,8 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
  */
 function commerce_tax_rate_calculate($tax_rate, $line_item_wrapper) {
   // By default, do not duplicate a tax that's already on the line item.
+  // TODO: Support cumulative non-display-inclusive tax rates by calculating
+  // based on the component total instead of the unit price amount.
   if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), $tax_rate['price_component'])) {
     return array(
       'amount' => $line_item_wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'],
@@ -425,6 +428,7 @@ function commerce_tax_price_field_validate($element, &$form_state) {
 
     // Add the tax to the data array.
     $component['amount'] = $price['amount'] - $amount;
+    $component['data']['tax_rate'] = $tax_rate;
 
     $price['data'] = commerce_price_component_add($price, $tax_rate['price_component'], $component, TRUE);
   }
@@ -437,4 +441,82 @@ function commerce_tax_price_field_validate($element, &$form_state) {
   $parents[] = 'data';
 
   form_set_value(array('#parents' => $parents), $price['data'], $form_state);
+}
+
+/**
+ * Implements hook_commerce_line_item_rebase_unit_price().
+ */
+function commerce_tax_commerce_line_item_rebase_unit_price(&$price, $old_components, $line_item) {
+  $inclusive_taxes = array();
+
+  // Loop over the old components looking for taxes that were applied.
+  foreach ($old_components as $key => $component) {
+    // Find tax components based on the tax_rate property the Tax modules adds
+    // to tax rate component types.
+    if ($component_type = commerce_price_component_type_load($component['name'])) {
+      // Ensure the tax rate still exists.
+      if (!empty($component_type['tax_rate']) &&
+        $tax_rate = commerce_tax_rate_load($component_type['tax_rate'])) {
+        // If this tax is displayed inclusively with product prices, add it to an
+        // array that we'll calculate in reverse order later.
+        if ($component['included']) {
+          $inclusive_taxes[] = $tax_rate;
+        }
+        else {
+          // Otherwise assume we'll just have sales taxes and add this one now.
+          // Note that this means component arrays that mix display inclusive
+          // and non-display inclusive tax types will not be supported; however,
+          // this shouldn't be possible in real world scenarios.
+          $tax_price = $tax_rate['calculation_callback']($tax_rate, entity_metadata_wrapper('commerce_line_item', $line_item));
+
+          // If we received a valid price array, add it as a component.
+          if (!empty($tax_price)) {
+            $price['data'] = commerce_price_component_add($price, $tax_rate['price_component'], $tax_price, FALSE);
+          }
+        }
+      }
+    }
+  }
+
+  // If this unit price had inclusive taxes...
+  if (!empty($inclusive_taxes)) {
+    // We assume the first price component is the base price component that we
+    // will deduct the included tax amount from. If it isn't, exit without
+    // applying taxes because we would not be able to update the base price.
+    if ($price['data']['components'][0]['name'] != 'base_price') {
+      return;
+    }
+
+    // Prepare an array of tax price components.
+    $tax_components = array();
+
+    // Calculate these taxes in reverse order to accommodate cumulative display
+    // inclusive tax rates.
+    foreach (array_reverse($inclusive_taxes) as $tax_rate) {
+      // The amount of this tax is determined by dividing the current base price
+      // by 1 + the tax rate expressed as a decimal (i.e. 1.1 for a 10% tax).
+      // The result is the base price against which the tax would have been
+      // applied, so the difference becomes our tax amount.
+      $pretax_base = $price['data']['components'][0]['price']['amount'] / (1 + $tax_rate['rate']);
+      $tax_amount = $price['data']['components'][0]['price']['amount'] - $pretax_base;
+
+      // Update the base price component.
+      $price['data']['components'][0]['price']['amount'] = $pretax_base;
+
+      // Prepare a tax component that will be added to the price after every tax
+      // has been calculated.
+      $tax_components[$tax_rate['price_component']] = array(
+        'amount' => $tax_amount,
+        'currency_code' => $price['currency_code'],
+        'data' => array(
+          'tax_rate' => $tax_rate,
+        ),
+      );
+    }
+
+    // Add their components to the price in their order of appearance, though.
+    foreach (array_reverse($tax_components, TRUE) as $name => $tax_component) {
+      $price['data'] = commerce_price_component_add($price, $name, $tax_component, TRUE);
+    }
+  }
 }

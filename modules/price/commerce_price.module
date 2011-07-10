@@ -810,7 +810,7 @@ function commerce_price_component_type_load($name) {
  *   The price array for the component as defined by the price field.
  * @param $included
  *   Boolean indicating whether or not the price component has already been
- *     included in the price the component is being added to.
+ *   included in the price the component is being added to.
  *
  * @return
  *   The updated data array.

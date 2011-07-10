@@ -1130,13 +1130,19 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
 
       // Manually validate the unit price of each line item.
       $unit_price = $form_state['values'][$element['#field_name']][$element['#language']]['line_items'][$line_item_id]['commerce_unit_price'];
+      $amount = $unit_price[$element['#language']][0]['amount'];
 
-      if (is_numeric($unit_price[$element['#language']][0]['amount'])) {
-        $line_item->commerce_unit_price = $unit_price;
-      }
-      else {
+      // Display an error message for a non-numeric unit price.
+      if (!is_numeric($amount)) {
         $name = implode('][', array_merge($element['line_items'][$line_item_id]['commerce_unit_price']['#parents'], array($element['#language'], 0, 'amount')));
         form_set_error($name, 'You must enter a numeric value for the unit price.');
+      }
+      elseif ($amount <> $line_item->commerce_unit_price[$element['#language']][0]['amount']) {
+        // Otherwise update the unit price amount if it has changed.
+        $line_item->commerce_unit_price = $unit_price;
+
+        // Rebuild the price components array.
+        commerce_line_item_rebase_unit_price($line_item);
       }
 
       // Only save if values were actually changed.
@@ -1218,6 +1224,55 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
  */
 function commerce_line_item_field_widget_error($element, $error) {
   form_error($element, $error['message']);
+}
+
+/**
+ * Recalculates the price components of the given line item's unit price based
+ * on its current amount and currency code.
+ *
+ * When a line item's unit price is adjusted via the line item manager widget,
+ * its components need to be recalculated using the given price as the new base
+ * price. Otherwise old component data will be used when calculating the total
+ * of the order, causing it not to match with the actual line item total.
+ *
+ * This function recalculates components by using the new unit price amount as
+ * the base price and allowing other modules to add additional components to the
+ * new components array as required based on the prior components.
+ *
+ * @param $line_item
+ *   The line item object whose unit price components should be recalculated.
+ *   The unit price amount and currency code should already be set to their new
+ *   value.
+ *
+ * @see hook_commerce_line_item_rebase_unit_price()
+ */
+function commerce_line_item_rebase_unit_price($line_item) {
+  // Prepare a line item wrapper.
+  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $price = $wrapper->commerce_unit_price->value();
+
+  // Extract the old components array and reset the current one.
+  $old_components = array();
+
+  if (!empty($price['data']['components'])) {
+    $old_components = $price['data']['components'];
+  }
+
+  // Set the current price as the new base price.
+  $price['data']['components'] = array();
+  $price['data'] = commerce_price_component_add($price, 'base_price', $price, TRUE);
+
+  // Set the unit price to the current price array.
+  $wrapper->commerce_unit_price = $price;
+
+  // Give other modules a chance to add components to the array.
+  foreach (module_implements('commerce_line_item_rebase_unit_price') as $module) {
+    $function = $module . '_commerce_line_item_rebase_unit_price';
+    $function($price, $old_components, $line_item);
+  }
+
+  // Set the unit price once again to the price with any additional components.
+  $wrapper->commerce_unit_price = $price;
 }
 
 /**
