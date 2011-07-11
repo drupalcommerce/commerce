@@ -1,9 +1,10 @@
 name = Line Item
 description = Defines the Line Item entity and associated features.
 package = Commerce
-dependencies[] = rules
 dependencies[] = commerce
 dependencies[] = commerce_price
+dependencies[] = entity
+dependencies[] = rules
 core = 7.x
 
 ; Module includes

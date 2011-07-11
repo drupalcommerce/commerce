@@ -3,6 +3,7 @@ description = Defines the Customer entity with Address Field integration.
 package = Commerce
 dependencies[] = addressfield
 dependencies[] = commerce
+dependencies[] = entity
 core = 7.x
 
 ; Module includes

@@ -5,6 +5,7 @@ dependencies[] = commerce
 dependencies[] = commerce_line_item
 dependencies[] = commerce_price
 dependencies[] = commerce_product
+dependencies[] = entity
 dependencies[] = options
 core = 7.x
 

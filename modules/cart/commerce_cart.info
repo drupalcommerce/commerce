@@ -7,6 +7,8 @@ dependencies[] = commerce_line_item
 dependencies[] = commerce_order
 dependencies[] = commerce_product
 dependencies[] = commerce_product_reference
+dependencies[] = entity
+dependencies[] = rules
 dependencies[] = views
 core = 7.x
 

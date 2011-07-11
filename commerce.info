@@ -1,6 +1,8 @@
 name = Commerce
 description = Defines features and functions common to the Commerce modules.
 package = Commerce
+dependencies[] = entity
+dependencies[] = rules
 core = 7.x
 
 ; Tests

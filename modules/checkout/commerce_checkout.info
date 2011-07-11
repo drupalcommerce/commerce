@@ -4,6 +4,8 @@ package = Commerce
 dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_order
+dependencies[] = entity
+dependencies[] = rules
 core = 7.x
 configure = admin/commerce/config/checkout
 

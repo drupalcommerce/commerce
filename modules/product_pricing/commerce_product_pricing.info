@@ -1,8 +1,10 @@
 name = Product Pricing
 description = Enables Rules based product sell price calculation for dynamic product pricing.
 package = Commerce
-dependencies[] = rules_admin
 dependencies[] = commerce
 dependencies[] = commerce_price
 dependencies[] = commerce_product_reference
+dependencies[] = entity
+dependencies[] = rules
+dependencies[] = rules_admin
 core = 7.x
