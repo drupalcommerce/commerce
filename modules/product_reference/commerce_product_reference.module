@@ -970,7 +970,7 @@ function commerce_product_reference_commerce_product_can_delete($product) {
     ->fieldCondition('commerce_product', 'product_id', $product->product_id, '=')
     ->count();
 
-  return $query->execute() > 0 ? FALSE : TRUE;
+  return $query->execute() == 0;
 }
 
 /**

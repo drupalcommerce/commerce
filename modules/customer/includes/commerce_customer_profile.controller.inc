@@ -111,4 +111,39 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
     // hook_commerce_customer_profile_load().
     parent::attachLoad($queried_profiles, $revision_id);
   }
+
+  /**
+   * Deletes multiple customer profiles by ID.
+   *
+   * @param $profile_ids
+   *   An array of customer profile IDs to delete.
+   * @param $transaction
+   *   An optional transaction object.
+   *
+   * @return
+   *   TRUE on success, FALSE otherwise.
+   */
+  public function delete($profile_ids, DatabaseTransaction $transaction = NULL) {
+    if (!empty($profile_ids)) {
+      $profiles = $this->load($profile_ids, array());
+
+      // Ensure the customer profiles can actually be deleted.
+      foreach ((array) $profiles as $profile_id => $profile) {
+        if (in_array(FALSE, module_invoke_all('commerce_customer_profile_can_delete', $profile))) {
+          unset($profiles[$profile_id]);
+        }
+      }
+
+      // If none of the specified profiles can be deleted, return FALSE.
+      if (empty($profiles)) {
+        return FALSE;
+      }
+
+      parent::delete($profile_ids, $transaction);
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
 }

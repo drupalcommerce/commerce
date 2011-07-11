@@ -266,6 +266,75 @@ function commerce_order_commerce_order_status_info() {
 }
 
 /**
+ * Implements hook_commerce_customer_profile_can_delete().
+ */
+function commerce_order_commerce_customer_profile_can_delete($profile) {
+  // Look for any order with a reference field targeting the given profile.
+  foreach (commerce_info_fields('commerce_customer_profile_reference') as $field_name => $field) {
+    // Use EntityFieldQuery to look for orders referencing this customer profile
+    // and do not allow the delete to occur if one exists.
+    $query = new EntityFieldQuery();
+
+    $query
+      ->entityCondition('entity_type', 'commerce_order', '=')
+      ->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=')
+      ->count();
+
+    return $query->execute() == 0;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * When a profile is being deleted, display a message on the confirmation form
+ * saying how many times the it has been referenced in all orders.
+ */
+function acommerce_order_form_commerce_customer_customer_profile_delete_form_alter(&$form, &$form_state) {
+  $items = array();
+
+  // Check the data in every customer profile reference field.
+  foreach (commerce_info_fields('commerce_customer_profile_reference') as $field_name => $field) {
+    // Query for any entity referencing the deleted profile in this field.
+    $query = new EntityFieldQuery();
+    $query->fieldCondition($field_name, 'profile_id', $form_state['customer_profile']->profile_id, '=');
+    $result = $query->execute();
+
+    // If results were returned...
+    if (!empty($result)) {
+      // Loop over results for each type of entity returned.
+      foreach ($result as $entity_type => $data) {
+        if (($count = count($data)) > 0) {
+          // For order references, display a message about the inability of the
+          // customer profile to be deleted and disable the submit button.
+          if ($entity_type == 'commerce_order') {
+            // Load the referencing order.
+            $order = reset($data);
+            $order = commerce_order_load($order->order_id);
+
+            $description = t('This customer profile is referenced by Order @order_number and therefore cannot be deleted. Disable it instead.', array('@order_number' => $order->order_number));
+
+            $form['description']['#markup'] .= '<p>' . $description . '</p>';
+            $form['actions']['submit']['#disabled'] = TRUE;
+            return;
+          }
+
+          // Load the entity information.
+          $entity_info = entity_get_info($entity_type);
+
+          // Add a message regarding the references.
+          $items[] = t('@entity_label: @count', array('@entity_label' => $entity_info['label'], '@count' => $count));
+        }
+      }
+    }
+  }
+
+  if (!empty($items)) {
+    $form['description']['#markup'] .= '<p>' . t('This customer profile is referenced by the following entities: !entity_list', array('!entity_list' => theme('item_list', array('items' => $items)))) . '</p>';
+  }
+}
+
+/**
  * Returns the name of the specified order type or all names keyed by type if no
  *   type is specified.
  *

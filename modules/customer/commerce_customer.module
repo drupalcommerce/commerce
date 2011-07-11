@@ -211,7 +211,6 @@ function commerce_customer_commerce_checkout_pane_info() {
   return $checkout_panes;
 }
 
-
 /**
  * Implements hook_field_views_data().
  */
