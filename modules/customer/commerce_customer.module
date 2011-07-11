@@ -565,8 +565,10 @@ function commerce_customer_configure_customer_profile_type($profile_type) {
         'widget' => array(
           'type' => 'addressfield_standard',
           'weight' => -10,
+          'settings' => array(
+            'format_handlers' => array('address', 'name-oneline'),
+          ),
         ),
-        'settings' => array(),
         'display' => array(),
       );
 

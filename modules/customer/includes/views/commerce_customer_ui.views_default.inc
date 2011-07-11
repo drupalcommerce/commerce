@@ -138,9 +138,9 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['fields']['commerce_customer_address']['hide_empty'] = 0;
   $handler->display->display_options['fields']['commerce_customer_address']['empty_zero'] = 0;
   $handler->display->display_options['fields']['commerce_customer_address']['click_sort_column'] = 'country';
-  $handler->display->display_options['fields']['commerce_customer_address']['type'] = 'addressfield_name';
+  $handler->display->display_options['fields']['commerce_customer_address']['type'] = 'addressfield_default';
   $handler->display->display_options['fields']['commerce_customer_address']['settings'] = array(
-    'organisation' => 0,
+    'format_handlers' => array('name-oneline'),
   );
   $handler->display->display_options['fields']['commerce_customer_address']['field_api_classes'] = 0;
   /* Field: User: Name */

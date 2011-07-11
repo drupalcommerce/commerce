@@ -125,20 +125,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $billing_country = $this->xpath("//select[starts-with(@name, 'commerce_customer_address')]");
     $this->drupalPostAJAX(NULL, array((string) $billing_country[0]['name'] => $address['country']), (string) $billing_country[0]['name']);
 
-    // Get the form elements to assert.
-    $form_controller = addressfield_get_form_controller($address);
-    $form = $form_controller->form($address, array(), array(), array(), array(), array(), array());
-
     $this->assertFieldByXPath("//select[starts-with(@id, 'edit-commerce-customer-address-und-0-country')]", $address['country'], t('Country field exists and it has the default country selected'));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-commerce-customer-address-und-0-name-line')]", NULL, t('Field !field exists in the customer profile form', array('!field' => 'Name line')));
-    foreach ($form as $id => $element) {
-      if ($element['#type'] == 'select') {
-        $this->assertFieldByXPath("//select[starts-with(@id, 'edit-commerce-customer-address-und-0-" . strtr($id, '_', '-') . "')]", NULL, t('Field !field exists in the customer profile form', array('!field' => $element['#title'])));
-      }
-      else{
-        $this->assertFieldByXPath("//input[starts-with(@id, 'edit-commerce-customer-address-und-0-" . strtr($id, '_', '-') . "')]", NULL, t('Field !field exists in the customer profile form', array('!field' => $element['#title'])));
-      }
-    }
 
     // Also check for the buttons and cancel link.
     $this->assertFieldById('edit-submit', t('Save profile'), t('\'Save profile\' button is present'));
@@ -293,13 +281,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $address = $profile->commerce_customer_address[LANGUAGE_NONE][0];
     // Check the integrity of the edit form.
     $this->pass(t('Test the integrity of the edit customer profile form:'));
-    $form_controller = addressfield_get_form_controller($address);
-    $form = $form_controller->form($address, array(), array(), array(), array(), array(), array());
     $this->assertFieldById('edit-commerce-customer-address-und-0-country', $address['country'], t('Country field exists and it has the default country selected'));
     $this->assertFieldById('edit-commerce-customer-address-und-0-name-line', $address['name_line'], t('Field !field exists in the customer profile form and has the correct value !value', array('!field' => 'Name line', '!value' => $address['name_line'])));
-    foreach ($form as $id => $element) {
-        $this->assertFieldById('edit-commerce-customer-address-und-0-' . strtr($id, '_', '-') , $address[$id], t('Field !field exists in the customer profile form and has the correct value !value', array('!field' => $element['#title'], '!value' => $address[$id])));
-    }
 
     // Also check for the buttons and cancel link.
     $this->assertFieldById('edit-submit', t('Save profile'), t('\'Save profile\' button is present'));
