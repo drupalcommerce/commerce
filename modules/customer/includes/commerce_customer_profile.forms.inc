@@ -80,15 +80,22 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
   $form['profile_status']['status'] = array(
     '#type' => 'radios',
     '#title' => t('Status'),
-    '#description' => t('Disabled profiles will not be visible to customers.'),
+    '#description' => t('Disabled profiles will not be visible to customers in options lists.'),
     '#options' => array(
       '1' => t('Active'),
       '0' => t('Disabled'),
     ),
     '#default_value' => $profile->status,
     '#required' => TRUE,
+    '#disabled' => !commerce_customer_profile_type_load($profile->type),
     '#weight' => 35,
   );
+
+  // Disable the status field if the customer profile type has been disabled.
+  if (!commerce_customer_profile_type_load($profile->type)) {
+    $form['profile_status']['status']['#disabled'] = TRUE;
+    $form['profile_status']['status']['#description'] .= '<br />' . t('This profile is of a type that is no longer available, so its status cannot be adjusted.');
+  }
 
   $form['actions'] = array(
     '#type' => 'container',

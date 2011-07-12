@@ -127,11 +127,88 @@ function commerce_customer_modules_enabled($modules) {
     if (module_hook($module, 'commerce_customer_profile_type_info')) {
       $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
 
+      // If this profile type has been previously disabled, update any reference
+      // fields to be active again before attempting to recreate them.
+      foreach ($profile_types as $type => $profile_type) {
+        foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference', 'active' => 0, 'storage_active' => 1, 'deleted' => 0), array('include_inactive' => TRUE)) as $field_name => $field) {
+          // If this field references profiles of the re-enabled type...
+          if ($field['settings']['profile_type'] == $type) {
+            commerce_customer_reactivate_reference_field($field_name);
+          }
+        }
+      }
+
       // Loop through and configure the customer profile types defined by the module.
       foreach ($profile_types as $type => $profile_type) {
         // Default the addressfield property if it isn't set.
         $profile_type = array_merge(array('addressfield' => TRUE), $profile_type);
         commerce_customer_configure_customer_profile_type($profile_type);
+      }
+    }
+  }
+}
+
+/**
+ * Attempts to directly reactivate a customer profile reference field that was
+ * disabled due to its module being disabled.
+ *
+ * @param $field_name
+ *   The name of the field to reactivate.
+ *
+ * @return
+ *   Boolean indicating whether or not the field was reactivated.
+ */
+function commerce_customer_reactivate_reference_field($field_name) {
+  // Set it to active via a query because field_update_field() does
+  // not work on inactive fields.
+  $updated = db_update('field_config')
+    ->fields(array('active' => 1))
+    ->condition('field_name', $field_name, '=')
+    ->execute();
+
+  // If a row was actually updated...
+  if ($updated) {
+    // Clear the field cache to refresh the field info data.
+    field_cache_clear();
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_modules_disabled().
+ */
+function commerce_customer_modules_disabled($modules) {
+  // Loop through all the disabled modules.
+  foreach ($modules as $module) {
+    // If the module implements hook_commerce_customer_profile_type_info()...
+    if (module_hook($module, 'commerce_customer_profile_type_info')) {
+      $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
+
+      // Disable any profiles of the types disabled.
+      $query = db_update('commerce_customer_profile')
+        ->fields(array('status' => 0))
+        ->condition('type', array_keys($profile_types), 'IN')
+        ->execute();
+
+      // Ensure each profile's current revision is also disabled.
+      $query = db_update('commerce_customer_profile_revision')
+        ->fields(array('status' => 0))
+        ->where('revision_id IN (SELECT revision_id FROM {commerce_customer_profile} WHERE type IN (:profile_types))', array(':profile_types' => array_keys($profile_types)))
+        ->execute();
+
+      // Loop through and disable customer profile reference fields that may
+      // correspond to the disabled profile types.
+      foreach ($profile_types as $type => $profile_type) {
+        foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference')) as $field_name => $field) {
+          // If this field references profiles of the disabled type...
+          if ($field['settings']['profile_type'] == $type) {
+            // Set it to inactive and save it.
+            $field['active'] = 0;
+            field_update_field($field);
+          }
+        }
       }
     }
   }

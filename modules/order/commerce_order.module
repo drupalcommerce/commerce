@@ -146,24 +146,6 @@ function commerce_order_modules_enabled($modules) {
 }
 
 /**
- * Implements hook_modules_disabled().
- */
-function commerce_order_modules_disabled($modules) {
-  // Loop through all the enabled modules.
-  foreach ($modules as $module) {
-    // If the module implements hook_commerce_customer_profile_type_info()...
-    if (module_hook($module, 'commerce_customer_profile_type_info')) {
-      $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
-
-      // Loop through and disable the customer profile reference fields.
-      foreach ($profile_types as $profile_type) {
-        commerce_order_disable_customer_profile_type($profile_type);
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_views_api().
  */
 function commerce_order_views_api() {
@@ -1177,20 +1159,6 @@ function commerce_order_calculate_total($order) {
 }
 
 /**
- * Remove the customer profile reference fields for the specified order type.
- *
- * @param $profile_type
- *   The customer profile type array.
- * @param $type
- *   The machine-name of the order type to remove the reference field.
- */
-function commerce_order_disable_customer_profile_type($profile_type, $type = 'commerce_order') {
-  $field_name = 'commerce_customer_' . $profile_type['type'];
-  $instance = field_info_instance('commerce_order', $field_name, $type);
-  field_delete_instance($instance);
-}
-
-/**
  * Configure the customer profile reference fields for the specified order type.
  *
  * @param $customer_profile_type
@@ -1203,6 +1171,11 @@ function commerce_order_disable_customer_profile_type($profile_type, $type = 'co
 function commerce_order_configure_customer_profile_type($customer_profile_type, $label, $order_type = 'commerce_order') {
   // Add the customer profile reference fields for each profile type.
   $field_name = 'commerce_customer_' . $customer_profile_type;
+
+  // First check to ensure this field doesn't already exist and was just inactive
+  // because of the profile defining module being disabled previously.
+  commerce_customer_reactivate_reference_field($field_name);
+
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_order', $field_name, $order_type);
 
