@@ -326,7 +326,7 @@ function commerce_order_ui_order_view($order, $view_mode = 'administrator', $bre
 
   drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order.css');
 
-  return entity_view('commerce_order', array($order->order_id => $order), $view_mode);
+  return entity_view('commerce_order', array($order->order_id => $order), $view_mode, NULL, TRUE);
 }
 
 /**

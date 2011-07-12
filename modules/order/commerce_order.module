@@ -37,14 +37,10 @@ function commerce_order_entity_info() {
         'administrator' => array(
           'label' => t('Administrator'),
           'custom settings' => FALSE,
-          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
-          'page' => TRUE,
         ),
         'customer' => array(
           'label' => t('Customer'),
           'custom settings' => FALSE,
-          // @todo: reconsider when http://drupal.org/node/1208864 is moving.
-          'page' => TRUE,
         ),
       ),
       'token type' => 'commerce-order',

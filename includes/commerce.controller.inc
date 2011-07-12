@@ -257,10 +257,19 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
    * @param $langcode
    *   (optional) A language code to use for rendering. Defaults to the global
    *   content language of the current request.
+   * @param $page
+   *   (optional) If set will control if the entity is rendered: if TRUE
+   *   the entity will be rendered without its title, so that it can be embeded
+   *   in another context. If FALSE the entity will be displayed with its title
+   *   in a mode suitable for lists.
+   *   If unset, the page mode will be enabled if the current path is the URI
+   *   of the entity, as returned by entity_uri().
+   *   This parameter is only supported for entities which controller is a
+   *   EntityAPIControllerInterface.
    * @return
    *   The renderable array.
    */
-  public function view($entities, $view_mode = '', $langcode = NULL) {
+  public function view($entities, $view_mode = '', $langcode = NULL, $page = NULL) {
     // If no view mode is specified, use the first one available..
     if (!isset($this->entityInfo['view modes'][$view_mode])) {
       reset($this->entityInfo['view modes']);
@@ -287,6 +296,7 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
         '#entity' => $entity,
         '#view_mode' => $view_mode,
         '#language' => $langcode,
+        '#page' => $page,
       );
 
       // Allow modules to modify the structured entity.
