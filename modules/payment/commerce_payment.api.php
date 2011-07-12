@@ -186,7 +186,7 @@ function hook_commerce_payment_method_info_alter(&$payment_methods) {
  *   A form snippet.
  */
 function CALLBACK_commerce_payment_method_settings_form($settings = NULL) {
-  
+
 }
 
 /**
@@ -204,7 +204,7 @@ function CALLBACK_commerce_payment_method_settings_form($settings = NULL) {
  *   A form snippet for the checkout pane.
  */
 function CALLBACK_commerce_payment_method_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
-  
+
 }
 
 /**
@@ -222,7 +222,7 @@ function CALLBACK_commerce_payment_method_submit_form($payment_method, $pane_val
  *   The identifier of the base element of the payment pane.
  */
 function CALLBACK_commerce_payment_method_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
-  
+
 }
 
 /**
@@ -240,7 +240,7 @@ function CALLBACK_commerce_payment_method_submit_form_validate($payment_method, 
  *   A price structure that needs to be charged.
  */
 function CALLBACK_commerce_payment_method_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
-  
+
 }
 
 /**
@@ -252,7 +252,7 @@ function CALLBACK_commerce_payment_method_submit_form_submit($payment_method, $p
  * property of the returned form array.
  */
 function CALLBACK_commerce_payment_method_redirect_form($form, &$form_state, $order, $payment_method) {
-  
+
 }
 
 /**
@@ -273,7 +273,7 @@ function CALLBACK_commerce_payment_method_redirect_form($form, &$form_state, $or
  *   back one step in the checkout process.
  */
 function CALLBACK_commerce_payment_method_redirect_form_validate($order, $payment_method) {
-  
+
 }
 
 /**
@@ -289,7 +289,7 @@ function CALLBACK_commerce_payment_method_redirect_form_validate($order, $paymen
  *   The payment method array.
  */
 function CALLBACK_commerce_payment_method_redirect_form_submit($order, $payment_method) {
-  
+
 }
 
 /**
@@ -317,7 +317,7 @@ function CALLBACK_commerce_payment_method_redirect_form_submit($order, $payment_
  * @see commerce_payment_enable_method()
  * @see rules_invoke_all()
  */
-function hook_commerce_payment_methods(&$order) {
+function hook_commerce_payment_methods($order) {
   // No example. See commerce_payment_enable_method() for a guide to what you
   // must add to the order's data array.
 }
@@ -330,7 +330,7 @@ function hook_commerce_payment_methods(&$order) {
  *
  * @see rules_invoke_all()
  */
-function hook_commerce_payment_transaction_presave(&$transaction) {
+function hook_commerce_payment_transaction_presave($transaction) {
   // No example.
 }
 

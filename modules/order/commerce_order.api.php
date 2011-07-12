@@ -14,6 +14,6 @@
  *
  * @see rules_invoke_all()
  */
-function hook_commerce_order_presave(&$order) {
+function hook_commerce_order_presave($order) {
   // No example.
 }

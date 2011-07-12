@@ -62,7 +62,7 @@
  *       in Views and other displays.
  *     - add_form(): returns the form elements necessary to add a line item of
  *       this type to an order via a line item manager widget.
- *     - add_form_submit(&$line_item, $element, &$form_state, $form): processes
+ *     - add_form_submit($line_item, $element, &$form_state, $form): processes
  *       the input from the "Add line item" form elements for this line item
  *       type, adding data to the new line item object; should return an error
  *       message if the line item should not be added for some reason.
