@@ -129,7 +129,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
 
       // Ensure the customer profiles can actually be deleted.
       foreach ((array) $profiles as $profile_id => $profile) {
-        if (in_array(FALSE, module_invoke_all('commerce_customer_profile_can_delete', $profile))) {
+        if (!commerce_customer_profile_can_delete($profile)) {
           unset($profiles[$profile_id]);
         }
       }

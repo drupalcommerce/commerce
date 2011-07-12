@@ -421,6 +421,22 @@ function commerce_customer_profile_build_content($profile, $view_mode = 'adminis
 }
 
 /**
+ * Determines whether or not the give customer profile can be deleted.
+ *
+ * @param $profile
+ *   The customer profile to be checked for deletion.
+ *
+ * @return
+ *   Boolean indicating whether or not the customer profile can be deleted.
+ */
+function commerce_customer_profile_can_delete($profile) {
+  // If any module implementing hook_commerce_customer_profile_can_delete()
+  // returns FALSE the customer profile cannot be deleted. Return TRUE if none
+  // return FALSE.
+  return !in_array(FALSE, module_invoke_all('commerce_customer_profile_can_delete', $profile));
+}
+
+/**
  * Deletes a customer profile by ID.
  *
  * @param $profile_id
@@ -840,9 +856,18 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
       // This checkbox will be overridden with a clickable delete image.
       // TODO: Make this an #ajaxy submit button.
       if ($profile->profile_id) {
+        // Create a title for this box based on whether or not the currently
+        // referenced customer profile can be deleted.
+        if (commerce_customer_profile_can_delete($profile)) {
+          $title = t('Delete this profile');
+        }
+        else {
+          $title = t('Clear this profile');
+        }
+
         $element['profiles'][$key]['remove'] = array(
           '#type' => 'checkbox',
-          '#title' => t('Delete this profile'),
+          '#title' => $title,
           '#default_value' => FALSE,
           '#access' => commerce_customer_profile_access('delete', $profile),
         );
@@ -878,8 +903,10 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
 
     // If the line item has been marked for deletion...
     if ($profile->profile_id && $element['profiles'][$key]['remove']['#value']) {
-      // Delete the profile now and don't include it from the $value array.
-      commerce_customer_profile_delete($profile->profile_id);
+      // Delete the profile now if we can and don't include it in the $value array.
+      if (commerce_customer_profile_can_delete($profile)) {
+        commerce_customer_profile_delete($profile->profile_id);
+      }
     }
     else {
       // Notify field widgets to validate their data.

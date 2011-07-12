@@ -269,7 +269,7 @@ function commerce_order_commerce_order_status_info() {
  * Implements hook_commerce_customer_profile_can_delete().
  */
 function commerce_order_commerce_customer_profile_can_delete($profile) {
-  // Look for any order with a reference field targeting the given profile.
+  // Look for any non-cart order with a reference field targeting the profile.
   foreach (commerce_info_fields('commerce_customer_profile_reference') as $field_name => $field) {
     // Use EntityFieldQuery to look for orders referencing this customer profile
     // and do not allow the delete to occur if one exists.
@@ -277,6 +277,7 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
 
     $query
       ->entityCondition('entity_type', 'commerce_order', '=')
+      ->propertyCondition('status', array_keys(commerce_order_statuses(array('cart' => TRUE))), 'NOT IN')
       ->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=')
       ->count();
 
