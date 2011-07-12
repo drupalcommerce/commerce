@@ -165,6 +165,7 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['fields']['commerce_customer_address']['click_sort_column'] = 'country';
   $handler->display->display_options['fields']['commerce_customer_address']['type'] = 'addressfield_default';
   $handler->display->display_options['fields']['commerce_customer_address']['settings'] = array(
+    'use_widget_handlers' => 0,
     'format_handlers' => array('name-oneline'),
   );
   $handler->display->display_options['fields']['commerce_customer_address']['field_api_classes'] = 0;
