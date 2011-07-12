@@ -91,7 +91,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
 
       // Ensure the products can actually be deleted.
       foreach ((array) $products as $product_id => $product) {
-        if (in_array(FALSE, module_invoke_all('commerce_product_can_delete', $product))) {
+        if (!commerce_product_can_delete($product)) {
           unset($products[$product_id]);
         }
       }
