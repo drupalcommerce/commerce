@@ -66,6 +66,12 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
     $profile = commerce_customer_profile_new($type, $order->uid);
   }
 
+  // Add the entity context of the current cart order.
+  $profile->entity_context = array(
+    'entity_type' => 'commerce_order',
+    'entity_id' => $order->order_id,
+  );
+
   $pane_form['customer_profile'] = array(
     '#type' => 'value',
     '#value' => $profile,

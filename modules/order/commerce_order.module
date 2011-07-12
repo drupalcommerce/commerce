@@ -266,6 +266,51 @@ function commerce_order_commerce_order_status_info() {
 }
 
 /**
+ * Implements hook_field_attach_form().
+ *
+ * This function adds a property to the customer profiles stored in a form array
+ * on order edit forms. The order module will use this to bypass considering
+ * that order when determining if the user should be able to delete a profile
+ * from that order's edit form.
+ */
+function commerce_order_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // If this is an order edit form...
+  if ($entity_type == 'commerce_order') {
+    // Get an array of customer profile reference fields attached to products.
+    $fields = commerce_info_fields('commerce_customer_profile_reference', 'commerce_order');
+
+    // Loop over each child element of the form.
+    foreach (element_children($form) as $key) {
+      // If the current element is for a customer profile reference field...
+      if (in_array($key, array_keys($fields))) {
+        // Loop over each of its child items...
+        foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
+          foreach (element_children($form[$key][$form[$key]['#language']][$delta]) as $subdelta) {
+            // Add the order context to the profile stored in the field element.
+            $form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->entity_context = array(
+              'entity_type' => 'commerce_order',
+              'entity_id' => $entity->order_id,
+            );
+
+            // Add a uid if it is empty and the order has one.
+            if (empty($form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->uid) &&
+              !empty($entity->uid)) {
+              $form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->uid = $entity->uid;
+            }
+
+            // If this means this profile can now be deleted...
+            if (commerce_customer_profile_can_delete($form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value'])) {
+              // Update its remove element's title accordingly.
+              $form[$key][$form[$key]['#language']][$delta][$subdelta]['remove']['#title'] = t('Delete this profile');
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_commerce_customer_profile_can_delete().
  */
 function commerce_order_commerce_customer_profile_can_delete($profile) {
@@ -281,7 +326,89 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
       ->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=')
       ->count();
 
+    // If the profile includes an order context property, we know this was added
+    // by the Order module as an order ID to skip in the deletion query.
+    if (!empty($profile->entity_context) && $profile->entity_context['entity_type'] == 'commerce_order') {
+      $query->propertyCondition('order_id', $profile->entity_context['entity_id'], '!=');
+    }
+
     return $query->execute() == 0;
+  }
+}
+
+/**
+ * Implements hook_commerce_customer_profile_presave().
+ *
+ * The Order module prevents customer profile deletion for any profile that is
+ * referenced by a non-cart order via hook_commerce_customer_profile_can_delete().
+ * The same logic applies when updating a customer profile to determine whether
+ * or not the update should be allowed on the same profile or if it should be
+ * handled as a clone of the original profile. This ensures that editing a
+ * profile on a separate order or through the admin UI after completing an order
+ * will not cause the original order to lose essential data.
+ */
+function commerce_order_commerce_customer_profile_presave($profile) {
+  // Only perform this check when updating an existing profile.
+  if (!empty($profile->profile_id)) {
+    // Load the unchanged profile to see if any essential data has changed.
+    $unchanged_profile = entity_load_unchanged('commerce_customer_profile', $profile->profile_id);
+    $field_change = FALSE;
+
+    // Compare against the field values.
+    foreach (field_info_instances('commerce_customer_profile', $profile->type) as $field_name => $instance) {
+      // Provide special handling for the addressfield to accommodate the fact
+      // that the field as loaded from the database may contain additional keys
+      // with empty values based on the field schema that aren't included in the
+      // profile being saved because their corresponding form elements weren't
+      // included on the edit form.
+      if ($field_name == 'commerce_customer_address') {
+        // For each item of each language...
+        foreach ($profile->{$field_name} as $langcode => $data) {
+          foreach ($data as $delta => $value) {
+            // Consider it a change if the same key did not previously exist.
+            if (empty($unchanged_profile->{$field_name}[$langcode][$delta])) {
+              $field_change = TRUE;
+              break;
+            }
+
+            // Strip the element key out of this item.
+            unset($value['element_key']);
+
+            // First create a comparison array from the unchanged value.
+            $comparison_value = array_intersect_key($unchanged_profile->{$field_name}[$langcode][$delta], $value);
+
+            // If the arrays don't match, we have a change.
+            if ($value != $comparison_value) {
+              $field_change = TRUE;
+              break;
+            }
+
+            // Or if the unchanged value has data that the updated address does
+            // not, we have a changed.
+            foreach ($unchanged_profile->{$field_name}[$langcode][$delta] as $key => $value) {
+              if (!in_array($key, array_keys($comparison_value)) && !empty($value)) {
+                $field_change = TRUE;
+                break 2;
+              }
+            }
+          }
+        }
+      }
+      elseif ($profile->{$field_name} != $unchanged_profile->{$field_name}) {
+        $field_change = TRUE;
+        break;
+      }
+    }
+
+    // If we did in fact detect significant changes and this profile has been
+    // referenced by a non-cart order...
+    if ($field_change && !commerce_order_commerce_customer_profile_can_delete($profile)) {
+      // Update various properties of the profile so it gets saved as new.
+      $profile->profile_id = '';
+      $profile->revision_id = '';
+      $profile->created = REQUEST_TIME;
+      $profile->log = '';
+    }
   }
 }
 
@@ -291,7 +418,7 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
  * When a profile is being deleted, display a message on the confirmation form
  * saying how many times the it has been referenced in all orders.
  */
-function acommerce_order_form_commerce_customer_customer_profile_delete_form_alter(&$form, &$form_state) {
+function commerce_order_form_commerce_customer_customer_profile_delete_form_alter(&$form, &$form_state) {
   $items = array();
 
   // Check the data in every customer profile reference field.
@@ -313,11 +440,14 @@ function acommerce_order_form_commerce_customer_customer_profile_delete_form_alt
             $order = reset($data);
             $order = commerce_order_load($order->order_id);
 
-            $description = t('This customer profile is referenced by Order @order_number and therefore cannot be deleted. Disable it instead.', array('@order_number' => $order->order_number));
+            // Only exit here if the order is in a non-cart status.
+            if (!in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))))) {
+              $description = t('This customer profile is referenced by Order @order_number and therefore cannot be deleted. Disable it instead.', array('@order_number' => $order->order_number));
 
-            $form['description']['#markup'] .= '<p>' . $description . '</p>';
-            $form['actions']['submit']['#disabled'] = TRUE;
-            return;
+              $form['description']['#markup'] .= '<p>' . $description . '</p>';
+              $form['actions']['submit']['#disabled'] = TRUE;
+              return;
+            }
           }
 
           // Load the entity information.

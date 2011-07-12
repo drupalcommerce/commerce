@@ -119,16 +119,27 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
    *   An array of customer profile IDs to delete.
    * @param $transaction
    *   An optional transaction object.
+   * @param $entity_context
+   *   An optional entity context array that specifies the entity throgh whose
+   *   customer profile reference field the given profiles are being deleted:
+   *   - entity_type: the type of entity
+   *   - entity_id: the unique ID of the entity
    *
    * @return
    *   TRUE on success, FALSE otherwise.
    */
-  public function delete($profile_ids, DatabaseTransaction $transaction = NULL) {
+  public function delete($profile_ids, DatabaseTransaction $transaction = NULL, $entity_context = array()) {
     if (!empty($profile_ids)) {
       $profiles = $this->load($profile_ids, array());
 
       // Ensure the customer profiles can actually be deleted.
       foreach ((array) $profiles as $profile_id => $profile) {
+        // If we received an entity context for this profile, add it now.
+        if (!empty($entity_context)) {
+          $profile->entity_context = $entity_context;
+        }
+
+        // If the profile cannot be deleted, remove it from the profiles array.
         if (!commerce_customer_profile_can_delete($profile)) {
           unset($profiles[$profile_id]);
         }

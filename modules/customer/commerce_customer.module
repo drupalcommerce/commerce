@@ -441,12 +441,17 @@ function commerce_customer_profile_can_delete($profile) {
  *
  * @param $profile_id
  *   The ID of the customer profile to delete.
+ * @param $entity_context
+ *   An optional entity context array that specifies the entity throgh whose
+ *   customer profile reference field the given profiles are being deleted:
+ *   - entity_type: the type of entity
+ *   - entity_id: the unique ID of the entity
  *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_customer_profile_delete($profile_id) {
-  return commerce_customer_profile_delete_multiple(array($profile_id));
+function commerce_customer_profile_delete($profile_id, $entity_context = array()) {
+  return commerce_customer_profile_delete_multiple(array($profile_id), $entity_context);
 }
 
 /**
@@ -454,12 +459,17 @@ function commerce_customer_profile_delete($profile_id) {
  *
  * @param $profile_ids
  *   An array of customer profile IDs to delete.
+ * @param $entity_context
+ *   An optional entity context array that specifies the entity throgh whose
+ *   customer profile reference field the given profiles are being deleted:
+ *   - entity_type: the type of entity
+ *   - entity_id: the unique ID of the entity
  *
  * @return
  *   TRUE on success, FALSE otherwise.
  */
-function commerce_customer_profile_delete_multiple($profile_ids) {
-  return entity_get_controller('commerce_customer_profile')->delete($profile_ids);
+function commerce_customer_profile_delete_multiple($profile_ids, $entity_context = array()) {
+  return entity_get_controller('commerce_customer_profile')->delete($profile_ids, NULL, $entity_context);
 }
 
 /**
@@ -905,7 +915,14 @@ function commerce_customer_profile_manager_validate($element, &$form_state, $for
     if ($profile->profile_id && $element['profiles'][$key]['remove']['#value']) {
       // Delete the profile now if we can and don't include it in the $value array.
       if (commerce_customer_profile_can_delete($profile)) {
-        commerce_customer_profile_delete($profile->profile_id);
+        // If another module altered in an entity context, be sure to pass it to
+        // the delete function.
+        if (!empty($profile->entity_context)) {
+          commerce_customer_profile_delete($profile->profile_id, $profile->entity_context);
+        }
+        else {
+          commerce_customer_profile_delete($profile->profile_id);
+        }
       }
     }
     else {
