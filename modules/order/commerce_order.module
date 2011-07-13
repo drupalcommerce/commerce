@@ -300,9 +300,15 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
 
     $query
       ->entityCondition('entity_type', 'commerce_order', '=')
-      ->propertyCondition('status', array_keys(commerce_order_statuses(array('cart' => TRUE))), 'NOT IN')
       ->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=')
       ->count();
+
+    // Add a condition on the order status if there are cart order statuses.
+    $statuses = array_keys(commerce_order_statuses(array('cart' => TRUE)));
+
+    if (!empty($statuses)) {
+      $query->propertyCondition('status', $statuses, 'NOT IN');
+    }
 
     // If the profile includes an order context property, we know this was added
     // by the Order module as an order ID to skip in the deletion query.
@@ -387,6 +393,36 @@ function commerce_order_commerce_customer_profile_presave($profile) {
       $profile->created = REQUEST_TIME;
       $profile->log = '';
     }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * When a profile is being edited via its standalone form, display a message
+ * that tells the user the profile is going to be cloned if it already being
+ * referenced by a non-cart order.
+ */
+function commerce_order_form_commerce_customer_customer_profile_form_alter(&$form, &$form_state) {
+  if (!commerce_order_commerce_customer_profile_can_delete($form_state['customer_profile'])) {
+    $form['clone_message'] = array(
+      '#markup' => '<div class="messages status">' . t('Because this profile is currently referenced by an order, if you change any field values it will save as a clone of the current profile instead of updating this profile itself. This is to maintain the integrity of customer data as entered on the order(s).') . '</div>',
+      '#weight' => -100,
+    );
+
+    // Add the original profile ID to the form state so our custom submit handler
+    // can display a message when the clone is saved.
+    $form_state['original_profile_id'] = $form_state['customer_profile']->profile_id;
+    $form['actions']['submit']['#submit'][] = 'commerce_order_customer_profile_form_submit';
+  }
+}
+
+/**
+ * Submit callback: display a message when a profile is cloned.
+ */
+function commerce_order_customer_profile_form_submit($form, &$form_state) {
+  if ($form_state['original_profile_id'] != $form_state['customer_profile']->profile_id) {
+    drupal_set_message(t('The customer profile was cloned to prevent data loss on orders referencing the profile. It is now profile @profile_id.', array('@profile_id' => $form_state['customer_profile']->profile_id)));
   }
 }
 
