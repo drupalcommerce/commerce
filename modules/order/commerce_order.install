@@ -182,6 +182,16 @@ function commerce_order_schema() {
 }
 
 /**
+ * Implements hook_uninstall().
+ */
+function commerce_order_uninstall() {
+  // Delete any field instance attached to an order type.
+  commerce_delete_instances('commerce_order');
+
+  variable_del('commerce_order_help_text');
+}
+
+/**
  * Between 7.x-1.0-beta2 and 7.x-1.0-beta3 we determined we needed to revise the
  * way we handled price amounts, preferring to preserve integer amounts as
  * loaded from the database until formatting them as decimal values upon display

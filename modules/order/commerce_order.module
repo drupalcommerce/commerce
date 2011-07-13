@@ -1210,7 +1210,7 @@ function commerce_order_configure_customer_profile_type($customer_profile_type, 
 
   // First check to ensure this field doesn't already exist and was just inactive
   // because of the profile defining module being disabled previously.
-  commerce_customer_reactivate_reference_field($field_name);
+  commerce_activate_field($field_name);
 
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_order', $field_name, $order_type);

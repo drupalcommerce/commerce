@@ -105,6 +105,126 @@ function commerce_entity_reference_delete($entity_type, $entity, $field_name, $r
 }
 
 /**
+ * Attempts to directly activate a field that was disabled due to its module
+ * being disabled.
+ *
+ * The normal API function for updating fields, field_update_field(), will not
+ * work on disabled fields. As a workaround, this function directly updates the
+ * database and clears the field cache if necessary.
+ *
+ * @param $field_name
+ *   The name of the field to activate.
+ *
+ * @return
+ *   Boolean indicating whether or not the field was activated.
+ */
+function commerce_activate_field($field_name) {
+  // Set it to active via a query because field_update_field() does
+  // not work on inactive fields.
+  $updated = db_update('field_config')
+    ->fields(array('active' => 1))
+    ->condition('field_name', $field_name, '=')
+    ->execute();
+
+  // If a row was actually updated...
+  if ($updated) {
+    // Clear the field cache to refresh the field info data.
+    field_cache_clear();
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Enables and deletes fields of the specified type.
+ *
+ * @param $type
+ *   The type of fields to enable and delete.
+ *
+ * @see commerce_delete_field()
+ */
+function commerce_delete_fields($type) {
+  // Read the fields for any active or inactive field of the specified type.
+  foreach (field_read_fields(array('type' => $type), array('include_inactive' => TRUE)) as $field_name => $field) {
+    commerce_delete_field($field_name);
+  }
+}
+
+/**
+ * Enables and deletes the specified field.
+ *
+ * The normal API function for deleting fields, field_delete_field(), will not
+ * work on disabled fields. As a workaround, this function first activates the
+ * fields of the specified type and then deletes them.
+ *
+ * @param $field_name
+ *   The name of the field to enable and delete.
+ */
+function commerce_delete_field($field_name) {
+  // In case the field is inactive, first activate it.
+  commerce_activate_field($field_name);
+
+  // Delete the field.
+  field_delete_field($field_name);
+}
+
+/**
+ * Deletes any field instance attached to entities of the specified type,
+ * regardless of whether or not the field is active.
+ *
+ * @param $entity_type
+ *   The type of entity whose fields should be deleted.
+ * @param $bundle
+ *   Optionally limit instance deletion to a specific bundle of the specified
+ *   entity type.
+ */
+function commerce_delete_instances($entity_type, $bundle = NULL) {
+  // Prepare a parameters array to load the specified instances.
+  $params = array(
+    'entity_type' => $entity_type,
+  );
+
+  if (!empty($bundle)) {
+    $params['bundle'] = $bundle;
+  }
+
+  // Read and delete the matching field instances.
+  foreach (field_read_instances($params, array('include_inactive' => TRUE)) as $instance) {
+    commerce_delete_instance($instance);
+  }
+}
+
+/**
+ * Deletes the specified instance and handles field cleanup manually in case the
+ * instance is of a disabled field.
+ *
+ * @param $instance
+ *   The field instance info array to be deleted.
+ */
+function commerce_delete_instance($instance) {
+  // First activate the instance's field if necessary.
+  $field_name = $instance['field_name'];
+  $activated = commerce_activate_field($field_name);
+
+  // Then delete the instance.
+  field_delete_instance($instance, FALSE);
+
+  // Now check to see if there are any other instances of the field left.
+  $field = field_info_field($field_name);
+
+  if (count($field['bundles']) == 0) {
+    field_delete_field($field_name);
+  }
+  elseif ($activated) {
+    // If there are remaining instances but the field was originally disabled,
+    // disabled it again now.
+    $field['active'] = 0;
+    field_update_field($field);
+  }
+}
+
+/**
  * Makes any required form elements in a form unrequired.
  *
  * @param $form

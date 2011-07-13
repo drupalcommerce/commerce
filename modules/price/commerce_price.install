@@ -125,3 +125,11 @@ function commerce_price_field_schema($field) {
     );
   }
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_price_uninstall() {
+  // Delete any price fields.
+  commerce_delete_fields('commerce_price');
+}

@@ -1,6 +1,20 @@
 <?php
 
 /**
+ * Performs database updates and uninstallation cleanup for the Commerce module.
+ */
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_uninstall() {
+  variable_del('commerce_default_currency');
+  variable_del('commerce_enabled_currencies');
+  variable_del('commerce_password_length');
+}
+
+/**
  * Update Rules to use new prefixed parameter names and tokens.
  */
 function commerce_update_7100() {

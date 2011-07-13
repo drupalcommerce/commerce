@@ -133,7 +133,7 @@ function commerce_customer_modules_enabled($modules) {
         foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference', 'active' => 0, 'storage_active' => 1, 'deleted' => 0), array('include_inactive' => TRUE)) as $field_name => $field) {
           // If this field references profiles of the re-enabled type...
           if ($field['settings']['profile_type'] == $type) {
-            commerce_customer_reactivate_reference_field($field_name);
+            commerce_activate_field($field_name);
           }
         }
       }
@@ -146,34 +146,6 @@ function commerce_customer_modules_enabled($modules) {
       }
     }
   }
-}
-
-/**
- * Attempts to directly reactivate a customer profile reference field that was
- * disabled due to its module being disabled.
- *
- * @param $field_name
- *   The name of the field to reactivate.
- *
- * @return
- *   Boolean indicating whether or not the field was reactivated.
- */
-function commerce_customer_reactivate_reference_field($field_name) {
-  // Set it to active via a query because field_update_field() does
-  // not work on inactive fields.
-  $updated = db_update('field_config')
-    ->fields(array('active' => 1))
-    ->condition('field_name', $field_name, '=')
-    ->execute();
-
-  // If a row was actually updated...
-  if ($updated) {
-    // Clear the field cache to refresh the field info data.
-    field_cache_clear();
-    return TRUE;
-  }
-
-  return FALSE;
 }
 
 /**

@@ -94,6 +94,13 @@ function commerce_product_schema() {
   return $schema;
 }
 
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_product_uninstall() {
+  // Delete any field instance attached to a product type.
+  commerce_delete_instances('commerce_product');
+}
 
 /**
  * Changes the name of the 'type' index on the commerce_product table to ensure

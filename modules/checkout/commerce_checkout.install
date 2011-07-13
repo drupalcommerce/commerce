@@ -70,3 +70,11 @@ function commerce_checkout_schema() {
 
   return $schema;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_checkout_uninstall() {
+  variable_del('commerce_checkout_completion_message');
+  variable_del('commerce_checkout_completion_message_override');
+}

@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * Deletes Product Pricing data on uninstallation.
+ */
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_product_pricing_uninstall() {
+  variable_del('commerce_product_sell_price_pre_calculation');
+  variable_del('commerce_product_sell_price_pre_calculation_rules_bypass');
+}

@@ -25,3 +25,11 @@ function commerce_product_reference_field_schema($field) {
     );
   }
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_product_reference_uninstall() {
+  // Delete any product referencefields.
+  commerce_delete_fields('commerce_product_reference');
+}
