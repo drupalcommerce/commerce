@@ -349,20 +349,8 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
             // Find the default value for the tax included element.
             $default = '';
 
-            if (!empty($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['components'])) {
-              foreach (array_keys($options) as $optgroup) {
-                foreach ($options[$optgroup] as $name => $title) {
-                  $tax_rate = commerce_tax_rate_load($name);
-
-                  // If this tax rate's component is included in the price, it
-                  // must be the default!
-                  foreach ($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['components'] as $component) {
-                    if ($component['included'] && $component['name'] == $tax_rate['price_component']) {
-                      $default = $name;
-                    }
-                  }
-                }
-              }
+            if (!empty($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['include_tax'])) {
+              $default = $form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['include_tax'];
             }
 
             $form[$key][$form[$key]['#language']][$delta]['currency_code']['#title'] = '&nbsp;';
@@ -394,7 +382,7 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
 
 /**
  * Validate callback for the tax inclusion select list that serves to reset the
- *   data array based on the selected tax.
+ * data array based on the selected tax.
  */
 function commerce_tax_price_field_validate($element, &$form_state) {
   // Build an array of form parents to the price array.
@@ -409,38 +397,69 @@ function commerce_tax_price_field_validate($element, &$form_state) {
 
   // If a tax was specified...
   if (!empty($element['include_tax']['#value'])) {
-    // Remove the include_tax value from the price array and reset the components.
-    unset($price['include_tax']);
+    // Reset the components and store the tax name in the data array.
     $price['data']['components'] = array();
-
-    // Load and reverse apply the tax.
-    $tax_rate = commerce_tax_rate_load($element['include_tax']['#value']);
-    $amount = $price['amount'] / (1 + $tax_rate['rate']);
-
-    // Add a base price to the data array.
-    $component = array(
-      'amount' => $amount,
-      'currency_code' => $price['currency_code'],
-      'data' => array(),
-    );
-
-    $price['data'] = commerce_price_component_add($price, 'base_price', $component, TRUE);
-
-    // Add the tax to the data array.
-    $component['amount'] = $price['amount'] - $amount;
-    $component['data']['tax_rate'] = $tax_rate;
-
-    $price['data'] = commerce_price_component_add($price, $tax_rate['price_component'], $component, TRUE);
+    $price['data']['include_tax'] = $element['include_tax']['#value'];
   }
   else {
     // Otherwise reset the components array.
-    unset($price['data']['components']);
+    $price['data']['components'] = array();
+    unset($price['data']['include_tax']);
   }
 
   // Add the data array to the form state.
   $parents[] = 'data';
 
   form_set_value(array('#parents' => $parents), $price['data'], $form_state);
+}
+
+/**
+ * Implements hook_field_attach_load().
+ */
+function commerce_tax_field_attach_load($entity_type, $entities, $age, $options) {
+  // If product entities are being loaded...
+  if ($entity_type == 'commerce_product') {
+    // Loop over all the products looking for prices needing tax calculation.
+    foreach ($entities as $product) {
+      // Examine every field instance attached to this product's bundle.
+      foreach (field_info_instances('commerce_product', $product->type) as $field_name => $instance) {
+        // Load the instance's field data.
+        $field = field_info_field($instance['field_name']);
+
+        // If the instance is of a price field...
+        if ($field['type'] == 'commerce_price') {
+          // Check to see if the product has specified an included tax.
+          foreach ($product->{$field_name} as $langcode => $items) {
+            foreach ($items as $delta => $item) {
+              // If it specifies a tax and we can load it...
+              if (!empty($item['data']['include_tax']) && $tax_rate = commerce_tax_rate_load($item['data']['include_tax'])) {
+                // Reverse apply the tax.
+                $amount = $item['amount'] / (1 + $tax_rate['rate']);
+
+                // Add a base price to the data array.
+                $component = array(
+                  'amount' => $amount,
+                  'currency_code' => $item['currency_code'],
+                  'data' => array(),
+                );
+
+                $item['data'] = commerce_price_component_add($item, 'base_price', $component, TRUE);
+
+                // Add the tax to the data array.
+                $component['amount'] = $item['amount'] - $amount;
+                $component['data']['tax_rate'] = $tax_rate;
+
+                $item['data'] = commerce_price_component_add($item, $tax_rate['price_component'], $component, TRUE);
+
+                // Set the new item on the product entity.
+                $product->{$field_name}[$langcode][$delta] = $item;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
