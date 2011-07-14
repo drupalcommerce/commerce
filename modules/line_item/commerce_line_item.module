@@ -560,8 +560,7 @@ function commerce_line_item_new($type = '', $order_id = 0) {
  *   The full line item object to save.
  *
  * @return
- *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
- *   performed.
+ *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
 function commerce_line_item_save($line_item) {
   return entity_get_controller('commerce_line_item')->save($line_item);

@@ -46,7 +46,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
    *   An optional transaction object.
    *
    * @return
-   *   The saved customer profile object.
+   *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
   public function save($profile, DatabaseTransaction $transaction = NULL) {
     if (!isset($transaction)) {

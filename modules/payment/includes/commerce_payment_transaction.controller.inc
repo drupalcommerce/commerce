@@ -58,7 +58,7 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
    *   An optional transaction object.
    *
    * @return
-   *   The saved transaction object.
+   *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
   public function save($transaction, DatabaseTransaction $db_transaction = NULL) {
     if (!isset($db_transaction)) {

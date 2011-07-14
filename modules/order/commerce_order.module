@@ -573,8 +573,7 @@ function commerce_order_new($uid = 0, $status = NULL, $type = 'commerce_order') 
  *     will be created.
  *
  * @return
- *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
- *   performed.
+ *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
 function commerce_order_save($order) {
   return entity_get_controller('commerce_order')->save($order);

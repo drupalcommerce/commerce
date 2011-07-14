@@ -718,7 +718,7 @@ function commerce_payment_transaction_new($method_id = '', $order_id = 0) {
  *   The full transaction object to save.
  *
  * @return
- *   The saved transaction object.
+ *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
 function commerce_payment_transaction_save($transaction) {
   return entity_get_controller('commerce_payment_transaction')->save($transaction);

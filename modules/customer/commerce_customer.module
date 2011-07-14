@@ -421,8 +421,7 @@ function commerce_customer_profile_new($type = '', $uid = 0) {
  *     a new customer profile will be created.
  *
  * @return
- *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
- *   performed.
+ *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
 function commerce_customer_profile_save($profile) {
   return entity_get_controller('commerce_customer_profile')->save($profile);

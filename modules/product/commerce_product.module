@@ -382,8 +382,7 @@ function commerce_product_new($type = '') {
  *   The full product object to save.
  *
  * @return
- *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
- *   performed.
+ *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
  */
 function commerce_product_save($product) {
   return entity_get_controller('commerce_product')->save($product);

@@ -98,8 +98,7 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
    *   responsible for rolling back the transaction if something goes wrong.
    *
    * @return
-   *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
-   *   performed.
+   *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
   public function save($entity, DatabaseTransaction $transaction = NULL) {
     if (!isset($transaction)) {

@@ -42,7 +42,7 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
    *   An optional transaction object.
    *
    * @return
-   *   The saved line item object.
+   *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
   public function save($line_item, DatabaseTransaction $transaction = NULL) {
     if (!isset($transaction)) {

@@ -49,7 +49,7 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
    *   An optional transaction object.
    *
    * @return
-   *   The saved order object.
+   *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
   public function save($order, DatabaseTransaction $transaction = NULL) {
     if (!isset($transaction)) {
