@@ -198,8 +198,8 @@ function commerce_payment_credit_card_validate($details, $settings) {
  *   The credit card number to validate.
  * @param $card_types
  *   An array of credit card types containing any of the keys from the array
- *     returned by commerce_payment_credit_card_types(). If any are specified,
- *     only those card types will pass validation.
+ *   returned by commerce_payment_credit_card_types(). If any are specified,
+ *   only those card types will pass validation.
  *
  * @return
  *   TRUE or FALSE indicating the number's validity.
@@ -215,6 +215,8 @@ function commerce_payment_validate_credit_card_number($number, $card_types = arr
 
   // Check for valid credit card types if specified.
   if (!empty($card_types)) {
+    $card_type = '';
+
     switch (substr($number, 0, 1)) {
       case '3':
         $card_type = 'amex';

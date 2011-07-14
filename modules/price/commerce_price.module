@@ -739,6 +739,10 @@ function commerce_price_commerce_price_component_type_info() {
       'title' => t('Discount'),
       'weight' => -10,
     ),
+    'fee' => array(
+      'title' => t('Fee'),
+      'weight' => -20,
+    ),
   );
 }
 
