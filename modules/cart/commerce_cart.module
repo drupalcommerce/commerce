@@ -1233,6 +1233,9 @@ function commerce_cart_forms($form_id, $args) {
 function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_quantity = FALSE, $context = array()) {
   global $user;
 
+  // Store the context in the form state for use during AJAX refreshes.
+  $form_state['context'] = $context;
+
   // Store the line item passed to the form builder for reference on submit.
   $form_state['line_item'] = $line_item;
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
@@ -1426,7 +1429,6 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       $default_product_wrapper = entity_metadata_wrapper('commerce_product', $default_product);
 
       $form_state['default_product'] = $default_product;
-      $form_state['context'] = $context;
 
       // If all the products are of the same type...
       if ($same_type) {
@@ -1946,10 +1948,8 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
       // that references the product by looking at the entity this product
       // reference field is attached to.
       list($entity_id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
-      $cart_context += array(
-        'class_prefix' => $context['entity_type'] . '-' . $entity_id,
-        'view_mode' => $context['entity_type'] . '_' . $element['#view_mode'],
-      );
+      $cart_context['class_prefix'] = $context['entity_type'] . '-' . $entity_id;
+      $cart_context['view_mode'] = $context['entity_type'] . '_' . $element['#view_mode'];
 
       $entity_uri = entity_uri($context['entity_type'], $element['#object']);
 
