@@ -745,58 +745,59 @@ function commerce_entity_access($op, $entity, $account, $entity_type) {
  */
 function commerce_entity_access_permissions($entity_type) {
   $entity_info = entity_get_info($entity_type);
+  $labels = $entity_info['permission labels'];
 
   $permissions = array();
 
   // General 'administer' permission.
   $permissions['administer ' . $entity_type . ' entities'] = array(
-    'title' => t('Administer entities of type %type', array('%type' => $entity_info['label'])),
-    'description' => t('Allows users to perform any action on those entities.'),
+    'title' => t('Administer @entity_type', array('@entity_type' => $labels['plural'])),
+    'description' => t('Allows users to perform any action on @entity_type.', array('@entity_type' => $labels['plural'])),
     'restrict access' => TRUE,
   );
 
   // Generic create and edit permissions.
   $permissions['create ' . $entity_type . ' entities'] = array(
-    'title' => t('Create entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+    'title' => t('Create @entity_type of any type', array('@entity_type' => $labels['plural'])),
   );
   if (!empty($entity_info['access arguments']['user key'])) {
     $permissions['edit own ' . $entity_type . ' entities'] = array(
-      'title' => t('Edit own entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+      'title' => t('Edit own @entity_type of any type', array('@entity_type' => $labels['plural'])),
     );
   }
   $permissions['edit any ' . $entity_type . ' entity'] = array(
-    'title' => t('Edit any entity of type %type of any bundle', array('%type' => $entity_info['label'])),
+    'title' => t('Edit any @entity_type of any type', array('@entity_type' => $labels['singular'])),
   );
   if (!empty($entity_info['access arguments']['user key'])) {
     $permissions['view own ' . $entity_type . ' entities'] = array(
-      'title' => t('View own entities of type %type of any bundle', array('%type' => $entity_info['label'])),
+      'title' => t('View own @entity_type of any type', array('@entity_type' => $labels['plural'])),
     );
   }
   $permissions['view any ' . $entity_type . ' entity'] = array(
-    'title' => t('View any entity of type %type of any bundle', array('%type' => $entity_info['label'])),
+    'title' => t('View any @entity_type of any type', array('@entity_type' => $labels['singular'])),
   );
 
   // Per-bundle create and edit permissions.
   if (!empty($entity_info['entity keys']['bundle'])) {
     foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
       $permissions['create ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
-        'title' => t('Create entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+        'title' => t('Create %bundle @entity_type', array('@entity_type' => $labels['plural'], '%bundle' => $bundle_info['label'])),
       );
       if (!empty($entity_info['access arguments']['user key'])) {
         $permissions['edit own ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
-          'title' => t('Edit own entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+          'title' => t('Edit own %bundle @entity_type', array('@entity_type' => $labels['plural'], '%bundle' => $bundle_info['label'])),
         );
       }
       $permissions['edit any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
-        'title' => t('Edit any entity of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+        'title' => t('Edit any %bundle @entity_type', array('@entity_type' => $labels['singular'], '%bundle' => $bundle_info['label'])),
       );
       if (!empty($entity_info['access arguments']['user key'])) {
         $permissions['view own ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
-          'title' => t('View own entities of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+          'title' => t('View own %bundle @entity_type', array('@entity_type' => $labels['plural'], '%bundle' => $bundle_info['label'])),
         );
       }
       $permissions['view any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
-        'title' => t('View any entity of type %type and bundle %bundle', array('%type' => $entity_info['label'], '%bundle' => $bundle_info['label'])),
+        'title' => t('View any %bundle @entity_type', array('@entity_type' => $labels['singular'], '%bundle' => $bundle_info['label'])),
       );
     }
   }

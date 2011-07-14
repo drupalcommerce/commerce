@@ -100,6 +100,10 @@ function commerce_product_entity_info() {
         'user key' => 'uid',
         'access tag' => 'commerce_product_access',
       ),
+      'permission labels' => array(
+        'singular' => t('product'),
+        'plural' => t('products'),
+      ),
 
       // Add translation support.
       'translation' => array(

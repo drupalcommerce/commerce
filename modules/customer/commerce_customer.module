@@ -49,6 +49,10 @@ function commerce_customer_entity_info() {
         'user key' => 'uid',
         'access tag' => 'commerce_customer_profile_access',
       ),
+      'permission labels' => array(
+        'singular' => t('customer profile'),
+        'plural' => t('customer profiles'),
+      ),
     ),
   );
 

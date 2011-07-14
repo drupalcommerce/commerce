@@ -50,6 +50,10 @@ function commerce_order_entity_info() {
         'user key' => 'uid',
         'access tag' => 'commerce_order_access',
       ),
+      'permission labels' => array(
+        'singular' => t('order'),
+        'plural' => t('orders'),
+      ),
     ),
   );
 

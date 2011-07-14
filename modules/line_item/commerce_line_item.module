@@ -35,6 +35,10 @@ function commerce_line_item_entity_info() {
       'access callback' => 'commerce_line_item_access',
       'metadata controller class' => '',
       'token type' => 'commerce-line-item',
+      'permission labels' => array(
+        'singular' => t('line item'),
+        'plural' => t('line items'),
+      ),
     ),
   );
 
