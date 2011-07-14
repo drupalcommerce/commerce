@@ -60,3 +60,18 @@ function hook_commerce_product_valid_pre_calculation_rule($rule) {
   // TODO: Use the implementation specced in http://drupal.org/node/1020976 as
   // an example here.
 }
+
+/**
+ * Allows modules to alter the product line item used for sell price calculation.
+ *
+ * @param $line_item
+ *   The product line item used for sell price calculation.
+ */
+function hook_commerce_product_calculate_sell_price_line_item_alter($line_item) {
+  global $user;
+
+  // Reference the current shopping cart order in the line item if it isn't set.
+  if (empty($line_item->order_id)) {
+    $line_item->order_id = commerce_cart_order_id($user->uid);
+  }
+}

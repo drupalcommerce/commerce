@@ -16,6 +16,9 @@ function commerce_product_pricing_hook_info() {
     'commerce_product_valid_pre_calculation_product' => array(
       'group' => 'commerce',
     ),
+    'commerce_product_calculate_sell_price_line_item_alter' => array(
+      'group' => 'commerce',
+    ),
   );
 
   return $hooks;
@@ -89,6 +92,9 @@ function commerce_product_pricing_commerce_price_field_formatter_prepare_view($e
 function commerce_product_calculate_sell_price($product, $precalc = FALSE) {
   // First create a pseudo product line item that we will pass to Rules.
   $line_item = commerce_product_line_item_new($product);
+
+  // Allow modules to prepare this as necessary.
+  drupal_alter('commerce_product_calculate_sell_price_line_item', $line_item);
 
   // Attempt to fetch a database stored price if specified.
   if ($precalc) {

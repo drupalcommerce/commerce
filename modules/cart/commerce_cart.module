@@ -372,6 +372,18 @@ function commerce_cart_commerce_order_delete($order) {
 }
 
 /**
+ * Implements hook_commerce_product_calculate_sell_price_line_item_alter().
+ */
+function commerce_cart_commerce_product_calculate_sell_price_line_item_alter($line_item) {
+  global $user;
+
+  // Reference the current shopping cart order in the line item if it isn't set.
+  if (empty($line_item->order_id)) {
+    $line_item->order_id = commerce_cart_order_id($user->uid);
+  }
+}
+
+/**
  * Implements hook_views_api().
  */
 function commerce_cart_views_api() {
