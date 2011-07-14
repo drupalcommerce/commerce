@@ -252,8 +252,11 @@ function commerce_price_create_instance($field_name, $entity_type, $bundle, $lab
 
     $entity_info = entity_get_info($entity_type);
 
-    // Spoof the default view mode so its display type is set.
-    $entity_info['view modes']['default'] = array();
+    // Spoof the default view mode and node teaser so its display type is set.
+    $entity_info['view modes'] += array(
+      'default' => array(),
+      'node_teaser' => array(),
+    );
 
     foreach ($entity_info['view modes'] as $view_mode => $data) {
       $instance['display'][$view_mode] = $display + array(
