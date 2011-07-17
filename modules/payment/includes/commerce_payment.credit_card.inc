@@ -174,9 +174,14 @@ function commerce_payment_credit_card_validate($details, $settings) {
   $prefix = implode('][', $settings['form_parents']) . '][';
   $valid = TRUE;
 
+  // Validate the credit card type.
+  if (!empty($details['valid_types']) && !commerce_payment_validate_credit_card_type($details['number'], $details['valid_types'])) {
+    form_set_error($prefix . 'type', t('You have entered a credit card number of an unsupported card type.'));
+    $valid = FALSE;
+  }
+
   // Validate the credit card number.
-  // TODO: Separate card type validation from Luhn algorithm validation.
-  if (!commerce_payment_validate_credit_card_number($details['number'], $details['valid_types'])) {
+  if (!commerce_payment_validate_credit_card_number($details['number'])) {
     form_set_error($prefix . 'number', t('You have entered an invalid credit card number.'));
     $valid = FALSE;
   }
@@ -209,168 +214,182 @@ function commerce_payment_credit_card_validate($details, $settings) {
 }
 
 /**
- * Validates a credit card number using card types and the Luhn algorithm.
+ * Validates a credit card number using an array of approved card types.
  *
  * @param $number
  *   The credit card number to validate.
  * @param $card_types
  *   An array of credit card types containing any of the keys from the array
- *   returned by commerce_payment_credit_card_types(). If any are specified,
- *   only those card types will pass validation.
+ *   returned by commerce_payment_credit_card_types(). Only numbers determined
+ *   to be of the types specified will pass validation. This determination is
+ *   based on the length of the number and the valid number ranges for the
+ *   various types of known credit card types.
+ *
+ * @return
+ *   TRUE or FALSE indicating the number's validity based on the approved credit
+ *   card types.
+ *
+ * @see http://en.wikipedia.org/wiki/Bank_card_number#Issuer_Identification_Number_.28IIN.29
+ * @see commerce_payment_credit_card_types()
+ */
+function commerce_payment_validate_credit_card_type($number, $card_types) {
+  $strlen = strlen($number);
+
+  // Provide a check on the first digit (and card length if applicable).
+  switch (substr($number, 0, 1)) {
+    case '3':
+      // American Express begins with 3 and is 15 numbers.
+      if ($strlen == 15 && in_array('amex', $card_types)) {
+        break;
+      }
+
+      // JCB begins with 3528-3589 and is 16 numbers.
+      if ($strlen == 16 && in_array('jcb', $card_types)) {
+        break;
+      }
+
+      // Carte Blanche begins with 300-305 and is 14 numbers.
+      // Diners Club International begins 36 and is 14 numbers.
+      if ($strlen == 14) {
+        $initial = (int) substr($number, 0, 3);
+
+        if ($initial >= 300 && $initial <= 305 && in_array('cb', $card_types)) {
+          break;
+        }
+
+        if (substr($number, 0, 2) == '36' && in_array('dci', $card_types)) {
+          break;
+        }
+      }
+
+      return FALSE;
+
+    case '4':
+      $initial = (int) substr($number, 0, 4);
+
+      // Visa begins with 4 and is 16 numbers.
+      if ($strlen == 16 && in_array('visa', $card_types)) {
+        // Don't break if the number is a Visa Electron or Switch number and
+        // those aren't enabled.
+        if (!((in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') && !in_array('visaelectron', $card_types)) &&
+          !(in_array($initial, array(4903, 4905, 4911, 4936)) && !in_array('switch', $card_types))) {
+          break;
+        }
+      }
+
+      // Visa Electron begins with 4026, 417500, 4508, 4844, 4913, or 4917 and
+      // is 16 numbers.
+      if (in_array('visaelectron', $card_types) && $strlen == 16 &&
+        (in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500')) {
+        break;
+      }
+
+      // Switch begins with 4903, 4905, 4911, or 4936 and is 16, 18, or 19
+      // numbers.
+      if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+        in_array($initial, array(4903, 4905, 4911, 4936))) {
+        break;
+      }
+
+      return FALSE;
+
+    case '5':
+      // MasterCard begins with 51-55 and is 16 numbers.
+      // Diners Club begins with 54 or 55 and is 16 numbers.
+      if ($strlen == 16) {
+        $initial = (int) substr($number, 0, 2);
+
+        if ($initial >= 51 && $initial <= 55 && in_array('mastercard', $card_types)) {
+          break;
+        }
+
+        if ($initial >= 54 && $initial <= 55 && in_array('dc', $card_types)) {
+          break;
+        }
+      }
+
+      // Switch begins with 564182 and is 16, 18, or 19 numbers.
+      if (in_array('switch', $card_types) && substr($number, 0, 6) == '564182' &&
+        in_array($strlen, array(16, 18, 19))) {
+        break;
+      }
+
+      // Maestro begins with 5018, 5020, or 5038 and is 12-19 numbers.
+      if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
+        in_array(substr($number, 0, 4), array(5018, 5020, 5038))) {
+        break;
+      }
+
+      return FALSE;
+
+    case '6':
+      // Discover begins with 6011, 622126-622925, 644-649, or 65 and is 16
+      // numbers.
+      if ($strlen == 16 && in_array('discover', $card_types)) {
+        if (substr($number, 0, 4) == '6011' || substr($number, 0, 2) == '65') {
+          break;
+        }
+
+        $initial = (int) substr($number, 0, 6);
+
+        if ($initial >= 622126 && $initial <= 622925) {
+          break;
+        }
+
+        $initial = (int) substr($number, 0, 3);
+
+        if ($initial >= 644 && $initial <= 649) {
+          break;
+        }
+      }
+
+      // Laser begins with 6304, 6706, 6771, or 6709 and is 16-19 numbers.
+      $initial = (int) substr($number, 0, 4);
+
+      if (in_array('laser', $card_types) && $strlen >= 16 && $strlen <= 19 &&
+        in_array($initial, array(6304, 6706, 6771, 6709))) {
+        break;
+      }
+
+      // Maestro begins with 6304, 6759, 6761, or 6763 and is 12-19 numbers.
+      if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
+        in_array($initial, array(6304, 6759, 6761, 6763))) {
+        break;
+      }
+
+      // Solo begins with 6334 or 6767 and is 16, 18, or 19 numbers.
+      if (in_array('solo', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+        in_array($initial, array(6334, 6767))) {
+        break;
+      }
+
+      // Switch begins with 633110, 6333, or 6759 and is 16, 18, or 19 numbers.
+      if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+        (in_array($initial, array(6333, 6759)) || substr($number, 0, 6) == 633110)) {
+        break;
+      }
+
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Validates a credit card number using the Luhn algorithm.
+ *
+ * @param $number
+ *   The credit card number to validate.
  *
  * @return
  *   TRUE or FALSE indicating the number's validity.
  *
- * @see http://en.wikipedia.org/wiki/Bank_card_number#Issuer_Identification_Number_.28IIN.29
  * @see http://www.merriampark.com/anatomycc.htm
- * @see commerce_payment_credit_card_types()
  */
-function commerce_payment_validate_credit_card_number($number, $card_types = array()) {
+function commerce_payment_validate_credit_card_number($number) {
   // Ensure every character in the number is numeric.
   if (!ctype_digit($number)) {
     return FALSE;
-  }
-
-  // Check for valid credit card types if specified.
-  if (!empty($card_types)) {
-    $strlen = strlen($number);
-
-    // Provide a check on the first digit (and card length if applicable).
-    switch (substr($number, 0, 1)) {
-      case '3':
-        // American Express begins with 3 and is 15 numbers.
-        if ($strlen == 15 && in_array('amex', $card_types)) {
-          break;
-        }
-
-        // JCB begins with 3528-3589 and is 16 numbers.
-        if ($strlen == 16 && in_array('jcb', $card_types)) {
-          break;
-        }
-
-        // Carte Blanche begins with 300-305 and is 14 numbers.
-        // Diners Club International begins 36 and is 14 numbers.
-        if ($strlen == 14) {
-          $initial = (int) substr($number, 0, 3);
-
-          if ($initial >= 300 && $initial <= 305 && in_array('cb', $card_types)) {
-            break;
-          }
-
-          if (substr($number, 0, 2) == '36' && in_array('dci', $card_types)) {
-            break;
-          }
-        }
-
-        return FALSE;
-
-      case '4':
-        $initial = (int) substr($number, 0, 4);
-
-        // Visa begins with 4 and is 16 numbers.
-        if ($strlen == 16 && in_array('visa', $card_types)) {
-          // Don't break if the number is a Visa Electron or Switch number and
-          // those aren't enabled.
-          if (!((in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') && !in_array('visaelectron', $card_types)) &&
-            !(in_array($initial, array(4903, 4905, 4911, 4936)) && !in_array('switch', $card_types))) {
-            break;
-          }
-        }
-
-        // Visa Electron begins with 4026, 417500, 4508, 4844, 4913, or 4917 and
-        // is 16 numbers.
-        if (in_array('visaelectron', $card_types) && $strlen == 16 &&
-          (in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500')) {
-          break;
-        }
-
-        // Switch begins with 4903, 4905, 4911, or 4936 and is 16, 18, or 19
-        // numbers.
-        if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
-          in_array($initial, array(4903, 4905, 4911, 4936))) {
-          break;
-        }
-
-        return FALSE;
-
-      case '5':
-        // MasterCard begins with 51-55 and is 16 numbers.
-        // Diners Club begins with 54 or 55 and is 16 numbers.
-        if ($strlen == 16) {
-          $initial = (int) substr($number, 0, 2);
-
-          if ($initial >= 51 && $initial <= 55 && in_array('mastercard', $card_types)) {
-            break;
-          }
-
-          if ($initial >= 54 && $initial <= 55 && in_array('dc', $card_types)) {
-            break;
-          }
-        }
-
-        // Switch begins with 564182 and is 16, 18, or 19 numbers.
-        if (in_array('switch', $card_types) && substr($number, 0, 6) == '564182' &&
-          in_array($strlen, array(16, 18, 19))) {
-          break;
-        }
-
-        // Maestro begins with 5018, 5020, or 5038 and is 12-19 numbers.
-        if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
-          in_array(substr($number, 0, 4), array(5018, 5020, 5038))) {
-          break;
-        }
-
-        return FALSE;
-
-      case '6':
-        // Discover begins with 6011, 622126-622925, 644-649, or 65 and is 16
-        // numbers.
-        if ($strlen == 16 && in_array('discover', $card_types)) {
-          if (substr($number, 0, 4) == '6011' || substr($number, 0, 2) == '65') {
-            break;
-          }
-
-          $initial = (int) substr($number, 0, 6);
-
-          if ($initial >= 622126 && $initial <= 622925) {
-            break;
-          }
-
-          $initial = (int) substr($number, 0, 3);
-
-          if ($initial >= 644 && $initial <= 649) {
-            break;
-          }
-        }
-
-        // Laser begins with 6304, 6706, 6771, or 6709 and is 16-19 numbers.
-        $initial = (int) substr($number, 0, 4);
-
-        if (in_array('laser', $card_types) && $strlen >= 16 && $strlen <= 19 &&
-          in_array($initial, array(6304, 6706, 6771, 6709))) {
-          break;
-        }
-
-        // Maestro begins with 6304, 6759, 6761, or 6763 and is 12-19 numbers.
-        if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
-          in_array($initial, array(6304, 6759, 6761, 6763))) {
-          break;
-        }
-
-        // Solo begins with 6334 or 6767 and is 16, 18, or 19 numbers.
-        if (in_array('solo', $card_types) && in_array($strlen, array(16, 18, 19)) &&
-          in_array($initial, array(6334, 6767))) {
-          break;
-        }
-
-        // Switch begins with 633110, 6333, or 6759 and is 16, 18, or 19 numbers.
-        if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
-          (in_array($initial, array(6333, 6759)) || substr($number, 0, 6) == 633110)) {
-          break;
-        }
-
-        return FALSE;
-    }
   }
 
   // Validate the number using the Luhn algorithm.
