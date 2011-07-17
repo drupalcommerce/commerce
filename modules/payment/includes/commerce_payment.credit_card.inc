@@ -9,11 +9,11 @@
  * Returns a set of credit card form elements that payment method modules can
  *   incorporate into their submission form callbacks.
  *
- * @param $default
- *   An array of default values for the available CC fields.
  * @param $fields
  *   An array specifying the CC fields that should be included on the form; the
  *     card number and expiration date fields are always present.
+ * @param $default
+ *   An array of default values for the available CC fields.
  */
 function commerce_payment_credit_card_form($fields = array(), $default = array()) {
   // Merge default values into the default array.
@@ -41,6 +41,16 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
       '#title' => t('Card type'),
       '#options' => array_intersect_key(commerce_payment_credit_card_types(), drupal_map_assoc((array) $fields['type'])),
       '#default_value' => $default['type'],
+    );
+    $form['credit_card']['valid_types'] = array(
+      '#type' => 'value',
+      '#value' => $fields['type'],
+    );
+  }
+  else {
+    $form['credit_card']['valid_types'] = array(
+      '#type' => 'value',
+      '#value' => array(),
     );
   }
 
@@ -147,7 +157,13 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
  *
  * @param $details
  *   An array of credit card details as retrieved from the credit card array in
- *     the form values of a form containing the credit card form.
+ *   the form values of a form containing the credit card form.
+ * @param $settings
+ *   Settings used for calling validation functions and setting form errors:
+ *   - form_parents: an array of parent elements identifying where the credit
+ *     card form was situated in the form array
+ *   - valid_cc_types: optional array of credit card types to accept when
+ *     validating the credit card number: visa, mastercard, amex, discover
  *
  * @return
  *   TRUE or FALSE indicating the validity of all the data.
@@ -159,7 +175,8 @@ function commerce_payment_credit_card_validate($details, $settings) {
   $valid = TRUE;
 
   // Validate the credit card number.
-  if (!commerce_payment_validate_credit_card_number($details['number'])) {
+  // TODO: Separate card type validation from Luhn algorithm validation.
+  if (!commerce_payment_validate_credit_card_number($details['number'], $details['valid_types'])) {
     form_set_error($prefix . 'number', t('You have entered an invalid credit card number.'));
     $valid = FALSE;
   }
@@ -204,6 +221,7 @@ function commerce_payment_credit_card_validate($details, $settings) {
  * @return
  *   TRUE or FALSE indicating the number's validity.
  *
+ * @see http://en.wikipedia.org/wiki/Bank_card_number#Issuer_Identification_Number_.28IIN.29
  * @see http://www.merriampark.com/anatomycc.htm
  * @see commerce_payment_credit_card_types()
  */
@@ -215,25 +233,143 @@ function commerce_payment_validate_credit_card_number($number, $card_types = arr
 
   // Check for valid credit card types if specified.
   if (!empty($card_types)) {
-    $card_type = '';
+    $strlen = strlen($number);
 
+    // Provide a check on the first digit (and card length if applicable).
     switch (substr($number, 0, 1)) {
       case '3':
-        $card_type = 'amex';
-        break;
-      case '4':
-        $card_type = 'visa';
-        break;
-      case '5':
-        $card_type = 'mastercard';
-        break;
-      case '6':
-        $card_type = 'discover';
-        break;
-    }
+        // American Express begins with 3 and is 15 numbers.
+        if ($strlen == 15 && in_array('amex', $card_types)) {
+          break;
+        }
 
-    if (!in_array($card_type, $card_types)) {
-      return FALSE;
+        // JCB begins with 3528-3589 and is 16 numbers.
+        if ($strlen == 16 && in_array('jcb', $card_types)) {
+          break;
+        }
+
+        // Carte Blanche begins with 300-305 and is 14 numbers.
+        // Diners Club International begins 36 and is 14 numbers.
+        if ($strlen == 14) {
+          $initial = (int) substr($number, 0, 3);
+
+          if ($initial >= 300 && $initial <= 305 && in_array('cb', $card_types)) {
+            break;
+          }
+
+          if (substr($number, 0, 2) == '36' && in_array('dci', $card_types)) {
+            break;
+          }
+        }
+
+        return FALSE;
+
+      case '4':
+        $initial = (int) substr($number, 0, 4);
+
+        // Visa begins with 4 and is 16 numbers.
+        if ($strlen == 16 && in_array('visa', $card_types)) {
+          // Don't break if the number is a Visa Electron or Switch number and
+          // those aren't enabled.
+          if (!((in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') && !in_array('visaelectron', $card_types)) &&
+            !(in_array($initial, array(4903, 4905, 4911, 4936)) && !in_array('switch', $card_types))) {
+            break;
+          }
+        }
+
+        // Visa Electron begins with 4026, 417500, 4508, 4844, 4913, or 4917 and
+        // is 16 numbers.
+        if (in_array('visaelectron', $card_types) && $strlen == 16 &&
+          (in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500')) {
+          break;
+        }
+
+        // Switch begins with 4903, 4905, 4911, or 4936 and is 16, 18, or 19
+        // numbers.
+        if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+          in_array($initial, array(4903, 4905, 4911, 4936))) {
+          break;
+        }
+
+        return FALSE;
+
+      case '5':
+        // MasterCard begins with 51-55 and is 16 numbers.
+        // Diners Club begins with 54 or 55 and is 16 numbers.
+        if ($strlen == 16) {
+          $initial = (int) substr($number, 0, 2);
+
+          if ($initial >= 51 && $initial <= 55 && in_array('mastercard', $card_types)) {
+            break;
+          }
+
+          if ($initial >= 54 && $initial <= 55 && in_array('dc', $card_types)) {
+            break;
+          }
+        }
+
+        // Switch begins with 564182 and is 16, 18, or 19 numbers.
+        if (in_array('switch', $card_types) && substr($number, 0, 6) == '564182' &&
+          in_array($strlen, array(16, 18, 19))) {
+          break;
+        }
+
+        // Maestro begins with 5018, 5020, or 5038 and is 12-19 numbers.
+        if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
+          in_array(substr($number, 0, 4), array(5018, 5020, 5038))) {
+          break;
+        }
+
+        return FALSE;
+
+      case '6':
+        // Discover begins with 6011, 622126-622925, 644-649, or 65 and is 16
+        // numbers.
+        if ($strlen == 16 && in_array('discover', $card_types)) {
+          if (substr($number, 0, 4) == '6011' || substr($number, 0, 2) == '65') {
+            break;
+          }
+
+          $initial = (int) substr($number, 0, 6);
+
+          if ($initial >= 622126 && $initial <= 622925) {
+            break;
+          }
+
+          $initial = (int) substr($number, 0, 3);
+
+          if ($initial >= 644 && $initial <= 649) {
+            break;
+          }
+        }
+
+        // Laser begins with 6304, 6706, 6771, or 6709 and is 16-19 numbers.
+        $initial = (int) substr($number, 0, 4);
+
+        if (in_array('laser', $card_types) && $strlen >= 16 && $strlen <= 19 &&
+          in_array($initial, array(6304, 6706, 6771, 6709))) {
+          break;
+        }
+
+        // Maestro begins with 6304, 6759, 6761, or 6763 and is 12-19 numbers.
+        if (in_array('maestro', $card_types) && $strlen >= 12 && $strlen <= 19 &&
+          in_array($initial, array(6304, 6759, 6761, 6763))) {
+          break;
+        }
+
+        // Solo begins with 6334 or 6767 and is 16, 18, or 19 numbers.
+        if (in_array('solo', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+          in_array($initial, array(6334, 6767))) {
+          break;
+        }
+
+        // Switch begins with 633110, 6333, or 6759 and is 16, 18, or 19 numbers.
+        if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+          (in_array($initial, array(6333, 6759)) || substr($number, 0, 6) == 633110)) {
+          break;
+        }
+
+        return FALSE;
     }
   }
 
@@ -364,12 +500,16 @@ function commerce_payment_credit_card_types() {
   return array(
     'visa' => t('Visa'),
     'mastercard' => t('MasterCard'),
-    'discover' => t('Discover'),
     'amex' => t('American Express'),
-    'maestro' => t('Maestro'),
-    'delta' => t('Visa Debit / Delta'),
-    'dc' => t("Diner's Club"),
+    'discover' => t('Discover Card'),
+    'dc' => t("Diners Club"),
+    'dci' => t("Diners Club International"),
+    'cb' => t("Carte Blanche"),
     'jcb' => t('JCB'),
-    'laser' => t('Laser')
+    'maestro' => t('Maestro'),
+    'visaelectron' => t('Visa Electron'),
+    'laser' => t('Laser'),
+    'solo' => t('Solo'),
+    'switch' => t('Switch'),
   );
 }
