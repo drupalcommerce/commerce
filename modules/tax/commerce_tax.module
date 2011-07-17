@@ -539,3 +539,62 @@ function commerce_tax_commerce_line_item_rebase_unit_price(&$price, $old_compone
     }
   }
 }
+
+/**
+ * Returns the total amount of tax included in a price components array.
+ *
+ * @param $components
+ *   A price's components array including potential tax components.
+ * @param $included
+ *   Boolean indicating whether or not to include in the total taxes that were
+ *   included in the price amount already.
+ * @param $currency_code
+ *   The currency to return the tax amount in.
+ *
+ * @return
+ *   The consolidated tax collected for an order expressed as an integer amount.
+ */
+function commerce_tax_total_amount($components, $included, $currency_code) {
+  $component_types = commerce_tax_commerce_price_component_type_info();
+  $amount = 0;
+
+  // Loop over each component passed in...
+  foreach ($components as $component) {
+    // Looking for components that match one of the defined tax price components.
+    if (in_array($component['name'], array_keys($component_types))) {
+      // If the component matches the requested "included" value...
+      if ((!$included && empty($component['included'])) ||
+        $included && !empty($component['included'])) {
+        // Add the converted price amount to the running total.
+        $amount += commerce_currency_convert($component['price']['amount'], $component['price']['currency_code'], $currency_code);
+      }
+    }
+  }
+
+  return $amount;
+}
+
+/**
+ * Returns an array of tax components from a price components array.
+ *
+ * @param $components
+ *   A price's components array including potential tax components.
+ *
+ * @return
+ *   An array of tax price component arrays.
+ */
+function commerce_tax_components($components) {
+  $component_types = commerce_tax_commerce_price_component_type_info();
+  $tax_components = array();
+
+  // Loop over each component passed in...
+  foreach ($components as $component) {
+    // Looking for components that match one of the defined tax price components.
+    if (in_array($component['name'], array_keys($component_types))) {
+      // Add the component to the tax components array.
+      $tax_components[] = $component;
+    }
+  }
+
+  return $tax_components;
+}
