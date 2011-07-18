@@ -735,6 +735,8 @@ function commerce_commerce_currency_info() {
       'symbol' => 'RM',
       'name' => t('Malaysian Ringgit'),
       'numeric_code' => '458',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Sen'),
       'major_unit' => t('Ringgits'),
     ),
