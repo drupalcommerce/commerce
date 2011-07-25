@@ -670,19 +670,19 @@ function commerce_entity_access($op, $entity, $account, $entity_type) {
   global $user;
   $account = isset($account) ? $account : $user;
 
-  $info = entity_get_info($entity_type);
+  $entity_info = entity_get_info($entity_type);
 
   if ($op == 'view') {
     if (isset($entity)) {
       // When trying to figure out access to an entity, query the base table using
       // our access control tag.
-      if (!empty($info['access arguments']['access tag']) && module_implements('query_' . $info['access arguments']['access tag'] . '_alter')) {
-        $query = db_select($info['base table']);
+      if (!empty($entity_info['access arguments']['access tag']) && module_implements('query_' . $entity_info['access arguments']['access tag'] . '_alter')) {
+        $query = db_select($entity_info['base table']);
         $query->addExpression('1');
         return (bool) $query
-          ->addTag($info['access arguments']['access tag'])
+          ->addTag($entity_info['access arguments']['access tag'])
           ->addMetaData('account', $account)
-          ->condition($info['entity keys']['id'], $entity->{$info['entity keys']['id']})
+          ->condition($entity_info['entity keys']['id'], $entity->{$entity_info['entity keys']['id']})
           ->range(0, 1)
           ->execute()
           ->fetchField();
