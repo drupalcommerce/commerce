@@ -16,6 +16,7 @@ function commerce_customer_views_data() {
     'field' => 'profile_id',
     'title' => t('Commerce Customer Profile'),
     'help' => t('Customer profiles containing addresses and other customer information.'),
+    'entity type' => 'commerce_customer_profile',
     'access query tag' => 'commerce_customer_profile_access',
   );
 

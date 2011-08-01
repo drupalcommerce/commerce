@@ -16,6 +16,7 @@ function commerce_order_views_data() {
     'field' => 'order_number',
     'title' => t('Commerce Order'),
     'help' => t('Order placed in the store.'),
+    'entity type' => 'commerce_order',
     'access query tag' => 'commerce_order_access',
   );
 

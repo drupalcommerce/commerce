@@ -16,6 +16,7 @@ function commerce_product_views_data() {
     'field' => 'product_id',
     'title' => t('Commerce Product'),
     'help' => t('Products from the store.'),
+    'entity type' => 'commerce_product',
     'access query tag' => 'commerce_product_access',
   );
 
