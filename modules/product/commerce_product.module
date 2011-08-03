@@ -172,29 +172,29 @@ function commerce_product_field_extra_fields() {
     $extra['commerce_product'][$type] = array(
       'form' => array(
         'sku' => array(
-          'label' => 'Product SKU',
+          'label' => t('Product SKU'),
           'description' => t('Product module SKU form element'),
           'weight' => -10,
         ),
         'title' => array(
-          'label' => 'Title',
+          'label' => t('Title'),
           'description' => t('Product module title form element'),
           'weight' => -5,
         ),
         'status' => array(
-          'label' => 'Status',
+          'label' => t('Status'),
           'description' => t('Product module status form element'),
           'weight' => 35,
         ),
       ),
       'display' => array(
         'sku' => array(
-          'label' => 'Product SKU',
+          'label' => t('Product SKU'),
           'description' => t('The human readable identifier of the product'),
           'weight' => -10,
         ),
         'title' => array(
-          'label' => 'Title',
+          'label' => t('Title'),
           'description' => t('Full product title'),
           'weight' => -5,
         ),
