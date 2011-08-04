@@ -311,18 +311,14 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
     $statuses = array_keys(commerce_order_statuses(array('cart' => TRUE)));
 
     if (!empty($statuses)) {
-      watchdog('Profile ' . $profile->profile_id, 'Adding statuses.');
       $query->propertyCondition('status', $statuses, 'NOT IN');
     }
 
     // If the profile includes an order context property, we know this was added
     // by the Order module as an order ID to skip in the deletion query.
     if (!empty($profile->entity_context) && $profile->entity_context['entity_type'] == 'commerce_order') {
-      watchdog('Profile ' . $profile->profile_id, 'Exempting order ' . $profile->entity_context['entity_id']);
       $query->propertyCondition('order_id', $profile->entity_context['entity_id'], '!=');
     }
-
-    watchdog('Profile ' . $profile->profile_id, 'Count = ' . $query->execute());
 
     if ($query->execute() > 0) {
       return FALSE;
