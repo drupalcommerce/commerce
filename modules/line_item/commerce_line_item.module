@@ -301,7 +301,7 @@ function commerce_line_item_commerce_line_item_delete($line_item) {
 
         // Loop over each entity and remove the reference to the deleted line item.
         foreach ($entities as $entity_id => $entity) {
-          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $line_item->line_item_id);
+          commerce_entity_reference_delete($entity, $field_name, 'line_item_id', $line_item->line_item_id);
 
           entity_save($entity_type, $entity);
         }

@@ -176,18 +176,7 @@ function commerce_product_reference_commerce_product_delete($product) {
 
         // Loop over each entity and remove the reference to the deleted product.
         foreach ($entities as $entity_id => $entity) {
-          foreach ($entity->{$field_name} as $langcode => $items) {
-            foreach ($items as $delta => $item) {
-              if ($item['product_id'] == $product->product_id) {
-                unset($entity->{$field_name}[$langcode][$delta]);
-              }
-            }
-
-            // If the reference field is empty, wipe its data altogether.
-            if (count($entity->{$field_name}[$langcode]) == 0) {
-              unset($entity->{$field_name}[$langcode]);
-            }
-          }
+          commerce_entity_reference_delete($entity, $field_name, 'product_id', $product->product_id);
 
           // Store the changes to the entity.
           entity_save($entity_type, $entity);

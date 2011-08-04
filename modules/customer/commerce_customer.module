@@ -547,7 +547,7 @@ function commerce_customer_commerce_customer_profile_delete($profile) {
 
         // Loop over each entity and remove the reference to the deleted profile.
         foreach ($entities as $entity_id => $entity) {
-          $entity = commerce_entity_reference_delete($entity_type, $entity, $field_name, $profile->profile_id);
+          commerce_entity_reference_delete($entity, $field_name, 'profile_id', $profile->profile_id);
 
           // Store the changes to the entity.
           entity_save($entity_type, $entity);

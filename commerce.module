@@ -68,40 +68,37 @@ function commerce_info_fields($field_type, $entity_type = NULL) {
 /**
  * Deletes a reference to another entity from an entity with a reference field.
  *
- * @param $entity_type
- *   Entity type of the entity with the reference field.
  * @param $entity
  *   The entity that contains the reference field.
  * @param $field_name
  *   The name of the entity reference field.
+ * @param $col_name
+ *   The name of the column in the field's schema containing the referenced
+ *   entity's ID.
  * @param $ref_entity_id
  *   The ID of the entity to delete from the reference field.
- *
- * @return
- *   The updated entity with the reference deleted.
  */
-function commerce_entity_reference_delete($entity_type, $entity, $field_name, $ref_entity_id) {
-  $wrapper = entity_metadata_wrapper($entity_type, $entity);
+function commerce_entity_reference_delete($entity, $field_name, $col_name, $ref_entity_id) {
+  // Exit now if the entity does not have the expected field.
+  if (empty($entity->{$field_name})) {
+    return;
+  }
 
-  // If the reference field is multiple value...
-  if ($wrapper->{$field_name} instanceof EntityListWrapper) {
-    // Loop over every entity referenced by the specified field.
-    foreach ($wrapper->{$field_name} as $delta => $ref_entity_wrapper) {
-      // If its ID matches the specified entity...
-      if ($ref_entity_wrapper->getIdentifier() == $ref_entity_id) {
-        // Unset the referenced entity and return the containing updated entity.
-        $wrapper->{$field_name}->offsetUnset($delta);
+  // Loop over each of the field's items in every language.
+  foreach ($entity->{$field_name} as $langcode => $items) {
+    foreach ($items as $delta => $item) {
+      // If the item references the specified entity...
+      if (!empty($item[$col_name]) && $item[$col_name] == $ref_entity_id) {
+        // Unset the reference.
+        unset($entity->{$field_name}[$langcode][$delta]);
       }
     }
-  }
-  else {
-    // Otherwise check the reference value directly.
-    if ($wrapper->{$field_name}->getIdentifier() == $ref_entity_id) {
-      $wrapper->{$field_name} = NULL;
+
+    // If the reference field is empty, wipe its data altogether.
+    if (count($entity->{$field_name}[$langcode]) == 0) {
+      unset($entity->{$field_name}[$langcode]);
     }
   }
-
-  return $wrapper->value();
 }
 
 /**
