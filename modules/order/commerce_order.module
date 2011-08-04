@@ -268,20 +268,24 @@ function commerce_order_field_attach_form($entity_type, $entity, &$form, &$form_
         // Loop over each of its child items...
         foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
           foreach (element_children($form[$key][$form[$key]['#language']][$delta]) as $subdelta) {
+            // Extract the customer profile from the widget form element.
+            $profile = $form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value'];
+
             // Add the order context to the profile stored in the field element.
-            $form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->entity_context = array(
+            $profile->entity_context = array(
               'entity_type' => 'commerce_order',
               'entity_id' => $entity->order_id,
             );
 
             // Add a uid if it is empty and the order has one.
-            if (empty($form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->uid) &&
-              !empty($entity->uid)) {
-              $form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value']->uid = $entity->uid;
+            if (empty($profile->uid) && !empty($entity->uid)) {
+              $profile->uid = $entity->uid;
             }
 
-            // If this means this profile can now be deleted...
-            if (commerce_customer_profile_can_delete($form[$key][$form[$key]['#language']][$delta][$subdelta]['profile']['#value'])) {
+            // If this means this profile can now be deleted and the reference
+            // field widget includes a remove element...
+            if ($profile->profile_id && commerce_customer_profile_can_delete($profile) &&
+              !empty($form[$key][$form[$key]['#language']][$delta][$subdelta]['remove'])) {
               // Update its remove element's title accordingly.
               $form[$key][$form[$key]['#language']][$delta][$subdelta]['remove']['#title'] = t('Delete this profile');
             }

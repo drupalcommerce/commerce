@@ -482,6 +482,13 @@ function commerce_customer_profile_build_content($profile, $view_mode = 'adminis
  *   Boolean indicating whether or not the customer profile can be deleted.
  */
 function commerce_customer_profile_can_delete($profile) {
+  // Return FALSE if the given profile does not have an ID; it need not be
+  // deleted, which is functionally equivalent to cannot be deleted as far as
+  // code depending on this function is concerned.
+  if (empty($profile->profile_id)) {
+    return FALSE;
+  }
+
   // If any module implementing hook_commerce_customer_profile_can_delete()
   // returns FALSE the customer profile cannot be deleted. Return TRUE if none
   // return FALSE.

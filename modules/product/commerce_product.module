@@ -460,6 +460,13 @@ function commerce_product_build_content($product, $view_mode = 'full') {
  *   Boolean indicating whether or not the product can be deleted.
  */
 function commerce_product_can_delete($product) {
+  // Return FALSE if the given product does not have an ID; it need not be
+  // deleted, which is functionally equivalent to cannot be deleted as far as
+  // code depending on this function is concerned.
+  if (empty($product->product_id)) {
+    return FALSE;
+  }
+
   // If any module implementing hook_commerce_product_can_delete() returns FALSE
   // the product cannot be deleted. Return TRUE if none return FALSE.
   return !in_array(FALSE, module_invoke_all('commerce_product_can_delete', $product));
