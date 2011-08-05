@@ -656,12 +656,19 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 }
 
 /**
- * Implements hook_field_widget_validate().
+ * Validate callback: ensures the amount value is numeric and converts it from a
+ * decimal value to an integer price amount.
  */
 function commerce_price_field_widget_validate($element, &$form_state) {
   if ($element['amount']['#value'] !== '') {
-    // Convert the decimal amount value entered to an integer based amount value.
-    form_set_value($element['amount'], commerce_currency_decimal_to_amount($element['amount']['#value'], $element['currency_code']['#value']), $form_state);
+    // Ensure the price is numeric.
+    if (!is_numeric($element['amount']['#value'])) {
+      form_error($element['amount'], t('%title: you must enter a numeric value for the price amount.', array('%title' => $element['amount']['#title'])));
+    }
+    else {
+      // Convert the decimal amount value entered to an integer based amount value.
+      form_set_value($element['amount'], commerce_currency_decimal_to_amount($element['amount']['#value'], $element['currency_code']['#value']), $form_state);
+    }
   }
 }
 
