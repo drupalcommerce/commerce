@@ -80,16 +80,27 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   // Add the field widgets for the profile.
   field_attach_form('commerce_customer_profile', $profile, $pane_form, $form_state);
 
-  // Tweak the form to remove the fieldset from address fields.
-  $field_name = 'commerce_customer_address';
+  // Tweak the form to remove the fieldset from the address field if there
+  // is only one on this profile.
+  $addressfields = array();
 
-  if (!empty($pane_form[$field_name])) {
-    $language = $pane_form[$field_name]['#language'];
+  foreach (commerce_info_fields('addressfield', 'commerce_customer_profile') as $field_name => $field) {
+    $langcode = $pane_form[$field_name]['#language'];
 
-    foreach (element_children($pane_form[$field_name][$language]) as $delta) {
+    // Only consider this addressfield if it's represented on the form.
+    if (!empty($pane_form[$field_name][$langcode])) {
+      $addressfields[] = array($field_name, $langcode);
+    }
+  }
+
+  // Check to ensure only one addressfield was found on the form.
+  if (count($addressfields) == 1) {
+    list($field_name, $langcode) = array_shift($addressfields);
+
+    foreach (element_children($pane_form[$field_name][$langcode]) as $delta) {
       // Don't mess with the "Add another item" button that could be present.
-      if ($pane_form[$field_name][$language][$delta]['#type'] != 'submit') {
-        $pane_form[$field_name][$language][$delta]['#type'] = 'container';
+      if ($pane_form[$field_name][$langcode][$delta]['#type'] != 'submit') {
+        $pane_form[$field_name][$langcode][$delta]['#type'] = 'container';
       }
     }
   }
