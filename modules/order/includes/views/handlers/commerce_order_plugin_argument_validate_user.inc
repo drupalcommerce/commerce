@@ -80,8 +80,9 @@ class commerce_order_plugin_argument_validate_user extends views_plugin_argument
         $roles = array();
 
         foreach ($this->options['roles'] as $rid) {
-          $role = user_role_load($rid);
-          $roles[$rid] = $role->name;
+          if ($role = user_role_load($rid)) {
+            $roles[$rid] = $role->name;
+          }
         }
 
         // Look for matching roles on the current user.
