@@ -61,23 +61,23 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
       $line_item->changed = REQUEST_TIME;
 
       // Update the total of the line item based on the quantity and unit price.
-      $wrapper->commerce_total->amount = $line_item->quantity * $wrapper->commerce_unit_price->amount->value();
-      $wrapper->commerce_total->currency_code = $wrapper->commerce_unit_price->currency_code->value();
+      $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
+
+      $wrapper->commerce_total->amount = $line_item->quantity * $unit_price['amount'];
+      $wrapper->commerce_total->currency_code = $unit_price['currency_code'];
 
       // Add the components multiplied by the quantity to the data array.
-      $data = $wrapper->commerce_unit_price->data->value();
-
-      if (empty($data['components'])) {
-        $data['components'] = array();
+      if (empty($unit_price['data']['components'])) {
+        $unit_price['data']['components'] = array();
       }
       else {
-        foreach ($data['components'] as $key => $component) {
-          $data['components'][$key]['price']['amount'] *= $line_item->quantity;
+        foreach ($unit_price['data']['components'] as $key => &$component) {
+          $component['price']['amount'] *= $line_item->quantity;
         }
       }
 
       // Set the updated data array to the total price.
-      $wrapper->commerce_total->data = $data;
+      $wrapper->commerce_total->data = $unit_price['data'];
 
       return parent::save($line_item, $transaction);
     }

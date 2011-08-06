@@ -390,6 +390,13 @@ function commerce_price_field_formatter_view($entity_type, $entity, $field, $ins
 
   // Loop through each price value in this field.
   foreach ($items as $delta => $item) {
+    // Do not render a price if the amount is NULL (i.e. non-zero empty value).
+    if (is_null($item['amount'])) {
+      // TODO: Consider if we should render as N/A or something indicating a
+      // price was not available as opposed to just leaving a blank.
+      continue;
+    }
+
     // Theme the display of the price based on the display type.
     switch ($display['type']) {
       case 'commerce_price_raw_amount':
@@ -733,6 +740,34 @@ function commerce_price_field_data_property_info($name = NULL) {
       'setter callback' => 'entity_property_verbatim_set',
     ),
   );
+}
+
+/**
+ * Returns the data array of a single value price field from a wrapped entity,
+ * using an optional default value if the entity does not have data in the field.
+ *
+ * @param $wrapper
+ *   An EntityMetadataWrapper for the entity whose price should be retrieved.
+ * @param $field_name
+ *   The name of the field to retrieve data from in the wrapper.
+ * @param $default
+ *   Boolean indicating whether or not to return a default price array if the
+ *   entity does not have data in the specified price field.
+ *
+ * @return
+ *   The data array of the specified price field.
+ */
+function commerce_price_wrapper_value($wrapper, $field_name, $default = FALSE) {
+  // Extract the price field's value array from the given entity.
+  $price = $wrapper->{$field_name}->value();
+
+  // If the value is empty and we want to return a default value for the field,
+  // use the auto creation value defined for Entity API usage.
+  if (empty($price) && $default) {
+    $price = commerce_price_field_data_auto_creation();
+  }
+
+  return $price;
 }
 
 /**

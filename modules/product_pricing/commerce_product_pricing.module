@@ -292,23 +292,25 @@ function commerce_product_pre_calculate_sell_prices($from = NULL, $count = 1) {
         // Build the record of the pre-calculated price and write it.
         $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-        $record = array(
-          'module' => 'commerce_product_pricing',
-          'module_key' => $key,
-          'entity_type' => 'commerce_product',
-          'entity_id' => $product_id,
-          'field_name' => 'commerce_price',
-          'language' => !empty($product->language) ? $product->language : '',
-          'delta' => 0,
-          'amount' => round($wrapper->commerce_unit_price->amount->value()),
-          'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
-          'data' => $wrapper->commerce_unit_price->data->value(),
-          'created' => time(),
-        );
+        if (!is_null($wrapper->commerce_unit_price->value())) {
+          $record = array(
+            'module' => 'commerce_product_pricing',
+            'module_key' => $key,
+            'entity_type' => 'commerce_product',
+            'entity_id' => $product_id,
+            'field_name' => 'commerce_price',
+            'language' => !empty($product->language) ? $product->language : '',
+            'delta' => 0,
+            'amount' => round($wrapper->commerce_unit_price->amount->value()),
+            'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),
+            'data' => $wrapper->commerce_unit_price->data->value(),
+            'created' => time(),
+          );
 
-        // Save the price and increment the total if successful.
-        if (drupal_write_record('commerce_calculated_price', $record) == SAVED_NEW) {
-          $total++;
+          // Save the price and increment the total if successful.
+          if (drupal_write_record('commerce_calculated_price', $record) == SAVED_NEW) {
+            $total++;
+          }
         }
       }
     }

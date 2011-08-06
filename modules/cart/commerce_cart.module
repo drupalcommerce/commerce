@@ -719,28 +719,35 @@ function commerce_cart_order_refresh($order) {
     // Allow other modules alter line items on a shopping cart refresh.
     module_invoke_all('commerce_cart_line_item_refresh', $cloned_line_item, $order_wrapper);
 
-    // Compare the refreshed unit price to the original unit price looking for
-    // differences in the amount, currency code, or price components.
+    // Delete this line item if the product no longer has a valid price.
     $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $cloned_line_item);
-    $data = $line_item_wrapper->commerce_unit_price->data->value();
-    $current_data = $current_line_item_wrapper->commerce_unit_price->data->value();
 
-    if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
-      $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value() ||
-      $data['components'] != $current_data['components']) {
-      // Adjust the unit price accordingly if necessary.
-      $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
-      $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
+    if (is_null($current_line_item_wrapper->commerce_unit_price->value())) {
+      commerce_cart_order_product_line_item_delete($order, $cloned_line_item->line_item_id, TRUE);
+    }
+    else {
+      // Compare the refreshed unit price to the original unit price looking for
+      // differences in the amount, currency code, or price components.
+      $data = $line_item_wrapper->commerce_unit_price->data->value();
+      $current_data = $current_line_item_wrapper->commerce_unit_price->data->value();
 
-      // Only migrate the price components in the data to preserve other data.
-      $data['components'] = $current_data['components'];
-      $line_item_wrapper->commerce_unit_price->data = $data;
+      if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
+        $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value() ||
+        $data['components'] != $current_data['components']) {
+        // Adjust the unit price accordingly if necessary.
+        $line_item_wrapper->commerce_unit_price->amount = $current_line_item_wrapper->commerce_unit_price->amount->value();
+        $line_item_wrapper->commerce_unit_price->currency_code = $current_line_item_wrapper->commerce_unit_price->currency_code->value();
 
-      // Save the updated line item and clear the entity cache.
-      commerce_line_item_save($line_item_wrapper->value());
-      entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
+        // Only migrate the price components in the data to preserve other data.
+        $data['components'] = $current_data['components'];
+        $line_item_wrapper->commerce_unit_price->data = $data;
 
-      $line_item_changed = TRUE;
+        // Save the updated line item and clear the entity cache.
+        commerce_line_item_save($line_item_wrapper->value());
+        entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
+
+        $line_item_changed = TRUE;
+      }
     }
   }
 
@@ -895,6 +902,13 @@ function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE
  *   The new or updated line item object or FALSE on failure.
  */
 function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
+  // Do not add the line item if it doesn't have a unit price.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+  if (is_null($line_item_wrapper->commerce_unit_price->value())) {
+    return FALSE;
+  }
+
   // First attempt to load the customer's shopping cart order.
   $order = commerce_cart_order_load($uid);
 
@@ -906,9 +920,8 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
   // Set the incoming line item's order_id.
   $line_item->order_id = $order->order_id;
 
-  // Wrap the order and incoming line item for easy access to field data.
+  // Wrap the order for easy access to field data.
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
   // Extract the product and quantity we're adding from the incoming line item.
   $product = $line_item_wrapper->commerce_product->value();
@@ -1290,6 +1303,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       '#type' => 'submit',
       '#value' => t('Product not available'),
       '#disabled' => TRUE,
+      '#weight' => 15,
     );
   }
   else {
@@ -1666,11 +1680,22 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       }
     }
 
-    $form['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add to cart'),
-      '#weight' => 15,
-    );
+    // Do not allow products without a price to be purchased.
+    if (is_null(commerce_product_calculate_sell_price($form_state['default_product']))) {
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Product not available'),
+        '#disabled' => TRUE,
+        '#weight' => 15,
+      );
+    }
+    else {
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add to cart'),
+        '#weight' => 15,
+      );
+    }
   }
 
   // Add the handlers manually since we're using hook_forms() to associate this
@@ -1760,16 +1785,24 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
     // purchase price.
     rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
 
-    // Add the product to the specified shopping cart.
-    $form_state['line_item'] = commerce_cart_product_add(
-      $form_state['values']['uid'],
-      $line_item,
-      isset($line_item->data['context']['add_to_cart_combine']) ? $line_item->data['context']['add_to_cart_combine'] : TRUE
-    );
+    // Only attempt an Add to Cart if the line item has a valid unit price.
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
-    // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
-    // display the product title or the product display node title?
-    drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
+    if (!is_null($line_item_wrapper->commerce_unit_price->value())) {
+      // Add the product to the specified shopping cart.
+      $form_state['line_item'] = commerce_cart_product_add(
+        $form_state['values']['uid'],
+        $line_item,
+        isset($line_item->data['context']['add_to_cart_combine']) ? $line_item->data['context']['add_to_cart_combine'] : TRUE
+      );
+
+      // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
+      // display the product title or the product display node title?
+      drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
+    }
+    else {
+      drupal_set_message(t('%title could not be added to your cart.', array('%title' => $product->title)), 'error');
+    }
   }
 }
 

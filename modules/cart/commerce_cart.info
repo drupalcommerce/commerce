@@ -6,6 +6,7 @@ dependencies[] = commerce_checkout
 dependencies[] = commerce_line_item
 dependencies[] = commerce_order
 dependencies[] = commerce_product
+dependencies[] = commerce_product_pricing
 dependencies[] = commerce_product_reference
 dependencies[] = entity
 dependencies[] = rules

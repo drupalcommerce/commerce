@@ -927,17 +927,20 @@ function commerce_product_line_item_populate($line_item, $product) {
     $line_item_wrapper->commerce_display_path = '';
   }
 
-  // Set the unit price on the line item object.
-  $line_item_wrapper->commerce_unit_price = $product_wrapper->commerce_price->value();
+  // Set the unit price on the line item object if the product has a value in
+  // its commerce_price field.
+  $line_item->commerce_unit_price = $product->commerce_price;
 
-  // Add the base price to the components array.
-  if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), 'base_price')) {
-    $line_item_wrapper->commerce_unit_price->data = commerce_price_component_add(
-      $line_item_wrapper->commerce_unit_price->value(),
-      'base_price',
-      $line_item_wrapper->commerce_unit_price->value(),
-      TRUE
-    );
+  if (!is_null($line_item_wrapper->commerce_unit_price->value())) {
+    // Add the base price to the components array.
+    if (!commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), 'base_price')) {
+      $line_item_wrapper->commerce_unit_price->data = commerce_price_component_add(
+        $line_item_wrapper->commerce_unit_price->value(),
+        'base_price',
+        $line_item_wrapper->commerce_unit_price->value(),
+        TRUE
+      );
+    }
   }
 }
 
