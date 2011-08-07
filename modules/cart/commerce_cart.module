@@ -624,17 +624,58 @@ function commerce_cart_order_is_cart($order) {
 }
 
 /**
- * Implementation of hook_commerce_entity_access_condition_commerce_order_alter().
+ * Implements hook_commerce_entity_access_condition_commerce_order_alter().
  *
- * Allow visitors to access their own shopping carts.
+ * This alter hook allows the Cart module to add conditions to the query used to
+ * determine if a user has view access to a given order. The Cart module will
+ * always grant users access to view their own carts (independent of any
+ * permission settings) and also grants anonymous users access to view their
+ * completed orders if they've been given the permission.
  */
 function commerce_cart_commerce_entity_access_condition_commerce_order_alter(&$conditions, $context) {
-  if ($current_order_id = commerce_cart_order_id($context['account']->uid)) {
+  // Find the user's cart order ID and anonymous user's completed orders.
+  $current_order_id = commerce_cart_order_id($context['account']->uid);
+  $completed_order_ids = commerce_cart_order_session_order_ids(TRUE);
+
+  // Always give the current user access to their own cart regardless of order
+  // view permissions.
+  if (!empty($current_order_id)) {
     $conditions->condition($context['base_table'] . '.order_id', $current_order_id);
   }
 
-  if ($completed_order_ids = commerce_cart_order_session_order_ids(TRUE)) {
+  // Bail now if the access query is for an authenticated user or if the
+  // anonymous user doesn't have any completed orders.
+  if ($context['account']->uid || empty($completed_order_ids)) {
+    return;
+  }
+
+  // If the user has access to view his own orders of any bundle...
+  if (user_access('view own ' . $context['entity_type'] . ' entities', $context['account'])) {
+    // Add a condition granting the user view access to any completed orders
+    // in his session.
     $conditions->condition($context['base_table'] . '.order_id', $completed_order_ids, 'IN');
+  }
+
+  // Add additional conditions on a per order bundle basis.
+  $entity_info = entity_get_info($context['entity_type']);
+
+  foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+    // If the user has access to view entities of the current bundle...
+    if (user_access('view any ' . $context['entity_type'] . ' entity of bundle ' . $bundle_name, $context['account'])) {
+      // Add a condition granting access if the entity specified by the view
+      // query is of the same bundle.
+      $conditions->condition($context['base_table'] . '.' . $entity_info['entity keys']['bundle'], $bundle_name);
+    }
+    elseif (user_access('view own ' . $context['entity_type'] . ' entities of bundle ' . $bundle_name, $context['account'])) {
+      // Otherwise if the user has access to view his own entities of the
+      // current bundle, add an AND condition group that grants access if the
+      // entity specified by the view query matches the same bundle and belongs
+      // to the user.
+      $conditions->condition(db_and()
+        ->condition($context['base_table'] . '.' . $entity_info['entity keys']['bundle'], $bundle_name)
+        ->condition($context['base_table'] . '.order_id', $completed_order_ids, 'IN')
+      );
+    }
   }
 }
 
@@ -788,8 +829,8 @@ function commerce_cart_get_properties($data = FALSE, array $options, $name) {
  * Returns an array of cart order IDs stored in the session.
  *
  * @param $completed
- *   Boolean indicating whether or not the operation should save to the
- *     completed orders array instead of the active cart orders array.
+ *   Boolean indicating whether or not the operation should retrieve the
+ *   completed orders array instead of the active cart orders array.
  *
  * @return
  *   An array of applicable cart order IDs or an empty array if none exist.

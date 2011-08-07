@@ -808,10 +808,13 @@ function commerce_entity_access_permissions($entity_type) {
 function commerce_entity_access_query_alter($query, $entity_type, $base_table = NULL, $account = NULL) {
   global $user;
 
-  // Read the meta-data from the query.
+  // Read the account from the query if available or default to the current user.
   if (!isset($account) && !$account = $query->getMetaData('account')) {
     $account = $user;
   }
+
+  // Read the base table from the query if available or default to the first
+  // table in the query's tables array.
   if (!isset($base_table) && !$base_table = $query->getMetaData('base table')) {
     // Assume that the base table if the first table if not set. It will result
     // in an invalid query if the first table is not the table we expect,
@@ -820,24 +823,35 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
     $base_table = key($tables);
   }
 
-  // Blanket access control.
+  // Do not apply any conditions for users with administrative view permissions.
   if (user_access('administer ' . $entity_type . ' entities', $account)
-   || user_access('view any ' . $entity_type . ' entity', $account)) {
+    || user_access('view any ' . $entity_type . ' entity', $account)) {
     return;
   }
 
+  // Get the entity type info array for the current access check and prepare a
+  // conditions object.
   $entity_info = entity_get_info($entity_type);
-
   $conditions = db_or();
 
-  // Perform 'view entities of type x and bundle y'.
+  // Perform bundle specific permission checks for the specified entity type.
   $really_restricted = FALSE;
+
+  // Loop over every possible bundle for the given entity type.
   foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
-    if (user_access('view any ' . $entity_type . ' entities of bundle ' . $bundle_name, $account)) {
+    // If the user has access to view entities of the current bundle...
+    if (user_access('view any ' . $entity_type . ' entity of bundle ' . $bundle_name, $account)) {
+      // Add a condition granting access if the entity specified by the view
+      // query is of the same bundle.
       $conditions->condition($base_table . '.' . $entity_info['entity keys']['bundle'], $bundle_name);
     }
-    else if (!empty($entity_info['access arguments']['user key']) && user_access('view own ' . $entity_type . ' entity of bundle ' . $bundle_name, $account)) {
+    elseif ($account->uid && !empty($entity_info['access arguments']['user key']) && user_access('view own ' . $entity_type . ' entities of bundle ' . $bundle_name, $account)) {
+      // Otherwise if an authenticated user has access to view his own entities
+      // of the current bundle and the given entity type has a user ownership key...
       $really_restricted = TRUE;
+
+      // Add an AND condition group that grants access if the entity specified
+      // by the view query matches the same bundle and belongs to the user.
       $conditions->condition(db_and()
         ->condition($base_table . '.' . $entity_info['entity keys']['bundle'], $bundle_name)
         ->condition($base_table . '.' . $entity_info['access arguments']['user key'], $account->uid)
@@ -848,34 +862,47 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
     }
   }
 
-  // Don't bother, the user has the permission to view all the bundles of the entity.
+  // No further conditions need to be added to the query if we determined above
+  // that the user has an administrative view permission for any entity of the
+  // type and bundles represented by the query.
   if (!$really_restricted) {
     return;
   }
 
+  // If the given entity type has a user ownership key...
   if (!empty($entity_info['access arguments']['user key'])) {
-    // Perform 'view own' access control.
-    if (user_access('view own ' . $entity_type . ' entities', $account)) {
+    // Perform 'view own' access control for the entity in the query if the user
+    // is authenticated.
+    if ($account->uid && user_access('view own ' . $entity_type . ' entities', $account)) {
       $conditions->condition($base_table . '.' . $entity_info['access arguments']['user key'], $account->uid);
     }
   }
 
+  // Prepare an array of condition alter hooks to invoke and an array of context
+  // data for the current query.
   $hooks = array(
     'commerce_entity_access_condition_' . $entity_type,
     'commerce_entity_access_condition'
   );
+
   $context = array(
     'account' => $account,
     'entity_type' => $entity_type,
     'base_table' => $base_table
   );
+
+  // Allow other modules to add conditions to the array as necessary.
   drupal_alter($hooks, $conditions, $context);
 
+  // If we have more than one condition based on the entity access permissions
+  // and any hook implementations...
   if (count($conditions)) {
+    // Add the conditions to the query.
     $query->condition($conditions);
   }
   else {
-    // No condition can match.
+    // Otherwise, since we don't have any possible conditions to match against,
+    // we falsify this query. View checks are access grants, not access denials.
     $query->where('1 = 0');
   }
 }
