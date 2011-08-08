@@ -127,14 +127,15 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       if (empty($entity->{$this->idKey}) || !empty($entity->is_new)) {
         // For new entities, create the row in the base table, then save the
         // revision.
+        $op = 'insert';
         $return = drupal_write_record($this->entityInfo['base table'], $entity);
         if (!empty($this->revisionKey)) {
           drupal_write_record($this->entityInfo['revision table'], $entity);
           $update_base_table = TRUE;
         }
-        $this->invoke('insert', $entity);
       }
       else {
+        $op = 'update';
         $return = drupal_write_record($this->entityInfo['base table'], $entity, $this->idKey);
 
         if (!empty($this->revisionKey)) {
@@ -146,9 +147,6 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
             drupal_write_record($this->entityInfo['revision table'], $entity, $this->revisionKey);
           }
         }
-
-        $this->resetCache(array($entity->{$this->idKey}));
-        $this->invoke('update', $entity);
       }
 
       if (!empty($update_base_table)) {
@@ -158,6 +156,9 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
         ->condition($this->idKey, $entity->{$this->idKey})
         ->execute();
       }
+
+      $this->resetCache(array($entity->{$this->idKey}));
+      $this->invoke($op, $entity);
 
       // Ignore slave server temporarily.
       db_ignore_slave();
