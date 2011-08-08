@@ -660,17 +660,10 @@ function commerce_cart_commerce_entity_access_condition_commerce_order_alter(&$c
   $entity_info = entity_get_info($context['entity_type']);
 
   foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
-    // If the user has access to view entities of the current bundle...
-    if (user_access('view any ' . $context['entity_type'] . ' entity of bundle ' . $bundle_name, $context['account'])) {
-      // Add a condition granting access if the entity specified by the view
-      // query is of the same bundle.
-      $conditions->condition($context['base_table'] . '.' . $entity_info['entity keys']['bundle'], $bundle_name);
-    }
-    elseif (user_access('view own ' . $context['entity_type'] . ' entities of bundle ' . $bundle_name, $context['account'])) {
-      // Otherwise if the user has access to view his own entities of the
-      // current bundle, add an AND condition group that grants access if the
-      // entity specified by the view query matches the same bundle and belongs
-      // to the user.
+    // Otherwise if the user has access to view his own entities of the current
+    // bundle, add an AND condition group that grants access if the entity
+    // specified by the view query matches the same bundle and belongs to the user.
+    if (user_access('view own ' . $context['entity_type'] . ' entities of bundle ' . $bundle_name, $context['account'])) {
       $conditions->condition(db_and()
         ->condition($context['base_table'] . '.' . $entity_info['entity keys']['bundle'], $bundle_name)
         ->condition($context['base_table'] . '.order_id', $completed_order_ids, 'IN')
