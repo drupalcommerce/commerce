@@ -102,4 +102,45 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
     // hook_commerce_line_item_load().
     parent::attachLoad($queried_line_items, $revision_id);
   }
+
+  /**
+   * Delete permanently saved line items.
+   *
+   * In case of failures, an exception is thrown.
+   *
+   * @param $line_item_ids
+   *   An array of line item IDs to delete.
+   * @param $transaction
+   *   An optional transaction object to pass thru. If passed the caller is
+   *   responsible for rolling back the transaction if something goes wrong.
+   */
+  public function delete($line_item_ids, DatabaseTransaction $transaction = NULL) {
+    $line_items = $line_item_ids ? $this->load($line_item_ids) : FALSE;
+
+    if (!$line_items) {
+      // Do nothing, in case invalid or no ids have been passed.
+      return;
+    }
+
+    if (!isset($transaction)) {
+      $transaction = db_transaction();
+      $started_transaction = TRUE;
+    }
+
+    try {
+      // First attempt to delete references for the given line items.
+      foreach ($line_items as $line_item_id => $line_item) {
+        commerce_line_item_delete_references($line_item);
+      }
+
+      return parent::delete($line_item_ids, $transaction);
+    }
+    catch (Exception $e) {
+      if (!empty($started_transaction)) {
+        $transaction->rollback();
+        watchdog_exception($this->entityType, $e);
+      }
+      throw $e;
+    }
+  }
 }
