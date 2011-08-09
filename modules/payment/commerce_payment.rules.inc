@@ -208,7 +208,7 @@ class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectI
 
   public static function inputForm($name, $info, $settings, RulesPlugin $element) {
     // If the specified payment method exists...
-    if ($payment_method = commerce_payment_method_load($info['payment_method'])) {
+    if (!empty($info['payment_method']) && $payment_method = commerce_payment_method_load($info['payment_method'])) {
       $form[$name]['method_id'] = array('#type' => 'value', '#value' => $info['payment_method']);
 
       // If the payment method has a settings callback...
@@ -225,7 +225,7 @@ class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectI
       }
     }
     else {
-      $form[$name]['invalid']['#markup'] = t('Invalid payment method.');
+      $form[$name]['invalid']['#markup'] = t('Invalid or missing payment method.');
     }
 
     return $form;
