@@ -34,19 +34,20 @@ function commerce_cart_checkout_router() {
 function commerce_cart_view() {
   global $user;
 
-  // First check for items in the shopping cart.
-  $order = commerce_cart_order_load($user->uid);
+  // Default to displaying an empty message.
+  $content = theme('commerce_cart_empty_page');
 
-  // If the cart is empty...
-  if (!$order || commerce_line_items_quantity($order->commerce_line_items, commerce_product_line_item_types()) == 0) {
-    // Display an appropriate message.
-    $content = theme('commerce_cart_empty_page');
-  }
-  else {
-    drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+  // First check to make sure we have a valid order.
+  if ($order = commerce_cart_order_load($user->uid)) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-    // Add the form for editing the cart contents.
-    $content = commerce_embed_view('commerce_cart_form', 'default', array($order->order_id));
+    // Only show the cart form if we found product line items.
+    if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
+      drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+
+      // Add the form for editing the cart contents.
+      $content = commerce_embed_view('commerce_cart_form', 'default', array($order->order_id));
+    }
   }
 
   return $content;
