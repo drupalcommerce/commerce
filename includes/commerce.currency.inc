@@ -943,6 +943,8 @@ function commerce_commerce_currency_info() {
       'numeric_code' => '752',
       'thousands_separator' => ' ',
       'decimal_separator' => ',',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
       'minor_unit' => t('Öre'),
       'major_unit' => t('Kronor'),
     ),
