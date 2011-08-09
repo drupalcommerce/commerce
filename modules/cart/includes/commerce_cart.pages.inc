@@ -38,7 +38,7 @@ function commerce_cart_view() {
   $order = commerce_cart_order_load($user->uid);
 
   // If the cart is empty...
-  if (!$order || empty($order->commerce_line_items)) {
+  if (!$order || commerce_line_items_quantity($order->commerce_line_items, commerce_product_line_item_types()) == 0) {
     // Display an appropriate message.
     $content = theme('commerce_cart_empty_page');
   }

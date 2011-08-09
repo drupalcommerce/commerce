@@ -53,7 +53,7 @@ function commerce_cart_menu_item_title() {
   $order = commerce_cart_order_load($user->uid);
 
   // If it's empty or has no line items, return a static title.
-  if (empty($order) || empty($order->commerce_line_items)) {
+  if (!$order || commerce_line_items_quantity($order->commerce_line_items, commerce_product_line_item_types()) == 0) {
     return t('Shopping cart');
   }
 
@@ -455,7 +455,7 @@ function commerce_cart_block_view($delta) {
     $order = commerce_cart_order_load($user->uid);
 
     // If the cart is empty...
-    if (!$order || empty($order->commerce_line_items)) {
+    if (!$order || commerce_line_items_quantity($order->commerce_line_items, commerce_product_line_item_types()) == 0) {
       // Display an appropriate message.
       $content = theme('commerce_cart_empty_block');
     }
