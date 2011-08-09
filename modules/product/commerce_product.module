@@ -163,6 +163,32 @@ function commerce_product_uri($product) {
 }
 
 /**
+ * Implements hook_file_download_access().
+ *
+ * This hook is grants access to files based on a user's access to the entity
+ * a file is attached to. For example, users with access to a product should be
+ * allowed to download files attached to that product. Here we do this on a per-
+ * field basis for files attached to products.
+ *
+ * @param $field
+ *   The field to which the file belongs.
+ * @param $entity_type
+ *   The type of $entity; for example, 'node' or 'user' or 'commerce_product'.
+ * @param $entity
+ *   The $entity to which $file is referenced.
+ *
+ * @return
+ *   TRUE if access should be allowed by this entity or FALSE if denied. Note
+ *   that denial may be overridden by another entity controller, making this
+ *   grant permissive rather than restrictive.
+ */
+function commerce_product_file_download_access($field, $entity_type, $entity) {
+  if ($entity_type == 'commerce_product') {
+    return field_access('view', $field, $entity_type, $entity);
+  }
+}
+
+/**
  * Implements hook_field_extra_fields().
  */
 function commerce_product_field_extra_fields() {
@@ -820,13 +846,4 @@ function commerce_product_entity_translation_tab_access($product) {
  */
 function commerce_product_entity_translation_supported_type($type) {
   return variable_get('language_product_type_' . $type, 0) == ENTITY_TRANSLATION_ENABLED;
-}
-
-/**
- * Implements hook_file_download_access().
- */
-function commerce_product_file_download_access($field, $entity_type, $entity) {
-  if ($entity_type == 'commerce_product') {
-    return commerce_product_access('view', $entity);
-  }
 }
