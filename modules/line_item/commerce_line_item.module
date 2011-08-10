@@ -1162,7 +1162,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
     else {
       unset($form_state['line_item_add']);
 
-      $parent = array_pop($form_state['triggering_element']['#parents']);
+      $parent = end($form_state['triggering_element']['#parents']);
 
       // If the save button was clicked from the line item type action form...
       if ($parent == 'save_line_item') {
