@@ -378,6 +378,20 @@ function commerce_tax_ui_tax_type_form($form, &$form_state, $tax_type) {
     '#default_value' => $tax_type['display_inclusive'],
   );
 
+  $form['tax_type']['round_mode'] = array(
+    '#type' => 'radios',
+    '#title' => t('Tax amount rounding mode'),
+    '#description' => t('Specify what type of rounding should occur when tax rates of this type are calculated for the unit price of a line item. Sales taxes will generally not round these amounts at the unit price level, while VAT style taxes will generally round the half up.'),
+    '#options' => array(
+      COMMERCE_TAX_ROUND_NONE => t('Do not round tax amounts'),
+      COMMERCE_TAX_ROUND_HALF_UP => t('Round the half up'),
+      COMMERCE_TAX_ROUND_HALF_DOWN => t('Round the half down'),
+      COMMERCE_TAX_ROUND_HALF_EVEN => t('Round the half to the nearest even number'),
+      COMMERCE_TAX_ROUND_HALF_ODD => t('Round the half to the nearest odd number'),
+    ),
+    '#default_value' => $tax_type['round_mode'],
+  );
+
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
@@ -438,6 +452,11 @@ function commerce_tax_ui_tax_type_form_submit($form, &$form_state) {
   // Write the tax type to the database.
   $tax_type['is_new'] = !$updated;
   commerce_tax_ui_tax_type_save($tax_type);
+
+  // Clear the field cache if the round mode changed.
+  if ($form_state['tax_type']['round_mode'] != $tax_type['round_mode']) {
+    field_cache_clear();
+  }
 
   // Redirect based on the button clicked.
   drupal_set_message(t('Tax type saved.'));

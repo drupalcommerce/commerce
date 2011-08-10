@@ -22,6 +22,7 @@ function commerce_tax_ui_install() {
   $tax_type['display_title'] = t('VAT');
   $tax_type['description'] = t('A basic type for taxes that display inclusive with product prices.');
   $tax_type['display_inclusive'] = TRUE;
+  $tax_type['round_mode'] = COMMERCE_TAX_ROUND_HALF_UP;
 
   commerce_tax_ui_tax_type_save($tax_type);
 }
@@ -64,6 +65,13 @@ function commerce_tax_ui_schema() {
       ),
       'display_inclusive' => array(
         'description' => 'Boolean indicating whether or not taxes of this type display inclusively in product prices.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'round_mode' => array(
+        'description' => 'Integer indicating what type of rounding (if any) should be done for taxes of this type.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
@@ -152,4 +160,28 @@ function commerce_tax_ui_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add a rounding mode column to the tax type table.
+ */
+function commerce_tax_ui_update_7000() {
+  // Define and add the new database column.
+  $spec = array(
+    'description' => 'Integer indicating what type of rounding (if any) should be done for taxes of this type.',
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+
+  db_add_field('commerce_tax_type', 'round_mode', $spec);
+
+  // Update the default VAT tax type to round the half up.
+  db_update('commerce_tax_type')
+    ->fields(array('round_mode' => COMMERCE_TAX_ROUND_HALF_UP))
+    ->condition('name', 'vat')
+    ->execute();
+
+  return t('A new rounding mode option has been added to tax types, letting you specify how taxes of a given type should be rounded.');
 }

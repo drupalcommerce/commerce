@@ -7,6 +7,13 @@
  */
 
 
+// Define our own rounding constants since we can't depend on PHP 5.3.
+define('COMMERCE_TAX_ROUND_NONE', 0);
+define('COMMERCE_TAX_ROUND_HALF_UP', 1);
+define('COMMERCE_TAX_ROUND_HALF_DOWN', 2);
+define('COMMERCE_TAX_ROUND_HALF_EVEN', 3);
+define('COMMERCE_TAX_ROUND_HALF_ODD', 4);
+
 /**
  * Implements hook_hook_info().
  */
@@ -70,6 +77,7 @@ function commerce_tax_types() {
           'display_title' => $tax_type['title'],
           'description' => '',
           'display_inclusive' => FALSE,
+          'round_mode' => COMMERCE_TAX_ROUND_NONE,
           'module' => $module,
         );
 
@@ -302,12 +310,13 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
  */
 function commerce_tax_rate_calculate($tax_rate, $line_item_wrapper) {
   // By default, do not duplicate a tax that's already on the line item.
-  // TODO: Support cumulative non-display-inclusive tax rates by calculating
-  // based on the component total instead of the unit price amount.
   if (!is_null($line_item_wrapper->commerce_unit_price->value()) &&
     !commerce_price_component_load($line_item_wrapper->commerce_unit_price->value(), $tax_rate['price_component'])) {
+    // Calculate the tax amount.
+    $amount = $line_item_wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'];
+
     return array(
-      'amount' => $line_item_wrapper->commerce_unit_price->amount->value() * $tax_rate['rate'],
+      'amount' => commerce_tax_rate_round_amount($tax_rate, $amount),
       'currency_code' => $line_item_wrapper->commerce_unit_price->currency_code->value(),
       'data' => array(
         'tax_rate' => $tax_rate,
@@ -316,6 +325,91 @@ function commerce_tax_rate_calculate($tax_rate, $line_item_wrapper) {
   }
 
   return FALSE;
+}
+
+/**
+ * Rounds an amount for a given tax rate.
+ *
+ * @param $tax_rate
+ *   The tax rate array for the tax to calculate.
+ * @param $amount
+ *   The amount of the tax to round.
+ *
+ * @return
+ *   The amount rounded based on the type of tax it is for.
+ */
+function commerce_tax_rate_round_amount($tax_rate, $amount) {
+  // Remember if this is a negative or positive amount and make it positive.
+  $negative = $amount < 0;
+  $amount = abs($amount);
+
+  // Store the decimal value of the amount.
+  $decimal = $amount - floor($amount);
+
+  // No need to round if there is no decimal value.
+  if ($decimal == 0) {
+    return $amount;
+  }
+
+  // Round it now according to the tax type's specification.
+  $tax_type = commerce_tax_type_load($tax_rate['type']);
+
+  switch ($tax_type['round_mode']) {
+    // PHP's round() function defaults to rounding the half up.
+    case COMMERCE_TAX_ROUND_HALF_UP:
+      $amount = round($amount);
+      break;
+
+    // PHP < 5.3.0 does not support rounding the half down, so we compare the
+    // decimal value and use floor() / ciel() directly.
+    case COMMERCE_TAX_ROUND_HALF_DOWN:
+      if ($decimal <= .5) {
+        $amount = floor($amount);
+      }
+      else {
+        $amount = ceil($amount);
+      }
+      break;
+
+    // PHP < 5.3.0 does not support rounding to the nearest even number, so we
+    // determine it ourselves if the decimal is .5.
+    case COMMERCE_TAX_ROUND_HALF_EVEN:
+      if ($decimal == .5) {
+        if (floor($amount) % 2 == 0) {
+          $amount = floor($amount);
+        }
+        else {
+          $amount = ceil($amount);
+        }
+      }
+      else {
+        $amount = round($amount);
+      }
+      break;
+
+    // PHP < 5.3.0 does not support rounding to the nearest odd number, so we
+    // determine it ourselves if the decimal is .5.
+    case COMMERCE_TAX_ROUND_HALF_ODD:
+      if ($decimal == .5) {
+        if (floor($amount) % 2 == 0) {
+          $amount = ceil($amount);
+        }
+        else {
+          $amount = floor($amount);
+        }
+      }
+      else {
+        $amount = round($amount);
+      }
+      break;
+
+    case COMMERCE_TAX_ROUND_NONE:
+    default:
+      break;
+  }
+
+  // Return the amount preserving the initial negative / positive value.
+  return $negative ? -$amount : $amount;
 }
 
 /**
@@ -440,11 +534,12 @@ function commerce_tax_field_attach_load($entity_type, $entities, $age, $options)
               // If it specifies a tax and we can load it...
               if (!empty($item['data']['include_tax']) && $tax_rate = commerce_tax_rate_load($item['data']['include_tax'])) {
                 // Reverse apply the tax.
-                $amount = $item['amount'] / (1 + $tax_rate['rate']);
+                $tax_amount = $item['amount'] - ($item['amount'] / (1 + $tax_rate['rate']));
+                $tax_amount = commerce_tax_rate_round_amount($tax_rate, $tax_amount);
 
                 // Add a base price to the data array.
                 $component = array(
-                  'amount' => $amount,
+                  'amount' => $item['amount'] - $tax_amount,
                   'currency_code' => $item['currency_code'],
                   'data' => array(),
                 );
@@ -452,7 +547,7 @@ function commerce_tax_field_attach_load($entity_type, $entities, $age, $options)
                 $item['data'] = commerce_price_component_add($item, 'base_price', $component, TRUE);
 
                 // Add the tax to the data array.
-                $component['amount'] = $item['amount'] - $amount;
+                $component['amount'] = $tax_amount;
                 $component['data']['tax_rate'] = $tax_rate;
 
                 $item['data'] = commerce_price_component_add($item, $tax_rate['price_component'], $component, TRUE);
@@ -522,8 +617,10 @@ function commerce_tax_commerce_line_item_rebase_unit_price(&$price, $old_compone
       // by 1 + the tax rate expressed as a decimal (i.e. 1.1 for a 10% tax).
       // The result is the base price against which the tax would have been
       // applied, so the difference becomes our tax amount.
-      $pretax_base = $price['data']['components'][0]['price']['amount'] / (1 + $tax_rate['rate']);
-      $tax_amount = $price['data']['components'][0]['price']['amount'] - $pretax_base;
+      $tax_amount = $price['data']['components'][0]['price']['amount'] - $price['data']['components'][0]['price']['amount'] / (1 + $tax_rate['rate']);
+      $tax_amount = commerce_tax_rate_round_amount($tax_rate, $tax_amount);
+
+      $pretax_base = $price['data']['components'][0]['price']['amount'] - $tax_amount;
 
       // Update the base price component.
       $price['data']['components'][0]['price']['amount'] = $pretax_base;

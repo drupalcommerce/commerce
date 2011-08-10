@@ -914,8 +914,8 @@ function commerce_cart_order_session_delete($order_id = NULL, $completed = FALSE
  * @param $uid
  *   The uid of the user whose cart you are adding the product to.
  * @param $line_item
- *   The product line item to be added to the cart with the following data on
- *   the line item being used to determine how to add the product to the cart:
+ *   An unsaved product line item to be added to the cart with the following data
+ *   on the line item being used to determine how to add the product to the cart:
  *   - $line_item->commerce_product: reference to the product to add to the cart.
  *   - $line_item->quantity: quantity of this product to add to the cart.
  *   - $line_item->data: data array that is saved with the line item if the line
