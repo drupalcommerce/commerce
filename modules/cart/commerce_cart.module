@@ -1715,7 +1715,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       $info = field_info_instance('commerce_line_item', $field_name, $form_state['line_item']->type);
 
       if (empty($info['commerce_cart_settings']['field_access'])) {
-        unset($form['line_item_fields'][$field_name]);
+        $form['line_item_fields'][$field_name]['#access'] = FALSE;
       }
     }
 
