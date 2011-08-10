@@ -77,6 +77,8 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Get the order for the anonymous user.
     $this->order = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
   }
 
   /**
@@ -160,6 +162,8 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Load the order to check the status.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
 
     // At this point we should be in Checkout Review.
     $this->assertEqual(reset($order)->status, 'checkout_review', t('Order status is \'Checkout Review\' in the review phase.'));
@@ -320,6 +324,8 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // Load the order to check the status.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
 
     // At this point we should be in Checkout Review.
     $this->assertEqual(reset($order)->status, 'checkout_review', t('Order status is \'Checkout Review\' in the review phase.'));

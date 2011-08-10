@@ -10,6 +10,43 @@
 class DrupalCommerceEntityController extends DrupalDefaultEntityController implements EntityAPIControllerInterface {
 
   /**
+   * Stores our transaction object, necessary for pessimistic locking to work.
+   */
+  protected $controllerTransaction = NULL;
+
+  /**
+   * Override of DrupalDefaultEntityController::buildQuery().
+   *
+   * Handle pessimistic locking.
+   */
+  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+    $query = parent::buildQuery($ids, $conditions, $revision_id);
+    if (isset($this->entityInfo['locking mode']) && $this->entityInfo['locking mode'] == 'pessimistic') {
+      // In pessimistic locking mode, we issue the load query with a FOR UPDATE
+      // clause. This will block all other load queries to the loaded objects
+      // but requires us to start a transaction.
+      if (empty($this->controllerTransaction)) {
+        $this->controllerTransaction = db_transaction();
+      }
+
+      $query->forUpdate();
+    }
+
+    return $query;
+  }
+
+  public function resetCache(array $ids = NULL) {
+    parent::resetCache($ids);
+    if (empty($this->entityCache) && !empty($this->controllerTransaction)) {
+      // If we don't have any entity in our local cache anymore, we commit the
+      // transaction so as to remove the locks we acquired.
+      // This will not commit the translation directly. Drupal will commit
+      // it as soon as possible given the state of the transaction stack.
+      unset($this->controllerTransaction);
+    }
+  }
+
+  /**
    * (Internal use) Invokes a hook on behalf of the entity.
    *
    * For hooks that have a respective field API attacher like insert/update/..

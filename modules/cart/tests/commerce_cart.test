@@ -510,6 +510,8 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
 
     // Get the order just created.
     $order_anonymous = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
 
     // Access to the cart and check if the product is in it.
     $this->drupalGet($this->getCommerceUrl('cart'));
@@ -528,6 +530,8 @@ class CommerceCartTestCaseAnonymousToAuthenticated extends CommerceCartTestCase 
 
     // Get the order for user just logged in.
     $order_authenticated = reset(commerce_order_load_multiple(array(), array('uid' => $this->store_customer->uid, 'status' => 'cart'), TRUE));
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
 
     // Access to the cart and check if the product is in it.
     $this->drupalGet($this->getCommerceUrl('cart'));

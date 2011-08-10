@@ -166,6 +166,8 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Reload the order.
     $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    // Reset the cache as we don't want to keep the lock.
+    entity_get_controller('commerce_order')->resetCache();
 
     // Check order balance, it should be half of total now.
     $new_balance = commerce_payment_order_balance($order);

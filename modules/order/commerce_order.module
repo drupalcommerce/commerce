@@ -14,6 +14,7 @@ function commerce_order_entity_info() {
     'commerce_order' => array(
       'label' => t('Commerce Order', array(), array('context' => 'a drupal commerce order')),
       'controller class' => 'CommerceOrderEntityController',
+      'locking mode' => 'pessimistic',
       'base table' => 'commerce_order',
       'revision table' => 'commerce_order_revision',
       'load hook' => 'commerce_order_load',
