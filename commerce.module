@@ -693,12 +693,10 @@ function commerce_entity_access($op, $entity, $account, $entity_type) {
     }
   }
   else {
-    // We grant access to the entity if both of the following conditions are met:
-    // - No modules say to deny access
-    // - At least one module says to grant access
-    // If no module specified either allow or deny, we fall back to the logic
-    // below.
+    // First grant access to the entity for the specified operation if no other
+    // module denies it and at least one other module says to grant access.
     $access_results = module_invoke_all('commerce_entity_access', $op, $entity, $account, $entity_type);
+
     if (in_array(FALSE, $access_results, TRUE)) {
       return FALSE;
     }
@@ -706,30 +704,47 @@ function commerce_entity_access($op, $entity, $account, $entity_type) {
       return TRUE;
     }
 
-    // Generic administrator-level access.
+    // Grant generic administrator level access.
     if (user_access('administer ' . $entity_type . ' entities', $account)) {
       return TRUE;
     }
 
+    // Grant access based on entity type and bundle specific permissions with
+    // special handling for the create operation since the entity passed in will
+    // be initialized without ownership.
     if ($op == 'create') {
+      // Assuming an entity was passed in and we know its bundle key, perform
+      // the entity type and bundle-level access checks.
       if (isset($entity) && !empty($entity_info['entity keys']['bundle'])) {
-        // If the entity is passed in and we have a bundle, do bundle-level
-        // access control.
-        return user_access('create ' . $entity_type . ' entities of bundle ' . $entity, $account);
+        return user_access('create ' . $entity_type . ' entities', $account) || user_access('create ' . $entity_type . ' entities of bundle ' . $entity->{$entity_info['entity keys']['bundle']}, $account);
       }
       else {
-        // Else, but is that really possible? do entity type-level access control.
+        // Otherwise perform an entity type-level access check.
         return user_access('create ' . $entity_type . ' entities', $account);
       }
     }
     else {
-      if (!empty($entity_info['access arguments']['user key']) && isset($entity->{$entity_info['access arguments']['user key']}) && $entity->{$entity_info['access arguments']['user key']} == $account->uid) {
-        if (user_access('edit own ' . $entity_type . ' entities', $account)) {
+      // Next perform checks for the edit and delete operations. Begin by
+      // extracting the bundle name from the entity if available.
+      $bundle_name = '';
+
+      if (isset($entity) && !empty($entity_info['entity keys']['bundle'])) {
+        $bundle_name = $entity->{$entity_info['entity keys']['bundle']};
+      }
+
+      // For the edit and delete operations, first perform the entity type and
+      // bundle-level access check for any entity.
+      if (user_access('edit any ' . $entity_type . ' entity', $account) ||
+        user_access('edit any ' . $entity_type . ' entity of bundle ' . $bundle_name, $account)) {
+        return TRUE;
+      }
+
+      // Then check an authenticated user's access to edit his own entities.
+      if ($account->uid && !empty($entity_info['access arguments']['user key']) && isset($entity->{$entity_info['access arguments']['user key']}) && $entity->{$entity_info['access arguments']['user key']} == $account->uid) {
+        if (user_access('edit own ' . $entity_type . ' entities', $account) ||
+          user_access('edit own ' . $entity_type . ' entities of bundle ' . $bundle_name, $account)) {
           return TRUE;
         }
-      }
-      if (user_access('edit any ' . $entity_type . ' entity', $account)) {
-        return TRUE;
       }
     }
   }
@@ -764,6 +779,7 @@ function commerce_entity_access_permissions($entity_type) {
   }
   $permissions['edit any ' . $entity_type . ' entity'] = array(
     'title' => t('Edit any @entity_type of any type', array('@entity_type' => $labels['singular'])),
+    'restrict access' => TRUE,
   );
   if (!empty($entity_info['access arguments']['user key'])) {
     $permissions['view own ' . $entity_type . ' entities'] = array(
@@ -772,6 +788,7 @@ function commerce_entity_access_permissions($entity_type) {
   }
   $permissions['view any ' . $entity_type . ' entity'] = array(
     'title' => t('View any @entity_type of any type', array('@entity_type' => $labels['singular'])),
+    'restrict access' => TRUE,
   );
 
   // Per-bundle create and edit permissions.
@@ -787,6 +804,7 @@ function commerce_entity_access_permissions($entity_type) {
       }
       $permissions['edit any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
         'title' => t('Edit any %bundle @entity_type', array('@entity_type' => $labels['singular'], '%bundle' => $bundle_info['label'])),
+        'restrict access' => TRUE,
       );
       if (!empty($entity_info['access arguments']['user key'])) {
         $permissions['view own ' . $entity_type . ' entities of bundle ' . $bundle_name] = array(
@@ -795,6 +813,7 @@ function commerce_entity_access_permissions($entity_type) {
       }
       $permissions['view any ' . $entity_type . ' entity of bundle ' . $bundle_name] = array(
         'title' => t('View any %bundle @entity_type', array('@entity_type' => $labels['singular'], '%bundle' => $bundle_info['label'])),
+        'restrict access' => TRUE,
       );
     }
   }
