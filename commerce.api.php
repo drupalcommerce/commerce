@@ -45,6 +45,8 @@
  *   - decimal_separator: The char to split the integer from the decimal part.
  *     Default: .
  *   - format_callback: Custom callback function to format a price value.
+ *   - conversion_callback: Custom callback function to convert a price amount
+ *     from one currency into another.
  *   - conversion_rate: The conversion rate of this currency calculated against
  *     the base currency, expressed as a decimal value denoting the value of
  *     one major unit of this currency when converted to the base currency.

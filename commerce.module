@@ -375,6 +375,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       'symbol_placement' => '',
       'code_placement' => 'after',
       'format_callback' => '',
+      'conversion_callback' => '',
       'conversion_rate' => 1,
     );
 
@@ -555,6 +556,12 @@ function commerce_currency_round($amount, $currency) {
  */
 function commerce_currency_convert($amount, $currency_code, $target_currency_code) {
   $currency = commerce_currency_load($currency_code);
+
+  // Invoke the custom conversion callback if specified.
+  if (!empty($currency['conversion_callback'])) {
+    return $currency['conversion_callback']($amount, $currency_code, $target_currency_code);
+  }
+
   $target_currency = commerce_currency_load($target_currency_code);
 
   return $amount * ($currency['conversion_rate'] / $target_currency['conversion_rate']);
