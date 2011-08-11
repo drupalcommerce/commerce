@@ -1813,6 +1813,18 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
     // Create the new product line item of the same type.
     $line_item = commerce_product_line_item_new($product, $form_state['values']['quantity'], 0, $form_state['line_item']->data, $form_state['line_item']->type);
 
+    // Remove line item field values the user didn't have access to modify.
+    foreach ($form_state['values']['line_item_fields'] as $field_name => $value) {
+      if (!$form['line_item_fields'][$field_name]['#access']) {
+        unset($form_state['values']['line_item_fields'][$field_name]);
+      }
+    }
+
+    // Unset the line item field values array if it is now empty.
+    if (empty($form_state['values']['line_item_fields'])) {
+      unset($form_state['values']['line_item_fields']);
+    }
+
     // Add field data to the line item.
     field_attach_submit('commerce_line_item', $line_item, $form['line_item_fields'], $form_state);
 
