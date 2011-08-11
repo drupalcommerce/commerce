@@ -258,10 +258,6 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   // If the deleted line item is a product...
   if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
     $title = $line_item_wrapper->commerce_product->title->value();
-
-    // Invoke the Rules event for removing an item from the cart so the order
-    // status can be reset by the default rule.
-    rules_invoke_all('commerce_cart_product_remove', $form_state['order'], $line_item_wrapper->commerce_product->value(), $line_item_wrapper->quantity->value(), $line_item_wrapper->value());
   }
   else {
     $title = $line_item_wrapper->line_item_label->value();
