@@ -255,6 +255,7 @@ function commerce_tax_ui_tax_type_new() {
     'display_title' => '',
     'description' => '',
     'display_inclusive' => FALSE,
+    'round_mode' => COMMERCE_TAX_ROUND_NONE,
     'admin_list' => TRUE,
     'module' => 'commerce_tax_ui',
     'is_new' => TRUE,
