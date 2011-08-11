@@ -29,7 +29,7 @@ function commerce_customer_ui_menu() {
       'page callback' => 'commerce_customer_ui_customer_profile_form_wrapper',
       'page arguments' => array(commerce_customer_profile_new($type)),
       'access callback' => 'commerce_customer_profile_access',
-      'access arguments' => array('create', $type),
+      'access arguments' => array('create', commerce_customer_profile_new($type)),
       'file' => 'includes/commerce_customer_ui.profiles.inc',
     );
   }
@@ -111,7 +111,7 @@ function commerce_customer_ui_customer_profile_add_any_access() {
 
   // Check the user's access on a profile type basis.
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
-    if (commerce_customer_profile_access('create', $type)) {
+    if (commerce_customer_profile_access('create', commerce_customer_profile_new($type))) {
       return TRUE;
     }
   }

@@ -29,7 +29,7 @@ function commerce_product_ui_menu() {
       'page callback' => 'commerce_product_ui_product_form_wrapper',
       'page arguments' => array(commerce_product_new($type)),
       'access callback' => 'commerce_product_access',
-      'access arguments' => array('create', $type),
+      'access arguments' => array('create', commerce_product_new($type)),
       'file' => 'includes/commerce_product_ui.products.inc',
     );
   }
@@ -140,7 +140,7 @@ function commerce_product_ui_product_add_any_access() {
 
   // Check the user's access on a product type basis.
   foreach (commerce_product_types() as $type => $product_type) {
-    if (commerce_product_access('create', $type)) {
+    if (commerce_product_access('create', commerce_product_new($type))) {
       return TRUE;
     }
   }
