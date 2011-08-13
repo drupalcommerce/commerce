@@ -9,7 +9,7 @@
 /**
  * Implements hook_token_info().
  */
-function commerce_customer_item_token_info() {
+function commerce_customer_token_info() {
   $type = array(
     'name' => t('Customer profiles'),
     'description' => t('Tokens related to customer profiles.'),
