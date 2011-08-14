@@ -83,7 +83,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
       'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => $address_info['administrative_area'],
       'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Check for default panes and information in this checkout phase.
     $this->assertTitle(t('Review order') . ' | Drupal', t('Review order page successfully loaded'));
@@ -98,7 +98,7 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->assertText('Example payment', t('Example payment method pane is present'));
 
     // Test validation messages not filling any information.
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
 
     // Get all panes from the system to get their forms.
     $panes = commerce_checkout_panes();
@@ -114,12 +114,12 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     // Test payment information validation. Payment example module name field
     // will fail for single character value.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName(1)), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName(1)), t('Continue to next step'));
     $this->assertTitle(t('Review order') . ' | Drupal', t('We should still be on review order page'));
     $this->assertText(t('You must enter a name two or more characters long.'), t('Validation error message found on the page'));
 
     // Finish checkout process.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName()), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName()), t('Continue to next step'));
 
     // Load payment to check its status.
     $payment = commerce_payment_transaction_load_multiple(array(), array('order_id' => $this->order->order_id), TRUE);
@@ -337,14 +337,13 @@ class CommercePaymentOffsiteTest extends CommerceBaseTestCase {
     $this->drupalGet($this->getCommerceUrl('checkout'));
 
     // Process the order and check if the offsite payment is working.
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
     $this->assertText(t('Dummy Payment Method Offsite'), t('Offsite example payment method is listed in the checkout process form'));
     $this->drupalPostAJAX(NULL, array('commerce_payment[payment_method]' => 'commerce_payment_dummy_offsite|commerce_payment_commerce_payment_dummy_offsite'), 'commerce_payment[payment_method]');
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
 
     $this->assertFieldById('edit-submit', t('Redirect to Offsite platform'), t('Redirection button to offsite payment platform is present'));
     // We can't really test further than this.
   }
 
 }
-

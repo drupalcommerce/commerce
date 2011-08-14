@@ -3,7 +3,6 @@
 .checkout-buttons .checkout-back {
   border: 0;
   background: none;
-  text-decoration: underline;
   color: #0071B3;
   padding: 4px 6px;
 }
@@ -14,6 +13,7 @@
 .checkout-buttons .checkout-back:hover {
   background: none;
   color: #018fe2;
+  text-decoration: underline;
 }
 
 table.checkout-review .pane-title td {

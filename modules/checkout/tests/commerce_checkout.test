@@ -148,7 +148,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
       'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
       'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Check for default panes and information in this checkout phase.
     $this->pass(t('Checking the default panes and the page information:'));
@@ -169,13 +169,13 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertEqual(reset($order)->status, 'checkout_review', t('Order status is \'Checkout Review\' in the review phase.'));
 
     // Test the back & continue buttons.
-    $this->drupalPost(NULL, array(), t('Back'));
+    $this->drupalPost(NULL, array(), t('Go back'));
     $this->assertTitle(t('Checkout') . ' | Drupal', t('When clicking in the \'Back\' button, the title displayed corresponds with the current checkout phase: \'Checkout\''));
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
     $this->assertTitle(t('Review order') . ' | Drupal', t('When clicking in the \'Continue\' button, the title displayed corresponds with the current checkout phase: \'Review order\''));
 
     // Finish checkout process
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // Reload the order directly from db to update status.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
@@ -201,7 +201,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertText(t('Account information'), t('Account information pane is present in the checkout page'));
 
     // Test validation messages not filling any information.
-    $this->drupalPost(NULL, array(), t('Continue'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
 
     // Get all panes from the system to get their forms.
     $panes = commerce_checkout_panes();
@@ -250,7 +250,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     );
 
     // Go to the next checkout step with the required information.
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Check if the wrong e-mail address fails validation.
     $this->assertRaw(t('The e-mail address %mail is not valid.', array('%mail' => $user_mail)), t('A warning message is displayed when the e-mail address for the anonymous user is not valid'));
@@ -258,12 +258,12 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Fix it and continue to next step.
     $user_mail = $this->randomName() . '@example.com';
     $info['account[login][mail]'] = $user_mail;
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     $this->assertNoRaw(t('The e-mail address %mail is not valid.', array('%mail' => $user_mail)), t('A warning message is not displayed when the e-mail address for the anonymous user is valid'));
 
     // Finish checkout process for good.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
   }
 
   /**
@@ -309,7 +309,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     );
 
     // Go to the next checkout step with the required information.
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Check for default panes and information in this checkout phase.
     $this->pass(t('Checking the default panes and the page information:'));
@@ -331,7 +331,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertEqual(reset($order)->status, 'checkout_review', t('Order status is \'Checkout Review\' in the review phase.'));
 
     // Finish checkout process
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // Reload the order directly from db to check status.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
@@ -379,10 +379,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     );
 
     // Go to the next checkout step with the required information.
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Finish checkout process
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // Reload the order directly from db to check its owner.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
@@ -425,10 +425,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     );
 
     // Go to the next checkout step with the required information.
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Finish checkout process
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // Reload the order directly from db to check its owner.
     $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
@@ -495,7 +495,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     	'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
     	'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
     );
-    $this->drupalPost(NULL, $info, t('Continue'));
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // At this point, only first page and review should be accessible, but the
     //  rest shouldn't.
@@ -509,7 +509,7 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertResponse(200, t('\'Review\' checkout page not accessible when the order is in checkout status'));
 
     // Fill in the payment method and continue the process.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue'));
+    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // At this point, only the complete page should be accessible.
     $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/review');
