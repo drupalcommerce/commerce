@@ -371,8 +371,8 @@ function commerce_checkout_pages() {
         'help' => '',
         'status_cart' => TRUE,
         'buttons' => TRUE,
-        'back_value' => t('Back'),
-        'submit_value' => t('Continue'),
+        'back_value' => t('Go back'),
+        'submit_value' => t('Continue to next step'),
         'prev_page' => NULL,
         'next_page' => NULL,
       );

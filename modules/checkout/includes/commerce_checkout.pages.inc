@@ -104,6 +104,12 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       '#type' => 'fieldset',
       '#attributes' => array('class' => array('checkout-buttons')),
     );
+    $form['buttons']['continue'] = array(
+      '#type' => 'submit',
+      '#value' => $checkout_page['submit_value'],
+      '#attributes' => array('class' => array('checkout-continue')),
+      '#submit' => array('commerce_checkout_form_submit'),
+    );
 
     // Add the cancel or back button where appropriate. We define button level
     // submit handlers because we're using hook_forms() to use this form builder
@@ -125,6 +131,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         '#attributes' => array('class' => array('checkout-cancel')),
         '#submit' => array('commerce_checkout_form_cancel_submit'),
         '#limit_validation_errors' => array(),
+        '#prefix' => t('or'),
       );
     }
     elseif ($checkout_page['prev_page'] && !empty($checkout_page['back_value'])) {
@@ -134,15 +141,9 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         '#attributes' => array('class' => array('checkout-back')),
         '#submit' => array('commerce_checkout_form_back_submit'),
         '#limit_validation_errors' => array(),
+        '#prefix' => t('or'),
       );
     }
-
-    $form['buttons']['continue'] = array(
-      '#type' => 'submit',
-      '#value' => $checkout_page['submit_value'],
-      '#attributes' => array('class' => array('checkout-continue')),
-      '#submit' => array('commerce_checkout_form_submit'),
-    );
   }
 
   return $form;

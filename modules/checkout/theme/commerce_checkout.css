@@ -1,14 +1,19 @@
 
-fieldset.checkout-buttons {
-  text-align: right;
+.checkout-buttons .checkout-cancel,
+.checkout-buttons .checkout-back {
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  color: #0071B3;
+  padding: 4px 6px;
 }
 
-fieldset.checkout-buttons .form-button, fieldset.checkout-buttons .form-submit {
-  margin-left: 1em;
-}
-
-fieldset.checkout-buttons .checkout-cancel, fieldset.checkout-buttons .checkout-back {
-  float: left;
+.checkout-buttons .checkout-cancel:focus,
+.checkout-buttons .checkout-back:focus,
+.checkout-buttons .checkout-cancel:hover,
+.checkout-buttons .checkout-back:hover {
+  background: none;
+  color: #018fe2;
 }
 
 table.checkout-review .pane-title td {
@@ -38,6 +43,7 @@ table.checkout-review .pane-data-full {
 }
 
 .checkout-processing {
-  padding-right: 18px !important;
+  padding-right: 13px !important;
+  margin-right: 6px;
   background: url(../images/status-active.gif) right center no-repeat;
 }
