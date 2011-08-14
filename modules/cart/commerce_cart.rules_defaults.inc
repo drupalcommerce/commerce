@@ -28,5 +28,33 @@ function commerce_cart_default_rules_configuration() {
 
   $rules['commerce_cart_order_status_reset'] = $rule;
 
+  // Add a reaction rule to unset the price of disabled products in the cart
+  // during price calculation, effectively removing them from the order.
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Unset the price of disabled products in the cart');
+  $rule->active = TRUE;
+  $rule->weight = 10;
+
+  $rule
+    ->event('commerce_product_calculate_sell_price')
+    ->condition(rules_condition('data_is_empty', array(
+      'data:select' => 'commerce-line-item:line-item-id',
+    ))->negate())
+    ->condition('entity_has_field', array(
+      'entity:select' => 'commerce-line-item',
+      'field' => 'commerce_product',
+    ))
+    ->condition('data_is', array(
+      'data:select' => 'commerce-line-item:commerce-product:status',
+      'op' => '==',
+      'value' => '0',
+    ))
+    ->action('data_set', array(
+      'data:select' => 'commerce-line-item:commerce-unit-price:amount',
+    ));
+
+  $rules['commerce_cart_unset_disabled_products'] = $rule;
+
   return $rules;
 }

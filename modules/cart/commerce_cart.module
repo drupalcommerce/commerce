@@ -757,7 +757,9 @@ function commerce_cart_order_refresh($order) {
     // Delete this line item if the product no longer has a valid price.
     $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $cloned_line_item);
 
-    if (is_null($current_line_item_wrapper->commerce_unit_price->value())) {
+    if (is_null($current_line_item_wrapper->commerce_unit_price->value()) ||
+      is_null($current_line_item_wrapper->commerce_unit_price->amount->value()) ||
+      is_null($current_line_item_wrapper->commerce_unit_price->currency_code->value())) {
       commerce_cart_order_product_line_item_delete($order, $cloned_line_item->line_item_id, TRUE);
     }
     else {
