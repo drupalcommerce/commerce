@@ -591,9 +591,16 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         '#type' => 'textfield',
         '#title' => $element['#title'],
         '#default_value' => $default_amount,
+        '#required' => $instance['required'] && ($delta == 0 || $field['cardinality'] > 0),
         '#size' => 10,
         '#field_suffix' => $default_currency['code'],
       );
+
+      // Add the help text if specified.
+      if (!empty($element['#description'])) {
+        $element['amount']['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
+      }
+
       $element['currency_code'] = array(
         '#type' => 'value',
         '#default_value' => $default_currency['code'],
@@ -606,6 +613,7 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
         '#type' => 'textfield',
         '#title' => $element['#title'],
         '#default_value' => $default_amount,
+        '#required' => $instance['required'] && ($delta == 0 || $field['cardinality'] > 0),
         '#size' => 10,
       );
 
@@ -633,6 +641,11 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
 
         $element['amount']['#field_suffix'] = $currency_code;
 
+        // Add the help text if specified.
+        if (!empty($element['#description'])) {
+          $element['amount']['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
+        }
+
         $element['currency_code'] = array(
           '#type' => 'value',
           '#default_value' => $currency_code,
@@ -648,6 +661,11 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
           '#default_value' => isset($items[$delta]['currency_code']) ? $items[$delta]['currency_code'] : $default_currency['code'],
           '#suffix' => '</div>',
         );
+
+        // Add the help text if specified.
+        if (!empty($element['#description'])) {
+          $element['currency_code']['#suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
+        }
       }
       break;
   }
