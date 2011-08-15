@@ -93,7 +93,7 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = FALSE;
   $handler->display->display_options['empty']['area']['content'] = 'No customer profiles have been created yet.';
-  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  $handler->display->display_options['empty']['area']['format'] = 'plain_text';
   /* Relationship: Commerce Customer Profile: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_customer_profile';

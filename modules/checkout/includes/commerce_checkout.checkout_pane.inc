@@ -64,7 +64,13 @@ function commerce_checkout_completion_message_pane_settings_form($checkout_pane)
   }
   else {
     $message = commerce_checkout_completion_message_default();
-    $text_format = 'filtered_html';
+
+    if (filter_format_load('filtered_html')) {
+      $text_format = 'filtered_html';
+    }
+    else {
+      $text_format = 'plain_text';
+    }
   }
 
   $form['commerce_checkout_completion_message_override'] = array(
@@ -124,7 +130,13 @@ function commerce_checkout_completion_message_pane_checkout_form($form, &$form_s
   }
   else {
     $message = commerce_checkout_completion_message_default();
-    $text_format = 'filtered_html';
+
+    if (filter_format_load('filtered_html')) {
+      $text_format = 'filtered_html';
+    }
+    else {
+      $text_format = 'plain_text';
+    }
   }
 
   // Perform token replacement.
