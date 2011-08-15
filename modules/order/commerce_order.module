@@ -321,7 +321,7 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
 
     // If the profile includes an order context property, we know this was added
     // by the Order module as an order ID to skip in the deletion query.
-    if (!empty($profile->entity_context) && $profile->entity_context['entity_type'] == 'commerce_order') {
+    if (!empty($profile->entity_context['entity_id']) && $profile->entity_context['entity_type'] == 'commerce_order') {
       $query->propertyCondition('order_id', $profile->entity_context['entity_id'], '!=');
     }
 
