@@ -417,7 +417,7 @@ function commerce_order_commerce_customer_profile_presave($profile) {
  * referenced by a non-cart order.
  */
 function commerce_order_form_commerce_customer_customer_profile_form_alter(&$form, &$form_state) {
-  if (!commerce_order_commerce_customer_profile_can_delete($form_state['customer_profile'])) {
+  if (!empty($form_state['customer_profile']->profile_id) && !commerce_order_commerce_customer_profile_can_delete($form_state['customer_profile'])) {
     $form['clone_message'] = array(
       '#markup' => '<div class="messages status">' . t('Because this profile is currently referenced by an order, if you change any field values it will save as a clone of the current profile instead of updating this profile itself. This is to maintain the integrity of customer data as entered on the order(s).') . '</div>',
       '#weight' => -100,
