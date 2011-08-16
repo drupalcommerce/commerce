@@ -214,7 +214,7 @@ class RulesDataUIPaymentSettings extends RulesDataUI implements RulesDataDirectI
       // If the payment method has a settings callback...
       if ($callback = commerce_payment_method_callback($payment_method, 'settings_form')) {
         // Prepare an array of payment method settings defaults.
-        $method_settings = !empty($settings[$name]) ? $settings[$name]['settings'] : array();
+        $method_settings = !empty($settings[$name]['settings']) && is_array($settings[$name]['settings']) ? $settings[$name]['settings'] : array();
 
         // Add the settings form elements to the action form.
         $form[$name]['settings'] = $callback($method_settings);
