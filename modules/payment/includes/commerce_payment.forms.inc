@@ -220,10 +220,15 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
         'currency_code' => $form_state['values']['currency_code'],
       );
 
-      $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order, $charge);
-    }
+      $result = $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order, $charge);
 
-    drupal_set_message(t('Payment transaction created.'));
+      if ($result === FALSE) {
+        $form_state['rebuild'] = TRUE;
+      }
+      else {
+        drupal_set_message(t('Payment transaction created.'));
+      }
+    }
   }
 }
 
