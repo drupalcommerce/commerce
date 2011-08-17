@@ -1203,7 +1203,7 @@ function commerce_order_calculate_total($order) {
   }
 
   // Update the order total price field with the final total amount.
-  $order_wrapper->commerce_order_total->amount = $amount;
+  $order_wrapper->commerce_order_total->amount = round($amount);
 }
 
 /**
