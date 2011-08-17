@@ -220,7 +220,10 @@ function commerce_payment_order_transaction_add_form_submit($form, &$form_state)
         'currency_code' => $form_state['values']['currency_code'],
       );
 
-      $result = $callback($payment_method, $form['payment_terminal']['payment_details'], $form_state['values']['payment_details'], $order, $charge);
+      $details_form = !empty($form['payment_terminal']['payment_details']) ? $form['payment_terminal']['payment_details'] : array();
+      $details_values = !empty($form_state['values']['payment_details']) ? $form_state['values']['payment_details'] : array();
+
+      $result = $callback($payment_method, $details_form, $details_values, $order, $charge);
 
       if ($result === FALSE) {
         $form_state['rebuild'] = TRUE;
