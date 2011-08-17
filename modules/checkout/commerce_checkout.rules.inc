@@ -53,6 +53,19 @@ function commerce_checkout_rules_action_info() {
     'base' => 'commerce_checkout_action_send_account_email',
     'access callback' => 'rules_system_integration_access',
   );
+  $actions['commerce_checkout_complete'] = array(
+    'label' => t('Complete checkout for an order'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order in checkout'),
+      ),
+    ),
+    'group' => t('Commerce Checkout'),
+    'callbacks' => array(
+      'execute' => 'commerce_checkout_rules_complete_checkout',
+    ),
+  );
 
   return $actions;
 }
@@ -94,6 +107,13 @@ function commerce_checkout_action_send_account_email($account, $email_type) {
       watchdog('rules', 'Failed to send %type e-mail to %recipient.', array('%type' => $types[$email_type], '%recipient' => $account->mail));
     }
   }
+}
+
+/**
+ * Action callback: completes checkout for the given order.
+ */
+function commerce_checkout_rules_complete_checkout($order) {
+  commerce_checkout_complete($order);
 }
 
 /**
