@@ -348,7 +348,7 @@ function commerce_tax_rate_round_amount($tax_rate, $amount) {
 
   // No need to round if there is no decimal value.
   if ($decimal == 0) {
-    return $amount;
+    return $negative ? -$amount : $amount;
   }
 
   // Round it now according to the tax type's specification.
