@@ -13,7 +13,7 @@ function commerce_order_views_data() {
   $data['commerce_order']['table']['group']  = t('Commerce Order');
 
   $data['commerce_order']['table']['base'] = array(
-    'field' => 'order_number',
+    'field' => 'order_id',
     'title' => t('Commerce Order'),
     'help' => t('Order placed in the store.'),
     'entity type' => 'commerce_order',
