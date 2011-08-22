@@ -1,4 +1,20 @@
 
+/**
+ * Add styles to payment elements on Checkout pages.
+ */
+.commerce-credit-card-expiration {
+  margin-bottom: 1em;
+}
+
+.commerce-credit-card-expiration .form-item {
+  display: inline;
+  margin-right: .5em;
+  margin-bottom: 1em;
+}
+
+/**
+ * Add styles for administrative payment transaction displays.
+ */
 .views-field-status img.pending {
   position: relative;
   top: 3px;

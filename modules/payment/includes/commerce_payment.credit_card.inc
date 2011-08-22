@@ -98,16 +98,17 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
   // Always add fields for the credit card expiration date.
   $form['credit_card']['exp_month'] = array(
     '#type' => 'select',
-    '#title' => t('Expiration month'),
+    '#title' => t('Expiration'),
     '#options' => commerce_months(),
     '#default_value' => $default['exp_month'],
+    '#prefix' => '<div class="commerce-credit-card-expiration">',
   );
 
   $form['credit_card']['exp_year'] = array(
     '#type' => 'select',
-    '#title' => t('Expiration Year'),
     '#options' => drupal_map_assoc(range(date('Y'), date('Y') + 20)),
     '#default_value' => $default['exp_year'],
+    '#suffix' => '</div>',
   );
 
   // Add a field for the card issue number if specified.
