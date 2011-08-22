@@ -270,7 +270,7 @@ function commerce_product_pre_calculate_sell_prices($from = NULL, $count = 1) {
 
         $state = new RulesState();
         $vars = $event->parameterInfo(TRUE);
-        $state->addVariable('line_item', $line_item, $vars['line_item']);
+        $state->addVariable('commerce_line_item', $line_item, $vars['commerce_line_item']);
 
         // For each Rule signified by the current key...
         foreach (explode('|', $key) as $name) {
