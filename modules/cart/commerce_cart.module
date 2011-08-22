@@ -977,6 +977,8 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
     $comparison_properties = array('type', 'commerce_product');
 
     // Add any field that was exposed on the Add to Cart form to the array.
+    // TODO: Bypass combination when an exposed field is no longer available but
+    // the same base product is added to the cart.
     foreach (field_info_instances('commerce_line_item', $line_item->type) as $info) {
       if (!empty($info['commerce_cart_settings']['field_access'])) {
         $comparison_properties[] = $info['field_name'];
@@ -1711,8 +1713,9 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     // '#access' => FALSE to avoid specifying empty values for hidden fields.
     foreach (element_children($form['line_item_fields']) as $field_name) {
       $info = field_info_instance('commerce_line_item', $field_name, $form_state['line_item']->type);
+      $form['line_item_fields'][$field_name]['#commerce_cart_settings'] = commerce_cart_field_instance_access_settings($info);
 
-      if (empty($info['commerce_cart_settings']['field_access'])) {
+      if (empty($form['line_item_fields'][$field_name]['#commerce_cart_settings']['field_access'])) {
         $form['line_item_fields'][$field_name]['#access'] = FALSE;
       }
     }
@@ -1817,7 +1820,12 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
 
     // Remove line item field values the user didn't have access to modify.
     foreach ($form_state['values']['line_item_fields'] as $field_name => $value) {
-      if (!$form['line_item_fields'][$field_name]['#access']) {
+      // Note that we're checking the Commerce Cart settings that we inserted
+      // into this form element array back when we built the form. This means a
+      // module wanting to alter a line item field widget to be available must
+      // update both its form element's #access value and the field_access value
+      // of the #commerce_cart_settings array.
+      if (empty($form['line_item_fields'][$field_name]['#commerce_cart_settings']['field_access'])) {
         unset($form_state['values']['line_item_fields'][$field_name]);
       }
     }
