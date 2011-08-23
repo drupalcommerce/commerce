@@ -938,7 +938,7 @@ function commerce_commerce_currency_info() {
     ),
     'SEK' => array(
       'code' => 'SEK',
-      'symbol' => 'Skr',
+      'symbol' => 'kr',
       'name' => t('Swedish Krona'),
       'numeric_code' => '752',
       'thousands_separator' => ' ',
