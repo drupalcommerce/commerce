@@ -783,22 +783,26 @@ function commerce_checkout_commerce_order_state_info_alter(&$order_states) {
  *   The fully loaded order object.
  *
  * @return
- *   A string containing the URI to the order's current checkout page. If an
+ *   A string containing the URI to the order's current checkout page or NULL if
+ *   the order is in a state that does not have a valid checkout URL.
  */
 function commerce_checkout_order_uri($order) {
   $order_status = commerce_order_status_load($order->status);
 
   if ($order_status['state'] == 'checkout') {
-    $page_id = $order_status['checkout_page'];
+    $page_id = '/' . $order_status['checkout_page'];
   }
   elseif ($order_status['state'] == 'cart') {
-    $page_id = NULL;
+    $page_id = '';
+  }
+  elseif (commerce_checkout_complete_access($order)) {
+    $page_id = '/complete';
   }
   else {
-    $page_id = 'complete';
+    return NULL;
   }
 
-  return 'checkout/' . $order->order_id . ($page_id ? '/' . $page_id : '');
+  return 'checkout/' . $order->order_id . $page_id;
 }
 
 /**

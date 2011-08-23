@@ -40,3 +40,19 @@ function hook_commerce_checkout_router($order, $checkout_page) {
     drupal_goto('checkout/login/' . $order->order_id);
   }
 }
+
+/**
+ * Allows modules to perform business logic when an order completes checkout.
+ *
+ * This hook coincides with the "Customer completes checkout" event. Only
+ * business logic should be performed when this is invoked, such as updating the
+ * order status, assigning the order to a user account, or sending notification
+ * e-mails. Interaction with the user should instead occur through checkout
+ * panes on the checkout completion page.
+ *
+ * @param $order
+ *   The order that just completed checkout.
+ */
+function hook_commerce_checkout_complete($order) {
+  // No example.
+}

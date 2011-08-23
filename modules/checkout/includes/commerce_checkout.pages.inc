@@ -27,22 +27,12 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
   // If the user is attempting to access an inaccessible page for their order,
   // redirect them to the proper page.
   if (!commerce_checkout_page_access($checkout_page, $order)) {
-    $order_status = commerce_order_status_load($order->status);
-
-    if ($order_status['state'] == 'checkout') {
-      $target_page = $order_status['checkout_page'];
-    }
-    elseif ($order_status['state'] == 'cart') {
-      $target_page = NULL;
-    }
-    else {
-      $target_page = 'complete';
-    }
+    $target_uri = commerce_checkout_order_uri($order);
 
     // Only redirect if the target page is different from the page the user was
     // trying to access. Otherwise give a 403 error.
-    if ($target_page !== $checkout_page['page_id']) {
-      return drupal_goto('checkout/' . $order->order_id . ($target_page ? '/' . $target_page : ''));
+    if (!empty($target_uri) && $target_uri !== $_GET['q']) {
+      return drupal_goto($target_uri);
     }
     else {
       return drupal_access_denied();
