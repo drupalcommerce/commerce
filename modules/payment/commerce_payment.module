@@ -801,17 +801,42 @@ function commerce_payment_transaction_build_content($order, $transaction, $view_
  *
  * @param $op
  *   The operation being performed, one of view, update, create, or delete.
- * @param $order
- *   The order object the payment operation applies to.
  * @param $transaction
- *   The payment transaction to check. Required for updating and deleting.
+ *   The payment transaction to check.
  * @param $account
  *   The user account attempting the operation; defaults to the current user.
  *
  * @return
  *   TRUE or FALSE indicating access for the operation.
  */
-function commerce_payment_transaction_access($op, $order, $transaction = NULL, $account = NULL) {
+function commerce_payment_transaction_access($op, $transaction, $account = NULL) {
+  if (isset($transaction->order_id)) {
+    $order = commerce_order_load($transaction->order_id);
+    if (!$order) {
+      return FALSE;
+    }
+  }
+  else {
+    $order = NULL;
+  }
+
+  return commerce_payment_transaction_order_access($op, $order, $account);
+}
+
+/**
+ * Determines access for a variety of operations for payment transactions on a given order.
+ *
+ * @param $op
+ *   The payment transaction operation being performed, one of view, update, create, or delete.
+ * @param $order
+ *   The order to check against (optional if $op == 'create').
+ * @param $account
+ *   The user account attempting the operation; defaults to the current user.
+ *
+ * @return
+ *   TRUE or FALSE indicating access for the operation.
+ */
+function commerce_payment_transaction_order_access($op, $order, $account = NULL) {
   global $user;
 
   if (empty($account)) {
@@ -823,15 +848,16 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
     return TRUE;
   }
 
-  if (empty($order)) {
-    $order = commerce_order_load($transaction->order_id);
-  }
-
   switch ($op) {
     // Creating new payment transactions.
     case 'create':
       if (user_access('create payments', $account)) {
-        if (commerce_order_access('update', $order, $account)) {
+        // We currently allow any user to create any payment transaction,
+        // regardless of the order, because entity_access() doesn't give us a
+        // way to discriminate on the order.
+        // @todo: find a way to prevent creating a payment transaction if the
+        // user doesn't have access to the order.
+        if (!isset($order) || commerce_order_access('update', $order, $account)) {
           return TRUE;
         }
       }
@@ -852,6 +878,8 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
           return TRUE;
         }
       }
+      break;
+
     case 'delete':
       if (user_access('delete payments', $account)) {
         if (commerce_order_access('update', $order, $account)) {
@@ -859,13 +887,6 @@ function commerce_payment_transaction_access($op, $order, $transaction = NULL, $
         }
       }
       break;
-  }
-
-  // Allow other modules to provide other cases for access grants.
-  foreach (module_invoke_all('commerce_payment_transaction_access', $op, $order, $transaction, $account) as $access) {
-    if ($access) {
-      return TRUE;
-    }
   }
 
   return FALSE;
