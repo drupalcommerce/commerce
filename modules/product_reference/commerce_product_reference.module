@@ -223,7 +223,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         // Loop through the fields on the referenced product's type.
         foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
           // Add the product field to the entity's content array.
-          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $entity_type . '_' . $view_mode);
+          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $entity_type . '_' . $view_mode, $langcode);
 
           // For multiple value references, add context information so the cart
           // form can do dynamic replacement of fields.
