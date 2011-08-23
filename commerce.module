@@ -286,17 +286,24 @@ function commerce_form_callback($form_id, $form_state) {
  *   The ID of the display of the View that will actually be rendered.
  * @param $arguments
  *   An array of arguments to pass to the View.
+ * @param $override_url
+ *   A url that overrides the url of the current view.
  *
  * @return
  *   The rendered output of the chosen View display.
  */
-function commerce_embed_view($view_id, $display_id, $arguments) {
+function commerce_embed_view($view_id, $display_id, $arguments, $override_url = '') {
   // Load the cart line item View.
   $view = views_get_view($view_id);
   $view->set_display($display_id);
 
   // Set the specific line items for this order.
   $view->set_arguments($arguments);
+
+  // Override the view url, if an override was provided.
+  if (!empty($override_url)) {
+    $view->override_url = $override_url;
+  }
 
   // Prepare and execute the View query.
   $view->pre_execute();
