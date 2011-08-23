@@ -343,7 +343,6 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->assertTitle(t('Checkout complete') . ' | Drupal', t('Title of the page is \'Checkout complete\' when finishing the checkout process'));
     // Check completion message.
     $this->assertText(t('Your order is number @order-number.', array('@order-number' => $this->order->order_number)), t('Completion message for the checkout is correctly displayed'));
-
   }
 
   /**
@@ -446,8 +445,13 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     // Log in as normal user.
     $this->drupalLogin($this->store_customer);
 
+
+    // Create dummy product.
+    $product = $this->createDummyProduct('PROD-01', 'Product One');
+
     // Order creation, in complete status.
-    $this->order = $this->createDummyOrder($this->store_customer->uid, array(), 'complete');
+    $this->order = $this->createDummyOrder($this->store_customer->uid, array($product->product_id => 1), 'complete');
+
 
     // Access to the complete page, this one should be always accesible.
     $this->assertCheckoutPageAccessible($this->order, 'complete');
