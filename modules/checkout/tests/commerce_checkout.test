@@ -450,8 +450,19 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->order = $this->createDummyOrder($this->store_customer->uid, array(), 'complete');
 
     // Access to the complete page, this one should be always accesible.
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/complete');
-    $this->assertResponse(200, t('Order owner can access to the completion page of a completed order'));
+    $this->assertCheckoutPageAccessible($this->order, 'complete');
+  }
+
+  public function assertCheckoutPageAccessible($order, $page) {
+    $path = $this->getCommerceUrl('checkout') . '/' . $order->order_id . ($page ? '/' . $page : '');
+    $this->drupalGet($path);
+    return $this->assertEqual($this->getUrl(), url($path, array('absolute' => TRUE)),  t('@page checkout page is accessible.', array('@page' => $page)));
+  }
+
+  public function assertCheckoutPageNotAccessible($order, $page) {
+    $path = $this->getCommerceUrl('checkout') . '/' . $order->order_id . ($page ? '/' . $page : '');
+    $this->drupalGet($path);
+    return $this->assertNotEqual($this->getUrl(), url($path, array('absolute' => TRUE)),  t('@page checkout page is not accessible.', array('@page' => $page)));
   }
 
   /**
@@ -465,16 +476,10 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->order = $this->createDummyOrder($this->store_customer->uid);
 
     // At this point, the rest of checkout pages shouldn't be accessible.
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/review');
-    $this->assertResponse(404, t('\'Review\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/payment');
-    $this->assertResponse(404, t('\'Payment\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/complete');
-    $this->assertResponse(404, t('\'Completion\' checkout page is not accessible when the order is in cart status'));
-
-    // Access to current checkout page.
-    $this->drupalGet($this->getCommerceUrl('checkout'));
-    $this->assertResponse(200, t('Checkout page is accessible when the order is in cart status'));
+    $this->assertCheckoutPageAccessible($this->order, '');
+    $this->assertCheckoutPageNotAccessible($this->order, 'review');
+    $this->assertCheckoutPageNotAccessible($this->order, 'payment');
+    $this->assertCheckoutPageNotAccessible($this->order, 'complete');
 
     // Generate random information, as city, postal code, etc.
     $address_info = $this->generateAddressInformation();
@@ -499,26 +504,19 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
 
     // At this point, only first page and review should be accessible, but the
     //  rest shouldn't.
-    $this->drupalGet($this->getCommerceUrl('checkout'));
-    $this->assertResponse(200, t('Checkout page is accessible when the order is in checkout status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/payment');
-    $this->assertResponse(404, t('\'Payment\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/complete');
-    $this->assertResponse(404, t('\'Completion\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/review');
-    $this->assertResponse(200, t('\'Review\' checkout page not accessible when the order is in checkout status'));
+    $this->assertCheckoutPageAccessible($this->order, '');
+    $this->assertCheckoutPageAccessible($this->order, 'review');
+    $this->assertCheckoutPageNotAccessible($this->order, 'payment');
+    $this->assertCheckoutPageNotAccessible($this->order, 'complete');
 
     // Fill in the payment method and continue the process.
     $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
 
     // At this point, only the complete page should be accessible.
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/review');
-    $this->assertResponse(404, t('\'Review\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/payment');
-    $this->assertResponse(404, t('\'Payment\' checkout page is not accessible when the order is in cart status'));
-    $this->drupalGet($this->getCommerceUrl('checkout') . '/' . $this->order->order_id . '/complete');
-    $this->assertResponse(200, t('\'Completion\' checkout page is accessible when the order is in cart status'));
-
+    $this->assertCheckoutPageNotAccessible($this->order, '');
+    $this->assertCheckoutPageNotAccessible($this->order, 'review');
+    $this->assertCheckoutPageNotAccessible($this->order, 'payment');
+    $this->assertCheckoutPageAccessible($this->order, 'complete');
   }
 
 }
