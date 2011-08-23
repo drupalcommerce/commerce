@@ -627,17 +627,14 @@ function commerce_checkout_pane_callback($checkout_pane, $callback) {
  *
  * @param $order
  *   The fully loaded order object represented on the checkout form.
- * @param $checkout_page
- *   The fully loaded checkout page object representing the current step in the
- *     checkout process.
  * @param $account
  *   Alternately provide an account object whose access to check instead of the
- *     current user.
+ *   current user.
  *
  * @return
  *   TRUE or FALSE indicating access.
  */
-function commerce_checkout_access($order, $checkout_page, $account = NULL) {
+function commerce_checkout_access($order, $account = NULL) {
   global $user;
 
   // Default to the current user as the account whose access we're checking.
@@ -647,7 +644,7 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
 
   // First, if this order doesn't belong to the account return FALSE.
   if ($account->uid) {
-    if ($account->uid != $order->uid ) {
+    if ($account->uid != $order->uid) {
       return FALSE;
     }
   }
@@ -665,6 +662,22 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
     }
   }
 
+  return TRUE;
+}
+
+/**
+ * Checks access to a particular checkout page for a given order.
+ *
+ * @param $checkout_page
+ *   The fully loaded checkout page object representing the current step in the
+ *   checkout process.
+ * @param $order
+ *   The fully loaded order object represented on the checkout form.
+ *
+ * @return
+ *   TRUE or FALSE indicating access.
+ */
+function commerce_checkout_page_access($checkout_page, $order) {
   // Load the order status object for the current order.
   $order_status = commerce_order_status_load($order->status);
 
@@ -689,23 +702,27 @@ function commerce_checkout_access($order, $checkout_page, $account = NULL) {
   if ($order_status['state'] == 'checkout') {
     $status_checkout_page = commerce_checkout_page_load($order_status['checkout_page']);
 
-    // However, if buttons aren't present on the status's checkout page, don't
-    //  allow access unless the order status matches the page.
-    if (!$status_checkout_page['buttons'] && $status_checkout_page['page_id'] != $checkout_page['page_id']) {
-      // The exception here for the checkout completion page allows customers to
-      // access this page for any order status the order might be moved to when
-      // the order is completed.
-      if ($checkout_page['page_id'] != 'complete') {
+    // This is the page the user is currently on.
+    if ($status_checkout_page['page_id'] == $checkout_page['page_id']) {
+      return TRUE;
+    }
+
+    // Prevent access to later steps of the checkout process.
+    if ($checkout_page['weight'] > $status_checkout_page['weight']) {
+      return FALSE;
+    }
+
+    // Check that there are back buttons in every pages between the current
+    // page and the page the user wants to access.
+    $pages = commerce_checkout_pages();
+    $current_page = $status_checkout_page;
+    do {
+      if (!$current_page['buttons']) {
         return FALSE;
       }
+      $current_page = $pages[$pages[$current_page['page_id']]['prev_page']];
     }
-    else {
-      // Compare the weights of the currently requested page against the weight
-      // of the order status's page and return FALSE if it's greater.
-      if ($checkout_page['weight'] > $status_checkout_page['weight']) {
-        return FALSE;
-      }
-    }
+    while ($current_page['page_id'] != $checkout_page['page_id']);
   }
   // We've now handled above cases where the user is trying to access a checkout
   // page other than the completion page for an order that is not in a checkout

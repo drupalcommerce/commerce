@@ -20,8 +20,27 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
   // If the user does not have access to checkout the order, return a 404. We
   // could return a 403, but then the user would know they've identified a
   // potentially valid checkout URL.
-  if (!commerce_checkout_access($order, $checkout_page)) {
+  if (!commerce_checkout_access($order)) {
     return drupal_not_found();
+  }
+
+  // If the user is attempting to access an inaccessible page for their order,
+  // redirect them to the proper page.
+  if (!commerce_checkout_page_access($checkout_page, $order)) {
+    $order_status = commerce_order_status_load($order->status);
+
+    if ($order_status['state'] == 'checkout') {
+      $target_page = $order_status['checkout_page'];
+    }
+    elseif ($order_status['state'] == 'cart') {
+      $target_page = NULL;
+    }
+    else {
+      $target_page = 'complete';
+    }
+    if ($target_page !== $checkout_page) {
+      return drupal_goto('checkout/' . $order->order_id . ($target_page ? '/' . $target_page : ''));
+    }
   }
 
   // If there are no line items on the order, redirect away.
