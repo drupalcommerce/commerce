@@ -126,6 +126,9 @@ function commerce_customer_schema() {
       ),
     ),
     'primary key' => array('revision_id'),
+    'indexes' => array(
+      'profile_id' => array('profile_id'),
+    ),
     'foreign keys' => array(
       'customer_profile' => array(
         'table' => 'commerce_customer_profile',
@@ -199,4 +202,15 @@ function commerce_customer_update_7000() {
   commerce_update_rename_permissions($map);
 
   return t('Role and custom View permissions updated for order entity management. Access checks in modules and permissions on default Views must be updated manually.');
+}
+
+/**
+ * Add an index to the commerce_customer_profile_revision table on profile_id.
+ */
+function commerce_customer_update_7100() {
+  if (db_index_exists('commerce_customer_profile_revision', 'profile_id')) {
+    db_drop_index('commerce_customer_profile_revision', 'profile_id');
+  }
+
+  db_add_index('commerce_customer_profile_revision', 'profile_id', array('profile_id'));
 }

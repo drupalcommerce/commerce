@@ -231,6 +231,9 @@ function commerce_payment_schema() {
         'description' => 'A serialized array of additional data.',
       ),
     ),
+    'indexes' => array(
+      'transaction_id' => array('transaction_id'),
+    ),
     'primary key' => array('revision_id'),
     'foreign keys' => array(
       'payment_transaction' => array(
@@ -245,4 +248,15 @@ function commerce_payment_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add an index to the commerce_payment_transaction_revision table on transaction_id.
+ */
+function commerce_payment_update_7100() {
+  if (db_index_exists('commerce_payment_transaction_revision', 'transaction_id')) {
+    db_drop_index('commerce_payment_transaction_revision', 'transaction_id');
+  }
+
+  db_add_index('commerce_payment_transaction_revision', 'transaction_id', array('transaction_id'));
 }
