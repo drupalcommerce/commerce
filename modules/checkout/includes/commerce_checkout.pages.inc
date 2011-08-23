@@ -38,8 +38,14 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
     else {
       $target_page = 'complete';
     }
-    if ($target_page !== $checkout_page) {
+
+    // Only redirect if the target page is different from the page the user was
+    // trying to access. Otherwise give a 403 error.
+    if ($target_page !== $checkout_page['page_id']) {
       return drupal_goto('checkout/' . $order->order_id . ($target_page ? '/' . $target_page : ''));
+    }
+    else {
+      return drupal_access_denied();
     }
   }
 

@@ -731,12 +731,49 @@ function commerce_checkout_page_access($checkout_page, $order) {
   // the user is accessing the complete page for any other order state.
   elseif ($checkout_page['page_id'] == 'complete') {
     // Don't allow completion page access for orders in the cart or canceled states.
-    if (in_array($order_status['state'], array('canceled', 'cart'))) {
+    if (!commerce_checkout_complete_access($order)) {
       return FALSE;
     }
   }
 
   return TRUE;
+}
+
+/**
+ * Determines if the given order should have access to the checkout completion
+ * page based on its order status.
+ *
+ * @param $order
+ *   The fully loaded order object.
+ *
+ * @return
+ *   TRUE or FALSE indicating completion access.
+ */
+function commerce_checkout_complete_access($order) {
+  // Load the order state array.
+  $order_status = commerce_order_status_load($order->status);
+  $order_state = commerce_order_state_load($order_status['state']);
+
+  // Check for the checkout_complete property.
+  return !empty($order_state['checkout_complete']);
+}
+
+/**
+ * Implements hook_commerce_order_state_info_alter().
+ *
+ * Adds the checkout_complete property to order state info arrays to determine
+ * access to the completion page for orders in the given state. By default,
+ * neither orders in the canceled or cart states can view the completion page.
+ */
+function commerce_checkout_commerce_order_state_info_alter(&$order_states) {
+  foreach ($order_states as $name => &$order_state) {
+    if (in_array($name, array('canceled', 'cart'))) {
+      $order_state['checkout_complete'] = FALSE;
+    }
+    else {
+      $order_state['checkout_complete'] = TRUE;
+    }
+  }
 }
 
 /**
