@@ -273,6 +273,53 @@ function commerce_payment_commerce_checkout_pane_info() {
 }
 
 /**
+ * Moves an order ahead to the next page via an order update and redirect.
+ *
+ * Redirected payment methods are responsible for calling this method when
+ * receiving external notifications of successful payment.
+ *
+ * @param $order
+ *   An order object.
+ */
+function commerce_payment_redirect_pane_next_page($order) {
+  // Load the order status object for the current order.
+  $order_status = commerce_order_status_load($order->status);
+
+  if ($order_status['state'] == 'checkout' && $order_status['checkout_page'] == 'payment') {
+    $payment_page = commerce_checkout_page_load($order_status['checkout_page']);
+    $next_page = $payment_page['next_page'];
+
+    $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+
+    // Inform modules of checkout completion if the next page is Completed.
+    if ($next_page == 'complete') {
+      commerce_checkout_complete($order);
+    }
+  }
+}
+
+/**
+ * Moves an order back to the previous page via an order update and redirect.
+ *
+ * Redirected payment methods are responsible for calling this method when
+ * receiving external notifications of failed payment.
+ *
+ * @param $order
+ *   An order object.
+ */
+function commerce_payment_redirect_pane_previous_page($order) {
+  // Load the order status object for the current order.
+  $order_status = commerce_order_status_load($order->status);
+
+  if ($order_status['state'] == 'checkout' && $order_status['checkout_page'] == 'payment') {
+    $payment_page = commerce_checkout_page_load($order_status['checkout_page']);
+    $prev_page = $payment_page['prev_page'];
+
+    $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
+  }
+}
+
+/**
  * Implements hook_commerce_payment_totals_row_info().
  */
 function commerce_payment_commerce_payment_totals_row_info($totals, $order) {
