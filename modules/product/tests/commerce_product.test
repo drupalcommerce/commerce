@@ -200,7 +200,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 
 /**
  * Test the Rules and Entity integration.
- */
+ *
+ * TODO: replace this with a simpler event test that doesn't depend on the odd
+ * product loading / saving interplay. I don't even think the unchanged
+ * condition will ever work as is in here.
+ *
 class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
@@ -217,7 +221,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   /**
    * Calculates the output of t() given an array of placeholders to replace.
-   */
+   *
   static function t($text, $strings) {
     $placeholders = array();
     foreach ($strings as $string) {
@@ -228,7 +232,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   /**
    * Tests rules CRUD actions for products.
-   */
+   *
   function testRulesCRUD() {
     // Test creation.
     $action = rules_action('entity_create', array(
@@ -262,13 +266,12 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
     $pos = ($pos !== FALSE) ? strpos($text, self::t('Saved %product of type %commerce_product.', array('product', 'commerce_product')), $pos) : FALSE;
     $pos = ($pos !== FALSE) ? strpos($text, self::t('Evaluating the action %entity_delete.', array('entity_delete')), $pos) : FALSE;
     $this->assertTrue($pos !== FALSE, 'Product has been fetched, saved and deleted.');
-    //debug(RulesLog::logger()->render());
     $this->assertFalse(commerce_product_load($product->product_id), 'Product has been deleted.');
   }
 
   /**
    * Tests making use of product metadata.
-   */
+   *
   function testProductPropertyInfo() {
     // Populate $values with all values that are setable. They will be set
     // with an metadata wrapper, so we also test setting that way.
@@ -293,7 +296,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   /**
    * Assert the value for the given property is returned.
-   */
+   *
   protected function assertValue($wrapper, $key) {
     $this->assertTrue($wrapper->$key->value() !== NULL, check_plain($key) . ' property returned.');
     $info = $wrapper->$key->info();
@@ -305,7 +308,7 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
 
   /**
    * Creates a value for the given data type.
-   */
+   *
   protected function createValue($type, $info) {
     if (!isset($this->node)) {
       // Create some entities to use the first time this runs.
@@ -342,10 +345,6 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
    * Tests making use of the product 'presave' event and loading the unchanged
    * product.
    *
-   * TODO: replace this with a simpler event test that doesn't depend on the odd
-   * product loading / saving interplay. I don't even think the unchanged
-   * condition will ever work as is in here.
-   *
   public function testProductEvent() {
     $rule = rules_reaction_rule();
     $rule->event('commerce_product_presave')
@@ -375,5 +374,5 @@ class CommerceProductRulesTestCase extends DrupalWebTestCase {
     $this->assertFalse(commerce_product_load($product->product_id), 'Reaction rule fired.');
     RulesLog::logger()->checkLog();
   }
-   */
 }
+ */
