@@ -141,5 +141,5 @@ function commerce_product_pricing_ui_form_commerce_product_pricing_ui_add_pricin
   unset($form['settings']['help']);
   $form['settings']['event']['#type'] = 'value';
   $form['settings']['event']['#value'] = 'commerce_product_calculate_sell_price';
-  $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/products/pricing-rules');
+  $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/product-pricing');
 }
