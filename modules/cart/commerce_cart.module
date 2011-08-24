@@ -550,6 +550,18 @@ function commerce_cart_order_load($uid = 0) {
  *   The requested cart order ID.
  */
 function commerce_cart_order_id($uid = 0) {
+  // First let other modules attempt to provide a valid order ID for the given
+  // uid. Instead of invoking hook_commerce_cart_order_id() directly, we invoke
+  // it in each module implementing the hook and return the first valid order ID
+  // returned (if any).
+  foreach (module_implements('commerce_cart_order_id') as $module) {
+    $order_id = module_invoke($module, 'commerce_cart_order_id', $uid);
+
+    if (!empty($order_id) && is_int($order_id)) {
+      return $order_id;
+    }
+  }
+
   // Create an array of valid shopping cart order statuses.
   $status_ids = array_keys(commerce_order_statuses(array('cart' => TRUE)));
 

@@ -7,6 +7,20 @@
 
 
 /**
+ * Allows modules to return a shopping cart order ID for a user before the Cart
+ * module determines it using its default queries.
+ *
+ * @param $uid
+ *   The uid of the user whose shopping cart order ID should be returned.
+ *
+ * @return
+ *   The order ID or nothing if the function did not find one.
+ */
+function hook_commerce_cart_order_id($uid) {
+  // No example.
+}
+
+/**
  * Determines whether or not the given order is a shopping cart order.
  *
  * When determining if an order should be considered a shopping cart order, the
