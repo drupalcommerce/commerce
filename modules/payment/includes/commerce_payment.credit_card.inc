@@ -22,9 +22,9 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
     'owner' => '',
     'number' => '',
     'start_month' => '',
-    'start_year' => '',
-    'exp_month' => '',
-    'exp_year' => '',
+    'start_year' => date('Y') - 5,
+    'exp_month' => date('m'),
+    'exp_year' => date('Y'),
     'issue' => '',
     'code' => '',
     'bank' => '',
@@ -82,16 +82,17 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
   if (isset($fields['start_date'])) {
     $form['credit_card']['start_month'] = array(
       '#type' => 'select',
-      '#title' => t('Start month'),
+      '#title' => t('Start date'),
       '#options' => commerce_months(),
       '#default_value' => $default['start_month'],
+      '#prefix' => '<div class="commerce-credit-card-start">',
     );
 
     $form['credit_card']['start_year'] = array(
       '#type' => 'select',
-      '#title' => t('Start year'),
       '#options' => drupal_map_assoc(range(date('Y') - 10, date('Y'))),
       '#default_value' => $default['start_year'],
+      '#suffix' => '</div>',
     );
   }
 

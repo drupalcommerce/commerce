@@ -2,13 +2,15 @@
 /**
  * Add styles to payment elements on Checkout pages.
  */
+.commerce-credit-card-start,
 .commerce-credit-card-expiration {
   margin-bottom: 1em;
 }
 
+.commerce-credit-card-start .form-item,
 .commerce-credit-card-expiration .form-item {
   display: inline;
-  margin-right: .5em;
+  margin-right: .25em;
   margin-bottom: 1em;
 }
 
