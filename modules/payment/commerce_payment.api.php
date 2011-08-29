@@ -197,7 +197,8 @@ function CALLBACK_commerce_payment_method_settings_form($settings = NULL) {
  * @param $pane_values
  *   The current values of the pane.
  * @param $checkout_pane
- *   The checkout pane array.
+ *   The checkout pane array. The checkout pane will be NULL if the payment is
+ *   being added through the administration form.
  * @param $order
  *   The order object.
  * @return
