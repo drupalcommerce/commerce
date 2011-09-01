@@ -78,11 +78,15 @@ function commerce_checkout_default_rules_configuration() {
 
   // Accommodate any profile types referenced by the order.
   foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
-    $loop
-      ->action('data_set', array(
-        'data:select' => 'commerce-order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
-        'value:select' => 'list-item:uid',
-      ));
+    $instance = field_info_instance('commerce_order', 'commerce_customer_' . $type, 'commerce_order');
+
+    if (!empty($instance)) {
+      $loop
+        ->action('data_set', array(
+          'data:select' => 'commerce-order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
+          'value:select' => 'list-item:uid',
+        ));
+    }
   }
 
   // Add the loop to the rule as an action.
@@ -164,11 +168,15 @@ function commerce_checkout_default_rules_configuration() {
 
   // Accommodate any profile types referenced by the order.
   foreach ($customer_profile_entity_info['bundles'] as $type => $data) {
-    $loop
-      ->action('data_set', array(
-        'data:select' => 'commerce-order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
-        'value:select' => 'list-item:uid',
-      ));
+    $instance = field_info_instance('commerce_order', 'commerce_customer_' . $type, 'commerce_order');
+
+    if (!empty($instance)) {
+      $loop
+        ->action('data_set', array(
+          'data:select' => 'commerce-order:' . strtr('commerce-customer-' . $type, '_', '-') . ':uid',
+          'value:select' => 'list-item:uid',
+        ));
+    }
   }
 
   // Add the loop to the rule as an action.
