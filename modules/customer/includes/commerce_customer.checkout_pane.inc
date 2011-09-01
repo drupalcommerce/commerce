@@ -85,11 +85,13 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   $addressfields = array();
 
   foreach (commerce_info_fields('addressfield', 'commerce_customer_profile') as $field_name => $field) {
-    $langcode = $pane_form[$field_name]['#language'];
+    if (!empty($pane_form[$field_name]['#language'])) {
+      $langcode = $pane_form[$field_name]['#language'];
 
-    // Only consider this addressfield if it's represented on the form.
-    if (!empty($pane_form[$field_name][$langcode])) {
-      $addressfields[] = array($field_name, $langcode);
+      // Only consider this addressfield if it's represented on the form.
+      if (!empty($pane_form[$field_name][$langcode])) {
+        $addressfields[] = array($field_name, $langcode);
+      }
     }
   }
 
