@@ -77,9 +77,13 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form_state['account'] = clone($user);
 
   // Add any instructions for the checkout page.
-  $form['help'] = array(
-    '#markup' => '<div class="checkout-help">' . filter_xss($checkout_page['help']) . '</div>',
-  );
+  $help = filter_xss($checkout_page['help']);
+
+  if (!empty($help)) {
+    $form['help'] = array(
+      '#markup' => '<div class="checkout-help">' . $help . '</div>',
+    );
+  }
 
   // Restore form errors.
   if (!empty($form_state['storage']['errors'])) {
