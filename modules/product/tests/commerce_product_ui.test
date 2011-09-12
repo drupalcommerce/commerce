@@ -104,7 +104,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertFalse(empty($status_required), t('Status field is required'));
     $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
     $this->assertFieldById('edit-save-continue', t('Save and add another'), t('Save an add another button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/products'), t('Cancel link is present'));
 
     // Try to save the product and check validation messages.
     $this->drupalPost(NULL, array(), t('Save product'));
@@ -211,7 +211,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertFieldByName('commerce_price[und][0][amount]', commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value()), t('Price field is present'));
     $this->assertFieldByName('status', $product->status, t('Status field is present'));
     $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/products'), t('Cancel link is present'));
 
     // Change the product values.
     $price = rand(2, 500);
@@ -241,7 +241,7 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->assertFieldByName('commerce_price[und][0][amount]', $edit['commerce_price[und][0][amount]'], t('Price field has the correct value'));
     $this->assertFieldByName('status', $edit['status'], t('Status field is present'));
     $this->assertFieldById('edit-submit', t('Save product'), t('Save product button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/products'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/products'), t('Cancel link is present'));
   }
 
   /**

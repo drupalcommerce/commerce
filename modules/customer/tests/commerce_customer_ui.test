@@ -131,7 +131,7 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     // Also check for the buttons and cancel link.
     $this->assertFieldById('edit-submit', t('Save profile'), t('\'Save profile\' button is present'));
     $this->assertFieldById('edit-save-continue', t('Save and add another'), t('\'Save an add another\' button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/customer-profiles'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/customer-profiles'), t('Cancel link is present'));
 
     // Generate random information, as city, postal code, etc.
     $address_info = $this->generateAddressInformation();
@@ -286,7 +286,7 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
 
     // Also check for the buttons and cancel link.
     $this->assertFieldById('edit-submit', t('Save profile'), t('\'Save profile\' button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/customer-profiles'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/customer-profiles'), t('Cancel link is present'));
 
     // Change some fields and save.
     $edit = array(

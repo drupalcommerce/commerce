@@ -503,12 +503,12 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
       '#type' => 'submit',
       '#value' => t('Save and add another'),
       '#submit' => $form['actions']['submit']['#submit'],
-      '#suffix' => l('Cancel', 'admin/commerce/products'),
+      '#suffix' => l(t('Cancel'), 'admin/commerce/products'),
       '#weight' => 45,
     );
   }
   else {
-    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/products');
+    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/products');
   }
 }
 

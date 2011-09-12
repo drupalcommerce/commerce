@@ -139,7 +139,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     }
 
     $this->assertFieldById('edit-submit', t('Save tax rate'), t('\'Save tax rate\' button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/config/taxes'), t('Cancel link is present'));
 
     // Fill the tax rate information and save tax rate.
     $edit = array(
@@ -199,7 +199,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->assertOptionSelected('edit-tax-rate-type', $tax_rate['type'], t('Type select value corresponds with tax rate'));
     $this->assertFieldById('edit-submit', t('Save tax rate'), t('\'Save tax rate\' button is present'));
     $this->assertFieldById('edit-delete', t('Delete tax rate'), t('Delete button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/config/taxes'), t('Cancel link is present'));
 
     // Modify tax rate information and save the form.
     $edit = array(
@@ -377,7 +377,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->assertFieldById('edit-tax-type-description', NULL, t('Tax type description is present'));
     $this->assertFieldById('edit-tax-type-display-inclusive', NULL, t('Tax type checkbox for configure inclusive taxes is present'));
     $this->assertFieldById('edit-submit', t('Save tax type'), t('\'Save tax type\' button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
 
     // Save the tax type.
     $edit = array(
@@ -435,7 +435,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->assertFieldById('edit-tax-type-display-title', $this->tax_type['display_title'], t('Display title field corresponds with tax type'));
     $this->assertFieldById('edit-submit', t('Save tax type'), t('\'Save tax rate\' button is present'));
     $this->assertFieldById('edit-delete', t('Delete tax type'), t('Delete button is present'));
-    $this->assertRaw(l('Cancel', 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
+    $this->assertRaw(l(t('Cancel'), 'admin/commerce/config/taxes/types'), t('Cancel link is present'));
 
     // Modify the tax type and save it.
     $edit = array(

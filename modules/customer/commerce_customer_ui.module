@@ -305,12 +305,12 @@ function commerce_customer_ui_form_commerce_customer_ui_customer_profile_form_al
       '#type' => 'submit',
       '#value' => t('Save and add another'),
       '#submit' => $form['actions']['submit']['#submit'],
-      '#suffix' => l('Cancel', 'admin/commerce/customer-profiles'),
+      '#suffix' => l(t('Cancel'), 'admin/commerce/customer-profiles'),
       '#weight' => 45,
     );
   }
   else {
-    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/customer-profiles');
+    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/customer-profiles');
   }
 }
 

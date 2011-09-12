@@ -213,13 +213,13 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete tax rate'),
-      '#suffix' => l('Cancel', 'admin/commerce/config/taxes'),
+      '#suffix' => l(t('Cancel'), 'admin/commerce/config/taxes'),
       '#submit' => array('commerce_tax_ui_tax_rate_form_delete_submit'),
       '#weight' => 45,
     );
   }
   else {
-    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/config/taxes');
+    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/taxes');
   }
 
   return $form;
@@ -407,13 +407,13 @@ function commerce_tax_ui_tax_type_form($form, &$form_state, $tax_type) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete tax type'),
-      '#suffix' => l('Cancel', 'admin/commerce/config/taxes/types'),
+      '#suffix' => l(t('Cancel'), 'admin/commerce/config/taxes/types'),
       '#submit' => array('commerce_tax_ui_tax_type_form_delete_submit'),
       '#weight' => 45,
     );
   }
   else {
-    $form['actions']['submit']['#suffix'] = l('Cancel', 'admin/commerce/config/taxes/types');
+    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/taxes/types');
   }
 
   return $form;
