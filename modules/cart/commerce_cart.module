@@ -1698,7 +1698,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
         '#default_value' => $default_quantity,
         '#datatype' => 'integer',
         '#size' => 5,
-        '#weight' => 5,
+        '#weight' => 45,
       );
     }
     else {
@@ -1706,7 +1706,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
         '#type' => 'hidden',
         '#value' => $default_quantity,
         '#datatype' => 'integer',
-        '#weight' => 5,
+        '#weight' => 45,
       );
     }
 
@@ -1738,14 +1738,14 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
         '#type' => 'submit',
         '#value' => t('Product not available'),
         '#disabled' => TRUE,
-        '#weight' => 15,
+        '#weight' => 50,
       );
     }
     else {
       $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Add to cart'),
-        '#weight' => 15,
+        '#weight' => 50,
       );
     }
   }
