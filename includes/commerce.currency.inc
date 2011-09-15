@@ -847,11 +847,11 @@ function commerce_commerce_currency_info() {
     ),
     'PLN' => array(
       'code' => 'PLN',
-      'symbol' => 'zl',
-      'name' => t('Polish Zloty'),
+      'symbol' => 'zł',
+      'name' => t('Polish Złoty'),
       'numeric_code' => '985',
       'minor_unit' => t('Grosz'),
-      'major_unit' => t('Zlotych'),
+      'major_unit' => t('Złotych'),
     ),
     'PYG' => array(
       'code' => 'PYG',
