@@ -10,9 +10,6 @@ dependencies[] = views
 core = 7.x
 configure = admin/commerce/customer-profiles/types
 
-; Base module files
-files[] = commerce_customer_ui.module
-
 ; Module includes
 files[] = includes/commerce_customer_ui.profiles.inc
 files[] = includes/commerce_customer_ui.profile_types.inc

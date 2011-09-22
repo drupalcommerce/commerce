@@ -4,6 +4,3 @@ package = Commerce
 dependencies[] = commerce
 dependencies[] = commerce_payment
 core = 7.x
-
-; Base module files
-files[] = commerce_payment_example.module
