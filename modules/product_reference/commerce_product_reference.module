@@ -805,7 +805,7 @@ function commerce_product_line_item_title($line_item) {
  * Returns the elements necessary to add a product line item through a line item
  *   manager widget.
  */
-function commerce_product_line_item_add_form() {
+function commerce_product_line_item_add_form($element, &$form_state) {
   $form = array();
   $options = array();
 

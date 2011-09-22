@@ -986,13 +986,10 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
         '#value' => $line_item_type,
       );
 
-      // TODO: What would it look like to use the line item type's add form
-      // instead of this custom callback mechanism? Probably better...
-
       // If this type specifies a valid add form callback function...
       if ($callback = commerce_line_item_type_callback($line_item_type, 'add_form')) {
         // Load in the appropriate form elements to the actions array.
-        $element['actions'] += $callback();
+        $element['actions'] += $callback($element, $form_state);
       }
 
       // Add a default save button.

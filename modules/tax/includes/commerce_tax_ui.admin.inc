@@ -62,7 +62,6 @@ function commerce_tax_ui_overview($type) {
   return theme('table', array('header' => $header, 'rows' => $rows));
 }
 
-
 /**
  * Builds an overview of a tax rate for display to an administrator.
  *

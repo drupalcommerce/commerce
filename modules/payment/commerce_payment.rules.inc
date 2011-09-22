@@ -118,7 +118,11 @@ function commerce_payment_rules_action_info() {
     $actions['commerce_payment_enable_' . $payment_method['method_id']] = array(
       'label' => t('Enable payment method: @method', array('@method' => $payment_method['title'])),
       'parameter' => array(
-        'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
+        'commerce_order' => array(
+          'type' => 'commerce_order',
+          'label' => t('Order', array(), array('context' => 'a drupal commerce order')),
+          'skip save' => TRUE,
+        ),
         'payment_method' => array(
           'type' => 'commerce_payment_settings',
           'restriction' => 'input',

@@ -257,7 +257,7 @@ function commerce_customer_commerce_checkout_pane_info() {
       'file' => 'includes/commerce_customer.checkout_pane.inc',
       'base' => 'commerce_customer_profile_pane',
       'page' => 'checkout',
-      'weight' => $weight++,
+      'weight' => isset($profile_type['checkout_pane_weight']) ? $profile_type['checkout_pane_weight'] : $weight++,
     );
   }
 
