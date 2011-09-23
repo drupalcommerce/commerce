@@ -1128,9 +1128,12 @@ function commerce_commerce_currency_info() {
     ),
     'VND' => array(
       'code' => 'VND',
-      'symbol' => '₫',
+      'symbol' => 'đ',
       'name' => t('Vietnamese Dong'),
       'decimals' => 0,
+      'thousands_separator' => '.',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
       'numeric_code' => '704',
       'minor_unit' => t('Hà'),
       'major_unit' => t('Dong'),
