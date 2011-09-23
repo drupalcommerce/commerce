@@ -131,7 +131,7 @@ function commerce_product_pricing_ui_forms($form_id, $args) {
 /**
  * Implements hook_form_FORM_ID_alter().
  *
- * The Product Reference UI module instantiates the Rules Admin rule configuration
+ * The Product Pricing UI module instantiates the Rules Admin rule configuration
  * add form at a particular path in the Commerce IA. It uses its own form ID to
  * do so and alters the form here to select the necessary Rules event.
  *
