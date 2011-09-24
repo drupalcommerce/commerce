@@ -68,6 +68,13 @@ function commerce_line_item_rules_action_info() {
           'options list' => 'commerce_line_item_price_component_options_list',
           'default value' => 'base_price',
         ),
+        'round_mode' => array(
+          'type' => 'integer',
+          'label' => t('Price rounding mode'),
+          'description' => t('Round the resulting price amount after performing this operation.'),
+          'options list' => 'commerce_round_mode_options_list',
+          'default value' => COMMERCE_ROUND_NONE,
+        ),
       ),
       'group' => t('Commerce Line Item'),
     );
@@ -118,7 +125,7 @@ function commerce_line_item_price_component_options_list() {
 /**
  * Rules action: add an amount to the unit price.
  */
-function commerce_line_item_unit_price_add($line_item, $amount, $component_name) {
+function commerce_line_item_unit_price_add($line_item, $amount, $component_name, $round_mode) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
@@ -126,7 +133,7 @@ function commerce_line_item_unit_price_add($line_item, $amount, $component_name)
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = $current_amount + $amount;
+    $updated_amount = commerce_round($round_mode, $current_amount + $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,
@@ -149,7 +156,7 @@ function commerce_line_item_unit_price_add($line_item, $amount, $component_name)
 /**
  * Rules action: subtract an amount from the unit price.
  */
-function commerce_line_item_unit_price_subtract($line_item, $amount, $component_name) {
+function commerce_line_item_unit_price_subtract($line_item, $amount, $component_name, $round_mode) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
@@ -157,7 +164,7 @@ function commerce_line_item_unit_price_subtract($line_item, $amount, $component_
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = $current_amount - $amount;
+    $updated_amount = commerce_round($round_mode, $current_amount - $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,
@@ -180,7 +187,7 @@ function commerce_line_item_unit_price_subtract($line_item, $amount, $component_
 /**
  * Rules action: multiply the unit price by some amount.
  */
-function commerce_line_item_unit_price_multiply($line_item, $amount, $component_name) {
+function commerce_line_item_unit_price_multiply($line_item, $amount, $component_name, $round_mode) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
@@ -188,7 +195,7 @@ function commerce_line_item_unit_price_multiply($line_item, $amount, $component_
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = $current_amount * $amount;
+    $updated_amount = commerce_round($round_mode, $current_amount * $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,
@@ -211,7 +218,7 @@ function commerce_line_item_unit_price_multiply($line_item, $amount, $component_
 /**
  * Rules action: divide the unit price by some amount.
  */
-function commerce_line_item_unit_price_divide($line_item, $amount, $component_name) {
+function commerce_line_item_unit_price_divide($line_item, $amount, $component_name, $round_mode) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
@@ -219,7 +226,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount, $component_na
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = $current_amount / $amount;
+    $updated_amount = commerce_round($current_amount / $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,
@@ -242,7 +249,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount, $component_na
 /**
  * Rules action: set the unit price to a specific amount.
  */
-function commerce_line_item_unit_price_amount($line_item, $amount, $component_name) {
+function commerce_line_item_unit_price_amount($line_item, $amount, $component_name, $round_mode) {
   if (is_numeric($amount)) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
@@ -250,7 +257,7 @@ function commerce_line_item_unit_price_amount($line_item, $amount, $component_na
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = $amount;
+    $updated_amount = commerce_round($round_mode, $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,

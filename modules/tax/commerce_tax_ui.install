@@ -22,7 +22,7 @@ function commerce_tax_ui_install() {
   $tax_type['display_title'] = t('VAT');
   $tax_type['description'] = t('A basic type for taxes that display inclusive with product prices.');
   $tax_type['display_inclusive'] = TRUE;
-  $tax_type['round_mode'] = COMMERCE_TAX_ROUND_HALF_UP;
+  $tax_type['round_mode'] = COMMERCE_ROUND_HALF_UP;
 
   commerce_tax_ui_tax_type_save($tax_type);
 }
@@ -179,7 +179,7 @@ function commerce_tax_ui_update_7000() {
 
   // Update the default VAT tax type to round the half up.
   db_update('commerce_tax_type')
-    ->fields(array('round_mode' => COMMERCE_TAX_ROUND_HALF_UP))
+    ->fields(array('round_mode' => COMMERCE_ROUND_HALF_UP))
     ->condition('name', 'vat')
     ->execute();
 

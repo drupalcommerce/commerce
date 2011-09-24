@@ -6,6 +6,13 @@
  */
 
 
+// Define our own rounding constants since we can't depend on PHP 5.3.
+define('COMMERCE_ROUND_NONE', 0);
+define('COMMERCE_ROUND_HALF_UP', 1);
+define('COMMERCE_ROUND_HALF_DOWN', 2);
+define('COMMERCE_ROUND_HALF_EVEN', 3);
+define('COMMERCE_ROUND_HALF_ODD', 4);
+
 /**
  * Implements hook_permission().
  */
@@ -659,6 +666,104 @@ function commerce_months() {
  */
 function commerce_numeric_comparison_operator_options_list() {
   return drupal_map_assoc(array('<', '<=', '=', '>=', '>'));
+}
+
+/**
+ * Returns an options list of round modes.
+ */
+function commerce_round_mode_options_list() {
+  return array(
+    COMMERCE_ROUND_NONE => t('Do not round at all'),
+    COMMERCE_ROUND_HALF_UP => t('Round the half up'),
+    COMMERCE_ROUND_HALF_DOWN => t('Round the half down'),
+    COMMERCE_ROUND_HALF_EVEN => t('Round the half to the nearest even number'),
+    COMMERCE_ROUND_HALF_ODD => t('Round the half to the nearest odd number'),
+  );
+}
+
+/**
+ * Rounds a number using the specified rounding mode.
+ *
+ * @param $round_mode
+ *   The round mode specifying which direction to round the number.
+ * @param $number
+ *   The number to round.
+ *
+ * @return
+ *   The number rounded based on the specified mode.
+ *
+ * @see commerce_round_mode_options_list()
+ */
+function commerce_round($round_mode, $number) {
+  // Remember if this is a negative or positive number and make it positive.
+  $negative = $number < 0;
+  $number = abs($number);
+
+  // Store the decimal value of the number.
+  $decimal = $number - floor($number);
+
+  // No need to round if there is no decimal value.
+  if ($decimal == 0) {
+    return $negative ? -$number : $number;
+  }
+
+  // Round it now according to the specified round mode.
+  switch ($round_mode) {
+    // PHP's round() function defaults to rounding the half up.
+    case COMMERCE_ROUND_HALF_UP:
+      $number = round($number);
+      break;
+
+    // PHP < 5.3.0 does not support rounding the half down, so we compare the
+    // decimal value and use floor() / ceil() directly.
+    case COMMERCE_ROUND_HALF_DOWN:
+      if ($decimal <= .5) {
+        $number = floor($number);
+      }
+      else {
+        $number = ceil($number);
+      }
+      break;
+
+    // PHP < 5.3.0 does not support rounding to the nearest even number, so we
+    // determine it ourselves if the decimal is .5.
+    case COMMERCE_ROUND_HALF_EVEN:
+      if ($decimal == .5) {
+        if (floor($number) % 2 == 0) {
+          $number = floor($number);
+        }
+        else {
+          $number = ceil($number);
+        }
+      }
+      else {
+        $number = round($number);
+      }
+      break;
+
+    // PHP < 5.3.0 does not support rounding to the nearest odd number, so we
+    // determine it ourselves if the decimal is .5.
+    case COMMERCE_ROUND_HALF_ODD:
+      if ($decimal == .5) {
+        if (floor($number) % 2 == 0) {
+          $number = ceil($number);
+        }
+        else {
+          $number = floor($number);
+        }
+      }
+      else {
+        $number = round($number);
+      }
+      break;
+
+    case COMMERCE_ROUND_NONE:
+    default:
+      break;
+  }
+
+  // Return the number preserving the initial negative / positive value.
+  return $negative ? -$number : $number;
 }
 
 /**
