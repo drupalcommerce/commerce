@@ -104,3 +104,62 @@ function commerce_line_item_uninstall() {
   // Delete any line item reference fields.
   commerce_delete_fields('commerce_line_item_reference');
 }
+
+/**
+ * Update Rules using unit price manipulation actions to set a default value for
+ * the rounding mode to use on the updated unit price amount.
+ */
+function commerce_line_item_update_7000() {
+  drupal_flush_all_caches();
+
+  // Loop over all defined Rules configurations.
+  foreach (rules_config_load_multiple(FALSE) as $rule) {
+    if ($rule instanceof RulesContainerPlugin) {
+      _commerce_line_item_update_rule_container_round_mode($rule);
+    }
+    else {
+      _commerce_line_item_update_rule_round_mode($rule);
+    }
+  }
+
+  return t('Rules updated to set a default rounding mode actions that manipulate unit prices.');
+}
+
+/**
+ * Iterates over a container's children to recursively find non-container
+ * plugins whose settings should be updated.
+ */
+function _commerce_line_item_update_rule_container_round_mode($rule) {
+  foreach ($rule->getIterator() as $child) {
+    if ($child instanceof RulesContainerPlugin) {
+      _commerce_line_item_update_rule_container_round_mode($child);
+    }
+    else {
+      _commerce_line_item_update_rule_round_mode($child);
+    }
+  }
+}
+
+/**
+ * Given a Rule configuration, checks its element name to see if it is an action
+ * that requires a value for the new round_mode setting used in unit price
+ * manipulation actions.
+ */
+function _commerce_line_item_update_rule_round_mode($rule) {
+  // Build an array of all element names that require this new setting.
+  $action_names = array(
+    'commerce_line_item_unit_price_add',
+    'commerce_line_item_unit_price_subtract',
+    'commerce_line_item_unit_price_multiply',
+    'commerce_line_item_unit_price_divide',
+    'commerce_line_item_unit_price_amount',
+  );
+
+  // If the Rule passed in is one of these actions...
+  if (in_array($rule->getElementName(), $action_names)) {
+    // Initialize its round_mode setting to match the previous behavior of not
+    // rounding at all and save it.
+    $rule->settings['round_mode'] = COMMERCE_ROUND_HALF_UP;
+    $rule->save();
+  }
+}

@@ -73,7 +73,7 @@ function commerce_line_item_rules_action_info() {
           'label' => t('Price rounding mode'),
           'description' => t('Round the resulting price amount after performing this operation.'),
           'options list' => 'commerce_round_mode_options_list',
-          'default value' => COMMERCE_ROUND_NONE,
+          'default value' => COMMERCE_ROUND_HALF_UP,
         ),
       ),
       'group' => t('Commerce Line Item'),
