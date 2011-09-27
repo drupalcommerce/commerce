@@ -767,6 +767,46 @@ function commerce_round($round_mode, $number) {
 }
 
 /**
+ * Adds child elements to a SimpleXML element using the data provided.
+ *
+ * @param $simplexml_element
+ *   The SimpleXML element that will be populated with children from the child
+ *   data array. This should already be initialized with its container element.
+ * @param $child_data
+ *   The array of data. It can be of any depth, but it only provides support for
+ *   child elements and their values - not element attributes. If an element can
+ *   have multiple child elements with the same name, you cannot depend on a
+ *   simple associative array because of key collision. You must instead include
+ *   each child element as a value array in a numerically indexed array.
+ */
+function commerce_simplexml_add_children(&$simplexml_element, $child_data) {
+  // Loop over all the child data...
+  foreach ($child_data as $key => $value) {
+    // If the current child is itself a container...
+    if (is_array($value)) {
+      // If it has a non-numeric key...
+      if (!is_numeric($key)) {
+        // Add a child element to the current element with the key as the name.
+        $child_element = $simplexml_element->addChild("$key");
+
+        // Add the value of this element to the child element.
+        commerce_simplexml_add_children($child_element, $value);
+      }
+      else {
+        // Otherwise assume we have multiple child elements of the same name and
+        // pass through to add the child data from the current value array to
+        // current element.
+        commerce_simplexml_add_children($simplexml_element, $value);
+      }
+    }
+    else {
+      // Otherwise add the child element with its simple value.
+      $simplexml_element->addChild("$key", "$value");
+    }
+  }
+}
+
+/**
  * Generic access control for Drupal Commerce entities.
  *
  * @param $op
