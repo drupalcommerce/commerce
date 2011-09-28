@@ -101,7 +101,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
         return FALSE;
       }
 
-      parent::delete($product_ids, $transaction);
+      parent::delete(array_keys($products), $transaction);
       return TRUE;
     }
     else {
