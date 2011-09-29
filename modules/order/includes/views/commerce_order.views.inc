@@ -16,9 +16,9 @@ function commerce_order_views_data() {
     'field' => 'order_id',
     'title' => t('Commerce Order'),
     'help' => t('Order placed in the store.'),
-    'entity type' => 'commerce_order',
     'access query tag' => 'commerce_order_access',
   );
+  $data['commerce_order']['table']['entity type'] = 'commerce_order';
 
   // Expose the order ID.
   $data['commerce_order']['order_id'] = array(
