@@ -24,7 +24,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   $form['sku'] = array(
     '#type' => 'textfield',
     '#title' => t('Product SKU'),
-    '#description' => t('Supply a unique identifier for this product using letters, numbers, hypens, and underscores.'),
+    '#description' => t('Supply a unique identifier for this product using letters, numbers, hyphens, and underscores.'),
     '#default_value' => $product->sku,
     '#maxlength' => 128,
     '#required' => TRUE,
