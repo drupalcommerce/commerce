@@ -987,7 +987,7 @@ function commerce_product_reference_property_info_callback(&$info, $entity_type,
 
   $property['type'] = ($field['cardinality'] != 1) ? 'list<commerce_product>' : 'commerce_product';
   $property['options list'] = 'entity_metadata_field_options_list';
-  $propery['getter callback'] = 'entity_metadata_field_property_get';
+  $property['getter callback'] = 'entity_metadata_field_property_get';
   $property['setter callback'] = 'entity_metadata_field_property_set';
   $property['property info'] = commerce_product_reference_field_data_property_info();
 
