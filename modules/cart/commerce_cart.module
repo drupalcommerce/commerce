@@ -485,7 +485,7 @@ function commerce_cart_block_view($delta) {
  * prices of product line items and save them if any values have changed.
  */
 function commerce_cart_commerce_order_load($orders) {
-  static $refreshed = array();
+  $refreshed = &drupal_static(__FUNCTION__, array());
 
   foreach ($orders as $order) {
     // Refresh only if this order hasn't been refreshed already.
