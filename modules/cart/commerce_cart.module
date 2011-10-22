@@ -1525,6 +1525,11 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
                 $allowed_values = $translate($field);
                 _options_prepare_options($allowed_values, $properties);
               }
+
+              // Translate the field title if set.
+              if (!empty($instance['label'])) {
+                $instance['label'] = i18n_field_translate_property($instance, 'label');
+              }
             }
 
             // Otherwise just use the base language values.
