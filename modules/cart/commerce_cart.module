@@ -1798,6 +1798,7 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
   // updated on the page.
   if (!empty($form_state['context'])) {
     $product = $form_state['default_product'];
+    $product->display_context = $form_state['context'];
 
     foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
       $class = drupal_html_class(implode('-', array($form_state['context']['class_prefix'], 'product', $product_field_name)));
