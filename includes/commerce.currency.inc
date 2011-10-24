@@ -723,10 +723,13 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Cent'),
       'major_unit' => t('Rupee'),
     ),
-    'MXP' => array(
-      'code' => 'MXP',
-      'symbol' => 'MX$',
-      'name' => t('Mexican Silver Peso (1861-1992)'),
+    'MXN' => array(
+      'code' => 'MXN',
+      'symbol' => '$',
+      'name' => t('Mexican Peso'),
+      'numeric_code' => '484',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Centavo'),
       'major_unit' => t('Peso'),
     ),
