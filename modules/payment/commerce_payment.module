@@ -25,6 +25,9 @@ define('COMMERCE_PAYMENT_STATUS_FAILURE', 'failure');
 // Used to just authorize an amount on a credit card account.
 define('COMMERCE_CREDIT_AUTH_ONLY', 'authorize');
 
+// User to just capture an amount on a credit card account.
+define('COMMERCE_CREDIT_CAPTURE_ONLY', 'capture');
+
 // Used to capture funds from a prior authorization.
 define('COMMERCE_CREDIT_PRIOR_AUTH_CAPTURE', 'prior_auth_capture');
 
