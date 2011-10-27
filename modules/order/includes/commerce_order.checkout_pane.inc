@@ -67,7 +67,7 @@ function commerce_order_account_pane_checkout_form($form, &$form_state, $checkou
 }
 
 /**
- * Account pane: validatation callback.
+ * Account pane: validation callback.
  */
 function commerce_order_account_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
   if (!empty($form_state['values'][$checkout_pane['pane_id']])) {
