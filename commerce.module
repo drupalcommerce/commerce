@@ -93,17 +93,24 @@ function commerce_entity_reference_delete($entity, $field_name, $col_name, $ref_
 
   // Loop over each of the field's items in every language.
   foreach ($entity->{$field_name} as $langcode => $items) {
+    $rekey = FALSE;
     foreach ($items as $delta => $item) {
       // If the item references the specified entity...
       if (!empty($item[$col_name]) && $item[$col_name] == $ref_entity_id) {
         // Unset the reference.
         unset($entity->{$field_name}[$langcode][$delta]);
+        $rekey = TRUE;
       }
     }
 
-    // If the reference field is empty, wipe its data altogether.
-    if (count($entity->{$field_name}[$langcode]) == 0) {
-      unset($entity->{$field_name}[$langcode]);
+    if ($rekey) {
+      // Rekey the field items if necessary.
+      $entity->{$field_name}[$langcode] = array_values($entity->{$field_name}[$langcode]);
+
+      // If the reference field is empty, wipe its data altogether.
+      if (count($entity->{$field_name}[$langcode]) == 0) {
+        unset($entity->{$field_name}[$langcode]);
+      }
     }
   }
 }
