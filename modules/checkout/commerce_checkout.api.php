@@ -56,3 +56,82 @@ function hook_commerce_checkout_router($order, $checkout_page) {
 function hook_commerce_checkout_complete($order) {
   // No example.
 }
+
+/**
+ * Allows modules to define additional checkout pages.
+ *
+ * @see http://www.drupalcommerce.org/specification/info-hooks/checkout
+ * @see commerce_checkout_commerce_checkout_page_info()
+ */
+function hook_commerce_checkout_page_info() {
+
+  // Define an additional checkout page.
+  $checkout_pages['additional_checkout_page'] = array(
+    'title' => t('Additional Checkout Page'),
+    'help' => t('Somebody asked for this additional checkout page'),
+    'weight' => 60,
+
+    // 'status_cart' => TRUE,
+
+    'back_value' => t('Back'), // Value of the "Back" button
+    'submit_value' => t('Next'), // Value of the "Next" button
+
+    // If 'buttons' is FALSE, the "next" and "previous" buttons will be omitted.
+    // 'buttons' => FALSE,
+  );
+
+  return $checkout_pages;
+}
+
+/**
+ * Allows modules to declare their own checkout panes.
+ *
+ * This hook provides a set of parameters defining a pane that can be added
+ * to the checkout system. This includes detail information like the title
+ * and also a way to determine the names of the key form functions to be called.
+ *
+ * @see commerce_order_commerce_checkout_pane_info()
+ * @see http://www.drupalcommerce.org/specification/info-hooks/checkout
+ */
+function hook_commerce_checkout_pane_info() {
+
+  $checkout_panes['new_pane'] = array(
+    'title' => t('A new pane'),
+
+    // The base of the form builder and related callbacks used to describe the
+    // pane. In this case these form functions will be required:
+    // - mymodule_new_pane_checkout_form($form, &$form_state, $checkout_pane, $order)
+    // - mymodule_new_pane_review($form, $form_state, $checkout_pane, $order)
+    // - mymodule_new_pane_settings_form($checkout_pane)
+    'base' => 'mymodule_new_pane',
+
+    // Note that the form builder functions and callbacks could also be
+    // specified in
+    // 'callbacks' => array(
+    //   'settings_form' => 'mymodule_new_pane_settings_form',
+    //   'checkout_form' => 'mymodule_new_pane_checkout_form',
+    //   'checkout_form_validate' => 'mymodule_new_pane_checkout_form_validate',
+    //   'checkout_form_submit' => 'mymodule_new_pane_checkout_form_submit',
+    //   'review' => 'mymodule_new_pane_review',
+    // ),
+
+    // page name where this pane should appear. Defaults to 'checkout'
+    'page' => 'checkout',
+    'weight' => -5,
+
+    // Administrative title of the pane,  used in administrative interface.
+    'name' => t('Additional pane'),
+
+    // 'pane_id' => 'new_pane',
+    'collapsible' => TRUE,
+    'collapsed' => FALSE,
+    'enabled' => TRUE, // Defaults to TRUE, but could default to FALSE.
+    'review' => TRUE, // If FALSE will be excluded from review page.
+
+    // A file where the callback functions may be found.
+    'file' => 'includes/mymodule.checkout_pane.inc',
+  );
+
+  return $checkout_panes;
+}
+
