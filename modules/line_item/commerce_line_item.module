@@ -891,6 +891,18 @@ function commerce_line_item_field_widget_info() {
     ),
   );
 
+  // Do not show the widget on forms; useful in cases where line item reference
+  // fields will be attached to non-order entities and managed by code.
+  $widgets['commerce_line_item_reference_hidden'] = array(
+    'label' => t('Do not show a widget'),
+    'description' => t('Will not display the line item reference field on forms. Use only if you maintain line item references some other way.'),
+    'field types' => array('commerce_line_item_reference'),
+    'settings' => array(),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+    ),
+  );
+
   return $widgets;
 }
 
@@ -1037,6 +1049,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
     }
 
     return $element;
+  }
+  elseif ($instance['widget']['type'] == 'commerce_line_item_reference_hidden') {
+    return array();
   }
 }
 
