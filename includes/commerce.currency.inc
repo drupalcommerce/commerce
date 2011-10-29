@@ -672,6 +672,16 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Dirham'),
       'major_unit' => t('Dinar'),
     ),
+    'MAD' => array(
+      'code' => 'MAD',
+      'symbol' => ' Dhs',
+      'name' => t('Moroccan Dirham'),
+      'numeric_code' => '504',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Santimat'),
+      'major_unit' => t('Dirhams'),
+    ),
     'MMK' => array(
       'code' => 'MMK',
       'symbol' => 'MMK',
