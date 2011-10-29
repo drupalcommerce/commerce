@@ -1806,12 +1806,18 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
     $product->display_context = $form_state['context'];
 
     foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
-      $class = drupal_html_class(implode('-', array($form_state['context']['class_prefix'], 'product', $product_field_name)));
+      // Rebuild the same array of classes used when the field was first rendered.
+      $classes = array(
+        'commerce-product-field',
+        drupal_html_class('commerce-product-field-' . $product_field_name),
+        drupal_html_class('field-' . $product_field_name),
+        drupal_html_class(implode('-', array($form_state['context']['class_prefix'], 'product', $product_field_name))),
+      );
 
       $element = field_view_field('commerce_product', $product, $product_field_name, $form_state['context']['view_mode']);
       $element += array(
-        '#prefix' => '<span class="' . $class . '">',
-        '#suffix' => '</span>',
+        '#prefix' => '<div class="' . implode(' ', $classes) . '">',
+        '#suffix' => '</div>',
       );
 
       $commands[] = ajax_command_replace('.' . $class, drupal_render($element));

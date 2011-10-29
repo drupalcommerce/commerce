@@ -228,11 +228,18 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
           // For multiple value references, add context information so the cart
           // form can do dynamic replacement of fields.
           if ($field['cardinality'] != 1) {
-            $class = array($entity_type, $id, 'product', $product_field_name);
+            // Construct an array of classes that will be used to theme and
+            // target the rendered field for AJAX replacement.
+            $classes = array(
+              'commerce-product-field',
+              drupal_html_class('commerce-product-field-' . $product_field_name),
+              drupal_html_class('field-' . $product_field_name),
+              drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_field_name))),
+            );
 
             $entity->content['product:' . $product_field_name] += array(
-              '#prefix' => '<span class="' . drupal_html_class(implode('-', $class)) . '">',
-              '#suffix' => '</span>',
+              '#prefix' => '<div class="' . implode(' ', $classes) . '">',
+              '#suffix' => '</div>',
             );
           }
         }
