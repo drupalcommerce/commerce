@@ -1353,8 +1353,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Product not available'),
-      '#disabled' => TRUE,
       '#weight' => 15,
+      // Do not set #disabled in order not to prevent submission.
+      '#attributes' => array('disabled' => 'disabled'),
+      '#validate' => array('commerce_cart_add_to_cart_form_disabled_validate'),
     );
   }
   else {
@@ -1742,8 +1744,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Product not available'),
-        '#disabled' => TRUE,
         '#weight' => 50,
+        // Do not set #disabled in order not to prevent submission.
+        '#attributes' => array('disabled' => 'disabled'),
+        '#validate' => array('commerce_cart_add_to_cart_form_disabled_validate'),
       );
     }
     else {
@@ -1764,9 +1768,17 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
 }
 
 /**
+ * Validation callback that prevents submission if the product is not available.
+ */
+function commerce_cart_add_to_cart_form_disabled_validate($form, &$form_state) {
+  form_set_error('submit', t('This product is no longer available.'));
+}
+
+/**
  * Form validate handler: validate the product and quantity to add to the cart.
  */
 function commerce_cart_add_to_cart_form_validate($form, &$form_state) {
+  // Check to ensure the quantity is valid.
   if (!is_numeric($form_state['values']['quantity']) || $form_state['values']['quantity'] <= 0) {
     form_set_error('quantity', t('You must specify a valid quantity to add to the cart.'));
   }
