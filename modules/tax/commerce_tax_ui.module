@@ -291,9 +291,6 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   if (!empty($tax_type['is_new']) && $op !== FALSE) {
     // Notify other modules that a new tax type has been created.
     module_invoke_all('commerce_tax_type_insert', $tax_type, $skip_reset);
-
-    // Ensure the default rule is built.
-    entity_defaults_rebuild();
   }
   elseif ($op !== FALSE) {
     // Notify other modules that an existing tax type has been updated.
@@ -303,6 +300,7 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
     commerce_tax_types_reset();
+    entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
   }
@@ -421,14 +419,11 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   if (!$tax_rate['rules_component']) {
     rules_config_delete(array('commerce_tax_rate_' . $tax_rate['name']));
   }
-  else {
-    // Otherwise ensure the default component is rebuilt.
-    entity_defaults_rebuild();
-  }
 
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
     commerce_tax_rates_reset();
+    entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
   }
