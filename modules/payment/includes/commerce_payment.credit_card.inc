@@ -83,14 +83,23 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
     $form['credit_card']['start_month'] = array(
       '#type' => 'select',
       '#title' => t('Start date'),
-      '#options' => commerce_months(),
+      '#options' => drupal_map_assoc(array_keys(commerce_months())),
       '#default_value' => $default['start_month'],
+      '#required' => TRUE,
       '#prefix' => '<div class="commerce-credit-card-start">',
+      '#suffix' => '<span class="commerce-month-year-divider">/</span>',
     );
+
+    // Build a year select list that uses a 4 digit key with a 2 digit value.
+    $options = array();
+
+    for ($i = -10; $i < 1; $i++) {
+      $options[date('Y') + $i] = date('y') + $i;
+    }
 
     $form['credit_card']['start_year'] = array(
       '#type' => 'select',
-      '#options' => drupal_map_assoc(range(date('Y') - 10, date('Y'))),
+      '#options' => $options,
       '#default_value' => $default['start_year'],
       '#suffix' => '</div>',
     );
@@ -100,14 +109,23 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
   $form['credit_card']['exp_month'] = array(
     '#type' => 'select',
     '#title' => t('Expiration'),
-    '#options' => commerce_months(),
+    '#options' => drupal_map_assoc(array_keys(commerce_months())),
     '#default_value' => $default['exp_month'],
+    '#required' => TRUE,
     '#prefix' => '<div class="commerce-credit-card-expiration">',
+    '#suffix' => '<span class="commerce-month-year-divider">/</span>',
   );
+
+  // Build a year select list that uses a 4 digit key with a 2 digit value.
+  $options = array();
+
+  for ($i = 0; $i < 20; $i++) {
+    $options[date('Y') + $i] = date('y') + $i;
+  }
 
   $form['credit_card']['exp_year'] = array(
     '#type' => 'select',
-    '#options' => drupal_map_assoc(range(date('Y'), date('Y') + 20)),
+    '#options' => $options,
     '#default_value' => $default['exp_year'],
     '#suffix' => '</div>',
   );

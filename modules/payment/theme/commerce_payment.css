@@ -14,6 +14,10 @@
   margin-bottom: 1em;
 }
 
+.commerce-month-year-divider {
+  margin-right: 3px;
+}
+
 /**
  * Add styles for administrative payment transaction displays.
  */
