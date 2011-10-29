@@ -17,6 +17,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
     $options['default_quantity'] = array('default' => 1);
     $options['combine'] = array('default' => TRUE);
     $options['display_path'] = array('default' => FALSE);
+    $options['line_item_type'] = array('product' => t('Product'));
 
     return $options;
   }
@@ -48,6 +49,24 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       '#default_value' => $this->options['combine'],
     );
 
+    // Add a conditionally visible line item type element.
+    $types = commerce_product_line_item_types();
+
+    if (count($types) > 1) {
+      $form['line_item_type'] = array(
+        '#type' => 'select',
+        '#title' => t('Add to Cart line item type'),
+        '#options' => array_intersect_key(commerce_line_item_type_get_name(), drupal_map_assoc($types)),
+        '#default_value' => !empty($this->options['line_item_type']) ? $this->options['line_item_type'] : 'product',
+      );
+    }
+    else {
+      $form['line_item_type'] = array(
+        '#type' => 'hidden',
+        '#value' => key($types),
+      );
+    }
+
     $form['display_path'] = array(
       '#type' => 'checkbox',
       '#title' => t("Link products added to the cart from this View to this View's path if displayed as a page."),
@@ -70,7 +89,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
       $product_ids = array($product->product_id);
 
       // Build the line item we'll pass to the Add to Cart form.
-      $line_item = commerce_product_line_item_new($product, $default_quantity);
+      $line_item = commerce_product_line_item_new($product, $default_quantity, 0, array(), $this->options['line_item_type']);
       $line_item->data['context']['product_ids'] = $product_ids;
       $line_item->data['context']['add_to_cart_combine'] = $this->options['combine'];
 
