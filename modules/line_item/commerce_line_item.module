@@ -1143,13 +1143,15 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
       // Manually validate the unit price of each line item.
       $unit_price = $form_state['values'][$element['#field_name']][$element['#language']]['line_items'][$line_item_id]['commerce_unit_price'];
       $amount = $unit_price[$element['#language']][0]['amount'];
+      $currency_code = $unit_price[$element['#language']][0]['currency_code'];
 
       // Display an error message for a non-numeric unit price.
       if (!is_numeric($amount)) {
         $name = implode('][', array_merge($element['line_items'][$line_item_id]['commerce_unit_price']['#parents'], array($element['#language'], 0, 'amount')));
         form_set_error($name, 'You must enter a numeric value for the unit price.');
       }
-      elseif ($amount <> $line_item->commerce_unit_price[$element['#language']][0]['amount']) {
+      elseif ($amount <> $line_item->commerce_unit_price[$element['#language']][0]['amount'] ||
+        $currency_code <> $line_item->commerce_unit_price[$element['#language']][0]['currency_code']) {
         // Otherwise update the unit price amount if it has changed.
         $line_item->commerce_unit_price = $unit_price;
 
