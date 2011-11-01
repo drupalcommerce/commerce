@@ -216,6 +216,60 @@ function commerce_payment_views_data() {
     ),
   );
 
+  $data['commerce_payment_transaction']['created_fulldate'] = array(
+    'title' => t('Created date'),
+    'help' => t('In the form of CCYYMMDD.'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_fulldate',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['created_year_month'] = array(
+    'title' => t('Created year + month'),
+    'help' => t('In the form of YYYYMM.'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_year_month',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['created_timestamp_year'] = array(
+    'title' => t('Created year'),
+    'help' => t('In the form of YYYY.'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_year',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['created_month'] = array(
+    'title' => t('Created month'),
+    'help' => t('In the form of MM (01 - 12).'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_month',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['created_day'] = array(
+    'title' => t('Created day'),
+    'help' => t('In the form of DD (01 - 31).'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_day',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['created_week'] = array(
+    'title' => t('Created week'),
+    'help' => t('In the form of WW (01 - 53).'),
+    'argument' => array(
+      'field' => 'created',
+      'handler' => 'views_handler_argument_node_created_week',
+    ),
+  );
+
   $data['commerce_payment_transaction']['changed'] = array(
     'title' => t('Changed date'),
     'help' => t('The date the transaction was last changed.'),
@@ -228,6 +282,60 @@ function commerce_payment_views_data() {
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_fulldate'] = array(
+    'title' => t('Updated date'),
+    'help' => t('In the form of CCYYMMDD.'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_fulldate',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_year_month'] = array(
+    'title' => t('Updated year + month'),
+    'help' => t('In the form of YYYYMM.'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_year_month',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_timestamp_year'] = array(
+    'title' => t('Updated year'),
+    'help' => t('In the form of YYYY.'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_year',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_month'] = array(
+    'title' => t('Updated month'),
+    'help' => t('In the form of MM (01 - 12).'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_month',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_day'] = array(
+    'title' => t('Updated day'),
+    'help' => t('In the form of DD (01 - 31).'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_day',
+    ),
+  );
+
+  $data['commerce_payment_transaction']['changed_week'] = array(
+    'title' => t('Updated week'),
+    'help' => t('In the form of WW (01 - 53).'),
+    'argument' => array(
+      'field' => 'changed',
+      'handler' => 'views_handler_argument_node_created_week',
     ),
   );
 
