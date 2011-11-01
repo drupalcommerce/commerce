@@ -606,11 +606,11 @@ function commerce_product_reference_field_widget_error($element, $error) {
 /**
  * Implements hook_options_list().
  */
-function commerce_product_reference_options_list($field) {
+function commerce_product_reference_options_list($field, $instance = NULL) {
   $options = array();
 
   // Loop through all product matches.
-  foreach (commerce_product_match_products($field) as $product_id => $data) {
+  foreach (commerce_product_match_products($field, $instance) as $product_id => $data) {
     // Add them to the options list in optgroups by product type.
     $name = check_plain(commerce_product_type_get_name($data['type']));
     $options[$name][$product_id] = t('@sku: @title', array('@sku' => $data['sku'], '@title' => $data['title']));

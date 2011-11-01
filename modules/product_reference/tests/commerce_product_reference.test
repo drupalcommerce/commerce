@@ -202,12 +202,12 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
 
     // Check if it is in the reference field for product displays.
     $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/fields/' . $this->field_name);
-    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $select_options = $this->xpath("//select[@id='edit-field-product-und']//option");
     $this->assertTrue(in_array($product_title, $select_options), t('Product is available in the select'));
 
     // Check if it is in the product display creation select form.
     $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
-    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $select_options = $this->xpath("//select[@id='edit-field-product-und']//option");
     $this->assertTrue(in_array($product_title, $select_options), t('Product is available in the select'));
   }
 
@@ -222,7 +222,7 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
 
     // Check if the additional type is available in the product display.
     $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
-    $select_options = $this->xpath("//select['edit-field-product-und']//option");
+    $select_options = $this->xpath("//select[@id='edit-field-product-und']//option");
     $this->assertTrue(in_array($product_title, $select_options), t('Additional product is available in the select'));
 
     // Check if the additional type is available in the product field settings.
@@ -230,6 +230,7 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
     $this->assertFieldById('edit-instance-settings-referenceable-types-additional-type', NULL, t('Additional product type is present'));
 
     // Select only the additional type.
+    $this->pass(t('Configure the display product reference field to only accept products from "Additional" type:'));
     $this->drupalPost(NULL, array('instance[settings][referenceable_types][additional_type]' => 1), t('Save settings'));
 
     // Check the saved message and the checkbox.
@@ -245,12 +246,12 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
     $this->assertTrue($field_instance['settings']['referenceable_types']['additional_type'] == 'additional_type', t('Product type: Additional type is referenceable'));
     $this->assertTrue($field_instance['settings']['referenceable_types']['product'] == 0, t('Product type: Product is not referenceable'));
 
-    // TODO: As the commerce_product_reference_options_list call doesn't have
-    // $instance context, all products are being displayed at product display
-    // level, this should be fixed either at core level (hook_options_list) or
-    // a workaround in commerce.
-    // @see http://drupal.org/node/1066274
-    // @see http://drupal.org/node/1066326
+    // Check if the additional type is available in the product display.
+    $this->drupalGet('node/add/' . strtr($this->display_type->type, '_', '-'));
+    $select_options = $this->xpath("//select[@id='edit-field-product-und']//option");
+    foreach ($this->products as $product) {
+      $this->assertFalse(in_array($product->title, $select_options), t('Product "!product_title" of regular type is not available in the product reference select', array('!product_title' => $product->title)));
+    }
   }
 
   /**
