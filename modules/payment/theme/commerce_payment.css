@@ -1,24 +1,5 @@
 
 /**
- * Add styles to payment elements on Checkout pages.
- */
-.commerce-credit-card-start,
-.commerce-credit-card-expiration {
-  margin-bottom: 1em;
-}
-
-.commerce-credit-card-start .form-item,
-.commerce-credit-card-expiration .form-item {
-  display: inline;
-  margin-right: .25em;
-  margin-bottom: 1em;
-}
-
-.commerce-month-year-divider {
-  margin-right: 3px;
-}
-
-/**
  * Add styles for administrative payment transaction displays.
  */
 .views-field-status img.pending {

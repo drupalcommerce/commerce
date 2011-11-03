@@ -1,0 +1,19 @@
+
+/**
+ * Add styles to credot card form elements.
+ */
+.commerce-credit-card-start,
+.commerce-credit-card-expiration {
+  margin-bottom: 1em;
+}
+
+.commerce-credit-card-start .form-item,
+.commerce-credit-card-expiration .form-item {
+  display: inline;
+  margin-right: .25em;
+  margin-bottom: 1em;
+}
+
+.commerce-month-year-divider {
+  margin-right: 3px;
+}

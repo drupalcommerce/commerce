@@ -35,12 +35,6 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
     return $pane_form;
   }
 
-  // Add the payment CSS in case any elements appear needing the styling.
-  $pane_form['#attached'] = array(
-    'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css'),
-  );
-
-
   // Store the payment methods in the form for validation purposes.
   $pane_form['payment_methods'] = array(
     '#type' => 'value',
