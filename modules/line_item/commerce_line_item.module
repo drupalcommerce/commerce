@@ -231,16 +231,63 @@ function commerce_line_item_views_api() {
  * Implements hook_enable().
  */
 function commerce_line_item_enable() {
-  // Loop through and configure all the currently defined line item types.
-  foreach (commerce_line_item_types() as $line_item_type) {
-    commerce_line_item_configure_line_item_type($line_item_type);
-  }
+  commerce_line_item_configure_line_item_types();
 }
 
 /**
  * Implements hook_modules_enabled().
  */
 function commerce_line_item_modules_enabled($modules) {
+  commerce_line_item_configure_line_item_fields($modules);
+}
+
+/**
+ * Configures line item types defined by enabled modules.
+ */
+function commerce_line_item_configure_line_item_types() {
+  foreach (commerce_line_item_types() as $line_item_type) {
+    commerce_line_item_configure_line_item_type($line_item_type);
+  }
+}
+
+/**
+ * Configures a line item type by adding default price fields and then calling
+ * its configuration callback.
+ *
+ * @param $line_item_type
+ *   The fully loaded line item type array to configure.
+ */
+function commerce_line_item_configure_line_item_type($line_item_type) {
+  // Add the default price fields to the line item type.
+  $weight = 0;
+
+  foreach (array('commerce_unit_price' => t('Unit price'), 'commerce_total' => t('Total')) as $field_name => $label) {
+    commerce_price_create_instance($field_name, 'commerce_line_item', $line_item_type['type'], $label, $weight++);
+  }
+
+  // If this line item type specifies a configuration callback...
+  if ($callback = commerce_line_item_type_callback($line_item_type, 'configuration')) {
+    // Invoke it now.
+    $callback($line_item_type);
+  }
+}
+
+/**
+ * Configures line item types defined by other modules that are enabled after
+ * the Line Item module.
+ *
+ * @param $modules
+ *   An array of module names whose line item type fields should be configured;
+ *   if left NULL, will default to all modules that implement
+ *   hook_commerce_line_item_type_info().
+ */
+function commerce_line_item_configure_line_item_fields($modules = NULL) {
+  // If no modules array is passed, recheck the fields for all line item types
+  // defined by enabled modules.
+  if (empty($modules)) {
+    $modules = module_implements('commerce_line_item_type_info');
+  }
+
   // Reset the line item cache to get the default options and callbacks.
   commerce_line_item_types_reset();
 
@@ -438,27 +485,6 @@ function commerce_line_item_type_get_name($type = NULL) {
  */
 function commerce_line_item_type_options_list() {
   return commerce_line_item_type_get_name();
-}
-
-/**
- * Configures a line item type by calling its configuration callback.
- *
- * @param $line_item_type
- *   The fully loaded line item type array to configure.
- */
-function commerce_line_item_configure_line_item_type($line_item_type) {
-  // Add the default price fields to the line item type.
-  $weight = 0;
-
-  foreach (array('commerce_unit_price' => t('Unit price'), 'commerce_total' => t('Total')) as $field_name => $label) {
-    commerce_price_create_instance($field_name, 'commerce_line_item', $line_item_type['type'], $label, $weight++);
-  }
-
-  // If this line item type specifies a configuration callback...
-  if ($callback = commerce_line_item_type_callback($line_item_type, 'configuration')) {
-    // Invoke it now.
-    $callback($line_item_type);
-  }
 }
 
 /**

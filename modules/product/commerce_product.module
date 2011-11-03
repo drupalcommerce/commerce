@@ -262,16 +262,47 @@ function commerce_product_permission() {
  * Implements hook_enable().
  */
 function commerce_product_enable() {
-  // Loop through and configure all the currently defined product types.
-  foreach (commerce_product_types() as $type => $product_type) {
-    commerce_product_configure_product_type($type);
-  }
+  commerce_product_configure_product_types();
 }
 
 /**
  * Implements hook_modules_enabled().
  */
 function commerce_product_modules_enabled($modules) {
+  commerce_product_configure_product_fields($modules);
+}
+
+/**
+ * Configure the product types defined by enabled modules.
+ */
+function commerce_product_configure_product_types() {
+  foreach (commerce_product_types() as $type => $product_type) {
+    commerce_product_configure_product_type($type);
+  }
+}
+
+/**
+ * Ensures a base price field is present on a product type bundle.
+ */
+function commerce_product_configure_product_type($type) {
+  commerce_price_create_instance('commerce_price', 'commerce_product', $type, t('Price'), 0, 'calculated_sell_price');
+}
+
+/**
+ * Configures the fields on product types provided by other modules.
+ *
+ * @param $modules
+ *   An array of module names whose product type fields should be configured;
+ *   if left NULL, will default to all modules that implement
+ *   hook_commerce_product_type_info().
+ */
+function commerce_product_configure_product_fields($modules = NULL) {
+  // If no modules array is passed, recheck the fields for all product types
+  // defined by enabled modules.
+  if (empty($modules)) {
+    $modules = module_implements('commerce_product_type_info');
+  }
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_product_type_info()...
@@ -379,13 +410,6 @@ function commerce_product_type_options_list() {
  */
 function commerce_product_type_to_arg($type) {
   return strtr($type, '_', '-');
-}
-
-/**
- * Ensures a base price field is present on a product type bundle.
- */
-function commerce_product_configure_product_type($type) {
-  commerce_price_create_instance('commerce_price', 'commerce_product', $type, t('Price'), 0, 'calculated_sell_price');
 }
 
 /**

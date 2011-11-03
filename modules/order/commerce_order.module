@@ -128,7 +128,6 @@ function commerce_order_hook_info() {
  * Implements hook_enable().
  */
 function commerce_order_enable() {
-  // Add the default order fields.
   commerce_order_configure_order_type();
 }
 
@@ -136,6 +135,151 @@ function commerce_order_enable() {
  * Implements hook_modules_enabled().
  */
 function commerce_order_modules_enabled($modules) {
+  commerce_order_configure_order_fields($modules);
+}
+
+/**
+ * Ensures the line item field is present on the default order bundle.
+ */
+function commerce_order_configure_order_type($type = 'commerce_order') {
+  // If a field type we know should exist isn't found, clear the Field cache.
+  if (!field_info_field_types('commerce_line_item_reference') ||
+    !field_info_field_types('commerce_customer_profile_reference')) {
+    field_cache_clear();
+  }
+
+  // Look for or add a line item reference field to the order type.
+  $field_name = 'commerce_line_items';
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_order', $field_name, $type);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'commerce_line_item_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'entity_types' => array('commerce_order'),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => 'commerce_order',
+      'bundle' => $type,
+      'label' => t('Line items'),
+      'settings' => array(),
+      'widget' => array(
+        'type' => 'commerce_line_item_manager',
+        'weight' => -10,
+      ),
+      'display' => array(),
+    );
+
+    // Set the default display formatters for various view modes.
+    foreach (array('default', 'customer', 'administrator') as $view_mode) {
+      $instance['display'][$view_mode] = array(
+        'label' => 'hidden',
+        'type' => 'commerce_line_item_reference_view',
+        'weight' => -10,
+      );
+    }
+
+    field_create_instance($instance);
+  }
+
+  // Add the order total price field.
+  commerce_price_create_instance('commerce_order_total', 'commerce_order', $type, t('Order total'), -8, FALSE, array('type' => 'commerce_price_formatted_components'));
+
+  // Add the customer profile reference fields for each profile type.
+  foreach (commerce_customer_profile_types() as $customer_profile_type => $profile_type) {
+    commerce_order_configure_customer_profile_type($customer_profile_type, $profile_type['name'], $type);
+  }
+}
+
+/**
+ * Configure the customer profile reference fields for the specified order type.
+ *
+ * @param $customer_profile_type
+ *   The machine-name of the customer profile type to reference.
+ * @param $label
+ *   The label to use for the profile type's reference field.
+ * @param $order_type
+ *   The machine-name of the order type to add fields to.
+ */
+function commerce_order_configure_customer_profile_type($customer_profile_type, $label, $order_type = 'commerce_order') {
+  // Add the customer profile reference fields for each profile type.
+  $field_name = 'commerce_customer_' . $customer_profile_type;
+
+  // First check to ensure this field doesn't already exist and was just inactive
+  // because of the profile defining module being disabled previously.
+  commerce_activate_field($field_name);
+
+  $field = field_info_field($field_name);
+  $instance = field_info_instance('commerce_order', $field_name, $order_type);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'commerce_customer_profile_reference',
+      'cardinality' => 1,
+      'entity_types' => array('commerce_order'),
+      'translatable' => FALSE,
+      'settings' => array(
+        'profile_type' => $customer_profile_type,
+      ),
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => 'commerce_order',
+      'bundle' => $order_type,
+      'label' => $label,
+      'widget' => array(
+        'type' => 'commerce_customer_profile_manager',
+        'weight' => -5,
+      ),
+      'display' => array(),
+    );
+
+    // Set the default display formatters for various view modes.
+    foreach (array('default', 'customer', 'administrator') as $view_mode) {
+      $instance['display'][$view_mode] = array(
+        'label' => 'above',
+        'type' => 'commerce_customer_profile_reference_display',
+        'weight' => -5,
+      );
+    }
+
+    field_create_instance($instance);
+
+    variable_set('commerce_customer_profile_' . $customer_profile_type . '_field', $field_name);
+  }
+}
+
+/**
+ * Configures the customer profile reference fields attached to the default
+ * order type when modules defining customer profile types are enabeld after the
+ * Order module.
+ *
+ * @param $modules
+ *   An array of module names whose customer profile reference fields should be
+ *   configured; if left NULL, will default to all modules that implement
+ *   hook_commerce_customer_profile_type_info().
+ */
+function commerce_order_configure_order_fields($modules = NULL) {
+  // If no modules array is passed, recheck the customer profile reference
+  // fields to all customer profile types defined by enabled modules.
+  if (empty($modules)) {
+    $modules = module_implements('commerce_customer_profile_type_info');
+  }
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_customer_profile_type_info()...
@@ -509,7 +653,7 @@ function commerce_order_form_commerce_customer_customer_profile_delete_form_alte
  *
  * @return
  *   Either the specified name, defaulting to the type itself if the name is not
- *     found, or an array of all names keyed by type if no type is passed in.
+ *   found, or an array of all names keyed by type if no type is passed in.
  */
 function commerce_order_type_get_name($type = NULL) {
   $names = array();
@@ -1204,131 +1348,6 @@ function commerce_order_calculate_total($order) {
 
   // Update the order total price field with the final total amount.
   $order_wrapper->commerce_order_total->amount = round($amount);
-}
-
-/**
- * Configure the customer profile reference fields for the specified order type.
- *
- * @param $customer_profile_type
- *   The machine-name of the customer profile type to reference.
- * @param $label
- *   The label to use for the profile type's reference field.
- * @param $order_type
- *   The machine-name of the order type to add fields to.
- */
-function commerce_order_configure_customer_profile_type($customer_profile_type, $label, $order_type = 'commerce_order') {
-  // Add the customer profile reference fields for each profile type.
-  $field_name = 'commerce_customer_' . $customer_profile_type;
-
-  // First check to ensure this field doesn't already exist and was just inactive
-  // because of the profile defining module being disabled previously.
-  commerce_activate_field($field_name);
-
-  $field = field_info_field($field_name);
-  $instance = field_info_instance('commerce_order', $field_name, $order_type);
-
-  if (empty($field)) {
-    $field = array(
-      'field_name' => $field_name,
-      'type' => 'commerce_customer_profile_reference',
-      'cardinality' => 1,
-      'entity_types' => array('commerce_order'),
-      'translatable' => FALSE,
-      'settings' => array(
-        'profile_type' => $customer_profile_type,
-      ),
-    );
-    $field = field_create_field($field);
-  }
-
-  if (empty($instance)) {
-    $instance = array(
-      'field_name' => $field_name,
-      'entity_type' => 'commerce_order',
-      'bundle' => $order_type,
-      'label' => $label,
-      'widget' => array(
-        'type' => 'commerce_customer_profile_manager',
-        'weight' => -5,
-      ),
-      'display' => array(),
-    );
-
-    // Set the default display formatters for various view modes.
-    foreach (array('default', 'customer', 'administrator') as $view_mode) {
-      $instance['display'][$view_mode] = array(
-        'label' => 'above',
-        'type' => 'commerce_customer_profile_reference_display',
-        'weight' => -5,
-      );
-    }
-
-    field_create_instance($instance);
-
-    variable_set('commerce_customer_profile_' . $customer_profile_type . '_field', $field_name);
-  }
-}
-
-/**
- * Ensures the line item field is present on the default order bundle.
- */
-function commerce_order_configure_order_type($type = 'commerce_order') {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_line_item_reference') ||
-    !field_info_field_types('commerce_customer_profile_reference')) {
-    field_cache_clear();
-  }
-
-  // Look for or add a line item reference field to the order type.
-  $field_name = 'commerce_line_items';
-  $field = field_info_field($field_name);
-  $instance = field_info_instance('commerce_order', $field_name, $type);
-
-  if (empty($field)) {
-    $field = array(
-      'field_name' => $field_name,
-      'type' => 'commerce_line_item_reference',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-      'entity_types' => array('commerce_order'),
-      'translatable' => FALSE,
-      'locked' => TRUE,
-    );
-    $field = field_create_field($field);
-  }
-
-  if (empty($instance)) {
-    $instance = array(
-      'field_name' => $field_name,
-      'entity_type' => 'commerce_order',
-      'bundle' => $type,
-      'label' => t('Line items'),
-      'settings' => array(),
-      'widget' => array(
-        'type' => 'commerce_line_item_manager',
-        'weight' => -10,
-      ),
-      'display' => array(),
-    );
-
-    // Set the default display formatters for various view modes.
-    foreach (array('default', 'customer', 'administrator') as $view_mode) {
-      $instance['display'][$view_mode] = array(
-        'label' => 'hidden',
-        'type' => 'commerce_line_item_reference_view',
-        'weight' => -10,
-      );
-    }
-
-    field_create_instance($instance);
-  }
-
-  // Add the order total price field.
-  commerce_price_create_instance('commerce_order_total', 'commerce_order', $type, t('Order total'), -8, FALSE, array('type' => 'commerce_price_formatted_components'));
-
-  // Add the customer profile reference fields for each profile type.
-  foreach (commerce_customer_profile_types() as $customer_profile_type => $profile_type) {
-    commerce_order_configure_customer_profile_type($customer_profile_type, $profile_type['name'], $type);
-  }
 }
 
 /**

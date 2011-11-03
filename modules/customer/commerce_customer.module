@@ -115,16 +115,99 @@ function commerce_customer_hook_info() {
  * Implements hook_enable().
  */
 function commerce_customer_enable() {
-  // Add the address field to customer profile bundles.
-  foreach (commerce_customer_profile_types() as $type => $profile_type) {
-    commerce_customer_configure_customer_profile_type($profile_type);
-  }
+  commerce_customer_configure_customer_types();
 }
 
 /**
  * Implements hook_modules_enabled().
  */
 function commerce_customer_modules_enabled($modules) {
+  commerce_customer_configure_customer_fields($modules);
+}
+
+/**
+ * Configures customer profile types defined by enabled modules.
+ */
+function commerce_customer_configure_customer_types() {
+  foreach (commerce_customer_profile_types() as $type => $profile_type) {
+    commerce_customer_configure_customer_profile_type($profile_type);
+  }
+}
+
+/**
+ * Ensures the address field is present on the specified customer profile bundle.
+ */
+function commerce_customer_configure_customer_profile_type($profile_type) {
+  if ($profile_type['addressfield']) {
+    // If a field type we know should exist isn't found, clear the Field cache.
+    if (!field_info_field_types('addressfield')) {
+      field_cache_clear();
+    }
+
+    // Look for or add an address field to the customer profile type.
+    $field_name = 'commerce_customer_address';
+    $field = field_info_field($field_name);
+    $instance = field_info_instance('commerce_customer_profile', $field_name, $profile_type['type']);
+
+    if (empty($field)) {
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'addressfield',
+        'cardinality' => 1,
+        'entity_types' => array('commerce_customer_profile'),
+        'translatable' => FALSE,
+      );
+
+      $field = field_create_field($field);
+    }
+
+    if (empty($instance)) {
+      $instance = array(
+        'field_name' => $field_name,
+        'entity_type' => 'commerce_customer_profile',
+        'bundle' => $profile_type['type'],
+        'label' => t('Address'),
+        'required' => TRUE,
+        'widget' => array(
+          'type' => 'addressfield_standard',
+          'weight' => -10,
+          'settings' => array(
+            'format_handlers' => array('address', 'name-oneline'),
+          ),
+        ),
+        'display' => array(),
+      );
+
+      // Set the default display formatters for various view modes.
+      foreach (array('default', 'customer', 'administrator') as $view_mode) {
+        $instance['display'][$view_mode] = array(
+          'label' => 'hidden',
+          'type' => 'addressfield_default',
+          'weight' => -10,
+        );
+      }
+
+      field_create_instance($instance);
+    }
+  }
+}
+
+/**
+ * Configures fields referencing customer profile types defined by enabled
+ * modules and configures the fields on those profile types if necessary.
+ *
+ * @param $modules
+ *   An array of module names whose customer profile type fields should be
+ *   configured; if left NULL, will default to all modules that implement
+ *   hook_commerce_customer_profile_type_info().
+ */
+function commerce_customer_configure_customer_fields($modules = NULL) {
+  // If no modules array is passed, recheck the fields for all customer profile
+  // types defined by enabled modules.
+  if (empty($modules)) {
+    $modules = module_implements('commerce_customer_profile_type_info');
+  }
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_customer_profile_type_info()...
@@ -585,64 +668,6 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
  */
 function commerce_customer_profile_query_commerce_customer_profile_access_alter(QueryAlterableInterface $query) {
   return commerce_entity_access_query_alter($query, 'commerce_customer_profile');
-}
-
-/**
- * Ensures the address field is present on the specified customer profile bundle.
- */
-function commerce_customer_configure_customer_profile_type($profile_type) {
-  if ($profile_type['addressfield']) {
-    // If a field type we know should exist isn't found, clear the Field cache.
-    if (!field_info_field_types('addressfield')) {
-      field_cache_clear();
-    }
-
-    // Look for or add an address field to the customer profile type.
-    $field_name = 'commerce_customer_address';
-    $field = field_info_field($field_name);
-    $instance = field_info_instance('commerce_customer_profile', $field_name, $profile_type['type']);
-
-    if (empty($field)) {
-      $field = array(
-        'field_name' => $field_name,
-        'type' => 'addressfield',
-        'cardinality' => 1,
-        'entity_types' => array('commerce_customer_profile'),
-        'translatable' => FALSE,
-      );
-
-      $field = field_create_field($field);
-    }
-
-    if (empty($instance)) {
-      $instance = array(
-        'field_name' => $field_name,
-        'entity_type' => 'commerce_customer_profile',
-        'bundle' => $profile_type['type'],
-        'label' => t('Address'),
-        'required' => TRUE,
-        'widget' => array(
-          'type' => 'addressfield_standard',
-          'weight' => -10,
-          'settings' => array(
-            'format_handlers' => array('address', 'name-oneline'),
-          ),
-        ),
-        'display' => array(),
-      );
-
-      // Set the default display formatters for various view modes.
-      foreach (array('default', 'customer', 'administrator') as $view_mode) {
-        $instance['display'][$view_mode] = array(
-          'label' => 'hidden',
-          'type' => 'addressfield_default',
-          'weight' => -10,
-        );
-      }
-
-      field_create_instance($instance);
-    }
-  }
 }
 
 /**
