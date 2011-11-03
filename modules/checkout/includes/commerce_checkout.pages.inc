@@ -110,10 +110,10 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       // If there are messages in the session right now for this pane, theme
       // them into the form right above the pane itself.
       if (!empty($_SESSION['messages'])) {
-        $form_state['storage']['messages'][$pane_id] = theme('status_messages');
+        $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
 
         $form[$pane_id . '_messages'] = array(
-          '#markup' =>  $form_state['storage']['messages'][$pane_id],
+          '#markup' =>  $form_state['storage']['themed_messages'][$pane_id],
         );
       }
 
@@ -145,6 +145,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       '#type' => 'submit',
       '#value' => $checkout_page['submit_value'],
       '#attributes' => array('class' => array('checkout-continue')),
+      '#validate' => array('commerce_checkout_form_validate'),
       '#submit' => array('commerce_checkout_form_submit'),
     );
 
@@ -183,18 +184,22 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
     }
   }
 
+  // Remove form level validate and submit handlers.
+  $form['#validate'] = array();
+  $form['#submit'] = array();
+
   return $form;
 }
 
 /**
- * Submit handler for the continue and back buttons of the checkout form.
+ * Validate handler for the continue button of the checkout form.
  *
  * This function calls the validation function of each pane, followed by
  * the submit function if the validation succeeded. As long as one pane
  * fails validation, we then ask for the form to be rebuilt. Once all the panes
  * are happy, we move on to the next page.
  */
-function commerce_checkout_form_submit($form, &$form_state) {
+function commerce_checkout_form_validate($form, &$form_state) {
   global $user;
 
   $checkout_page = $form_state['checkout_page'];
@@ -205,15 +210,39 @@ function commerce_checkout_form_submit($form, &$form_state) {
   // Catch and clear already pushed messages.
   $previous_messages = drupal_get_messages();
 
+  // Load any pre-existing validation errors for the elements.
+  $errors = array();
+
+  foreach ((array) form_get_errors() as $element_path => $error) {
+    list($pane_id, ) = explode('][', $element_path, 2);
+    $errors[$pane_id][$element_path] = $error;
+  }
+
   // Loop through the enabled checkout panes for the current page.
   $form_validate = TRUE;
   foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page['page_id'])) as $pane_id => $checkout_pane) {
     $validate = TRUE;
 
+    // If any element in the pane failed validation, we mark the pane as
+    // unvalidated and replay the validation messages on top of it.
+    if (!empty($errors[$pane_id])) {
+      $validate = FALSE;
+
+      foreach ($errors[$pane_id] as $element_path => $message) {
+        if ($message) {
+          drupal_set_message($message, 'error');
+        }
+      }
+
+      if (isset($previous_messages['error'])) {
+        $previous_messages['error'] = array_diff($previous_messages['error'], $errors[$pane_id]);
+      }
+    }
+
     // If the pane has defined a checkout form validate handler...
     if ($callback = commerce_checkout_pane_callback($checkout_pane, 'checkout_form_validate')) {
       // Give it a chance to process the submitted data.
-      $validate = $callback($form, $form_state, $checkout_pane, $order);
+      $validate &= $callback($form, $form_state, $checkout_pane, $order);
     }
 
     // Catch and clear panes' messages.
@@ -244,8 +273,17 @@ function commerce_checkout_form_submit($form, &$form_state) {
   // initiate a rebuild, return without moving to the next checkout page.
   if (!$form_validate || $form_state['rebuild']) {
     $form_state['rebuild'] = TRUE;
-    return;
   }
+}
+
+/**
+ * Submit handler for the continue button of the checkout form.
+ */
+function commerce_checkout_form_submit($form, &$form_state) {
+  $checkout_page = $form_state['checkout_page'];
+
+  // Load a fresh copy of the order stored in the form.
+  $order = commerce_order_load($form_state['order']->order_id);
 
   // If we are going to redirect with checkout pane messages stored in the form
   // state, they will not be displayed on a subsequent form build like normal.
