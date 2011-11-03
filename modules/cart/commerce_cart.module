@@ -185,11 +185,13 @@ function commerce_cart_form_alter(&$form, &$form_state, $form_id) {
     if (!empty($form['edit_delete'])) {
       foreach(element_children($form['edit_delete']) as $key) {
         // Load and wrap the line item to have the title in the submit phase.
-        $line_item_id = $form['edit_delete'][$key]['#line_item_id'];
-        $form_state['line_items'][$line_item_id] = commerce_line_item_load($line_item_id);
+        if (!empty($form['edit_delete'][$key]['#line_item_id'])) {
+          $line_item_id = $form['edit_delete'][$key]['#line_item_id'];
+          $form_state['line_items'][$line_item_id] = commerce_line_item_load($line_item_id);
 
-        $form['edit_delete'][$key]['#value'] = t('Remove');
-        $form['edit_delete'][$key]['#submit'] = array_merge($form['#submit'], array('commerce_cart_line_item_delete_form_submit'));
+          $form['edit_delete'][$key]['#value'] = t('Remove');
+          $form['edit_delete'][$key]['#submit'] = array_merge($form['#submit'], array('commerce_cart_line_item_delete_form_submit'));
+        }
       }
     }
   }
