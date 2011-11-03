@@ -70,15 +70,22 @@ function commerce_product_pricing_commerce_price_field_formatter_prepare_view($e
       // If this price should be calculated...
       if (!empty($displays[$product_id]['settings']['calculation']) &&
         $displays[$product_id]['settings']['calculation'] == 'calculated_sell_price') {
-        // If this price has already been calculated once, reset it to its
-        // original values so it can be recalculated in the current context.
+        // If this price has already been calculated, reset it to its original
+        // value so it can be recalculated afresh in the current context.
         if (isset($items[$product_id][0]['original'])) {
-          $items[$product_id] = array();
-          $items[$product_id][0] = $items[$product_id][0]['original'];
-        }
+          $original = $items[$product_id][0]['original'];
+          $items[$product_id] = array(0 => $original);
 
-        // Save the original value.
-        $original = isset($items[$product_id][0]) ? $items[$product_id][0] : NULL;
+          // Reset the price field value on the product object used to perform
+          // the calculation.
+          foreach ($product->commerce_price as $langcode => $value) {
+            $product->commerce_price[$langcode] = $items[$product_id];
+          }
+        }
+        else {
+          // Save the original value for use in subsequent calculations.
+          $original = isset($items[$product_id][0]) ? $items[$product_id][0] : NULL;
+        }
 
         // Replace the data being displayed with data from a calculated price.
         $items[$product_id] = array();
