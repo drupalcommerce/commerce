@@ -1056,6 +1056,52 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
 }
 
 /**
+ * Adds the specified product to a customer's shopping cart by product ID.
+ *
+ * This function is merely a helper function that builds a line item for the
+ * specified product ID and adds it to a shopping cart. It does not offer the
+ * full support of product line item fields that commerce_cart_product_add()
+ * does, so you may still need to use the full function, especially if you need
+ * to specify display_path field values or interact with custom line item fields.
+ *
+ * @param $product_id
+ *   ID of the product to add to the cart.
+ * @param $quantity
+ *   Quantity of the specified product to add to the cart; defaults to 1.
+ * @param $combine
+ *   Boolean indicating whether or not to combine like products on the same line
+ *   item, incrementing an existing line item's quantity instead of adding a
+ *   new line item to the cart order.
+ * @param $uid
+ *   User ID of the shopping cart owner the whose cart the product should be
+ *   added to; defaults to the current user.
+ *
+ * @return
+ *   A new or updated line item object representing the product in the cart or
+ *   FALSE on failure.
+ *
+ * @see commerce_cart_product_add()
+ */
+function commerce_cart_product_add_by_id($product_id, $quantity = 1, $combine = TRUE, $uid = NULL) {
+  global $user;
+
+  // If the specified product exists...
+  if ($product = commerce_product_load($product_id)) {
+    // Create a new product line item for it.
+    $line_item = commerce_product_line_item_new($product, $quantity);
+
+    // Default to the current user if a uid was not passed in.
+    if ($uid === NULL) {
+      $uid = $user->uid;
+    }
+
+    return commerce_cart_product_add($uid, $line_item, $combine);
+  }
+
+  return FALSE;
+}
+
+/**
  * Deletes a product line item from a shopping cart order.
  *
  * @param $order
