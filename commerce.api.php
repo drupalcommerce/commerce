@@ -26,8 +26,12 @@
  *   - name: The name of the currency. Translatable.
  *   - symbol_placement: Defines where the currency symbol has to be placed for
  *      display. Allowed values: before, after, hidden.
+ *   - symbol_spacer: The spacer to put between the price amount and a currency
+ *     symbol that appears after the amount; defaults to ' '.
  *   - code_placement: Defines where the currency code has to be placed for
  *      display. Allowed values: before, after, hidden.
+ *   - code_spacer: The spacer to put between the price amount and currency code
+ *     whether the code is displayed before or after the amount; defaults to ' '.
  *   - minor_unit: Name of the minor unit of the currency. For example Cent.
  *     Translatable
  *   - major_unit: Name of the major unit of the currency. For example Dollar.

@@ -1146,6 +1146,7 @@ function commerce_commerce_currency_info() {
       'decimals' => 0,
       'thousands_separator' => '.',
       'symbol_placement' => 'after',
+      'symbol_spacer' => '',
       'code_placement' => '',
       'numeric_code' => '704',
       'minor_unit' => t('Hà'),
