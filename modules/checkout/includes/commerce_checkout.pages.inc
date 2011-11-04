@@ -81,7 +81,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
   if (!empty($help)) {
     $form['help'] = array(
-      '#markup' => '<div class="checkout-help">' . $help . '</div>',
+      '#markup' => theme('commerce_checkout_help', array('help' => $help)),
     );
   }
 
@@ -93,6 +93,8 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
 
   // Catch and clear already pushed messages.
   $previous_messages = drupal_get_messages();
+  $show_errors_message = FALSE;
+  $visible_panes = 0;
 
   // Add any enabled checkout panes for this page to the form.
   foreach (commerce_checkout_panes(array('enabled' => TRUE, 'page' => $checkout_page['page_id'])) as $pane_id => $checkout_pane) {
@@ -110,6 +112,13 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       // If there are messages in the session right now for this pane, theme
       // them into the form right above the pane itself.
       if (!empty($_SESSION['messages'])) {
+        // If there are error messages and this is not the first pane on the
+        // form, then indicate we need to show an error message at the top of
+        // the page.
+        if ($visible_panes > 0 && !empty($_SESSION['messages']['error'])) {
+          $show_errors_message = TRUE;
+        }
+
         $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
 
         $form[$pane_id . '_messages'] = array(
@@ -128,12 +137,22 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
           '#attributes' => array('class' => array($pane_id)),
           '#tree' => TRUE,
         );
+
+        $visible_panes++;
       }
     }
   }
 
   // Restore general messages to the current session's messages array.
   $_SESSION['messages'] = array_merge_recursive(array_filter($previous_messages), drupal_get_messages());
+
+  // If there are errors on the form, add a message to the top of the page.
+  if ($show_errors_message) {
+    $form['error_message'] = array(
+      '#markup' => theme('commerce_checkout_errors_message'),
+      '#weight' => -10,
+    );
+  }
 
   // Only add buttons to the form if the checkout page hasn't disabled them.
   if ($checkout_page['buttons']) {

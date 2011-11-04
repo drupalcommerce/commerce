@@ -155,6 +155,19 @@ function commerce_checkout_theme() {
       'render element' => 'form',
       'file' => 'includes/commerce_checkout.pages.inc',
     ),
+    'commerce_checkout_help' => array(
+      'variables' => array('help' => NULL),
+      'path' => drupal_get_path('module', 'commerce_checkout') . '/theme',
+      'template' => 'commerce-checkout-help',
+    ),
+    'commerce_checkout_errors_message' => array(
+      'variables' => array(
+        'label' => t('Errors on form'),
+        'message' => t('There are errors on the page. Please correct them and resubmit the form.'),
+      ),
+      'path' => drupal_get_path('module', 'commerce_checkout') . '/theme',
+      'template' => 'commerce-checkout-errors-message',
+    ),
   );
 }
 
