@@ -5,6 +5,20 @@
  * Callback functions for the Payment module's checkout panes.
  */
 
+/**
+ * Checkout pane callback: returns the payment pane's settings form.
+ */
+function commerce_payment_pane_settings_form($checkout_pane) {
+  $form = array();
+
+  $form['commerce_payment_pane_require_method'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Require a payment method at all times, preventing checkout if none is available.'),
+    '#default_value' => variable_get('commerce_payment_pane_require_method', FALSE),
+  );
+
+  return $form;
+}
 
 /**
  * Payment pane: form callback.
@@ -32,7 +46,14 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
 
   // If no payment methods were found, return the empty form.
   if (empty($options)) {
-    return $pane_form;
+    if (!variable_get('commerce_payment_pane_require_method', FALSE)) {
+      return $pane_form;
+    }
+    else {
+      $pane_form['message'] = array(
+        '#markup' => '<div>' . t('Unfortunately we could not find any suitable payment methods, and we require a payment method to complete checkout.') . '<br /><strong>' . t('Please contact us to resolve any issues with your order.') . '</strong></div>',
+      );
+    }
   }
 
   // Store the payment methods in the form for validation purposes.
@@ -109,7 +130,7 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
     $pane_values = $form_state['values'][$pane_id];
 
     // Only attempt validation if there were payment methods available.
-    if ($pane_values['payment_methods']) {
+    if (!empty($pane_values['payment_methods'])) {
       // If the selected payment method was changed...
       if ($pane_values['payment_method'] != $pane_form['payment_method']['#default_value']) {
         // And the newly selected method has a valid form callback...
@@ -133,6 +154,10 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
         // default to TRUE.
         return $result === FALSE ? FALSE : TRUE;
       }
+    }
+    elseif (variable_get('commerce_payment_pane_require_method', FALSE)) {
+      drupal_set_message(t('You cannot complete checkout without submitting payment. Please contact us if an error continues to prevent you from seeing valid payment methods for your order.'), 'error');
+      return FALSE;
     }
   }
 
