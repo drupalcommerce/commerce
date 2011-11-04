@@ -69,7 +69,6 @@ function commerce_order_rules_condition_info() {
         'type' => 'text',
         'label' => t('Product SKU'),
         'description' => t('The SKU of the product to look for on the order.'),
-        'restriction' => 'input',
       ),
       'operator' => array(
         'type' => 'text',
