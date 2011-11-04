@@ -308,7 +308,13 @@ function commerce_order_views_api() {
  * Implements hook_permission().
  */
 function commerce_order_permission() {
-  return commerce_entity_access_permissions('commerce_order');
+  return commerce_entity_access_permissions('commerce_order') + array(
+    'configure order settings' => array(
+      'title' => t('Configure order settings'),
+      'description' => t('Allows users to configure order settings for the store.'),
+      'restrict access' => TRUE,
+    ),
+  );
 }
 
 /**

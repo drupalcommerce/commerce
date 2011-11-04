@@ -393,3 +393,19 @@ function commerce_order_update_7105() {
 
   db_add_index('commerce_order_revision', 'order_id', array('order_id'));
 }
+
+/**
+ * Assign the new 'Configure order settings' permission to roles that already
+ * have the 'Administer orders' permission.
+ */
+function commerce_order_update_7106() {
+  $roles = db_query("SELECT * FROM {role_permission} WHERE permission = 'administer commerce_order entities'")->fetchAllAssoc('rid', PDO::FETCH_ASSOC);
+
+  foreach ($roles as $rid => $permission) {
+    db_insert('role_permission')
+      ->fields(array('rid', 'permission', 'module'), array($rid, 'configure order settings', 'commerce_order'))
+      ->execute();
+  }
+
+  return t('All roles that had the <em>Administer orders</em> permission now also have the new <em>Configure order settings</em> permission.');
+}

@@ -75,7 +75,7 @@ function commerce_order_ui_menu() {
     'description' => 'Configure general order settings, fields, and displays.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_order_settings_form'),
-    'access arguments' => array('administer commerce_order entities'),
+    'access arguments' => array('configure order settings'),
     'file' => 'includes/commerce_order_ui.orders.inc',
   );
   $items['admin/commerce/config/order/settings'] = array(
@@ -179,7 +179,7 @@ function commerce_order_ui_entity_info_alter(&$entity_info) {
   $entity_info['commerce_order']['bundles']['commerce_order']['admin'] = array(
     'path' => 'admin/commerce/config/order',
     'real path' => 'admin/commerce/config/order',
-    'access arguments' => array('administer commerce_order entities'),
+    'access arguments' => array('configure order settings'),
   );
 }
 
