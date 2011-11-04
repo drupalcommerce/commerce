@@ -177,6 +177,7 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['operations']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['operations']['add_destination'] = 1;
   /* Sort criterion: Commerce Product: SKU */
   $handler->display->display_options['sorts']['sku']['id'] = 'sku';
   $handler->display->display_options['sorts']['sku']['table'] = 'commerce_product';
