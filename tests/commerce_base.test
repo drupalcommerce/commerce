@@ -141,6 +141,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer line items',
       'administer line item types',
       'administer commerce_order entities',
+      'configure order settings',
       'view any commerce_order entity',
       'create commerce_order entities',
       'edit any commerce_order entity',
