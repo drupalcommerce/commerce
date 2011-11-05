@@ -11,6 +11,20 @@
 function commerce_cart_default_rules_configuration() {
   $rules = array();
 
+  // Add a reaction rule to display the default Add to Cart message.
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Display an Add to Cart message');
+  $rule->active = TRUE;
+
+  $rule
+    ->event('commerce_cart_product_add')
+    ->action('commerce_cart_add_to_cart_message', array(
+      'commerce_product:select' => 'commerce-product',
+    ));
+
+  $rules['commerce_cart_add_to_cart_message'] = $rule;
+
   // Add a reaction rule to update a shopping cart order's status to "Shopping
   // cart" when a product is added to or removed from the order.
   $rule = rules_reaction_rule();

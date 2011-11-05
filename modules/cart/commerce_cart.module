@@ -1941,10 +1941,6 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
         $line_item,
         isset($line_item->data['context']['add_to_cart_combine']) ? $line_item->data['context']['add_to_cart_combine'] : TRUE
       );
-
-      // TODO: Accommodate multiple product Add to Cart forms better; i.e. should it
-      // display the product title or the product display node title?
-      drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
     }
     else {
       drupal_set_message(t('%title could not be added to your cart.', array('%title' => $product->title)), 'error');

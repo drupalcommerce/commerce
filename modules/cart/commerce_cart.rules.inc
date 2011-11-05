@@ -128,6 +128,20 @@ function commerce_cart_rules_action_info() {
     ),
   );
 
+  $actions['commerce_cart_add_to_cart_message'] = array(
+    'label' => t('Display a translatable Add to Cart message'),
+    'parameter' => array(
+      'commerce_product' => array(
+        'type' => 'commerce_product',
+        'label' => t('Product added to the cart'),
+      ),
+    ),
+    'group' => t('Commerce Cart'),
+    'callbacks' => array(
+      'execute' => 'commerce_cart_rules_add_to_cart_message',
+    ),
+  );
+
   $actions['commerce_cart_product_add_by_sku'] = array(
     'label' => t('Add a product to the cart'),
     'parameter' => array(
@@ -173,6 +187,13 @@ function commerce_cart_rules_action_info() {
  */
 function commerce_cart_rules_empty($order) {
   commerce_cart_order_empty($order);
+}
+
+/**
+ * Rules action: displays a the default translatable Add to Cart message.
+ */
+function commerce_cart_rules_add_to_cart_message($product) {
+  drupal_set_message(t('%title added to <a href="!cart-url">your cart</a>.', array('%title' => $product->title, '!cart-url' => url('cart'))));
 }
 
 /**
