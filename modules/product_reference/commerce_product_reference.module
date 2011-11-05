@@ -810,31 +810,19 @@ function commerce_product_line_item_title($line_item) {
 
 /**
  * Returns the elements necessary to add a product line item through a line item
- *   manager widget.
+ * manager widget.
  */
 function commerce_product_line_item_add_form($element, &$form_state) {
   $form = array();
-  $options = array();
 
-  // Get a an options list
-  $options = commerce_product_reference_options_list(array('field_name' => 'line_item_product_selector'));
-
-  // Ensure we have a list of options before we present a select list.
-  if (!empty($options)) {
-    $form['product_id'] = array(
-      '#type' => 'select',
-      '#title' => t('Product'),
-      '#options' => $options,
-    );
-  }
-  else {
-    // Take over the default save button, with an error message.
-    $form['save_line_item'] = array(
-      '#prefix' => '<div>',
-      '#markup' => t('You must add products before you can add a product line item.'),
-      '#suffix' => '</div>',
-    );
-  }
+  $form['product_sku'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Product SKU'),
+    '#description' => t('Enter the SKU of the product to add to the order.'),
+    '#autocomplete_path' => 'commerce_product/autocomplete/commerce_product/line_item_product_selector/product',
+    '#size' => 60,
+    '#maxlength' => 255,
+  );
 
   return $form;
 }
@@ -857,10 +845,13 @@ function commerce_product_line_item_add_form($element, &$form_state) {
  */
 function commerce_product_line_item_add_form_submit(&$line_item, $element, &$form_state, $form) {
   // Load the selected product.
-  $product = commerce_product_load($element['actions']['product_id']['#value']);
-
-  // Populate the line item with the product data.
-  commerce_product_line_item_populate($line_item, $product);
+  if ($product = commerce_product_load_by_sku($element['actions']['product_sku']['#value'])) {
+    // Populate the line item with the product data.
+    commerce_product_line_item_populate($line_item, $product);
+  }
+  else {
+    return t('You have entered an invalid product SKU.');
+  }
 }
 
 /**

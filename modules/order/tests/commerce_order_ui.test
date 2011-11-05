@@ -140,14 +140,15 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     // Add a product line item to the order.
     $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][line_item_type]' => 'product'), array('op' => t('Add line item')));
 
-    $this->assertFieldByXPath("//select[starts-with(@id, 'edit-commerce-line-items-und-actions-product-id')]", NULL, t('Product select form is present in the order admin screen'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-commerce-line-items-und-actions-product-sku')]", NULL, t('Product select form is present in the order admin screen'));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-commerce-line-items-und-actions-save-line-item')]", NULL, t('Add product button is present in the order admin screen'));
 
-    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_id]' => $this->product->product_id), array('op' => t('Add product')));
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_sku]' => $this->product->sku), array('op' => t('Add product')));
     $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Reload the order directly from db.
     $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
 
@@ -158,7 +159,7 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
          $products[$product->product_id]= $product;
        }
     }
-    $this->assertTrue(in_array($this->product->product_id, array_keys($products)), t('Added product is inclued in the order at database level'));
+    $this->assertTrue(in_array($this->product->product_id, array_keys($products)), t('Added product is included in the order at the database level'));
 
     // Access the edit page of the order and check if the product is present.
     $this->drupalGet('admin/commerce/orders/' . $this->order->order_id . '/edit');
@@ -178,7 +179,7 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
 
     // Add a product line item to the order.
     $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][line_item_type]' => 'product'), array('op' => t('Add line item')));
-    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_id]' => $this->product->product_id), array('op' => t('Add product')));
+    $this->drupalPostAJAX(NULL, array('commerce_line_items[und][actions][product_sku]' => $this->product->sku), array('op' => t('Add product')));
     $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Reload the order directly from db and wrap it to get the line item ids.

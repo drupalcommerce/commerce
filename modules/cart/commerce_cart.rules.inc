@@ -180,7 +180,7 @@ function commerce_cart_rules_empty($order) {
  */
 function commerce_cart_rules_product_add_by_sku($user, $sku, $quantity = 1, $combine = TRUE) {
   // Ensure we have a valid product SKU.
-  if ($product = commerce_product_load_by_sku($sku)) {
+  if ($product = commerce_product_load_by_sku(trim($sku))) {
     // Pull the uid from the user passed in.
     if (empty($user) || empty($user->uid)) {
       $uid = NULL;
