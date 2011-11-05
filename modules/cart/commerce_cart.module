@@ -455,7 +455,7 @@ function commerce_cart_block_view($delta) {
     // Default to an empty cart block message.
     $content = theme('commerce_cart_empty_block');
 
-    // First check to enure there are products in the shopping cart.
+    // First check to ensure there are products in the shopping cart.
     if ($order = commerce_cart_order_load($user->uid)) {
       $wrapper = entity_metadata_wrapper('commerce_order', $order);
 

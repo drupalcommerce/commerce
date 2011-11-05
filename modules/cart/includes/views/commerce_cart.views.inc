@@ -16,3 +16,18 @@ function commerce_cart_views_data_alter(&$data) {
     ),
   );
 }
+
+/**
+ * Implements hook_views_plugins().
+ */
+function commerce_cart_views_plugins() {
+  return array(
+    'argument default' => array(
+      'commerce_cart_current_cart_order_id' => array(
+        'title' => t("Current user's cart order ID"),
+        'handler' => 'commerce_cart_plugin_argument_default_current_cart_order_id',
+        'path' => drupal_get_path('module', 'commerce_cart') . '/includes/views/handlers'
+      )
+    )
+  );
+}
