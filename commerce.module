@@ -589,6 +589,11 @@ function commerce_currency_convert($amount, $currency_code, $target_currency_cod
 
   $target_currency = commerce_currency_load($target_currency_code);
 
+  // First multiply the amount to accommodate differences in decimals between
+  // the source and target currencies.
+  $exponent = $target_currency['decimals'] - $currency['decimals'];
+  $amount *= pow(10, $exponent);
+
   return $amount * ($currency['conversion_rate'] / $target_currency['conversion_rate']);
 }
 
