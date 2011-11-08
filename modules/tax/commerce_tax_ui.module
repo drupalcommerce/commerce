@@ -275,14 +275,14 @@ function commerce_tax_ui_tax_type_new() {
  *     commerce_tax_ui_tax_type_new().
  * @param $skip_reset
  *   Boolean indicating whether or not this save should result in tax types
- *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
- *     when you intend to perform many saves at once, as menu rebuilding is very
- *     costly in terms of performance.
+ *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *   when you intend to perform many saves at once, as menu rebuilding is very
+ *   costly in terms of performance.
  *
  * @return
  *   The return value of the call to drupal_write_record() to save the tax type,
- *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the type
- *     of query performed to save the tax type.
+ *   either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the type
+ *   of query performed to save the tax type.
  */
 function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_type', $tax_type, empty($tax_type['is_new']) ? 'name' : array());
@@ -315,9 +315,9 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
  *   The machine-name of the tax type.
  * @param $skip_reset
  *   Boolean indicating whether or not this delete should result in tax types
- *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
- *     when you intend to perform many saves at once, as menu rebuilding is very
- *     costly in terms of performance.
+ *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *   when you intend to perform many deletions at once, as menu rebuilding is
+ *   very costly in terms of performance.
  */
 function commerce_tax_ui_tax_type_delete($name, $skip_reset = FALSE) {
   $tax_type = commerce_tax_type_load($name);
@@ -331,6 +331,7 @@ function commerce_tax_ui_tax_type_delete($name, $skip_reset = FALSE) {
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
     commerce_tax_types_reset();
+    entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
   }
@@ -389,17 +390,17 @@ function commerce_tax_ui_tax_rate_new($type = '') {
  *
  * @param $tax_rate
  *   The tax rate array containing the basic properties as initialized in
- *     commerce_tax_ui_tax_rate_new().
+ *   commerce_tax_ui_tax_rate_new().
  * @param $skip_reset
  *   Boolean indicating whether or not this save should result in tax rates
- *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
- *     when you intend to perform many saves at once, as menu rebuilding is very
- *     costly in terms of performance.
+ *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *   when you intend to perform many d at once, as menu rebuilding is very
+ *   costly in terms of performance.
  *
  * @return
  *   The return value of the call to drupal_write_record() to save the tax rate,
- *     either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the rate
- *     of query performed to save the tax rate.
+ *   either FALSE on failure or SAVED_NEW or SAVED_UPDATED indicating the rate
+ *   of query performed to save the tax rate.
  */
 function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_rate', $tax_rate, empty($tax_rate['is_new']) ? 'name' : array());
@@ -438,9 +439,9 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
  *   The machine-name of the tax rate.
  * @param $skip_reset
  *   Boolean indicating whether or not this delete should result in tax rates
- *     being reset and the menu being rebuilt; defaults to FALSE. This is useful
- *     when you intend to perform many saves at once, as menu rebuilding is very
- *     costly in terms of performance.
+ *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
+ *   when you intend to perform many deletions at once, as menu rebuilding is
+ *   very costly in terms of performance.
  */
 function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   $tax_rate = commerce_tax_rate_load($name);
@@ -454,6 +455,7 @@ function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
     commerce_tax_rates_reset();
+    entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
   }
