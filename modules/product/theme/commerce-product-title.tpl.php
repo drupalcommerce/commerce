@@ -15,7 +15,7 @@
 <?php if ($title): ?>
   <div class="commerce-product-title">
     <?php if ($label): ?>
-      <div class="title-label">
+      <div class="commerce-product-title-label">
         <?php print $label; ?>
       </div>
     <?php endif; ?>

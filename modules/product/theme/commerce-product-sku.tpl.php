@@ -15,7 +15,7 @@
 <?php if ($sku): ?>
   <div class="commerce-product-sku">
     <?php if ($label): ?>
-      <div class="sku-label">
+      <div class="commerce-product-sku-label">
         <?php print $label; ?>
       </div>
     <?php endif; ?>

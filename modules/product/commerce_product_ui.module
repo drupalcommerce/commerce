@@ -250,21 +250,6 @@ function commerce_product_ui_theme() {
       'variables' => array('type' => NULL),
       'file' => 'includes/commerce_product_ui.types.inc',
     ),
-    'commerce_product_sku' => array(
-      'variables' => array('sku' => NULL, 'label' => NULL, 'product' => NULL),
-      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
-      'template' => 'commerce-product-sku',
-    ),
-    'commerce_product_title' => array(
-      'variables' => array('title' => NULL, 'label' => NULL, 'product' => NULL),
-      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
-      'template' => 'commerce-product-title',
-    ),
-    'commerce_product_status' => array(
-      'variables' => array('status' => NULL, 'label' => NULL, 'product' => NULL),
-      'path' => drupal_get_path('module', 'commerce_product_ui') . '/theme',
-      'template' => 'commerce-product-status',
-    ),
   );
 }
 

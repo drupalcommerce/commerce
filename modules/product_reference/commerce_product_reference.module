@@ -35,14 +35,34 @@ function commerce_product_reference_field_extra_fields() {
       }
 
       foreach ($bundles as $bundle_name) {
-        // Attach "extra fields" to the bundle representing fields on products
-        // that may be visible on the bundle.
+        // Attach extra fields from products that may be visible on the bundle.
+        // We have to call commerce_product_field_extra_fields() directly
+        // instead of using field_info_extra_fields() because of the order in
+        // which these items are rebuilt in the cache for use by "Manage
+        // display" tabs. Otherwise these extra fields will not appear.
+        $product_fields = commerce_product_field_extra_fields();
+
+        foreach ($product_fields['commerce_product'] as $key => $value) {
+          foreach ($value['display'] as $product_extra_field_name => $product_extra_field) {
+            $product_extra_field['label'] = t('Product: @label', array('@label' => $product_extra_field['label']));
+
+            $product_extra_field['display']['default'] = array(
+              'weight' => 0,
+              'visible' => FALSE,
+            );
+
+            $extra[$entity_type][$bundle_name]['display']['product:' . $product_extra_field_name] = $product_extra_field;
+          }
+        }
+
+        // Do the same for fields on products that may be visible on the bundle.
         foreach (field_info_instances('commerce_product') as $product_bundle_name => $product_fields) {
           foreach ($product_fields as $product_field_name => $product_field) {
             $extra[$entity_type][$bundle_name]['display']['product:' . $product_field_name] = array(
               'label' => t('Product: @label', array('@label' => $product_field['label'])),
               'description' => t('Field from a referenced product.'),
               'weight' => $product_field['widget']['weight'],
+              'configurable' => TRUE,
             );
           }
         }
@@ -51,6 +71,38 @@ function commerce_product_reference_field_extra_fields() {
   }
 
   return $extra;
+}
+
+/**
+ * Implements hook_field_extra_fields_display_alter().
+ *
+ * This whole implementation is basically a hack because Drupal core does not
+ * allow you to specify default visibility for extra fields. We don't want any
+ * of the Product extra fields to be visible by default in referencing entities,
+ * so we have to alter the display settings at this point until such a time as
+ * the settings have been updated for the given bundle.
+ */
+function commerce_product_reference_field_extra_fields_display_alter(&$displays, $context) {
+  // Load the bundle settings for the current bundle.
+  $bundle_settings = field_bundle_settings($context['entity_type'], $context['bundle']);
+
+  // Loop over the extra fields defined by the Product module.
+  $product_fields = commerce_product_field_extra_fields();
+
+  foreach ($product_fields['commerce_product'] as $key => $value) {
+    foreach ($value['display'] as $product_extra_field_name => $product_extra_field) {
+      // If the current extra field is represented in the $displays array...
+      if (!empty($displays['product:' . $product_extra_field_name])) {
+        // And no data yet exists for the extra field in the bundle settings...
+        if (empty($bundle_settings['extra_fields']['display']['product:' . $product_extra_field_name]) ||
+          (empty($bundle_settings['view_modes'][$context['view_mode']]['custom_settings']) && empty($bundle_settings['extra_fields']['display']['product:' . $product_extra_field_name]['default'])) ||
+          (!empty($bundle_settings['view_modes'][$context['view_mode']]['custom_settings']) && empty($bundle_settings['extra_fields']['display']['product:' . $product_extra_field_name][$context['view_mode']]))) {
+          // Default the extra field to be invisible.
+          $displays['product:' . $product_extra_field_name]['visible'] = FALSE;
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -77,7 +129,9 @@ function commerce_product_reference_form_field_ui_field_edit_form_alter(&$form, 
  * Implements hook_form_FORM_ID_alter().
  *
  * Override the field manage display screen to add a description to the fields
- * we embed into the target node from the product.
+ * we embed into the target node from the product. Also implements the same hack
+ * we had to use in commerce_product_reference_field_extra_fields_display_alter()
+ * to default product extra fields to be hidden.
  */
 function commerce_product_reference_form_field_ui_display_overview_form_alter(&$form, &$form_state) {
   if (!module_exists('commerce_product_ui')) {
@@ -86,12 +140,34 @@ function commerce_product_reference_form_field_ui_display_overview_form_alter(&$
 
   $entity_type = $form['#entity_type'];
   $bundle = $form['#bundle'];
+  $view_mode = $form['#view_mode'];
 
+  // Load the bundle settings for the current bundle.
+  $bundle_settings = field_bundle_settings($entity_type, $bundle);
+
+  // Loop over the extra fields defined by the Product Reference module for this
+  // entity to set help text and make sure any extra field derived from product
+  // fields to be hidden by default.
   $product_fields = commerce_product_reference_field_extra_fields();
 
   if (isset($product_fields[$entity_type][$bundle])) {
     foreach ($product_fields[$entity_type][$bundle]['display'] as $field_name => $field) {
-      $form['fields'][$field_name]['format']['type']['#description'] = t('Modify the settings for this field on the <a href="@url">product display configuration</a>.', array('@url' => url('admin/commerce/products/types')));
+      // If the extra field has configurable settings, add a help text for it.
+      if (!empty($field['configurable'])) {
+        $form['fields'][$field_name]['format']['type']['#description'] = t('Modify the settings for this field on the <a href="!url">product display configuration</a>.', array('!url' => url('admin/commerce/products/types')));
+      }
+      else {
+        // Otherwise just mention it as visibility settings.
+        $form['fields'][$field_name]['format']['type']['#description'] = t('The visibility of this field may also need to be toggled in the <a href="!url">product display configuration</a>.', array('!url' => url('admin/commerce/products/types')));
+
+        // If no data yet exists for the extra field in the bundle settings...
+        if (empty($bundle_settings['extra_fields']['display'][$field_name]) ||
+          (empty($bundle_settings['view_modes'][$view_mode]['custom_settings']) && empty($bundle_settings['extra_fields']['display'][$field_name]['default'])) ||
+          (!empty($bundle_settings['view_modes'][$view_mode]['custom_settings']) && empty($bundle_settings['extra_fields']['display'][$field_name][$view_mode]))) {
+          // Default it to be hidden.
+          $form['fields'][$field_name]['format']['type']['#default_value'] = 'hidden';
+        }
+      }
     }
   }
 }
@@ -197,6 +273,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
 
   $instances = field_info_instances($entity_type, $bundle);
+  $reference_view_mode = $entity_type . '_' . $view_mode;
 
   // Loop through product reference fields to see if any exist on this entity
   // bundle that is either hidden or displayed with the Add to Cart form display
@@ -223,7 +300,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         // Loop through the fields on the referenced product's type.
         foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
           // Add the product field to the entity's content array.
-          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $entity_type . '_' . $view_mode, $langcode);
+          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $reference_view_mode, $langcode);
 
           // For multiple value references, add context information so the cart
           // form can do dynamic replacement of fields.
@@ -241,6 +318,48 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
               '#prefix' => '<div class="' . implode(' ', $classes) . '">',
               '#suffix' => '</div>',
             );
+          }
+        }
+
+        // Attach "extra fields" to the bundle representing all the extra fields
+        // currently attached to products.
+        foreach (field_info_extra_fields('commerce_product', $product->type, 'display') as $product_extra_field_name => $product_extra_field) {
+          $display = field_extra_fields_get_display('commerce_product', $product->type, $reference_view_mode);
+
+          // Only include extra fields that specify a theme function and that
+          // are visible on the current view mode.
+          if (!empty($product_extra_field['theme']) &&
+            !empty($display[$product_extra_field_name]['visible'])) {
+            // Add the product extra field to the entity's content array.
+            $variables = array(
+              $product_extra_field_name => $product->{$product_extra_field_name},
+              'label' => $product_extra_field['label'] . ':',
+              'product' => $product,
+            );
+
+            $entity->content['product:' . $product_extra_field_name] = array(
+              '#markup' => theme($product_extra_field['theme'], $variables),
+              '#attached' => array(
+                'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.css'),
+              ),
+            );
+
+            // For multiple value references, add context information so the cart
+            // form can do dynamic replacement of fields.
+            if ($field['cardinality'] != 1) {
+              // Construct an array of classes that will be used to theme and
+              // target the rendered field for AJAX replacement.
+              $classes = array(
+                'commerce-product-extra-field',
+                drupal_html_class('commerce-product-extra-field-' . $product_extra_field_name),
+                drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_extra_field_name))),
+              );
+
+              $entity->content['product:' . $product_extra_field_name] += array(
+                '#prefix' => '<div class="' . implode(' ', $classes) . '">',
+                '#suffix' => '</div>',
+              );
+            }
           }
         }
       }

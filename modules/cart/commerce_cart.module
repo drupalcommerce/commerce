@@ -1865,6 +1865,7 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
     $product = $form_state['default_product'];
     $product->display_context = $form_state['context'];
 
+    // First render the actual fields attached to the referenced product.
     foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
       // Rebuild the same array of classes used when the field was first rendered.
       $replacement_class = drupal_html_class(implode('-', array($form_state['context']['class_prefix'], 'product', $product_field_name)));
@@ -1883,6 +1884,43 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
       );
 
       $commands[] = ajax_command_replace('.' . $replacement_class, drupal_render($element));
+    }
+
+    // Then render the extra fields defined for the referenced product.
+    foreach (field_info_extra_fields('commerce_product', $product->type, 'display') as $product_extra_field_name => $product_extra_field) {
+      $display = field_extra_fields_get_display('commerce_product', $product->type, $form_state['context']['view_mode']);
+
+      // Only include extra fields that specify a theme function and that
+      // are visible on the current view mode.
+      if (!empty($product_extra_field['theme']) &&
+        !empty($display[$product_extra_field_name]['visible'])) {
+        // Rebuild the same array of classes used when the field was first rendered.
+        $replacement_class = drupal_html_class(implode('-', array($form_state['context']['class_prefix'], 'product', $product_extra_field_name)));
+
+        $classes = array(
+          'commerce-product-extra-field',
+          drupal_html_class('commerce-product-extra-field-' . $product_extra_field_name),
+          $replacement_class,
+        );
+
+        // Theme the product extra field to $element.
+        $variables = array(
+          $product_extra_field_name => $product->{$product_extra_field_name},
+          'label' => $product_extra_field['label'] . ':',
+          'product' => $product,
+        );
+
+        $element = array(
+          '#markup' => theme($product_extra_field['theme'], $variables),
+          '#attached' => array(
+            'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.css'),
+          ),
+          '#prefix' => '<div class="' . implode(' ', $classes) . '">',
+          '#suffix' => '</div>',
+        );
+
+        $commands[] = ajax_command_replace('.' . $replacement_class, drupal_render($element));
+      }
     }
   }
 

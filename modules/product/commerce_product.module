@@ -215,13 +215,15 @@ function commerce_product_field_extra_fields() {
       ),
       'display' => array(
         'sku' => array(
-          'label' => t('Product SKU'),
+          'label' => t('SKU'),
           'description' => t('The human readable identifier of the product'),
+          'theme' => 'commerce_product_sku',
           'weight' => -10,
         ),
         'title' => array(
           'label' => t('Title'),
           'description' => t('Full product title'),
+          'theme' => 'commerce_product_title',
           'weight' => -5,
         ),
       ),
@@ -229,6 +231,29 @@ function commerce_product_field_extra_fields() {
   }
 
   return $extra;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_product_theme() {
+  return array(
+    'commerce_product_sku' => array(
+      'variables' => array('sku' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product') . '/theme',
+      'template' => 'commerce-product-sku',
+    ),
+    'commerce_product_title' => array(
+      'variables' => array('title' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product') . '/theme',
+      'template' => 'commerce-product-title',
+    ),
+    'commerce_product_status' => array(
+      'variables' => array('status' => NULL, 'label' => NULL, 'product' => NULL),
+      'path' => drupal_get_path('module', 'commerce_product') . '/theme',
+      'template' => 'commerce-product-status',
+    ),
+  );
 }
 
 /**
