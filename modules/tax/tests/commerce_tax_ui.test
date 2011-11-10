@@ -286,7 +286,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalLogin($this->normal_user);
 
     // Access the configure component page for tax rates.
-    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+    $this->drupalGet('admin/config/workflow/rules/components/manage/' . $tax_rate['rules_component']);
 
     // It should return a 403.
     $this->assertResponse(403, t('Normal user is not able to access the component configure page for a tax rate'));
@@ -295,7 +295,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalLogin($this->store_admin);
 
     // Access the configure component page for tax rates.
-    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+    $this->drupalGet('admin/config/workflow/rules/components/manage/' . $tax_rate['rules_component']);
 
     // It should return a 200.
     $this->assertResponse(200, t('Store admin user can access the component configure page for a tax rate'));
@@ -312,7 +312,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
 
     // Check that after saving the url is correct and the condition has been
     // added.
-    $this->assertTrue($this->url == url('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name'], array('absolute' => TRUE)), t('After adding a new condition component the landing page is the edit components one'));
+    $this->assertTrue($this->url == url('admin/config/workflow/rules/components/manage/' . $tax_rate['rules_component'], array('absolute' => TRUE)), t('After adding a new condition component the landing page is the edit components one'));
     $this->assertText(t('Entity is of type'), t('Condition was added correctly'));
   }
 
@@ -664,7 +664,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalLogin($this->store_admin);
 
     // Modify the tax rate to no match condition.
-    $this->drupalGet('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $tax_rate['name']);
+    $this->drupalGet('admin/config/workflow/rules/components/manage/' . $tax_rate['rules_component']);
     $this->clickLink(t('Add condition'));
     $this->drupalPost(NULL, array('element_name' => 'data_is'), t('Continue'));
     $this->drupalPost(NULL, array('parameter[data][settings][data:select]' => 'commerce-line-item:commerce-total:amount'), t('Continue'));

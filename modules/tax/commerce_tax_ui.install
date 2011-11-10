@@ -132,7 +132,7 @@ function commerce_tax_ui_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'rules_component' => array(
+      'default_rules_component' => array(
         'description' => 'Boolean indicating whether or not this rate should have a default Rules component for applying it to products.',
         'type' => 'int',
         'size' => 'tiny',
@@ -184,4 +184,23 @@ function commerce_tax_ui_update_7000() {
     ->execute();
 
   return t('A new rounding mode option has been added to tax types, letting you specify how taxes of a given type should be rounded.');
+}
+
+/**
+ * Change the name of the property indicating the Tax module should create a
+ * default Rules component for tax rates.
+ */
+function commerce_tax_ui_update_7001() {
+  $spec = array(
+    'description' => 'Boolean indicating whether or not this rate should have a default Rules component for applying it to products.',
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+
+  // Change the rules_component column to default_rules_component.
+  db_change_field('commerce_tax_rate', 'rules_component', 'default_rules_component', $spec);
+
+  return t('The tax rate table has been updated properly.');
 }

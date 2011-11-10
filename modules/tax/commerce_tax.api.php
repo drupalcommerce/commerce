@@ -15,13 +15,16 @@
  *   the tax type name. Each tax type array can include the following keys:
  *   - title: the title of the tax type
  *   - display_title: a display title for the tax type suitable for presenting
- *       to customers if necessary; defaults to the title
+ *     to customers if necessary; defaults to the title
  *   - description: a short description of the tax type
  *   - display_inclusive: boolean indicating whether or not prices containing
- *       this tax will include the tax amount in the displayed price; defaults
- *       to FALSE
+ *     this tax will include the tax amount in the displayed price; defaults
+ *     to FALSE
+ *   - rule: name to use for a default product pricing rule that calculates
+ *     taxes of this type for line items; defaults to 'commerce_tax_type_[name]'
+ *     but can be set to NULL to not create any default Rule
  *   - admin_list: boolean defined by the Tax UI module determining whether or
- *       not the tax type should appear in the admin list
+ *     not the tax type should appear in the admin list
  */
 function hook_commerce_tax_type_info() {
   $tax_types = array();
@@ -52,22 +55,25 @@ function hook_commerce_tax_type_info_alter(&$tax_types) {
  *   name. Each tax rate array can include the following keys:
  *   - title: the title of the tax rate
  *   - display_title: a display title for the tax type suitable for presenting
- *       to customers if necessary; defaults to the title
+ *     to customers if necessary; defaults to the title
  *   - description: a short description of the tax rate
  *   - rate: the percentage used to calculate this tax expressed as a decimal
  *   - type: the name of the tax type this rate belongs to
- *   - rules_component: boolean indicating whether or not this rate will get its own
- *       default Rules component used for determining the applicability of the
- *       tax to a line item; defaults to TRUE
+ *   - rules_component: name of the Rules component (if any) defined for
+ *     determining the applicability of the tax to a line item; defaults to
+ *     'commerce_tax_rate_[name]'.
+ *   - default_rules_component: boolean indicating whether or not the Tax module
+ *     should define a default default Rules component using the specified name;
+ *     defaults to TRUE.
  *   - price_component: name of the price component defined for this tax rate
- *       used when the tax is added to a line item; if set to FALSE, no price
- *       component will be defined for this tax rate
+ *     used when the tax is added to a line item; if set to FALSE, no price
+ *     component will be defined for this tax rate
  *   - admin_list: boolean defined by the Tax UI module determining whether or
- *       not the tax rate should appear in the admin list
+ *     not the tax rate should appear in the admin list
  *   - calculation_callback: name of the function used to calculate the tax rate
- *       for a given line item, returning either a tax price array to be added
- *       as a component to the line item's unit price or FALSE to not include
- *       anything; defaults to 'commerce_tax_rate_calculate'.
+ *     for a given line item, returning either a tax price array to be added as
+ *     a component to the line item's unit price or FALSE to not include
+ *     anything; defaults to 'commerce_tax_rate_calculate'.
  */
 function hook_commerce_tax_rate_info() {
   $tax_rates = array();

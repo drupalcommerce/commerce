@@ -95,7 +95,7 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
  * Implements hook_field_presave().
  */
 function commerce_price_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  // Convert amounts to integers and serialize data arrays before saving.
+  // Serialize data arrays before saving.
   foreach ($items as $delta => $item) {
     // Serialize an existing data array.
     if (isset($item['data']) && is_array($item['data'])) {

@@ -77,12 +77,12 @@ function commerce_tax_ui_menu() {
       );
     }
 
-    if (rules_config_load('commerce_tax_rate_' . $name)) {
+    if (rules_config_load($tax_rate['rules_component'])) {
       $items['admin/commerce/config/taxes/rates/' . $name_arg . '/component'] = array(
         'title' => 'Configure component',
         'description' => 'Add conditions to the Rules component used to apply this tax to products.',
         'page callback' => 'drupal_goto',
-        'page arguments' => array('admin/config/workflow/rules/components/manage/commerce_tax_rate_' . $name),
+        'page arguments' => array('admin/config/workflow/rules/components/manage/' . $tax_rate['rules_component']),
         'access arguments' => array('administer rules'),
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_INLINE,
@@ -152,12 +152,12 @@ function commerce_tax_ui_menu() {
       );
     }
 
-    if (rules_config_load('commerce_tax_type_' . $name)) {
+    if (rules_config_load($tax_type['rule'])) {
       $items['admin/commerce/config/taxes/types/' . $name_arg . '/rule'] = array(
         'title' => 'Configure rule',
         'description' => 'Add conditions to the rule used to apply taxes of this type to products.',
         'page callback' => 'drupal_goto',
-        'page arguments' => array('admin/config/workflow/rules/reaction/manage/commerce_tax_type_' . $name),
+        'page arguments' => array('admin/config/workflow/rules/reaction/manage/' . $tax_type['rule']),
         'access arguments' => array('administer rules'),
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_INLINE,
@@ -274,7 +274,7 @@ function commerce_tax_ui_tax_type_new() {
  *   The tax type array containing the basic properties as initialized in
  *     commerce_tax_ui_tax_type_new().
  * @param $skip_reset
- *   Boolean indicating whether or not this save should result in tax types
+ *   Boolean indicating whether or not this save should result in entities
  *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
  *   when you intend to perform many saves at once, as menu rebuilding is very
  *   costly in terms of performance.
@@ -286,6 +286,7 @@ function commerce_tax_ui_tax_type_new() {
  */
 function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_type', $tax_type, empty($tax_type['is_new']) ? 'name' : array());
+  commerce_tax_types_reset();
 
   // If this is a new tax type and the insert did not fail...
   if (!empty($tax_type['is_new']) && $op !== FALSE) {
@@ -299,7 +300,6 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
 
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
-    commerce_tax_types_reset();
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
@@ -314,7 +314,7 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
  * @param $name
  *   The machine-name of the tax type.
  * @param $skip_reset
- *   Boolean indicating whether or not this delete should result in tax types
+ *   Boolean indicating whether or not this delete should result in entities
  *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
  *   when you intend to perform many deletions at once, as menu rebuilding is
  *   very costly in terms of performance.
@@ -325,14 +325,14 @@ function commerce_tax_ui_tax_type_delete($name, $skip_reset = FALSE) {
   db_delete('commerce_tax_type')
     ->condition('name', $name)
     ->execute();
+  commerce_tax_types_reset();
 
-  rules_config_delete(array('commerce_tax_type_' . $name));
+  rules_config_delete(array(rules_config_load($tax_type['rule'])->id));
 
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
-    commerce_tax_types_reset();
     entity_defaults_rebuild();
-    rules_clear_cache(TRUE);
+    rules_clear_cache();
     menu_rebuild();
   }
 
@@ -371,7 +371,7 @@ function commerce_tax_ui_tax_rate_new($type = '') {
     'description' => '',
     'rate' => 0,
     'type' => $type,
-    'rules_component' => TRUE,
+    'default_rules_component' => TRUE,
     'tax_component' => '',
     'admin_list' => TRUE,
     'calculation_callback' => 'commerce_tax_rate_calculate',
@@ -392,7 +392,7 @@ function commerce_tax_ui_tax_rate_new($type = '') {
  *   The tax rate array containing the basic properties as initialized in
  *   commerce_tax_ui_tax_rate_new().
  * @param $skip_reset
- *   Boolean indicating whether or not this save should result in tax rates
+ *   Boolean indicating whether or not this save should result in entities
  *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
  *   when you intend to perform many d at once, as menu rebuilding is very
  *   costly in terms of performance.
@@ -404,6 +404,7 @@ function commerce_tax_ui_tax_rate_new($type = '') {
  */
 function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   $op = drupal_write_record('commerce_tax_rate', $tax_rate, empty($tax_rate['is_new']) ? 'name' : array());
+  commerce_tax_rates_reset();
 
   // If this is a new tax rate and the insert did not fail...
   if (!empty($tax_rate['is_new']) && $op !== FALSE) {
@@ -415,15 +416,8 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
     module_invoke_all('commerce_tax_rate_update', $tax_rate, $skip_reset);
   }
 
-  // If the rate specifies that it doesn't need a component and one already
-  // exists, delete it now.
-  if (!$tax_rate['rules_component']) {
-    rules_config_delete(array('commerce_tax_rate_' . $tax_rate['name']));
-  }
-
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
-    commerce_tax_rates_reset();
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();
@@ -438,7 +432,7 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
  * @param $name
  *   The machine-name of the tax rate.
  * @param $skip_reset
- *   Boolean indicating whether or not this delete should result in tax rates
+ *   Boolean indicating whether or not this delete should result in entities
  *   being reset and the menu being rebuilt; defaults to FALSE. This is useful
  *   when you intend to perform many deletions at once, as menu rebuilding is
  *   very costly in terms of performance.
@@ -449,12 +443,12 @@ function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   db_delete('commerce_tax_rate')
     ->condition('name', $name)
     ->execute();
+  commerce_tax_rates_reset();
 
-  rules_config_delete(array('commerce_tax_rate_' . $name));
+  rules_config_delete(array(rules_config_load($tax_rate['rules_component'])->id));
 
   // Clear the necessary caches and rebuild the menu items.
   if (!$skip_reset) {
-    commerce_tax_rates_reset();
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
     menu_rebuild();

@@ -71,6 +71,7 @@ function commerce_tax_types() {
           'description' => '',
           'display_inclusive' => FALSE,
           'round_mode' => COMMERCE_ROUND_NONE,
+          'rule' => 'commerce_tax_type_' . $name,
           'module' => $module,
         );
 
@@ -161,7 +162,8 @@ function commerce_tax_rates() {
           'description' => '',
           'rate' => 0,
           'type' => '',
-          'rules_component' => TRUE,
+          'rules_component' => 'commerce_tax_rate_' . $name,
+          'default_rules_component' => TRUE,
           'price_component' => 'tax|' . $name,
           'calculation_callback' => 'commerce_tax_rate_calculate',
           'module' => $module,
@@ -215,7 +217,7 @@ function commerce_tax_rate_titles() {
 
 /**
  * Calculates taxes of a particular type by invoking any components that match
- *   the tax type.
+ * the tax type.
  *
  * @param $tax_type
  *   The tax type object whose rates should be calculated.
@@ -229,8 +231,8 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item) {
   // Loop over each tax rate in search of matching components.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
     // If the current rate matches the type and specifies a default component...
-    if ($tax_rate['type'] == $tax_type['name'] && $tax_rate['rules_component']) {
-      $component_name = 'commerce_tax_rate_' . $name;
+    if ($tax_rate['type'] == $tax_type['name'] && !empty($tax_rate['rules_component'])) {
+      $component_name = $tax_rate['rules_component'];
 
       // If we can load the current rate's component...
       if (!empty($components[$component_name])) {
