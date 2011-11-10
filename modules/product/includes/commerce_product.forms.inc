@@ -24,7 +24,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   $form['sku'] = array(
     '#type' => 'textfield',
     '#title' => t('Product SKU'),
-    '#description' => t('Supply a unique identifier for this product using letters, numbers, hyphens, and underscores.'),
+    '#description' => t('Supply a unique identifier for this product using letters, numbers, hyphens, and underscores. Commas may not be used.'),
     '#default_value' => $product->sku,
     '#maxlength' => 128,
     '#required' => TRUE,
@@ -112,6 +112,14 @@ function commerce_product_product_form_validate($form, &$form_state) {
     if (!commerce_product_validate_sku_unique($sku, $product->product_id)) {
       form_set_error('sku', t('This SKU is already in use and must be unique. Please supply another value.'));
     }
+
+    // Validate the SKU for invalid characters.
+    if (!commerce_product_validate_sku($sku)) {
+      form_set_error('sku', t('The SKU %sku contains invalid characters.', array('%sku' => $sku)));
+    }
+
+    // Trim leading and trailing whitespace from the SKU.
+    form_set_value($form['sku'], trim($sku), $form_state);
   }
 
   // Notify field widgets to validate their data.
