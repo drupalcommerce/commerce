@@ -11,6 +11,16 @@
  */
 function commerce_commerce_currency_info() {
   return array(
+    'AED' => array(
+      'code' => 'AED',
+      'symbol' => 'د.إ',
+      'name' => t('United Arab Emirates Dirham'),
+      'numeric_code' => '784',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Fils'),
+      'major_unit' => t('Dirham'),
+    ),
     'AFN' => array(
       'code' => 'AFN',
       'symbol' => 'Af',
