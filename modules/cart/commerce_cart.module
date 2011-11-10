@@ -768,7 +768,7 @@ function commerce_cart_order_refresh($order) {
     // Allow other modules alter line items on a shopping cart refresh.
     module_invoke_all('commerce_cart_line_item_refresh', $cloned_line_item, $order_wrapper);
 
-    // Delete this line item if the product no longer has a valid price.
+    // Delete this line item if it no longer has a valid price.
     $current_line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $cloned_line_item);
 
     if (is_null($current_line_item_wrapper->commerce_unit_price->value()) ||
@@ -779,8 +779,8 @@ function commerce_cart_order_refresh($order) {
     else {
       // Compare the refreshed unit price to the original unit price looking for
       // differences in the amount, currency code, or price components.
-      $data = $line_item_wrapper->commerce_unit_price->data->value();
-      $current_data = $current_line_item_wrapper->commerce_unit_price->data->value();
+      $data = $line_item_wrapper->commerce_unit_price->data->value() + array('components' => array());
+      $current_data = $current_line_item_wrapper->commerce_unit_price->data->value() + array('components' => array());
 
       if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
         $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value() ||
