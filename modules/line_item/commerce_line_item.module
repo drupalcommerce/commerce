@@ -1323,7 +1323,7 @@ function commerce_line_item_rebase_unit_price($line_item) {
 function commerce_line_item_get_properties($line_item, array $options, $name) {
   switch ($name) {
     case 'order':
-      return $line_item->order_id;
+      return !empty($line_item->order_id) ? $line_item->order_id : commerce_order_new();
   }
 }
 

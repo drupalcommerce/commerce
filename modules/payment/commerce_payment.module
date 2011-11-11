@@ -1060,7 +1060,7 @@ function commerce_payment_transaction_get_properties($transaction, array $option
     case 'user':
       return $transaction->uid;
     case 'order':
-      return $transaction->order_id;
+      return !empty($transaction->order_id) ? $transaction->order_id : commerce_order_new();
     case 'message':
       if ($transaction->message) {
         return t($transaction->message, is_array($transaction->message_variables) ? $transaction->message_variables : array());
