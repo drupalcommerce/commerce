@@ -286,6 +286,17 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
       }
       else {
         $product = $wrapper->{$field_name}->get(0)->value();
+
+        // If the product is disabled, attempt to find one that is active and
+        // use that as the default product instead.
+        if ($product->status == 0) {
+          foreach ($wrapper->{$field_name} as $delta => $product_wrapper) {
+            if ($product_wrapper->status->value() != 0) {
+              $product = $product_wrapper->value();
+              break;
+            }
+          }
+        }
       }
 
       // If we found a product and the reference field enables field injection...
