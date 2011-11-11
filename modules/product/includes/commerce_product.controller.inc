@@ -58,6 +58,26 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       }
     }
 
+    // Remove price components from any price fields attached to the product.
+    // Default price components should instead be rebuilt each load using
+    // hook_field_attach_load().
+    foreach (field_info_instances('commerce_product', $entity->type) as $field_name => $instance) {
+      // Load the instance's field data.
+      $field = field_info_field($instance['field_name']);
+
+      // If the instance is a price field with data on this product...
+      if ($field['type'] == 'commerce_price' && !empty($entity->{$field_name})) {
+        // Remove the price components from every price value.
+        foreach ($entity->{$field_name} as $langcode => &$items) {
+          foreach ($items as $delta => &$item) {
+            if (!empty($item['data'])) {
+              $item['data']['components'] = array();
+            }
+          }
+        }
+      }
+    }
+
     return parent::save($entity);
   }
 

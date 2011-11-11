@@ -460,6 +460,10 @@ function commerce_tax_field_attach_load($entity_type, $entities, $age, $options)
             foreach ($items as $delta => $item) {
               // If it specifies a tax and we can load it...
               if (!empty($item['data']['include_tax']) && $tax_rate = commerce_tax_rate_load($item['data']['include_tax'])) {
+                // Clean the price's components array, as we must start with a
+                // blank slate to rebuild the components for inclusive taxes.
+                $item['data']['components'] = array();
+
                 // Reverse apply the tax.
                 $tax_amount = $item['amount'] - ($item['amount'] / (1 + $tax_rate['rate']));
                 $tax_amount = commerce_tax_rate_round_amount($tax_rate, $tax_amount);
