@@ -29,6 +29,12 @@ function commerce_tax_rules_action_info() {
           'options list' => 'commerce_tax_rate_titles',
         ),
       ),
+      'provides' => array(
+        'applied_tax' => array(
+          'type' => 'commerce_price',
+          'label' => t('Applied tax'),
+        ),
+      ),
       'group' => t('Commerce Tax'),
       'callbacks' => array(
         'execute' => 'commerce_tax_rate_rules_apply',
@@ -62,7 +68,13 @@ function commerce_tax_rules_action_info() {
  */
 function commerce_tax_rate_rules_apply($line_item, $name) {
   if ($tax_rate = commerce_tax_rate_load($name)) {
-    commerce_tax_rate_apply($tax_rate, $line_item);
+    $tax_price = commerce_tax_rate_apply($tax_rate, $line_item);
+
+    // If tax was applied, return the price array as a new variable for use in
+    // subsequent actions.
+    if ($tax_price) {
+      return array('applied_tax' => $tax_price);
+    }
   }
 }
 

@@ -254,6 +254,10 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item) {
  *   The tax rate to apply to the line item.
  * @param $line_item
  *   The line item whose unit price will be modified to include the tax.
+ *
+ * @return
+ *   A price array representing the tax applied to the line item or FALSE if
+ *   none was applied.
  */
 function commerce_tax_rate_apply($tax_rate, $line_item) {
   // If a valid rate is specified...
@@ -287,8 +291,12 @@ function commerce_tax_rate_apply($tax_rate, $line_item) {
         $tax_price,
         $included
       );
+
+      return $tax_price;
     }
   }
+
+  return FALSE;
 }
 
 /**
