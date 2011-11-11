@@ -21,7 +21,7 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
    *   A line item object with all default fields initialized.
    */
   public function create(array $values = array()) {
-    return (object) ($values + array(
+    $values += array(
       'line_item_id' => '',
       'order_id' => 0,
       'type' => '',
@@ -30,7 +30,9 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
       'created' => '',
       'changed' => '',
       'data' => array(),
-    ));
+    );
+
+    return parent::create($values);
   }
 
   /**

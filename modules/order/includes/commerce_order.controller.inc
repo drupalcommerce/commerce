@@ -21,7 +21,7 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
    *   An order object with all default fields initialized.
    */
   public function create(array $values = array()) {
-    return (object) ($values + array(
+    $values += array(
       'order_id' => '',
       'order_number' => '',
       'revision_id' => '',
@@ -31,7 +31,9 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
       'created' => '',
       'changed' => '',
       'hostname' => '',
-    ));
+    );
+
+    return parent::create($values);
   }
 
   /**

@@ -225,10 +225,20 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
   public function create(array $values = array()) {
     // Add is_new property if it is not set.
     $values += array('is_new' => TRUE);
+
+    // If there is a class for this entity type, instantiate it now.
     if (isset($this->entityInfo['entity class']) && $class = $this->entityInfo['entity class']) {
-      return new $class($values, $this->entityType);
+      $entity = new $class($values, $this->entityType);
     }
-    return (object) $values;
+    else {
+      // Otherwise use a good old stdClass.
+      $entity = (object) $values;
+    }
+
+    // Allow other modules to alter the created entity.
+    drupal_alter('commerce_entity_create', $this->entityType, $entity);
+
+    return $entity;
   }
 
   /**

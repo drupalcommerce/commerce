@@ -24,7 +24,7 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
   public function create(array $values = array()) {
     global $user;
 
-    return (object) ($values + array(
+    $values += array(
       'transaction_id' => '',
       'revision_id' => '',
       'uid' => $user->uid,
@@ -41,7 +41,9 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
       'payload' => array(),
       'created' => '',
       'changed' => '',
-    ));
+    );
+
+    return parent::create($values);
   }
 
   /**

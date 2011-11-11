@@ -75,7 +75,7 @@ function hook_commerce_currency_info() {
 }
 
 /**
- * Alter commerce currencies.
+ * Allows modules to alter Commerce currency definitions.
  *
  * By default Commerce provides all active currencies according to ISO 4217.
  * This hook allows you to change the formatting properties of existing
@@ -90,4 +90,22 @@ function hook_commerce_currency_info() {
  */
 function hook_commerce_currency_info_alter(&$currencies, $langcode) {
   $currencies['CHF']['code_placement'] = 'after';
+}
+
+/**
+ * Allows modules to alter newly created Commerce entities.
+ *
+ * Commerce's default entity controller, DrupalCommerceEntityController, invokes
+ * this hook after creating a new entity object using either a class specified
+ * by the entity type info or a stdClass. Using this hook, you can alter the
+ * entity before it is returned to any of our entity "new" API functions such
+ * as commerce_product_new().
+ *
+ * @param $entity_type
+ *   The machine-name type of the entity.
+ * @param $entity
+ *   The entity object that was just created.
+ */
+function hook_commerce_entity_create_alter($entity_type, $entity) {
+  // No example.
 }

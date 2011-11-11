@@ -21,7 +21,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
    *   A customer profile object with all default fields initialized.
    */
   public function create(array $values = array()) {
-    return (object) ($values + array(
+    $values += array(
       'profile_id' => '',
       'revision_id' => '',
       'type' => '',
@@ -29,7 +29,9 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
       'status' => 1,
       'created' => '',
       'changed' => '',
-    ));
+    );
+
+    return parent::create($values);
   }
 
   /**

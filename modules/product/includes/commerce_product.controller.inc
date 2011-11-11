@@ -22,7 +22,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
    *   A product object with all default fields initialized.
    */
   public function create(array $values = array()) {
-    return (object) ($values + array(
+    $values += array(
       'product_id' => '',
       'is_new' => TRUE,
       'sku' => '',
@@ -31,7 +31,9 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       'status' => 1,
       'created' => '',
       'changed' => '',
-    ));
+    );
+
+    return parent::create($values);
   }
 
   /**
