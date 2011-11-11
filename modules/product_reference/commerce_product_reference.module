@@ -689,7 +689,6 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
       '#default_value' => implode(', ', $skus),
       '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $instance['entity_type'] . '/' . $field['field_name'] . '/' . $instance['bundle'],
       '#size' => $instance['widget']['settings']['size'],
-      '#maxlength' => 1024,
       '#element_validate' => array('commerce_product_reference_autocomplete_validate'),
     );
   }
