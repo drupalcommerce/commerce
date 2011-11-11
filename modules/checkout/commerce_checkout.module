@@ -733,7 +733,19 @@ function commerce_checkout_page_access($checkout_page, $order) {
       if (!$current_page['buttons']) {
         return FALSE;
       }
-      $current_page = $pages[$pages[$current_page['page_id']]['prev_page']];
+
+      // Look for a previous page ID.
+      $prev_page_id = $current_page['prev_page'];
+
+      // If we cannot find one, do not allow access to the current page, causing
+      // a redirect to the order's current status. This edge case will occur
+      // when a checkout page is removed and a user tries to access an earlier
+      // page for an order that was set to the removed page's status.
+      if (empty($prev_page_id)) {
+        return FALSE;
+      }
+
+      $current_page = $pages[$prev_page_id];
     }
     while ($current_page['page_id'] != $checkout_page['page_id']);
   }
