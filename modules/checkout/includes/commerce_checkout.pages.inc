@@ -149,7 +149,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   // If there are errors on the form, add a message to the top of the page.
   if ($show_errors_message) {
     $form['error_message'] = array(
-      '#markup' => theme('commerce_checkout_errors_message'),
+      '#markup' => theme('commerce_checkout_errors_message', array('label' => t('Errors on form'), 'message' => t('There are errors on the page. Please correct them and resubmit the form.'))),
       '#weight' => -10,
     );
   }
