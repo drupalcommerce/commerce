@@ -73,6 +73,9 @@ function commerce_cart_menu_item_title() {
  */
 function commerce_cart_hook_info() {
   $hooks = array(
+    'commerce_cart_order_id' => array(
+      'group' => 'commerce',
+    ),
     'commerce_cart_order_is_cart' => array(
       'group' => 'commerce',
     ),
@@ -83,6 +86,15 @@ function commerce_cart_hook_info() {
       'group' => 'commerce',
     ),
 	  'commerce_cart_order_refresh' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_order_empty' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_attributes_refresh_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_product_comparison_properties_alter' => array(
       'group' => 'commerce',
     ),
   );
@@ -1942,7 +1954,8 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
     // Create the new product line item of the same type.
     $line_item = commerce_product_line_item_new($product, $form_state['values']['quantity'], 0, $form_state['line_item']->data, $form_state['line_item']->type);
 
-    // Allow modules to prepare this as necessary.
+    // Allow modules to prepare this as necessary. This hook is defined by the
+    // Product Pricing module.
     drupal_alter('commerce_product_calculate_sell_price_line_item', $line_item);
 
     // Remove line item field values the user didn't have access to modify.

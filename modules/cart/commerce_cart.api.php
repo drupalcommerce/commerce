@@ -73,8 +73,27 @@ function hook_commerce_cart_order_convert($order_wrapper, $account) {
 }
 
 /**
+ * Allows modules to perform additional processing to refresh an individual line
+ * item on a shopping cart order.
+ *
+ * Prior to this hook being invoked, product line items will have already had
+ * their sell prices refreshed via the creation of a new line item for the same
+ * product being passed through Rules for calculation.
+ *
+ * @param $line_item
+ *   A line item object that should be updated as necessary for the refresh.
+ * @param $order_wrapper
+ *   An EntityMetadataWrapper for the order the line item is attached to.
+ *
+ * @see commerce_cart_order_refresh()
+ */
+function hook_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
+  // No example.
+}
+
+/**
  * Allows modules to perform additional processing to refresh a shopping cart
- *   order's contents.
+ * order's contents.
  *
  * When an order is loaded, if it is in a shopping cart order status, its
  * contents are refreshed to get the current product prices. This prevents users
