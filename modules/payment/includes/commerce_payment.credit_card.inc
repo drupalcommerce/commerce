@@ -452,8 +452,8 @@ function commerce_payment_validate_credit_card_number($number) {
  *
  * @return
  *   TRUE for cards whose start date is blank (both month and year) or in the
- *     past, 'year' or 'month' for expired cards indicating which value should
- *     receive the error.
+ *   past, 'year' or 'month' for expired cards indicating which value should
+ *   receive the error.
  */
 function commerce_payment_validate_credit_card_start_date($month, $year) {
   if (empty($month) && empty($year)) {
@@ -462,6 +462,10 @@ function commerce_payment_validate_credit_card_start_date($month, $year) {
 
   if (empty($month) || empty($year)) {
     return empty($month) ? 'month' : 'year';
+  }
+
+  if ($month < 1 || $month > 12) {
+    return 'month';
   }
 
   if ($year > date('Y')) {
@@ -486,9 +490,13 @@ function commerce_payment_validate_credit_card_start_date($month, $year) {
  *
  * @return
  *   TRUE for non-expired cards, 'year' or 'month' for expired cards indicating
- *     which value should receive the error.
+ *   which value should receive the error.
  */
 function commerce_payment_validate_credit_card_exp_date($month, $year) {
+  if ($month < 1 || $month > 12) {
+    return 'month';
+  }
+
   if ($year < date('Y')) {
     return 'year';
   }
