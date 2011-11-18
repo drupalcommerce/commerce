@@ -289,7 +289,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
 
         // If the product is disabled, attempt to find one that is active and
         // use that as the default product instead.
-        if ($product->status == 0) {
+        if (!empty($product) && $product->status == 0) {
           foreach ($wrapper->{$field_name} as $delta => $product_wrapper) {
             if ($product_wrapper->status->value() != 0) {
               $product = $product_wrapper->value();
