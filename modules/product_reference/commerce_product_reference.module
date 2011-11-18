@@ -533,6 +533,12 @@ function commerce_product_reference_field_formatter_view($entity_type, $entity, 
     $product_ids[$item['product_id']] = $item['product_id'];
   }
 
+  // Exit now if we didn't find any product IDs.
+  if (empty($product_ids)) {
+    return;
+  }
+
+  // Load the referenced products.
   $products = commerce_product_load_multiple($product_ids, array('status' => 1));
 
   switch ($display['type']) {
