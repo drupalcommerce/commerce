@@ -280,3 +280,12 @@ function commerce_update_rename_permissions($map) {
     }
   }
 }
+
+/**
+ * Clear the cache of currency data so it can be rebuilt to include new
+ * formatting parameters.
+ */
+function commerce_update_7101() {
+  cache_clear_all('commerce_currencies:', 'cache', TRUE);
+  return t('Cached currency data has been deleted and will be rebuilt to include new formatting parameters.');
+}
