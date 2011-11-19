@@ -30,6 +30,9 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
     'bank' => '',
   );
 
+  $current_year_2 = date('y');
+  $current_year_4 = date('Y');
+
   $form['credit_card'] = array(
     '#tree' => TRUE,
     '#attached' => array(
@@ -97,7 +100,7 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
     $options = array();
 
     for ($i = -10; $i < 1; $i++) {
-      $options[date('Y') + $i] = date('y') + $i;
+      $options[$current_year_4 + $i] = $current_year_2 + $i;
     }
 
     $form['credit_card']['start_year'] = array(
@@ -123,7 +126,7 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
   $options = array();
 
   for ($i = 0; $i < 20; $i++) {
-    $options[date('Y') + $i] = date('y') + $i;
+    $options[$current_year_4 + $i] = $current_year_2 + $i;
   }
 
   $form['credit_card']['exp_year'] = array(
