@@ -60,8 +60,9 @@
  *       typically by adding additional fields to the line item type.
  *     - title($line_item): returns a sanitized title of the line item for use
  *       in Views and other displays.
- *     - add_form(): returns the form elements necessary to add a line item of
- *       this type to an order via a line item manager widget.
+ *     - add_form($element, &$form_state): returns the form elements necessary
+ *       to add a line item of this type to an order via a line item manager
+ *       widget.
  *     - add_form_submit($line_item, $element, &$form_state, $form): processes
  *       the input from the "Add line item" form elements for this line item
  *       type, adding data to the new line item object; should return an error
