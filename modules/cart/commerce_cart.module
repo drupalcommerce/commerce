@@ -97,6 +97,15 @@ function commerce_cart_hook_info() {
     'commerce_cart_product_comparison_properties_alter' => array(
       'group' => 'commerce',
     ),
+    'commerce_cart_product_prepare' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_product_add' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_cart_product_remove' => array(
+      'group' => 'commerce',
+    ),
   );
 
   return $hooks;

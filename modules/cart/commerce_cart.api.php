@@ -176,3 +176,56 @@ function hook_commerce_cart_product_comparison_properties_alter(&$comparison_pro
   // different display paths.
   $comparison_properties[] = 'commerce_display_path';
 }
+
+/**
+ * Rules event hook: allows modules to operate prior to adding a product to the
+ * cart but does not actually allow you to interrupt the process.
+ *
+ * Invoking this Rules event / hook does not result in the processing of any
+ * return value, so it is not useful for interrupting a cart product add
+ * operation outside of a redirect.
+ *
+ * @param $order
+ *   The cart order object the product will be added to.
+ * @param $product
+ *   The product being added to the cart.
+ * @param $quantity
+ *   The quantity of the product to add to the cart.
+ */
+function hook_commerce_cart_product_prepare($order, $product, $quantity) {
+  // No example.
+}
+
+/**
+ * Rules event hook: allows modules to react to the addition of a product to a
+ * shopping cart order.
+ *
+ * @param $order
+ *   The cart order object the product was added to.
+ * @param $product
+ *   The product that was added to the cart.
+ * @param $quantity
+ *   The quantity of the product added to the cart.
+ * @param $line_item
+ *   The new or updated line item representing that product on the given order.
+ */
+function hook_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  // No example.
+}
+
+/**
+ * Rules event hook: allows modules to react to the removal of a product from a
+ * shopping cart order.
+ *
+ * @param $order
+ *   The cart order object the product was removed from.
+ * @param $product
+ *   The product that was removed from the cart.
+ * @param $quantity
+ *   The quantity of the product line item removed from the cart.
+ * @param $line_item
+ *   The product line item that was deleted to remove the product from the cart.
+ */
+function hook_commerce_cart_product_remove($order, $product, $quantity, $line_item) {
+  // No example.
+}
