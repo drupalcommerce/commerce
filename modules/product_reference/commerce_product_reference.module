@@ -687,7 +687,9 @@ function commerce_product_reference_field_widget_form(&$form, &$form_state, $fie
     $products = commerce_product_load_multiple($product_ids);
 
     foreach ($product_ids as $product_id) {
-      $skus[] = $products[$product_id]->sku;
+      if (!empty($products[$product_id])) {
+        $skus[] = $products[$product_id]->sku;
+      }
     }
 
     return $element + array(
