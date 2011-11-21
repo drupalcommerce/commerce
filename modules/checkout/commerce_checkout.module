@@ -169,21 +169,6 @@ function commerce_checkout_theme() {
 }
 
 /**
- * Implements hook_entity_property_info_alter().
- */
-function commerce_checkout_entity_property_info_alter(&$info) {
-  // TODO: Remove this once http://drupal.org/node/1044332 is fixed.
-  if (empty($info['user']['properties']['status'])) {
-    $info['user']['properties']['status'] = array(
-      'label' => t("Status"),
-      'description' => t("Whether the user is active(1) or blocked(0)."),
-      'setter callback' => 'entity_property_verbatim_set',
-      'type' => 'integer',
-    );
-  }
-}
-
-/**
  * Implements hook_forms().
  *
  * Each page of the checkout form is actually a unique form as opposed to a
