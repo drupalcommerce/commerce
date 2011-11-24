@@ -8,19 +8,6 @@
  * @{
  */
 
-/**
- * Returns parameters suitable for using Rules to alter prices.
- */
-function commerce_price_rules_variables() {
-  $args = array(
-    'price' => array(
-      'type' => 'commerce_price',
-      'label' => t('Price'),
-    ),
-  );
-
-  return $args;
-}
 
 /**
  * Implements hook_rules_data_info().
