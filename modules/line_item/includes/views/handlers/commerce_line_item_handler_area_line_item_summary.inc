@@ -125,8 +125,8 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
     if ($this->options['info']['quantity']) {
       $variables = array(
         'quantity_raw' => $quantity,
-        'quantity_label' => format_plural($quantity, 'item', 'items'),
-        'quantity' => format_plural($quantity, '1 item', '@count items'),
+        'quantity_label' => format_plural($quantity, 'item', 'items', array(), array('context' => 'product count on a Commerce order')),
+        'quantity' => format_plural($quantity, '1 item', '@count items', array(), array('context' => 'product count on a Commerce order')),
       ) + $variables;
     }
     if ($this->options['info']['total']) {
