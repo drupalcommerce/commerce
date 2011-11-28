@@ -317,6 +317,21 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
    *   The renderable array.
    */
   public function view($entities, $view_mode = '', $langcode = NULL, $page = NULL) {
+    // Create a new entities array keyed by entity ID.
+    $rekeyed_entities = array();
+
+    foreach ($entities as $key => $entity) {
+      // Use the entity's ID if available and fallback to its existing key value
+      // if we couldn't determine it.
+      if (isset($entity->{$this->idKey})) {
+        $key = $entity->{$this->idKey};
+      }
+
+      $rekeyed_entities[$key] = $entity;
+    }
+
+    $entities = $rekeyed_entities;
+
     // If no view mode is specified, use the first one available..
     if (!isset($this->entityInfo['view modes'][$view_mode])) {
       reset($this->entityInfo['view modes']);
