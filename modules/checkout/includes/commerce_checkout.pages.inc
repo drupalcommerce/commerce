@@ -315,7 +315,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
   }
 
   // If the form was submitted via the continue button...
-  if ($form_state['values']['op'] == $form_state['values']['continue']) {
+  if (end($form_state['triggering_element']['#array_parents']) == 'continue') {
     // If there is another checkout page...
     if ($checkout_page['next_page']) {
       // Update the order status to reflect the next checkout page.
