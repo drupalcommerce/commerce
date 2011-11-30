@@ -17,6 +17,7 @@
  *   An array of information about the currencies commerce should provide.
  *   The array contains a sub-array for each currency, with the currency name
  *   as the key.
+ *
  *   Possible attributes for each sub-array are:
  *   - code: The uppercase alphabetic currency code.
  *      For example USD.
