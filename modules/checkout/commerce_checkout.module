@@ -104,6 +104,9 @@ function commerce_checkout_hook_info() {
     'commerce_checkout_router' => array(
       'group' => 'commerce',
     ),
+    'commerce_checkout_complete' => array(
+      'group' => 'commerce',
+    ),
   );
 
   return $hooks;

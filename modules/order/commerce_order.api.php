@@ -158,7 +158,7 @@ function hook_commerce_order_status_info_alter(&$order_statuses) {
  *  The uri elements of an entity as expected to be returned by entity_uri()
  *  matching the signature of url().
  *
- * @see commerce_order_ui_order_uri()
+ * @see commerce_order_uri()
  * @see hook_module_implements_alter()
  * @see entity_uri()
  * @see url()

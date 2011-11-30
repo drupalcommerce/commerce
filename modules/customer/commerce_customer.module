@@ -88,6 +88,12 @@ function commerce_customer_profile_uri($profile) {
  */
 function commerce_customer_hook_info() {
   $hooks = array(
+    'commerce_customer_profile_type_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_customer_profile_type_info_alter' => array(
+      'group' => 'commerce',
+    ),
     'commerce_customer_profile_uri' => array(
       'group' => 'commerce',
     ),
@@ -104,6 +110,9 @@ function commerce_customer_hook_info() {
       'group' => 'commerce',
     ),
     'commerce_customer_profile_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_customer_profile_can_delete' => array(
       'group' => 'commerce',
     ),
   );
