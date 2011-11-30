@@ -354,3 +354,59 @@ function hook_commerce_payment_transaction_presave($transaction) {
 function hook_commerce_payment_order_paid_in_full($transaction) {
   // No example.
 }
+
+/**
+ * Defines payment transaction statuses.
+ *
+ * A payment transaction represents any attempted payment via a payment method
+ * and includes a variety of properties used for tracking the amount, outcome,
+ * and parameters of the transaction. One of these is the transaction’s local
+ * status, not to be confused with its remote_status that stores the exact
+ * status of the transaction at the payment provider.
+ *
+ * Transaction statuses are used to visually represent in the order’s Payment
+ * tab whether or not the payment should be considered a success (meaning money
+ * was actually collected) and are accordingly considered when calculating the
+ * remaining balance of an order. Because payment statuses are critical
+ * functionality components, the default statuses listed below are actually
+ * defined in the function used to load all payment transaction statuses:
+ * - Pending: further action is required to determine if the attempted payment
+ *   was a success or failure; used for payment methods like e-checks that may
+ *   require time to clear or credit card authorizations that haven’t been
+ *   captured yet
+ * - Success: the transaction is complete and a success, meaning the amount of
+ *   this transaction will be subtracted from the order total to determine the
+ *   outstanding balance on the order
+ * - Failure: the attempted transaction failed and will not be counted in totals
+ *
+ * Additional statuses may be defined via this hook, but there is no general
+ * alteration. The properties of the default statuses may be altered as long as
+ * the actual status key is preserved via the use of array merging.
+ *
+ * The payment transaction status array structure is as follows:
+ * - status: machine-name identifying the payment transaction status using
+ *   lowercase alphanumeric characters, -, and _
+ * - title: the translatable title of the transaction status, used in
+ *   administrative interfaces
+ * - icon: the path to the status’s icon relative to the Drupal root directory
+ * - total: TRUE or FALSE indicating whether or not transactions in this
+ *   status should be totaled to determine the balance of an order
+ *
+ * @return
+ *   An array of payment transaction status arrays keyed by status.
+ *
+ * @see commerce_payment_transaction_statuses()
+ */
+function hook_commerce_payment_transaction_status_info() {
+  $statuses = array();
+
+  // COMMERCE_PAYMENT_STATUS_SUCCESS is a constant defined in the Payment module.
+  $statuses[COMMERCE_PAYMENT_STATUS_SUCCESS] = array(
+    'status' => COMMERCE_PAYMENT_STATUS_SUCCESS,
+    'title' => t('Success'),
+    'icon' => drupal_get_path('module', 'commerce_payment') . '/theme/icon-success.png',
+    'total' => TRUE,
+  );
+
+  return $statuses;
+}
