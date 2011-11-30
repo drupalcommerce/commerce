@@ -1385,3 +1385,31 @@ function commerce_order_set_properties($order, $name, $value) {
     $order->uid = $value;
   }
 }
+
+/**
+ * Implements hook_entity_query_alter().
+ */
+function commerce_order_entity_query_alter($query) {
+  // If we're performing an entity query to orders using a property condition on
+  // the order state pseudo-column property, we need to alter the condition to
+  // compare against the statuses in the specified state instead.
+  if (isset($query->entityConditions['entity_type']) && $query->entityConditions['entity_type']['value'] == 'commerce_order') {
+    foreach ($query->propertyConditions as &$condition) {
+      // If the current condition was against the non-existent 'state' column...
+      if ($condition['column'] == 'state' && !empty($condition['value'])) {
+        // Get all the statuses available for this state.
+        $statuses = commerce_order_statuses(array('state' => $condition['value']));
+        $condition['column'] = 'status';
+
+        if (count($statuses)) {
+          $condition['value'] = array_keys($statuses);
+          $condition['operator'] = (count($statuses) > 1) ? 'IN' : '=';
+        }
+        else {
+          // Do not return any orders for a non-existent state.
+          $condition['value'] = NULL;
+        }
+      }
+    }
+  }
+}
