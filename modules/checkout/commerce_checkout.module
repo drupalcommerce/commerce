@@ -101,7 +101,7 @@ function commerce_checkout_hook_info() {
     'commerce_checkout_pane_info_alter' => array(
       'group' => 'commerce',
     ),
-	  'commerce_checkout_router' => array(
+    'commerce_checkout_router' => array(
       'group' => 'commerce',
     ),
   );

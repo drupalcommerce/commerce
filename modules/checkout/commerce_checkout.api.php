@@ -58,80 +58,209 @@ function hook_commerce_checkout_complete($order) {
 }
 
 /**
- * Allows modules to define additional checkout pages.
+ * Defines checkout pages available for use in the checkout process.
  *
- * @see http://www.drupalcommerce.org/specification/info-hooks/checkout
- * @see commerce_checkout_commerce_checkout_page_info()
+ * The checkout form is not a true multi-step form in the Drupal sense, but it
+ * does use a series of connected menu items and the same form builder function
+ * to present the contents of each checkout page. Furthermore, as the customer
+ * progresses through checkout, their order’s status will be updated to reflect
+ * their current page in checkout.
+ *
+ * The Checkout module defines several checkout pages in its own implementation
+ * of this hook, commerce_checkout_commerce_checkout_page_info():
+ * - Checkout: the first page where the customer will enter their basic order
+ *   information
+ * - Review: a page where they can verify that the details of their order are
+ *   correct (and the default location of the payment checkout pane if the
+ *   Payment module is enabled)
+ * - Complete - the final step in checkout displaying pertinent order details
+ *   and links
+ *
+ * The Payment module adds an additional page:
+ * - Payment: a page that only appears when the customer selected an offsite
+ *   payment method; the related checkout pane handles building the form and
+ *   automatically submitting it to send the customer to the payment provider
+ *
+ * The checkout page array contains properties that define how the page should
+ * interact with the shopping cart and order status systems. It also contains
+ * properties that define the appearance and use of buttons on the page.
+ *
+ * The checkout page array structure is as follows:
+ * - page_id: machine-name identifying the page using lowercase alphanumeric
+ *   characters, -, and _
+ * - title: the Drupal page title used for this checkout page
+ * - name: the translatable name of the page, used in administrative displays
+ *   and the page’s corresponding order status; if not specified, defaults to
+ *   the title
+ * - help: the translatable help text displayed in a .checkout-help div at the
+ *   top of the checkout page (defined as part of the form array, not displayed
+ *   via hook_help())
+ * - weight: integer weight of the page used for determining the page order;
+ *   populated automatically if not specified
+ * - status_cart: boolean indicating whether or not this page’s corresponding
+ *   order status should be considered a shopping cart order status (this is
+ *   necessary because the shopping cart module relies on order status to
+ *   identify the user’s current shopping cart); defaults to TRUE
+ * - buttons - boolean indicating whether or not the checkout page should have
+ *   buttons for continuing and going back in the checkout process; defaults to
+ *   TRUE
+ * - back_value: the translatable value of the submit button used for going back
+ *   in the checkout process; defaults to ‘Back’
+ * - submit_value: the translatable value of the submit button used for going
+ *   forward in the checkout process; defaults to ‘Continue’
+ * - prev_page: the page_id of the previous page in the checkout process; should
+ *   not be set by the hook but will be populated automatically when the page is
+ *   loaded
+ * - next_page: the page_id of the next page in the checkout process; should not
+ *   be set by the hook but will be populated automatically when the page is
+ *   loaded
+ *
+ * Note: At this point there is no way to add checkout pages via the UI, so
+ * sites wishing to add extra steps to the checkout process will need to define
+ * custom pages.
+ *
+ * @return
+ *   An array of checkout page arrays keyed by page_id.
  */
 function hook_commerce_checkout_page_info() {
+  $checkout_pages = array();
 
-  // Define an additional checkout page.
-  $checkout_pages['additional_checkout_page'] = array(
-    'title' => t('Additional Checkout Page'),
-    'help' => t('Somebody asked for this additional checkout page'),
-    'weight' => 60,
-
-    // 'status_cart' => TRUE,
-
-    'back_value' => t('Back'), // Value of the "Back" button
-    'submit_value' => t('Next'), // Value of the "Next" button
-
-    // If 'buttons' is FALSE, the "next" and "previous" buttons will be omitted.
-    // 'buttons' => FALSE,
+  $checkout_pages['complete'] = array(
+    'name' => t('Complete'),
+    'title' => t('Checkout complete'),
+    'weight' => 50,
+    'status_cart' => FALSE,
+    'buttons' => FALSE,
   );
 
   return $checkout_pages;
 }
 
 /**
- * Allows modules to declare their own checkout panes.
+ * Allows modules to alter checkout pages defined by other modules.
  *
- * This hook provides a set of parameters defining a pane that can be added
- * to the checkout system. This includes detail information like the title
- * and also a way to determine the names of the key form functions to be called.
+ * @param $checkout_pages
+ *   The array of checkout page arrays.
  *
- * @see commerce_order_commerce_checkout_pane_info()
- * @see http://www.drupalcommerce.org/specification/info-hooks/checkout
+ * @see hook_commerce_checkout_page_info()
+ */
+function hook_commerce_checkout_page_info_alter(&$checkout_pages) {
+  $checkout_pages['review']['weight'] = 15;
+}
+
+/**
+ * Defines checkout panes available for use on checkout pages.
+ *
+ * Any number of panes may be assigned to a page and reordered using the
+ * checkout form builder. Each pane may also have its own settings form
+ * accessible from the builder. On the checkout page, a pane is represented as a
+ * fieldset or container div. Panes possess a variety of callbacks used to
+ * define settings and checkout form elements and validate / process submitted
+ * data when the checkout form is submitted.
+ *
+ * The Checkout module defines a couple of checkout panes in its own
+ * implementation of this hook, commerce_checkout_commerce_checkout_pane_info():
+ * - Review: the main pane on the default Review page that displays details from
+ *   other checkout panes for the user to review prior to completion
+ * - Completion message: the main pane on the default Complete page that
+ *   displays the checkout completion message and links
+ *
+ * Other checkout panes are defined by the Cart, Customer, and Payment modules
+ * as follows:
+ * - Shopping cart contents: displays a View listing the contents of the
+ *   shopping cart order with a summary including the total cost and number of
+ *   items but no links (as used in the cart block)
+ * - Customer profile panes: the Customer module defines one for each type of
+ *   customer information profile using the name of the profile type as the
+ *   title of the pane
+ * - Payment: the main payment pane that lets the customer select a payment
+ *   method and supply any necessary payment details; appears on the Review page
+ *   beneath the Review pane by default, allowing payments to be processed
+ *   immediately on submission for security purposes
+ * - Off-site payment redirect: a pane that handles redirected payment services
+ *   with some specialized behavior; should be the only pane on the actual
+ *   payment page
+ *
+ * The checkout pane array contains properties that directly affect the pane’s
+ * fieldset display on the checkout form. It also contains a property used to
+ * automatically populate an array of callback function names.
+ *
+ * The full list of properties is as follows:
+ * - pane_id: machine-name identifying the pane using lowercase alphanumeric
+ *   characters, -, and _
+ * - title: the translatable title used for this checkout pane as the fieldset
+ *   title in checkout
+ * - name: the translatable name of the pane, used in administrative displays;
+ *   if not specified, defaults to the title
+ * - page: the page_id of the checkout page the pane should appear on by
+ *   default; defaults to ‘checkout’
+ * - collapsible: boolean indicating whether or not the checkout pane’s fieldset
+ *   should be collapsible; defaults to FALSE
+ * - collapsed: boolean indicating whether or not the checkout pane’s fieldset
+ *   should be collapsed by default; defaults to FALSE
+ * - weight: integer weight of the page used for determining the pane sort order
+ *   on checkout pages; defaults to 0
+ * - enabled: boolean indicating whether or not the pane is enabled by default;
+ *   defaults to TRUE
+ * - review: boolean indicating whether or not the pane should be included in
+ *   the review checkout pane; defaults to TRUE
+ * - module: the name of the module that defined the pane; should not be set by
+ *   the hook but will be populated automatically when the pane is loaded
+ * - file: the filepath of an include file relative to the pane’s module
+ *   containing the callback functions for this pane, allowing modules to store
+ *   checkout pane code in include files that only get loaded when necessary
+ *   (like the menu item file property)
+ * - base: string used as the base for the magically constructed callback names,
+ *   each of which will be defaulted to [base]_[callback] unless explicitly set;
+ *   defaults to the pane_id
+ * - callbacks: an array of callback function names for the various types of
+ *   callback required for all the checkout pane operations, arguments per
+ *   callback in parentheses:
+ *   - settings_form($checkout_pane): returns form elements for the pane’s
+ *     settings form
+ *   - checkout_form($form, &$form_state, $checkout_pane, $order): returns form
+ *     elements for the pane’s checkout form fieldset
+ *   - checkout_form_validate($form, &$form_state, $checkout_pane, $order):
+ *     validates data inputted via the pane’s elements on the checkout form and
+ *     returns TRUE or FALSE indicating whether or not all the data validated
+ *   - checkout_form_submit($form, &$form_state, $checkout_pane, $order):
+ *     processes data inputted via the pane’s elements on the checkout form,
+ *     often updating parts of the order object based on the data
+ *   - review($form, $form_state, $checkout_pane, $order): returns data used in
+ *     the construction of the Review checkout pane
+ *
+ * The helper function commerce_checkout_pane_callback() will include a checkout
+ * pane’s include file if specified and check for the existence of a callback,
+ * returning either the name of the function or FALSE if the specified callback
+ * does not exist for the specified pane.
+ *
+ * @return
+ *   An array of checkout pane arrays keyed by pane_id.
+ *
+ * @see commerce_checkout_pane_callback()
  */
 function hook_commerce_checkout_pane_info() {
+  $checkout_panes = array();
 
-  $checkout_panes['new_pane'] = array(
-    'title' => t('A new pane'),
-
-    // The base of the form builder and related callbacks used to describe the
-    // pane. In this case these form functions will be required:
-    // - mymodule_new_pane_checkout_form($form, &$form_state, $checkout_pane, $order)
-    // - mymodule_new_pane_review($form, $form_state, $checkout_pane, $order)
-    // - mymodule_new_pane_settings_form($checkout_pane)
-    'base' => 'mymodule_new_pane',
-
-    // Note that the form builder functions and callbacks could also be
-    // specified in
-    // 'callbacks' => array(
-    //   'settings_form' => 'mymodule_new_pane_settings_form',
-    //   'checkout_form' => 'mymodule_new_pane_checkout_form',
-    //   'checkout_form_validate' => 'mymodule_new_pane_checkout_form_validate',
-    //   'checkout_form_submit' => 'mymodule_new_pane_checkout_form_submit',
-    //   'review' => 'mymodule_new_pane_review',
-    // ),
-
-    // page name where this pane should appear. Defaults to 'checkout'
-    'page' => 'checkout',
-    'weight' => -5,
-
-    // Administrative title of the pane,  used in administrative interface.
-    'name' => t('Additional pane'),
-
-    // 'pane_id' => 'new_pane',
-    'collapsible' => TRUE,
-    'collapsed' => FALSE,
-    'enabled' => TRUE, // Defaults to TRUE, but could default to FALSE.
-    'review' => TRUE, // If FALSE will be excluded from review page.
-
-    // A file where the callback functions may be found.
-    'file' => 'includes/mymodule.checkout_pane.inc',
+  $checkout_panes['checkout_review'] = array(
+    'title' => t('Review'),
+    'file' => 'includes/commerce_checkout.checkout_pane.inc',
+    'base' => 'commerce_checkout_review_pane',
+    'page' => 'review',
+    'fieldset' => FALSE,
   );
 
   return $checkout_panes;
 }
 
+/**
+ * Allows modules to alter checkout panes defined by other modules.
+ *
+ * @param $checkout_panes
+ *   The array of checkout pane arrays.
+ *
+ * @see hook_commerce_checkout_pane_info()
+ */
+function hook_commerce_checkout_pane_info_alter(&$checkout_panes) {
+  $checkout_panes['billing']['weight'] = -6;
+}
