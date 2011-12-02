@@ -50,6 +50,51 @@ function hook_commerce_product_type_info_alter(&$product_types) {
 }
 
 /**
+ * Allows modules to react to the creation of a new product type via Product UI.
+ *
+ * @param $product_type
+ *   The product type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this insert will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_product_ui_product_type_save()
+ */
+function hook_commerce_product_type_insert($product_type, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the update of a product type via Product UI.
+ *
+ * @param $product_type
+ *   The product type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this update will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_product_ui_product_type_save()
+ */
+function hook_commerce_product_type_update($product_type, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the deletion of a product type via Product UI.
+ *
+ * @param $product_type
+ *   The product type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this deletion will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_product_ui_product_type_delete()
+ */
+function hook_commerce_product_type_delete($product_type, $skip_reset) {
+  // No example.
+}
+
+/**
  * Lets modules specify the path information expected by a uri callback.
  *
  * The Product module defines a uri callback for the product entity even though

@@ -59,13 +59,16 @@ function commerce_line_item_hook_info() {
     'commerce_line_item_type_info' => array(
       'group' => 'commerce',
     ),
-    'commerce_line_item_access' => array(
+    'commerce_line_item_type_info_alter' => array(
       'group' => 'commerce',
     ),
     'commerce_line_item_summary_link_info' => array(
       'group' => 'commerce',
     ),
     'commerce_line_item_summary_link_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_access' => array(
       'group' => 'commerce',
     ),
     'commerce_line_item_update' => array(
@@ -75,6 +78,9 @@ function commerce_line_item_hook_info() {
       'group' => 'commerce',
     ),
     'commerce_line_item_delete' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_line_item_rebase_unit_price' => array(
       'group' => 'commerce',
     ),
   );

@@ -49,7 +49,7 @@ function hook_commerce_cart_order_is_cart($order, $is_cart) {
 
 /**
  * Allows modules to perform additional processing to convert an anonymous
- *   shopping cart order to an authenticated cart.
+ * shopping cart order to an authenticated cart.
  *
  * When anonymous users login to the site, if they have shopping cart orders,
  * those are converted to authenticated shopping carts. This means their uid and

@@ -90,12 +90,6 @@ function commerce_order_label($entity, $entity_type) {
  */
 function commerce_order_hook_info() {
   $hooks = array(
-    'commerce_order_uri' => array(
-      'group' => 'commerce',
-    ),
-    'commerce_order_view' => array(
-      'group' => 'commerce',
-    ),
     'commerce_order_state_info' => array(
       'group' => 'commerce',
     ),
@@ -106,6 +100,12 @@ function commerce_order_hook_info() {
       'group' => 'commerce',
     ),
     'commerce_order_status_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_uri' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_order_view' => array(
       'group' => 'commerce',
     ),
     'commerce_order_presave' => array(

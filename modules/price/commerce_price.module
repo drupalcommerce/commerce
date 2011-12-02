@@ -21,6 +21,9 @@ function commerce_price_hook_info() {
     'commerce_price_component_type_info_alter' => array(
       'group' => 'commerce',
     ),
+    'commerce_price_field_formatter_prepare_view' => array(
+      'group' => 'commerce',
+    ),
     'commerce_price_formatted_components_alter' => array(
       'group' => 'commerce',
     ),

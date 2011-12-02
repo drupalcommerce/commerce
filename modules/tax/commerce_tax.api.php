@@ -38,12 +38,57 @@ function hook_commerce_tax_type_info() {
 }
 
 /**
- * Alter tax types.
+ * Allows modules to alter tax types defined by other modules.
  *
  * @see hook_commerce_tax_type_info()
  */
 function hook_commerce_tax_type_info_alter(&$tax_types) {
   $tax_types['sales_tax']['display_inclusive'] = TRUE;
+}
+
+/**
+ * Allows modules to react to the creation of a new tax type via the UI module.
+ *
+ * @param $tax_type
+ *   The tax type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this insert will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_type_save()
+ */
+function hook_commerce_tax_type_insert($tax_type, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the update of a tax type via the UI module.
+ *
+ * @param $tax_type
+ *   The tax type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this update will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_type_save()
+ */
+function hook_commerce_tax_type_update($tax_type, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the deletion of a tax type via the UI module.
+ *
+ * @param $tax_type
+ *   The tax type info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this deletion will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_type_delete()
+ */
+function hook_commerce_tax_type_delete($tax_type, $skip_reset) {
+  // No example
 }
 
 /**
@@ -88,12 +133,57 @@ function hook_commerce_tax_rate_info() {
 }
 
 /**
- * Alter tax rates.
+ * Allows modules to alter tax rates defined by other modules.
  *
  * @see hook_commerce_tax_rate_info()
  */
 function hook_commerce_tax_rate_info_alter(&$tax_rates) {
   $tax_rates['ky_sales_tax']['rate'] = .06;
+}
+
+/**
+ * Allows modules to react to the creation of a new tax rate via the UI module.
+ *
+ * @param $tax_rate
+ *   The tax rate info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this insert will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_rate_save()
+ */
+function hook_commerce_tax_rate_insert($tax_rate, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the update of a tax rate via the UI module.
+ *
+ * @param $tax_rate
+ *   The tax rate info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this update will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_rate_save()
+ */
+function hook_commerce_tax_rate_update($tax_rate, $skip_reset) {
+  // No example.
+}
+
+/**
+ * Allows modules to react to the deletion of a tax rate via the UI module.
+ *
+ * @param $tax_rate
+ *   The tax rate info array.
+ * @param $skip_reset
+ *   Boolean indicating whether or not this deletion will trigger a cache reset
+ *   and menu rebuild.
+ *
+ * @see commerce_tax_ui_tax_rate_delete()
+ */
+function hook_commerce_tax_rate_delete($tax_rate, $skip_reset) {
+  // No example.
 }
 
 /**

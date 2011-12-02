@@ -123,10 +123,19 @@ function commerce_payment_transaction_uri($transaction) {
  */
 function commerce_payment_hook_info() {
   $hooks = array(
+    'commerce_payment_totals_row_info' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_totals_row_info_alter' => array(
+      'group' => 'commerce',
+    ),
     'commerce_payment_method_info' => array(
       'group' => 'commerce',
     ),
     'commerce_payment_method_info_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_payment_methods' => array(
       'group' => 'commerce',
     ),
     'commerce_payment_transaction_status_info' => array(
@@ -139,12 +148,6 @@ function commerce_payment_hook_info() {
       'group' => 'commerce',
     ),
     'commerce_payment_transaction_access' => array(
-      'group' => 'commerce',
-    ),
-    'commerce_payment_totals_row_info' => array(
-      'group' => 'commerce',
-    ),
-    'commerce_payment_totals_row_info_alter' => array(
       'group' => 'commerce',
     ),
     'commerce_payment_transaction_insert' => array(

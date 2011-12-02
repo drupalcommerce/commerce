@@ -272,7 +272,7 @@ function commerce_tax_ui_tax_type_new() {
  *
  * @param $tax_type
  *   The tax type array containing the basic properties as initialized in
- *     commerce_tax_ui_tax_type_new().
+ *   commerce_tax_ui_tax_type_new().
  * @param $skip_reset
  *   Boolean indicating whether or not this save should result in entities
  *   being reset and the menu being rebuilt; defaults to FALSE. This is useful

@@ -324,6 +324,30 @@ function hook_commerce_payment_methods($order) {
 }
 
 /**
+ * Allows modules to specify a uri for a payment transaction.
+ *
+ * When this hook is invoked, the first returned uri will be used for the
+ * payment transaction. Thus to override the default value provided by the
+ * Payment UI module, you would need to adjust the order of hook invocation via
+ * hook_module_implements_alter() or your module weight values.
+ *
+ * @param $transaction
+ *   The payment transaction object whose uri is being determined.
+ *
+ * @return
+ *  The uri elements of an entity as expected to be returned by entity_uri()
+ *  matching the signature of url().
+ *
+ * @see commerce_payment_transaction_uri()
+ * @see hook_module_implements_alter()
+ * @see entity_uri()
+ * @see url()
+ */
+function hook_commerce_payment_transaction_uri($transaction) {
+  // No example.
+}
+
+/**
  * Allows you to prepare payment transaction data before it is saved.
  *
  * @param $transaction
