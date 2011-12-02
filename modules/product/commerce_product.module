@@ -28,12 +28,6 @@ function commerce_product_menu() {
  */
 function commerce_product_hook_info() {
   $hooks = array(
-    'commerce_product_uri' => array(
-      'group' => 'commerce',
-    ),
-    'commerce_product_view' => array(
-      'group' => 'commerce',
-    ),
     'commerce_product_type_info' => array(
       'group' => 'commerce',
     ),
@@ -49,6 +43,12 @@ function commerce_product_hook_info() {
     'commerce_product_type_delete' => array(
       'group' => 'commerce',
     ),
+    'commerce_product_uri' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_view' => array(
+      'group' => 'commerce',
+    ),
     'commerce_product_presave' => array(
       'group' => 'commerce',
     ),
@@ -56,6 +56,9 @@ function commerce_product_hook_info() {
       'group' => 'commerce',
     ),
     'commerce_product_update' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_product_can_delete' => array(
       'group' => 'commerce',
     ),
     'commerce_product_delete' => array(

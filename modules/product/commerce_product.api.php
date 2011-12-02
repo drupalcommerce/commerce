@@ -7,6 +7,49 @@
 
 
 /**
+ * Defines the types of products available for creation on the site.
+ *
+ * Product types are represented as bundles of the Commerce Product entity type.
+ * Each one has a unique machine-name, title, description, and help text. They
+ * can also each have unique fields to store additional product data that may
+ * be exposed to the Add to Cart form as product attributes.
+ *
+ * The Product UI module implements this hook to define product types based on
+ * information stored in the database. On installation, Product UI adds a basic
+ * product type named "Product" to the database that can be used exclusively on
+ * a site with simple products or deleted if unnecessary for a given site.
+ *
+ * The product type array structure includes the following keys:
+ * - type: the machine-name of the product type
+ * - name: the translatable name of the product type
+ * - description: a translatable description of the product type for use in
+ *   administrative lists and pages
+ * - help: the translatable help text included at the top of the add / edit form
+ *   for products of this type
+ * - module: the name of the module defining the product type; should not be set
+ *   by the hook itself but will be set when all product types are loaded
+ *
+ * @return
+ *   An array of product type arrays keyed by type.
+ */
+function hook_commerce_product_type_info() {
+  // Return the product types defined in the database by the Product UI module.
+  return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
+}
+
+/**
+ * Allows modules to alter the product types defined by other modules.
+ *
+ * @param $product_types
+ *   The array of product types defined by enabled modules.
+ *
+ * @see hook_commerce_product_type_info()
+ */
+function hook_commerce_product_type_info_alter(&$product_types) {
+  // No example.
+}
+
+/**
  * Lets modules specify the path information expected by a uri callback.
  *
  * The Product module defines a uri callback for the product entity even though
