@@ -39,6 +39,15 @@ function commerce_hook_info() {
     'commerce_currency_info_alter' => array(
       'group' => 'commerce',
     ),
+    'commerce_entity_access' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_entity_access_condition_alter' => array(
+      'group' => 'commerce',
+    ),
+    'commerce_entity_create_alter' => array(
+      'group' => 'commerce',
+    ),
   );
 
   return $hooks;
