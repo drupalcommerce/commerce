@@ -108,6 +108,7 @@ function hook_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
  *   The entity metadata wrapper for the order being refreshed.
  *
  * @see commerce_cart_order_refresh()
+ * @see entity_metadata_wrapper()
  */
 function hook_commerce_cart_order_refresh($order_wrapper) {
   // No example.

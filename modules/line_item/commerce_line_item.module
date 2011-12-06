@@ -1392,7 +1392,7 @@ function commerce_line_items_quantity($line_items, $types = array()) {
  * @param $line_items
  *   The array of line items whose quantities you want to count; also accepts an
  *   EntityListWrapper of a line item reference field.
- * @param $type
+ * @param $types
  *   An array of line item types to filter by before totaling.
  *
  * @return
@@ -1450,7 +1450,7 @@ function commerce_line_items_total($line_items, $types = array()) {
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_wrapper);
     }
 
-    if (empty($type) || in_array($line_item_wrapper->type->value(), $types)) {
+    if (empty($types) || in_array($line_item_wrapper->type->value(), $types)) {
       $total += commerce_currency_convert(
         $line_item_wrapper->commerce_total->amount->value(),
         $line_item_wrapper->commerce_total->currency_code->value(),
