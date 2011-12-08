@@ -226,7 +226,7 @@ function commerce_line_item_unit_price_divide($line_item, $amount, $component_na
     // Calculate the updated amount and create a price array representing the
     // difference between it and the current amount.
     $current_amount = $unit_price['amount'];
-    $updated_amount = commerce_round($current_amount / $amount);
+    $updated_amount = commerce_round($round_mode, $current_amount / $amount);
 
     $difference = array(
       'amount' => $updated_amount - $current_amount,
