@@ -506,7 +506,7 @@ function commerce_currency_format($amount, $currency_code, $object = NULL, $conv
   $currency = commerce_currency_load($currency_code);
 
   // Then convert the price amount to the currency's major unit decimal value.
-  if ($convert = TRUE) {
+  if ($convert == TRUE) {
     $amount = commerce_currency_amount_to_decimal($amount, $currency_code);
   }
 
