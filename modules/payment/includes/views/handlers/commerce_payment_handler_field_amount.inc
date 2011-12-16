@@ -46,7 +46,7 @@ class commerce_payment_handler_field_amount extends views_handler_field {
 
     switch ($this->options['display_format']) {
       case 'formatted':
-        return commerce_currency_format($value, $currency_code, NULL, FALSE);
+        return commerce_currency_format($value, $currency_code);
 
       case 'raw':
         // First load the full currency array.
