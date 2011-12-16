@@ -28,7 +28,7 @@ function commerce_ui_menu() {
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('access administration pages'),
     'type' => MENU_NORMAL_ITEM,
-    'weight' => 10,
+    'weight' => 50,
     'file path' => drupal_get_path('module', 'system'),
     'file' => 'system.admin.inc',
   );
