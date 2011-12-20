@@ -1068,7 +1068,6 @@ function commerce_customer_field_widget_error($element, $error) {
 function commerce_customer_profile_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
   $property['options list'] = 'entity_metadata_field_options_list';
-  unset($property['query callback']);
 }
 
 /**

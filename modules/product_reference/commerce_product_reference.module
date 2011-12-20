@@ -1118,29 +1118,6 @@ function commerce_product_reference_commerce_product_can_delete($product) {
  * @see commerce_product_reference_field_info().
  */
 function commerce_product_reference_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
-  $name = $field['field_name'];
-  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
-
-  $property['type'] = ($field['cardinality'] != 1) ? 'list<commerce_product>' : 'commerce_product';
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
   $property['options list'] = 'entity_metadata_field_options_list';
-  $property['getter callback'] = 'entity_metadata_field_property_get';
-  $property['setter callback'] = 'entity_metadata_field_property_set';
-  $property['property info'] = commerce_product_reference_field_data_property_info();
-
-  unset($property['query callback']);
-}
-
-/**
- * Defines info for the properties of the Product reference field data structure.
- */
-function commerce_product_reference_field_data_property_info($name = NULL) {
-  return array(
-    'product_id' => array(
-      'label' => t('Product ID'),
-      'description' => t('The ID of the referenced product.'),
-      'type' => 'integer',
-      'getter callback' => 'entity_property_verbatim_get',
-      'setter callback' => 'entity_property_verbatim_set',
-    ),
-  );
 }
