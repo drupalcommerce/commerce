@@ -388,52 +388,54 @@ function commerce_currency_load($currency_code = NULL) {
  */
 function commerce_currencies($enabled = FALSE, $reset = FALSE) {
   global $language;
+  $currencies = &drupal_static(__FUNCTION__);
 
-  // Attempt to load currency data from the cache first.
-  if (!$reset && $currencies = cache_get('commerce_currencies:' . $language->language)) {
-    $currencies = $currencies->data;
-  }
-  else {
-    // Establish some default values for currencies.
-    $defaults = array(
-      'symbol' => '',
-      'minor_unit' => '',
-      'decimals' => 2,
-      'rounding_step' => 0,
-      'thousands_separator' => ',',
-      'decimal_separator' => '.',
-      'symbol_placement' => '',
-      'symbol_spacer' => ' ',
-      'code_placement' => 'after',
-      'code_spacer' => ' ',
-      'format_callback' => '',
-      'conversion_callback' => '',
-      'conversion_rate' => 1,
-    );
+  // If there is no static cache for currencies yet or a reset was specified...
+  if (!isset($currencies) || $reset) {
+    // First attempt to load currency data from the cache if we simply didn't
+    // have it statically cached and a reset hasn't been specified.
+    if (!$reset && $currencies_cached = cache_get('commerce_currencies:' . $language->language)) {
+      $currencies['all'] = $currencies_cached->data;
+    }
+    else {
+      // Otherwise we'll load currency definitions afresh from enabled modules.
+      // Begin by establishing some default values for currencies.
+      $defaults = array(
+        'symbol' => '',
+        'minor_unit' => '',
+        'decimals' => 2,
+        'rounding_step' => 0,
+        'thousands_separator' => ',',
+        'decimal_separator' => '.',
+        'symbol_placement' => '',
+        'symbol_spacer' => ' ',
+        'code_placement' => 'after',
+        'code_spacer' => ' ',
+        'format_callback' => '',
+        'conversion_callback' => '',
+        'conversion_rate' => 1,
+      );
 
-    // Include the currency file and invoke the currency info hook.
-    module_load_include('inc', 'commerce', 'includes/commerce.currency');
-    $currencies = module_invoke_all('commerce_currency_info');
-    drupal_alter('commerce_currency_info', $currencies);
+      // Include the currency file and invoke the currency info hook.
+      module_load_include('inc', 'commerce', 'includes/commerce.currency');
+      $currencies['all'] = module_invoke_all('commerce_currency_info');
+      drupal_alter('commerce_currency_info', $currencies['all']);
 
-    // Add default values if they don't exist and convert to objects.
-    foreach ($currencies as $currency_code => $currency) {
-      $currencies[$currency_code] = array_merge($defaults, $currency);
+      // Add default values if they don't exist.
+      foreach ($currencies['all'] as $currency_code => $currency) {
+        $currencies['all'][$currency_code] = array_merge($defaults, $currency);
+      }
+
+      cache_set('commerce_currencies:' . $language->language, $currencies['all']);
     }
 
-    cache_set('commerce_currencies:' . $language->language, $currencies);
-  }
-
-  // Return only enabled currencies if specified.
-  if ($enabled) {
     // Form an array of enabled currencies based on the variable set by the
     // checkboxes element on the currency settings form.
     $enabled_currencies = array_diff(array_values(variable_get('commerce_enabled_currencies', array('USD' => 'USD'))), array(0));
-
-    return array_intersect_key($currencies, drupal_map_assoc($enabled_currencies));
+    $currencies['enabled'] = array_intersect_key($currencies['all'], drupal_map_assoc($enabled_currencies));
   }
 
-  return $currencies;
+  return $enabled ? $currencies['enabled'] : $currencies['all'];
 }
 
 /**
