@@ -772,9 +772,16 @@ function commerce_cart_order_refresh($order) {
 
     // If the line item is a product line item...
     if (in_array($cloned_line_item->type, commerce_product_line_item_types())) {
-      // Load the product unchanged from the database so any existing price
-      // adjustments aren't duplicated in this line item.
-      $product = entity_load_unchanged('commerce_product', $line_item_wrapper->commerce_product->product_id->value());
+      $product = $line_item_wrapper->commerce_product->value();
+
+      // If this price has already been calculated, reset it to its original
+      // value so it can be recalculated afresh in the current context.
+      if (isset($product->commerce_price[LANGUAGE_NONE][0]['original'])) {
+        $original = $product->commerce_price[LANGUAGE_NONE][0]['original'];
+        foreach ($product->commerce_price as $langcode => $value) {
+          $product->commerce_price[$langcode] = array(0 => $original);
+        }
+      }
 
       // Repopulate the line item array with the default values for the product
       // as though it had not been added to the cart yet, but preserve the
