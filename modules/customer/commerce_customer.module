@@ -690,7 +690,7 @@ function commerce_customer_field_info() {
       'settings' => array('profile_type' => 'billing'),
       'instance_settings' => array(),
       'default_widget' => 'options_select',
-      'default_formatter' => 'commerce_customer_profile_reference_view',
+      'default_formatter' => 'commerce_customer_profile_reference_display',
       'property_type' => 'commerce_customer_profile',
       'property_callbacks' => array('commerce_customer_profile_property_info_callback'),
     ),
