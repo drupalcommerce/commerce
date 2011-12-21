@@ -37,10 +37,10 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
     ->fields('commerce_calculated_price', array('created'))
     ->condition('module', 'commerce_product_pricing')
     ->condition('entity_type', 'commerce_product')
-    ->condition('field_name', 'commerce_price')
-    ->execute();
+    ->condition('field_name', 'commerce_price');
 
-  $count = $query->rowCount();
+  $count_query = clone($query);
+  $count = $count_query->countQuery()->execute()->fetchField();
 
   // If there are rows in the table or price pre-calculation is enabled, show
   // the management fieldset with its action buttons.
@@ -53,7 +53,7 @@ function commerce_product_pre_calculation_settings_form($form, &$form_state) {
 
     // If there are prices, add the timestamp for the last calculation.
     if ($count > 0) {
-      $description .= ' ' . t('The last calculation occured on @date.', array('@date' => format_date($query->fetchField(), 'short')));
+      $description .= ' ' . t('The last calculation occured on @date.', array('@date' => format_date($query->execute()->fetchField(), 'short')));
     }
 
     $form['database'] = array(

@@ -511,12 +511,21 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     // deleted.
     $this->pass(t('Product type has at least one product, test the validation messages:'));
     $this->assertTitle(t('Cannot delete the !name product type', array('!name' => $product_types['product']['name'])) . ' | Drupal', t('Validation title of the page displayed correctly.'));
+
     // Get the count of products of the type
-    $count = db_query("SELECT product_id FROM {commerce_product} WHERE type = :product_type", array(':product_type' => $product_types['product']['type']))->rowCount();
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'commerce_product', '=')
+      ->entityCondition('bundle', $product_types['product']['type'], '=')
+      ->count();
+
+    $count = $query->execute();
+
     $message = format_plural($count,
       'There is 1 product of this type. It cannot be deleted.',
       'There are @count products of this type. It cannot be deleted.'
     );
+
     $this->assertText($message, t('Display the reason why the product type cannot be deleted and show the number of products related to it'));
   }
 

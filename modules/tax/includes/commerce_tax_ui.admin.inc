@@ -481,8 +481,16 @@ function commerce_tax_ui_tax_type_delete_form_wrapper($tax_type) {
   }
 
   // Don't allow deletion of tax types that have tax rates.
-  if (($count = db_query("SELECT name FROM {commerce_tax_rate} WHERE type = :tax_type", array(':tax_type' => $tax_type['name']))->rowCount()) > 0) {
+  $query = db_select('commerce_tax_rate')
+    ->condition('type', $tax_type['name'])
+    ->countQuery()
+    ->execute();
+
+  $count = $query->fetchField();
+
+  if ($count > 0) {
     drupal_set_title(t('Cannot delete the %title tax type', array('%title' => $tax_type['title'])), PASS_THROUGH);
+
     return format_plural($count,
       'There is a tax rate of this type. It cannot be deleted.',
       'There are @count tax rates of this type. It cannot be deleted.'
