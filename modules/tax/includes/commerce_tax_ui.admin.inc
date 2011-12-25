@@ -86,7 +86,7 @@ function theme_tax_rate_admin_overview($variables) {
 
   // Build the actual output.
   $output = check_plain($tax_rate['title']);
-  $output .= ' <small> (Machine name: ' . check_plain($tax_rate['name']) . ')</small>';
+  $output .= ' <small>' . t('(Machine name: @type)', array('@type' => $tax_rate['name'])) . '</small>';
   $output .= '<div class="description">' . implode('<br />', $description) . '</div>';
 
   return $output;
@@ -105,7 +105,7 @@ function theme_tax_type_admin_overview($variables) {
   $tax_type = $variables['tax_type'];
 
   $output = check_plain($tax_type['title']);
-  $output .= ' <small> (Machine name: ' . check_plain($tax_type['name']) . ')</small>';
+  $output .= ' <small>' . t('(Machine name: @type)', array('@type' => $tax_type['name'])) . '</small>';
   $output .= '<div class="description">' . filter_xss_admin($tax_type['description']) . '</div>';
 
   return $output;

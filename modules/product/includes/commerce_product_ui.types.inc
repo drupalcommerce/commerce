@@ -57,7 +57,7 @@ function theme_product_type_admin_overview($variables) {
   $product_type = $variables['product_type'];
 
   $output = check_plain($product_type['name']);
-  $output .= ' <small> (Machine name: ' . check_plain($product_type['type']) . ')</small>';
+  $output .= ' <small>' . t('(Machine name: @type)', array('@type' => $product_type['type'])) . '</small>';
   $output .= '<div class="description">' . filter_xss_admin($product_type['description']) . '</div>';
 
   return $output;
