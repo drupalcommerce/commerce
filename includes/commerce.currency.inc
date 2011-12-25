@@ -615,6 +615,18 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Cent'),
       'major_unit' => t('Dollar'),
     ),
+    'KZT' => array(
+      'code' => 'KZT',
+      'symbol' => 'тг.',
+      'name' => t('Kazakhstani tenge'),
+      'numeric_code' => '398',
+      'thousands_separator' => ' ',
+      'decimal_separator' => ',',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'minor_unit' => t('Tiyn'),
+      'major_unit' => t('Tenge'),
+    ),
     'LAK' => array(
       'code' => 'LAK',
       'symbol' => '₭N',
