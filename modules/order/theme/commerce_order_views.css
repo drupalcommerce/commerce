@@ -3,3 +3,12 @@
   text-transform: lowercase;
   margin-left: 0;
 }
+
+#commerce-order-ui-redirect-form .form-item {
+  float: left;
+  margin-right: 2em;
+}
+
+#commerce-order-ui-redirect-form .form-submit {
+  margin-top: 1.8em;
+}

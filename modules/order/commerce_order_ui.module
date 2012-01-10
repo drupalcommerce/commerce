@@ -336,3 +336,121 @@ function commerce_order_ui_form_entity_translation_admin_form_alter(&$form, &$fo
   // Hide the commerce_order option from entity translation.
   unset($form['entity_translation_entity_types']['#options']['commerce_order']);
 }
+
+/**
+ * Builds a form to redirect to an order's view page.
+ *
+ * @param $redirect_page
+ *   The page to redirect to, either 'admin', 'customer', or 'select' to add a
+ *   widget to the form so the user can specify which page they want.
+ * @param $identifier
+ *   The identifier to use to determine which order should be viewed; either
+ *   'order_number' (the default), 'order_id', or 'select'.
+ */
+function commerce_order_ui_redirect_form($form, &$form_state, $redirect_page = 'admin', $identifier = 'order_number') {
+  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_order') . '/theme/commerce_order_views.css';
+
+  if ($identifier == 'select') {
+    $form['identifier'] = array(
+      '#type' => 'select',
+      '#title' => t('Specify order by', array(), array('context' => 'a drupal commerce order')),
+      '#options' => array(
+        'order_number' => t('Order number', array(), array('context' => 'a drupal commerce order')),
+        'order_id' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
+      ),
+      '#default_value' => 'order_number',
+    );
+
+    $order_title = t('Order', array(), array('context' => 'a drupal commerce order'));
+  }
+  else {
+    $form['identifier'] = array(
+       '#type' => 'value',
+       '#value' => $identifier,
+    );
+
+    if ($identifier == 'order_number') {
+      $order_title = t('Order number', array(), array('context' => 'a drupal commerce order'));
+    }
+    else {
+      $order_title = t('Order ID', array(), array('context' => 'a drupal commerce order'));
+    }
+  }
+
+  $form['order_identifier'] = array(
+    '#type' => 'textfield',
+    '#title' => $order_title,
+    '#size' => 16,
+  );
+
+  $form['order'] = array(
+    '#type' => 'value',
+    '#value' => NULL,
+  );
+
+  if ($redirect_page == 'select') {
+    $form['redirect_page'] = array(
+      '#type' => 'select',
+      '#title' => t('Redirect page'),
+      '#options' => array(
+        'admin' => t('Admin view page'),
+        'customer' => t('Customer view page'),
+      ),
+      '#default_value' => 'admin',
+    );
+  }
+  else {
+    $form['redirect_page'] = array(
+      '#type' => 'value',
+      '#value' => $redirect_page,
+    );
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('View order'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validate callback: ensure a valid order was specified for viewing.
+ */
+function commerce_order_ui_redirect_form_validate($form, &$form_state) {
+  $order = FALSE;
+
+  // Attempt to load the specified order.
+  if ($form_state['values']['identifier'] == 'order_number') {
+    $order = commerce_order_load_by_number($form_state['values']['order_identifier']);
+  }
+  elseif ($form_state['values']['identifier'] == 'order_id') {
+    $order = commerce_order_load($form_state['values']['order_identifier']);
+  }
+
+  // If the order could not be loaded by ID or number or the user does not have
+  // view access for the order, throw an error.
+  if (empty($order) || !commerce_order_access('view', $order)) {
+    form_set_error('order', t('You have specified an invalid order.'));
+  }
+  else {
+    // If all's clear, store the order in the form state.
+    form_set_value($form['order'], $order, $form_state);
+  }
+}
+
+/**
+ * Submit callback: redirect to the appropriate page for the specified order.
+ */
+function commerce_order_ui_redirect_form_submit($form, &$form_state) {
+  // Extract the order from the form state.
+  $order = $form_state['values']['order'];
+
+  // Redirect to either the admin or customer view page as specified.
+  if ($form_state['values']['redirect_page'] == 'admin') {
+    $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id;
+  }
+  elseif ($form_state['values']['redirect_page'] == 'customer') {
+    $form_state['redirect'] = 'user/' . $order->uid . '/orders/' . $order->order_id;
+  }
+}

@@ -11,5 +11,8 @@ dependencies[] = views
 core = 7.x
 configure = admin/commerce/config/order
 
+; Views handlers
+files[] = includes/views/handlers/commerce_order_ui_handler_area_view_order_form.inc
+
 ; Simple tests
 files[] = tests/commerce_order_ui.test
