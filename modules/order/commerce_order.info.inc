@@ -61,6 +61,14 @@ function commerce_order_entity_property_info() {
     'setter permission' => 'administer commerce_order entities',
     'schema field' => 'changed',
   );
+  $properties['hostname'] = array(
+    'type' => 'text',
+    'label' => t('Host name'),
+    'description' => t('The IP address that created this order.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'setter permission' => 'administer commerce_order entities',
+    'schema field' => 'hostname',
+  );
   $properties['type'] = array(
     'type' => 'text',
     'label' => t('Type'),

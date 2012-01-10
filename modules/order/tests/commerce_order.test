@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * Unit tests for the commerce order module.
+ */
+
+/**
+ * Test the order and order type CRUD.
+ */
+class CommerceOrderCRUDTestCase extends CommerceBaseTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Order CRUD',
+      'description' => 'Test the order CRUD functions.',
+      'group' => 'Drupal Commerce',
+    );
+  }
+
+  function setUp() {
+    $modules = parent::setUpHelper('all');
+    parent::setUp($modules);
+
+    $this->site_admin = $this->createSiteAdmin();
+    cache_clear_all(); // Just in case
+  }
+
+  /**
+   * Test the order CRUD functions.
+   */
+  function testCommerceOrderCrud() {
+    // Ensure commerce_order_new() returns a new order.
+    $new_order = commerce_order_new(1);;
+    $fields = array('type', 'status', 'uid');
+    foreach ($fields as $field) {
+      $this->assertNotNull($new_order->{$field}, 'commerce_order_new() instantiated the ' . check_plain($field) . ' property.');
+    }
+
+    $new_order->order_number = $order_number = $this->randomName(10);
+    $new_order->mail = $this->generateEmail();
+    $new_order->hostname = $this->randomName(10);
+
+    // Ensure commerce_order_save() returns SAVED_NEW when saving a new order
+    $return = commerce_order_save($new_order);
+    $this->assertIdentical($return, SAVED_NEW, 'commerce_order_save() successfully saved the new order.');
+
+    // Ensure commerce_order_load() loaded the saved order.
+    $loaded_order = commerce_order_load($new_order->order_id);
+    foreach ($fields as $field) {
+      $this->assertEqual($loaded_order->{$field}, $new_order->{$field}, 'The ' . check_plain($field) . ' value loaded by commerce_order_load() matches the value saved by commerce_order_save()');
+    }
+
+    $this->assertTrue($loaded_order->created > 0, 'commerce_order_save() added a created date to the order');
+    $this->assertTrue($loaded_order->changed > 0, 'commerce_order_save() added a changed date to the order');
+
+    // Ensure commerce_order_save() returns SAVED_UPDATED when saving an existing order.
+    $loaded_order->uid = 0;
+    $return = commerce_order_save($loaded_order);
+    $this->assertIdentical($return, SAVED_UPDATED, 'commerce_order_save() successfully updated the order.');
+
+    // Ensure commerce_order_load_by_sku() can load an order by order number.
+    $loaded_order_by_number = commerce_order_load_by_number($order_number);
+    $this->assertEqual($loaded_order_by_number->order_id, $new_order->order_id, 'The ID of the order loaded via commerce_order_load_by_sku() matches the saved order ID.');
+
+    // Ensure commerce_order_load_multiple() can load multiple multiple orders.
+    $saved_order_ids = array();
+
+    // First create and save multiple new orders.
+    for ($i = 0; $i < 3; $i++) {
+      $order = commerce_order_new(1);
+      $order->order_number = $this->randomName(10);
+      $order->mail = $this->generateEmail();
+      $order->hostname = $this->randomName(10);
+      commerce_order_save($order);
+
+      // Save the ID and order number of the newly created order.
+      $saved_orders[$order->order_id] = $order->order_number;
+    }
+
+    $loaded_orders = commerce_order_load_multiple(array_keys($saved_orders));
+    $this->assertEqual(count($saved_orders), count($loaded_orders), 'commerce_order_load_multiple() loaded the proper number of the orders.');
+    foreach ($loaded_orders as $loaded_order) {
+      $this->assertEqual($loaded_order->order_number, $saved_orders[$loaded_order->order_id], 'commerce_order_load_multiple() successfully loaded a order.');
+    }
+
+    // Ensure commerce_order_delete() can remove a order.
+    $return = commerce_order_delete($new_order->order_id);
+    $this->assertTrue($return, 'commerce_order_delete() returned TRUE when deleting a order.');
+    $deleted_order_load = commerce_order_load_multiple(array($new_order->order_id), array(), TRUE);
+    $this->assertFalse($deleted_order_load, 'commerce_order_load_multiple() could not load the deleted order.');
+
+    // Ensure commerce_order_delete_multiple() can delete multiple orders.
+    $return = commerce_order_delete_multiple(array_keys($saved_orders));
+    $this->assertTrue($return, 'commerce_order_delete_multiple() returned TRUE when deleting a order.');
+    $deleted_orders_load = commerce_order_load_multiple(array_keys($saved_orders), array(), TRUE);
+    $this->assertFalse($deleted_order_load, 'commerce_order_load_multiple() could not load the deleted orders.');
+  }
+
+  /**
+   * Test order Token replacement.
+   */
+  function testCommerceOrderTokens() {
+    $creator = $this->drupalCreateUser();
+    $order = commerce_order_new($creator->uid);
+
+    $order->mail = $this->generateEmail();
+    $order->order_number = $this->randomName(10);
+    $order->hostname = $this->randomName(10);
+    commerce_order_save($order);
+
+    $this->assertEqual(token_replace('[commerce-order:order-id]', array('commerce-order' => $order)), $order->order_id, '[commerce-order:order-id] was replaced with the order ID.');
+    $this->assertEqual(token_replace('[commerce-order:mail]', array('commerce-order' => $order)), $order->mail, '[commerce-order:mail] was replaced with the mail.');
+    $this->assertEqual(token_replace('[commerce-order:hostname]', array('commerce-order' => $order)), $order->hostname, '[commerce-order:hostname] was replaced with the hostname.');
+    $this->assertEqual(token_replace('[commerce-order:type]', array('commerce-order' => $order)), $order->type, '[commerce-order:type] was replaced with the order type.');
+    $this->assertEqual(token_replace('[commerce-order:type-name]', array('commerce-order' => $order)), commerce_order_type_get_name($order->type), '[commerce-order:type-name] was replaced with the order type.');
+    $this->assertEqual(token_replace('[commerce-order:order-number]', array('commerce-order' => $order)), $order->order_number, '[commerce-order:order-number] was replaced with the order number.');
+    $this->assertNotIdentical(strpos(token_replace('[commerce-order:edit-url]', array('commerce-order' => $order)), url('admin/commerce/orders/' . $order->order_id . '/edit')), FALSE, '[commerce-order:edit-url] was replaced with the edit URL.');
+    $this->assertEqual(token_replace('[commerce-order:owner:uid]', array('commerce-order' => $order)), $order->uid, '[commerce-order:owner:uid] was replaced with the uid of the owner.');
+    $this->assertEqual(token_replace('[commerce-order:owner:name]', array('commerce-order' => $order)), check_plain(format_username($creator)), '[commerce-order:owner:name] was replaced with the name of the owner.');
+    $this->assertEqual(token_replace('[commerce-order:created]', array('commerce-order' => $order)), format_date($order->created, 'medium'), '[commerce-order:created] was replaced with the created date.');
+    $this->assertEqual(token_replace('[commerce-order:changed]', array('commerce-order' => $order)), format_date($order->changed, 'medium'), '[commerce-order:changed] was replaced with the changed date.');
+  }
+}

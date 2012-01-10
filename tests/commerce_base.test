@@ -657,6 +657,19 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Generate a random valid email
+   *
+   * @param string $type
+   *  Domain type
+   *
+   * @return string
+   *  Valid email
+   */
+  protected function generateEmail($type = 'com'){
+    return $this->randomName() . '@' . $this->randomName() . '.' . $type;
+  }
+
+  /**
    * Assertions for Drupal Commerce.
    */
 
