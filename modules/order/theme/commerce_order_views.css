@@ -6,7 +6,7 @@
 
 #commerce-order-ui-redirect-form .form-item {
   float: left;
-  margin-right: 2em;
+  margin: 0 2em 0 0;
 }
 
 #commerce-order-ui-redirect-form .form-submit {
