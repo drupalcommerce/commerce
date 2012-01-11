@@ -90,7 +90,7 @@ function commerce_line_item_ui_form_alter(&$form, &$form_state, $form_id) {
       // Load the line item type being modified for this form.
       $line_item_type = commerce_line_item_type_load($form['#bundle']);
 
-      drupal_set_title(check_plain($line_item_type['name']));
+      drupal_set_title($line_item_type['name']);
     }
   }
 }

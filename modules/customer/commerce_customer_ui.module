@@ -279,7 +279,7 @@ function commerce_customer_ui_form_alter(&$form, &$form_state, $form_id) {
       // Load the customer profile type being modified for this form.
       $profile_type = commerce_customer_profile_type_load($form['#bundle']);
 
-      drupal_set_title(check_plain($profile_type['name']));
+      drupal_set_title($profile_type['name']);
 
       commerce_customer_ui_set_breadcrumb(TRUE);
     }
