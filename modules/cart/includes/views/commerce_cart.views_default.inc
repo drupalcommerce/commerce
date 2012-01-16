@@ -18,7 +18,7 @@ function commerce_cart_views_default_views() {
   $view->base_table = 'commerce_order';
   $view->human_name = 'Shopping cart form';
   $view->core = 0;
-  $view->api_version = '3.0-alpha1';
+  $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
@@ -251,7 +251,6 @@ function commerce_cart_views_default_views() {
     t('Asc'),
     t('Desc'),
     t('Cart summary'),
-    t('Cart actions'),
     t('Line Item'),
     t('Product'),
     t('[commerce_display_path]'),
@@ -272,7 +271,7 @@ function commerce_cart_views_default_views() {
   $view->base_table = 'commerce_order';
   $view->human_name = 'Shopping cart block';
   $view->core = 0;
-  $view->api_version = '3.0-alpha1';
+  $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
@@ -475,7 +474,7 @@ function commerce_cart_views_default_views() {
   $view->base_table = 'commerce_order';
   $view->human_name = 'Shopping cart summary';
   $view->core = 0;
-  $view->api_version = '3.0-alpha1';
+  $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Defaults */
@@ -683,7 +682,40 @@ function commerce_cart_views_default_views() {
  * view.
  */
 function commerce_cart_views_default_views_alter(&$views) {
-  if(isset($views['commerce_orders'])) {
+  if (isset($views['commerce_orders'])) {
     $views['commerce_orders']->display['default']->display_options['filters']['state']['value']['cart'] = 'cart';
+    $views['commerce_orders']->display['default']->display_options['filters']['state']['value']['checkout'] = 'checkout';
+
+    /* Display: Shopping carts */
+    $handler = $views['commerce_orders']->new_display('page', 'Shopping carts', 'shopping_carts');
+    $handler->display->display_options['defaults']['title'] = FALSE;
+    $handler->display->display_options['title'] = 'Shopping carts';
+    $handler->display->display_options['defaults']['empty'] = FALSE;
+    /* No results behavior: Global: Text area */
+    $handler->display->display_options['empty']['text']['id'] = 'text';
+    $handler->display->display_options['empty']['text']['table'] = 'views';
+    $handler->display->display_options['empty']['text']['field'] = 'area';
+    $handler->display->display_options['empty']['text']['empty'] = FALSE;
+    $handler->display->display_options['empty']['text']['content'] = 'There are currently no shopping cart orders.';
+    $handler->display->display_options['empty']['text']['format'] = 'plain_text';
+    $handler->display->display_options['empty']['text']['tokenize'] = 0;
+    $handler->display->display_options['defaults']['filters'] = FALSE;
+    /* Filter criterion: Commerce Order: Order state */
+    $handler->display->display_options['filters']['state']['id'] = 'state';
+    $handler->display->display_options['filters']['state']['table'] = 'commerce_order';
+    $handler->display->display_options['filters']['state']['field'] = 'state';
+    $handler->display->display_options['filters']['state']['value'] = array(
+      'cart' => 'cart',
+      'checkout' => 'checkout',
+    );
+    $handler->display->display_options['filters']['state']['expose']['label'] = 'Order state';
+    $handler->display->display_options['filters']['state']['expose']['use_operator'] = 1;
+    $handler->display->display_options['filters']['state']['expose']['operator'] = 'state_op';
+    $handler->display->display_options['filters']['state']['expose']['identifier'] = 'state';
+    $handler->display->display_options['filters']['state']['expose']['reduce'] = 0;
+    $handler->display->display_options['path'] = 'admin/commerce/orders/carts';
+    $handler->display->display_options['menu']['type'] = 'tab';
+    $handler->display->display_options['menu']['title'] = 'Shopping carts';
+    $handler->display->display_options['menu']['weight'] = '0';
   }
 }
