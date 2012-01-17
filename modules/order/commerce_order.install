@@ -86,6 +86,9 @@ function commerce_order_schema() {
       'order_number' => array('order_number'),
       'revision_id' => array('revision_id'),
     ),
+    'indexes' => array(
+      'uid' => array('uid'),
+    ),
     'foreign keys' => array(
       'current_revision' => array(
         'table' => 'commerce_order_revision',
@@ -408,4 +411,17 @@ function commerce_order_update_7106() {
   }
 
   return t('All roles that had the <em>Administer orders</em> permission now also have the new <em>Configure order settings</em> permission.');
+}
+
+/**
+ * Add an index to the commerce_order table on uid.
+ */
+function commerce_order_update_7107() {
+  if (db_index_exists('commerce_order', 'uid')) {
+    db_drop_index('commerce_order', 'uid');
+  }
+
+  db_add_index('commerce_order', 'uid', array('uid'));
+
+  return t('Database index added to the uid column of the commerce_order table.');
 }

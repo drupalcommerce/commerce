@@ -129,6 +129,8 @@ function commerce_payment_schema() {
     ),
     'indexes' => array(
       'payment_method' => array('payment_method'),
+      'uid' => array('uid'),
+      'order_id' => array('order_id'),
     ),
     'foreign keys' => array(
       'payment_transaction_revision' => array(
@@ -259,4 +261,22 @@ function commerce_payment_update_7100() {
   }
 
   db_add_index('commerce_payment_transaction_revision', 'transaction_id', array('transaction_id'));
+}
+
+/**
+ * Add indexes to the commerce_payment_transaction table on order_id and uid.
+ */
+function commerce_payment_update_7101() {
+  if (db_index_exists('commerce_payment_transaction', 'uid')) {
+    db_drop_index('commerce_payment_transaction', 'uid');
+  }
+
+  if (db_index_exists('commerce_payment_transaction', 'order_id')) {
+    db_drop_index('commerce_payment_transaction', 'order_id');
+  }
+
+  db_add_index('commerce_payment_transaction', 'uid', array('uid'));
+  db_add_index('commerce_payment_transaction', 'order_id', array('order_id'));
+
+  return t('Database indexes added to the uid and order_id columns of the commerce_payment_transaction table.');
 }

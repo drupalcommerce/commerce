@@ -79,6 +79,7 @@ function commerce_product_schema() {
     'primary key' => array('product_id'),
     'indexes' => array(
       'product_type' => array('type'),
+      'uid' => array('uid'),
     ),
     'unique keys' => array(
       'sku' => array('sku'),
@@ -134,4 +135,17 @@ function commerce_product_update_7101() {
   commerce_update_rename_permissions($map);
 
   return t('Role and custom View permissions updated for product entity management. Access checks in modules and permissions on default Views must be updated manually.');
+}
+
+/**
+ * Add an index to the commerce_product table on uid.
+ */
+function commerce_product_update_7102() {
+  if (db_index_exists('commerce_product', 'uid')) {
+    db_drop_index('commerce_product', 'uid');
+  }
+
+  db_add_index('commerce_product', 'uid', array('uid'));
+
+  return t('Database index added to the uid column of the commerce_product table.');
 }
