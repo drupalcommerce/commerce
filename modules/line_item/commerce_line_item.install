@@ -63,6 +63,16 @@ function commerce_line_item_schema() {
       ),
     ),
     'primary key' => array('line_item_id'),
+    'indexes' => array(
+      'order_id' => array('order_id'),
+      'line_item_type' => array('type'),
+    ),
+    'foreign keys' => array(
+      'order_id' => array(
+        'table' => 'commerce_order',
+        'columns'=> array('order_id' => 'order_id'),
+      ),
+    ),
   );
 
   return $schema;
@@ -162,4 +172,26 @@ function _commerce_line_item_update_rule_round_mode($rule) {
     $rule->settings['round_mode'] = COMMERCE_ROUND_HALF_UP;
     $rule->save();
   }
+}
+
+/**
+ * Add indexes to the commerce_line_item table on order_id and type.
+ */
+function commerce_line_item_update_7101() {
+  if (db_index_exists('commerce_line_item', 'order_id')) {
+    db_drop_index('commerce_line_item', 'order_id');
+  }
+
+  if (db_index_exists('commerce_line_item', 'type')) {
+    db_drop_index('commerce_line_item', 'type');
+  }
+
+  if (db_index_exists('commerce_line_item', 'line_item_type')) {
+    db_drop_index('commerce_line_item', 'line_item_type');
+  }
+
+  db_add_index('commerce_line_item', 'order_id', array('order_id'));
+  db_add_index('commerce_line_item', 'line_item_type', array('type'));
+
+  return t('Database indexes added to the order_id and type columns of the commerce_line_item table.');
 }
