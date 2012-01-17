@@ -511,9 +511,11 @@ function commerce_cart_commerce_order_load($orders) {
   $refreshed = &drupal_static(__FUNCTION__, array());
 
   foreach ($orders as $order) {
-    // Refresh only if this order hasn't been refreshed already.
+    // Refresh only if this order object represents the latest revision of a
+    // shopping cart order and it hasn't been refreshed already.
     if (!isset($refreshed[$order->order_id]) &&
-      commerce_cart_order_is_cart($order)) {
+      commerce_cart_order_is_cart($order) &&
+      commerce_order_is_latest_revision($order)) {
       // Refresh the order and add its ID to the refreshed array.
       $refreshed[$order->order_id] = TRUE;
       commerce_cart_order_refresh($order);

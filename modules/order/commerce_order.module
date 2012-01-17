@@ -754,8 +754,10 @@ function commerce_order_load_by_number($order_number) {
  * @param $order_ids
  *   An array of order IDs.
  * @param $conditions
- *   An array of conditions on the {commerce_order} table in the form
- *     'field' => $value.
+ *   An array of conditions to filter loaded orders by on the {commerce_order}
+ *   table in the form 'field' => $value. Specifying a revision_id will load the
+ *   requested revision of the order identified either by a similar condition or
+ *   the $order_ids array assuming the revision_id is valid for the order_id.
  * @param $reset
  *   Whether to reset the internal order loading cache.
  *
@@ -764,6 +766,28 @@ function commerce_order_load_by_number($order_number) {
  */
 function commerce_order_load_multiple($order_ids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('commerce_order', $order_ids, $conditions, $reset);
+}
+
+/**
+ * Determines whether or not the given order object represents the latest
+ * revision of the order.
+ *
+ * @param $order
+ *   A fully loaded order object.
+ *
+ * @return
+ *   Boolean indicating whether or not the order object represents the latest
+ *   revision of the order.
+ */
+function commerce_order_is_latest_revision($order) {
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'commerce_order', '=')
+    ->propertyCondition('order_id', $order->order_id, '=')
+    ->propertyCondition('revision_id', $order->revision_id, '=');
+  $result = $query->execute();
+
+  return (!empty($result)) ? TRUE : FALSE;
 }
 
 /**
