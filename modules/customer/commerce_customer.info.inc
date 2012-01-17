@@ -16,13 +16,13 @@ function commerce_customer_entity_property_info() {
 
   $properties['profile_id'] = array(
     'label' => t('Profile ID'),
-    'description' => t('The internal numeric ID of the profile.'),
+    'description' => t('The internal numeric ID of the customer profile.'),
     'type' => 'integer',
     'schema field' => 'profile_id',
   );
   $properties['type'] = array(
     'label' => t('Type'),
-    'description' => t('The type of the profile.'),
+    'description' => t('The type of the customer profile.'),
     'type' => 'token',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_customer_profile entities',
@@ -51,7 +51,7 @@ function commerce_customer_entity_property_info() {
   );
   $properties['status'] = array(
     'label' => t('Status'),
-    'description' => t('Whether the profile is active.'),
+    'description' => t('Whether or not the customer profile is active.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_customer_profile entities',
     'type' => 'boolean',
@@ -59,7 +59,7 @@ function commerce_customer_entity_property_info() {
   );
   $properties['created'] = array(
     'label' => t('Date created'),
-    'description' => t('The date the product was created.'),
+    'description' => t('The date the customer profile was created.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_customer_profile entities',
@@ -67,7 +67,7 @@ function commerce_customer_entity_property_info() {
   );
   $properties['changed'] = array(
     'label' => t('Date updated'),
-    'description' => t('The date the product was last updated.'),
+    'description' => t('The date the customer profile was last updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_customer_profile entities',

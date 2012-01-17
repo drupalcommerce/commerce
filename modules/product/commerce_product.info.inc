@@ -63,20 +63,13 @@ function commerce_product_entity_property_info() {
     'schema field' => 'created',
   );
   $properties['changed'] = array(
-    'label' => t('Date changed'),
-    'description' => t('The date the product was most recently updated.'),
-    'type' => 'date',
-    'setter callback' => 'entity_property_verbatim_set',
-    'setter permission' => 'administer commerce_product entities',
-    'schema field' => 'changed',
-  );
-  $properties['changed'] = array(
     'label' => t('Date updated'),
-    'description' => t('The date the product was changed.'),
+    'description' => t('The date the product was most recently updated.'),
     'type' => 'date',
     'setter callback' => 'entity_property_verbatim_set',
     'query callback' => 'entity_metadata_table_query',
     'setter permission' => 'administer commerce_product entities',
+    'schema field' => 'changed',
   );
   $properties['uid'] = array(
     'label' => t("Creator ID"),
