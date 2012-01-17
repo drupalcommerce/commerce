@@ -65,6 +65,11 @@ function commerce_customer_schema() {
     'unique keys' => array(
       'revision_id' => array('revision_id'),
     ),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'customer_profile_type' => array('type'),
+      'uid_by_type' => array('uid', 'customer_profile_type'),
+    ),
     'foreign keys' => array(
       'customer_profile_revision' => array(
         'table' => 'commerce_customer_profile_revision',
@@ -213,4 +218,35 @@ function commerce_customer_update_7100() {
   }
 
   db_add_index('commerce_customer_profile_revision', 'profile_id', array('profile_id'));
+}
+
+/**
+ * Add indexes to the commerce_customer_profile table on uid, type, and both together.
+ */
+function commerce_customer_update_7101() {
+  if (db_index_exists('commerce_customer_profile', 'uid')) {
+    db_drop_index('commerce_customer_profile', 'uid');
+  }
+
+  if (db_index_exists('commerce_customer_profile', 'type')) {
+    db_drop_index('commerce_customer_profile', 'type');
+  }
+
+  if (db_index_exists('commerce_customer_profile', 'customer_profile_type')) {
+    db_drop_index('commerce_customer_profile', 'type');
+  }
+
+  if (db_index_exists('commerce_customer_profile', 'idx_type_uid')) {
+    db_drop_index('commerce_customer_profile', 'idx_type_uid');
+  }
+
+  if (db_index_exists('commerce_customer_profile', 'uid_by_type')) {
+    db_drop_index('commerce_customer_profile', 'uid_by_type');
+  }
+
+  db_add_index('commerce_customer_profile', 'uid', array('uid'));
+  db_add_index('commerce_customer_profile', 'customer_profile_type', array('type'));
+  db_add_index('commerce_customer_profile', 'uid_by_type', array('uid', 'type'));
+
+  return t('Database indexes added to the uid and type columns of the commerce_customer_profile table.');
 }
