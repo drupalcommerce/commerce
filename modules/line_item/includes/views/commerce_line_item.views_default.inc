@@ -246,6 +246,11 @@ function commerce_line_item_views_default_views() {
   $handler->display->display_options['arguments']['line_item_id']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['line_item_id']['break_phrase'] = 1;
   $handler->display->display_options['arguments']['line_item_id']['not'] = 0;
+  /* Filter criterion: Commerce Line Item: Line item is of a product line item type */
+  $handler->display->display_options['filters']['product_line_item_type']['id'] = 'product_line_item_type';
+  $handler->display->display_options['filters']['product_line_item_type']['table'] = 'commerce_line_item';
+  $handler->display->display_options['filters']['product_line_item_type']['field'] = 'product_line_item_type';
+  $handler->display->display_options['filters']['product_line_item_type']['value'] = '1';
   $translatables['commerce_line_item_table'] = array(
     t('Defaults'),
     t('more'),
