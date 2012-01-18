@@ -68,7 +68,7 @@ function commerce_customer_schema() {
     'indexes' => array(
       'uid' => array('uid'),
       'customer_profile_type' => array('type'),
-      'uid_by_type' => array('uid', 'customer_profile_type'),
+      'uid_by_type' => array('uid', 'type'),
     ),
     'foreign keys' => array(
       'customer_profile_revision' => array(
