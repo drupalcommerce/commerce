@@ -462,7 +462,7 @@ function commerce_tax_field_attach_load($entity_type, $entities, $age, $options)
         $field = field_info_field($instance['field_name']);
 
         // If the instance is of a price field...
-        if ($field['type'] == 'commerce_price') {
+        if ($field['type'] == 'commerce_price' && !empty($product->{$field_name})) {
           // Check to see if the product has specified an included tax.
           foreach ($product->{$field_name} as $langcode => $items) {
             foreach ($items as $delta => $item) {
