@@ -851,7 +851,7 @@ function commerce_order_access($op, $order = NULL, $account = NULL) {
 /**
  * Implementation of hook_query_commerce_order_access_alter().
  */
-function commerce_product_query_commerce_order_access_alter(QueryAlterableInterface $query) {
+function commerce_order_query_commerce_order_access_alter(QueryAlterableInterface $query) {
   commerce_entity_access_query_alter($query, 'commerce_order');
 }
 
