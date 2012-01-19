@@ -582,6 +582,13 @@ function commerce_cart_order_id($uid = 0) {
   foreach (module_implements('commerce_cart_order_id') as $module) {
     $order_id = module_invoke($module, 'commerce_cart_order_id', $uid);
 
+    // If a hook said the user should not have a cart, that overrides any other
+    // potentially valid order ID. Return FALSE now.
+    if ($order_id === FALSE) {
+      return FALSE;
+    }
+
+    // Otherwise only return a valid order ID.
     if (!empty($order_id) && is_int($order_id)) {
       return $order_id;
     }

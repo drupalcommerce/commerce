@@ -10,11 +10,20 @@
  * Allows modules to return a shopping cart order ID for a user before the Cart
  * module determines it using its default queries.
  *
+ * Implementations of this hook are executed one at a time, meaning the first
+ * implementation to return a non-NULL value will determine the current cart
+ * order ID for the given user. Acceptable values will be either FALSE to
+ * indicate that the user should not be considered to have a valid cart order or
+ * an order ID to use besides the ID that would be returned by the default
+ * queries in the Cart module.
+ *
  * @param $uid
  *   The uid of the user whose shopping cart order ID should be returned.
  *
  * @return
- *   The order ID or nothing if the function did not find one.
+ * The order ID (if a valid cart was found), FALSE (if the user should have no
+ * current cart), or NULL (if the implementation cannot tell if the user has a
+ * cart or not).
  */
 function hook_commerce_cart_order_id($uid) {
   // No example.
