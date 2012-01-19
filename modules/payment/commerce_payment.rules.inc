@@ -33,7 +33,7 @@ function commerce_payment_rules_event_info() {
     'label' => t('When an order is first paid in full'),
     'group' => t('Commerce Payment'),
     'variables' => $variables,
-    'access callback' => 'commerce_payment_rules_access',
+    'access callback' => 'commerce_order_rules_access',
   );
 
   return $events;
