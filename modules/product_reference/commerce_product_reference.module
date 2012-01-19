@@ -788,8 +788,9 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
   // hook_entity_info(), as field_read_instances() calls entity_get_info().
   $query = db_select('field_config_instance', 'fci', array('fetch' => PDO::FETCH_ASSOC));
   $query->join('field_config', 'fc', 'fc.id = fci.field_id');
-  $query->fields('fci');
+  $query->fields('fci', array('entity_type'));
   $query->condition('fc.type', 'commerce_product_reference');
+  $query->distinct();
 
   foreach ($query->execute() as $instance) {
     $entity_type = $instance['entity_type'];
