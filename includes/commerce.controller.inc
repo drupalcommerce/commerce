@@ -15,12 +15,19 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
   protected $controllerTransaction = NULL;
 
   /**
+   * Stores the ids of locked entities, necessary for knowing when to release a
+   * lock by committing the transaction.
+   */
+  protected $lockedEntities = array();
+
+  /**
    * Override of DrupalDefaultEntityController::buildQuery().
    *
    * Handle pessimistic locking.
    */
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
+
     if (isset($this->entityInfo['locking mode']) && $this->entityInfo['locking mode'] == 'pessimistic') {
       // In pessimistic locking mode, we issue the load query with a FOR UPDATE
       // clause. This will block all other load queries to the loaded objects
@@ -30,6 +37,10 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       }
 
       $query->forUpdate();
+
+      // Store the ids of the entities in the lockedEntities array for later
+      // tracking, flipped for easier management via unset() below.
+      $this->lockedEntities += array_flip($ids);
     }
 
     return $query;
@@ -37,12 +48,36 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
 
   public function resetCache(array $ids = NULL) {
     parent::resetCache($ids);
-    if (empty($this->entityCache) && !empty($this->controllerTransaction)) {
-      // If we don't have any entity in our local cache anymore, we commit the
-      // transaction so as to remove the locks we acquired.
-      // This will not commit the translation directly. Drupal will commit
-      // it as soon as possible given the state of the transaction stack.
-      unset($this->controllerTransaction);
+
+    // Maintain the list of locked entities, so that the releaseLock() method
+    // can know when it's time to commit the transaction.
+    if (!empty($this->lockedEntities)) {
+      if (isset($ids)) {
+        foreach ($ids as $id) {
+          unset($this->lockedEntities[$id]);
+        }
+      }
+      else {
+        $this->lockedEntities = array();
+      }
+    }
+
+    // Try to release the lock, if possible.
+    $this->releaseLock();
+  }
+
+  /**
+   * Checks the list of tracked locked entities, and if it's empty, commits
+   * the transaction in order to remove the acquired locks.
+   *
+   * The transaction is not necessarily committed immediately. Drupal will
+   * commit it as soon as possible given the state of the transaction stack.
+   */
+  protected function releaseLock() {
+    if (isset($this->entityInfo['locking mode']) && $this->entityInfo['locking mode'] == 'pessimistic') {
+      if (empty($this->lockedEntities)) {
+        unset($this->controllerTransaction);
+      }
     }
   }
 
@@ -194,8 +229,15 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
         ->execute();
       }
 
-      $this->resetCache(array($entity->{$this->idKey}));
       $this->invoke($op, $entity);
+
+      // Update the static cache so that the next entity_load() will return this
+      // newly saved entity.
+      $this->entityCache[$entity->{$this->idKey}] = $entity;
+
+      // Maintain the list of locked entities and release the lock if possible.
+      unset($this->lockedEntities[$entity->{$this->idKey}]);
+      $this->releaseLock();
 
       // Ignore slave server temporarily.
       db_ignore_slave();

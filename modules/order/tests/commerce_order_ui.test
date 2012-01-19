@@ -147,13 +147,13 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Reload the order directly from db.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
 
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
 
     // Check if the product has been added to the order.
-    foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
+    foreach (entity_metadata_wrapper('commerce_order', reset($order))->commerce_line_items as $delta => $line_item_wrapper) {
        if ($line_item_wrapper->type->value() == 'product') {
          $product = $line_item_wrapper->commerce_product->value();
          $products[$product->product_id]= $product;

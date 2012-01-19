@@ -296,7 +296,8 @@ class CommerceProductUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array(), t('Delete'));
 
     // Check for the product in database.
-    $this->assertFalse(commerce_product_load($product->product_id), t('After deleting it, the product is no more in database'));
+    $deleted_product = commerce_product_load_multiple(array($product->product_id), array(), TRUE);
+    $this->assertFalse(reset($deleted_product), t('After deleting it, the product is no more in database'));
 
     $this->assertTrue($this->url == url('admin/commerce/products', array('absolute' => TRUE)), t('Landing page after deleting a product is the product listing page'));
 

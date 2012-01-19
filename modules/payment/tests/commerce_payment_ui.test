@@ -165,12 +165,12 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, $post_data, t('Save'));
 
     // Reload the order.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
 
     // Check order balance, it should be half of total now.
-    $new_balance = commerce_payment_order_balance($order);
+    $new_balance = commerce_payment_order_balance(reset($order));
     $this->assertEqual($new_balance['amount'], $balance['amount'] - $payment_amount, t('After half payment order balance is correct'));
     $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($payment_amount, $post_data['currency_code']) . '</td>', t('Total paid reflects the payment'));
     $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format($new_balance['amount'], $new_balance['currency_code']) . '</td>', t('Order balance is displayed correctly'));
@@ -189,10 +189,10 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, $post_data, t('Save'));
 
     // Reload the order.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $order = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
 
     // Check order balance, it should be zero now.
-    $new_balance = commerce_payment_order_balance($order);
+    $new_balance = commerce_payment_order_balance(reset($order));
     $this->assertEqual($new_balance['amount'], 0, t('Order balance is now zero'));
     $this->assertRaw('<td class="label">' . t('Total paid') . '</td><td class="total">' . commerce_currency_format($balance['amount'], $balance['currency_code']) . '</td>', t('Total paid is now equal to order total'));
     $this->assertRaw('<td class="label">' . t('Order balance') . '</td><td class="balance">' . commerce_currency_format(0, $new_balance['currency_code']) . '</td>', t('Balance is displayed as zero'));
