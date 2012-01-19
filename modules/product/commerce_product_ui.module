@@ -23,8 +23,8 @@ function commerce_product_ui_menu() {
   );
   foreach (commerce_product_types() as $type => $product_type) {
     $items['admin/commerce/products/add/' . strtr($type, array('_' => '-'))] = array(
-      'title' => 'Create @name',
-      'title arguments' => array('@name' => $product_type['name']),
+      'title' => 'Create !name',
+      'title arguments' => array('!name' => $product_type['name']),
       'description' => $product_type['description'],
       'page callback' => 'commerce_product_ui_product_form_wrapper',
       'page arguments' => array(commerce_product_new($type)),
