@@ -1749,9 +1749,15 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
             $options = array();
 
             foreach ($matching_products as $product_id => $product) {
-              $options[$product_id] = check_plain($product->title);
+              $options[$product_id] = $product->title;
             }
 
+            // Note that this element by default is a select list, so its
+            // #options are not sanitized here. Sanitization will occur in a
+            // check_plain() in the function form_select_options(). If you alter
+            // this element to another #type, such as 'radios', you are also
+            // responsible for looping over its #options array and sanitizing
+            // the values.
             $form['attributes']['product_select'] = array(
               '#type' => 'select',
               '#title' => t('Select a product'),
@@ -1777,9 +1783,14 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
         $options = array();
 
         foreach ($products as $product_id => $product) {
-          $options[$product_id] = check_plain($product->title);
+          $options[$product_id] = $product->title;
         }
 
+        // Note that this element by default is a select list, so its #options
+        // are not sanitized here. Sanitization will occur in a check_plain() in
+        // the function form_select_options(). If you alter this element to
+        // another #type, such as 'radios', you are also responsible for looping
+        // over its #options array and sanitizing the values.
         $form['product_id'] = array(
           '#type' => 'select',
           '#options' => $options,
