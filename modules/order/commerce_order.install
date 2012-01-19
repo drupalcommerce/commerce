@@ -19,13 +19,13 @@ function commerce_order_schema() {
         'description' => 'The order number displayed to the customer.',
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
       'revision_id' => array(
         'description' => 'The current {commerce_order_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
+        'not null' => FALSE,
         'default' => 0,
       ),
       'type' => array(
@@ -115,7 +115,7 @@ function commerce_order_schema() {
         'description' => 'The order number displayed to the customer for this revision.',
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
       'revision_id' => array(
         'description' => 'The primary identifier for this revision.',
@@ -424,4 +424,36 @@ function commerce_order_update_7107() {
   db_add_index('commerce_order', 'uid', array('uid'));
 
   return t('Database index added to the uid column of the commerce_order table.');
+}
+
+/**
+ * Allow NULL values for order_number and revision_id on {commerce_order}, and
+ * order_number on {commerce_order_revision}.
+ */
+function commerce_order_update_7108() {
+  $order_number_spec = array(
+    'description' => 'The order number displayed to the customer.',
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+  );
+  $revision_id_spec = array(
+    'description' => 'The current {commerce_order_revision}.revision_id version identifier.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+    'default' => 0,
+  );
+  $order_number_revision_spec = array(
+    'description' => 'The order number displayed to the customer for this revision.',
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+  );
+
+  db_change_field('commerce_order', 'order_number', 'order_number', $order_number_spec);
+  db_change_field('commerce_order', 'revision_id', 'revision_id', $revision_id_spec);
+  db_change_field('commerce_order_revision', 'order_number', 'order_number', $order_number_revision_spec);
+
+  return t('Schema for the commerce_order and commerce_order_revision tables has been updated.');
 }

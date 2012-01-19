@@ -22,9 +22,9 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'order_id' => '',
-      'order_number' => '',
-      'revision_id' => '',
+      'order_id' => NULL,
+      'order_number' => NULL,
+      'revision_id' => NULL,
       'uid' => '',
       'mail' => ( !empty($values['uid']) && ($account = user_load($values['uid'])) ) ? $account->mail : '',
       'data' => array(),
