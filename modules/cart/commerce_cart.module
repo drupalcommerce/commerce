@@ -654,9 +654,20 @@ function commerce_cart_order_is_cart($order) {
   $is_cart = in_array($order->status, array_keys(commerce_order_statuses(array('cart' => TRUE))));
 
   // Allow other modules to make the judgment based on some other criteria.
-  if (in_array(FALSE, module_invoke_all('commerce_cart_order_is_cart', $order, $is_cart))) {
-    $is_cart = FALSE;
+  foreach (module_implements('commerce_cart_order_is_cart') as $module) {
+    $function = $module . '_commerce_cart_order_is_cart';
+
+    // As of Drupal Commerce 1.2, $is_cart should be accepted by reference and
+    // manipulated directly, but we still check for a return value to preserve
+    // backward compatibility with the hook. In future versions, we will
+    // deprecate hook_commerce_cart_order_is_cart() and force modules to update
+    // to hook_commerce_cart_order_is_cart_alter().
+    if ($function($order, $is_cart) === FALSE) {
+      $is_cart = FALSE;
+    }
   }
+
+  drupal_alter('commerce_cart_order_is_cart', $is_cart, $order);
 
   return $is_cart;
 }

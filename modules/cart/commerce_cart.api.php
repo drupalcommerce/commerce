@@ -41,9 +41,28 @@ function hook_commerce_cart_order_id($uid) {
  * @return
  *   FALSE to indicate that an order should not be treated as a cart.
  *
+ * @deprecated since 7.x-1.2, use hook_commerce_cart_order_is_cart_alter() instead.
  * @see commerce_cart_order_is_cart()
+ * @see hook_commerce_cart_order_is_cart_alter()
  */
-function hook_commerce_cart_order_is_cart($order, $is_cart) {
+function hook_commerce_cart_order_is_cart($order, &$is_cart) {
+  // No example.
+}
+
+/**
+ * Alter the cart status of an order.
+ *
+ * When determining if an order should be considered a shopping cart order, the
+ * Cart module provides a simple order status comparison but allows other
+ * modules to make the decision based on some other criteria.
+ *
+ * @param $is_cart
+ *   Boolean indicating whether or not the order should be considered a cart
+ *   order; initialized based on the order status.
+ * @param $order
+ *   The order whose cart status is being determined.
+ */
+function hook_commerce_cart_order_is_cart_alter(&$is_cart, $order) {
   // No example.
 }
 
