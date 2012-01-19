@@ -42,6 +42,11 @@ function commerce_product_reference_field_extra_fields() {
         // display" tabs. Otherwise these extra fields will not appear.
         $product_fields = commerce_product_field_extra_fields();
 
+        // Prevent notices if there are no product types defined.
+        if (empty($product_fields['commerce_product'])) {
+          continue;
+        }
+
         foreach ($product_fields['commerce_product'] as $key => $value) {
           foreach ($value['display'] as $product_extra_field_name => $product_extra_field) {
             $product_extra_field['label'] = t('Product: @label', array('@label' => $product_extra_field['label']));
@@ -88,6 +93,11 @@ function commerce_product_reference_field_extra_fields_display_alter(&$displays,
 
   // Loop over the extra fields defined by the Product module.
   $product_fields = commerce_product_field_extra_fields();
+
+  // Prevent notices if there are no product types defined.
+  if (empty($product_fields['commerce_product'])) {
+    return;
+  }
 
   foreach ($product_fields['commerce_product'] as $key => $value) {
     foreach ($value['display'] as $product_extra_field_name => $product_extra_field) {
