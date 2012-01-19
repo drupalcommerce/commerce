@@ -344,8 +344,12 @@ function commerce_customer_commerce_checkout_pane_info() {
   $weight = 5;
 
   foreach (commerce_customer_profile_types() as $type => $profile_type) {
+    // Get instance data for the customer profile reference field.
+    $field_name = variable_get('commerce_customer_profile_' . $type . '_field', '');
+    $instance = field_info_instance('commerce_order', $field_name, 'commerce_order');
+
     $checkout_panes['customer_profile_' . $type] = array(
-      'title' => $profile_type['name'],
+      'title' => !empty($instance['label']) ? check_plain($instance['label']) : $profile_type['name'],
       'file' => 'includes/commerce_customer.checkout_pane.inc',
       'base' => 'commerce_customer_profile_pane',
       'page' => 'checkout',
