@@ -367,7 +367,7 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
 
     foreach (commerce_tax_rates() as $name => $tax_rate) {
       if (in_array($tax_rate['type'], array_keys($inclusive_types))) {
-        $options[$inclusive_types[$tax_rate['type']]][$name] = t('Including @title', array('@title' => $tax_rate['title']));
+        $options[$inclusive_types[$tax_rate['type']]][$name] = t('Including !title', array('!title' => $tax_rate['title']));
       }
     }
 
@@ -390,6 +390,12 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
 
             $form[$key][$form[$key]['#language']][$delta]['currency_code']['#title'] = '&nbsp;';
 
+            // Note that because this is a select element, the values in the
+            // #options array have not been sanitized. They will be passed
+            // through check_plain() in form_select_options() when this form
+            // element is processed. If you alter the type of this element to
+            // radios or checkboxes, you are responsible for sanitizing the
+            // values of the #options array as well.
             $form[$key][$form[$key]['#language']][$delta]['include_tax'] = array(
               '#type' => 'select',
               '#title' => t('Include tax in this price'),
