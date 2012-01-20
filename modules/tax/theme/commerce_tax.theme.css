@@ -1,4 +1,9 @@
 
+/**
+ * @file
+ * Basic styling for the Commerce Tax module.
+ */
+
 .field-type-commerce-price .form-item {
   float: left;
   margin-right: 1em;

@@ -117,7 +117,7 @@ function commerce_line_item_form_alter(&$form, &$form_state, $form_id) {
     return;
   }
 
-  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item_views_form.css';
+  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.theme.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'commerce_line_item') . '/commerce_line_item.js';
   $form['#submit'][] = 'commerce_line_item_line_item_views_form_submit';
 
@@ -220,7 +220,7 @@ function commerce_line_item_line_item_views_form_submit($form, &$form_state) {
  * Adds the necessary CSS for the line item summary template.
  */
 function template_preprocess_commerce_line_item_summary(&$variables) {
-  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item_summary.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.theme.css');
 }
 
 /**
@@ -1101,7 +1101,7 @@ function commerce_line_item_manager_refresh($form, $form_state) {
  * Themes the line item manager widget form element.
  */
 function theme_commerce_line_item_manager($variables) {
-  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.manager.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_line_item') . '/theme/commerce_line_item.admin.css');
 
   $form = $variables['form'];
   $rows = array();

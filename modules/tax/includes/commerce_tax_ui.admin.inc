@@ -10,7 +10,7 @@
  * Displays an overview of Tax UI defined tax rates.
  */
 function commerce_tax_ui_overview($type) {
-  drupal_add_css(drupal_get_path('module', 'commerce_tax_ui') . '/theme/commerce_tax_ui.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.admin.css');
 
   // Load the items that will be represented in the overview table.
   if ($type == 'rates') {

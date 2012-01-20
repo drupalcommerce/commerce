@@ -483,7 +483,7 @@ function commerce_cart_block_view($delta) {
       // If there are one or more products in the cart...
       if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
         // Theme the full cart block.
-        drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+        drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
 
         // Build the variables array to send to the cart block template.
         $variables = array(
@@ -1972,7 +1972,7 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
         $element = array(
           '#markup' => theme($product_extra_field['theme'], $variables),
           '#attached' => array(
-            'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.css'),
+            'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
           ),
           '#prefix' => '<div class="' . implode(' ', $classes) . '">',
           '#suffix' => '</div>',

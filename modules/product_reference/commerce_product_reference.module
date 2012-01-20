@@ -361,7 +361,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
             $entity->content['product:' . $product_extra_field_name] = array(
               '#markup' => theme($product_extra_field['theme'], $variables),
               '#attached' => array(
-                'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.css'),
+                'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
               ),
             );
 

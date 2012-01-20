@@ -1,4 +1,11 @@
 
+/**
+ * @file
+ * Administration styles for the Commerce Checkout module.
+ *
+ * Optimized for the Seven administration theme.
+ */
+
 #panes td.page {
   font-weight: bold;
 }

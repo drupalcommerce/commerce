@@ -9,7 +9,7 @@
  * Menu callback: display an overview of available types.
  */
 function commerce_product_ui_types_overview() {
-  drupal_add_css(drupal_get_path('module', 'commerce_product_ui') . '/theme/commerce_product_ui.types.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.admin.css');
 
   $header = array(
     t('Name'),

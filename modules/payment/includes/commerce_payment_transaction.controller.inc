@@ -190,7 +190,7 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
     $content['transaction_table'] = array(
       '#attached' => array(
         'css' => array(
-          drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css',
+          drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.admin.css',
         ),
       ),
       '#markup' => theme('table', array('rows' => $rows, 'attributes' => array('class' => array('payment-transaction')))),

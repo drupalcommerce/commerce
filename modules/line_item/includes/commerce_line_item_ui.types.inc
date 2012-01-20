@@ -4,7 +4,7 @@
  * Menu callback: display an overview of available types.
  */
 function commerce_line_item_ui_types_overview() {
-  drupal_add_css(drupal_get_path('module', 'commerce_line_item_ui') .'/theme/commerce_line_item_ui.types.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_line_item') .'/theme/commerce_line_item.admin.css');
 
   $header = array(
     t('Name'),

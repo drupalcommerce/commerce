@@ -9,7 +9,7 @@
  * Menu callback: display an overview of available types.
  */
 function commerce_customer_ui_customer_profile_types_overview() {
-  drupal_add_css(drupal_get_path('module', 'commerce_customer_ui') . '/theme/commerce_customer_ui.profile_types.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_customer') . '/theme/commerce_customer.admin.css');
 
   $header = array(
     t('Name'),

@@ -1,0 +1,47 @@
+
+/**
+ * @file
+ * Basic styling for the Commerce Line Item module.
+ */
+
+/**
+ * Theme the line item summary.
+ */
+.line-item-summary {
+  text-align: right;
+  margin-bottom: 1em;
+}
+
+.line-item-summary .line-item-quantity {
+  float: left;
+}
+
+.line-item-summary .line-item-total-label {
+  font-weight: bold;
+}
+
+.line-item-summary .links {
+  margin-top: .5em;
+  clear: left;
+}
+
+.line-item-summary .links li.last {
+  padding-right: 0;
+}
+
+/**
+ * Theme the line item views form, used on the cart page.
+ */
+.commerce-line-item-views-form input.delete-line-item {
+  font-size: 0.8em;
+  padding: 1px 6px;
+}
+
+.commerce-line-item-views-form .cart-subtotal {
+  text-align: right;
+  font-size: 1.5em;
+}
+
+.commerce-line-item-views-form .commerce-line-item-actions {
+  text-align: right;
+}

@@ -23,8 +23,7 @@ class commerce_payment_handler_field_payment_transaction_operations extends view
     $links = menu_contextual_links('commerce-payment-transaction', 'admin/commerce/orders/' . $order_id . '/payment', array($transaction_id));
 
     if (!empty($links)) {
-      drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.css');
-
+      drupal_add_css(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.admin.css');
       return theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline', 'operations'))));
     }
   }

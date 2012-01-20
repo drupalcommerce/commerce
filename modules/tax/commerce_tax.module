@@ -406,7 +406,7 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
               '#empty_value' => '',
               '#suffix' => '<div class="commerce-price-tax-included-clearfix"></div>',
               '#attached' => array(
-                'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.css'),
+                'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.theme.css'),
               ),
             );
           }

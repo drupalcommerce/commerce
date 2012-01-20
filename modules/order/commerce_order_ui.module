@@ -324,7 +324,7 @@ function commerce_order_ui_order_view($order, $view_mode = 'administrator', $bre
     commerce_order_ui_set_breadcrumb();
   }
 
-  drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_order') . '/theme/commerce_order.theme.css');
 
   return entity_view('commerce_order', array($order->order_id => $order), $view_mode, NULL, TRUE);
 }
@@ -348,7 +348,7 @@ function commerce_order_ui_form_entity_translation_admin_form_alter(&$form, &$fo
  *   'order_number' (the default), 'order_id', or 'select'.
  */
 function commerce_order_ui_redirect_form($form, &$form_state, $redirect_page = 'admin', $identifier = 'order_number') {
-  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_order') . '/theme/commerce_order_views.css';
+  $form['#attached']['css'][] = drupal_get_path('module', 'commerce_order') . '/theme/commerce_order.admin.css';
 
   if ($identifier == 'select') {
     $form['identifier'] = array(

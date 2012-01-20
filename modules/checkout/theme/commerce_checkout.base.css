@@ -1,0 +1,13 @@
+
+/**
+ * @file
+ * Generic base styles for the Commerce Checkout module.
+ *
+ * Handles styling needed by AJAX effects.
+ */
+
+.checkout-processing {
+  padding-right: 13px !important;
+  margin-right: 6px;
+  background: url(../images/status-active.gif) right center no-repeat;
+}

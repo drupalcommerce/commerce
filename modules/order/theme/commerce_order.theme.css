@@ -1,4 +1,9 @@
 
+/**
+ * @file
+ * Basic styling for the Commerce Order module.
+ */
+
 .field-name-commerce-order-total .commerce-price-formatted-components {
   width: 33%;
   margin-left: auto;

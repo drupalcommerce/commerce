@@ -150,7 +150,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
   public function buildContent($product, $view_mode = 'full', $langcode = NULL, $content = array()) {
     // Prepare a reusable array representing the CSS file to attach to the view.
     $attached = array(
-      'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.css'),
+      'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
     );
 
     // Add the default fields inherent to the product entity.

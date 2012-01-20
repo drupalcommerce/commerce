@@ -43,7 +43,7 @@ function commerce_cart_view() {
 
     // Only show the cart form if we found product line items.
     if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
-      drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.css');
+      drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
 
       // Add the form for editing the cart contents.
       $content = commerce_embed_view('commerce_cart_form', 'default', array($order->order_id), 'cart');

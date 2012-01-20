@@ -1,5 +1,17 @@
 
 /**
+ * @file
+ * Administration styles for the Commerce Payment module.
+ *
+ * Optimized for the Seven administration theme.
+ */
+
+.views-field-operations .links.operations {
+  text-transform: lowercase;
+  margin-left: 0;
+}
+
+/**
  * Add styles for administrative payment transaction displays.
  */
 .views-field-status img.pending {
@@ -32,11 +44,6 @@
 
 .add-payment .ajax-progress .message {
   display:none;
-}
-
-.views-field-operations .links.operations {
-  text-transform: lowercase;
-  margin-left: 0;
 }
 
 .payment-terminal {

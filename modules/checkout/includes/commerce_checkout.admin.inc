@@ -129,7 +129,7 @@ function commerce_checkout_builder_form_reset_submit($form, &$form_state) {
 function theme_commerce_checkout_builder_form($variables) {
   $form = $variables['form'];
 
-  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout_admin.css');
+  drupal_add_css(drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.admin.css');
   drupal_add_js(drupal_get_path('module', 'commerce_checkout') .'/commerce_checkout_admin.js');
 
   // Build the full table header; Page and Weight will be hidden by tabledrag.

@@ -1,0 +1,15 @@
+
+/**
+ * @file
+ * Administration styles for the Commerce Product module.
+ *
+ * Optimized for the Seven administration theme.
+ */
+
+.links.operations {
+  text-transform: lowercase;
+}
+
+.views-field-operations .links.operations {
+  margin-left: 0;
+}

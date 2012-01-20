@@ -1,10 +1,23 @@
 
-.view-commerce-cart-block tr {
-  vertical-align: top;
+/**
+ * @file
+ * Basic styling for the Commerce Cart module.
+ */
+
+/**
+ * Theme the cart block and cart summary.
+ */
+.view-commerce-cart-block .views-field-quantity {
+ white-space: nowrap;
 }
 
-.view-commerce-cart-block .views-field-quantity {
-  white-space: nowrap;
+.commerce-order-handler-area-order-total .commerce-price-formatted-components {
+ width: 33%;
+ margin-left: auto;
+}
+
+.view-commerce-cart-block tr {
+  vertical-align: top;
 }
 
 .view-commerce-cart-block td.price,
@@ -16,11 +29,6 @@
 .view-commerce-cart-form tr,
 .view-commerce-cart-summary tr {
   vertical-align: top;
-}
-
-.commerce-order-handler-area-order-total .commerce-price-formatted-components {
-  width: 33%;
-  margin-left: auto;
 }
 
 .commerce-order-handler-area-order-total .commerce-price-formatted-components tr.component-type-commerce-price-formatted-amount {

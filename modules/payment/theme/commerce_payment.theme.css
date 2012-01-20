@@ -1,6 +1,11 @@
 
 /**
- * Add styles to credot card form elements.
+ * @file
+ * Basic styling for the Commerce Payment module.
+ */
+
+/**
+ * Add styles to credit card form elements.
  */
 .commerce-credit-card-start,
 .commerce-credit-card-expiration {

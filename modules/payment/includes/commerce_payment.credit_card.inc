@@ -36,7 +36,7 @@ function commerce_payment_credit_card_form($fields = array(), $default = array()
   $form['credit_card'] = array(
     '#tree' => TRUE,
     '#attached' => array(
-      'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.credit_card.css'),
+      'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.theme.css'),
     ),
   );
 

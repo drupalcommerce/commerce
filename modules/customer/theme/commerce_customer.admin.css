@@ -1,0 +1,11 @@
+
+/**
+ * @file
+ * Administration styles for the Commerce Customer module.
+ *
+ * Optimized for the Seven administration theme.
+ */
+
+.links.operations {
+  text-transform: lowercase;
+}
