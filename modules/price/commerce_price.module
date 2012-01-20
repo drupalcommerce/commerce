@@ -424,7 +424,7 @@ function commerce_price_field_formatter_view($entity_type, $entity, $field, $ins
 
           if (empty($components[$component['name']])) {
             $components[$component['name']] = array(
-              'title' => $component_type['display_title'],
+              'title' => check_plain($component_type['display_title']),
               'price' => commerce_price_component_total($item, $component['name']),
               'weight' => $component_type['weight'],
             );
