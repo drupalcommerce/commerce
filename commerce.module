@@ -54,6 +54,33 @@ function commerce_hook_info() {
 }
 
 /**
+ * Implements hook_system_info_alter().
+ *
+ * Drupal's Field module doesn't allow field type providing modules to be
+ * disabled while fields and instances of those types exist in the system.
+ * See http://drupal.org/node/943772 for further explanation.
+ *
+ * That approach doesn't work for Commerce, creating circular dependencies
+ * and making uninstall impossible. This function removes the requirement,
+ * allowing Commerce to implement its own workaround.
+ *
+ * @see commerce_delete_field()
+ */
+function commerce_system_info_alter(&$info, $file, $type) {
+  $modules = array(
+    'commerce_product_reference',
+    'commerce_price',
+    'commerce_customer',
+    'commerce_line_item',
+  );
+
+  if ($type == 'module' && in_array($file->name, $modules)) {
+    unset($info['required']);
+    unset($info['explanation']);
+  }
+}
+
+/**
  * Finds all fields of a particular field type.
  *
  * @param $field_type
@@ -212,6 +239,19 @@ function commerce_delete_instances($entity_type, $bundle = NULL) {
   // Read and delete the matching field instances.
   foreach (field_read_instances($params, array('include_inactive' => TRUE)) as $instance) {
     commerce_delete_instance($instance);
+  }
+
+  // Since this is a function called on uninstall, now is a good time
+  // to clear bundle display settings.
+  $settings = variable_get('field_bundle_settings', array());
+  if (isset($settings[$entity_type])) {
+    if (isset($bundle)) {
+      unset($settings[$entity_type][$bundle]);
+    }
+    else {
+      unset($settings[$entity_type]);
+    }
+    variable_set('field_bundle_settings', $settings);
   }
 }
 

@@ -192,6 +192,7 @@ function commerce_order_schema() {
  */
 function commerce_order_uninstall() {
   // Delete any field instance attached to an order type.
+  module_load_include('module', 'commerce');
   commerce_delete_instances('commerce_order');
 
   variable_del('commerce_order_help_text');

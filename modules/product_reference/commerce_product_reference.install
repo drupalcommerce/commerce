@@ -30,6 +30,7 @@ function commerce_product_reference_field_schema($field) {
  * Implements hook_uninstall().
  */
 function commerce_product_reference_uninstall() {
-  // Delete any product referencefields.
+  // Delete any product reference fields.
+  module_load_include('module', 'commerce');
   commerce_delete_fields('commerce_product_reference');
 }

@@ -108,6 +108,8 @@ function commerce_line_item_field_schema($field) {
  * Implements hook_uninstall().
  */
 function commerce_line_item_uninstall() {
+  module_load_include('module', 'commerce');
+
   // Delete any field instance attached to a line item type.
   commerce_delete_instances('commerce_line_item');
 

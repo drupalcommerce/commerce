@@ -100,6 +100,7 @@ function commerce_product_schema() {
  */
 function commerce_product_uninstall() {
   // Delete any field instance attached to a product type.
+  module_load_include('module', 'commerce');
   commerce_delete_instances('commerce_product');
 }
 

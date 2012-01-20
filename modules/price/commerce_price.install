@@ -131,5 +131,6 @@ function commerce_price_field_schema($field) {
  */
 function commerce_price_uninstall() {
   // Delete any price fields.
+  module_load_include('module', 'commerce');
   commerce_delete_fields('commerce_price');
 }
