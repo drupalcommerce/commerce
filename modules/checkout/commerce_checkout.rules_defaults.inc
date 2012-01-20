@@ -199,7 +199,7 @@ function commerce_checkout_default_rules_configuration() {
     ->action('mail', array(
       'to:select' => 'commerce-order:mail',
       'subject' => t('Order [commerce-order:order-number] at [site:name]'),
-      'message' => t("Thanks for your order [commerce-order:order-number] at [site:name].\n\nIf this is your first order with us, you will receive a separate e-mail with login instructions. You can view your order history with us at any time by logging into our website at:\n\n[site:login-url]\n\nYou can find the status of your current order at:\n\n[site:url]user/[commerce-order:uid]/orders/[commerce-order:order-id]\n\nPlease contact us if you have any questions about your order."),
+      'message' => t("Thanks for your order [commerce-order:order-number] at [site:name].\n\nIf this is your first order with us, you will receive a separate e-mail with login instructions. You can view your order history with us at any time by logging into our website at:\n\n[site:login-url]\n\nYou can find the status of your current order at:\n\n[commerce-order:customer-url]\n\nPlease contact us if you have any questions about your order."),
       'from' => '',
     ));
 

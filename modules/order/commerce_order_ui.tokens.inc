@@ -7,9 +7,18 @@
 function commerce_order_ui_token_info() {
   $order = array();
 
+  // @deprecated since 7.x-1.2; use [commerce-order:customer-url] instead.
   $order['url'] = array(
     'name' => t('URL'),
     'description' => t('The URL of the order.'),
+  );
+  $order['customer-url'] = array(
+    'name' => t('URL'),
+    'description' => t('The URL for customers to view the order.'),
+  );
+  $order['admin-url'] = array(
+    'name' => t('URL'),
+    'description' => t('The URL for administrators to view the order.'),
   );
   return array(
     'tokens' => array('commerce-order' => $order),
@@ -35,8 +44,15 @@ function commerce_order_ui_tokens($type, $tokens, array $data = array(), array $
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
+        // @deprecated since 7.x-1.2; use [commerce-order:customer-url] instead.
         case 'url':
           $replacements[$original] = url('user/' . $order->uid . '/orders/' . $order->order_id, $url_options);
+          break;
+        case 'customer-url':
+          $replacements[$original] = url('user/' . $order->uid . '/orders/' . $order->order_id, $url_options);
+          break;
+        case 'admin-url':
+          $replacements[$original] = url('admin/commerce/orders/' . $order->order_id);
           break;
       }
     }
