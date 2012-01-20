@@ -837,7 +837,7 @@ function commerce_line_item_field_formatter_settings_form($field, $instance, $vi
       // Only include line item Views.
       if ($view->base_table == 'commerce_line_item') {
          foreach ($view->display as $display_name => $display) {
-          $options[check_plain($name)][$name .'|'. $display_name] = check_plain($display->display_title);
+          $options[check_plain($name)][$name .'|'. $display_name] = $display->display_title;
         }
        }
      }
@@ -845,7 +845,7 @@ function commerce_line_item_field_formatter_settings_form($field, $instance, $vi
     $element['view'] = array(
       '#type' => 'select',
       '#title' => t('Order contents View'),
-      '#description' => t('Specify the View to use in the order contents pane.'),
+      '#description' => t('Specify the View to use to display the line items referenced by this field.'),
       '#options' => $options,
       '#default_value' => $settings['view'],
     );
