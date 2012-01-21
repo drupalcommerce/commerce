@@ -33,7 +33,6 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = 50;
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['group_rendered'] = 1;
   $handler->display->display_options['style_options']['columns'] = array(
     'order_number' => 'order_number',
     'created' => 'created',
@@ -95,18 +94,16 @@ function commerce_order_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
-  $handler->display->display_options['style_options']['empty_table'] = 0;
+  $handler->display->display_options['style_options']['empty_table'] = 1;
   /* Header: Global: View order form */
   $handler->display->display_options['header']['view_order_form']['id'] = 'view_order_form';
   $handler->display->display_options['header']['view_order_form']['table'] = 'views';
   $handler->display->display_options['header']['view_order_form']['field'] = 'view_order_form';
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['text']['id'] = 'text';
-  $handler->display->display_options['empty']['text']['table'] = 'views';
-  $handler->display->display_options['empty']['text']['field'] = 'area';
-  $handler->display->display_options['empty']['text']['empty'] = FALSE;
-  $handler->display->display_options['empty']['text']['content'] = 'No orders have been created yet.';
-  $handler->display->display_options['empty']['text']['format'] = 'plain_text';
+  /* No results behavior: Commerce Order: Empty text */
+  $handler->display->display_options['empty']['empty_text']['id'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['table'] = 'commerce_order';
+  $handler->display->display_options['empty']['empty_text']['field'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['add_path'] = 'admin/commerce/orders/add';
   /* Relationship: Commerce Order: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_order';
@@ -311,7 +308,6 @@ function commerce_order_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
-    t('No orders have been created yet.'),
     t('Order owner'),
     t('Customer profile'),
     t('Order number'),
@@ -353,7 +349,6 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = 25;
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['group_rendered'] = 1;
   $handler->display->display_options['style_options']['columns'] = array(
     'order_number' => 'order_number',
     'created' => 'created',

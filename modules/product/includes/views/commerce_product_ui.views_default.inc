@@ -36,7 +36,6 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = 50;
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['group_rendered'] = 1;
   $handler->display->display_options['style_options']['columns'] = array(
     'sku' => 'sku',
     'title' => 'title',
@@ -90,14 +89,12 @@ function commerce_product_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
-  $handler->display->display_options['style_options']['empty_table'] = 0;
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['text']['id'] = 'text';
-  $handler->display->display_options['empty']['text']['table'] = 'views';
-  $handler->display->display_options['empty']['text']['field'] = 'area';
-  $handler->display->display_options['empty']['text']['empty'] = FALSE;
-  $handler->display->display_options['empty']['text']['content'] = 'No products have been created yet.';
-  $handler->display->display_options['empty']['text']['format'] = 'plain_text';
+  $handler->display->display_options['style_options']['empty_table'] = 1;
+  /* No results behavior: Commerce Product: Empty text */
+  $handler->display->display_options['empty']['empty_text']['id'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['table'] = 'commerce_product';
+  $handler->display->display_options['empty']['empty_text']['field'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['add_path'] = 'admin/commerce/products/add';
   /* Field: Commerce Product: SKU */
   $handler->display->display_options['fields']['sku']['id'] = 'sku';
   $handler->display->display_options['fields']['sku']['table'] = 'commerce_product';
@@ -259,7 +256,6 @@ function commerce_product_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
-    t('No products have been created yet.'),
     t('SKU'),
     t('Title'),
     t('Type'),

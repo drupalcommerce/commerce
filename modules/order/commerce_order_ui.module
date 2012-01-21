@@ -236,6 +236,7 @@ function commerce_order_ui_forms($form_id, $args) {
 function commerce_order_ui_form_commerce_order_ui_order_form_alter(&$form, &$form_state) {
   // Add a submit handler to the save button to add a redirect.
   $form['actions']['submit']['#submit'][] = 'commerce_order_ui_order_form_submit';
+  $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/orders');
 }
 
 /**

@@ -253,5 +253,13 @@ function commerce_customer_views_data() {
     ),
   );
 
+  $data['commerce_customer_profile']['empty_text'] = array(
+    'title' => t('Empty text'),
+    'help' => t('Displays an appropriate empty text message for customer profile lists.'),
+    'area' => array(
+      'handler' => 'commerce_customer_handler_area_empty_text',
+    ),
+  );
+
   return $data;
 }

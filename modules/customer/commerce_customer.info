@@ -10,6 +10,7 @@ core = 7.x
 files[] = includes/commerce_customer_profile.controller.inc
 
 ; Views handlers
+files[] = includes/views/handlers/commerce_customer_handler_area_empty_text.inc
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile.inc
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link.inc
 files[] = includes/views/handlers/commerce_customer_handler_field_customer_profile_link_delete.inc

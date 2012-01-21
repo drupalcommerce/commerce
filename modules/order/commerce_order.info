@@ -16,6 +16,7 @@ files[] = includes/commerce_order.controller.inc
 files[] = includes/views/commerce_order.views.inc
 
 ; Views handlers
+files[] = includes/views/handlers/commerce_order_handler_area_empty_text.inc
 files[] = includes/views/handlers/commerce_order_handler_area_order_total.inc
 files[] = includes/views/handlers/commerce_order_handler_argument_order_order_id.inc
 files[] = includes/views/handlers/commerce_order_handler_field_order.inc

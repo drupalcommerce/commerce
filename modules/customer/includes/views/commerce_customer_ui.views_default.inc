@@ -38,7 +38,6 @@ function commerce_customer_ui_views_default_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['group_rendered'] = 1;
   $handler->display->display_options['style_options']['columns'] = array(
     'profile_id' => 'profile_id',
     'commerce_customer_address' => 'commerce_customer_address',
@@ -98,14 +97,12 @@ function commerce_customer_ui_views_default_views() {
   );
   $handler->display->display_options['style_options']['override'] = 1;
   $handler->display->display_options['style_options']['sticky'] = 0;
-  $handler->display->display_options['style_options']['empty_table'] = 0;
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['area']['id'] = 'area';
-  $handler->display->display_options['empty']['area']['table'] = 'views';
-  $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['empty'] = FALSE;
-  $handler->display->display_options['empty']['area']['content'] = 'No customer profiles have been created yet.';
-  $handler->display->display_options['empty']['area']['format'] = 'plain_text';
+  $handler->display->display_options['style_options']['empty_table'] = 1;
+  /* No results behavior: Commerce Customer Profile: Empty text */
+  $handler->display->display_options['empty']['empty_text']['id'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['table'] = 'commerce_customer_profile';
+  $handler->display->display_options['empty']['empty_text']['field'] = 'empty_text';
+  $handler->display->display_options['empty']['empty_text']['add_path'] = 'admin/commerce/customer-profiles/add';
   /* Relationship: Commerce Customer Profile: Owner */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'commerce_customer_profile';
@@ -291,7 +288,6 @@ function commerce_customer_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
-    t('No customer profiles have been created yet.'),
     t('Profile owner'),
     t('Profile ID'),
     t('Name'),
