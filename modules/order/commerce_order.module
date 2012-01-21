@@ -1437,3 +1437,37 @@ function commerce_order_entity_query_alter($query) {
     }
   }
 }
+
+/**
+ * Implements hook_preprocess_views_view().
+ *
+ * When the line item summary and order total area handlers are present on Views
+ * forms, it is natural for them to appear above the submit buttons that Views
+ * creates for the form. This hook checks for their existence in the footer area
+ * and moves them if necessary.
+ */
+function commerce_order_preprocess_views_view(&$vars) {
+  $view = $vars['view'];
+
+  // Determine if the line item summary or order total area handler is present
+  // on the View.
+  $has_handler = FALSE;
+
+  foreach ($view->footer as $area) {
+    if ($area instanceof commerce_line_item_handler_area_line_item_summary || $area instanceof commerce_order_handler_area_order_total) {
+      $has_handler = TRUE;
+    }
+  }
+
+  // If one of the handlers is present and the View in question is a form...
+  if ($has_handler && views_view_has_form_elements($view)) {
+    // Move the footer area into a row in the View positioned just above the
+    // form's submit buttons.
+    $vars['rows']['footer'] = array(
+      '#type' => 'markup',
+      '#markup' => $vars['footer'],
+      '#weight' => 99,
+    );
+    $vars['footer'] = '';
+  }
+}
