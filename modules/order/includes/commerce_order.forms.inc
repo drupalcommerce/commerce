@@ -204,6 +204,11 @@ function commerce_order_order_form_validate($form, &$form_state) {
     form_set_error('date', t('You have to specify a valid date.'));
   }
 
+  // Validate the e-mail address entered.
+  if (!empty($form_state['values']['mail']) && !valid_email_address($form_state['values']['mail'])) {
+    form_set_error('mail', t('You have specified an invalid e-mail address.'));
+  }
+
   // TODO: Pending token patterns for order numbers, validate the characters and
   // the final string for uniqueness.
 
