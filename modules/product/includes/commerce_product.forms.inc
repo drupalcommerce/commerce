@@ -171,7 +171,10 @@ function commerce_product_product_form_submit($form, &$form_state) {
     $product->uid = $user->uid;
   }
 
-  if ($form_state['values']['revision'] || !empty($form_state['values']['log'])) {
+  // Trigger a new revision if the checkbox was enabled or a log message supplied.
+  if ((user_access('administer commerce_product entities') && !empty($form_state['values']['revision'])) ||
+    (!user_access('administer commerce_product entities') && !empty($form['change_history']['revision']['#default_value'])) ||
+    !empty($form_state['values']['log'])) {
     $product->revision = TRUE;
     $product->log = $form_state['values']['log'];
   }
