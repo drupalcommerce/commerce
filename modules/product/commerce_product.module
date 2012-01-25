@@ -78,11 +78,13 @@ function commerce_product_entity_info() {
       'label' => t('Commerce Product'),
       'controller class' => 'CommerceProductEntityController',
       'base table' => 'commerce_product',
+      'revision table' => 'commerce_product_revision',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'product_id',
         'bundle' => 'type',
         'label' => 'title',
+        'revision' => 'revision_id',
       ),
       'bundle keys' => array(
         'bundle' => 'type',

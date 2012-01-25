@@ -26,6 +26,9 @@
  *   administrative lists and pages
  * - help: the translatable help text included at the top of the add / edit form
  *   for products of this type
+ * - revision: for product types governed by the Product UI module, this boolean
+ *   determines whether or not products of this type will default to creating
+ *   new revisions when edited
  * - module: the name of the module defining the product type; should not be set
  *   by the hook itself but will be set when all product types are loaded
  *

@@ -26,6 +26,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       'product_id' => '',
       'is_new' => TRUE,
       'sku' => '',
+      'revision_id' => NULL,
       'title' => '',
       'uid' => '',
       'status' => 1,
@@ -47,30 +48,53 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
    * @return
    *   SAVED_NEW or SAVED_UPDATED depending on the operation performed.
    */
-  public function save($entity, DatabaseTransaction $transaction = NULL) {
-    $transaction = isset($transaction) ? $transaction : db_transaction();
+  public function save($product, DatabaseTransaction $transaction = NULL) {
+    global $user;
 
     // Hardcode the changed time.
-    $entity->changed = REQUEST_TIME;
+    $product->changed = REQUEST_TIME;
 
-    if (empty($entity->{$this->idKey}) || !empty($entity->is_new)) {
+    if (empty($product->{$this->idKey}) || !empty($product->is_new)) {
       // Set the creation timestamp if not set, for new entities.
-      if (empty($entity->created)) {
-        $entity->created = REQUEST_TIME;
+      if (empty($product->created)) {
+        $product->created = REQUEST_TIME;
       }
+    }
+
+    $product->revision_timestamp = REQUEST_TIME;
+    $product->revision_uid = $user->uid;
+
+    // Determine if we will be inserting a new product.
+    $product->is_new = empty($product->product_id);
+
+    if ($product->is_new || !empty($product->revision)) {
+      // When inserting either a new product or revision, $entity->log must be set
+      // because {commerce_product_revision}.log is a text column and therefore
+      // cannot have a default value. However, it might not be set at this
+      // point, so we ensure that it is at least an empty string in that case.
+      if (!isset($product->log)) {
+        $product->log = '';
+      }
+    }
+    elseif (empty($product->log)) {
+      // If we are updating an existing product without adding a new revision,
+      // we need to make sure $entity->log is unset whenever it is empty. As
+      // long as $entity->log is unset, drupal_write_record() will not attempt
+      // to update the existing database column when re-saving the revision.
+      unset($product->log);
     }
 
     // Remove price components from any price fields attached to the product.
     // Default price components should instead be rebuilt each load using
     // hook_field_attach_load().
-    foreach (field_info_instances('commerce_product', $entity->type) as $field_name => $instance) {
+    foreach (field_info_instances('commerce_product', $product->type) as $field_name => $instance) {
       // Load the instance's field data.
       $field = field_info_field($instance['field_name']);
 
       // If the instance is a price field with data on this product...
-      if ($field['type'] == 'commerce_price' && !empty($entity->{$field_name})) {
+      if ($field['type'] == 'commerce_price' && !empty($product->{$field_name})) {
         // Remove the price components from every price value.
-        foreach ($entity->{$field_name} as $langcode => &$items) {
+        foreach ($product->{$field_name} as $langcode => &$items) {
           foreach ($items as $delta => &$item) {
             if (!empty($item['data'])) {
               $item['data']['components'] = array();
@@ -80,7 +104,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       }
     }
 
-    return parent::save($entity);
+    return parent::save($product, $transaction);
   }
 
   /**

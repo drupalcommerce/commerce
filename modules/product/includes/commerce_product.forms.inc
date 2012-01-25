@@ -57,6 +57,32 @@ function commerce_product_product_form($form, &$form_state, $product) {
     '#weight' => 35,
   );
 
+  // Load the product type to get the default revision setting.
+  $product_type = commerce_product_type_load($product->type);
+
+  $form['change_history'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Change history'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => 50,
+  );
+  if (!empty($product->product_id)) {
+    $form['change_history']['revision'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Create new revision on update'),
+      '#description' => t('If an update log message is entered, a revision will be created even if this is unchecked.'),
+      '#default_value' => $product_type['revision'],
+      '#access' => user_access('administer commerce_product entities'),
+    );
+  }
+  $form['change_history']['log'] = array(
+    '#type' => 'textarea',
+    '#title' => !empty($product->product_id) ? t('Update log message') : t('Creation log message'),
+    '#rows' => 4,
+    '#description' => t('Provide an explanation of the changes you are making. This will provide a meaningful history of changes to this product.'),
+  );
+
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
@@ -143,6 +169,11 @@ function commerce_product_product_form_submit($form, &$form_state) {
   // Set the product's uid if it's being created at this time.
   if (empty($product->product_id)) {
     $product->uid = $user->uid;
+  }
+
+  if ($form_state['values']['revision'] || !empty($form_state['values']['log'])) {
+    $product->revision = TRUE;
+    $product->log = $form_state['values']['log'];
   }
 
   // Notify field widgets.

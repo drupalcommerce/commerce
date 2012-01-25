@@ -196,6 +196,40 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $this->assertEqual(token_replace('[commerce-product:created]', array('commerce-product' => $product)), format_date($product->created, 'medium'), '[commerce-product:created] was replaced with the created date.');
     $this->assertEqual(token_replace('[commerce-product:changed]', array('commerce-product' => $product)), format_date($product->changed, 'medium'), '[commerce-product:changed] was replaced with the changed date.');
   }
+
+  /**
+   * Test product revision management.
+   */
+  function testCommerceProductRevisions() {
+    $new_product = commerce_product_new('product');
+
+    $new_product->sku = $this->randomName(10);
+    $new_product->type = 'product';
+    $new_product->title = $this->randomName(10);
+    $new_product->uid = 1;
+    commerce_product_save($new_product);
+
+    // Ensure commerce_product_save() returns an entity with the revision_id set.
+    $this->assertNotNull($new_product->revision_id, 'Revision id was created after first save.');
+
+    // Ensure that on update with the revision set to TRUE a new revision is
+    // created.
+    $old_revision_id = $new_product->revision_id;
+    $new_product->revision = TRUE;
+    $new_product->title = $this->randomName(10);
+    commerce_product_save($new_product);
+
+    $this->assertNotEqual($old_revision_id, $new_product->revision_id, 'New revision was created');
+
+    // Ensure that on update with the revision set to FALSE a new revision is
+    // not created.
+    $old_revision_id = $new_product->revision_id;
+    $new_product->revision = FALSE;
+    $new_product->title = $this->randomName(10);
+    commerce_product_save($new_product);
+
+    $this->assertEqual($old_revision_id, $new_product->revision_id, 'No new revision was created');
+  }
 }
 
 /**

@@ -316,6 +316,7 @@ function commerce_product_ui_product_type_new() {
     'name' => '',
     'description' => '',
     'help' => '',
+    'revision' => 1,
   );
 }
 

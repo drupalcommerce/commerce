@@ -50,9 +50,32 @@ function commerce_product_ui_schema() {
         'not null' => TRUE,
         'size' => 'medium',
       ),
+      'revision' => array(
+        'description' => 'Determine whether to create a new revision when a product of this type is updated.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
     ),
     'primary key' => array('type'),
   );
 
   return $schema;
+}
+
+/**
+ * Add support for product revisions.
+ */
+function commerce_product_ui_update_7100() {
+  $product_type_revision_spec = array(
+    'description' => 'Determine whether to create a new revision when a product of this type is updated.',
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 1,
+  );
+  db_add_field('commerce_product_type', 'revision', $product_type_revision_spec);
+
+  return t('Support for product revisions has been added to product types.');
 }

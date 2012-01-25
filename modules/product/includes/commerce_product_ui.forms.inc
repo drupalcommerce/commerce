@@ -64,6 +64,12 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
     '#rows' => 3,
   );
 
+  $form['product_type']['revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Default products of this type to be saved as new revisions when edited.'),
+    '#default_value' => $product_type['revision'],
+  );
+
   if (module_exists('entity_translation')) {
     $form['product_type']['multilingual'] = array(
       '#type' => 'radios',
