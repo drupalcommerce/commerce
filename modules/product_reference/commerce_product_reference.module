@@ -320,25 +320,32 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
 
         // Loop through the fields on the referenced product's type.
         foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
-          // Add the product field to the entity's content array.
-          $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $reference_view_mode, $langcode);
+          if (!isset($product_field['display'][$reference_view_mode])) {
+            $reference_view_mode = 'default';
+          }
 
-          // For multiple value references, add context information so the cart
-          // form can do dynamic replacement of fields.
-          if ($field['cardinality'] != 1) {
-            // Construct an array of classes that will be used to theme and
-            // target the rendered field for AJAX replacement.
-            $classes = array(
-              'commerce-product-field',
-              drupal_html_class('commerce-product-field-' . $product_field_name),
-              drupal_html_class('field-' . $product_field_name),
-              drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_field_name))),
-            );
+          // Only prepare visible fields.
+          if (!isset($product_field['display'][$reference_view_mode]['type']) || $product_field['display'][$reference_view_mode]['type'] != 'hidden') {
+            // Add the product field to the entity's content array.
+            $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $reference_view_mode, $langcode);
 
-            $entity->content['product:' . $product_field_name] += array(
-              '#prefix' => '<div class="' . implode(' ', $classes) . '">',
-              '#suffix' => '</div>',
-            );
+            // For multiple value references, add context information so the cart
+            // form can do dynamic replacement of fields.
+            if ($field['cardinality'] != 1) {
+              // Construct an array of classes that will be used to theme and
+              // target the rendered field for AJAX replacement.
+              $classes = array(
+                'commerce-product-field',
+                drupal_html_class('commerce-product-field-' . $product_field_name),
+                drupal_html_class('field-' . $product_field_name),
+                drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_field_name))),
+              );
+
+              $entity->content['product:' . $product_field_name] += array(
+                '#prefix' => '<div class="' . implode(' ', $classes) . '">',
+                '#suffix' => '</div>',
+              );
+            }
           }
         }
 
