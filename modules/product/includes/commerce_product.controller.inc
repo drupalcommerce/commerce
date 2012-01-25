@@ -179,14 +179,14 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
 
     // Add the default fields inherent to the product entity.
     $content['sku'] = array(
-      '#markup' => theme('commerce_product_sku', array('sku' => check_plain($product->sku), 'label' => t('SKU:'), 'product' => $product)),
+      '#markup' => theme('commerce_product_sku', array('sku' => $product->sku, 'label' => t('SKU:'), 'product' => $product)),
       '#attached' => $attached,
     );
 
     // Only display the title and status on the full page view.
     if ($view_mode == 'full') {
       $content['title'] = array(
-        '#markup' => theme('commerce_product_title', array('title' => check_plain($product->title), 'label' => t('Title:'), 'product' => $product)),
+        '#markup' => theme('commerce_product_title', array('title' => $product->title, 'label' => t('Title:'), 'product' => $product)),
         '#attached' => $attached,
       );
 

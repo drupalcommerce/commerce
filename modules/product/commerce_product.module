@@ -919,3 +919,17 @@ function commerce_product_entity_translation_tab_access($product) {
 function commerce_product_entity_translation_supported_type($type) {
   return variable_get('language_product_type_' . $type, 0) == ENTITY_TRANSLATION_ENABLED;
 }
+
+/**
+ * Sanitizes the product SKU before output.
+ */
+function template_preprocess_commerce_product_sku(&$variables) {
+  $variables['sku'] = check_plain($variables['sku']);
+}
+
+/**
+ * Sanitizes the product title before output.
+ */
+function template_preprocess_commerce_product_title(&$variables) {
+  $variables['title'] = check_plain($variables['title']);
+}
