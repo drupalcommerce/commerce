@@ -261,7 +261,7 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
   $entity_info['commerce_product']['uri callback'] = 'commerce_product_ui_product_uri';
 
   // Add callbacks and urls for administer translations.
-  $entity_info['commerce_product']['translation']['entity_translation'] = array(
+  $entity_info['commerce_product']['translation']['entity_translation'] += array(
     'base path' => 'admin/commerce/products/%commerce_product',
     'access callback' => 'commerce_product_entity_translation_tab_access',
     'access arguments' => array(3),
