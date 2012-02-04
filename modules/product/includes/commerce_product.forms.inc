@@ -60,11 +60,13 @@ function commerce_product_product_form($form, &$form_state, $product) {
   // Load the product type to get the default revision setting.
   $product_type = commerce_product_type_load($product->type);
 
+  // When updating a product, do not collapse the Change History fieldset if the
+  // product type is configured to create a new revision by default.
   $form['change_history'] = array(
     '#type' => 'fieldset',
     '#title' => t('Change history'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => empty($product->product_id) || empty($product_type['revision']),
     '#weight' => 50,
   );
   if (!empty($product->product_id)) {
