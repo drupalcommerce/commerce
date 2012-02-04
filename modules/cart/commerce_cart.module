@@ -26,8 +26,7 @@ function commerce_cart_menu() {
     'title' => 'Shopping cart (# items)',
     'title callback' => 'commerce_cart_menu_item_title',
     'title arguments' => array(TRUE),
-    'page callback' => 'drupal_goto',
-    'page arguments' => array('cart'),
+    'page callback' => 'commerce_cart_menu_item_redirect',
     'access arguments' => array('access content'),
     'type' => MENU_SUGGESTED_ITEM,
   );
@@ -66,6 +65,13 @@ function commerce_cart_menu_item_title() {
   }
 
   return $title;
+}
+
+/**
+ * Redirects a valid page request to cart/my to the cart page.
+ */
+function commerce_cart_menu_item_redirect() {
+  drupal_goto('cart');
 }
 
 /**
