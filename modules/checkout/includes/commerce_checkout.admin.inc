@@ -214,13 +214,12 @@ function commerce_checkout_pane_settings_form($form, &$form_state, $checkout_pan
 
   // If the checkout pane has a review callback, allow the user to include the
   // pane on the review checkout pane.
-  if (commerce_checkout_pane_callback($checkout_pane, 'review') !== FALSE) {
-    $form['display']['review'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Include this pane on the Review checkout pane.'),
-      '#default_value' => $checkout_pane['review'],
-    );
-  }
+  $form['display']['review'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include this pane on the Review checkout pane.'),
+    '#default_value' => $checkout_pane['review'],
+    '#access' => (boolean) commerce_checkout_pane_callback($checkout_pane, 'review'),
+  );
 
   // If a settings form exists for the specified checkout pane...
   if ($callback = commerce_checkout_pane_callback($checkout_pane, 'settings_form')) {
