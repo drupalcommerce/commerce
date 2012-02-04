@@ -361,8 +361,12 @@ function commerce_product_types() {
     // Find product types defined by hook_commerce_product_type_info().
     foreach (module_implements('commerce_product_type_info') as $module) {
       foreach (module_invoke($module, 'commerce_product_type_info') as $type => $product_type) {
-        // Set the module each product type is defined by if it isn't set yet.
-        $product_type += array('module' => $module);
+        // Set the module each product type is defined by and revision handling
+        // if they aren't set yet.
+        $product_type += array(
+          'module' => $module,
+          'revision' => 1,
+        );
         $product_types[$type] = $product_type;
       }
     }
