@@ -82,10 +82,10 @@ function commerce_cart_hook_info() {
     'commerce_cart_order_convert' => array(
       'group' => 'commerce',
     ),
-	  'commerce_cart_line_item_refresh' => array(
+    'commerce_cart_line_item_refresh' => array(
       'group' => 'commerce',
     ),
-	  'commerce_cart_order_refresh' => array(
+    'commerce_cart_order_refresh' => array(
       'group' => 'commerce',
     ),
     'commerce_cart_order_empty' => array(
@@ -788,6 +788,14 @@ function commerce_cart_order_refresh($order) {
   $line_item_changed = FALSE;
 
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    // If the current line item actually no longer exists...
+    if (!$line_item_wrapper->value()) {
+      // Remove the reference from the order and continue to the next value.
+      unset($order_wrapper->commerce_line_items[$delta]);
+      continue;
+    }
+
+    // Knowing it exists, clone the line item now.
     $cloned_line_item = clone($line_item_wrapper->value());
 
     // If the line item is a product line item...
