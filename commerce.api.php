@@ -8,19 +8,16 @@
  */
 
 /**
- * Defines currencies available to commerce.
+ * Defines currencies available to the Commerce currency formatting and price APIs.
  *
- * By default commerce provides all active currencies according to ISO 4217.
- * Make sure to use the translate function t() for translatable properties.
+ * By default Drupal Commerce defines all actively traded currencies according
+ * to ISO 4217. Additional currencies may be added by modules that depend on
+ * alternate or pseudo-currency definitions.
  *
  * @return
- *   An array of information about the currencies commerce should provide.
- *   The array contains a sub-array for each currency, with the currency name
- *   as the key.
- *
- *   Possible attributes for each sub-array are:
- *   - code: The uppercase alphabetic currency code.
- *      For example USD.
+ *   An array of currency data arrays keyed by three character currency codes.
+ *   Currency data arrays should include:
+ *   - code: The uppercase alphabetic currency code. For example USD.
  *   - numeric_code: The numeric currency code. According to ISO4217 this code
  *     consists of three digits and first digit can be a zero.
  *   - symbol: The currency symbol. For example $.

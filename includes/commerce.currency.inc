@@ -198,6 +198,17 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Thebe'),
       'major_unit' => t('Pulas'),
     ),
+    'BYR' => array(
+      'code' => 'BYR',
+      'symbol' => 'руб.',
+      'name' => t('Belarusian ruble'),
+      'numeric_code' => '974',
+      'symbol_placement' => 'after',
+      'code_placement' => '',
+      'decimals' => 0,
+      'thousands_separator' => ' ',
+      'major_unit' => t('Ruble'),
+    ),
     'BZD' => array(
       'code' => 'BZD',
       'symbol' => 'BZ$',
