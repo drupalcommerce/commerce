@@ -104,6 +104,14 @@ function commerce_order_entity_property_info() {
     'validation callback' => 'valid_email_address',
     'schema field' => 'mail',
   );
+  $properties['mail_username'] = array(
+    'type' => 'text',
+    'label' => t('Order e-mail prepared for username usage'),
+    'description' => t('The e-mail address associated with this order with illegal characters for usernames replaced.'),
+    'getter callback' => 'commerce_order_get_properties',
+    'computed' => TRUE,
+    'clear' => array('mail'),
+  );
 
   return $info;
 }

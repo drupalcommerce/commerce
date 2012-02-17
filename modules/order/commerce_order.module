@@ -1397,6 +1397,16 @@ function commerce_order_get_properties($order, array $options, $name) {
     case 'state':
       $order_status = commerce_order_status_load($order->status);
       return $order_status['state'];
+    case 'mail_username':
+      // To prepare an e-mail address to be a username, we trim any potential
+      // leading and trailing spaces and replace simple illegal characters with
+      // hyphens. More could be done with additional illegal characters if
+      // necessary, but those typically won't pass e-mail validation anyways.
+      // @see user_validate_name()
+      $username = preg_replace('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', '-', trim($order->mail));
+
+      // We also limit the username to the maximum length for usernames.
+      return substr($username, 0, USERNAME_MAX_LENGTH);
   }
 }
 

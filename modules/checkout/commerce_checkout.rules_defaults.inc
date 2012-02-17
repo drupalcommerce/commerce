@@ -127,7 +127,7 @@ function commerce_checkout_default_rules_configuration() {
     ))
     ->action('entity_create', array(
       'type' => 'user',
-      'param_name:select' => 'commerce-order:mail',
+      'param_name:select' => 'commerce-order:mail-username',
       'param_mail:select' => 'commerce-order:mail',
       'entity_created:label' => t('Created account'),
       'entity_created:var' => 'account_created',
