@@ -120,11 +120,18 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
           $show_errors_message = TRUE;
         }
 
-        $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
+        // Rendering status messages clears the session of messages, so they
+        // will not be visible if the user is redirected. We can at least not
+        // render here when we detect the global variable added by Rules to
+        // handle redirects, though modules implementing redirects will still
+        // encounter the same problem of "lost" messages.
+        if (!isset($GLOBALS['_rules_action_drupal_goto_do'])){
+          $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
 
-        $form[$pane_id . '_messages'] = array(
-          '#markup' =>  $form_state['storage']['themed_messages'][$pane_id],
-        );
+          $form[$pane_id . '_messages'] = array(
+            '#markup' =>  $form_state['storage']['themed_messages'][$pane_id],
+          );
+        }
       }
 
       // Create a fieldset for the pane and add the form data defined in the
