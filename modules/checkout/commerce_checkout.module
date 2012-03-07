@@ -119,7 +119,7 @@ function commerce_checkout_permission() {
   $permissions = array(
     'administer checkout' => array(
       'title' => t('Administer checkout'),
-      'description' => t('Access checkout for any order and configure checkout settings including the layout of the checkout form.'),
+      'description' => t('Configure checkout settings including the layout of the checkout form.'),
       'restrict access' => TRUE,
     ),
     'access checkout' => array(
