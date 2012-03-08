@@ -1135,7 +1135,7 @@ function _commerce_customer_match_customer_profiles_standard($field, $ids = arra
   $profile_type_alias = $query->addField('cp', 'type');
 
   // Add a condition to the query to filter by matching profile types.
-  if (is_array($field['settings']['referenceable_types']) && !empty($field['settings']['referenceable_types'])) {
+  if (!empty($field['settings']['referenceable_types']) && is_array($field['settings']['referenceable_types'])) {
     $types = array_diff(array_values($field['settings']['referenceable_types']), array(0, NULL));
 
     // Only filter by type if some types have been specified.
@@ -1146,7 +1146,7 @@ function _commerce_customer_match_customer_profiles_standard($field, $ids = arra
 
   if ($ids) {
     // Otherwise add a profile_id specific condition if specified.
-    $query->condition($product_id_alias, $ids, 'IN', $ids);
+    $query->condition($profile_id_alias, $ids, 'IN');
   }
 
   // Order the results by ID and then profile type.
