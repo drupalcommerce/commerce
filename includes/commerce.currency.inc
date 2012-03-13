@@ -863,6 +863,8 @@ function commerce_commerce_currency_info() {
       'symbol' => 'S/.',
       'name' => t('Peruvian Nuevo Sol'),
       'numeric_code' => '604',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Céntimo'),
       'major_unit' => t('Nuevos Sole'),
     ),
