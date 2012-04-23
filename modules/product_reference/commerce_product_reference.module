@@ -419,6 +419,7 @@ function commerce_product_reference_field_info() {
       'default_formatter' => 'commerce_product_reference_title_link',
       'property_type' => 'commerce_product',
       'property_callbacks' => array('commerce_product_reference_property_info_callback'),
+      'default_token_formatter' => 'commerce_product_reference_title_plain',
     ),
   );
 }

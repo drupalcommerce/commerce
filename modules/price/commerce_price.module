@@ -57,6 +57,7 @@ function commerce_price_field_info() {
       'default_formatter' => 'commerce_price_default',
       'property_type' => 'commerce_price',
       'property_callbacks' => array('commerce_price_property_info_callback'),
+      'default_token_formatter' => 'commerce_price_formatted_amount'
     ),
   );
 }
