@@ -175,7 +175,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save order', array(), array('context' => 'a drupal commerce order')),
-    '#submit' => $submit + array('commerce_order_order_form_submit'),
+    '#submit' => array_merge($submit, array('commerce_order_order_form_submit')),
     '#weight' => 40,
   );
 

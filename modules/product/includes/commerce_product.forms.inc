@@ -108,7 +108,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save product'),
-    '#submit' => $submit + array('commerce_product_product_form_submit'),
+    '#submit' => array_merge($submit, array('commerce_product_product_form_submit')),
   );
 
   // We append the validate handler to #validate in case a form callback_wrapper

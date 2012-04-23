@@ -100,7 +100,7 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save product type'),
-    '#submit' => $submit + array('commerce_product_ui_product_type_form_submit'),
+    '#submit' => array_merge($submit, array('commerce_product_ui_product_type_form_submit')),
   );
 
   if (!empty($form_state['product_type']['type'])) {
@@ -108,7 +108,7 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
       '#type' => 'submit',
       '#value' => t('Delete product type'),
       '#suffix' => l(t('Cancel'), 'admin/commerce/products/types'),
-      '#submit' => $submit + array('commerce_product_ui_product_type_form_delete_submit'),
+      '#submit' => array_merge($submit, array('commerce_product_ui_product_type_form_delete_submit')),
       '#weight' => 45,
     );
   }
@@ -117,7 +117,7 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
       '#type' => 'submit',
       '#value' => t('Save and add fields'),
       '#suffix' => l(t('Cancel'), 'admin/commerce/products/types'),
-      '#submit' => $submit + array('commerce_product_ui_product_type_form_submit'),
+      '#submit' => array_merge($submit, array('commerce_product_ui_product_type_form_submit')),
       '#weight' => 45,
     );
   }

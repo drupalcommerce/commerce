@@ -114,7 +114,7 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save profile'),
-    '#submit' => $submit + array('commerce_customer_customer_profile_form_submit'),
+    '#submit' => array_merge($submit, array('commerce_customer_customer_profile_form_submit')),
   );
 
   // We append the validate handler to #validate in case a form callback_wrapper
