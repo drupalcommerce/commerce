@@ -84,7 +84,7 @@ function commerce_price_field_load($entity_type, $entities, $field, $instances, 
   foreach ($entities as $id => $entity) {
     foreach ($items[$id] as $delta => $item) {
       // Unserialize the data array if necessary.
-      if (!empty($items[$id][$delta]['data'])) {
+      if (!empty($items[$id][$delta]['data']) && !is_array($items[$id][$delta]['data'])) {
         $items[$id][$delta]['data'] = unserialize($items[$id][$delta]['data']);
       }
       else {
