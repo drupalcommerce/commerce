@@ -580,6 +580,8 @@ function commerce_commerce_currency_info() {
       'name' => t('Japanese Yen'),
       'decimals' => 0,
       'numeric_code' => '392',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Sen'),
       'major_unit' => t('Yen'),
     ),
