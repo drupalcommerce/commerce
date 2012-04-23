@@ -715,6 +715,16 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Santimat'),
       'major_unit' => t('Dirhams'),
     ),
+    'MDL' => array(
+      'code' => 'MDL',
+      'symbol' => 'MDL',
+      'name' => t('Moldovan leu'),
+      'symbol_placement' => 'after',
+      'numeric_code' => '498',
+      'code_placement' => '',
+      'minor_unit' => t('bani'),
+      'major_unit' => t('Lei'),
+    ),
     'MMK' => array(
       'code' => 'MMK',
       'symbol' => 'MMK',
