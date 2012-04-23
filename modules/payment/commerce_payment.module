@@ -863,24 +863,6 @@ function commerce_payment_transaction_delete_multiple($transaction_ids) {
 }
 
 /**
- * Generate an array for rendering the given payment transaction.
- *
- * @param $transaction
- *   A fully loaded transaction object.
- * @param $view_mode
- *   The view mode for displaying the order, 'administrator' being the only one
- *     available by default.
- *
- * @return
- *   An array as expected by drupal_render().
- *
- * @deprecated since 7.x-1.0-rc1
- */
-function commerce_payment_transaction_build_content($order, $transaction, $view_mode = 'administrator') {
-  return entity_get_controller('commerce_payment_transaction')->view(array($transaction->transaction_id => $transaction), $view_mode);
-}
-
-/**
  * Determines access for a variety of operations on payment transactions.
  *
  * @param $op

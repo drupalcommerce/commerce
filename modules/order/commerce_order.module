@@ -791,23 +791,6 @@ function commerce_order_is_latest_revision($order) {
 }
 
 /**
- * Generate an array for rendering the given order.
- *
- * @param $order
- *   A fully loaded order object.
- * @param $view_mode
- *   The view mode for displaying the order, 'administrator' or 'customer'.
- *
- * @return
- *   An array as expected by drupal_render().
- *
- * @deprecated since 7.x-1.0-rc1
- */
-function commerce_order_build_content($order, $view_mode = 'administrator') {
-  return entity_get_controller('commerce_order')->view(array($order->order_id => $order), $view_mode);
-}
-
-/**
  * Deletes an order by ID.
  *
  * @param $order_id

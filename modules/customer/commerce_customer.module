@@ -552,23 +552,6 @@ function commerce_customer_profile_load_multiple($profile_ids = array(), $condit
 }
 
 /**
- * Generate an array for rendering the given customer profile.
- *
- * @param $profile
- *   A fully loaded customer profile object.
- * @param $view_mode
- *   The view mode for displaying the profile, 'administrator' or 'customer'.
- *
- * @return
- *   An array as expected by drupal_render().
- *
- * @deprecated since 7.x-1.0-rc1
- */
-function commerce_customer_profile_build_content($profile, $view_mode = 'administrator') {
-  return entity_get_controller('commerce_customer_profile')->view(array($profile->profile_id => $profile), $view_mode);
-}
-
-/**
  * Determines whether or not the give customer profile can be deleted.
  *
  * @param $profile
