@@ -164,11 +164,11 @@ function commerce_product_reference_form_field_ui_display_overview_form_alter(&$
     foreach ($product_fields[$entity_type][$bundle]['display'] as $field_name => $field) {
       // If the extra field has configurable settings, add a help text for it.
       if (!empty($field['configurable'])) {
-        $form['fields'][$field_name]['format']['type']['#description'] = t('Modify the settings for this field on the <a href="!url">product display configuration</a>.', array('!url' => url('admin/commerce/products/types')));
+        $form['fields'][$field_name]['format']['type']['#description'] = t('Modify the settings for this field on the <a href="!url">product type "manage display" configuration</a>.', array('!url' => url('admin/commerce/products/types')));
       }
       else {
         // Otherwise just mention it as visibility settings.
-        $form['fields'][$field_name]['format']['type']['#description'] = t('The visibility of this field may also need to be toggled in the <a href="!url">product display configuration</a>.', array('!url' => url('admin/commerce/products/types')));
+        $form['fields'][$field_name]['format']['type']['#description'] = t('The visibility of this field may also need to be toggled in the <a href="!url">product type "manage display" configuration</a>.', array('!url' => url('admin/commerce/products/types')));
 
         // If no data yet exists for the extra field in the bundle settings...
         if (empty($bundle_settings['extra_fields']['display'][$field_name]) ||
