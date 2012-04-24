@@ -172,7 +172,7 @@ function commerce_cart_views_default_views() {
   $handler->display->display_options['fields']['edit_quantity']['alter']['trim'] = 0;
   $handler->display->display_options['fields']['edit_quantity']['alter']['html'] = 0;
   $handler->display->display_options['fields']['edit_quantity']['element_label_colon'] = 0;
-  $handler->display->display_options['fields']['edit_quantity']['element_default_classes'] = 0;
+  $handler->display->display_options['fields']['edit_quantity']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['edit_quantity']['hide_empty'] = 0;
   $handler->display->display_options['fields']['edit_quantity']['empty_zero'] = 0;
   /* Field: Commerce Line Item: Delete button */
