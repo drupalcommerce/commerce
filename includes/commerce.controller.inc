@@ -40,7 +40,9 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
 
       // Store the ids of the entities in the lockedEntities array for later
       // tracking, flipped for easier management via unset() below.
-      $this->lockedEntities += array_flip($ids);
+      if (is_array($ids)) {
+        $this->lockedEntities += array_flip($ids);
+      }
     }
 
     return $query;
