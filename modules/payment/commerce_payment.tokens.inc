@@ -185,7 +185,7 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
           break;
 
         case 'creator':
-          if ($order->uid == 0) {
+          if ($transaction->uid == 0) {
             $name = variable_get('anonymous', t('Anonymous'));
           }
           else {
