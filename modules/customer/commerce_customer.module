@@ -348,6 +348,12 @@ function commerce_customer_commerce_checkout_pane_info() {
     $field_name = variable_get('commerce_customer_profile_' . $type . '_field', '');
     $instance = field_info_instance('commerce_order', $field_name, 'commerce_order');
 
+    // If the i18n_field module is available, we'll use it to translate
+    // user-configurable field labels.
+    if (module_exists('i18n_field') && !empty($instance['label'])) {
+      $instance['label'] = i18n_field_translate_property($instance, 'label');
+    }
+
     $checkout_panes['customer_profile_' . $type] = array(
       'title' => !empty($instance['label']) ? check_plain($instance['label']) : $profile_type['name'],
       'file' => 'includes/commerce_customer.checkout_pane.inc',
