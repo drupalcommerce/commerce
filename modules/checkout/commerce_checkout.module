@@ -224,8 +224,10 @@ function commerce_checkout_line_item_views_form_submit($form, &$form_state) {
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.
-  $form_state['order']->revision = TRUE;
-  $form_state['order']->log = t('Customer proceeded to checkout using a submit button.');
+  if (variable_get('commerce_order_auto_revision', TRUE)) {
+    $form_state['order']->revision = TRUE;
+    $form_state['order']->log = t('Customer proceeded to checkout using a submit button.');
+  }
 
   commerce_order_save($form_state['order']);
 

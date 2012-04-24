@@ -1247,7 +1247,8 @@ function commerce_order_status_options_list() {
  *     order would be saved elsewhere after the update.
  * @param $revision
  *   TRUE or FALSE indicating whether or not a new revision should be created
- *     for the order if it is saved as part of the status update. Defaults to TRUE.
+ *   for the order if it is saved as part of the status update. If missing or
+ *   NULL, the value configured in "Order settings" is used.
  * @param $log
  *   If a new revision is created for the update, the log message that will be
  *     used for the revision.
@@ -1255,7 +1256,11 @@ function commerce_order_status_options_list() {
  * @return
  *   The updated order.
  */
-function commerce_order_status_update($order, $name, $skip_save = FALSE, $revision = TRUE, $log = '') {
+function commerce_order_status_update($order, $name, $skip_save = FALSE, $revision = NULL, $log = '') {
+  if (!isset($revision)) {
+    $revision = variable_get('commerce_order_auto_revision', TRUE);
+  }
+
   // Do not update the status if the order is already at it.
   if ($order->status != $name) {
     $order->status = $name;

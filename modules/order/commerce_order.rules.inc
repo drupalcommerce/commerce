@@ -349,14 +349,14 @@ function commerce_order_rules_action_info() {
  */
 function commerce_order_rules_update_state($order, $name) {
   $order_state = commerce_order_state_load($name);
-  commerce_order_status_update($order, $order_state['default_status'], FALSE, TRUE, t('Order state updated via Rules.'));
+  commerce_order_status_update($order, $order_state['default_status'], FALSE, NULL, t('Order state updated via Rules.'));
 }
 
 /**
  * Rules action: updates an order's status using the Order API.
  */
 function commerce_order_rules_update_status($order, $name) {
-  commerce_order_status_update($order, $name, FALSE, TRUE, t('Order status updated via Rules.'));
+  commerce_order_status_update($order, $name, FALSE, NULL, t('Order status updated via Rules.'));
 }
 
 /**

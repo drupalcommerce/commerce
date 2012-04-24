@@ -246,8 +246,10 @@ function commerce_cart_checkout_form_cancel_submit($form, &$form_state) {
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.
-  $form_state['order']->revision = TRUE;
-  $form_state['order']->log = t('Customer manually canceled the checkout process.');
+  if (variable_get('commerce_order_auto_revision', TRUE)) {
+    $form_state['order']->revision = TRUE;
+    $form_state['order']->log = t('Customer manually canceled the checkout process.');
+  }
 
   commerce_order_save($form_state['order']);
 
@@ -267,8 +269,10 @@ function commerce_cart_line_item_views_form_submit($form, &$form_state) {
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.
-  $form_state['order']->revision = TRUE;
-  $form_state['order']->log = t('Customer updated the order via the shopping cart form.');
+  if (variable_get('commerce_order_auto_revision', TRUE)) {
+    $form_state['order']->revision = TRUE;
+    $form_state['order']->log = t('Customer updated the order via the shopping cart form.');
+  }
 
   commerce_order_save($form_state['order']);
 

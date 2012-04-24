@@ -16,6 +16,12 @@ function commerce_order_settings_form($form, &$form_state) {
     '#description' => t('Supply an optional help message to be displayed above the order add form.'),
     '#default_value' => variable_get('commerce_order_help_text', ''),
   );
+  $form['commerce_order_auto_revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create new revisions when orders are updated by default.'),
+    '#description' => t('This default may be overridden on the order edit form but will always be respected for other order status updates.'),
+    '#default_value' => variable_get('commerce_order_auto_revision', TRUE),
+  );
 
   return system_settings_form($form);
 }
