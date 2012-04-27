@@ -69,8 +69,7 @@ class CommercePaymentRulesTest extends CommerceBaseTestCase {
 
     foreach ($permissions as $permission) {
       $account = $this->drupalCreateUser($permission);
-      $this->assertTrue(commerce_payment_method_access($account));
+      $this->assertTrue(commerce_payment_ui_payment_method_access($account));
     }
   }
 }
-
