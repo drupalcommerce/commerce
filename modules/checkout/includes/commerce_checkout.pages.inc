@@ -172,6 +172,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
       '#type' => 'submit',
       '#value' => $checkout_page['submit_value'],
       '#attributes' => array('class' => array('checkout-continue')),
+      '#suffix' => '<span class="checkout-processing element-invisible"></span>',
       '#validate' => array('commerce_checkout_form_validate'),
       '#submit' => array('commerce_checkout_form_submit'),
     );
