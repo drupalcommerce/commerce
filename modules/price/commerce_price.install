@@ -134,3 +134,26 @@ function commerce_price_uninstall() {
   module_load_include('module', 'commerce');
   commerce_delete_fields('commerce_price');
 }
+
+/**
+ * Fix invalid data values on price fields if necessary.
+ */
+function commerce_price_update_7100() {
+  $fields = field_info_fields();
+  $message = '';
+
+  foreach ($fields as $field_name => $field) {
+    // Only update fields stored in the default sql storage type in order to
+    // speed up the process.
+    if ($field['type'] == 'commerce_price' && $field['storage']['module'] == 'field_sql_storage') {
+      db_query("UPDATE {field_data_" . $field_name . "} SET {" . $field_name . "_data} = :data WHERE {" . $field_name . "}_data = 'Array';", array(':data' => NULL));
+      db_query("UPDATE {field_revision_" . $field_name . "} SET {" . $field_name . "_data} = :data WHERE {" . $field_name . "}_data = 'Array';", array(':data' => NULL));
+
+      $message = t('Price fields were cleaned of invalid data values as necessary.');
+    }
+  }
+
+  if (!empty($message)) {
+    return $message;
+  }
+}
