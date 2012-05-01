@@ -1,0 +1,6 @@
+name = "Commerce product crud test"
+description = "Support module for product related testing."
+package = Testing
+version = VERSION
+core = 7.x
+hidden = TRUE

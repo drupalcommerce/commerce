@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_commerce_product_update().
+ */
+function commerce_product_crud_test_commerce_product_update($entity) {
+  global $commerce_product_crud_tests;
+  $product = commerce_product_load($entity->product_id);
+  $commerce_product_crud_tests['hook_update_identical_uid'] = $entity->uid === $product->uid;
+}
