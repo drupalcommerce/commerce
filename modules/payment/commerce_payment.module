@@ -293,7 +293,6 @@ function commerce_payment_commerce_checkout_pane_info() {
   $checkout_panes['commerce_payment'] = array(
     'title' => t('Payment'),
     'page' => 'review',
-    'locked' => TRUE,
     'file' => 'includes/commerce_payment.checkout_pane.inc',
     'base' => 'commerce_payment_pane',
     'weight' => 10,

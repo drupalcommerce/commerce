@@ -9,7 +9,7 @@
 Drupal.behaviors.paneDrag = {
   attach: function (context, settings) {
     // tableDrag is required for this behavior.
-    if (typeof Drupal.tableDrag == 'undefined') {
+    if (typeof Drupal.tableDrag == 'undefined' || typeof Drupal.tableDrag.panes == 'undefined') {
       return;
     }
 
@@ -17,7 +17,7 @@ Drupal.behaviors.paneDrag = {
     var tableDrag = Drupal.tableDrag.panes; // Get the blocks tableDrag object.
 
     // Add a handler for when a row is swapped, update empty regions.
-    tableDrag.row.prototype.onSwap = function(swappedRow) {
+    tableDrag.row.prototype.onSwap = function (swappedRow) {
       checkEmptyPages(table, this);
     };
 
@@ -46,6 +46,40 @@ Drupal.behaviors.paneDrag = {
       }
     };
 
+    // Add the behavior to each region select list.
+    $('select.checkout-pane-page', context).once('checkout-pane-page', function () {
+      $(this).change(function (event) {
+        // Make our new row and select field.
+        var row = $(this).parents('tr:first');
+        var select = $(this);
+        tableDrag.rowObject = new tableDrag.row(row);
+
+        // Find the correct region and insert the row as the first in the region.
+        $('tr.page-message', table).each(function () {
+          if ($(this).is('.page-' + select[0].value + '-message')) {
+            // Add the new row and remove the old one.
+            $(this).after(row);
+            // Manually update weights and restripe.
+            tableDrag.updateFields(row.get(0));
+            tableDrag.rowObject.changed = true;
+            if (tableDrag.oldRowElement) {
+              $(tableDrag.oldRowElement).removeClass('drag-previous');
+            }
+            tableDrag.oldRowElement = row.get(0);
+            tableDrag.restripeTable();
+            tableDrag.rowObject.markChanged();
+            tableDrag.oldRowElement = row;
+            $(row).addClass('drag-previous');
+          }
+        });
+
+        // Modify empty regions with added or removed fields.
+        checkEmptyPages(table, row);
+        // Remove focus from selectbox.
+        select.get(0).blur();
+      });
+    });
+
     var checkEmptyPages = function(table, rowObject) {
       $('tr.page-message', table).each(function() {
         // If the dragged row is in this region, but above the message row, swap it down one space.
@@ -56,7 +90,7 @@ Drupal.behaviors.paneDrag = {
           }
         }
         // This region has become empty
-        if ($(this).next('tr').is(':not(.draggable)') || $(this).next('tr').size() == 0) {
+        if ($(this).next('tr').is(':not(.draggable)') || $(this).next('tr').length == 0) {
           $(this).removeClass('page-populated').addClass('page-empty');
         }
         // This region has become populated.

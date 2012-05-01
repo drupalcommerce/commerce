@@ -22,9 +22,14 @@ function commerce_checkout_builder_form($form, &$form_state) {
     '#value' => $checkout_pages,
   );
 
+  $checkout_pages_options = array();
+
   // Create arrays for checkout panes in each of the pages.
   foreach (array_keys($checkout_pages) as $page_id) {
     $form['page'][$page_id]['panes'] = array('#tree' => TRUE);
+
+    // Build the options list for selecting the pane's checkout page.
+    $checkout_pages_options[$page_id] = $checkout_pages[$page_id]['title'];
   }
 
   // Loop through all the checkout panes on the site.
@@ -48,7 +53,7 @@ function commerce_checkout_builder_form($form, &$form_state) {
     // Add the select field for the pane's checkout page.
     $form['page'][$page_id]['panes'][$pane_id]['page'] = array(
       '#type' => 'select',
-      '#options' => drupal_map_assoc(array_keys($checkout_pages)),
+      '#options' => $checkout_pages_options,
       '#default_value' => $checkout_pane['page'],
       '#attributes' => array('class' => array('checkout-pane-page checkout-pane-page-'. $checkout_pane['page'])),
     );
@@ -84,6 +89,31 @@ function commerce_checkout_builder_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+/**
+ * Validation handler for the checkout builder form.
+ */
+function commerce_checkout_builder_form_validate(&$form, &$form_state) {
+  $pages = commerce_checkout_pages();
+
+  // Get unmodified checkout panes.
+  $panes = commerce_checkout_panes(array(), TRUE);
+
+  // Get saved checkout panes. If an error is detected, we'll need it to
+  // reference the original form structure so we can accurately locate the
+  // elements in the form and set their values.
+  $saved_panes = commerce_checkout_panes();
+
+  // Loop through each configured panes.
+  foreach ($form_state['values']['panes'] as $pane_id => $checkout_pane) {
+    // Check if pane should be locked but is configured on the wrong checkout page.
+    if (!empty($panes[$pane_id]['locked']) && $checkout_pane['page'] != $panes[$pane_id]['page']) {
+      $element = &$form['page'][$saved_panes[$pane_id]['page']]['panes'][$pane_id]['page'];
+      drupal_set_message(t('%pane is locked in the code to the %page page and was repositioned accordingly.', array('@pane' => $panes[$pane_id]['title'], '@page' => $pages[$panes[$pane_id]['page']]['title'])), 'warning');
+      form_set_value($element, $panes[$pane_id]['page'], $form_state);
+    }
+  }
 }
 
 /**

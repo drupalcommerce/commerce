@@ -194,6 +194,8 @@ function hook_commerce_checkout_page_info_alter(&$checkout_pages) {
  *   if not specified, defaults to the title
  * - page: the page_id of the checkout page the pane should appear on by
  *   default; defaults to ‘checkout’
+ * - locked: boolean indicating that the pane cannot be moved from the
+ *   specified checkout page.
  * - collapsible: boolean indicating whether or not the checkout pane’s fieldset
  *   should be collapsible; defaults to FALSE
  * - collapsed: boolean indicating whether or not the checkout pane’s fieldset
@@ -248,6 +250,7 @@ function hook_commerce_checkout_pane_info() {
     'base' => 'commerce_checkout_review_pane',
     'page' => 'review',
     'fieldset' => FALSE,
+    'locked' => FALSE,
   );
 
   return $checkout_panes;

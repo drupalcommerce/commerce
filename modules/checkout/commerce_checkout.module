@@ -440,16 +440,24 @@ function commerce_checkout_page_load($page_id) {
  *   An array of conditions to filter the returned list by; for example, if you
  *     specify 'enabled' => TRUE in the array, then only checkout panes with an
  *     enabled value equal to TRUE would be included.
+ * @param $skip_saved_data
+ *   A boolean that will allow the retrieval of checkout panes directly from
+ *   code. Specifically, it will skip the cache and also prevent configured
+ *   checkout panes data from merging.
  *
  * @return
  *   The array of checkout pane objects, keyed by pane ID.
  */
-function commerce_checkout_panes($conditions = array()) {
-  $checkout_panes = &drupal_static(__FUNCTION__);
+function commerce_checkout_panes($conditions = array(), $skip_saved_data = FALSE) {
+  if (!$skip_saved_data) {
+    $checkout_panes = &drupal_static(__FUNCTION__);
+  }
 
   // Cache the saved checkout pane data if it hasn't been loaded yet.
   if (!isset($checkout_panes)) {
-    $saved_panes = db_query('SELECT * FROM {commerce_checkout_pane}')->fetchAllAssoc('pane_id', PDO::FETCH_ASSOC);
+    if (!$skip_saved_data) {
+      $saved_panes = db_query('SELECT * FROM {commerce_checkout_pane}')->fetchAllAssoc('pane_id', PDO::FETCH_ASSOC);
+    }
 
     // Load panes defined by modules.
     $checkout_panes = array();
@@ -460,7 +468,7 @@ function commerce_checkout_panes($conditions = array()) {
         $checkout_pane['module'] = $module;
 
         // Update the pane with saved data.
-        if (!empty($saved_panes[$pane_id])) {
+        if (!$skip_saved_data && !empty($saved_panes[$pane_id])) {
           $checkout_pane = array_merge($checkout_pane, $saved_panes[$pane_id]);
           $checkout_pane['saved'] = TRUE;
         }
@@ -478,6 +486,7 @@ function commerce_checkout_panes($conditions = array()) {
         'base' => $pane_id,
         'name' => $checkout_pane['title'],
         'page' => 'checkout',
+        'locked' => FALSE,
         'fieldset' => TRUE,
         'collapsible' => FALSE,
         'collapsed' => FALSE,
