@@ -19,6 +19,7 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 
   function setUp() {
     $modules = parent::setUpHelper('all');
+    $modules[] = 'commerce_product_crud_test';
     parent::setUp($modules);
 
     $this->site_admin = $this->createSiteAdmin();
@@ -104,6 +105,8 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
    * Test the product CRUD functions.
    */
   function testCommerceProductCrud() {
+    global $commerce_product_crud_tests;
+
     // Ensure commerce_product_new() returns a new product.
     $new_product = commerce_product_new('product');
     $fields = array('product_id', 'sku', 'type', 'title', 'uid');
@@ -133,6 +136,11 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
     $loaded_product->uid = 0;
     $return = commerce_product_save($loaded_product);
     $this->assertIdentical($return, SAVED_UPDATED, 'commerce_product_save() successfully updated the product.');
+
+    // Ensure hooks invoked during the save operation can load identical objects
+    // be checking a global variable set in commerce_product_crud_test_commerce_product_update()
+    // if the uid is in fact being loaded as 0 in the update hook.
+    $this->assertTrue($commerce_product_crud_tests['hook_update_identical_uid'], t('Invoked hooks during save operation can successfully load identical object.'));
 
     // Ensure commerce_product_load_by_sku() can load a product by SKU.
     $loaded_product_by_sku = commerce_product_load_by_sku($sku);

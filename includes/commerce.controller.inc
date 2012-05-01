@@ -231,8 +231,6 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
         ->execute();
       }
 
-      $this->invoke($op, $entity);
-
       // Update the static cache so that the next entity_load() will return this
       // newly saved entity.
       $this->entityCache[$entity->{$this->idKey}] = $entity;
@@ -240,6 +238,8 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       // Maintain the list of locked entities and release the lock if possible.
       unset($this->lockedEntities[$entity->{$this->idKey}]);
       $this->releaseLock();
+
+      $this->invoke($op, $entity);
 
       // Ignore slave server temporarily.
       db_ignore_slave();
