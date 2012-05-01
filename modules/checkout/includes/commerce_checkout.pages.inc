@@ -21,7 +21,7 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
   // could return a 403, but then the user would know they've identified a
   // potentially valid checkout URL.
   if (!commerce_checkout_access($order)) {
-    return drupal_not_found();
+    return MENU_NOT_FOUND;
   }
 
   // If the user is attempting to access an inaccessible page for their order,
@@ -35,7 +35,7 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
       return drupal_goto($target_uri);
     }
     else {
-      return drupal_access_denied();
+      return MENU_ACCESS_DENIED;
     }
   }
 
