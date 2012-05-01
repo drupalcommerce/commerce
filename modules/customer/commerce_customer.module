@@ -444,6 +444,15 @@ function commerce_customer_profile_type_load($type) {
 }
 
 /**
+ * Resets the cached list of customer profile types.
+ */
+function commerce_customer_profile_types_reset() {
+  $profile_types = &drupal_static('commerce_customer_profile_types');
+  $profile_types = NULL;
+  entity_info_cache_clear();
+}
+
+/**
  * Returns the human readable name of any or all customer profile types.
  *
  * @param $type

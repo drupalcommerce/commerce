@@ -449,6 +449,7 @@ function commerce_line_item_type_load($type) {
 function commerce_line_item_types_reset() {
   $line_item_types = &drupal_static('commerce_line_item_types');
   $line_item_types = NULL;
+  entity_info_cache_clear();
 }
 
 /**
