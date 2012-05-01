@@ -1650,7 +1650,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
 
             // Otherwise just use the base language values.
             if (empty($allowed_values)) {
-              $allowed_values = _options_get_options($field, $instance, $properties);
+              $allowed_values = _options_get_options($field, $instance, $properties, 'commerce_product', $default_product);
             }
 
             // Only consider this field a qualifying attribute field if we could

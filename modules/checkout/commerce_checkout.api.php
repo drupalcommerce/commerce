@@ -224,7 +224,7 @@ function hook_commerce_checkout_page_info_alter(&$checkout_pages) {
  *     elements for the pane’s checkout form fieldset
  *   - checkout_form_validate($form, &$form_state, $checkout_pane, $order):
  *     validates data inputted via the pane’s elements on the checkout form and
- *     returns TRUE or FALSE indicating whether or not all the data validated
+ *     must return TRUE or FALSE indicating whether or not all the data validated
  *   - checkout_form_submit($form, &$form_state, $checkout_pane, $order):
  *     processes data inputted via the pane’s elements on the checkout form,
  *     often updating parts of the order object based on the data
