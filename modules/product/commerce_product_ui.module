@@ -366,7 +366,7 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE,
     module_invoke_all('commerce_product_type_update', $product_type, $skip_reset);
   }
 
-  // Rebuild the menu to get add this type's product add menu item.
+  // Rebuild the menu to add this product type's menu items.
   if (!$skip_reset) {
     commerce_product_types_reset();
     menu_rebuild();
@@ -393,7 +393,7 @@ function commerce_product_ui_product_type_delete($type, $skip_reset = FALSE) {
     ->condition('type', $type)
     ->execute();
 
-  // Rebuild the menu to get rid of this type's product add menu item.
+  // Rebuild the menu to get rid of this product type's menu items.
   if (!$skip_reset) {
     commerce_product_types_reset();
     menu_rebuild();

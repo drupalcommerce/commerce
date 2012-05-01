@@ -384,6 +384,7 @@ function commerce_product_types() {
 function commerce_product_types_reset() {
   $product_types = &drupal_static('commerce_product_types');
   $product_types = NULL;
+  entity_info_cache_clear();
 }
 
 /**
