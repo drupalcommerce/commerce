@@ -78,7 +78,7 @@ function commerce_customer_ui_menu() {
     $type_arg = strtr($type, '_', '-');
 
     $items['admin/commerce/customer-profiles/types/' . $type_arg] = array(
-      'title' => 'Profile types',
+      'title' => $profile_type['name'],
       'page callback' => 'commerce_customer_ui_profile_type_redirect',
       'page arguments' => array($type),
       'access arguments' => array('administer customer profile types'),
