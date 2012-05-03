@@ -484,6 +484,12 @@ function commerce_price_field_formatter_view($entity_type, $entity, $field, $ins
           $components = array();
         }
 
+        // If the i18n_field module is available, we'll use it to translate
+        // user-configurable field labels.
+        if (module_exists('i18n_field') && !empty($instance['label'])) {
+          $instance['label'] = i18n_field_translate_property($instance, 'label');
+        }
+
         // Add the actual field value to the array.
         $components['commerce_price_formatted_amount'] = array(
           'title' => check_plain($instance['label']),
