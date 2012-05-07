@@ -34,6 +34,8 @@
  *   administrative add / edit form for profiles of this type
  * - addressfield: boolean indicating whether or not the profile type should
  *   have a default address field; defaults to TRUE
+ * - label_callback: name of the function to use to determine the label of
+ *   customer profiles of this type; defaults to commerce_customer_profile_default_label
  * - module: the name of the module that defined the profile type; should not be
  *   set by the hook but will be populated automatically when the pane is loaded
  *
