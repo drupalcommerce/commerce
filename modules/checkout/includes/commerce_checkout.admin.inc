@@ -110,7 +110,7 @@ function commerce_checkout_builder_form_validate(&$form, &$form_state) {
     // Check if pane should be locked but is configured on the wrong checkout page.
     if (!empty($panes[$pane_id]['locked']) && $checkout_pane['page'] != $panes[$pane_id]['page']) {
       $element = &$form['page'][$saved_panes[$pane_id]['page']]['panes'][$pane_id]['page'];
-      drupal_set_message(t('%pane is locked in the code to the %page page and was repositioned accordingly.', array('@pane' => $panes[$pane_id]['title'], '@page' => $pages[$panes[$pane_id]['page']]['title'])), 'warning');
+      drupal_set_message(t('%pane is locked in the code to the %page page and was repositioned accordingly.', array('%pane' => $panes[$pane_id]['title'], '%page' => $pages[$panes[$pane_id]['page']]['title'])), 'warning');
       form_set_value($element, $panes[$pane_id]['page'], $form_state);
     }
   }
