@@ -298,32 +298,29 @@ function commerce_payment_validate_credit_card_type($number, $card_types) {
 
     case '4':
       $initial = (int) substr($number, 0, 4);
+      $return = FALSE;
 
-      // Visa begins with 4 and is 16 numbers.
-      if ($strlen == 16 && in_array('visa', $card_types)) {
-        // Don't break if the number is a Visa Electron or Switch number and
-        // those aren't enabled.
-        if (!((in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') && !in_array('visaelectron', $card_types)) &&
-          !(in_array($initial, array(4903, 4905, 4911, 4936)) && !in_array('switch', $card_types))) {
-          return 'visa';
+      if ($strlen == 16) {
+        // Visa begins with 4 and is 16 numbers.
+        if (in_array('visa', $card_types)) {
+          $return = 'visa';
         }
-      }
 
-      // Visa Electron begins with 4026, 417500, 4508, 4844, 4913, or 4917 and
-      // is 16 numbers.
-      if (in_array('visaelectron', $card_types) && $strlen == 16 &&
-        (in_array($initial, array(4026, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500')) {
-        return 'visaelectron';
+        // Visa Electron begins with 4026, 417500, 4256, 4508, 4844, 4913, or
+        // 4917 and is 16 numbers.
+        if (in_array($initial, array(4026, 4256, 4508, 4844, 4913, 4917)) || substr($number, 0, 6) == '417500') {
+          $return = in_array('visaelectron', $card_types) ? 'visaelectron' : FALSE;
+        }
       }
 
       // Switch begins with 4903, 4905, 4911, or 4936 and is 16, 18, or 19
       // numbers.
-      if (in_array('switch', $card_types) && in_array($strlen, array(16, 18, 19)) &&
+      if (in_array($strlen, array(16, 18, 19)) &&
         in_array($initial, array(4903, 4905, 4911, 4936))) {
-        return 'switch';
+        $return = in_array('switch', $card_types) ? 'switch' : FALSE;
       }
 
-      return FALSE;
+      return $return;
 
     case '5':
       // MasterCard begins with 51-55 and is 16 numbers.
