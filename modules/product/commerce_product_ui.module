@@ -470,6 +470,8 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
 
   // If translation support is enabled, provide the suitable languages
   if (module_exists('entity_translation') && entity_translation_enabled('commerce_product')) {
+    $translations = $form_state['commerce_product']->translations;
+
     $form['language'] = array(
       '#type' => 'select',
       '#title' => t('Language'),
@@ -477,6 +479,14 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
       '#options' => array(LANGUAGE_NONE => t('Language neutral')) + locale_language_list('name'),
       '#weight' => -10,
     );
+
+    // Disable languages for existing translations, so it is not possible to
+    // switch this product to some language which is already in the translation set.
+    foreach ($translations->data as $langcode => $translation) {
+      if ($langcode != $translations->original) {
+        unset($form['language']['#options'][$langcode]);
+      }
+    }
 
     // Since this function may change the language of the submitted form values,
     // it has to be the first called.
