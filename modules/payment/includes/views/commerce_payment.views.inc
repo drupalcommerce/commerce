@@ -371,11 +371,39 @@ function commerce_payment_views_data() {
  * Implements hook_views_data_alter()
  */
 function commerce_payment_views_data_alter(&$data) {
-  $data['commerce_order']['balance'] = array(
-    'field' => array(
-      'title' => t('Order Balance'),
-      'help' => t('Total transaction payment balance for the order.'),
-      'handler' => 'commerce_payment_handler_field_balance',
-    ),
+  $data['commerce_order']['balance']['field'] = array(
+    'title' => t('Order Balance'),
+    'help' => t('Total transaction payment balance for the order.'),
+    'handler' => 'commerce_payment_handler_field_balance',
   );
+
+  // Define the relationship from commerce_order to commerce_payment_transaction.
+  $data['commerce_order']['table']['join']['commerce_payment_transaction'] = array(
+    'left_field' => 'order_id',
+    'field' => 'order_id',
+  );
+
+  $data['commerce_order']['payment_transaction']['relationship'] = array(
+    'title' => t('Payment Transaction'),
+    'help' => t("Relate this order to its payment transactions. This relationship will cause duplicated records if there are multiple transactions per order."),
+    'handler' => 'views_handler_relationship',
+    'base' => 'commerce_payment_transaction',
+    'base field' => 'order_id',
+    'field' => 'order_id',
+    'label' => t('Transaction', array(), array('context' => 'a drupal commerce transaction')),
+  );
+
+  $data['commerce_order']['payment_transaction_representative']['relationship'] = array(
+    'title' => t('Representative payment transaction'),
+    'label'  => t('Representative payment transaction'),
+    'help' => t('Obtains a single representative payment transaction for each order, according to a chosen sort criterion.'),
+    'handler' => 'views_handler_relationship_groupwise_max',
+    'relationship field' => 'order_id',
+    'outer field' => 'commerce_order.order_id',
+    'argument table' => 'commerce_order',
+    'argument field' =>  'order_id',
+    'base'   => 'commerce_payment_transaction',
+    'field'  => 'transaction_id',
+  );
+
 }
