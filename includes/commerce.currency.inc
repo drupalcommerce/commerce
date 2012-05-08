@@ -597,6 +597,17 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Cent'),
       'major_unit' => t('Shilling'),
     ),
+    'KGS' => array(
+      'code' => 'KGS',
+      'code_placement' => '',
+      'symbol' => 'сом',
+      'symbol_placement' => 'after',
+      'name' => t('Kyrgyzstani Som'),
+      'numeric_code' => '417',
+      'thousands_separator' => '',
+      'major_unit' => t('Som'),
+      'minor_unit' => t('Tyiyn'),
+    ),
     'KMF' => array(
       'code' => 'KMF',
       'symbol' => 'CF',
