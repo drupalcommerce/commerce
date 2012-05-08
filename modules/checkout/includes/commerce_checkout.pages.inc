@@ -366,9 +366,11 @@ function commerce_checkout_form_back_submit($form, &$form_state) {
  * Special submit handler for the cancel button to avoid processing orders.
  */
 function commerce_checkout_form_cancel_submit($form, &$form_state) {
-  // Set the order status back to the first step of checkout.
   $order = commerce_order_load($form_state['order']->order_id);
-  $form_state['order'] = commerce_order_status_update($order, 'checkout_checkout', TRUE);
+
+  // Set the order status back to the first checkout page's status.
+  $order_state = commerce_order_state_load('checkout');
+  $form_state['order'] = commerce_order_status_update($order, $order_state['default_status'], TRUE);
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.

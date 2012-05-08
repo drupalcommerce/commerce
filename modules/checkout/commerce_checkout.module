@@ -219,9 +219,11 @@ function commerce_checkout_form_alter(&$form, &$form_values, $form_id) {
  * Submit handler used to redirect to the checkout page.
  */
 function commerce_checkout_line_item_views_form_submit($form, &$form_state) {
-  // Set the order status to the first checkout page.
   $order = commerce_order_load($form_state['order']->order_id);
-  $form_state['order'] = commerce_order_status_update($order, 'checkout_checkout', TRUE);
+
+  // Set the order status to the first checkout page's status.
+  $order_state = commerce_order_state_load('checkout');
+  $form_state['order'] = commerce_order_status_update($order, $order_state['default_status'], TRUE);
 
   // Skip saving in the status update and manually save here to force a save
   // even when the status doesn't actually change.
@@ -265,7 +267,7 @@ function commerce_checkout_commerce_order_state_info() {
     'title' => t('Checkout'),
     'description' => t('Orders in this state have begun but not completed the checkout process.'),
     'weight' => -3,
-    'default_status' => 'checkout_checkout',
+    'default_status' => 'checkout_' . commerce_checkout_first_checkout_page(),
   );
 
   return $order_states;
@@ -411,6 +413,13 @@ function commerce_checkout_pages() {
   }
 
   return $checkout_pages;
+}
+
+/**
+ * Returns the page ID of the first checkout page sorted by weight.
+ */
+function commerce_checkout_first_checkout_page() {
+  return key(commerce_checkout_pages());
 }
 
 /**
