@@ -15,6 +15,15 @@ function commerce_cart_views_data_alter(&$data) {
       'handler' => 'commerce_cart_handler_field_add_to_cart_form',
     ),
   );
+
+  $data['commerce_order']['cart_empty_text'] = array(
+    'title' => t('Empty Shopping Cart'),
+    'help' => t('Displays an appropriate empty text message for shopping carts.'),
+    'area' => array(
+      'handler' => 'commerce_cart_handler_area_empty_text',
+    ),
+  );
+
 }
 
 /**

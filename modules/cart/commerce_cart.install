@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Make all fields that were previously eligible for attribute selection on tne
+ * Make all fields that were previously eligible for attribute selection on the
  * Add to Cart form continue to use the attribute selection widget.
  */
 function commerce_cart_update_7100() {

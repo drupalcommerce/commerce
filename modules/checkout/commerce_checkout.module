@@ -203,15 +203,20 @@ function commerce_checkout_forms($form_id, $args) {
 /**
  * Implements hook_form_alter().
  */
-function commerce_checkout_form_alter(&$form, &$form_values, $form_id) {
+function commerce_checkout_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
-    $form['actions']['checkout'] = array(
-      '#type' => 'submit',
-      '#value' => t('Checkout'),
-      '#weight' => 5,
-      '#access' => user_access('access checkout'),
-      '#submit' => array_merge($form['#submit'], array('commerce_checkout_line_item_views_form_submit')),
-    );
+    // Only add the Checkout button if the cart form View shows line items.
+    $view = reset($form_state['build_info']['args']);
+
+    if (!empty($view->result)) {
+      $form['actions']['checkout'] = array(
+        '#type' => 'submit',
+        '#value' => t('Checkout'),
+        '#weight' => 5,
+        '#access' => user_access('access checkout'),
+        '#submit' => array_merge($form['#submit'], array('commerce_checkout_line_item_views_form_submit')),
+      );
+    }
   }
 }
 
