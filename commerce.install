@@ -323,3 +323,10 @@ function commerce_update_7102() {
     ->execute();
   return t('The module weight for Commerce has been increased.');
 }
+
+/**
+ * Flush all caches.
+ */
+function commerce_update_7103() {
+  // The update system is going to flush all caches anyway, so nothing to do.
+}
