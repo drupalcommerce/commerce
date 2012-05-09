@@ -1680,6 +1680,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       // by product title.
       if (!empty($qualifying_fields)) {
         $used_options = array();
+        $field_has_options = array();
 
         // Sort the fields by weight.
         uasort($qualifying_fields, 'drupal_sort_weight');
@@ -1704,12 +1705,15 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
 
             // With our hard dependency on widgets provided by the Options
             // module, we can make assumptions about where the data is stored.
+            if ($product_wrapper->{$field_name}->raw() != NULL) {
+              $field_has_options[$field_name] = TRUE;
+            }
             $used_options[$field_name][] = $product_wrapper->{$field_name}->raw();
           }
 
           // If for some reason no options for this field are used, remove it
           // from the qualifying fields array.
-          if (empty($used_options[$field_name])) {
+          if (empty($field_has_options[$field_name]) || empty($used_options[$field_name])) {
             unset($qualifying_fields[$field_name]);
           }
           else {
