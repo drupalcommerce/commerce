@@ -156,8 +156,7 @@ function commerce_checkout_theme() {
     ),
     'commerce_checkout_review' => array(
       'render element' => 'form',
-      'path' => drupal_get_path('module', 'commerce_checkout') . '/theme',
-      'template' => 'commerce-checkout-review',
+      'file' => 'includes/commerce_checkout.pages.inc',
     ),
     'commerce_checkout_help' => array(
       'variables' => array('help' => NULL),
@@ -896,22 +895,4 @@ function commerce_checkout_completion_message_default() {
   else {
     return t('Your order is number [commerce-order:order-number]. You can view your order on your account page when logged in.');
   }
-}
-
-/**
- * Preprocess function for theme_commerce_checkout_review.
- * @see commerce-checkout-review.tpl.php
- */
-function template_preprocess_commerce_checkout_review(&$variables) {
-  $variables['classes_array'][] = 'commerce-checkout-review-pane';
-  $variables['classes_array'][] = 'clearfix';
-
-  $panes = array();
-  foreach ($variables['form']['#data'] as $pane_id => $data) {
-    $panes[$pane_id] = array(
-      'title' => $data['title'],
-      'data' => $data['data'],
-    );
-  }
-  $variables['panes'] = $panes;
 }

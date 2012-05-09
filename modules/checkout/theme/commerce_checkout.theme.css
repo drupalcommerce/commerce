@@ -23,3 +23,32 @@
   color: #018fe2;
   text-decoration: underline;
 }
+
+/**
+ * Tweak review page layout.
+ */
+table.checkout-review .pane-title td {
+  padding-left: 1em;
+  font-weight: bold;
+}
+
+table.checkout-review tr.pane-data {
+  vertical-align: top;
+}
+
+table.checkout-review .pane-data-key {
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 3em;
+  width: 50%;
+}
+
+table.checkout-review .pane-data-value {
+  padding-right: 3em;
+}
+
+table.checkout-review .pane-data-full {
+  padding-left: 1em;
+  padding-right: 1em;
+}
