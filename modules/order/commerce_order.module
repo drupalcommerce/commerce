@@ -497,53 +497,60 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
 function commerce_order_commerce_customer_profile_presave($profile) {
   // Only perform this check when updating an existing profile.
   if (!empty($profile->profile_id)) {
-    // Load the unchanged profile to see if any essential data has changed.
-    $unchanged_profile = entity_load_unchanged('commerce_customer_profile', $profile->profile_id);
+    $original_profile = $profile->original;
     $field_change = FALSE;
 
     // Compare against the field values.
     foreach (field_info_instances('commerce_customer_profile', $profile->type) as $field_name => $instance) {
-      // Provide special handling for the addressfield to accommodate the fact
-      // that the field as loaded from the database may contain additional keys
-      // with empty values based on the field schema that aren't included in the
-      // profile being saved because their corresponding form elements weren't
-      // included on the edit form.
-      if ($field_name == 'commerce_customer_address') {
-        // For each item of each language...
-        foreach ($profile->{$field_name} as $langcode => $data) {
-          foreach ($data as $delta => $value) {
-            // Consider it a change if the same key did not previously exist.
-            if (empty($unchanged_profile->{$field_name}[$langcode][$delta])) {
+      $langcode = field_language('commerce_customer_profile', $profile, $field_name);
+
+      // Make sure that empty fields have a consistent structure.
+      if (empty($profile->{$field_name})) {
+        $profile->{$field_name}[$langcode] = array();
+      }
+
+      if (empty($original_profile->{$field_name})) {
+        $original_profile->{$field_name}[$langcode] = array();
+      }
+
+      // Extract the items from the field value that need to be compared.
+      $items = $profile->{$field_name}[$langcode];
+      $original_items = $original_profile->{$field_name}[$langcode];
+
+      // If the number of items has changed, mark the field change.
+      if (count($items) != count($original_items)) {
+        $field_change = TRUE;
+        break;
+      }
+
+      // Loop over each item in the field value.
+      foreach ($items as $delta => $item) {
+        // Find the supposedly matching original item.
+        $original_item = $original_items[$delta];
+
+        // Compare columns common to both arrays.
+        $item = array_intersect_key($item, $original_item);
+        $original_item = array_intersect_key($original_item, $item);
+
+        if ($item != $original_item) {
+          $field_change = TRUE;
+          break;
+        }
+
+        // Provide special handling for the addressfield to accommodate the fact
+        // that the field as loaded from the database may contain additional
+        // keys that aren't included in the profile being saved because their
+        // corresponding form elements weren't included on the edit form.
+        // If those additional keys contain data, the field needs to be
+        // marked as changed.
+        if ($field_name == 'commerce_customer_address') {
+          foreach ($original_items[$delta] as $key => $value) {
+            if (!in_array($key, array_keys($item)) && !empty($value)) {
               $field_change = TRUE;
-              break;
-            }
-
-            // Strip the element key out of this item.
-            unset($value['element_key']);
-
-            // First create a comparison array from the unchanged value.
-            $comparison_value = array_intersect_key($unchanged_profile->{$field_name}[$langcode][$delta], $value);
-
-            // If the arrays don't match, we have a change.
-            if ($value != $comparison_value) {
-              $field_change = TRUE;
-              break;
-            }
-
-            // Or if the unchanged value has data that the updated address does
-            // not, we have a changed.
-            foreach ($unchanged_profile->{$field_name}[$langcode][$delta] as $key => $value) {
-              if (!in_array($key, array_keys($comparison_value)) && !empty($value)) {
-                $field_change = TRUE;
-                break 2;
-              }
+              break 2;
             }
           }
         }
-      }
-      elseif ($profile->{$field_name} != $unchanged_profile->{$field_name}) {
-        $field_change = TRUE;
-        break;
       }
     }
 
