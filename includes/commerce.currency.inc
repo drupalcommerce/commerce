@@ -928,6 +928,7 @@ function commerce_commerce_currency_info() {
       'thousands_separator' => ' ',
       'numeric_code' => '985',
       'symbol_placement' => 'after',
+      'code_placement' => '',
       'minor_unit' => t('Grosz'),
       'major_unit' => t('Złotych'),
     ),
