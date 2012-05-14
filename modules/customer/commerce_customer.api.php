@@ -19,7 +19,7 @@
  *
  * The Customer module defines a single customer information profile type in its
  * own implementation of this hook,
- * commerce_customer_commerce_commerce_customer_profile_type_info():
+ * commerce_customer_commerce_customer_profile_type_info():
  * - Billing information: used to collect a billing name and address from the
  *   customer for use in processing payments.
  *

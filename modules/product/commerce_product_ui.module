@@ -369,7 +369,7 @@ function commerce_product_ui_product_type_save($product_type, $configure = TRUE,
   // Rebuild the menu to add this product type's menu items.
   if (!$skip_reset) {
     commerce_product_types_reset();
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   return $op;
@@ -396,7 +396,7 @@ function commerce_product_ui_product_type_delete($type, $skip_reset = FALSE) {
   // Rebuild the menu to get rid of this product type's menu items.
   if (!$skip_reset) {
     commerce_product_types_reset();
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   // Notify the field API that this bundle has been destroyed.

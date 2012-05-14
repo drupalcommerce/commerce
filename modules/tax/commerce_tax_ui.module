@@ -302,7 +302,7 @@ function commerce_tax_ui_tax_type_save($tax_type, $skip_reset = FALSE) {
   if (!$skip_reset) {
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   return $op;
@@ -333,7 +333,7 @@ function commerce_tax_ui_tax_type_delete($name, $skip_reset = FALSE) {
   if (!$skip_reset) {
     entity_defaults_rebuild();
     rules_clear_cache();
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   // Notify other modules that this tax type has been deleted.
@@ -420,7 +420,7 @@ function commerce_tax_ui_tax_rate_save($tax_rate, $skip_reset = FALSE) {
   if (!$skip_reset) {
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   return $op;
@@ -451,7 +451,7 @@ function commerce_tax_ui_tax_rate_delete($name, $skip_reset = FALSE) {
   if (!$skip_reset) {
     entity_defaults_rebuild();
     rules_clear_cache(TRUE);
-    menu_rebuild();
+    variable_set('menu_rebuild_needed', TRUE);
   }
 
   // Notify other modules that this tax rate has been deleted.
