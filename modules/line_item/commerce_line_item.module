@@ -800,7 +800,7 @@ function commerce_line_item_field_validate($entity_type, $entity, $field, $insta
  * Implements hook_field_is_empty().
  */
 function commerce_line_item_field_is_empty($item, $field) {
-  // line_item_id = 0 îs empty too, which is exactly what we want.
+  // line_item_id = 0 is empty too, which is exactly what we want.
   return empty($item['line_item_id']);
 }
 

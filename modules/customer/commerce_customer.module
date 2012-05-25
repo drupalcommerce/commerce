@@ -823,7 +823,7 @@ function commerce_customer_field_validate($entity_type, $entity, $field, $instan
  */
 function commerce_customer_field_is_empty($item, $field) {
   if ($field['type'] == 'commerce_customer_profile_reference') {
-    // profile_id = 0 îs empty too, which is exactly what we want.
+    // profile_id = 0 is empty too, which is exactly what we want.
     return empty($item['profile_id']);
   }
 }
