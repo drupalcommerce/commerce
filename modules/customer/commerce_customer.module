@@ -1243,3 +1243,96 @@ function commerce_customer_profile_set_properties($profile, $name, $value) {
     $profile->uid = $value;
   }
 }
+
+/**
+ * Element validate callback: Pertaining to the "copy profile" checkbox.
+ */
+function commerce_customer_profile_copy_validate($element, &$form_state, $form) {
+  $triggering_element = end($form_state['triggering_element']['#array_parents']);
+  $pane_id = reset($element['#array_parents']);
+
+  // Checkbox: Off - Only invoked for the corresponding trigger element.
+  if ($triggering_element == 'commerce_customer_profile_copy' && $form_state['triggering_element']['#id'] == $element['#id'] && empty($element['#value'])) {
+    $form_state['order']->data['profile_copy'][$pane_id]['status'] = FALSE;
+    unset($form_state['order']->data['profile_copy'][$pane_id]['elements']);
+    commerce_order_save($form_state['order']);
+  }
+
+  // Checkbox: On - Only invoked for the corresponding trigger element, or the
+  // "continue" checkout form button.
+  elseif ((($triggering_element == 'commerce_customer_profile_copy' && $form_state['triggering_element']['#id'] == $element['#id']) || $triggering_element == 'continue') && !empty($element['#value'])) {
+    $type = substr($pane_id, 17);  // Removes 'customer_profile_'
+    $source_id = 'customer_profile_' . variable_get('commerce_' . $pane_id . '_profile_copy_source', '');
+    $info = array('commerce_customer_profile', $type, $pane_id);
+
+    // Try getting the source profile from the form_state values, if it is present on the form..
+    if (isset($form_state['values'][$source_id])) {
+      _commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $form_state['input'][$source_id], $form_state);
+      _commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $form_state['values'][$source_id], $form_state);
+    }
+
+    // Otherwise, attempt to get source profile from the order object.
+    else {
+      // Check for source profile via order wrapper.
+      $wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+      $profile = NULL;
+
+      if ($source_field_name = variable_get('commerce_' . $source_id . '_field', '')) {
+        $profile = $wrapper->{$source_field_name}->value();
+      }
+      elseif (!empty($form_state['order']->data['profiles'][$source_id])) {
+        $profile = commerce_customer_profile_load($form_state['order']->data['profiles'][$source_id]);
+      }
+
+      if (!empty($profile)) {
+        _commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $profile, $form_state);
+        _commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $profile, $form_state);
+      }
+    }
+
+
+    $form_state['order']->data['profile_copy'][$pane_id]['status'] = TRUE;
+    commerce_order_save($form_state['order']);
+  }
+}
+
+/**
+ * Copy field values from a source profile to a target array.
+ *
+ * @param $info
+ *   An array containing info for the entity type, bundle, and pane ID.
+ * @param $target
+ *   An array (typically $form_state) in which values will be copied to.
+ * @param $source
+ *   Can be either an array or object of values.
+ * @param $form_state
+ *   The form state array from the form.
+ */
+function _commerce_customer_profile_copy_fields($info, &$target, $source, &$form_state) {
+  list($entity_type, $bundle, $pane_id) = $info;
+
+  // Loop over all the field instances that could be attached to this entity.
+  foreach (field_info_instances($entity_type, $bundle) as $field_name => $instance) {
+    $field = NULL;
+
+    // Extract the field value from the source object or array.
+    if (is_object($source) && isset($source->{$field_name})) {
+      $field = $source->{$field_name};
+    }
+    elseif (is_array($source) && isset($source[$field_name])) {
+      $field = $source[$field_name];
+    }
+
+    // Loop over the source field value and copy its items to the target.
+    if (is_array($field)) {
+      foreach ($field as $langcode => $items) {
+        if (is_array($items)) {
+          foreach ($items as $delta => $item) {
+            $target[$field_name][$langcode][$delta] = $item;
+            $form_state['order']->data['profile_copy'][$pane_id]['elements'][$field_name][$langcode][$delta] = TRUE;
+          }
+        }
+      }
+    }
+  }
+}

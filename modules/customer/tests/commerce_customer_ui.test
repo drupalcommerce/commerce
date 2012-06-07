@@ -555,6 +555,60 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     // Check if the profile type is present.
     $this->drupalGet('admin/commerce/orders/' . $order->order_id . '/edit');
     $this->assertText(t('Dummy profile type'), t('Dummy profile type is present in the order edit form'));
+  }
 
+  /**
+   * Test the copying of one profile's fields to another.
+   */
+  public function testCommerceCustomerUIProfileCopy() {
+    // Enable the helper module that creates a new profile type.
+    module_enable(array('commerce_customer_profile_dummy_type'));
+
+    // Configure the dummy profile type's checkout pane to allow copying from
+    // the billing information customer profile type.
+    variable_set('commerce_customer_profile_dummy_profile_copy', TRUE);
+    variable_set('commerce_customer_profile_dummy_profile_copy_source', 'billing');
+
+    // Create an order.
+    $order = $this->createDummyOrder($this->store_customer->uid);
+    // Login with customer.
+    $this->drupalLogin($this->store_customer);
+    // Access checkout.
+    $this->drupalGet($this->getCommerceUrl('checkout'));
+
+    // Generate random information, as city, postal code, etc.
+    $address_info = $this->generateAddressInformation();
+
+    // Fill in the billing address information
+    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
+    $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+
+    // Fill in the required information for billing pane, with a random State.
+    $info = array(
+      'customer_profile_billing[commerce_customer_address][und][0][name_line]' => $address_info['name_line'],
+      'customer_profile_billing[commerce_customer_address][und][0][thoroughfare]' => $address_info['thoroughfare'],
+      'customer_profile_billing[commerce_customer_address][und][0][locality]' => $address_info['locality'],
+      'customer_profile_billing[commerce_customer_address][und][0][administrative_area]' => 'KY',
+      'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => $address_info['postal_code'],
+      'customer_profile_dummy[commerce_customer_profile_copy]' => 1,
+    );
+    $this->drupalPostAJAX(NULL, $info, 'customer_profile_dummy[commerce_customer_profile_copy]');
+    $this->drupalPost(NULL, $info, t('Continue to next step'));
+
+    // Check the customer profile at database level.
+    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Extract the address field value from the billing profile.
+    $profile = $order_wrapper->commerce_customer_billing->value();
+    $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
+    $billing_address = $profile_wrapper->commerce_customer_address->value();
+
+    // And extract the address field value from the dummy profile.
+    $profile = $order_wrapper->commerce_customer_dummy->value();
+    $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
+    $dummy_address = $profile_wrapper->commerce_customer_address->value();
+
+    $this->assertTrue(array_intersect($billing_address, $dummy_address) == $billing_address, t('A billing information customer profile was successfully copied to a dummy customer profile during checkout.'));
   }
 }

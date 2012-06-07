@@ -1,0 +1,14 @@
+
+/**
+ * @file
+ * Basic styling for the Commerce Customer module.
+ */
+
+.commerce-customer-profile-copy .ajax-progress {
+  float: none;
+  display: inline;
+}
+
+.commerce-customer-profile-copy .ajax-progress .message {
+  display: none;
+}

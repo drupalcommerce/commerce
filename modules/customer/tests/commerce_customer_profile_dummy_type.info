@@ -1,7 +1,6 @@
-name = "Commerce customer module tests"
-description = "Support module for customer profile related testing."
+name = "Commerce Customer Dummy Profile"
+description = Defines a dummy customer profile type for use in certain Customer module tests.
 package = Testing
-dependencies[] = commerce
 version = VERSION
 core = 7.x
 hidden = TRUE
