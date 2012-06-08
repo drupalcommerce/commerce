@@ -19,13 +19,13 @@
  * The Order module defines several order states in its own implementation of
  * this hook, commerce_order_commerce_order_state_info():
  * - Canceled: for orders that have been canceled through some user action
- * - Pending: for rrders that have been created and are awaiting further action
+ * - Pending: for orders that have been created and are awaiting further action
  * - Completed: for orders that have been completed as far as the customer
  *   should be concerned.
  *
  * Additionally, the Cart and Checkout modules define the following order states:
  * - Shopping cart: for orders that have not been completed by the customer yet
- * - Checkout: for orders thathave begun but not completed the checkout process
+ * - Checkout: for orders that have begun but not completed the checkout process
  *
  * The order state array structure is as follows:
  * - name: machine-name identifying the order state using lowercase alphanumeric
