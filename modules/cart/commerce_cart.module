@@ -1698,8 +1698,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
                 continue;
               }
 
-              if ($product_wrapper->{$used_field_name}->raw() != $form['attributes'][$used_field_name]['#default_value']) {
-                continue 2;
+              if (isset($form['attributes'][$used_field_name]['#default_value'])) {
+                if ($product_wrapper->{$used_field_name}->raw() != $form['attributes'][$used_field_name]['#default_value']) {
+                  continue 2;
+                }
               }
             }
 
