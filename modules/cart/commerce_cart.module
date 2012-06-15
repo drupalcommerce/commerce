@@ -1481,9 +1481,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     );
   }
   else {
-    // If the form is for a single product, store the product_id in a hidden
-    // form field for use by the submit handler.
-    if (count($products) == 1) {
+    // If the form is for a single product and displaying attributes on a single
+    // product Add to Cart form is disabled in the form context, store the
+    // product_id in a hidden form field for use by the submit handler.
+    if (count($products) == 1 && empty($line_item->data['context']['show_single_product_attributes'])) {
       $form_state['default_product'] = reset($products);
 
       $form['product_id'] = array(
@@ -1809,28 +1810,38 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       }
 
       // If the products referenced were of different types or did not posess
-      // any qualifying attribute fields, add a product selection widget.
+      // any qualifying attribute fields...
       if (!$same_type || empty($qualifying_fields)) {
-        $options = array();
-
-        foreach ($products as $product_id => $product) {
-          $options[$product_id] = $product->title;
+        // For a single product form, just add the hidden product_id field.
+        if (count($products) == 1) {
+          $form['product_id'] = array(
+            '#type' => 'hidden',
+            '#value' => $default_product->product_id,
+          );
         }
+        else {
+          // Otherwise add a product selection widget.
+          $options = array();
 
-        // Note that this element by default is a select list, so its #options
-        // are not sanitized here. Sanitization will occur in a check_plain() in
-        // the function form_select_options(). If you alter this element to
-        // another #type, such as 'radios', you are also responsible for looping
-        // over its #options array and sanitizing the values.
-        $form['product_id'] = array(
-          '#type' => 'select',
-          '#options' => $options,
-          '#default_value' => $default_product->product_id,
-          '#weight' => 0,
-          '#ajax' => array(
-            'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
-          ),
-        );
+          foreach ($products as $product_id => $product) {
+            $options[$product_id] = $product->title;
+          }
+
+          // Note that this element by default is a select list, so its #options
+          // are not sanitized here. Sanitization will occur in a check_plain() in
+          // the function form_select_options(). If you alter this element to
+          // another #type, such as 'radios', you are also responsible for looping
+          // over its #options array and sanitizing the values.
+          $form['product_id'] = array(
+            '#type' => 'select',
+            '#options' => $options,
+            '#default_value' => $default_product->product_id,
+            '#weight' => 0,
+            '#ajax' => array(
+              'callback' => 'commerce_cart_add_to_cart_form_attributes_refresh',
+            ),
+          );
+        }
       }
     }
 
@@ -2103,6 +2114,7 @@ function commerce_cart_field_formatter_info() {
         'show_quantity' => FALSE,
         'default_quantity' => 1,
         'combine' => TRUE,
+        'show_single_product_attributes' => FALSE,
         'line_item_type' => 'product',
       ),
     ),
@@ -2138,6 +2150,13 @@ function commerce_cart_field_formatter_settings_form($field, $instance, $view_mo
       '#title' => t('Attempt to combine like products on the same line item in the cart.'),
       '#description' => t('The line item type, referenced product, and data from fields exposed on the Add to Cart form must all match to combine.'),
       '#default_value' => $settings['combine'],
+    );
+
+    $element['show_single_product_attributes'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show attribute widgets even if the Add to Cart form only represents one product.'),
+      '#description' => t('If enabled, attribute widgets will be shown on the form with the only available options selected.'),
+      '#default_value' => $settings['show_single_product_attributes'],
     );
 
     // Add a conditionally visible line item type element.
@@ -2185,6 +2204,7 @@ function commerce_cart_field_formatter_settings_summary($field, $instance, $view
       t('Quantity widget: !status', array('!status' => $settings['show_quantity'] ? t('Enabled') : t('Disabled'))),
       t('Default quantity: @quantity', array('@quantity' => $settings['default_quantity'])),
       t('Combine like items: !status', array('!status' => $settings['combine'] ? t('Enabled') : t('Disabled'))),
+      t('!visibility attributes on single product forms.', array('!visibility' => $settings['show_single_product_attributes'] ? t('Showing') : t('Hiding'))),
     );
 
     if (count(commerce_product_line_item_types()) > 1) {
@@ -2219,6 +2239,7 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
       $line_item = commerce_product_line_item_new(reset($products), $settings['default_quantity'], 0, array(), $type);
       $line_item->data['context']['product_ids'] = array_keys($products);
       $line_item->data['context']['add_to_cart_combine'] = $settings['combine'];
+      $line_item->data['context']['show_single_product_attributes'] = $settings['show_single_product_attributes'];
 
       $result[] = array(
         '#arguments' => array(
