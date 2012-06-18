@@ -145,6 +145,25 @@ function commerce_order_views_data() {
     ),
   );
 
+  // Expose the order e-mail address.
+  $data['commerce_order']['mail'] = array(
+    'title' => t('E-mail'),
+    'help' => t('The e-mail address used for correspondence about this order.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order_mail',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Expose the created and changed timestamps.
   $data['commerce_order']['created'] = array(
     'title' => t('Created date'),
