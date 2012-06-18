@@ -8,12 +8,12 @@
  * Theme the line item summary.
  */
 .line-item-summary {
-  text-align: right;
+  text-align: right; /* LTR */
   margin-bottom: 1em;
 }
 
 .line-item-summary .line-item-quantity {
-  float: left;
+  float: left; /* LTR */
 }
 
 .line-item-summary .line-item-total-label {
@@ -22,11 +22,11 @@
 
 .line-item-summary .links {
   margin-top: .5em;
-  clear: left;
+  clear: left; /* LTR */
 }
 
 .line-item-summary .links li.last {
-  padding-right: 0;
+  padding-right: 0; /* LTR */
 }
 
 /**
@@ -38,10 +38,10 @@
 }
 
 .commerce-line-item-views-form .cart-subtotal {
-  text-align: right;
+  text-align: right; /* LTR */
   font-size: 1.5em;
 }
 
 .commerce-line-item-views-form .commerce-line-item-actions {
-  text-align: right;
+  text-align: right; /* LTR */
 }

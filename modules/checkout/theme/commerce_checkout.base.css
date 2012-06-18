@@ -7,7 +7,7 @@
  */
 
 .checkout-processing {
-  padding-right: 13px !important;
-  margin-right: 6px;
-  background: url(../images/status-active.gif) right center no-repeat;
+  padding-right: 13px !important; /* LTR */
+  margin-right: 6px; /* LTR */
+  background: url(../images/status-active.gif) right center no-repeat; /* LTR */
 }

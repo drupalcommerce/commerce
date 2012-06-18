@@ -1,0 +1,8 @@
+.commerce-price-full .form-item {
+  margin-right: 0;
+  margin-left: 1em;
+}
+
+.commerce-price-formatted-components .component-total {
+  text-align: left;
+}

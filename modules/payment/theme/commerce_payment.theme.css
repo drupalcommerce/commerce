@@ -15,10 +15,10 @@
 .commerce-credit-card-start .form-item,
 .commerce-credit-card-expiration .form-item {
   display: inline;
-  margin-right: .25em;
+  margin-right: .25em; /* LTR */
   margin-bottom: 1em;
 }
 
 .commerce-month-year-divider {
-  margin-right: 3px;
+  margin-right: 3px; /* LTR */
 }

@@ -8,15 +8,15 @@
 
 .views-field-operations .links.operations {
   text-transform: lowercase;
-  margin-left: 0;
+  margin-left: 0; /* LTR */
 }
 
 /**
  * Order redirect form
  */
 #commerce-order-ui-redirect-form .form-item {
-  float: left;
-  margin: 0 2em 0 0;
+  float: left; /* LTR */
+  margin: 0 2em 0 0; /* LTR */
 }
 
 #commerce-order-ui-redirect-form .form-submit {

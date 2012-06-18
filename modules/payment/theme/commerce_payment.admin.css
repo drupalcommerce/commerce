@@ -8,7 +8,7 @@
 
 .views-field-operations .links.operations {
   text-transform: lowercase;
-  margin-left: 0;
+  margin-left: 0; /* LTR */
 }
 
 /**
@@ -21,7 +21,7 @@
 
 .payment-totals-table {
   width: 33%;
-  float: right;
+  float: right; /* LTR */
 }
 
 .payment-totals-table tr.order-balance {
@@ -31,14 +31,14 @@
 
 .payment-totals-table .total,
 .payment-totals-table .balance {
-  text-align: right;
+  text-align: right; /* LTR */
 }
 
 .add-payment .form-item-payment-method {
-  float: left;
+  float: left; /* LTR */
 }
 .add-payment .form-submit {
-  float: left;
+  float: left; /* LTR */
   margin: 5px;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .payment-terminal {
-  clear: right;
+  clear: right; /* LTR */
 }
 
 .payment-terminal-amount div {

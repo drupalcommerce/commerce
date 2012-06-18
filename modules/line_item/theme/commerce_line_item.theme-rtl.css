@@ -1,0 +1,23 @@
+.line-item-summary {
+  text-align: left;
+}
+
+.line-item-summary .line-item-quantity {
+  float: right;
+}
+
+.line-item-summary .links {
+  clear: right;
+}
+
+.line-item-summary .links li.last {
+  padding-left: 0;
+}
+
+.commerce-line-item-views-form .cart-subtotal {
+  text-align: left;
+}
+
+.commerce-line-item-views-form .commerce-line-item-actions {
+  text-align: left;
+}

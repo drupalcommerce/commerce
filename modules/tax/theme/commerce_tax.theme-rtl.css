@@ -1,0 +1,9 @@
+.field-type-commerce-price .form-item {
+  float: right;
+  margin-right: 0;
+  margin-left: 1em;
+}
+
+.commerce-price-tax-included-clearfix {
+  clear: right;
+}

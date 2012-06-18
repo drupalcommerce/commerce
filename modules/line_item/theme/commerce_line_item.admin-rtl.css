@@ -1,0 +1,12 @@
+#line-item-manager caption {
+  text-align: right;
+}
+
+.add-line-item .form-type-select {
+  float: right;
+  padding: 3px 0 0 10px;
+}
+
+#line-item-manager .form-submit {
+  float: right;
+}

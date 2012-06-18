@@ -6,7 +6,7 @@
 
 .commerce-price-full .form-item {
   display: inline;
-  margin-right: 1em;
+  margin-right: 1em; /* LTR */
 }
 
 #edit-parameter-value .commerce-price-full {
@@ -14,5 +14,5 @@
 }
 
 .commerce-price-formatted-components .component-total {
-  text-align: right;
+  text-align: right; /* LTR */
 }

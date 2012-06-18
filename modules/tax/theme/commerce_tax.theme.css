@@ -5,10 +5,10 @@
  */
 
 .field-type-commerce-price .form-item {
-  float: left;
-  margin-right: 1em;
+  float: left; /* LTR */
+  margin-right: 1em; /* LTR */
 }
 
 .commerce-price-tax-included-clearfix {
-  clear: left;
+  clear: left; /* LTR */
 }

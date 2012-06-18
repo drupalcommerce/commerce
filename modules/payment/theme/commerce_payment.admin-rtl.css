@@ -1,0 +1,23 @@
+.views-field-operations .links.operations {
+  margin-right: 0;
+}
+
+.payment-totals-table {
+  float: left;
+}
+
+.payment-totals-table .total,
+.payment-totals-table .balance {
+  text-align: left;
+}
+
+.add-payment .form-item-payment-method {
+  float: right;
+}
+.add-payment .form-submit {
+  float: right;
+}
+
+.payment-terminal {
+  clear: left;
+}

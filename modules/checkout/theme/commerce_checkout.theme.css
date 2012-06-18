@@ -28,7 +28,7 @@
  * Tweak review page layout.
  */
 table.checkout-review .pane-title td {
-  padding-left: 1em;
+  padding-left: 1em; /* LTR */
   font-weight: bold;
 }
 
@@ -38,14 +38,14 @@ table.checkout-review tr.pane-data {
 
 table.checkout-review .pane-data-key {
   font-weight: bold;
-  text-align: right;
+  text-align: right; /* LTR */
   white-space: nowrap;
-  padding-left: 3em;
+  padding-left: 3em; /* LTR */
   width: 50%;
 }
 
 table.checkout-review .pane-data-value {
-  padding-right: 3em;
+  padding-right: 3em; /* LTR */
 }
 
 table.checkout-review .pane-data-full {
