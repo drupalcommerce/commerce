@@ -200,8 +200,13 @@ function commerce_payment_enable_method($order, $payment_method, $action_setting
   // Find the Rule that contains this action.
   $rule = $action->parentElement();
 
-  while ($rule->getPluginName() != 'reaction rule') {
-    $rule = $rule->parentElement();
+  while (!($rule instanceof RulesActionContainer)) {
+    if ($rule->parentElement()) {
+      $rule = $rule->parentElement();
+    }
+    else {
+      return;
+    }
   }
 
   // Initialize variables for the payment method ID and settings.
