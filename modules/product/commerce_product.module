@@ -231,6 +231,12 @@ function commerce_product_field_extra_fields() {
           'theme' => 'commerce_product_title',
           'weight' => -5,
         ),
+        'status' => array(
+          'label' => t('Status'),
+          'description' => t('Whether the product is active or disabled'),
+          'theme' => 'commerce_product_status',
+          'weight' => 5,
+        ),
       ),
     );
   }
@@ -919,4 +925,11 @@ function template_preprocess_commerce_product_sku(&$variables) {
  */
 function template_preprocess_commerce_product_title(&$variables) {
   $variables['title'] = check_plain($variables['title']);
+}
+
+/**
+ * Converts the product status integer to a string before output.
+ */
+function template_preprocess_commerce_product_status(&$variables) {
+  $variables['status'] = empty($variables['status']) ? t('Disabled') : t('Active');
 }

@@ -182,19 +182,14 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       '#markup' => theme('commerce_product_sku', array('sku' => $product->sku, 'label' => t('SKU:'), 'product' => $product)),
       '#attached' => $attached,
     );
-
-    // Only display the title and status on the full page view.
-    if ($view_mode == 'full') {
-      $content['title'] = array(
-        '#markup' => theme('commerce_product_title', array('title' => $product->title, 'label' => t('Title:'), 'product' => $product)),
-        '#attached' => $attached,
-      );
-
-      $content['status'] = array(
-        '#markup' => theme('commerce_product_status', array('status' => $product->status ? t('Active') : t('Disabled'), 'label' => t('Status:'), 'product' => $product)),
-        '#attached' => $attached,
-      );
-    }
+    $content['title'] = array(
+      '#markup' => theme('commerce_product_title', array('title' => $product->title, 'label' => t('Title:'), 'product' => $product)),
+      '#attached' => $attached,
+    );
+    $content['status'] = array(
+      '#markup' => theme('commerce_product_status', array('status' => $product->status, 'label' => t('Status:'), 'product' => $product)),
+      '#attached' => $attached,
+    );
 
     return parent::buildContent($product, $view_mode, $langcode, $content);
   }
