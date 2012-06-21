@@ -108,6 +108,8 @@ function commerce_product_entity_property_info_alter(&$info) {
       $properties += $bundle_info['properties'];
     }
 
-    $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
+    if (!empty($properties['commerce_price'])) {
+      $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
+    }
   }
 }
