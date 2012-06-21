@@ -465,17 +465,20 @@ function commerce_product_ui_form_alter(&$form, &$form_state, $form_id) {
  * @see commerce_product_ui_product_form()
  */
 function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form, &$form_state) {
+  $product = $form_state['commerce_product'];
+
   // Add a submit handler to the save button to add a redirect.
   $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_form_submit';
 
   // If translation support is enabled, provide the suitable languages
   if (module_exists('entity_translation') && entity_translation_enabled('commerce_product')) {
-    $translations = $form_state['commerce_product']->translations;
+    $handler = entity_translation_get_handler('commerce_product', $product);
+    $translations = $handler->getTranslations();
 
     $form['language'] = array(
       '#type' => 'select',
       '#title' => t('Language'),
-      '#default_value' => (isset($form_state['commerce_product']->language) ? $form_state['commerce_product']->language : ''),
+      '#default_value' => isset($product->language) ? $product->language : '',
       '#options' => array(LANGUAGE_NONE => t('Language neutral')) + locale_language_list('name'),
       '#weight' => -10,
     );
@@ -494,7 +497,7 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
   }
 
   // Add the save and continue button for new products.
-  if (empty($form_state['commerce_product']->product_id)) {
+  if (empty($product->product_id)) {
     $form['actions']['save_continue'] = array(
       '#type' => 'submit',
       '#value' => t('Save and add another'),
