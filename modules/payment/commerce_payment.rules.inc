@@ -65,7 +65,7 @@ function commerce_payment_rules_condition_info() {
       'value' => array(
         'type' => 'text',
         'label' => t('Value'),
-        'description' => t('The value to compare against the order balance. An order balance less than or equal to 0 indicates the order has been paid in full.'),
+        'description' => t('Integer representing a value in minor currency units to compare against, such as 1000 for $10. A balance of 0 or less indicates the order has been paid in full.'),
         'default value' => '0',
       ),
     ),
