@@ -69,7 +69,7 @@ function commerce_checkout_completion_message_pane_settings_form($checkout_pane)
       $text_format = 'filtered_html';
     }
     else {
-      $text_format = 'plain_text';
+      $text_format = filter_fallback_format();
     }
   }
 
@@ -135,7 +135,7 @@ function commerce_checkout_completion_message_pane_checkout_form($form, &$form_s
       $text_format = 'filtered_html';
     }
     else {
-      $text_format = 'plain_text';
+      $text_format = filter_fallback_format();
     }
   }
 
