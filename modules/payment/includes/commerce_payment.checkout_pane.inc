@@ -210,15 +210,22 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
 
   // If the payment method doesn't exist or does not require a redirect...
   if (!$payment_method || !$payment_method['offsite']) {
+    if (!$payment_method) {
+      $log = t('Customer skipped the Payment page because no payment was required.');
+    }
+    else {
+      $log = t('Customer skipped the Payment page because payment was already submitted.');
+    }
+
     // Advance the customer to the next step of the checkout process.
-    commerce_payment_redirect_pane_next_page($order);
+    commerce_payment_redirect_pane_next_page($order, $log);
     drupal_goto(commerce_checkout_order_uri($order));
   }
 
   // If the user came to the cancel URL...
   if (arg(3) == 'back' && arg(4) == $order->data['payment_redirect_key']) {
     // Send the customer to the previous step of the checkout process.
-    commerce_payment_redirect_pane_previous_page($order);
+    commerce_payment_redirect_pane_previous_page($order, t('Customer canceled payment at the payment gateway.'));
     drupal_goto(commerce_checkout_order_uri($order));
   }
 
@@ -235,14 +242,14 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
       }
 
       // Send the customer on to the next checkout page.
-      commerce_payment_redirect_pane_next_page($order);
+      commerce_payment_redirect_pane_next_page($order, t('Customer successfully submitted payment at the payment gateway.'));
       drupal_goto(commerce_checkout_order_uri($order));
     }
     else {
       // Otherwise display the failure message and send the customer back.
       drupal_set_message(t('Payment failed at the payment server. Please review your information and try again.'), 'error');
 
-      commerce_payment_redirect_pane_previous_page($order);
+      commerce_payment_redirect_pane_previous_page($order, t('Customer payment submission failed at the payment gateway.'));
       drupal_goto(commerce_checkout_order_uri($order));
     }
   }

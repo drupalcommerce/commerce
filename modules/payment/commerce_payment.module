@@ -317,8 +317,11 @@ function commerce_payment_commerce_checkout_pane_info() {
  *
  * @param $order
  *   An order object.
+ * @param $log
+ *   Optional log message to use when updating the order status in conjunction
+ *   with the redirect to the next checkout page.
  */
-function commerce_payment_redirect_pane_next_page($order) {
+function commerce_payment_redirect_pane_next_page($order, $log = '') {
   // Load the order status object for the current order.
   $order_status = commerce_order_status_load($order->status);
 
@@ -326,7 +329,7 @@ function commerce_payment_redirect_pane_next_page($order) {
     $payment_page = commerce_checkout_page_load($order_status['checkout_page']);
     $next_page = $payment_page['next_page'];
 
-    $order = commerce_order_status_update($order, 'checkout_' . $next_page);
+    $order = commerce_order_status_update($order, 'checkout_' . $next_page, FALSE, NULL, $log);
 
     // Inform modules of checkout completion if the next page is Completed.
     if ($next_page == 'complete') {
@@ -343,8 +346,11 @@ function commerce_payment_redirect_pane_next_page($order) {
  *
  * @param $order
  *   An order object.
+ * @param $log
+ *   Optional log message to use when updating the order status in conjunction
+ *   with the redirect to the previous checkout page.
  */
-function commerce_payment_redirect_pane_previous_page($order) {
+function commerce_payment_redirect_pane_previous_page($order, $log = '') {
   // Load the order status object for the current order.
   $order_status = commerce_order_status_load($order->status);
 
@@ -352,7 +358,7 @@ function commerce_payment_redirect_pane_previous_page($order) {
     $payment_page = commerce_checkout_page_load($order_status['checkout_page']);
     $prev_page = $payment_page['prev_page'];
 
-    $order = commerce_order_status_update($order, 'checkout_' . $prev_page);
+    $order = commerce_order_status_update($order, 'checkout_' . $prev_page, FALSE, NULL, $log);
   }
 }
 
