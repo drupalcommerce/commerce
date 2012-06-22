@@ -327,7 +327,9 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
           // Only prepare visible fields.
           if (!isset($product_field['display'][$reference_view_mode]['type']) || $product_field['display'][$reference_view_mode]['type'] != 'hidden') {
             // Add the product field to the entity's content array.
-            $entity->content['product:' . $product_field_name] = field_view_field('commerce_product', $product, $product_field_name, $reference_view_mode, $langcode);
+            $content_key = 'product:' . $product_field_name;
+
+            $entity->content[$content_key] = field_view_field('commerce_product', $product, $product_field_name, $reference_view_mode, $langcode);
 
             // For multiple value references, add context information so the cart
             // form can do dynamic replacement of fields.
@@ -341,10 +343,15 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
                 drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_field_name))),
               );
 
-              $entity->content['product:' . $product_field_name] += array(
-                '#prefix' => '<div class="' . implode(' ', $classes) . '">',
-                '#suffix' => '</div>',
+              // Ensure the field's content array has a prefix and suffix key.
+              $entity->content[$content_key] += array(
+                '#prefix' => '',
+                '#suffix' => '',
               );
+
+              // Add the custom div before and after the prefix and suffix.
+              $entity->content[$content_key]['#prefix'] = '<div class="' . implode(' ', $classes) . '">' . $entity->content[$content_key]['#prefix'];
+              $entity->content[$content_key]['#suffix'] .= '</div>';
             }
           }
         }
@@ -359,13 +366,15 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
           if (!empty($product_extra_field['theme']) &&
             !empty($display[$product_extra_field_name]['visible'])) {
             // Add the product extra field to the entity's content array.
+            $content_key = 'product:' . $product_extra_field_name;
+
             $variables = array(
               $product_extra_field_name => $product->{$product_extra_field_name},
               'label' => $product_extra_field['label'] . ':',
               'product' => $product,
             );
 
-            $entity->content['product:' . $product_extra_field_name] = array(
+            $entity->content[$content_key] = array(
               '#markup' => theme($product_extra_field['theme'], $variables),
               '#attached' => array(
                 'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
@@ -383,10 +392,15 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
                 drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_extra_field_name))),
               );
 
-              $entity->content['product:' . $product_extra_field_name] += array(
-                '#prefix' => '<div class="' . implode(' ', $classes) . '">',
-                '#suffix' => '</div>',
+              // Ensure the extra field's content array has a prefix and suffix key.
+              $entity->content[$content_key] += array(
+                '#prefix' => '',
+                '#suffix' => '',
               );
+
+              // Add the custom div before and after the prefix and suffix.
+              $entity->content[$content_key]['#prefix'] = '<div class="' . implode(' ', $classes) . '">' . $entity->content[$content_key]['#prefix'];
+              $entity->content[$content_key]['#suffix'] .= '</div>';
             }
           }
         }
