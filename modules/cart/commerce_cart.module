@@ -1542,6 +1542,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
             if ($value != $unchanged_attributes[$key]) {
               // Store the field name.
               $changed_attribute = $key;
+
+              // Clear the input for the "Select a product" widget now if it
+              // exists on the form since we know an attribute was changed.
+              unset($form_state['input']['attributes']['product_select']);
             }
 
             // If a field name has been stored and we've moved past it to
