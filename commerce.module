@@ -234,24 +234,19 @@ function commerce_delete_instances($entity_type, $bundle = NULL) {
 
   if (!empty($bundle)) {
     $params['bundle'] = $bundle;
+    // Delete this bundle's field bundle settings.
+    variable_del('field_bundle_settings_' . $entity_type . '__' . $bundle);
+  }
+  else {
+    // Delete all field bundle settings for this entity type.
+    db_delete('variable')
+      ->condition('name', db_like('field_bundle_settings_' . $entity_type . '__') . '%', 'LIKE')
+      ->execute();
   }
 
   // Read and delete the matching field instances.
   foreach (field_read_instances($params, array('include_inactive' => TRUE)) as $instance) {
     commerce_delete_instance($instance);
-  }
-
-  // Since this is a function called on uninstall, now is a good time
-  // to clear bundle display settings.
-  $settings = variable_get('field_bundle_settings', array());
-  if (isset($settings[$entity_type])) {
-    if (isset($bundle)) {
-      unset($settings[$entity_type][$bundle]);
-    }
-    else {
-      unset($settings[$entity_type]);
-    }
-    variable_set('field_bundle_settings', $settings);
   }
 }
 
