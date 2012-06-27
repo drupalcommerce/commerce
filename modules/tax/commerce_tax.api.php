@@ -13,13 +13,18 @@
  *   An array of information about tax types available for use by rates. The
  *   returned array should be an associative array of tax type arrays keyed by
  *   the tax type name. Each tax type array can include the following keys:
- *   - title: the title of the tax type
+ *   - title: the title of the tax type; must be defined
  *   - display_title: a display title for the tax type suitable for presenting
  *     to customers if necessary; defaults to the title
  *   - description: a short description of the tax type
  *   - display_inclusive: boolean indicating whether or not prices containing
  *     this tax will include the tax amount in the displayed price; defaults
  *     to FALSE
+ *   - round_mode: integer indicating how taxes of this type should be rounded
+ *     after calculation using one of COMMERCE_ROUND_NONE (default),
+ *     COMMERCE_ROUND_HALF_UP, COMMERCE_ROUND_HALF_DOWN, COMMERCE_ROUND_HALF_EVEN,
+ *     or COMMERCE_ROUND_HALF_ODD; these constants are similar to those used by
+ *     the round() function in PHP 5.3+
  *   - rule: name to use for a default product pricing rule that calculates
  *     taxes of this type for line items; defaults to 'commerce_tax_type_[name]'
  *     but can be set to NULL to not create any default Rule
