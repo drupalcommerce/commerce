@@ -37,6 +37,7 @@ function commerce_payment_entity_property_info() {
     'setter callback' => 'commerce_payment_transaction_set_properties',
     'setter permission' => 'administer payment transactions',
     'required' => TRUE,
+    'computed' => TRUE,
     'clear' => array('uid'),
   );
   $properties['order_id'] = array(
@@ -56,6 +57,7 @@ function commerce_payment_entity_property_info() {
     'setter callback' => 'commerce_payment_transaction_set_properties',
     'setter permission' => 'administer payment transactions',
     'required' => TRUE,
+    'computed' => TRUE,
     'clear' => array('order_id'),
   );
   $properties['payment_method'] = array(
@@ -107,6 +109,7 @@ function commerce_payment_entity_property_info() {
     'description' => t('Message for this transaction.'),
     'type' => 'text',
     'getter callback' => 'commerce_payment_transaction_get_properties',
+    'computed' => TRUE,
   );
   $properties['status'] = array(
     'label' => t('Status'),

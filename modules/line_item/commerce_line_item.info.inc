@@ -37,6 +37,7 @@ function commerce_line_item_entity_property_info() {
     'setter callback' => 'commerce_line_item_set_properties',
     'setter permission' => 'administer line items',
     'required' => TRUE,
+    'computed' => TRUE,
     'clear' => array('order_id'),
   );
   $properties['type'] = array(

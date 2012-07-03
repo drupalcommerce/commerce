@@ -47,6 +47,7 @@ function commerce_customer_entity_property_info() {
     'setter callback' => 'commerce_customer_profile_set_properties',
     'setter permission' => 'administer commerce_customer_profile entities',
     'required' => TRUE,
+    'computed' => TRUE,
     'clear' => array('uid'),
   );
   $properties['status'] = array(

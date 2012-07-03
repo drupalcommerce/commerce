@@ -88,6 +88,7 @@ function commerce_product_entity_property_info() {
     'setter callback' => 'commerce_product_set_properties',
     'setter permission' => 'administer commerce_product entities',
     'required' => TRUE,
+    'computed' => TRUE,
     'clear' => array('uid'),
   );
 

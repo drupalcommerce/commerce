@@ -43,7 +43,7 @@ function commerce_order_entity_property_info() {
     'description' => t('The state of the order derived from its status.'),
     'getter callback' => 'commerce_order_get_properties',
     'options list' => 'commerce_order_state_options_list',
-    'schema field' => 'state',
+    'computed' => TRUE,
   );
   $properties['created'] = array(
     'type' => 'date',
@@ -94,8 +94,9 @@ function commerce_order_entity_property_info() {
     'getter callback' => 'commerce_order_get_properties',
     'setter callback' => 'commerce_order_set_properties',
     'setter permission' => 'administer commerce_order entities',
-    'clear' => array('uid'),
     'required' => TRUE,
+    'computed' => TRUE,
+    'clear' => array('uid'),
   );
   $properties['mail'] = array(
     'label' => t('Order e-mail'),
