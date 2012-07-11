@@ -39,6 +39,37 @@ function commerce_payment_views_data() {
     ),
   );
 
+
+  // Expose the creator uid.
+  $data['commerce_payment_transaction']['uid'] = array(
+    'title' => t('Uid'),
+    'help' => t("The creator's user ID."),
+    'field' => array(
+      'handler' => 'views_handler_field_user',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_user_uid',
+      'name field' => 'name', // display this field in the summary
+    ),
+    'filter' => array(
+      'title' => t('Name'),
+      'handler' => 'views_handler_filter_user_name',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'title' => t('Creator'),
+      'help' => t("Relate this payment transaction to its creator's user account"),
+      'handler' => 'views_handler_relationship',
+      'base' => 'users',
+      'base field' => 'uid',
+      'field' => 'uid',
+      'label' => t('Payment transaction creator'),
+    ),
+  );
+
   // Expose the order ID.
   $data['commerce_payment_transaction']['order_id'] = array(
     'title' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
