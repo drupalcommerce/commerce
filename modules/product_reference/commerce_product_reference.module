@@ -801,6 +801,20 @@ function commerce_product_reference_options_list($field, $instance = NULL) {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function commerce_product_reference_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'entity_info_alter') {
+    // Place this module's implementation of hook_entity_info_alter() is at the
+    // end of the invocation list so it can react to view modes altered onto the
+    // product entity type from other modules like Display Suite.
+    $group = $implementations['commerce_product_reference'];
+    unset($implementations['commerce_product_reference']);
+    $implementations['commerce_product_reference'] = $group;
+  }
+}
+
+/**
  * Implements hook_entity_info_alter().
  *
  * Adds the line item and the product display-specific views mode to the product.
