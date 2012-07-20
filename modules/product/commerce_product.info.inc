@@ -46,6 +46,15 @@ function commerce_product_entity_property_info() {
     'required' => TRUE,
     'schema field' => 'title',
   );
+  $properties['language'] = array(
+    'label' => t('Language'),
+    'type' => 'token',
+    'description' => t('The language the product was created in.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'options list' => 'entity_metadata_language_list',
+    'schema field' => 'language',
+    'setter permission' => 'administer commerce_product entities',
+  );
   $properties['status'] = array(
     'label' => t('Status'),
     'description' => t('Boolean indicating whether the product is active or disabled.'),
@@ -72,18 +81,18 @@ function commerce_product_entity_property_info() {
     'schema field' => 'changed',
   );
   $properties['uid'] = array(
-    'label' => t("Creator ID"),
+    'label' => t('Creator ID'),
     'type' => 'integer',
-    'description' => t("The unique ID of the product creator."),
+    'description' => t('The unique ID of the product creator.'),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_product entities',
     'clear' => array('creator'),
     'schema field' => 'uid',
   );
   $properties['creator'] = array(
-    'label' => t("Creator"),
+    'label' => t('Creator'),
     'type' => 'user',
-    'description' => t("The creator of the product."),
+    'description' => t('The creator of the product.'),
     'getter callback' => 'commerce_product_get_properties',
     'setter callback' => 'commerce_product_set_properties',
     'setter permission' => 'administer commerce_product entities',
