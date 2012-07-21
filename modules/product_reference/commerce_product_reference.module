@@ -30,11 +30,21 @@ function commerce_product_reference_field_extra_fields() {
   foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
     foreach ($field['bundles'] as $entity_type => $bundles) {
       if ($entity_type == 'commerce_line_item' || $entity_type == 'commerce_product') {
-        // It would make no sense to merge the product fields into those.
+        // We do not currently support the injection of product fields into the
+        // display of line items or other products.
         continue;
       }
 
       foreach ($bundles as $bundle_name) {
+        // Get the instance settings for the field on this entity bundle.
+        $instance_settings = field_info_instance($entity_type, $field['field_name'], $bundle_name);
+
+        // If field injection is turned off for this instance, skip adding the
+        // extra fields to this bundle's view modes.
+        if (empty($instance_settings['settings']['field_injection'])) {
+          continue;
+        }
+
         // Attach extra fields from products that may be visible on the bundle.
         // We have to call commerce_product_field_extra_fields() directly
         // instead of using field_info_extra_fields() because of the order in
