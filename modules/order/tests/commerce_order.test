@@ -30,7 +30,7 @@ class CommerceOrderCRUDTestCase extends CommerceBaseTestCase {
    */
   function testCommerceOrderCrud() {
     // Ensure commerce_order_new() returns a new order.
-    $new_order = commerce_order_new(1);;
+    $new_order = commerce_order_new(1);
     $fields = array('type', 'status', 'uid');
     foreach ($fields as $field) {
       $this->assertNotNull($new_order->{$field}, 'commerce_order_new() instantiated the ' . check_plain($field) . ' property.');
