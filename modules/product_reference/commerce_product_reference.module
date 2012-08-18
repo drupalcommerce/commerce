@@ -353,6 +353,11 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
                 drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_field_name))),
               );
 
+              // Add an extra class to distinguish empty product fields.
+              if (empty($entity->content[$content_key])) {
+                $classes[] = 'commerce-product-field-empty';
+              }
+
               // Ensure the field's content array has a prefix and suffix key.
               $entity->content[$content_key] += array(
                 '#prefix' => '',
@@ -401,6 +406,11 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
                 drupal_html_class('commerce-product-extra-field-' . $product_extra_field_name),
                 drupal_html_class(implode('-', array($entity_type, $id, 'product', $product_extra_field_name))),
               );
+
+              // Add an extra class to distinguish empty fields.
+              if (empty($entity->content[$content_key])) {
+                $classes[] = 'commerce-product-extra-field-empty';
+              }
 
               // Ensure the extra field's content array has a prefix and suffix key.
               $entity->content[$content_key] += array(

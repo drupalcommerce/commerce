@@ -1983,6 +1983,12 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
       );
 
       $element = field_view_field('commerce_product', $product, $product_field_name, $form_state['context']['view_mode']);
+
+      // Add an extra class to distinguish empty product fields.
+      if (empty($element)) {
+        $classes[] = 'commerce-product-field-empty';
+      }
+
       $element += array(
         '#prefix' => '<div class="' . implode(' ', $classes) . '">',
         '#suffix' => '</div>',
@@ -2023,6 +2029,11 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
           '#prefix' => '<div class="' . implode(' ', $classes) . '">',
           '#suffix' => '</div>',
         );
+
+        // Add an extra class to distinguish empty fields.
+        if (empty($element['#markup'])) {
+          $classes[] = 'commerce-product-extra-field-empty';
+        }
 
         $commands[] = ajax_command_replace('.' . $replacement_class, drupal_render($element));
       }
