@@ -294,7 +294,7 @@ function commerce_line_item_configure_line_item_fields($modules = NULL) {
     $modules = module_implements('commerce_line_item_type_info');
   }
 
-  // Reset the line item cache to get the default options and callbacks.
+  // Reset the line item type cache to get types added by newly enabled modules.
   commerce_line_item_types_reset();
 
   // Loop through all the enabled modules.

@@ -339,6 +339,9 @@ function commerce_product_configure_product_fields($modules = NULL) {
     $modules = module_implements('commerce_product_type_info');
   }
 
+  // Reset the product type cache to get types added by newly enabled modules.
+  commerce_product_types_reset();
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_product_type_info()...

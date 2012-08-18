@@ -238,6 +238,7 @@ function template_preprocess_commerce_payment_totals(&$variables) {
  * Implements hook_modules_enabled().
  */
 function commerce_payment_modules_enabled($modules) {
+  commerce_payment_methods_reset();
   _commerce_payment_default_rules_reset($modules);
 }
 
@@ -549,6 +550,15 @@ function commerce_payment_methods() {
   }
 
   return $payment_methods;
+}
+
+/**
+ * Resets the cached list of payment methods.
+ */
+function commerce_payment_methods_reset() {
+  $payment_methods = &drupal_static('commerce_payment_methods');
+  $payment_methods = NULL;
+  entity_info_cache_clear();
 }
 
 /**

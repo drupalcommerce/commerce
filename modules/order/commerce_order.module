@@ -136,6 +136,11 @@ function commerce_order_enable() {
  */
 function commerce_order_modules_enabled($modules) {
   commerce_order_configure_order_fields($modules);
+
+  // Reset the order state and status static caches in case a newly enabled
+  // module has provided new states or statuses.
+  commerce_order_states_reset();
+  commerce_order_statuses_reset();
 }
 
 /**

@@ -261,6 +261,10 @@ function commerce_customer_configure_customer_fields($modules = NULL) {
     $modules = module_implements('commerce_customer_profile_type_info');
   }
 
+  // Reset the customer profile type static cache to ensure we get types added
+  // by newly enabled modules.
+  commerce_customer_profile_types_reset();
+
   // Loop through all the enabled modules.
   foreach ($modules as $module) {
     // If the module implements hook_commerce_customer_profile_type_info()...
