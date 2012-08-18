@@ -49,6 +49,28 @@ function commerce_product_reference_field_views_data($field) {
  * Implements hook_views_data_alter().
  */
 function commerce_product_reference_views_data_alter(&$data) {
+  // Add a node filter that filters by node types with product reference fields.
+  $data['node']['is_product_display'] = array(
+    'title' => t('Product display'),
+    'help' => t('Whether or not the content functions as a product display.'),
+    'real field' => 'type',
+    'filter' => array(
+      'handler' => 'commerce_product_reference_handler_filter_node_is_product_display',
+      'label' => t('Is a product display'),
+      'type' => 'yes-no',
+    ),
+  );
+
+  // Add the node filter that filters by node types with product reference fields.
+  $data['node']['product_display_node_type'] = array(
+    'title' => t('Product display content type'),
+    'help' => t('Filters by the content type but only shows product display content types as options.'),
+    'real field' => 'type',
+    'filter' => array(
+      'handler' => 'commerce_product_reference_handler_filter_node_type',
+    ),
+  );
+
   // Add the line item filter for filtering by line items of a product line item
   // type (based on $line_item_type['product']).
   $data['commerce_line_item']['product_line_item_type'] = array(

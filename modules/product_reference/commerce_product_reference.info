@@ -10,6 +10,8 @@ dependencies[] = options
 core = 7.x
 
 ; Views handlers
+files[] = includes/views/handlers/commerce_product_reference_handler_filter_node_is_product_display.inc
+files[] = includes/views/handlers/commerce_product_reference_handler_filter_node_type.inc
 files[] = includes/views/handlers/commerce_product_reference_handler_filter_product_line_item_type.inc
 
 ; Simple tests
