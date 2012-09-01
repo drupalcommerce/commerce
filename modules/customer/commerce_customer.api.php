@@ -124,3 +124,35 @@ function hook_commerce_customer_profile_presave($profile) {
 function hook_commerce_customer_profile_can_delete($profile) {
   // No example.
 }
+
+/**
+ * Allows modules to add arbitrary AJAX commands to the array returned from the
+ * customer profile copy checkbox refresh.
+ *
+ * When a customer checks or unchecks a box to copy the relevant information
+ * from one customer profile to another, the associated checkout pane gets an
+ * AJAX refresh. The form will be rebuilt using the new form state and the AJAX
+ * callback of the element that was clicked will be called. For this checkbox it
+ * is commerce_customer_profile_copy_refresh().
+ *
+ * Instead of just returning the checkout pane to be rendered, this AJAX refresh
+ * function returns an array of AJAX commands that includes the necessary form
+ * element replacement. However, other modules may want to interact with the
+ * refreshed form. They can use this hook to add additional items to the
+ * commands array, which is passed to the hook by reference. Note that the form
+ * array and form state cannot be altered, just the array of commands.
+ *
+ * @param &$commands
+ *   The array of AJAX commands used to refresh the customer profile checkout
+ *   pane with updated form elements.
+ * @param $form
+ *   The rebuilt form array.
+ * @param $form_state
+ *   The form state array from the form.
+ *
+ * @see commerce_customer_profile_copy_refresh()
+ */
+function hook_commerce_customer_profile_copy_refresh_alter(&$commands, $form, $form_state) {
+  // Display an alert message.
+  $commands[] = ajax_command_alert(t('The customer profile checkout pane has been updated.'));
+}

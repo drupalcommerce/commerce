@@ -1271,8 +1271,8 @@ function commerce_customer_profile_copy_validate($element, &$form_state, $form) 
 
     // Try getting the source profile from the form_state values, if it is present on the form..
     if (isset($form_state['values'][$source_id])) {
-      _commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $form_state['input'][$source_id], $form_state);
-      _commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $form_state['values'][$source_id], $form_state);
+      commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $form_state['input'][$source_id], $form_state);
+      commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $form_state['values'][$source_id], $form_state);
     }
 
     // Otherwise, attempt to get source profile from the order object.
@@ -1289,14 +1289,20 @@ function commerce_customer_profile_copy_validate($element, &$form_state, $form) 
       }
 
       if (!empty($profile)) {
-        _commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $profile, $form_state);
-        _commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $profile, $form_state);
+        commerce_customer_profile_copy_fields($info, $form_state['input'][$pane_id], $profile, $form_state);
+        commerce_customer_profile_copy_fields($info, $form_state['values'][$pane_id], $profile, $form_state);
       }
     }
 
-
     $form_state['order']->data['profile_copy'][$pane_id]['status'] = TRUE;
     commerce_order_save($form_state['order']);
+
+    // Unset any cached addressfield data for this customer profile.
+    foreach ($form_state['addressfield'] as $key => $value) {
+      if (strpos($key, 'commerce_customer_profile|' . $type) === 0) {
+        unset($form_state['addressfield'][$key]);
+      }
+    }
   }
 }
 
@@ -1312,7 +1318,7 @@ function commerce_customer_profile_copy_validate($element, &$form_state, $form) 
  * @param $form_state
  *   The form state array from the form.
  */
-function _commerce_customer_profile_copy_fields($info, &$target, $source, &$form_state) {
+function commerce_customer_profile_copy_fields($info, &$target, $source, &$form_state) {
   list($entity_type, $bundle, $pane_id) = $info;
 
   // Loop over all the field instances that could be attached to this entity.

@@ -124,7 +124,7 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
         '#default_value' => isset($order->data['profile_copy'][$checkout_pane['pane_id']]['status']) ? $order->data['profile_copy'][$checkout_pane['pane_id']]['status'] : FALSE,
         '#weight' => -30,
         '#ajax' => array(
-          'callback' => 'commerce_customer_profile_copy_ajax_callback',
+          'callback' => 'commerce_customer_profile_copy_refresh',
           'wrapper' => strtr($checkout_pane['pane_id'], '_', '-') . '-ajax-wrapper',
         ),
         '#attached' => array(
@@ -181,9 +181,18 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 /**
  * Ajax callback: Returns ajax command to refresh customer profile pane.
  */
-function commerce_customer_profile_copy_ajax_callback($form, &$form_state) {
+function commerce_customer_profile_copy_refresh($form, &$form_state) {
   $pane_id = reset($form_state['triggering_element']['#parents']);
-  return $form[$pane_id];
+
+  $commands = array();
+
+  // Render the pane afresh to capture any changes based on address entry.
+  $commands[] = ajax_command_replace(NULL, drupal_render($form[$pane_id]));
+
+  // Allow other modules to add arbitrary AJAX commands on the refresh.
+  drupal_alter('commerce_customer_profile_copy_refresh', $commands, $form, $form_state);
+
+  return array('#type' => 'ajax', '#commands' => $commands);
 }
 
 /**
