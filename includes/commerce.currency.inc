@@ -878,13 +878,6 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('Centésimo'),
       'major_unit' => t('Balboa'),
     ),
-    'PEI' => array(
-      'code' => 'PEI',
-      'symbol' => 'I/.',
-      'name' => t('Peruvian Inti'),
-      'minor_unit' => t('Céntimo'),
-      'major_unit' => t('Inti'),
-    ),
     'PEN' => array(
       'code' => 'PEN',
       'symbol' => 'S/.',
