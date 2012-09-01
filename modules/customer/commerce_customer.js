@@ -1,8 +1,7 @@
-
-(function ($) {
+(function($) {
 
 Drupal.behaviors.customerFieldsetSummaries = {
-  attach: function (context) {
+  attach: function (context, settings) {
     $('fieldset#edit-user', context).drupalSetSummary(function (context) {
       var name = $('#edit-name').val() || Drupal.settings.anonymous;
 
