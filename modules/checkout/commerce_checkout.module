@@ -598,7 +598,7 @@ function commerce_checkout_pane_load($pane_id) {
  *   The checkout pane object represented on the settings form.
  */
 function commerce_checkout_pane_settings_title($checkout_pane) {
-  return t("'@pane' checkout pane", array('@pane' => $checkout_pane['name']));
+  return t("'!pane' checkout pane", array('!pane' => $checkout_pane['name']));
 }
 
 /**
