@@ -1085,12 +1085,6 @@ function commerce_order_state_options_list() {
 /**
  * Returns an array of some or all of the order statuses keyed by name.
  *
- * Order statuses can only be defined by modules but may have settings
- * overridden that are stored in the database (weight and status). When this
- * function is first called, it will load all the statuses as defined by
- * hook_commerce_order_status_info() and update them based on the data in the
- * database. The final array will be cached for subsequent calls.
- *
  * @param $conditions
  *   An array of conditions to filter the returned list by; for example, if you
  *   specify 'state' => 'cart' in the array, then only order statuses in the
