@@ -71,8 +71,17 @@ function commerce_product_reference_field_extra_fields() {
         }
 
         // Do the same for fields on products that may be visible on the bundle.
-        foreach (field_info_instances('commerce_product') as $product_bundle_name => $product_fields) {
-          foreach ($product_fields as $product_field_name => $product_field) {
+        // First build a list of product types that may be referenced.
+        $field_instance = field_info_instance($entity_type, $field_name, $bundle_name);
+        $product_types = array_filter($field_instance['settings']['referenceable_types']);
+
+        // If no product types are specified, use all product types.
+        if (empty($product_types)) {
+          $product_types = array_keys(commerce_product_types());
+        }
+
+        foreach ($product_types as $product_type) {
+          foreach (field_info_instances('commerce_product', $product_type) as $product_field_name => $product_field) {
             $extra[$entity_type][$bundle_name]['display']['product:' . $product_field_name] = array(
               'label' => t('Product: @label', array('@label' => $product_field['label'])),
               'description' => t('Field from a referenced product.'),
