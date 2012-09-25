@@ -298,8 +298,11 @@ function commerce_product_reference_commerce_product_delete($product) {
  * display if the product contains a non-empty product reference field.
  */
 function commerce_product_reference_entity_view($entity, $entity_type, $view_mode, $langcode) {
-  $wrapper = entity_metadata_wrapper($entity_type, $entity);
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+
+  // An entity metadata wrapper will be loaded on demand if it is determined
+  // this entity has a product reference field instance attached to it.
+  $wrapper = NULL;
 
   $instances = field_info_instances($entity_type, $bundle);
   $reference_view_mode = $entity_type . '_' . $view_mode;
@@ -309,6 +312,11 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
   // formatter.
   foreach (commerce_info_fields('commerce_product_reference', $entity_type) as $field_name => $field) {
     if (isset($instances[$field_name])) {
+      // Load a wrapper for the entity being viewed.
+      if (!empty($wrapper)) {
+        $wrapper = entity_metadata_wrapper($entity_type, $entity);
+      }
+
       // Find the default product based on the cardinality of the field.
       if ($field['cardinality'] == 1) {
         $product = $wrapper->{$field_name}->value();
