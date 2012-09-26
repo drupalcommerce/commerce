@@ -23,8 +23,8 @@ function commerce_product_reference_field_views_data($field) {
   // Build an array of bundles the product reference field appears on.
   $bundles = array();
 
-  foreach ($field['bundles'] as $entity => $bundles) {
-    $bundles[] = $entity . ' (' . implode(', ', $bundles) . ')';
+  foreach ($field['bundles'] as $entity => $entity_bundles) {
+    $bundles[] = $entity . ' (' . implode(', ', $entity_bundles) . ')';
   }
 
   foreach ($data as $table_name => $table_data) {
