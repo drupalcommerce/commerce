@@ -511,6 +511,8 @@ function commerce_commerce_currency_info() {
       'symbol' => 'Ft',
       'name' => t('Hungarian Forint'),
       'numeric_code' => '348',
+      'decimal_separator' => ',',
+      'thousands_separator' => ' ',
       'decimals' => 0,
       'symbol_placement' => 'after',
       'code_placement' => '',
