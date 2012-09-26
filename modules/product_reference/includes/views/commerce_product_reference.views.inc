@@ -32,7 +32,7 @@ function commerce_product_reference_field_views_data($field) {
       if (isset($field_data['filter']['field_name']) && $field_name != 'delta') {
         $data[$table_name][$field_name]['relationship'] = array(
           'title' => t('Referenced product'),
-          'help' => t('Appears in: @bundles', array('@bundles' => implode(', ', $bundles))),
+          'help' => t('Appears in: @bundles.', array('@bundles' => implode(', ', $bundles))),
           'base' => 'commerce_product',
           'base field' => 'product_id',
           'handler' => 'views_handler_relationship',

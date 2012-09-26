@@ -432,7 +432,7 @@ function commerce_customer_field_views_data($field) {
       if (isset($field_data['filter']['field_name']) && $field_name != 'delta') {
         $data[$table_name][$field_name]['relationship'] = array(
           'title' => t('Referenced customer profile'),
-          'help' => t('Appears in: @bundles', array('@bundles' => implode(', ', $bundles))),
+          'help' => t('Appears in: @bundles.', array('@bundles' => implode(', ', $bundles))),
           'base' => 'commerce_customer_profile',
           'base field' => 'profile_id',
           'handler' => 'views_handler_relationship',
