@@ -313,7 +313,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
   foreach (commerce_info_fields('commerce_product_reference', $entity_type) as $field_name => $field) {
     if (isset($instances[$field_name])) {
       // Load a wrapper for the entity being viewed.
-      if (!empty($wrapper)) {
+      if (empty($wrapper)) {
         $wrapper = entity_metadata_wrapper($entity_type, $entity);
       }
 

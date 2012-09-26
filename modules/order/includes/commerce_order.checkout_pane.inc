@@ -12,6 +12,13 @@
 function commerce_order_account_pane_settings_form($checkout_pane) {
   $form = array();
 
+  $form['commerce_order_account_pane_mail_double_entry'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Require double entry of email address.'),
+    '#description' => t('Forces anonymous users to enter their email address in two consecutive fields, which must have indentical values.'),
+    '#default_value' => variable_get('commerce_order_account_pane_mail_double_entry', FALSE)
+  );
+
   $form['commerce_order_account_pane_auth_display'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display the account information pane for authenticated users.'),
@@ -61,6 +68,16 @@ function commerce_order_account_pane_checkout_form($form, &$form_state, $checkou
       '#default_value' => $order->mail,
       '#required' => TRUE,
     );
+
+    if (variable_get('commerce_order_account_pane_mail_double_entry', FALSE)) {
+      $pane_form['login']['mail_confirm'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Confirm e-mail address'),
+        '#description' => t('Provide your e-mail address in both fields.'),
+        '#default_value' => $order->mail,
+        '#required' => TRUE,
+      );
+    }
   }
 
   return $pane_form;
@@ -79,6 +96,13 @@ function commerce_order_account_pane_checkout_form_validate($form, &$form_state,
       if ($error = user_validate_mail($pane_values['login']['mail'])) {
         form_set_error($checkout_pane['pane_id'] . '][login][mail', $error);
         return FALSE;
+      }
+      if (variable_get('commerce_order_account_pane_mail_double_entry', FALSE)) {
+        // Display an error if the two email addresses don't match.
+        if ($pane_values['login']['mail'] != $pane_values['login']['mail_confirm']) {
+          form_set_error($checkout_pane['pane_id'] . '][login][mail_confirm', t('The specified e-mail addresses do not match.'));
+          return FALSE;
+        }
       }
     }
   }
