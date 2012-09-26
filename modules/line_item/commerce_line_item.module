@@ -680,6 +680,11 @@ function commerce_line_item_access($op, $line_item, $account = NULL) {
     $order = commerce_order_load($line_item->order_id);
     return commerce_order_access($op, $order, $account);
   }
+
+  // Issue a blanket refusal of access in the event the order module is not
+  // enabled, as we have no other way of determining line item access outside of
+  // the 'administer line items' permission.
+  return FALSE;
 }
 
 /**
