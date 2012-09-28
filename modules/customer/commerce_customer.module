@@ -1041,6 +1041,7 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
           '#title' => $title,
           '#default_value' => FALSE,
           '#access' => commerce_customer_profile_access('delete', $profile),
+          '#weight' => 100,
         );
       }
 
