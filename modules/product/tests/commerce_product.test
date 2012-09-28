@@ -109,7 +109,7 @@ class CommerceProductCRUDTestCase extends CommerceBaseTestCase {
 
     // Ensure commerce_product_new() returns a new product.
     $new_product = commerce_product_new('product');
-    $fields = array('product_id', 'sku', 'type', 'title', 'uid');
+    $fields = array('sku', 'type', 'title', 'uid');
     foreach ($fields as $field) {
       $this->assertNotNull($new_product->{$field}, 'commerce_product_new() instantiated the ' . check_plain($field) . ' property.');
     }

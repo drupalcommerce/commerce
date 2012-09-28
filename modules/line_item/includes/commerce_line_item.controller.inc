@@ -22,7 +22,7 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'line_item_id' => '',
+      'line_item_id' => NULL,
       'order_id' => 0,
       'type' => '',
       'line_item_label' => '',

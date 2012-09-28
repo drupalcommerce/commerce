@@ -25,8 +25,8 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
     global $user;
 
     $values += array(
-      'transaction_id' => '',
-      'revision_id' => '',
+      'transaction_id' => NULL,
+      'revision_id' => NULL,
       'uid' => $user->uid,
       'order_id' => 0,
       'payment_method' => '',

@@ -22,8 +22,8 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
    */
   public function create(array $values = array()) {
     $values += array(
-      'profile_id' => '',
-      'revision_id' => '',
+      'profile_id' => NULL,
+      'revision_id' => NULL,
       'type' => '',
       'uid' => 0,
       'status' => 1,

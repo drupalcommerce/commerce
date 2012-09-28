@@ -23,7 +23,7 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
    */
   public function create(array $values = array()) {
     $values += array(
-      'product_id' => '',
+      'product_id' => NULL,
       'is_new' => TRUE,
       'sku' => '',
       'revision_id' => NULL,
