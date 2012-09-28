@@ -343,6 +343,8 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         $product->display_context = array(
           'entity_type' => $entity_type,
           'entity' => $entity,
+          'view_mode' => $reference_view_mode,
+          'language' => $langcode,
         );
 
         // Loop through the fields on the referenced product's type.
