@@ -853,7 +853,7 @@ function commerce_cart_order_refresh($order) {
       // Compare the refreshed unit price to the original unit price looking for
       // differences in the amount, currency code, or price components.
       $data = $line_item_wrapper->commerce_unit_price->data->value() + array('components' => array());
-      $current_data = $current_line_item_wrapper->commerce_unit_price->data->value() + array('components' => array());
+      $current_data = (array) $current_line_item_wrapper->commerce_unit_price->data->value() + array('components' => array());
 
       if ($line_item_wrapper->commerce_unit_price->amount->value() != $current_line_item_wrapper->commerce_unit_price->amount->value() ||
         $line_item_wrapper->commerce_unit_price->currency_code->value() != $current_line_item_wrapper->commerce_unit_price->currency_code->value() ||
