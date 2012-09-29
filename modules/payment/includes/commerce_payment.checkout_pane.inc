@@ -169,6 +169,13 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
  * Payment pane: submit callback.
  */
 function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
+  // Check to make sure there are no validation issues with other form elements
+  // before executing payment method callbacks.
+  if (form_get_errors()) {
+    drupal_set_message(t('Your payment will not be processed until all errors on the page have been addressed.'), 'warning');
+    return FALSE;
+  }
+
   $pane_id = $checkout_pane['pane_id'];
 
   // Only submit if we actually had payment methods on the form.
