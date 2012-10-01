@@ -318,7 +318,7 @@ function commerce_product_pre_calculate_sell_prices($from = NULL, $count = 1) {
             'entity_type' => 'commerce_product',
             'entity_id' => $product_id,
             'field_name' => 'commerce_price',
-            'language' => !empty($product->language) ? $product->language : '',
+            'language' => !empty($product->language) ? $product->language : LANGUAGE_NONE,
             'delta' => 0,
             'amount' => round($wrapper->commerce_unit_price->amount->value()),
             'currency_code' => $wrapper->commerce_unit_price->currency_code->value(),

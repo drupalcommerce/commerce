@@ -12,3 +12,15 @@ function commerce_product_pricing_uninstall() {
   variable_del('commerce_product_sell_price_pre_calculation');
   variable_del('commerce_product_sell_price_pre_calculation_rules_bypass');
 }
+
+/**
+ * Provide a default language value for pre-calculated prices if necessary.
+ */
+function commerce_product_pricing_update_7100() {
+  db_update('commerce_calculated_price')
+    ->fields(array('language' => LANGUAGE_NONE))
+    ->condition('language', '')
+    ->execute();
+
+  return t('Pre-calculated price records have been updated.');
+}
