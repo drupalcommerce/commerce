@@ -136,9 +136,21 @@ function commerce_product_product_form_validate($form, &$form_state) {
     form_set_error('sku', t('The SKU contains invalid tokens.'));
   }
   else {
-    // Ensure the proposed SKU is unique.
-    if (!commerce_product_validate_sku_unique($sku, $product->product_id)) {
-      form_set_error('sku', t('This SKU is already in use and must be unique. Please supply another value.'));
+    // Ensure the proposed SKU is unique or reused only during product updates.
+    $query = new EntityFieldQuery();
+
+    $query
+      ->entityCondition('entity_type', 'commerce_product')
+      ->propertyCondition('sku', $sku);
+
+    $result = $query->execute();
+
+    if (!empty($result)) {
+      $product_id = key($result['commerce_product']);
+
+      if ($product_id != $product->product_id) {
+        form_set_error('sku', t('This SKU is <a href="!url">already in use</a> and must be unique. Please supply another value.', array('!url' => url('admin/commerce/products/' . $product_id))));
+      }
     }
 
     // Validate the SKU for invalid characters.
