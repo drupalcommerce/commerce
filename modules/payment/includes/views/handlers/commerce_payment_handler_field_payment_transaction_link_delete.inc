@@ -12,7 +12,7 @@ class commerce_payment_handler_field_payment_transaction_link_delete extends com
     $order = commerce_order_load($order_id);
     $transaction = commerce_payment_transaction_load($transaction_id);
 
-    if (commerce_payment_transaction_access('delete', $order, $transaction)) {
+    if (commerce_payment_transaction_access('delete', $transaction)) {
       $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
       return l($text, 'admin/commerce/orders/' . $order_id . '/payment/' . $transaction_id .'/delete', array('query' => drupal_get_destination()));
     }

@@ -172,7 +172,7 @@ function commerce_payment_ui_payment_transaction_uri($transaction) {
   // Only return a value if the transaction references an order and the user has
   // permission to view the payment transaction.
   if ($order = commerce_order_load($transaction->order_id)) {
-    if (commerce_payment_transaction_access('view', $order, $transaction)) {
+    if (commerce_payment_transaction_access('view', $transaction)) {
       return array(
         'path' => 'admin/commerce/orders/' . $order->order_id . '/payment/' . $transaction->transaction_id . '/view',
       );

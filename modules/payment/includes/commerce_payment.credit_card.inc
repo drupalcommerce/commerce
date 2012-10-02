@@ -540,7 +540,12 @@ function commerce_payment_validate_credit_card_security_code($number, $code) {
   // Check the length based on the type of the credit card.
   switch (substr($number, 0, 1)) {
     case '3':
-      return strlen($code) == 4;
+      if (strlen($number) == 15) {
+        return strlen($code) == 4;
+      }
+      else {
+        return strlen($code) == 3;
+      }
 
     case '4':
     case '5':
