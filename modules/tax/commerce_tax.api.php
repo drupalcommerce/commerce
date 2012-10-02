@@ -193,7 +193,7 @@ function hook_commerce_tax_rate_delete($tax_rate, $skip_reset) {
 
 /**
  * Allows modules to calculate taxes that don't determine applicability through
- *   default Rules components.
+ * default Rules components.
  *
  * @param $tax_type
  *   The tax type object whose rates should be calculated.
