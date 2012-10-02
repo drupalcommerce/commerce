@@ -623,12 +623,11 @@ function commerce_cart_order_id($uid = 0) {
   else {
     // Otherwise look for a shopping cart order ID in the session.
     if (commerce_cart_order_session_exists()) {
-      // We can't trust a user's session to contain only their order IDs, as
-      // they could've edited their session to try and gain access to someone
-      // else's order data. Therefore, this query restricts its search to
-      // orders assigned to anonymous users using the same IP address to try
-      // and mitigate risk as much as possible.
-      return db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND hostname = :hostname AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':hostname' => ip_address(), ':status_ids' => $status_ids))->fetchField();
+      // We can't trust a user's IP address to remain the same, especially since
+      // it may be derived from a proxy server and not the actual client. As of
+      // Commerce 1.4, this query no longer restricts order IDs based on IP
+      // address, instead trusting Drupal to prevent session hijacking.
+      return db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
     }
   }
 }
