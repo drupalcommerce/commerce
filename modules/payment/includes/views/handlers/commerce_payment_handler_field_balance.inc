@@ -42,21 +42,18 @@ class commerce_payment_handler_field_balance extends views_handler_field {
 
   function render($values) {
     $order_id = $this->get_value($values, 'order_id');
-    switch ($this->options['display_format']) {
-      case 'formatted':
-        // Get the order object and the balance.
-        $order = commerce_order_load($order_id);
-        $balance = commerce_payment_order_balance($order);
-        // Format the amount with currency.
-        return commerce_currency_format($balance['amount'], $balance['currency_code']);
-      case 'raw':
-        // Get the order object and the balance.
-        $order = commerce_order_load($order_id);
-        $balance = commerce_payment_order_balance($order);
-        // Then load the currency array.
-        $currency = commerce_currency_load();
-        // Format the price as a number.
-        return number_format(commerce_currency_round($balance['amount'], $currency), $currency['decimals']);
+
+    // Only render this field if we find a valid order.
+    if (!empty($order_id) && $order = commerce_order_load($order_id)) {
+      $balance = commerce_payment_order_balance($order);
+
+      // Output according to the format selected as with price fields.
+      switch ($this->options['display_format']) {
+        case 'formatted':
+          return commerce_currency_format($balance['amount'], $balance['currency_code']);
+        case 'raw':
+          return check_plain($balance['amount']);
+      }
     }
   }
 }
