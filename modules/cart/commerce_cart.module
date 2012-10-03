@@ -565,17 +565,12 @@ function theme_commerce_cart_empty_page() {
  *   The fully loaded shopping cart order or FALSE if non-existent.
  */
 function commerce_cart_order_load($uid = 0) {
-  // Cart order IDs will be cached keyed by $uid.
-  $cart_order_ids = &drupal_static(__FUNCTION__);
-
-  // Cache the user's cart order ID if it hasn't been set already.
-  if (!isset($cart_order_ids[$uid])) {
-    $cart_order_ids[$uid] = commerce_cart_order_id($uid);
-  }
+  // Retrieve the order ID for the specified user's current shopping cart.
+  $order_id = commerce_cart_order_id($uid);
 
   // If a valid cart order ID exists for the user, return it now.
-  if (!empty($cart_order_ids[$uid])) {
-    return commerce_order_load($cart_order_ids[$uid]);
+  if (!empty($order_id)) {
+    return commerce_order_load($order_id);
   }
 
   return FALSE;
@@ -589,9 +584,17 @@ function commerce_cart_order_load($uid = 0) {
  *   an anonymous order from the session.
  *
  * @return
- *   The requested cart order ID.
+ *   The requested cart order ID or FALSE if none was found.
  */
 function commerce_cart_order_id($uid = 0) {
+  // Cart order IDs will be cached keyed by $uid.
+  $cart_order_ids = &drupal_static(__FUNCTION__);
+
+  // Cache the user's cart order ID if it hasn't been set already.
+  if (isset($cart_order_ids[$uid])) {
+    return $cart_order_ids[$uid];
+  }
+
   // First let other modules attempt to provide a valid order ID for the given
   // uid. Instead of invoking hook_commerce_cart_order_id() directly, we invoke
   // it in each module implementing the hook and return the first valid order ID
@@ -602,11 +605,13 @@ function commerce_cart_order_id($uid = 0) {
     // If a hook said the user should not have a cart, that overrides any other
     // potentially valid order ID. Return FALSE now.
     if ($order_id === FALSE) {
+      $cart_order_ids[$uid] = FALSE;
       return FALSE;
     }
 
     // Otherwise only return a valid order ID.
     if (!empty($order_id) && is_int($order_id)) {
+      $cart_order_ids[$uid] = $order_id;
       return $order_id;
     }
   }
@@ -618,7 +623,7 @@ function commerce_cart_order_id($uid = 0) {
   if ($uid) {
     // Look for the user's most recent shopping cart order, although they
     // should never really have more than one.
-    return db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
+    $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE uid = :uid AND status IN (:status_ids) ORDER BY order_id DESC', array(':uid' => $uid, ':status_ids' => $status_ids))->fetchField();
   }
   else {
     // Otherwise look for a shopping cart order ID in the session.
@@ -627,16 +632,21 @@ function commerce_cart_order_id($uid = 0) {
       // it may be derived from a proxy server and not the actual client. As of
       // Commerce 1.4, this query no longer restricts order IDs based on IP
       // address, instead trusting Drupal to prevent session hijacking.
-      return db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
+      $cart_order_ids[$uid] = db_query('SELECT order_id FROM {commerce_order} WHERE order_id IN (:order_ids) AND uid = 0 AND status IN (:status_ids) ORDER BY order_id DESC', array(':order_ids' => commerce_cart_order_session_order_ids(), ':status_ids' => $status_ids))->fetchField();
+    }
+    else {
+      $cart_order_ids[$uid] = FALSE;
     }
   }
+
+  return $cart_order_ids[$uid];
 }
 
 /**
  * Resets the cached array of shopping cart orders.
  */
 function commerce_cart_order_ids_reset() {
-  $cart_order_ids = &drupal_static('commerce_cart_order_load');
+  $cart_order_ids = &drupal_static('commerce_cart_order_id');
   $cart_order_ids = NULL;
 }
 
@@ -645,7 +655,7 @@ function commerce_cart_order_ids_reset() {
  *
  * @param $uid
  *   The uid of the user for whom to create the order. If left 0, the order will
- *     be created for the current user and associated with his or her session.
+ *   be created for the current user and associated with his or her session.
  *
  * @return
  *   The newly created shopping cart order object.
