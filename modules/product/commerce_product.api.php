@@ -36,8 +36,15 @@
  *   An array of product type arrays keyed by type.
  */
 function hook_commerce_product_type_info() {
-  // Return the product types defined in the database by the Product UI module.
-  return db_query('SELECT * FROM {commerce_product_type}')->fetchAllAssoc('type', PDO::FETCH_ASSOC);
+  $product_types = array();
+
+  $product_types['ebook'] = array(
+    'type' => 'ebook',
+    'name' => t('E-book'),
+    'description' => t('An e-book product uploaded to the site as a PDF.'),
+  );
+
+  return $product_types;
 }
 
 /**
