@@ -52,10 +52,14 @@ function commerce_order_ui_tokens($type, $tokens, array $data = array(), array $
       switch ($name) {
         // @deprecated since 7.x-1.2; use [commerce-order:customer-url] instead.
         case 'url':
-          $replacements[$original] = url('user/' . $order->uid . '/orders/' . $order->order_id, $url_options);
-          break;
         case 'customer-url':
-          $replacements[$original] = url('user/' . $order->uid . '/orders/' . $order->order_id, $url_options);
+          if ($uri = commerce_order_uri($order)) {
+            $path = $uri['path'];
+          }
+          else {
+            $path = 'user/' . $order->uid . '/orders/' . $order->order_id;
+          }
+          $replacements[$original] = url($path, $url_options);
           break;
         case 'admin-url':
           $replacements[$original] = url('admin/commerce/orders/' . $order->order_id, $url_options);
