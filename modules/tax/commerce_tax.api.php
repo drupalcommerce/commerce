@@ -120,10 +120,10 @@ function hook_commerce_tax_type_delete($tax_type, $skip_reset) {
  *     component will be defined for this tax rate
  *   - admin_list: boolean defined by the Tax UI module determining whether or
  *     not the tax rate should appear in the admin list
- *   - calculation_callback: name of the function used to calculate the tax rate
- *     for a given line item, returning either a tax price array to be added as
- *     a component to the line item's unit price or FALSE to not include
- *     anything; defaults to 'commerce_tax_rate_calculate'.
+ *   - calculation_callback: name of the function used to calculate the tax
+ *     amount for a given line item, returning either a tax price array to be
+ *     added as a component to the line item's unit price or FALSE to not
+ *     include anything; defaults to 'commerce_tax_rate_calculate'.
  */
 function hook_commerce_tax_rate_info() {
   $tax_rates = array();
@@ -195,6 +195,9 @@ function hook_commerce_tax_rate_delete($tax_rate, $skip_reset) {
  * Allows modules to calculate taxes that don't determine applicability through
  * default Rules components.
  *
+ * An implementation might contact a web service and apply the tax to the unit
+ * price of the line item based on the returned data.
+ *
  * @param $tax_type
  *   The tax type object whose rates should be calculated.
  * @param $line_item
@@ -203,6 +206,5 @@ function hook_commerce_tax_rate_delete($tax_rate, $skip_reset) {
  * @see commerce_tax_type_calculate_rates()
  */
 function hook_commerce_tax_type_calculate_rates($tax_type, $line_item) {
-  // An implementation might contact a web service and apply the tax to the unit
-  // price of the line item based on the returned data.
+  // No example.
 }

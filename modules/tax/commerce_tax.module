@@ -261,7 +261,7 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item) {
  */
 function commerce_tax_rate_apply($tax_rate, $line_item) {
   // If a valid rate is specified...
-  if (!empty($tax_rate['rate']) && is_numeric($tax_rate['rate'])) {
+  if (isset($tax_rate['rate']) && is_numeric($tax_rate['rate'])) {
     $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
 
     // Don't apply tax if the unit price has a NULL amount.
