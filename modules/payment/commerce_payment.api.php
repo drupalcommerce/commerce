@@ -374,8 +374,14 @@ function hook_commerce_payment_transaction_presave($transaction) {
  * back down to or below zero. In either of these cases, no further action is
  * taken. At present, this hook and Rules event are only meant to be invoked the
  * first time an order is considered paid in full.
+ *
+ * @param $order
+ *   The order that was just paid in full.
+ * @param $transaction
+ *   The successful transaction that just caused the order's balance to drop to
+ *   or below zero.
  */
-function hook_commerce_payment_order_paid_in_full($transaction) {
+function hook_commerce_payment_order_paid_in_full($order, $transaction) {
   // No example.
 }
 
