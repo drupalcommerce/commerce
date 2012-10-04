@@ -61,12 +61,8 @@ function theme_customer_profile_add_list($variables) {
  * @see commerce_customer_customer_profile_form()
  */
 function commerce_customer_ui_customer_profile_form_wrapper($profile) {
-  // Add the breadcrumb for the form's location.
-  commerce_customer_ui_set_breadcrumb();
-
   // Include the forms file from the Customer module.
   module_load_include('inc', 'commerce_customer', 'includes/commerce_customer_profile.forms');
-
   return drupal_get_form('commerce_customer_ui_customer_profile_form', $profile);
 }
 
@@ -79,11 +75,7 @@ function commerce_customer_ui_customer_profile_form_wrapper($profile) {
  * @see commerce_customer_customer_profile_delete_form()
  */
 function commerce_customer_ui_customer_profile_delete_form_wrapper($profile) {
-  // Add the breadcrumb for the form's location.
-  commerce_customer_ui_set_breadcrumb(TRUE);
-
   // Include the forms file from the Customer module.
   module_load_include('inc', 'commerce_customer', 'includes/commerce_customer_profile.forms');
-
   return drupal_get_form('commerce_customer_ui_customer_profile_delete_form', $profile);
 }

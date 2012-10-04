@@ -37,9 +37,6 @@ function commerce_order_settings_form($form, &$form_state) {
  * @see commerce_order_order_form()
  */
 function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
-  // Add the breadcrumb for the form's location.
-  commerce_order_ui_set_breadcrumb();
-
   // Set the page title and a default customer if necessary.
   if (empty($order->order_id)) {
     drupal_set_title(t('Create an order'));
@@ -51,7 +48,6 @@ function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
 
   // Include the forms file from the Order module.
   module_load_include('inc', 'commerce_order', 'includes/commerce_order.forms');
-
   return drupal_get_form('commerce_order_ui_order_form', $order);
 }
 
@@ -64,11 +60,7 @@ function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
  * @see commerce_order_order_delete_form()
  */
 function commerce_order_ui_order_delete_form_wrapper($order) {
-  // Add the breadcrumb for the form's location.
-  commerce_order_ui_set_breadcrumb();
-
   // Include the forms file from the Order module.
   module_load_include('inc', 'commerce_order', 'includes/commerce_order.forms');
-
   return drupal_get_form('commerce_order_ui_order_delete_form', $order);
 }

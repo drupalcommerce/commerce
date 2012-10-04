@@ -80,9 +80,6 @@ function commerce_product_ui_product_type_form_wrapper($type) {
     $product_type = commerce_product_type_load($type);
   }
 
-  // Add the breadcrumb for the form's location.
-  commerce_product_ui_set_breadcrumb(TRUE);
-
   // Return a message if the product type is not governed by Product UI.
   if (!empty($product_type['type']) && $product_type['module'] != 'commerce_product_ui') {
     return t('This product type cannot be edited, because it is not defined by the Product UI module.');
@@ -110,9 +107,6 @@ function commerce_product_ui_product_type_delete_form_wrapper($type) {
   else {
     $product_type = commerce_product_type_load($type);
   }
-
-  // Add the breadcrumb for the form's location.
-  commerce_product_ui_set_breadcrumb(TRUE);
 
   // Return a message if the product type is not governed by Product UI.
   if ($product_type['module'] != 'commerce_product_ui') {

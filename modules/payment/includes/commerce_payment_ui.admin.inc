@@ -10,9 +10,7 @@
  * Displays the payment transaction View in an order's payment tab.
  */
 function commerce_payment_ui_order_tab($order) {
-  // Set the breadcrumb and display the payments View.
-  commerce_order_ui_set_breadcrumb();
-
+  // Display the payments View.
   return commerce_embed_view('commerce_payment_order', 'defaults', array($order->order_id));
 }
 
@@ -42,12 +40,7 @@ function commerce_payment_ui_admin_page() {
 /**
  * Displays the full details of a payment transaction.
  */
-function commerce_payment_ui_payment_transaction_view($order, $transaction, $view_mode, $breadcrumb = TRUE) {
-  // Set the breadcrumb for the appropriate view mode if specified.
-  if ($breadcrumb) {
-    commerce_payment_ui_set_order_breadcrumb($order, $view_mode);
-  }
-
+function commerce_payment_ui_payment_transaction_view($order, $transaction, $view_mode) {
   return entity_view('commerce_payment_transaction', array($transaction->transaction_id => $transaction), $view_mode, NULL, TRUE);
 }
 
@@ -62,11 +55,7 @@ function commerce_payment_ui_payment_transaction_view($order, $transaction, $vie
  * @see commerce_payment_payment_transaction_delete_form()
  */
 function commerce_payment_ui_payment_transaction_delete_form_wrapper($order, $transaction) {
-  // Add the breadcrumb for the form's location.
-  commerce_payment_ui_set_order_breadcrumb($order);
-
   // Include the forms file from the Payment module.
   module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.forms');
-
   return drupal_get_form('commerce_payment_ui_payment_transaction_delete_form', $order, $transaction);
 }
