@@ -225,21 +225,20 @@ function commerce_tax_rate_titles() {
  *   The line item to which the taxes should be applied.
  */
 function commerce_tax_type_calculate_rates($tax_type, $line_item) {
-  // Load all the rule components.
-  $components = rules_get_components(FALSE, 'action');
+  // Prepare an array of rules components to load.
+  $component_names = array();
 
   // Loop over each tax rate in search of matching components.
   foreach (commerce_tax_rates() as $name => $tax_rate) {
     // If the current rate matches the type and specifies a default component...
     if ($tax_rate['type'] == $tax_type['name'] && !empty($tax_rate['rules_component'])) {
-      $component_name = $tax_rate['rules_component'];
-
-      // If we can load the current rate's component...
-      if (!empty($components[$component_name])) {
-        // Invoke it with the line item.
-        rules_invoke_component($component_name, $line_item);
-      }
+      $component_names[] = $tax_rate['rules_component'];
     }
+  }
+
+  // Load and invoke the tax rules components.
+  foreach (rules_config_load_multiple($component_names) as $component_name => $component) {
+    rules_invoke_component($component_name, $line_item);
   }
 
   // Allow modules handling tax application on their own to apply rates of the
