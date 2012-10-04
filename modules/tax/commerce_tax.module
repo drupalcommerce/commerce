@@ -237,8 +237,10 @@ function commerce_tax_type_calculate_rates($tax_type, $line_item) {
   }
 
   // Load and invoke the tax rules components.
-  foreach (rules_config_load_multiple($component_names) as $component_name => $component) {
-    rules_invoke_component($component_name, $line_item);
+  if (!empty($component_names)) {
+    foreach (rules_config_load_multiple($component_names) as $component_name => $component) {
+      rules_invoke_component($component_name, $line_item);
+    }
   }
 
   // Allow modules handling tax application on their own to apply rates of the
