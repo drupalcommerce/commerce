@@ -1014,7 +1014,6 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
         list($field_name, $langcode) = array_shift($addressfields);
 
         foreach (element_children($element['profiles'][$key][$field_name][$langcode]) as $delta) {
-          // Don't mess with the "Add another item" button that could be present.
           if ($element['profiles'][$key][$field_name][$langcode][$delta]['#type'] != 'submit') {
             $element['profiles'][$key][$field_name][$langcode][$delta]['#type'] = 'container';
           }
@@ -1068,12 +1067,37 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
 function commerce_customer_profile_manager_validate($element, &$form_state, $form) {
   $value = array();
 
+  // If the triggering element wants to limit validation errors and the form is
+  // not going to be submitted...
+  if (isset($form_state['triggering_element']['#limit_validation_errors']) && ($form_state['triggering_element']['#limit_validation_errors'] !== FALSE) && !($form_state['submitted'] && !isset($form_state['triggering_element']['#submit']))) {
+    // Ensure this element wasn't specifically marked for validation in the
+    // #limit_validation_errors sections array.
+    $section_match = FALSE;
+
+    foreach ($form_state['triggering_element']['#limit_validation_errors'] as $section) {
+      // Because #limit_validation_errors sections force validation for any
+      // element that matches the section or is a child of it, we can consider
+      // it a match if the section completely matches the beginning of this
+      // element's #parents array even if #parents contains additional elements.
+      if (array_intersect_assoc($section, $element['#parents']) === $section) {
+        $section_match = TRUE;
+      }
+    }
+
+    // Exit this validate function, because the form is going to be rebuilt and
+    // the data submitted may very well be incomplete.
+    if (!$section_match) {
+      form_set_value($element, array(), $form_state);
+      return;
+    }
+  }
+
   // Loop through the profiles in the manager table.
   foreach (element_children($element['profiles']) as $key) {
     // Update the profile based on the values in the additional elements.
     $profile = clone($element['profiles'][$key]['profile']['#value']);
 
-    // If the line item has been marked for deletion...
+    // If the profile has been marked for deletion...
     if ($profile->profile_id && $element['profiles'][$key]['remove']['#value']) {
       // Delete the profile now if we can and don't include it in the $value array.
       if (commerce_customer_profile_can_delete($profile)) {
