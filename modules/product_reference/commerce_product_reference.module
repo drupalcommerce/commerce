@@ -871,17 +871,21 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
   $query->join('field_config', 'fc', 'fc.id = fci.field_id');
   $query->fields('fci', array('entity_type'));
   $query->condition('fc.type', 'commerce_product_reference');
+  $query->condition('fc.deleted', 0);
   $query->distinct();
 
   foreach ($query->execute() as $instance) {
     $entity_type = $instance['entity_type'];
-    foreach ($entity_info[$entity_type]['view modes'] as $view_mode => $view_mode_info) {
-      $entity_info['commerce_product']['view modes'][$entity_type . '_' . $view_mode] = array(
-        'label' => t('@entity_type: @view_mode', array('@entity_type' => $entity_info[$entity_type]['label'], '@view_mode' => $view_mode_info['label'])),
 
-        // UX: Enable the 'Node: teaser' mode by default, if present.
-        'custom settings' => $entity_type == 'node' && $view_mode == 'teaser',
-      );
+    if (!empty($entity_info[$entity_type]['view modes'])) {
+      foreach ($entity_info[$entity_type]['view modes'] as $view_mode => $view_mode_info) {
+        $entity_info['commerce_product']['view modes'][$entity_type . '_' . $view_mode] = array(
+          'label' => t('@entity_type: @view_mode', array('@entity_type' => $entity_info[$entity_type]['label'], '@view_mode' => $view_mode_info['label'])),
+
+          // UX: Enable the 'Node: teaser' mode by default, if present.
+          'custom settings' => $entity_type == 'node' && $view_mode == 'teaser',
+        );
+      }
     }
   }
 }
