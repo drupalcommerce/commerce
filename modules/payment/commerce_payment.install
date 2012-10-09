@@ -25,8 +25,7 @@ function commerce_payment_schema() {
         'description' => 'The current {commerce_payment_transaction_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+        'not null' => FALSE,
       ),
       'uid' => array(
         'description' => 'The {users}.uid that created this transaction.',
@@ -279,4 +278,18 @@ function commerce_payment_update_7101() {
   db_add_index('commerce_payment_transaction', 'order_id', array('order_id'));
 
   return t('Database indexes added to the uid and order_id columns of the commerce_payment_transaction table.');
+}
+
+/**
+ * Allow NULL values for revision_id on {commerce_payment_transaction} to avoid locking issues.
+ */
+function commerce_payment_update_7102() {
+  db_change_field('commerce_payment_transaction', 'revision_id', 'revision_id', array(
+    'description' => 'The current {commerce_payment_transaction_revision}.revision_id version identifier.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+  ));
+
+  return t('Schema for the commerce_payment_transaction table has been updated.');
 }

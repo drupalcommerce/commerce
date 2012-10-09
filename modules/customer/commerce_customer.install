@@ -19,8 +19,7 @@ function commerce_customer_schema() {
         'description' => 'The current {commerce_customer_profile_revision}.revision_id version identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+        'not null' => FALSE,
       ),
       'type' => array(
         'description' => 'The {commerce_customer_profile_type}.type of this profile.',
@@ -251,4 +250,18 @@ function commerce_customer_update_7101() {
   db_add_index('commerce_customer_profile', 'uid_by_type', array('uid', 'type'));
 
   return t('Database indexes added to the uid and type columns of the commerce_customer_profile table.');
+}
+
+/**
+ * Allow NULL values for revision_id on {commerce_customer} to avoid locking issues.
+ */
+function commerce_customer_update_7102() {
+  db_change_field('commerce_customer_profile', 'revision_id', 'revision_id', array(
+    'description' => 'The current {commerce_customer_profile_revision}.revision_id version identifier.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+  ));
+
+  return t('Schema for the commerce_customer_profile table has been updated.');
 }

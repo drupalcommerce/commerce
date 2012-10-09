@@ -21,7 +21,6 @@ function commerce_product_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
-        'default' => NULL,
       ),
       'sku' => array(
         'description' => 'The unique, human-readable identifier for a product.',

@@ -26,7 +26,6 @@ function commerce_order_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
-        'default' => 0,
       ),
       'type' => array(
         'description' => 'The type of this order.',
@@ -457,4 +456,18 @@ function commerce_order_update_7108() {
   db_change_field('commerce_order_revision', 'order_number', 'order_number', $order_number_revision_spec);
 
   return t('Schema for the commerce_order and commerce_order_revision tables has been updated.');
+}
+
+/**
+ * Remove the default value for revision_id on {commerce_order}.
+ */
+function commerce_order_update_7109() {
+  db_change_field('commerce_order', 'revision_id', 'revision_id', array(
+    'description' => 'The current {commerce_order_revision}.revision_id version identifier.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+  ));
+
+  return t('Schema for the commerce_order table has been updated.');
 }
