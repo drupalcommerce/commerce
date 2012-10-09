@@ -406,3 +406,17 @@ function commerce_product_update_7103(&$sandbox) {
 
   return t('The update for commerce product revisions ran successfully.');
 }
+
+/**
+ * Remove the default value for revision_id on {commerce_product}.
+ */
+function commerce_product_update_7104() {
+  db_change_field('commerce_product', 'revision_id', 'revision_id', array(
+    'description' => 'The current {commerce_product_revision}.revision_id version identifier.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+  ));
+
+  return t('Schema for the commerce_product table has been updated.');
+}
