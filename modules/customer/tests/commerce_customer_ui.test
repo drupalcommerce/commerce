@@ -558,9 +558,23 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
   }
 
   /**
-   * Test the copying of one profile's fields to another.
+   * Test the copying of one profile's fields to another (disabled by default).
    */
   public function testCommerceCustomerUIProfileCopy() {
+    $this->_testCommerceCustomerUIProfileCopy();
+  }
+
+  /**
+   * Test the copying of one profile's fields to another (enabled by default).
+   */
+  public function testCommerceCustomerUIProfileCopyDefaultEnabled() {
+    $this->_testCommerceCustomerUIProfileCopy(TRUE);
+  }
+
+  /**
+   * Test the copying of one profile's fields to another.
+   */
+  public function _testCommerceCustomerUIProfileCopy($default_enabled = FALSE) {
     // Enable the helper module that creates a new profile type.
     module_enable(array('commerce_customer_profile_dummy_type'));
 
@@ -568,6 +582,7 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     // the billing information customer profile type.
     variable_set('commerce_customer_profile_dummy_profile_copy', TRUE);
     variable_set('commerce_customer_profile_dummy_profile_copy_source', 'billing');
+    variable_set('commerce_customer_profile_dummy_profile_copy_default', $default_enabled);
 
     // Create an order.
     $order = $this->createDummyOrder($this->store_customer->uid);
@@ -579,9 +594,11 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     // Generate random information, as city, postal code, etc.
     $address_info = $this->generateAddressInformation();
 
-    // Fill in the billing address information
-    $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
-    $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+    // Fill in the billing address information if the copying isn't enabled by default.
+    if (!$default_enabled) {
+      $billing_pane = $this->xpath("//select[starts-with(@name, 'customer_profile_billing[commerce_customer_address]')]");
+      $this->drupalPostAJAX(NULL, array((string) $billing_pane[0]['name'] => 'US'), (string) $billing_pane[0]['name']);
+    }
 
     // Fill in the required information for billing pane, with a random State.
     $info = array(
