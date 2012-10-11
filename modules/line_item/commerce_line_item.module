@@ -1305,14 +1305,24 @@ function commerce_line_item_rebase_unit_price($line_item) {
 
   // Extract the old components array and reset the current one.
   $old_components = array();
+  $component_type = 'base_price';
 
   if (!empty($price['data']['components'])) {
     $old_components = $price['data']['components'];
+
+    // Find the base price component type used so line items that don't use the
+    // base_price component can preserve their own initial component type.
+    $base_component = reset($old_components);
+    $component_type = $base_component['name'];
+
+    if (!commerce_price_component_type_load($component_type)) {
+      $component_type = 'base_price';
+    }
   }
 
   // Set the current price as the new base price.
   $price['data']['components'] = array();
-  $price['data'] = commerce_price_component_add($price, 'base_price', $price, TRUE);
+  $price['data'] = commerce_price_component_add($price, $component_type, $price, TRUE, FALSE);
 
   // Set the unit price to the current price array.
   $wrapper->commerce_unit_price = $price;
