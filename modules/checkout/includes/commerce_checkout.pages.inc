@@ -128,8 +128,9 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
         if (!isset($GLOBALS['_rules_action_drupal_goto_do'])){
           $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
 
-          $form[$pane_id . '_messages'] = array(
+          $pane_form[$pane_id . '_messages'] = array(
             '#markup' =>  $form_state['storage']['themed_messages'][$pane_id],
+            '#weight' => -50,
           );
         }
       }
