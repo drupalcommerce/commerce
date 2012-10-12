@@ -349,11 +349,15 @@ function commerce_tax_rate_round_amount($tax_rate, $amount) {
 }
 
 /**
- * Implements hook_field_attach_form().
+ * Implements hook_field_widget_form_alter().
+ *
+ * Alter price widgets on the product form to have tax inclusive price entry.
+ * This hook was added in Drupal 7.8, so entering prices including VAT will
+ * require at least that version.
  */
-function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
-  // Alter price widgets on the product form to have tax inclusive price entry.
-  if ($entity_type == 'commerce_product') {
+function commerce_tax_field_widget_form_alter(&$element, &$form_state, $context) {
+  // Act on widgets for fields of type commerce_price on commerce_products.
+  if ($context['field']['type'] == 'commerce_price' && $context['instance']['entity_type'] == 'commerce_product') {
     // Build an array of tax types that are display inclusive.
     $inclusive_types = array();
 
@@ -372,53 +376,41 @@ function commerce_tax_field_attach_form($entity_type, $entity, &$form, &$form_st
       }
     }
 
-    // Get an array of price fields attached to products.
-    $fields = commerce_info_fields('commerce_price', 'commerce_product');
+    if (!empty($options)) {
+      // Find the default value for the tax included element.
+      $default = '';
 
-    // Loop over each child element of the form.
-    foreach (element_children($form) as $key) {
-      // If the current element is for a price field...
-      if (in_array($key, array_keys($fields))) {
-        // Loop over each of its child items...
-        foreach (element_children($form[$key][$form[$key]['#language']]) as $delta) {
-          if (!empty($options)) {
-            // Find the default value for the tax included element.
-            $default = '';
-
-            if (!empty($form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['include_tax'])) {
-              $default = $form[$key][$form[$key]['#language']][$delta]['data']['#default_value']['include_tax'];
-            }
-
-            $form[$key][$form[$key]['#language']][$delta]['currency_code']['#title'] = '&nbsp;';
-
-            // Note that because this is a select element, the values in the
-            // #options array have not been sanitized. They will be passed
-            // through check_plain() in form_select_options() when this form
-            // element is processed. If you alter the type of this element to
-            // radios or checkboxes, you are responsible for sanitizing the
-            // values of the #options array as well.
-            $form[$key][$form[$key]['#language']][$delta]['include_tax'] = array(
-              '#type' => 'select',
-              '#title' => t('Include tax in this price'),
-              '#description' => t('Saving prices tax inclusive will bypass later calculations for the specified tax.'),
-              '#options' => count($options) == 1 ? reset($options) : $options,
-              '#default_value' => $default,
-              '#required' => FALSE,
-              '#empty_value' => '',
-              '#suffix' => '<div class="commerce-price-tax-included-clearfix"></div>',
-              '#attached' => array(
-                'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.theme.css'),
-              ),
-            );
-          }
-
-          // Append a validation handler to the price field's element validate
-          // array to add the included tax price component after the price has
-          // been converted from a decimal.
-          $form[$key][$form[$key]['#language']][$delta]['#element_validate'][] = 'commerce_tax_price_field_validate';
-        }
+      if (!empty($element['data']['#default_value']['include_tax'])) {
+        $default = $element['data']['#default_value']['include_tax'];
       }
+
+      $element['currency_code']['#title'] = '&nbsp;';
+
+      // Note that because this is a select element, the values in the
+      // #options array have not been sanitized. They will be passed
+      // through check_plain() in form_select_options() when this form
+      // element is processed. If you alter the type of this element to
+      // radios or checkboxes, you are responsible for sanitizing the
+      // values of the #options array as well.
+      $element['include_tax'] = array(
+        '#type' => 'select',
+        '#title' => t('Include tax in this price'),
+        '#description' => t('Saving prices tax inclusive will bypass later calculations for the specified tax.'),
+        '#options' => count($options) == 1 ? reset($options) : $options,
+        '#default_value' => $default,
+        '#required' => FALSE,
+        '#empty_value' => '',
+        '#suffix' => '<div class="commerce-price-tax-included-clearfix"></div>',
+        '#attached' => array(
+          'css' => array(drupal_get_path('module', 'commerce_tax') . '/theme/commerce_tax.theme.css'),
+        ),
+      );
     }
+
+    // Append a validation handler to the price field's element validate
+    // array to add the included tax price component after the price has
+    // been converted from a decimal.
+    $element['#element_validate'][] = 'commerce_tax_price_field_validate';
   }
 }
 
