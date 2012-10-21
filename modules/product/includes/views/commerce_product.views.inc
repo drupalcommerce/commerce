@@ -96,6 +96,27 @@ function commerce_product_views_data() {
     ),
   );
 
+  if (module_exists('locale')) {
+    // Expose the language
+    $data['commerce_product']['language'] = array(
+      'title' => t('Language'),
+      'help' => t('The language the product is in.'),
+      'field' => array(
+       'handler' => 'views_handler_field_locale_language',
+       'click sortable' => TRUE,
+      ),
+     'filter' => array(
+       'handler' => 'views_handler_filter_locale_language',
+     ),
+     'argument' => array(
+       'handler' => 'views_handler_argument_locale_language',
+     ),
+     'sort' => array(
+     'handler' => 'views_handler_sort',
+     ),
+    );
+  }
+
   // Expose the creator uid.
   $data['commerce_product']['uid'] = array(
     'title' => t('Creator'),
