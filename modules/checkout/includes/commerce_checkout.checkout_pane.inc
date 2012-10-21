@@ -140,7 +140,7 @@ function commerce_checkout_completion_message_pane_checkout_form($form, &$form_s
   }
 
   // Perform token replacement.
-  $message = token_replace($message, array('commerce-order' => $order));
+  $message = token_replace($message, array('commerce-order' => $order), array('clear' => TRUE));
 
   // Apply the proper text format.
   $message = check_markup($message, $text_format);
