@@ -15,8 +15,8 @@
  */
 class EntityTranslationCommerceProductHandler extends EntityTranslationDefaultHandler {
 
-  public function __construct($entity_type, $entity_info, $entity, $entity_id) {
-    parent::__construct('commerce_product', $entity_info, $entity, $entity_id);
+  public function __construct($entity_type, $entity_info, $entity) {
+    parent::__construct('commerce_product', $entity_info, $entity);
   }
 
   /**
@@ -27,17 +27,29 @@ class EntityTranslationCommerceProductHandler extends EntityTranslationDefaultHa
   }
 
   /**
-   * Returns the original language of the product.
-   */
-  public function getLanguage() {
-    return $this->entity->language;
-  }
-
-  /**
    * Checks whether the current user has access to this product.
    */
   public function getAccess($op) {
     return commerce_product_access($op, $this->entity);
+  }
+
+  /**
+   * Tweaks the product form to support multilingual elements.
+   */
+  public function entityForm(&$form, &$form_state) {
+    parent::entityForm($form, $form_state);
+    if (isset($form['change_history']['#weight'])) {
+      $form['translation']['#weight'] = $form['change_history']['#weight'] - 0.01;
+    }
+    $form['actions']['delete_translation']['#suffix'] = $form['actions']['submit']['#suffix'];
+    unset($form['actions']['submit']['#suffix']);
+  }
+
+  /**
+   * @see EntityTranslationDefaultHandler::entityFormTitle()
+   */
+  protected function entityFormTitle() {
+    return commerce_product_ui_product_title($this->entity);
   }
 
   /**

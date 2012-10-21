@@ -85,6 +85,7 @@ function commerce_product_entity_info() {
         'bundle' => 'type',
         'label' => 'title',
         'revision' => 'revision_id',
+        'language' => 'language',
       ),
       'bundle keys' => array(
         'bundle' => 'type',
@@ -115,6 +116,11 @@ function commerce_product_entity_info() {
         'locale' => TRUE,
         'entity_translation' => array(
           'class' => 'EntityTranslationCommerceProductHandler',
+          'bundle callback' => 'commerce_product_entity_translation_supported_type',
+          'default settings' => array(
+            'default_language' => LANGUAGE_NONE,
+            'hide_language_selector' => FALSE,
+          ),
         ),
       ),
 
@@ -894,13 +900,7 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
  * Access callback: determines access to a product's translation tab.
  */
 function commerce_product_entity_translation_tab_access($product) {
-  if (!empty($product->language) && $product->language != LANGUAGE_NONE) {
-    if (commerce_product_entity_translation_supported_type($product->type)) {
-      return entity_translation_tab_access('commerce_product');
-    }
-  }
-
-  return FALSE;
+  return entity_translation_tab_access('commerce_product', $product);
 }
 
 /**

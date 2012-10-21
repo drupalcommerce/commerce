@@ -263,9 +263,6 @@ function commerce_product_ui_entity_info_alter(&$entity_info) {
   // Add callbacks and urls for administer translations.
   $entity_info['commerce_product']['translation']['entity_translation'] += array(
     'base path' => 'admin/commerce/products/%commerce_product',
-    'access callback' => 'commerce_product_entity_translation_tab_access',
-    'access arguments' => array(3),
-    'edit form' => TRUE,
   );
 
   // Expose the admin UI for product fields.
@@ -458,31 +455,6 @@ function commerce_product_ui_form_commerce_product_ui_product_form_alter(&$form,
   // Add a submit handler to the save button to add a redirect.
   $form['actions']['submit']['#submit'][] = 'commerce_product_ui_product_form_submit';
 
-  // If translation support is enabled, provide the suitable languages
-  if (module_exists('entity_translation') && entity_translation_enabled('commerce_product')) {
-    $handler = entity_translation_get_handler('commerce_product', $product);
-    $translations = $handler->getTranslations();
-
-    $form['language'] = array(
-      '#type' => 'select',
-      '#title' => t('Language'),
-      '#default_value' => isset($product->language) ? $product->language : '',
-      '#options' => array(LANGUAGE_NONE => t('Language neutral')) + locale_language_list('name'),
-      '#weight' => -10,
-    );
-
-    // Disable languages for existing translations, so it is not possible to
-    // switch this product to some language which is already in the translation set.
-    foreach ($translations->data as $langcode => $translation) {
-      if ($langcode != $translations->original) {
-        unset($form['language']['#options'][$langcode]);
-      }
-    }
-
-    // Since this function may change the language of the submitted form values,
-    // it has to be the first called.
-    array_unshift($form['actions']['submit']['#submit'], 'commerce_product_ui_product_form_translation_submit');
-  }
 
   // Add the save and continue button for new products.
   if (empty($product->product_id)) {
@@ -514,34 +486,6 @@ function commerce_product_ui_product_form_submit($form, &$form_state) {
   }
   elseif (arg(2) == 'products' && arg(3) == 'add') {
     $form_state['redirect'] = 'admin/commerce/products';
-  }
-}
-
-/**
- * Submit callback for commerce_product_ui_product_form().
- *
- * Checks if translation is enabled for the product and handles language changes.
- * Since this handler may change the language of submitted form values it should
- * be the first submit handler called.
- *
- * @see commerce_product_ui_form_commerce_product_ui_product_form_alter()
- */
-function commerce_product_ui_product_form_translation_submit($form, &$form_state) {
-  // Get an array of available languages.
-  $available_languages = field_content_languages();
-  list(, , $bundle) = entity_extract_ids('commerce_product', $form_state['commerce_product']);
-
-  foreach (field_info_instances('commerce_product', $bundle) as $instance) {
-    $field_name = $instance['field_name'];
-    $field = field_info_field($field_name);
-    $previous_language = $form[$field_name]['#language'];
-
-    // Handle a possible language change; new language values are inserted and
-    // the previous values are deleted.
-    if ($field['translatable'] && $previous_language != $form_state['values']['language']) {
-      $form_state['values'][$field_name][$form_state['values']['language']] = $form_state['commerce_product']->{$field_name}[$previous_language];
-      $form_state['values'][$field_name][$previous_language] = array();
-    }
   }
 }
 

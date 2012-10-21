@@ -14,8 +14,6 @@
  *     with only a product type defined.
  */
 function commerce_product_product_form($form, &$form_state, $product) {
-  $language = !empty($product->language) ? $product->language : LANGUAGE_NONE;
-
   // Ensure this include file is loaded when the form is rebuilt from the cache.
   $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_product') . '/includes/commerce_product.forms.inc';
 
@@ -42,7 +40,8 @@ function commerce_product_product_form($form, &$form_state, $product) {
 
   // Add the field related form elements.
   $form_state['commerce_product'] = $product;
-  field_attach_form('commerce_product', $product, $form, $form_state, $language);
+  $langcode = entity_language('commerce_product', $product);
+  field_attach_form('commerce_product', $product, $form, $form_state, $langcode);
 
   $form['status'] = array(
     '#type' => 'radios',
@@ -94,7 +93,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   // Simply use default language
   $form['language'] = array(
     '#type' => 'value',
-    '#value' => $language,
+    '#value' => $langcode,
   );
 
   // We add the form's #submit array to this button along with the actual submit
