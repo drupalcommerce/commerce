@@ -796,6 +796,13 @@ function commerce_price_field_data_property_info($name = NULL) {
       'getter callback' => 'entity_property_verbatim_get',
       'setter callback' => 'entity_property_verbatim_set',
     ),
+    'amount_decimal' => array(
+      'label' => t('Amount (decimal)'),
+      'description' => !empty($name) ? t('Amount value of field %name (as a decimal)', array('%name' => $name)) : '',
+      'type' => 'decimal',
+      'getter callback' => 'commerce_price_amount_decimal_get',
+      'computed' => TRUE,
+    ),
     'currency_code' => array(
       'label' => t('Currency'),
       'description' => !empty($name) ? t('Currency code of field %name', array('%name' => $name)) : '',
@@ -812,6 +819,13 @@ function commerce_price_field_data_property_info($name = NULL) {
       'setter callback' => 'entity_property_verbatim_set',
     ),
   );
+}
+
+/**
+ * Property getter callback returing the amount (as a decimal).
+ */
+function commerce_price_amount_decimal_get($data, array $options, $name, $type, $info) {
+  return commerce_currency_amount_to_decimal($data['amount'], $data['currency_code']);
 }
 
 /**
