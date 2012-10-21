@@ -9,9 +9,6 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
   function option_definition() {
     $options = parent::option_definition();
 
-    // Undefine the empty option.
-    unset($options['empty']);
-
     // Define an option to control the links displayed in the summary.
     $options['links'] = array('default' => array());
 
@@ -30,9 +27,6 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-
-    // Don't display a form element for the undefined empty option.
-    unset($form['empty']);
 
     // Add checkboxes for the summary links if any are available.
     $options = array();
@@ -84,7 +78,7 @@ class commerce_line_item_handler_area_line_item_summary extends views_handler_ar
   }
 
   function render($empty = FALSE) {
-    if (!$empty) {
+    if (!$empty || !empty($this->options['empty'])) {
       // Build an array of line item IDs from the View results that we will load
       // and use for calculating totals.
       $line_item_ids = array();

@@ -8,9 +8,6 @@ class commerce_order_handler_area_empty_text extends views_handler_area {
   function option_definition() {
     $options = parent::option_definition();
 
-    // Undefine the empty option.
-    unset($options['empty']);
-
     // Define an option to link to an order creation form.
     $options['add_path'] = array('default' => '');
 
@@ -19,9 +16,6 @@ class commerce_order_handler_area_empty_text extends views_handler_area {
 
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-
-    // Don't display a form element for the undefined empty option.
-    unset($form['empty']);
 
     $form['add_path'] = array(
       '#type' => 'textfield',
