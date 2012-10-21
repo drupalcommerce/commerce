@@ -316,7 +316,7 @@ function commerce_line_item_unit_price_currency_convert($line_item, $currency_co
   $wrapper->commerce_unit_price->amount = commerce_currency_convert($wrapper->commerce_unit_price->amount->value(), $wrapper->commerce_unit_price->currency_code->value(), $currency_code);
   $wrapper->commerce_unit_price->currency_code = $currency_code;
 
-  // Convert the curreny code of the price's components.
+  // Convert the currency code of the price's components.
   if (!empty($unit_price['data']['components'])) {
     foreach ($unit_price['data']['components'] as $key => &$component) {
       $component['price']['amount'] = commerce_currency_convert($component['price']['amount'], $component['price']['currency_code'], $currency_code);
