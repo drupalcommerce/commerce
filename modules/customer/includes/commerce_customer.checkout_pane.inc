@@ -33,6 +33,7 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
     '#options' => $options,
     '#empty_value' => '',
     '#default_value' => variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', ''),
+    '#required' => TRUE,
   );
 
   // Provide the option to copy values from other profile types if they exist.

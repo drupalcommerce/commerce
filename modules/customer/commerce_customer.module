@@ -406,7 +406,8 @@ function commerce_customer_commerce_checkout_pane_info() {
       'title' => !empty($instance['label']) ? check_plain($instance['label']) : $profile_type['name'],
       'file' => 'includes/commerce_customer.checkout_pane.inc',
       'base' => 'commerce_customer_profile_pane',
-      'page' => 'checkout',
+      'page' => !empty($instance) ? 'checkout' : 'disabled',
+      'locked' => empty($instance),
       'weight' => isset($profile_type['checkout_pane_weight']) ? $profile_type['checkout_pane_weight'] : $weight++,
     );
   }
@@ -445,6 +446,26 @@ function commerce_customer_field_views_data($field) {
   return $data;
 }
 
+/**
+ * Implements hook_field_delete_field().
+ */
+function commerce_customer_field_delete_field($field) {
+  if ($field['type'] == 'commerce_customer_profile_reference') {
+    foreach (commerce_customer_profile_types() as $type => $profile_type) {
+      if (variable_get('commerce_customer_profile_' . $type . '_field', '') == $field['field_name']) {
+        variable_set('commerce_customer_profile_' . $type . '_field', '');
+
+        $checkout_pane = commerce_checkout_pane_load('customer_profile_' . $type);
+        $checkout_pane['enabled'] = FALSE;
+        $checkout_pane['page'] = 'disabled';
+
+        commerce_checkout_pane_save($checkout_pane);
+
+        drupal_static_reset('commerce_checkout_panes');
+      }
+    }
+  }
+}
 
 /**
  * Returns an array of customer profile type arrays keyed by type.
