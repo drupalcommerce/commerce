@@ -181,15 +181,6 @@ function commerce_payment_rules_action_info() {
     );
   }
 
-  $actions['commerce_payment_capture'] = array(
-    'label' => t('Capture from a prior authorization'),
-    'parameter' => array(
-      'commerce_order' => array('type' => 'commerce_order', 'label' => t('Order', array(), array('context' => 'a drupal commerce order'))),
-      'amount' => array('type' => 'text', 'label' => t('Amount')),
-    ),
-    'group' => t('Commerce Payment'),
-  );
-
   return $actions;
 }
 
@@ -230,13 +221,6 @@ function commerce_payment_enable_method($order, $payment_method, $action_setting
     'rule_name' => $rule->name,
     'weight' => $rule->weight,
   );
-}
-
-/**
- * Rules action: capture a payment from a previous authorization.
- */
-function commerce_payment_capture($order, $amount) {
-
 }
 
 /**

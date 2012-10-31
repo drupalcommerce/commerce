@@ -1134,7 +1134,7 @@ function _commerce_price_rules_data_ui_element_validate($element, &$form_state, 
   if (is_numeric($value['amount'])) {
     // Ensure price amount is formatted correctly in major units according to the
     // currency code.
-    $minor_unit_amount = number_format($value['amount'], $currency['decimals']);
+    $minor_unit_amount = number_format($value['amount'], $currency['decimals'], '.', '');
 
     // Now that the minor unit amount expected by the currency, we can safely
     // convert back to major units for storage.
