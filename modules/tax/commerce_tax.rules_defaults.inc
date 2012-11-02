@@ -19,6 +19,7 @@ function commerce_tax_default_rules_configuration() {
       // item using the name specified by the rate.
       $rule = rule(commerce_tax_rate_component_variables());
       $rule->label = t('Calculate @title', array('@title' => $tax_rate['title']));
+      $rule->tags = array('Commerce Tax', $tax_rate['type']);
 
       // Add the action to apply the current tax.
       $rule
@@ -39,6 +40,7 @@ function commerce_tax_default_rules_configuration() {
       $rule = rules_reaction_rule();
 
       $rule->label = t('Calculate taxes: @title', array('@title' => $tax_type['title']));
+      $rule->tags = array('Commerce Tax');
       $rule->active = TRUE;
 
       // Add the action to invoke every tax rate's component matching this type.
