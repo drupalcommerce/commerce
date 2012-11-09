@@ -162,9 +162,9 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
       elseif (empty($order->data['profile_copy']) && $profile_copy_default) {
         // Get field names that will be copied from the source profile.
         foreach (field_info_instances('commerce_customer_profile', $source_profile_type['type']) as $field_name => $field) {
-          $langcode = $pane_form[$field_name]['#language'];
           // If the field exists on the destination profile then disable it.
-          if(!empty($pane_form[$field_name])){
+          if (!empty($pane_form[$field_name])){
+            $langcode = $pane_form[$field_name]['#language'];
             $pane_form[$field_name][$langcode]['#access'] = FALSE;
           }
         }
