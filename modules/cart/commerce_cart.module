@@ -419,8 +419,12 @@ function commerce_cart_commerce_product_calculate_sell_price_line_item_alter($li
   global $user;
 
   // Reference the current shopping cart order in the line item if it isn't set.
+  // We load the complete order at this time to ensure it primes the order cache
+  // and avoid any untraceable recursive loops.
+  // @see http://drupal.org/node/1268472
   if (empty($line_item->order_id)) {
-    $line_item->order_id = commerce_cart_order_id($user->uid);
+    $order = commerce_cart_order_load($user->uid);
+    $line_item->order_id = $order->order_id;
   }
 }
 
@@ -562,7 +566,7 @@ function theme_commerce_cart_empty_page() {
  *   an anonymous order from the session.
  *
  * @return
- *   The fully loaded shopping cart order or FALSE if non-existent.
+ *   The fully loaded shopping cart order or FALSE if nonexistent.
  */
 function commerce_cart_order_load($uid = 0) {
   // Retrieve the order ID for the specified user's current shopping cart.

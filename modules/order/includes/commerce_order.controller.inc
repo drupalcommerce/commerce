@@ -120,5 +120,4 @@ class CommerceOrderEntityController extends DrupalCommerceEntityController {
     // hook_commerce_order_load().
     parent::attachLoad($queried_orders, $revision_id);
   }
-
 }
