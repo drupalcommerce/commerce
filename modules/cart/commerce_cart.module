@@ -424,7 +424,10 @@ function commerce_cart_commerce_product_calculate_sell_price_line_item_alter($li
   // @see http://drupal.org/node/1268472
   if (empty($line_item->order_id)) {
     $order = commerce_cart_order_load($user->uid);
-    $line_item->order_id = $order->order_id;
+
+    if ($order) {
+      $line_item->order_id = $order->order_id;
+    }
   }
 }
 
