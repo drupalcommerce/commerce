@@ -570,6 +570,8 @@ function commerce_commerce_currency_info() {
       'symbol' => 'J$',
       'name' => t('Jamaican Dollar'),
       'numeric_code' => '388',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Cent'),
       'major_unit' => t('Dollar'),
     ),
