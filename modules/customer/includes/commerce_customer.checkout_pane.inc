@@ -223,10 +223,21 @@ function commerce_customer_profile_copy_refresh($form, &$form_state) {
  * Checkout pane callback: validates a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  $profile = $form_state['values'][$checkout_pane['pane_id']]['customer_profile'];
+  $pane_id = $checkout_pane['pane_id'];
+  $profile = $form_state['values'][$pane_id]['customer_profile'];
 
   // Notify field widgets to validate their data.
   field_attach_form_validate('commerce_customer_profile', $profile, $form[$checkout_pane['pane_id']], $form_state);
+
+  // If there were any errors in the field attach validate process for fields on
+  // this checkout pane's customer profile, fail the checkout pane validation.
+  if ($errors = form_get_errors()) {
+    foreach ($errors as $field => $error) {
+      if (substr($field, 0, strlen($pane_id) + 2) == $pane_id . '][') {
+        return FALSE;
+      }
+    }
+  }
 
   return TRUE;
 }
