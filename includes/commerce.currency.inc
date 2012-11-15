@@ -532,8 +532,10 @@ function commerce_commerce_currency_info() {
     'ILS' => array(
       'code' => 'ILS',
       'symbol' => '₪',
-      'name' => t('Israeli New Sheqel'),
+      'name' => t('Israeli New Shekel'),
       'numeric_code' => '376',
+      'symbol_placement' => 'before',
+      'code_placement' => '',
       'minor_unit' => t('Agora'),
       'major_unit' => t('New Shekels'),
     ),
