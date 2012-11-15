@@ -166,6 +166,23 @@ function commerce_order_ui_menu_local_tasks_alter(&$data, $router_item, $root_pa
       );
     }
   }
+
+  // Add an action link to the order edit page from the user order page.
+  if ($root_path == 'user/%/orders/%') {
+    // Extract the order ID from the current router item and fetch the admin
+    // update menu item.
+    $order_id = $router_item['original_map'][3];
+    $item = menu_get_item('admin/commerce/orders/' . $order_id . '/edit');
+
+    if ($item['access']) {
+      // Override the title.
+      $item['title'] = t('Edit this order');
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
 }
 
 /**
