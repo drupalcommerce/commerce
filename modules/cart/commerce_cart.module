@@ -784,13 +784,15 @@ function commerce_cart_order_convert($order, $account) {
     // Update the uid of any referenced customer profiles.
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-    foreach (commerce_customer_profile_types() as $type => $profile_type) {
-      $field_name = 'commerce_customer_' . $type;
+    foreach (field_info_instances('commerce_order', $order->type) as $field_name => $instance) {
+      $field_info = field_info_field($field_name);
 
-      if (!is_null($order_wrapper->{$field_name}->value()) &&
-        $order_wrapper->{$field_name}->uid->value() == 0) {
-        $order_wrapper->{$field_name}->uid = $account->uid;
-        $order_wrapper->{$field_name}->save();
+      if ($field_info['type'] == 'commerce_customer_profile_reference') {
+        if (!is_null($order_wrapper->{$field_name}->value()) &&
+          $order_wrapper->{$field_name}->uid->value() == 0) {
+          $order_wrapper->{$field_name}->uid = $account->uid;
+          $order_wrapper->{$field_name}->save();
+        }
       }
     }
 

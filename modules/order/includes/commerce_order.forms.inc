@@ -269,16 +269,17 @@ function commerce_order_order_form_submit($form, &$form_state) {
   // Ensure the attached customer profiles are associated with the order owner
   // if they do not have a uid yet and the order does.
   if ($converted) {
-    $entity_info = entity_get_info('commerce_customer_profile');
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-    foreach ($entity_info['bundles'] as $profile_type => $data) {
-      $field_name = 'commerce_customer_' . $profile_type;
+    foreach (field_info_instances('commerce_order', $order->type) as $field_name => $instance) {
+      $field_info = field_info_field($field_name);
 
-      if (!is_null($wrapper->{$field_name}->value()) &&
-        $wrapper->{$field_name}->uid->value() == 0) {
-        $wrapper->{$field_name}->uid = $order->uid;
-        $wrapper->{$field_name}->save();
+      if ($field_info['type'] == 'commerce_customer_profile_reference') {
+        if (!is_null($wrapper->{$field_name}->value()) &&
+          $wrapper->{$field_name}->uid->value() == 0) {
+          $wrapper->{$field_name}->uid = $order->uid;
+          $wrapper->{$field_name}->save();
+        }
       }
     }
   }
