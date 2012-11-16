@@ -116,7 +116,9 @@ function commerce_customer_profile_default_label($profile) {
   if (!empty($profile->commerce_customer_address)) {
     // Wrap the customer profile object for easier access to its field data.
     $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
-    $label = $profile_wrapper->commerce_customer_address->name_line->value();
+    if (isset($profile_wrapper->commerce_customer_address->name_line)) {
+      $label = $profile_wrapper->commerce_customer_address->name_line->value();
+    }
   }
 
   // Return the profile ID if we couldn't derive a label from an address field.
