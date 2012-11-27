@@ -581,7 +581,8 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $order = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
     $order_wrapper = entity_metadata_wrapper('commerce_order', reset($order));
     $order_data = $order_wrapper->commerce_order_total->value();
-    $tax_component = reset(commerce_price_component_load($order_data, $tax_rate['price_component']));
+    $components = commerce_price_component_load($order_data, $tax_rate['price_component']);
+    $tax_component = reset($components);
     $this->assertFalse(empty($tax_component), t('Tax is applied in the order'));
 
     // Tax should be applied in Checkout Review with the correct quantity.
@@ -609,10 +610,12 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('node/' . $product_node->nid);
 
     // Check the tax applied in database and product display.
-    $product = reset(commerce_product_load_multiple(array($product->product_id), array(), TRUE));
+    $products = commerce_product_load_multiple(array($product->product_id), array(), TRUE);
+    $product = reset($products);
     $price_component = commerce_product_calculate_sell_price($product);
     $this->assertText(trim(commerce_currency_format($price_component['amount'], $price_component['currency_code'])), t('Amount with taxes corresponds with the amount displayed in the product display page'));
-    $tax_component = reset(commerce_price_component_load($price_component, $tax_rate['price_component']));
+    $components = commerce_price_component_load($price_component, $tax_rate['price_component']);
+    $tax_component = reset($components);
     $this->assertFalse(empty($tax_component), t('Tax component is set in the product.'));
   }
 
@@ -642,10 +645,12 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('node/' . $product_node->nid);
 
     // Check the tax applied in database and in the product display.
-    $product = reset(commerce_product_load_multiple(array($product->product_id), array(), TRUE));
+    $products = commerce_product_load_multiple(array($product->product_id), array(), TRUE);
+    $product = reset($products);
     $price_component = commerce_product_calculate_sell_price($product);
     $this->assertText(trim(commerce_currency_format($price_component['amount'], $price_component['currency_code'])), t('Amount with taxes included corresponds with the amount displayed in the product display page'));
-    $tax_component = reset(commerce_price_component_load($price_component, $tax_rate['price_component']));
+    $components = commerce_price_component_load($price_component, $tax_rate['price_component']);
+    $tax_component = reset($components);
     $this->assertFalse(empty($tax_component), t('Tax component is set in the product.'));
     $this->assertTrue($tax_component['included'], t('Tax component is configured to be included in the price'));
   }
@@ -681,9 +686,11 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     // As the condition is impossible to match, tax rate shouldn't be applied.
     $this->assertNoText($tax_rate['display_title'], t('Tax rate doesn\'t match the conditions and is not present in the cart review pane.'));
     // Also check it at database level.
-    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+    $components = commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']);
+    $tax_component = reset($components);
     $this->assertTrue(empty($tax_component), t('Tax component is not set in the order.'));
   }
 
@@ -707,9 +714,11 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('user/' . $this->normal_user->uid . '/orders/' . $order->order_id);
 
     // Reload the order directly from db.
-    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+    $components = commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']);
+    $tax_component = reset($components);
 
     // Check the taxes applied.
     $this->assertText($tax_rate['display_title'], t('Tax display title is displayed in the user view of an order.'));
@@ -739,9 +748,11 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/commerce/orders/' . $order->order_id);
 
     // Reload the order directly from db.
-    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $tax_component = reset(commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']));
+    $components = commerce_price_component_load($order_wrapper->commerce_order_total->value(), $tax_rate['price_component']);
+    $tax_component = reset($components);
 
     // Check the taxes applied.
     $this->assertText($tax_rate['display_title'], t('Tax display title is displayed in the admin view of an order.'));

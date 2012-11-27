@@ -133,6 +133,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer rules',
     );
     $store_admin = array(
+      'access administration pages',
       'administer checkout',
       'access checkout',
       'configure store',

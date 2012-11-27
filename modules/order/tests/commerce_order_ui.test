@@ -60,7 +60,9 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array('name' => $this->store_customer->name), t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Load the order from database for later use.
-    $this->order = reset(commerce_order_load_multiple(array(), array('uid' => $this->store_customer->uid)));
+    $orders = commerce_order_load_multiple(array(), array('uid' => $this->store_customer->uid));
+    $this->order = reset($orders);
+
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
 
@@ -109,7 +111,8 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, $edit, t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Reload the order from database.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
     // Check the order properties.
@@ -183,8 +186,10 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array(), t('Save order', array(), array('context' => 'a drupal commerce order')));
 
     // Reload the order directly from db and wrap it to get the line item ids.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
 
@@ -330,7 +335,8 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, array(), t('Delete'));
 
     // Reload the order from database.
-    $order = reset(commerce_order_load_multiple(array($this->order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($this->order->order_id), array(), TRUE);
+    $order = reset($orders);
     $this->assertFalse($order, t('Order has been deleted from database'));
 
     // Check if the confirmation message is displayed.
