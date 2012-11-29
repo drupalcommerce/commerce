@@ -86,7 +86,7 @@ function hook_commerce_customer_profile_type_info_alter(&$profile_types){
  * @see entity_uri()
  * @see url()
  */
-function hook_commerce_customer_profile_uri($order) {
+function hook_commerce_customer_profile_uri($profile) {
   // No example.
 }
 
