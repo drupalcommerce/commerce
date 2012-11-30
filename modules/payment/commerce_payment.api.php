@@ -231,10 +231,10 @@ function CALLBACK_commerce_payment_method_submit_form_validate($payment_method, 
  *
  * @param $payment_method
  *   An array of the current settings.
+ * @param $pane_form
+ *   The pane form.
  * @param $pane_values
  *   The current values of the pane.
- * @param $checkout_pane
- *   The checkout pane array.
  * @param $order
  *   The order object.
  * @param $charge

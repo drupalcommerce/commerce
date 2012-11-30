@@ -132,7 +132,7 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 
       $pane_form['commerce_customer_profile_copy'] = array(
         '#type' => 'checkbox',
-        '#title' => t('My @target is the same as my @source.', array('@target' => drupal_strtolower($target_profile_type['name']), '@source' => drupal_strtolower($source_profile_type['name']))),
+        '#title' => t('My %target is the same as my %source.', array('%target' => $target_profile_type['name'], '%source' => $source_profile_type['name'])),
         '#element_validate' => array('commerce_customer_profile_copy_validate'),
         '#default_value' => isset($order->data['profile_copy'][$checkout_pane['pane_id']]['status']) ? $order->data['profile_copy'][$checkout_pane['pane_id']]['status'] : $profile_copy_default,
         '#weight' => -30,
