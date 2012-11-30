@@ -399,7 +399,7 @@ function commerce_checkout_pages() {
 
     foreach ($checkout_pages as &$checkout_page) {
       // Look for any checkout panes assigned to this page.
-      $checkout_panes = commerce_checkout_panes(array('page' => $checkout_page['page_id']));
+      $checkout_panes = commerce_checkout_panes(array('page' => $checkout_page['page_id'], 'enabled' => TRUE));
 
       // If this is the completion page or at least one pane was found...
       if ($checkout_page['page_id'] == 'complete' || !empty($checkout_panes)) {
@@ -452,8 +452,8 @@ function commerce_checkout_page_load($page_id) {
  *
  * @param $conditions
  *   An array of conditions to filter the returned list by; for example, if you
- *     specify 'enabled' => TRUE in the array, then only checkout panes with an
- *     enabled value equal to TRUE would be included.
+ *   specify 'enabled' => TRUE in the array, then only checkout panes with an
+ *   enabled value equal to TRUE would be included.
  * @param $skip_saved_data
  *   A boolean that will allow the retrieval of checkout panes directly from
  *   code. Specifically, it will skip the cache and also prevent configured
