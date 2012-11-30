@@ -1644,11 +1644,11 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
       // If all the products are of the same type...
       if ($same_type) {
         // Loop through all the field instances on that product type.
-        foreach (field_info_instances('commerce_product', $type) as $name => $instance) {
+        foreach (field_info_instances('commerce_product', $type) as $field_name => $instance) {
           // A field qualifies if it is single value, required and uses a widget
           // with a definite set of options. For the sake of simplicity, this is
           // currently restricted to fields defined by the options module.
-          $field = field_info_field($instance['field_name']);
+          $field = field_info_field($field_name);
 
           // Get the array of Cart settings pertaining to this instance.
           $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
@@ -1686,7 +1686,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
             // Only consider this field a qualifying attribute field if we could
             // derive a set of options for it.
             if (!empty($allowed_values)) {
-              $qualifying_fields[$name] = array(
+              $qualifying_fields[$field_name] = array(
                 'field' => $field,
                 'instance' => $instance,
                 'commerce_cart_settings' => $commerce_cart_settings,
