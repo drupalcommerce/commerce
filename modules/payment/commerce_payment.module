@@ -542,7 +542,7 @@ function commerce_payment_methods() {
       }
 
       // Merge in default callbacks.
-      foreach (array('settings_form', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
+      foreach (array('settings_form', 'submit_form', 'submit_form_validate', 'submit_form_submit', 'redirect_form', 'redirect_form_back', 'redirect_form_validate', 'redirect_form_submit') as $callback) {
         if (!isset($payment_method['callbacks'][$callback])) {
           $payment_method['callbacks'][$callback] = $payment_method['base'] . '_' . $callback;
         }
@@ -631,6 +631,7 @@ function commerce_payment_method_options_list() {
  *   - submit_form_validate
  *   - submit_form_submit
  *   - redirect_form
+ *   - redirect_form_back
  *   - redirect_form_validate
  *   - redirect_form_submit
  *

@@ -237,6 +237,11 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
 
   // If the user came to the cancel URL...
   if (arg(3) == 'back' && arg(4) == $order->data['payment_redirect_key']) {
+    // Perform any payment cancellation functions if necessary.
+    if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form_back')) {
+      $callback($order, $payment_method);
+    }
+
     // Send the customer to the previous step of the checkout process.
     commerce_payment_redirect_pane_previous_page($order, t('Customer canceled payment at the payment gateway.'));
     drupal_goto(commerce_checkout_order_uri($order));

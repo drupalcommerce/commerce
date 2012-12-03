@@ -174,7 +174,7 @@ function hook_commerce_payment_method_info() {
  *   An array of payment methods, keyed by method id.
  */
 function hook_commerce_payment_method_info_alter(&$payment_methods) {
-
+  // No example.
 }
 
 /**
@@ -186,7 +186,7 @@ function hook_commerce_payment_method_info_alter(&$payment_methods) {
  *   A form snippet.
  */
 function CALLBACK_commerce_payment_method_settings_form($settings = NULL) {
-
+  // No example.
 }
 
 /**
@@ -205,7 +205,7 @@ function CALLBACK_commerce_payment_method_settings_form($settings = NULL) {
  *   A form snippet for the checkout pane.
  */
 function CALLBACK_commerce_payment_method_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
-
+  // No example.
 }
 
 /**
@@ -223,7 +223,7 @@ function CALLBACK_commerce_payment_method_submit_form($payment_method, $pane_val
  *   The identifier of the base element of the payment pane.
  */
 function CALLBACK_commerce_payment_method_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
-
+  // No example.
 }
 
 /**
@@ -241,7 +241,7 @@ function CALLBACK_commerce_payment_method_submit_form_validate($payment_method, 
  *   A price structure that needs to be charged.
  */
 function CALLBACK_commerce_payment_method_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
-
+  // No example.
 }
 
 /**
@@ -253,7 +253,22 @@ function CALLBACK_commerce_payment_method_submit_form_submit($payment_method, $p
  * property of the returned form array.
  */
 function CALLBACK_commerce_payment_method_redirect_form($form, &$form_state, $order, $payment_method) {
+  // No example.
+}
 
+/**
+ * Payment method callback; cancellation callback for the redirected payments.
+ *
+ * If the customer cancels payment or payment fails at the redirected payment
+ * service, the custom will be sent back to the previous checkout page upon
+ * return from the payment service. Before the redirect occurs, the payment
+ * method module has the opportunity to take additional action by implementing
+ * this callback. Note that updating the order status and performing the
+ * redirect are handled by the Payment module, so these two operations should
+ * not be duplicated by the payment method module.
+ */
+function CALLBACK_commerce_payment_method_redirect_form_back($form, &$form_state, $order, $payment_method) {
+  // No example.
 }
 
 /**
@@ -274,7 +289,7 @@ function CALLBACK_commerce_payment_method_redirect_form($form, &$form_state, $or
  *   back one step in the checkout process.
  */
 function CALLBACK_commerce_payment_method_redirect_form_validate($order, $payment_method) {
-
+  // No example.
 }
 
 /**
@@ -290,7 +305,7 @@ function CALLBACK_commerce_payment_method_redirect_form_validate($order, $paymen
  *   The payment method array.
  */
 function CALLBACK_commerce_payment_method_redirect_form_submit($order, $payment_method) {
-
+  // No example.
 }
 
 /**
