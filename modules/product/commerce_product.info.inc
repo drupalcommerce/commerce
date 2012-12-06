@@ -59,6 +59,7 @@ function commerce_product_entity_property_info() {
     'label' => t('Status'),
     'description' => t('Boolean indicating whether the product is active or disabled.'),
     'type' => 'boolean',
+    'options list' => 'commerce_product_status_options_list',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer commerce_product entities',
     'schema field' => 'status',

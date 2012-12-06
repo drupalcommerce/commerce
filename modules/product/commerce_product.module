@@ -931,6 +931,16 @@ function template_preprocess_commerce_product_title(&$variables) {
 }
 
 /**
+ * Returns the options list for the product status property.
+ */
+function commerce_product_status_options_list() {
+  return array(
+    0 => t('Disabled'),
+    1 => t('Active'),
+  );
+}
+
+/**
  * Converts the product status integer to a string before output.
  */
 function template_preprocess_commerce_product_status(&$variables) {
