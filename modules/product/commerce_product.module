@@ -821,6 +821,9 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
     $query->addTag('commerce_product_access');
   }
 
+  // Add a global query tag so anyone can alter this query.
+  $query->addTag('commerce_product_match');
+
   $product_id_alias = $query->addField('cp', 'product_id');
   $product_sku_alias = $query->addField('cp', 'sku');
   $product_title_alias = $query->addField('cp', 'title');
