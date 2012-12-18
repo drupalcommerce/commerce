@@ -174,7 +174,6 @@ function commerce_payment_rules_action_info() {
         ),
       ),
       'group' => t('Commerce Payment'),
-      'base' => $payment_method['base'],
       'callbacks' => array(
         'execute' => 'commerce_payment_enable_method',
       ),
