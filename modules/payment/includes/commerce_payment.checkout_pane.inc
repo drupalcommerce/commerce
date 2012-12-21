@@ -147,6 +147,12 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
       $payment_method = commerce_payment_method_instance_load($pane_values['payment_method']);
 
       if ($callback = commerce_payment_method_callback($payment_method, 'submit_form_validate')) {
+        // Initialize the payment details array to accommodate payment methods
+        // that don't add any additional details to the checkout pane form.
+        if (!isset($pane_values['payment_details'])) {
+          $pane_values['payment_details'] = array();
+        }
+
         $result = $callback($payment_method, $pane_form['payment_details'], $pane_values['payment_details'], $order, array($checkout_pane['pane_id'], 'payment_details'));
 
         // To prevent payment method validation routines from having to return TRUE

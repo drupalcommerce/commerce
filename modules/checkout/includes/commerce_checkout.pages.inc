@@ -32,7 +32,7 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
     // Only redirect if the target page is different from the page the user was
     // trying to access. Otherwise give a 403 error.
     if (!empty($target_uri) && $target_uri !== $_GET['q']) {
-      return drupal_goto($target_uri);
+      drupal_goto($target_uri);
     }
     else {
       return MENU_ACCESS_DENIED;
