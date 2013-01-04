@@ -280,9 +280,12 @@ function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $che
 
   // If the function to build the redirect form exists...
   if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form')) {
-    // Generate a key to use in the return URL from the redirected service.
-    $order->data['payment_redirect_key'] = drupal_hash_base64(time());
-    commerce_order_save($order);
+    // Generate a key to use in the return URL from the redirected service if it
+    // does not already exist.
+    if (empty($order->data['payment_redirect_key'])) {
+      $order->data['payment_redirect_key'] = drupal_hash_base64(time());
+      commerce_order_save($order);
+    }
 
     // If the payment method has the 'offsite_autoredirect' option enabled, add
     // the redirection behavior.
