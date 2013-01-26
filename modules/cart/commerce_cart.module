@@ -669,12 +669,15 @@ function commerce_cart_order_ids_reset() {
  *
  * @param $uid
  *   The uid of the user for whom to create the order. If left 0, the order will
- *   be created for the current user and associated with his or her session.
+ *   be created for an anonymous user and associated with the current session
+ *   if it is anonymous.
  *
  * @return
  *   The newly created shopping cart order object.
  */
 function commerce_cart_order_new($uid = 0) {
+  global $user;
+
   // Create the new order with the customer's uid and the cart order status.
   $order = commerce_order_new($uid, 'cart');
   $order->log = t('Created as a shopping cart order.');
@@ -686,7 +689,7 @@ function commerce_cart_order_new($uid = 0) {
   commerce_cart_order_ids_reset();
 
   // If the user is not logged in, ensure the order ID is stored in the session.
-  if (!$uid) {
+  if (!$uid && empty($user->uid)) {
     commerce_cart_order_session_save($order->order_id);
   }
 
