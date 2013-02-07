@@ -27,7 +27,9 @@
  *     the round() function in PHP 5.3+
  *   - rule: name to use for a default product pricing rule that calculates
  *     taxes of this type for line items; defaults to 'commerce_tax_type_[name]'
- *     but can be set to NULL to not create any default Rule
+ *     but can be set to NULL to not create any default Rule. If the tax type
+ *     name is longer than 46 characters, it must have a rule name set here that
+ *     is 64 characters or less.
  *   - admin_list: boolean defined by the Tax UI module determining whether or
  *     not the tax type should appear in the admin list
  */
@@ -111,7 +113,9 @@ function hook_commerce_tax_type_delete($tax_type, $skip_reset) {
  *   - type: the name of the tax type this rate belongs to
  *   - rules_component: name of the Rules component (if any) defined for
  *     determining the applicability of the tax to a line item; defaults to
- *     'commerce_tax_rate_[name]'.
+ *     'commerce_tax_rate_[name]'. If the tax rate name is longer than 46
+ *     characters, it must have a Rules component name set here that is 64
+ *     characters or less.
  *   - default_rules_component: boolean indicating whether or not the Tax module
  *     should define a default default Rules component using the specified name;
  *     defaults to TRUE.
