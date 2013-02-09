@@ -1921,7 +1921,9 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     }
 
     // Do not allow products without a price to be purchased.
-    if (is_null(commerce_product_calculate_sell_price($form_state['default_product']))) {
+    $values = commerce_product_calculate_sell_price($form_state['default_product']);
+
+    if (is_null($values) || is_null($values['amount']) || is_null($values['currency_code'])) {
       $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Product not available'),
