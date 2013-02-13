@@ -91,6 +91,41 @@ function commerce_order_rules_condition_info() {
     ),
   );
 
+  $conditions['commerce_order_contains_product_type'] = array(
+    'label' => t('Order contains products of particular product types'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'label' => t('Order'),
+        'type' => 'commerce_order',
+        'description' => t('The order whose line items should be checked for the specified product type. If the specified order does not exist, the comparison will act as if it is against a quantity of 0.'),
+      ),
+      'product_type' => array(
+        'label' => t('Product type(s)'),
+        'type' => 'list<text>',
+        'description' => t('The product type(s) to look for in the order.'),
+        'options list' => 'commerce_product_type_options_list',
+      ),
+      'operator' => array(
+        'label' => t('Operator'),
+        'type' => 'text',
+        'description' => t('The operator used with the quantity value below to compare against the quantity of products matching the specified product type(s) on the order.'),
+        'default value' => '>=',
+        'options list' => 'commerce_numeric_comparison_operator_options_list',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'label' => t('Quantity'),
+        'type' => 'text',
+        'default value' => '1',
+        'description' => t('The value to compare against the quantity of products of the specified product type(s) on the order.'),
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => 'commerce_order_rules_contains_product_type',
+    ),
+  );
+
   $conditions['commerce_order_compare_total_product_quantity'] = array(
     'label' => t('Total product quantity comparison'),
     'parameter' => array(
@@ -257,6 +292,49 @@ function commerce_order_rules_contains_product($order, $sku, $operator, $value) 
       return $products[$sku] >= $value;
     case '>':
       return $products[$sku] > $value;
+  }
+
+  return FALSE;
+}
+
+/**
+ * Condition callback: checks to see if one or more particular product types exist on an order
+ * in the specified quantity.
+ */
+function commerce_order_rules_contains_product_type($order, $product_types, $operator, $value) {
+  $quantity = 0;
+
+  // If we actually received a valid order...
+  if (!empty($order)) {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Look for product line items on the order whose products match the
+    // specified product types and increment the quantity count accordingly.
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+        // Extract the product type from the line item.
+        $line_item_product_type = $line_item_wrapper->commerce_product->type->value();
+
+        // If the line item product type matches, update the total quantity.
+        if (in_array($line_item_product_type, $product_types)) {
+          $quantity += $line_item_wrapper->quantity->value();
+        }
+      }
+    }
+  }
+
+  // Make a quantity comparison based on the operator.
+  switch ($operator) {
+    case '<':
+      return $quantity < $value;
+    case '<=':
+      return $quantity <= $value;
+    case '=':
+      return $quantity == $value;
+    case '>=':
+      return $quantity >= $value;
+    case '>':
+      return $quantity > $value;
   }
 
   return FALSE;
