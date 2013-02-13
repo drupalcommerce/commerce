@@ -328,5 +328,163 @@ function commerce_product_views_data() {
     ),
   );
 
+  $data['commerce_product_revision']['table']['group']  = t('Commerce Product Revision');
+
+  // Advertise this table as a possible base table
+  $data['commerce_product_revision']['table']['base'] = array(
+    'field' => 'revision_id',
+    'title' => t('Commerce Product revision'),
+    'help' => t('Commerce Product revision is a history of changes to a product.'),
+  );
+
+  $data['commerce_product_revision']['table']['join'] = array(
+    'commerce_product' => array(
+      'left_field' => 'product_id',
+      'field' => 'product_id',
+    )
+  );
+
+  // Expose the revision product ID
+  $data['commerce_product_revision']['product_id'] = array(
+    'title' => t('Product ID'),
+    'help' => t('The unique internal identifier of the product.'),
+    'field' => array(
+      'handler' => 'commerce_product_handler_field_product',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'commerce_product_handler_argument_product_id',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'commerce_product',
+      'base field' => 'product_id',
+      'title' => t('Product'),
+      'label' => t('Relate this revision to its product.'),
+    ),
+  );
+
+  // Expose the revision id.
+  $data['commerce_product_revision']['revision_id'] = array(
+    'title' => t('Revision ID'),
+    'help' => t('The revision ID of the product revision.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Expose the product revision SKU.
+  $data['commerce_product_revision']['sku'] = array(
+    'title' => t('SKU'),
+    'help' => t('The unique human-readable identifier of the product revision.'),
+    'field' => array(
+      'handler' => 'commerce_product_handler_field_product',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the product revision title.
+  $data['commerce_product_revision']['title'] = array(
+    'title' => t('Title'),
+    'help' => t('The title of the product revision used for administrative display.'),
+    'field' => array(
+      'handler' => 'commerce_product_handler_field_product',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the product revision user ID
+  $data['commerce_product_revision']['revision_uid'] = array(
+    'title' => t('User'),
+    'help' => t('Relate a product revision to the user who created the revision.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'users',
+      'base field' => 'uid',
+      'field' => 'revision_uid',
+      'field_name' => 'revision_uid',
+      'label' => t('Revision user'),
+    ),
+  );
+
+  // Expose the product revision status.
+  $data['commerce_product_revision']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('Whether or not the product was active at the time of the revision.'),
+    'field' => array(
+      'handler' => 'views_handler_field_boolean',
+      'click sortable' => TRUE,
+      'output formats' => array(
+        'active-disabled' => array(t('Active'), t('Disabled')),
+      ),
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_boolean_operator',
+      'label' => t('Active'),
+      'type' => 'yes-no',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Expose the order revision log.
+  $data['commerce_product_revision']['log'] = array(
+    'title' => t('Log message'),
+    'help' => t('The log message entered when the revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_xss',
+     ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+
+  // Expose the revision timestamp.
+  $data['commerce_product_revision']['revision_timestamp'] = array(
+    'title' => t('Revision Timestamp'),
+    'help' => t('The date the order revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
   return $data;
 }
