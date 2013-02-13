@@ -22,6 +22,7 @@ class commerce_payment_handler_field_payment_method extends views_handler_field 
       '#title' => t('Display the payment method using the following title'),
       '#type' => 'radios',
       '#options' => array(
+        'method_id' => t('The payment method ID'),
         'title' => t('The full administrative title of the payment method'),
         'short_title' => t('A short version of the title safe to display to all'),
         'display_title' => t('The title displayed on the checkout form (may include HTML)'),
