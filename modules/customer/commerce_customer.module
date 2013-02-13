@@ -405,7 +405,7 @@ function commerce_customer_commerce_checkout_pane_info() {
     }
 
     $checkout_panes['customer_profile_' . $type] = array(
-      'title' => !empty($instance['label']) ? check_plain($instance['label']) : $profile_type['name'],
+      'title' => !empty($instance['label']) ? $instance['label'] : $profile_type['name'],
       'file' => 'includes/commerce_customer.checkout_pane.inc',
       'base' => 'commerce_customer_profile_pane',
       'page' => !empty($instance) ? 'checkout' : 'disabled',

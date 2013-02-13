@@ -22,7 +22,7 @@ function commerce_customer_profile_pane_settings_form($checkout_pane) {
   foreach (commerce_info_fields('commerce_customer_profile_reference', 'commerce_order') as $name => $field) {
     if ($type == $field['settings']['profile_type']) {
       $instance = field_info_instance('commerce_order', $name, 'commerce_order');
-      $options[$name] = check_plain($instance['label']);
+      $options[$name] = $instance['label'];
     }
   }
 
