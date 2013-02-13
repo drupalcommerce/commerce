@@ -20,6 +20,13 @@ function commerce_product_views_data() {
   );
   $data['commerce_product']['table']['entity type'] = 'commerce_product';
 
+  $data['commerce_product']['table']['default_relationship'] = array(
+    'commerce_product_revision' => array(
+      'table' => 'commerce_product_revision',
+      'field' => 'revision_id',
+    ),
+  );
+
   // Expose the product ID.
   $data['commerce_product']['product_id'] = array(
     'title' => t('Product ID'),
@@ -328,20 +335,34 @@ function commerce_product_views_data() {
     ),
   );
 
-  $data['commerce_product_revision']['table']['group']  = t('Commerce Product Revision');
+  /**
+   * Integrate the product revision table.
+   */
+  $data['commerce_product_revision']['table']['entity type'] = 'commerce_product';
+  $data['commerce_product_revision']['table']['group']  = t('Commerce Product revision');
 
   // Advertise this table as a possible base table
   $data['commerce_product_revision']['table']['base'] = array(
     'field' => 'revision_id',
     'title' => t('Commerce Product revision'),
     'help' => t('Commerce Product revision is a history of changes to a product.'),
+    'defaults' => array(
+      'field' => 'title',
+    ),
   );
 
   $data['commerce_product_revision']['table']['join'] = array(
     'commerce_product' => array(
-      'left_field' => 'product_id',
-      'field' => 'product_id',
+      'left_field' => 'revision_id',
+      'field' => 'revision_id',
     )
+  );
+
+  $data['commerce_product_revision']['table']['default_relationship'] = array(
+    'commerce_product' => array(
+      'table' => 'commerce_product',
+      'field' => 'revision_id',
+    ),
   );
 
   // Expose the revision product ID
@@ -361,13 +382,6 @@ function commerce_product_views_data() {
     'argument' => array(
       'handler' => 'commerce_product_handler_argument_product_id',
     ),
-    'relationship' => array(
-      'handler' => 'views_handler_relationship',
-      'base' => 'commerce_product',
-      'base field' => 'product_id',
-      'title' => t('Product'),
-      'label' => t('Relate this revision to its product.'),
-    ),
   );
 
   // Expose the revision id.
@@ -382,6 +396,13 @@ function commerce_product_views_data() {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'commerce_product',
+      'base field' => 'revision_id',
+      'title' => t('Product'),
+      'label' => t('Latest product revision'),
     ),
   );
 
@@ -472,8 +493,8 @@ function commerce_product_views_data() {
 
   // Expose the revision timestamp.
   $data['commerce_product_revision']['revision_timestamp'] = array(
-    'title' => t('Revision Timestamp'),
-    'help' => t('The date the order revision was created.'),
+    'title' => t('Revision date'),
+    'help' => t('The date the product revision was created.'),
     'field' => array(
       'handler' => 'views_handler_field_date',
       'click sortable' => TRUE,
