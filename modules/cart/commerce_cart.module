@@ -1376,7 +1376,7 @@ function commerce_cart_field_instance_access_settings($instance) {
  *
  * @see commerce_cart_forms().
  */
-function commerce_cart_add_to_cart_form_id($product_ids, $qty = 0) {
+function commerce_cart_add_to_cart_form_id($product_ids) {
   // Make sure the length of the form id is limited.
   $data = implode('_', $product_ids);
 
@@ -1485,7 +1485,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
 
   // Store the form ID as a class of the form to avoid the incrementing form ID
   // from causing the AJAX refresh not to work.
-  $form['#attributes']['class'][] = drupal_html_class(commerce_cart_add_to_cart_form_id($product_ids, $default_quantity));
+  $form['#attributes']['class'][] = drupal_html_class(commerce_cart_add_to_cart_form_id($product_ids));
 
   // Store the customer uid in the form so other modules can override with a
   // selection widget if necessary.
