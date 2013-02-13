@@ -268,7 +268,7 @@ function commerce_product_ui_views_default_views() {
 
   $views[$view->name] = $view;
 
-  // Product revision overview at admin/commerce/product/%/revisions
+  // Product revision overview at admin/commerce/products/%/revisions
   $view = new view();
   $view->name = 'commerce_product_revisions';
   $view->description = 'Display a list of product revisions for the store admin.';
@@ -351,15 +351,16 @@ function commerce_product_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  /* Relationship: Commerce Product Revision: User */
+  /* Relationship: Commerce Product revision: User */
   $handler->display->display_options['relationships']['revision_uid']['id'] = 'revision_uid';
   $handler->display->display_options['relationships']['revision_uid']['table'] = 'commerce_product_revision';
   $handler->display->display_options['relationships']['revision_uid']['field'] = 'revision_uid';
-  /* Field: Commerce Product Revision: Revision ID */
+  /* Field: Commerce Product revision: Revision ID */
   $handler->display->display_options['fields']['revision_id']['id'] = 'revision_id';
   $handler->display->display_options['fields']['revision_id']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['revision_id']['field'] = 'revision_id';
-  /* Field: Commerce Product Revision: Revision Timestamp */
+  $handler->display->display_options['fields']['revision_id']['label'] = 'Revision';
+  /* Field: Commerce Product revision: Revision date */
   $handler->display->display_options['fields']['revision_timestamp']['id'] = 'revision_timestamp';
   $handler->display->display_options['fields']['revision_timestamp']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['revision_timestamp']['field'] = 'revision_timestamp';
@@ -371,27 +372,27 @@ function commerce_product_ui_views_default_views() {
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['relationship'] = 'revision_uid';
   $handler->display->display_options['fields']['name']['label'] = 'Created by';
-  /* Field: Commerce Product Revision: SKU */
+  /* Field: Commerce Product revision: SKU */
   $handler->display->display_options['fields']['sku']['id'] = 'sku';
   $handler->display->display_options['fields']['sku']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['sku']['field'] = 'sku';
-  $handler->display->display_options['fields']['sku']['link_to_product'] = 1;
-  /* Field: Commerce Product Revision: Title */
+  $handler->display->display_options['fields']['sku']['link_to_product'] = 0;
+  /* Field: Commerce Product revision: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['link_to_product'] = 0;
-  /* Field: Commerce Product Revision: Status */
+  /* Field: Commerce Product revision: Status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['status']['field'] = 'status';
   $handler->display->display_options['fields']['status']['label'] = 'Active';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Field: Commerce Product Revision: Log message */
+  /* Field: Commerce Product revision: Log message */
   $handler->display->display_options['fields']['log']['id'] = 'log';
   $handler->display->display_options['fields']['log']['table'] = 'commerce_product_revision';
   $handler->display->display_options['fields']['log']['field'] = 'log';
-  /* Contextual filter: Commerce Product Revision: Product ID */
+  /* Contextual filter: Commerce Product revision: Product ID */
   $handler->display->display_options['arguments']['product_id']['id'] = 'product_id';
   $handler->display->display_options['arguments']['product_id']['table'] = 'commerce_product_revision';
   $handler->display->display_options['arguments']['product_id']['field'] = 'product_id';
@@ -427,7 +428,7 @@ function commerce_product_ui_views_default_views() {
     t('next ›'),
     t('last »'),
     t('Revision user'),
-    t('Revision ID'),
+    t('Revision'),
     t('Created on'),
     t('Created by'),
     t('SKU'),

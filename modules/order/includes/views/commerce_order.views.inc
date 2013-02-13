@@ -20,6 +20,13 @@ function commerce_order_views_data() {
   );
   $data['commerce_order']['table']['entity type'] = 'commerce_order';
 
+  $data['commerce_order']['table']['default_relationship'] = array(
+    'commerce_order_revision' => array(
+      'table' => 'commerce_order_revision',
+      'field' => 'revision_id',
+    ),
+  );
+
   // Expose the order ID.
   $data['commerce_order']['order_id'] = array(
     'title' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
@@ -348,6 +355,179 @@ function commerce_order_views_data() {
     'help' => t('Displays the order total field formatted with its components list; requires an Order ID argument.'),
     'area' => array(
       'handler' => 'commerce_order_handler_area_order_total',
+    ),
+  );
+
+  /**
+   * Integrate the order revision table.
+   */
+  $data['commerce_order_revision']['table']['entity type'] = 'commerce_order';
+  $data['commerce_order_revision']['table']['group']  = t('Commerce Order revision');
+
+  // Advertise this table as a possible base table
+  $data['commerce_order_revision']['table']['base'] = array(
+    'field' => 'revision_id',
+    'title' => t('Commerce Order revision'),
+    'help' => t('Commerce Order revision is a history of changes to an order.'),
+    'defaults' => array(
+      'field' => 'order_number',
+    ),
+  );
+
+  $data['commerce_order_revision']['table']['join'] = array(
+    'commerce_order' => array(
+      'left_field' => 'revision_id',
+      'field' => 'revision_id',
+    )
+  );
+
+  $data['commerce_order_revision']['table']['default_relationship'] = array(
+    'commerce_order' => array(
+      'table' => 'commerce_order',
+      'field' => 'revision_id',
+    ),
+  );
+
+  // Expose the revision order ID
+  $data['commerce_order_revision']['order_id'] = array(
+    'title' => t('Order ID', array(), array('context' => 'a drupal commerce order')),
+    'help' => t('The unique internal identifier of the order.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'commerce_order_handler_argument_order_order_id',
+      'numeric' => TRUE,
+      'validate type' => 'order_id',
+    ),
+  );
+
+  // Expose the revision order number
+  $data['commerce_order_revision']['order_number'] = array(
+    'title' => t('Order number', array(), array('context' => 'a drupal commerce order')),
+    'help' => t('The customer facing number of the order.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the revision ID.
+  $data['commerce_order_revision']['revision_id'] = array(
+    'title' => t('Revision ID'),
+    'help' => t('The revision ID of the order revision.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'commerce_order',
+      'base field' => 'revision_id',
+      'title' => t('Order'),
+      'label' => t('Latest order revision'),
+    ),
+  );
+
+  // Expose the order revision user ID.
+  $data['commerce_order_revision']['revision_uid'] = array(
+    'title' => t('User'),
+    'help' => t('Relate an order revision to the user who created the revision.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'users',
+      'base field' => 'uid',
+      'field' => 'revision_uid',
+      'field_name' => 'revision_uid',
+      'label' => t('Revision user'),
+    ),
+  );
+
+
+  // Expose the order revision contact email.
+  $data['commerce_order_revision']['mail'] = array(
+    'title' => t('E-mail'),
+    'help' => t('The e-mail address used for correspondence about this order revision.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order_mail',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the order status for this revision.
+  $data['commerce_order_revision']['status'] = array(
+    'title' => t('Order status'),
+    'help' => t('The workflow status of the order revision.'),
+    'field' => array(
+      'handler' => 'commerce_order_handler_field_order_status',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'commerce_order_handler_filter_order_status',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the order revision log
+  $data['commerce_order_revision']['log'] = array(
+    'title' => t('Log message'),
+    'help' => t('The log message entered when the revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_xss',
+     ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+
+  // Expose the revision timestamp
+  $data['commerce_order_revision']['revision_timestamp'] = array(
+    'title' => t('Revision date'),
+    'help' => t('The date the order revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
     ),
   );
 

@@ -341,7 +341,7 @@ function commerce_product_views_data() {
   $data['commerce_product_revision']['table']['entity type'] = 'commerce_product';
   $data['commerce_product_revision']['table']['group']  = t('Commerce Product revision');
 
-  // Advertise this table as a possible base table
+  // Advertise this table as a possible base table.
   $data['commerce_product_revision']['table']['base'] = array(
     'field' => 'revision_id',
     'title' => t('Commerce Product revision'),
@@ -384,7 +384,7 @@ function commerce_product_views_data() {
     ),
   );
 
-  // Expose the revision id.
+  // Expose the revision ID.
   $data['commerce_product_revision']['revision_id'] = array(
     'title' => t('Revision ID'),
     'help' => t('The revision ID of the product revision.'),
@@ -444,7 +444,7 @@ function commerce_product_views_data() {
     ),
   );
 
-  // Expose the product revision user ID
+  // Expose the product revision user ID.
   $data['commerce_product_revision']['revision_uid'] = array(
     'title' => t('User'),
     'help' => t('Relate a product revision to the user who created the revision.'),
