@@ -25,11 +25,11 @@ function commerce_line_item_views_data() {
     'title' => t('Line item ID'),
     'help' => t('The unique internal identifier of the line item.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'views_handler_filter_numeric',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
