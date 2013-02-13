@@ -152,8 +152,18 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
       if (!empty($order->data['profile_copy'][$checkout_pane['pane_id']]['status']) && isset($order->data['profile_copy'][$checkout_pane['pane_id']]['elements'])) {
         foreach ($order->data['profile_copy'][$checkout_pane['pane_id']]['elements'] as $field_name => $field) {
           foreach ($field as $langcode => $items) {
-            foreach ($items as $delta => $item) {
-              $pane_form[$field_name][$langcode][$delta]['#access'] = FALSE;
+            if (is_array($items)) {
+              foreach ($items as $delta => $item) {
+                if (!empty($pane_form[$field_name][$langcode][$delta])) {
+                  $pane_form[$field_name][$langcode][$delta]['#access'] = FALSE;
+                }
+                elseif (!empty($pane_form[$field_name][$langcode])) {
+                  $pane_form[$field_name][$langcode]['#access'] = FALSE;
+                }
+              }
+            }
+            else {
+              $pane_form[$field_name][$langcode]['#access'] = FALSE;
             }
           }
         }

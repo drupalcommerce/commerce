@@ -1346,9 +1346,11 @@ function commerce_customer_profile_copy_validate($element, &$form_state, $form) 
     commerce_order_save($form_state['order']);
 
     // Unset any cached addressfield data for this customer profile.
-    foreach ($form_state['addressfield'] as $key => $value) {
-      if (strpos($key, 'commerce_customer_profile|' . $type) === 0) {
-        unset($form_state['addressfield'][$key]);
+    if (!empty($form_state['addressfield'])) {
+      foreach ($form_state['addressfield'] as $key => $value) {
+        if (strpos($key, 'commerce_customer_profile|' . $type) === 0) {
+          unset($form_state['addressfield'][$key]);
+        }
       }
     }
   }
@@ -1385,10 +1387,16 @@ function commerce_customer_profile_copy_fields($info, &$target, $source, &$form_
     if (is_array($field)) {
       foreach ($field as $langcode => $items) {
         if (is_array($items)) {
+          $target[$field_name][$langcode] = array();
+
           foreach ($items as $delta => $item) {
             $target[$field_name][$langcode][$delta] = $item;
             $form_state['order']->data['profile_copy'][$pane_id]['elements'][$field_name][$langcode][$delta] = TRUE;
           }
+        }
+        else {
+          $target[$field_name][$langcode] = $items;
+          $form_state['order']->data['profile_copy'][$pane_id]['elements'][$field_name][$langcode] = TRUE;
         }
       }
     }
