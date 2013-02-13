@@ -34,6 +34,10 @@ function commerce_payment_ui_admin_page() {
   $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
   $content['disabled']['rules']['#empty'] = t('There are no disabled payment methods.');
 
+  // Store the function name in the content array to make it easy to alter the
+  // contents of this page.
+  $content['#page_callback'] = 'commerce_payment_ui_admin_page';
+
   return $content;
 }
 

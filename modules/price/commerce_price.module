@@ -479,7 +479,7 @@ function commerce_price_field_formatter_view($entity_type, $entity, $field, $ins
         }
 
         // If there is only a single component and its price equals the field's,
-        //  then remove it and just show the actual price amount.
+        // then remove it and just show the actual price amount.
         if (count($components) == 1 && in_array('base_price', array_keys($components))) {
           $components = array();
         }
