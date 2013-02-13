@@ -1200,7 +1200,7 @@ function commerce_customer_profile_property_info_callback(&$info, $entity_type, 
  *     ...
  *   )
  */
-function commerce_customer_match_customer_profiles($field, $ids = array(), $limit = NULL) {
+function commerce_customer_match_customer_profiles($field, $ids = array(), $limit = 50) {
   $results = &drupal_static(__FUNCTION__, array());
 
   // Create unique id for static cache.
@@ -1225,7 +1225,7 @@ function commerce_customer_match_customer_profiles($field, $ids = array(), $limi
  *
  * Returns an array of products matching the specific parameters.
  */
-function _commerce_customer_match_customer_profiles_standard($field, $ids = array(), $limit = NULL) {
+function _commerce_customer_match_customer_profiles_standard($field, $ids = array(), $limit = 50) {
   // Build the query object with the necessary fields.
   $query = db_select('commerce_customer_profile', 'cp');
   $profile_id_alias = $query->addField('cp', 'profile_id');
