@@ -847,7 +847,15 @@ function commerce_order_access($op, $order = NULL, $account = NULL) {
  * Implementation of hook_query_commerce_order_access_alter().
  */
 function commerce_order_query_commerce_order_access_alter(QueryAlterableInterface $query) {
-  commerce_entity_access_query_alter($query, 'commerce_order');
+  // Look for an order base table to pass to the query altering function or else
+  // assume we don't have the tables we need to establish order related altering
+  // right now.
+  foreach ($query->getTables() as $table) {
+    if ($table['table'] === 'commerce_order') {
+      commerce_entity_access_query_alter($query, 'commerce_order', $table['alias']);
+      break;
+    }
+  }
 }
 
 /**

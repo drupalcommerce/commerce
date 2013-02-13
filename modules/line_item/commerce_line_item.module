@@ -708,8 +708,21 @@ function commerce_line_item_query_commerce_line_item_access_alter(QueryAlterable
   // Join the line items to their orders.
   if (module_exists('commerce_order')) {
     $tables = &$query->getTables();
-    $base_table = key($tables);
-    $order_alias = $query->innerJoin('commerce_order', 'co', '%alias.order_id = ' . $base_table . '.order_id');
+
+    // Look for an existing commerce_order table.
+    foreach ($tables as $table) {
+      if ($table['table'] === 'commerce_order') {
+        $order_alias = $table['alias'];
+        break;
+      }
+    }
+
+    // If not found, attempt a join against the first table.
+    if (!isset($order_alias)) {
+      reset($tables);
+      $base_table = key($tables);
+      $order_alias = $query->innerJoin('commerce_order', 'co', '%alias.order_id = ' . $base_table . '.order_id');
+    }
 
     // Perform the access control on the order.
     commerce_entity_access_query_alter($query, 'commerce_order', $order_alias);

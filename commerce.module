@@ -1059,10 +1059,11 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
   // Read the base table from the query if available or default to the first
   // table in the query's tables array.
   if (!isset($base_table) && !$base_table = $query->getMetaData('base_table')) {
-    // Assume that the base table if the first table if not set. It will result
+    // Assume that the base table is the first table if not set. It will result
     // in an invalid query if the first table is not the table we expect,
     // forcing the caller to actually properly pass a base table in that case.
     $tables = &$query->getTables();
+    reset($tables);
     $base_table = key($tables);
   }
 
