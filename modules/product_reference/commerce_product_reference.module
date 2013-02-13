@@ -933,6 +933,9 @@ function commerce_product_reference_autocomplete_validate($element, &$form_state
         // And store its product ID for later validation.
         $value[] = array('product_id' => $product->product_id);
       }
+      else {
+        form_error($element, t('Product SKU %sku does not exist.', array('%sku' => $typed_sku)));
+      }
     }
   }
   else {
