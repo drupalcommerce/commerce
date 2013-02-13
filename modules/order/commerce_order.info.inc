@@ -25,7 +25,6 @@ function commerce_order_entity_property_info() {
     'label' => t('Order number', array(), array('context' => 'a drupal commerce order')),
     'description' => t('The order number displayed to the customer.'),
     'setter callback' => 'entity_property_verbatim_set',
-    'required' => TRUE,
     'schema field' => 'order_number',
   );
   $properties['status'] = array(
