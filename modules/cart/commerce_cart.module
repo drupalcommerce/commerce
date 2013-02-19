@@ -2318,10 +2318,14 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
       // Prepare the context information needed by the cart form.
       $cart_context = $context;
 
+      // Remove the full entity from the context array and put the ID in instead.
+      list($entity_id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
+      $cart_context['entity_id'] = $entity_id;
+      unset($cart_context['entity']);
+
       // Add the context for displaying product fields in the context of an entity
       // that references the product by looking at the entity this product
       // reference field is attached to.
-      list($entity_id, $vid, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
       $cart_context['class_prefix'] = $context['entity_type'] . '-' . $entity_id;
       $cart_context['view_mode'] = $context['entity_type'] . '_' . $element['#view_mode'];
 
