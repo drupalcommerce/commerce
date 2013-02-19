@@ -50,6 +50,9 @@ class commerce_line_item_handler_field_edit_quantity extends views_handler_field
         '#size' => 4,
         '#maxlength' => max(4, strlen($quantity)),
         '#line_item_id' => $line_item_id,
+        '#attributes' => array(
+          'title' => $this->options['label'],
+        ),
       );
     }
   }
