@@ -111,6 +111,9 @@ function commerce_product_entity_info() {
         'plural' => t('products'),
       ),
 
+      // Prevent Redirect alteration of the product form.
+      'redirect' => FALSE,
+
       // Add translation support.
       'translation' => array(
         'locale' => TRUE,
