@@ -3,12 +3,7 @@
 /**
  * Field handler to present an add to cart form for the product..
  */
-class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
-  function construct() {
-    parent::construct();
-
-    $this->additional_fields['product_id'] = 'product_id';
-  }
+class commerce_cart_handler_field_add_to_cart_form extends views_handler_field_entity {
 
   function option_definition() {
     $options = parent::option_definition();
@@ -74,14 +69,9 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field {
     );
   }
 
-  function query() {
-    $this->ensure_my_table();
-    $this->add_additional_fields();
-  }
-
   function render($values) {
     // Attempt to load the specified product.
-    $product = commerce_product_load($this->get_value($values, 'product_id'));
+    $product = $this->get_value($values);
 
     if (!empty($product)) {
       // Extract a default quantity for the Add to Cart form line item.

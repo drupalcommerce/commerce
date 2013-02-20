@@ -8,7 +8,12 @@
  * Implements hook_views_data_alter().
  */
 function commerce_cart_views_data_alter(&$data) {
-  $data['commerce_product']['add_to_cart_form'] = array(
+  // Define some fields based upon views_handler_field_entity in the entity
+  // table so they can be re-used with other query backends.
+  // @see views_handler_field_entity
+
+  $data['commerce_product']['add_to_cart_form']['moved to'] = array('views_entity_commerce_product', 'add_to_cart_form');
+  $data['views_entity_commerce_product']['add_to_cart_form'] = array(
     'field' => array(
       'title' => t('Add to Cart form'),
       'help' => t('Display an Add to Cart form for the product.'),
@@ -16,14 +21,14 @@ function commerce_cart_views_data_alter(&$data) {
     ),
   );
 
-  $data['commerce_order']['cart_empty_text'] = array(
+  $data['commerce_order']['cart_empty_text']['moved to'] = array('views_entity_commerce_order', 'cart_empty_text');
+  $data['views_entity_commerce_order']['cart_empty_text'] = array(
     'title' => t('Empty Shopping Cart'),
     'help' => t('Displays an appropriate empty text message for shopping carts.'),
     'area' => array(
       'handler' => 'commerce_cart_handler_area_empty_text',
     ),
   );
-
 }
 
 /**
