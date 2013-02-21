@@ -54,7 +54,7 @@ function commerce_customer_entity_info() {
         'plural' => t('customer profiles'),
       ),
 
-      // Prevent Redirect alteration of the product form.
+      // Prevent Redirect alteration of the customer form.
       'redirect' => FALSE,
     ),
   );

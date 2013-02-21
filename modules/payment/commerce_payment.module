@@ -89,7 +89,7 @@ function commerce_payment_entity_info() {
         'plural' => t('payment transactions'),
       ),
 
-      // Prevent Redirect alteration of the product form.
+      // Prevent Redirect alteration of the payment transaction form.
       'redirect' => FALSE,
     ),
   );

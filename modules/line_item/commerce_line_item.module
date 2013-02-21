@@ -40,7 +40,7 @@ function commerce_line_item_entity_info() {
         'plural' => t('line items'),
       ),
 
-      // Prevent Redirect alteration of the product form.
+      // Prevent Redirect alteration of the line item form.
       'redirect' => FALSE,
     ),
   );

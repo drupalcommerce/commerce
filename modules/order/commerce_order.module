@@ -56,7 +56,7 @@ function commerce_order_entity_info() {
         'plural' => t('orders'),
       ),
 
-      // // Prevent Redirect alteration of the product form.
+      // // Prevent Redirect alteration of the order form.
       'redirect' => FALSE,
     ),
   );
