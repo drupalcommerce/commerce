@@ -166,7 +166,7 @@ function commerce_customer_field_schema($field) {
       ),
       'foreign keys' => array(
         'profile_id' => array(
-          'table' => 'commerce_customer',
+          'table' => 'commerce_customer_profile',
           'columns' => array('profile_id' => 'profile_id'),
         ),
       ),
