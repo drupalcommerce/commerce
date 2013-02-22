@@ -946,7 +946,9 @@ function commerce_customer_form_field_ui_field_edit_form_alter(&$form, &$form_st
  * Implements hook_field_widget_info_alter().
  */
 function commerce_customer_field_widget_info_alter(&$info) {
-  $info['options_select']['field types'][] = 'commerce_customer_profile_reference';
+  if (!empty($info['options_select'])) {
+    $info['options_select']['field types'][] = 'commerce_customer_profile_reference';
+  }
 }
 
 /**
