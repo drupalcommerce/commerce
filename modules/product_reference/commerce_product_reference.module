@@ -606,6 +606,7 @@ function commerce_product_reference_field_formatter_info() {
 function commerce_product_reference_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
+  $element = array();
 
   if ($display['type'] == 'commerce_product_reference_rendered_product') {
     $entity_info = entity_get_info('commerce_product');
