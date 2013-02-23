@@ -299,18 +299,21 @@ function commerce_product_reference_commerce_product_delete($product) {
  */
 function commerce_product_reference_entity_view($entity, $entity_type, $view_mode, $langcode) {
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  $instances = NULL;
 
   // An entity metadata wrapper will be loaded on demand if it is determined
   // this entity has a product reference field instance attached to it.
   $wrapper = NULL;
 
-  $instances = field_info_instances($entity_type, $bundle);
-  $reference_view_mode = $entity_type . '_' . $view_mode;
-
   // Loop through product reference fields to see if any exist on this entity
   // bundle that is either hidden or displayed with the Add to Cart form display
   // formatter.
   foreach (commerce_info_fields('commerce_product_reference', $entity_type) as $field_name => $field) {
+    // Load the instances array only if the entity has product reference fields.
+    if (empty($instances)) {
+      $instances = field_info_instances($entity_type, $bundle);
+    }
+
     if (isset($instances[$field_name])) {
       // Load a wrapper for the entity being viewed.
       if (empty($wrapper)) {
@@ -338,14 +341,24 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
 
       // If we found a product and the reference field enables field injection...
       if (!empty($product) && $instances[$field_name]['settings']['field_injection']) {
-
         // Add the display context for these field to the product.
         $product->display_context = array(
           'entity_type' => $entity_type,
           'entity' => $entity,
-          'view_mode' => $reference_view_mode,
+          'view_mode' => $view_mode,
           'language' => $langcode,
         );
+
+        // Determine if the referenced product type specifies custom settings
+        // for the reference view mode.
+        $view_mode_settings = field_view_mode_settings('commerce_product', $product->type);
+
+        if (!empty($view_mode_settings[$entity_type . '_' . $view_mode]['custom_settings'])) {
+          $reference_view_mode = $entity_type . '_' . $view_mode;
+        }
+        else {
+          $reference_view_mode = 'default';
+        }
 
         // Loop through the fields on the referenced product's type.
         foreach (field_info_instances('commerce_product', $product->type) as $product_field_name => $product_field) {
@@ -998,7 +1011,7 @@ function commerce_product_reference_module_implements_alter(&$implementations, $
 /**
  * Implements hook_entity_info_alter().
  *
- * Adds the line item and the product display-specific views mode to the product.
+ * Adds the line item and the product display-specific view modes to the product.
  */
 function commerce_product_reference_entity_info_alter(&$entity_info) {
   $entity_info['commerce_product']['view modes']['line_item'] = array(
