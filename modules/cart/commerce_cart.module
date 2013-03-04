@@ -1337,6 +1337,21 @@ function commerce_cart_field_instance_attribute_settings($instance) {
 }
 
 /**
+ * Determines whether or not a field instance is fucntioning as a product
+ * attribute field.
+ *
+ * @param $instance
+ *   The instance info array for the field instance.
+ *
+ * @return
+ *   Boolean indicating whether or not the field instance is an attribute field.
+ */
+function commerce_cart_field_instance_is_attribute($instance) {
+  $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
+  return !empty($commerce_cart_settings['attribute_field']);
+}
+
+/**
  * Returns an array of cart form field access settings for a field instance.
  *
  * Fields attached to line item types can be included on the Add to Cart form so
@@ -1660,13 +1675,10 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
           // currently restricted to fields defined by the options module.
           $field = field_info_field($field_name);
 
-          // Get the array of Cart settings pertaining to this instance.
-          $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
-
           // If the instance is of a field type that is eligible to function as
           // a product attribute field and if its attribute field settings
           // specify that this functionality is enabled...
-          if (commerce_cart_field_attribute_eligible($field) && $commerce_cart_settings['attribute_field']) {
+          if (commerce_cart_field_attribute_eligible($field) && commerce_cart_field_instance_is_attribute($instance)) {
             // Get the options properties from the options module and store the
             // options for the instance in select list format in the array of
             // qualifying fields.
@@ -1699,7 +1711,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
               $qualifying_fields[$field_name] = array(
                 'field' => $field,
                 'instance' => $instance,
-                'commerce_cart_settings' => $commerce_cart_settings,
+                'commerce_cart_settings' => commerce_cart_field_instance_attribute_settings($instance),
                 'options' => $allowed_values,
                 'weight' => $instance['widget']['weight'],
                 'required' => $instance['required'],
