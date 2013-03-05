@@ -260,7 +260,7 @@ function CALLBACK_commerce_payment_method_redirect_form($form, &$form_state, $or
  * Payment method callback; cancellation callback for the redirected payments.
  *
  * If the customer cancels payment or payment fails at the redirected payment
- * service, the custom will be sent back to the previous checkout page upon
+ * service, the customer will be sent back to the previous checkout page upon
  * return from the payment service. Before the redirect occurs, the payment
  * method module has the opportunity to take additional action by implementing
  * this callback. Note that updating the order status and performing the

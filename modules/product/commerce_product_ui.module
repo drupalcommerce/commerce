@@ -288,7 +288,7 @@ function commerce_product_ui_product_uri($product) {
   }
 
   // Otherwise return an admin URI if the user has permission.
-  if (commerce_product_access('view', $product)) {
+  if (commerce_product_access('update', $product)) {
     return array(
       'path' => 'admin/commerce/products/' . $product->product_id,
     );
