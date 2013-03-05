@@ -743,8 +743,7 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
 
     // Loop through the products and convert them into autocomplete output.
     foreach ($products as $product_id => $data) {
-      // Add a class wrapper for a few required CSS overrides.
-      $matches[$prefix . $data['sku']] = '<div class="reference-autocomplete">' . $data['rendered'] . '</div>';
+      $matches[$prefix . $data['sku']] = $data['rendered'];
     }
   }
 
