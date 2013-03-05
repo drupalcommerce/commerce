@@ -12,6 +12,16 @@
 function commerce_product_reference_commerce_product_uri($product) {
   // If the product has a display context, use its URI.
   if (!empty($product->display_context)) {
+    // If the display context does not have the fully loaded entity, as on the
+    // Add to Cart form refresh, load it now using the entity ID if present.
+    if (empty($product->display_context['entity']) && !empty($product->display_context['entity_id'])) {
+      $product->display_context['entity'] = entity_load_single($product->display_context['entity_type'], $product->display_context['entity_id']);
+    }
+    else {
+      // Otherwise do not return a URI from this function.
+      return NULL;
+    }
+
     return entity_uri($product->display_context['entity_type'], $product->display_context['entity']);
   }
 }
