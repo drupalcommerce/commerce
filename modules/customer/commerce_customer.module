@@ -481,6 +481,8 @@ function commerce_customer_profile_types() {
 
   // If it did not exist, fetch the types now.
   if (!isset($profile_types)) {
+    $profile_types = array();
+
     // Find profile types defined by hook_commerce_customer_profile_type_info().
     foreach (module_implements('commerce_customer_profile_type_info') as $module) {
       foreach (module_invoke($module, 'commerce_customer_profile_type_info') as $type => $profile_type) {
@@ -981,6 +983,12 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
   // Define the complex customer profile reference field widget.
   if ($instance['widget']['type'] == 'commerce_customer_profile_manager') {
     $profile_type = commerce_customer_profile_type_load($field['settings']['profile_type']);
+
+    // Do not attempt to render the widget for a non-existent profile type.
+    if (empty($profile_type)) {
+      drupal_set_message(t('Field %field_name attempted to use the non-existing customer profile type %type.', array('%field_name' => $field['field_name'], '%type' => $field['settings']['profile_type'])), 'error');
+      return array();
+    }
 
     // Build an array of customer profile IDs from this field's values.
     $profile_ids = array();
