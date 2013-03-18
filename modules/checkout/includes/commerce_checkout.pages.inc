@@ -266,7 +266,7 @@ function commerce_checkout_form_validate($form, &$form_state) {
       }
 
       if (isset($previous_messages['error'])) {
-        $previous_messages['error'] = array_diff($previous_messages['error'], $errors[$pane_id]);
+        $previous_messages['error'] = array_values(array_diff($previous_messages['error'], $errors[$pane_id]));
       }
     }
 
