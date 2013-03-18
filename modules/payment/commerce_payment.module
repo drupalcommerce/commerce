@@ -82,6 +82,10 @@ function commerce_payment_entity_info() {
       ),
       'uri callback' => 'commerce_payment_transaction_uri',
       'access callback' => 'commerce_payment_transaction_access',
+      'access arguments' => array(
+        'user key' => 'uid',
+        'access tag' => 'commerce_payment_transaction_access',
+      ),
       'token type' => 'commerce-payment-transaction',
       'metadata controller class' => '',
       'permission labels' => array(
@@ -590,8 +594,8 @@ function commerce_payment_method_load($method_id) {
  *
  * @return
  *   Either an array of all payment method titles keyed by the machine name or a
- *     string containing the title for the specified type. If a type is specified
- *     that does not exist, this function returns FALSE.
+ *   string containing the title for the specified type. If a type is specified
+ *   that does not exist, this function returns FALSE.
  */
 function commerce_payment_method_get_title($title = 'title', $method = NULL) {
   $payment_methods = commerce_payment_methods();
