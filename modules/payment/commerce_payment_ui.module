@@ -145,7 +145,7 @@ function commerce_payment_ui_help($path, $arg) {
       return t("Payment methods are enabled for use by the rule configurations listed below. An enabled payment rule can specify a payment method to enable using one of the available <em>Enable payment method</em> actions. The action's settings form will contain any necessary settings for the payment method that must be configured before it may be used.");
 
     case 'admin/commerce/config/payment-methods/add':
-      return t('After setting the label for this rule configuration, you will be redirected to its empty edit page. There you must add an action enabling a particular payment method for use and any conditions that must be met for a customer to be able to choose the payment method during checkout.');
+      return t("Submitting this form will create a new rule configuration that enables the selected payment method. You will need to edit the action on the rule to configure the payment method settings. You can also add any conditions that must be met for the payment method to be available on the checkout form, such as a comparison against the customer's country or the order total.");
   }
 }
 /**
@@ -250,15 +250,42 @@ function commerce_payment_ui_payment_transaction_delete_form_submit($form, &$for
  *
  * The Payment UI module instantiates the Rules Admin rule configuration add
  * form at a particular path in the Commerce IA. It uses its own form ID to do
- * so and alters the form here to select the necessary Rules event.
+ * so and alters the form here to select the necessary Rules event. It also lets
+ * the user specify which payment method to enable through the Rule.
  *
+ * @see commerce_payment_ui_add_payment_rule_form_submit()
  * @see rules_admin_add_reaction_rule()
  */
 function commerce_payment_ui_form_commerce_payment_ui_add_payment_rule_form_alter(&$form, &$form_state) {
   unset($form['settings']['help']);
   $form['settings']['event']['#type'] = 'value';
   $form['settings']['event']['#value'] = 'commerce_payment_methods';
+
+  $form['method_id'] = array(
+    '#type' => 'select',
+    '#title' => t('Payment method'),
+    '#options' => commerce_payment_method_get_title(),
+    '#required' => TRUE,
+  );
+
+  // Add function call to the beginning of the submit callback array
+  array_unshift($form['#submit'],'commerce_payment_ui_add_payment_rule_form_submit');
+
   $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/payment-methods');
+}
+
+/**
+ * Submit callback for commerce_payment_ui_form_commerce_payment_ui_add_payment_rule_form_alter().
+ */
+function commerce_payment_ui_add_payment_rule_form_submit($form, &$form_state) {
+  // Enable the selected payment method on the Rule.
+  $method_id = $form_state['values']['method_id'];
+
+  $form_state['rules_config']
+    ->action('commerce_payment_enable_' . $method_id, array(
+      'commerce_order:select' => 'commerce-order',
+      'payment_method' => $method_id,
+    ));
 }
 
 /**
