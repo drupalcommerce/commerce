@@ -56,20 +56,4 @@ class CommercePaymentRulesTest extends CommerceBaseTestCase {
       $this->assert($test['result'] == $condition->executeByArgs(array('commerce_order' => $order, 'operator' => $test['operator'], 'value' => $test['value'])), t('Order balance is @operator $@value.', array('@operator' => $test['operator'], '@value' => $test['value'])));
     }
   }
-
-  /**
-   * Test payment method access.
-   */
-  function testPaymentMethodAccess() {
-    $permissions = array(
-      array('administer payments'),
-      array('administer payment methods'),
-      array('administer payments', 'administer payment methods'),
-    );
-
-    foreach ($permissions as $permission) {
-      $account = $this->drupalCreateUser($permission);
-      $this->assertTrue(commerce_payment_ui_payment_method_access($account));
-    }
-  }
 }
