@@ -149,6 +149,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'administer commerce_product entities',
       'administer product types',
       'administer product pricing',
+      'administer payment methods',
       'administer payments',
       'administer taxes',
       'administer rules',
