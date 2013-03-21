@@ -335,7 +335,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         $product = $wrapper->{$field_name}->value();
       }
       else {
-        $product = $wrapper->{$field_name}->get(0)->value();
+        $product = commerce_product_reference_default_product($wrapper->{$field_name}->value());
 
         // If the product is disabled, attempt to find one that is active and
         // use that as the default product instead.
@@ -1414,6 +1414,31 @@ function commerce_product_reference_preprocess_entity(&$variables) {
   if (!isset($variables['url'])) {
     $variables['url'] = FALSE;
   }
+}
+
+/**
+ * Returns the default referenced product from an array of product entities.
+ *
+ * The basic behavior for determining a default product from an array of
+ * referenced products is to use the first referenced product. This function
+ * also allows other modules to specify a different default product through
+ * hook_commerce_product_reference_default_delta_alter().
+ *
+ * @param $products
+ *   An array of product entities referenced by a product reference field.
+ *
+ * @return
+ *   The default product entity.
+ */
+function commerce_product_reference_default_product($products) {
+  // Fetch the first delta value from the array.
+  reset($products);
+  $delta = key($products);
+
+  // Allow other modules to specify a different delta value if desired.
+  drupal_alter('commerce_product_reference_default_delta', $delta, $products);
+
+  return $products[$delta];
 }
 
 /**
