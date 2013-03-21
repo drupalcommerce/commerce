@@ -452,21 +452,34 @@ function commerce_customer_field_views_data($field) {
 }
 
 /**
- * Implements hook_field_delete_field().
+ * Implements hook_field_delete_instance().
  */
-function commerce_customer_field_delete_field($field) {
-  if ($field['type'] == 'commerce_customer_profile_reference') {
-    foreach (commerce_customer_profile_types() as $type => $profile_type) {
-      if (variable_get('commerce_customer_profile_' . $type . '_field', '') == $field['field_name']) {
-        variable_set('commerce_customer_profile_' . $type . '_field', '');
+function commerce_customer_field_delete_instance($instance) {
+  // If the checkout module is enabled, we need to react to the deletion of a
+  // profile reference field from the core order bundle by updating the related
+  // checkout pane so it is no longer configured to use the deleted field.
+  if (module_exists('commerce_checkout')) {
+    $field = field_info_field($instance['field_name']);
 
-        $checkout_pane = commerce_checkout_pane_load('customer_profile_' . $type);
-        $checkout_pane['enabled'] = FALSE;
-        $checkout_pane['page'] = 'disabled';
+    // Ensure the deleted field instance is a customer profile reference field
+    // and is attached to the core commerce_order entity type / bundle.
+    if ($field['type'] == 'commerce_customer_profile_reference' &&
+      $instance['entity_type'] == 'commerce_order' && $instance['bundle'] == 'commerce_order') {
+      // Loop through the customer profile types to see if there's a checkout
+      // pane that used the deleted field.
+      foreach (commerce_customer_profile_types() as $type => $profile_type) {
+        if (variable_get('commerce_customer_profile_' . $type . '_field', '') == $field['field_name']) {
+          // Unset the field variable and disable the checkout pane.
+          variable_set('commerce_customer_profile_' . $type . '_field', '');
 
-        commerce_checkout_pane_save($checkout_pane);
+          $checkout_pane = commerce_checkout_pane_load('customer_profile_' . $type);
+          $checkout_pane['enabled'] = FALSE;
+          $checkout_pane['page'] = 'disabled';
 
-        drupal_static_reset('commerce_checkout_panes');
+          commerce_checkout_pane_save($checkout_pane);
+
+          drupal_static_reset('commerce_checkout_panes');
+        }
       }
     }
   }
