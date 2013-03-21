@@ -77,26 +77,43 @@ class commerce_line_item_handler_field_edit_quantity extends views_handler_field
 
   function views_form_submit($form, &$form_state) {
     $field_name = $this->options['id'];
+    $deleted_line_items = array();
+    $updated_line_items = array();
+
     foreach (element_children($form[$field_name]) as $row_id) {
       $line_item_id = $form[$field_name][$row_id]['#line_item_id'];
+
       // If the line item hasn't been deleted...
       if ($line_item = commerce_line_item_load($line_item_id)) {
-        // And the quantity on the form is different...
-        if ($form_state['values'][$field_name][$row_id] != $line_item->quantity) {
-          if ($form_state['values'][$field_name][$row_id] == 0) {
-            // If the quantity specified is 0, the line item is deleted.
-            $order = commerce_order_load($form_state['order']->order_id);
-            commerce_cart_order_product_line_item_delete($order, $line_item_id);
+        $form_quantity = $form_state['values'][$field_name][$row_id];
+
+        // If the quantity on the form is different...
+        if ($form_quantity != $line_item->quantity) {
+          // If the quantity specified is 0, flag the line item for deletion.
+          if ($form_quantity == 0) {
+            $deleted_line_items[] = $line_item_id;
           }
           else {
-            // Change the quantity and save the line item.
-            $line_item->quantity = $form_state['values'][$field_name][$row_id];
-
-            commerce_line_item_save($line_item);
-            entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
+            // Otherwise queue the line item quantity update.
+            $updated_line_items[$line_item_id] = $form_quantity;
           }
         }
       }
+    }
+
+    // Process the deletes first.
+    foreach ($deleted_line_items as $line_item_id) {
+      $order = commerce_order_load($form_state['order']->order_id);
+      commerce_cart_order_product_line_item_delete($order, $line_item_id);
+    }
+
+    // Then process the quantity updates.
+    foreach ($updated_line_items as $line_item_id => $quantity) {
+      // Load the line item and update it.
+      $line_item = commerce_line_item_load($line_item_id);
+      $line_item->quantity = $quantity;
+      commerce_line_item_save($line_item);
+      entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
     }
   }
 }
