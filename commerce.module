@@ -1150,3 +1150,12 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
     $query->where('1 = 0');
   }
 }
+
+/**
+ * Ensures an options list limit value is either empty or a positive integer.
+ */
+function commerce_options_list_limit_validate($element, &$form_state, $form) {
+  if (!empty($element['#value']) && (!is_numeric($element['#value']) || $element['#value'] < 1)) {
+    form_error($element, t('Use a positive number for the options list limit or else leave it blank for no limit.'));
+  }
+}

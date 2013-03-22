@@ -779,7 +779,7 @@ function commerce_customer_field_info() {
     'commerce_customer_profile_reference' => array(
       'label' => t('Customer profile reference'),
       'description' => t('This field stores the ID of a related customer profile as an integer value.'),
-      'settings' => array('profile_type' => 'billing'),
+      'settings' => array('profile_type' => 'billing', 'options_list_limit' => 50),
       'instance_settings' => array(),
       'default_widget' => 'options_select',
       'default_formatter' => 'commerce_customer_profile_reference_display',
@@ -810,6 +810,14 @@ function commerce_customer_field_settings_form($field, $instance, $has_data) {
       '#options' => $options,
       '#default_value' => !empty($settings['profile_type']) ? $settings['profile_type'] : 'billing',
       '#disabled' => $has_data,
+    );
+
+    $form['options_list_limit'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Options list limit'),
+      '#description' => t('Limits the number of customer profiles available in field widgets with options lists; leave blank for no limit.'),
+      '#default_value' => !empty($settings['options_list_limit']) ? $settings['options_list_limit'] : 50,
+      '#element_validate' => array('commerce_options_list_limit_validate'),
     );
   }
 
@@ -972,8 +980,16 @@ function commerce_customer_field_widget_info_alter(&$info) {
 function commerce_customer_options_list($field) {
   $options = array();
 
+  // Look for an options list limit in the field settings.
+  if (!empty($field['settings']['options_list_limit'])) {
+    $limit = (int) $field['settings']['options_list_limit'];
+  }
+  else {
+    $limit = NULL;
+  }
+
   // Loop through all customer matches.
-  foreach (commerce_customer_match_customer_profiles($field) as $profile_id => $data) {
+  foreach (commerce_customer_match_customer_profiles($field, array(), $limit) as $profile_id => $data) {
     // Add them to the options list in optgroups by customer profile type.
     $name = check_plain(commerce_customer_profile_type_get_name($data['type']));
     $options[$name][$profile_id] = t('@profile: User @user', array('@profile' => $profile_id, '@user' => $data['uid']));
@@ -1226,7 +1242,7 @@ function commerce_customer_profile_property_info_callback(&$info, $entity_type, 
  *     ...
  *   )
  */
-function commerce_customer_match_customer_profiles($field, $ids = array(), $limit = 50) {
+function commerce_customer_match_customer_profiles($field, $ids = array(), $limit = NULL) {
   $results = &drupal_static(__FUNCTION__, array());
 
   // Create unique id for static cache.
@@ -1251,7 +1267,7 @@ function commerce_customer_match_customer_profiles($field, $ids = array(), $limi
  *
  * Returns an array of products matching the specific parameters.
  */
-function _commerce_customer_match_customer_profiles_standard($field, $ids = array(), $limit = 50) {
+function _commerce_customer_match_customer_profiles_standard($field, $ids = array(), $limit = NULL) {
   // Build the query object with the necessary fields.
   $query = db_select('commerce_customer_profile', 'cp');
   $profile_id_alias = $query->addField('cp', 'profile_id');
