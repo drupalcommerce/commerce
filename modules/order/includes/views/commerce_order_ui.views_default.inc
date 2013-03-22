@@ -222,7 +222,7 @@ function commerce_order_ui_views_default_views() {
   $views[$view->name] = $view;
 
   // User order history displayed at user/%/orders.
-  $view = new view;
+  $view = new view();
   $view->name = 'commerce_user_orders';
   $view->description = 'Display a list of completed orders for a user.';
   $view->tag = 'commerce';
@@ -235,6 +235,7 @@ function commerce_order_ui_views_default_views() {
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->display->display_options['title'] = 'Orders';
+  $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'view own commerce_order entities';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -289,115 +290,40 @@ function commerce_order_ui_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  $handler->display->display_options['style_options']['override'] = 1;
-  $handler->display->display_options['style_options']['sticky'] = 0;
-  $handler->display->display_options['style_options']['empty_table'] = 0;
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['text']['id'] = 'text';
   $handler->display->display_options['empty']['text']['table'] = 'views';
   $handler->display->display_options['empty']['text']['field'] = 'area';
-  $handler->display->display_options['empty']['text']['empty'] = FALSE;
   $handler->display->display_options['empty']['text']['content'] = 'You have not placed any orders with us yet.';
   $handler->display->display_options['empty']['text']['format'] = 'plain_text';
   /* Field: Commerce Order: Order number */
   $handler->display->display_options['fields']['order_number']['id'] = 'order_number';
   $handler->display->display_options['fields']['order_number']['table'] = 'commerce_order';
   $handler->display->display_options['fields']['order_number']['field'] = 'order_number';
-  $handler->display->display_options['fields']['order_number']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['order_number']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['order_number']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['order_number']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['order_number']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['order_number']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['order_number']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['order_number']['empty_zero'] = 0;
   $handler->display->display_options['fields']['order_number']['link_to_order'] = 'customer';
   /* Field: Commerce Order: Created date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'commerce_order';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = 'Created';
-  $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['created']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['created']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['created']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['created']['empty_zero'] = 0;
   /* Field: Commerce Order: Updated date */
   $handler->display->display_options['fields']['changed']['id'] = 'changed';
   $handler->display->display_options['fields']['changed']['table'] = 'commerce_order';
   $handler->display->display_options['fields']['changed']['field'] = 'changed';
-  $handler->display->display_options['fields']['changed']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['changed']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['changed']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['changed']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['changed']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['changed']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['changed']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['changed']['empty_zero'] = 0;
   /* Field: Commerce Order: Order total */
   $handler->display->display_options['fields']['commerce_order_total']['id'] = 'commerce_order_total';
   $handler->display->display_options['fields']['commerce_order_total']['table'] = 'field_data_commerce_order_total';
   $handler->display->display_options['fields']['commerce_order_total']['field'] = 'commerce_order_total';
   $handler->display->display_options['fields']['commerce_order_total']['label'] = 'Total';
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['commerce_order_total']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['commerce_order_total']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['commerce_order_total']['empty_zero'] = 0;
   $handler->display->display_options['fields']['commerce_order_total']['click_sort_column'] = 'amount';
   $handler->display->display_options['fields']['commerce_order_total']['type'] = 'commerce_price_formatted_amount';
   $handler->display->display_options['fields']['commerce_order_total']['settings'] = array(
     'calculation' => FALSE,
   );
-  $handler->display->display_options['fields']['commerce_order_total']['field_api_classes'] = 0;
   /* Field: Commerce Order: Order status */
   $handler->display->display_options['fields']['status']['id'] = 'status';
   $handler->display->display_options['fields']['status']['table'] = 'commerce_order';
   $handler->display->display_options['fields']['status']['field'] = 'status';
-  $handler->display->display_options['fields']['status']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['status']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['status']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['status']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['status']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['status']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['status']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['status']['empty_zero'] = 0;
   /* Contextual filter: Commerce Order: Uid */
   $handler->display->display_options['arguments']['uid_1']['id'] = 'uid_1';
   $handler->display->display_options['arguments']['uid_1']['table'] = 'commerce_order';
@@ -407,14 +333,12 @@ function commerce_order_ui_views_default_views() {
   $handler->display->display_options['arguments']['uid_1']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['uid_1']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['uid_1']['summary_options']['items_per_page'] = '25';
-  $handler->display->display_options['arguments']['uid_1']['specify_validation'] = 1;
+  $handler->display->display_options['arguments']['uid_1']['specify_validation'] = TRUE;
   $handler->display->display_options['arguments']['uid_1']['validate']['type'] = 'current_user_or_role';
-  $handler->display->display_options['arguments']['uid_1']['validate_options']['restrict_roles'] = '1';
+  $handler->display->display_options['arguments']['uid_1']['validate_options']['restrict_roles'] = TRUE;
   $handler->display->display_options['arguments']['uid_1']['validate_options']['roles'] = array(
     3 => '3',
   );
-  $handler->display->display_options['arguments']['uid_1']['break_phrase'] = 0;
-  $handler->display->display_options['arguments']['uid_1']['not'] = 0;
   /* Filter criterion: Commerce Order: Order state */
   $handler->display->display_options['filters']['state']['id'] = 'state';
   $handler->display->display_options['filters']['state']['table'] = 'commerce_order';
@@ -448,6 +372,10 @@ function commerce_order_ui_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
     t('You have not placed any orders with us yet.'),
     t('Order number'),
     t('Created'),
