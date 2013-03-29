@@ -12,4 +12,5 @@ files[] = commerce_price.rules.inc
 files[] = includes/views/commerce_price.views.inc
 
 ; Views handlers
+files[] = includes/views/handlers/commerce_price_handler_field_commerce_price.inc
 files[] = includes/views/handlers/commerce_price_handler_filter_commerce_price_amount.inc
