@@ -144,15 +144,6 @@ function commerce_order_customer_order_view_access($order) {
 }
 
 /**
- * Implements hook_menu_alter().
- */
-function commerce_order_ui_menu_alter(&$items) {
-  // Transform the field UI tabs into contextual links.
-  $items['admin/commerce/config/order/settings/fields']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
-  $items['admin/commerce/config/order/settings/display']['context'] = MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE;
-}
-
-/**
  * Implements hook_menu_local_tasks_alter().
  */
 function commerce_order_ui_menu_local_tasks_alter(&$data, $router_item, $root_path) {
