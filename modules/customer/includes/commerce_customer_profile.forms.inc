@@ -97,12 +97,6 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
     $form['profile_status']['status']['#description'] .= '<br />' . t('This profile is of a type that is no longer available, so its status cannot be adjusted.');
   }
 
-  $form['actions'] = array(
-    '#type' => 'container',
-    '#attributes' => array('class' => array('form-actions')),
-    '#weight' => 100,
-  );
-
   // We add the form's #submit array to this button along with the actual submit
   // handler to preserve any submit handlers added by a form callback_wrapper.
   $submit = array();
@@ -111,6 +105,7 @@ function commerce_customer_customer_profile_form($form, &$form_state, $profile) 
     $submit += $form['#submit'];
   }
 
+  $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save profile'),

@@ -84,8 +84,7 @@ function commerce_product_ui_product_type_form($form, &$form_state, $product_typ
   }
 
   $form['actions'] = array(
-    '#type' => 'container',
-    '#attributes' => array('class' => array('form-actions')),
+    '#type' => 'actions',
     '#weight' => 40,
   );
 

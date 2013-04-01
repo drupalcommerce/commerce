@@ -91,8 +91,7 @@ function commerce_product_product_form($form, &$form_state, $product) {
   );
 
   $form['actions'] = array(
-    '#type' => 'container',
-    '#attributes' => array('class' => array('form-actions')),
+    '#type' => 'actions',
     '#weight' => 400,
   );
 

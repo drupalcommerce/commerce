@@ -76,6 +76,7 @@ function commerce_payment_order_transaction_add_form($form, &$form_state, $order
 
     $form['payment_terminal']['payment_details']['#tree'] = TRUE;
 
+    $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Save'),

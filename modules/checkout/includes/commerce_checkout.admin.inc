@@ -73,9 +73,8 @@ function commerce_checkout_builder_form($form, &$form_state) {
   }
 
   $form['actions'] = array(
-    '#type' => 'container',
+    '#type' => 'actions',
     '#tree' => FALSE,
-    '#attributes' => array('class' => array('form-actions')),
   );
   $form['actions']['submit'] = array(
     '#type' => 'submit',

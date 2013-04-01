@@ -158,12 +158,6 @@ function commerce_order_order_form($form, &$form_state, $order) {
     '#attributes' => array('id' => 'edit-changed'),
   );
 
-  $form['actions'] = array(
-    '#type' => 'container',
-    '#attributes' => array('class' => array('form-actions')),
-    '#weight' => 100,
-  );
-
   // We add the form's #submit array to this button along with the actual submit
   // handler to preserve any submit handlers added by a form callback_wrapper.
   $submit = array();
@@ -172,6 +166,7 @@ function commerce_order_order_form($form, &$form_state, $order) {
     $submit += $form['#submit'];
   }
 
+  $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save order', array(), array('context' => 'a drupal commerce order')),
