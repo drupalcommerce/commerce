@@ -78,6 +78,8 @@ function commerce_payment_ui_admin_page() {
               '#theme' => 'item_list',
               '#items' => $items,
             );
+
+            break;
           }
         }
       }
