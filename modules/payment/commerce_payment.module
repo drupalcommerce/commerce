@@ -521,6 +521,7 @@ function commerce_payment_methods() {
         'title' => '',
         'description' => '',
         'active' => FALSE,
+        'checkout' => TRUE,
         'terminal' => TRUE,
         'offsite' => FALSE,
         'offsite_autoredirect' => FALSE,

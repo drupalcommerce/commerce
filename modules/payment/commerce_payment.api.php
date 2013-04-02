@@ -116,6 +116,9 @@ function hook_commerce_payment_totals_row_info_alter(&$rows, $totals, $order) {
  *  - active (optional): TRUE of FALSE indicating whether or not the default
  *    payment method rule configuration for this payment method should be
  *    enabled by default; defaults to FALSE.
+ *  - checkout (optional): TRUE or FALSE indicating whether or not payments can
+ *    be processed via this payment method through the checkout form; defaults
+ *    to TRUE.
  *  - terminal (optional): TRUE or FALSE indicating whether or not payments can
  *    be processed via this payment method through the administrative payment
  *    terminal on an order’s Payment tab; defaults to TRUE.
