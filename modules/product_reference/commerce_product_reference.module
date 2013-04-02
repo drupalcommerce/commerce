@@ -311,6 +311,12 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   $instances = NULL;
 
+  if ($entity_type == 'commerce_line_item' || $entity_type == 'commerce_product') {
+    // We do not currently support the injection of product fields into the
+    // display of line items or other products.
+    return;
+  }
+
   // An entity metadata wrapper will be loaded on demand if it is determined
   // this entity has a product reference field instance attached to it.
   $wrapper = NULL;
