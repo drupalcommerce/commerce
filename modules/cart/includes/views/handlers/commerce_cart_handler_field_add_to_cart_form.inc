@@ -62,9 +62,16 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field_e
       );
     }
 
+    if ($this->view->display[$this->view->current_display]->display_plugin == 'page') {
+      $title = t("Link products added to the cart from this page display to the View's path.");
+    }
+    else {
+      $title = t('Link products added to the cart from this display to the current path the customer is viewing where the View is rendered.');
+    }
+
     $form['display_path'] = array(
       '#type' => 'checkbox',
-      '#title' => t("Link products added to the cart from this View to this View's path if displayed as a page."),
+      '#title' => $title,
       '#default_value' => $this->options['display_path'],
     );
   }
@@ -87,9 +94,13 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field_e
       $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
 
       // Add the display path to the line item's context data array if specified.
-      if ($this->view->display[$this->view->current_display]->display_plugin == 'page' &&
-        $this->options['display_path']) {
-        $line_item->data['context']['display_path'] = $this->view->display[$this->view->current_display]->display_options['path'];
+      if ($this->options['display_path']) {
+        if ($this->view->display[$this->view->current_display]->display_plugin == 'page') {
+          $line_item->data['context']['display_path'] = $this->view->display[$this->view->current_display]->display_options['path'];
+        }
+        else {
+          $line_item->data['context']['display_path'] = current_path();
+        }
       }
 
       // Store the View data in the context data array as well.
