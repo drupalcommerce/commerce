@@ -117,6 +117,7 @@ function commerce_payment_entity_property_info() {
     'type' => 'text',
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer payment transactions',
+    'options list' => 'commerce_payment_transaction_status_options_list',
     'schema field' => 'status',
   );
   $properties['remote_status'] = array(

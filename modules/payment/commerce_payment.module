@@ -773,6 +773,20 @@ function commerce_payment_transaction_statuses() {
 }
 
 /**
+ * Returns an options list of payment transaction statuses.
+ */
+function commerce_payment_transaction_status_options_list() {
+  // Build an array of payment transaction status options.
+  $options = array();
+
+  foreach(commerce_payment_transaction_statuses() as $payment_transaction_status) {
+    $options[$payment_transaction_status['status']] = $payment_transaction_status['title'];
+  }
+
+  return $options;
+}
+
+/**
  * Themes the icon representing a payment transaction status.
  */
 function theme_commerce_payment_transaction_status_icon($variables) {
