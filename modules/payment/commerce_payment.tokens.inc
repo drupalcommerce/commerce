@@ -99,6 +99,27 @@ function commerce_payment_token_info() {
 }
 
 /**
+ * Implements hook_token_info_alter().
+ */
+function commerce_payment_token_info_alter(&$data) {
+  if (module_exists('commerce_checkout')) {
+    $data['tokens']['commerce-order']['payment-method'] = array(
+      'name' => t('Payment method'),
+      'description' => t('The method_id of the payment method selected by the customer during checkout.'),
+    );
+    $data['tokens']['commerce-order']['payment-method-title'] = array(
+      'name' => t('Payment method title'),
+      'description' => t('The administrative title of the payment method selected by the customer during checkout.'),
+    );
+    $data['tokens']['commerce-order']['payment-method-short-title'] = array(
+      'name' => t('Payment method short title'),
+      'description' => t('The customer oriented short title of the payment method selected by the customer during checkout.'),
+    );
+
+  }
+}
+
+/**
  * Implements hook_tokens().
  */
 function commerce_payment_tokens($type, $tokens, array $data = array(), array $options = array()) {
@@ -218,6 +239,44 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
     foreach (array('created', 'changed') as $date) {
       if ($created_tokens = token_find_with_prefix($tokens, $date)) {
         $replacements += token_generate('date', $created_tokens, array('date' => $transaction->{$date}), $options);
+      }
+    }
+  }
+
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $order = $data['commerce-order'];
+
+    if (!empty($order->data['payment_method'])) {
+      $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+      $method_id = $payment_method['method_id'];
+
+      foreach ($tokens as $name => $original) {
+        switch ($name) {
+          case 'payment-method':
+            $replacements[$original] = $sanitize ? check_plain($method_id) : $method_id;
+            break;
+
+          case 'payment-method-title':
+            $title = commerce_payment_method_get_title('title', $method_id);
+            $replacements[$original] = $sanitize ? check_plain($title) : $title;
+            break;
+
+          case 'payment-method-short-title':
+            $title = commerce_payment_method_get_title('short_title', $method_id);
+            $replacements[$original] = $sanitize ? check_plain($title) : $title;
+            break;
+        }
+      }
+    }
+    else {
+      foreach ($tokens as $name => $original) {
+        switch ($name) {
+          case 'payment-method':
+          case 'payment-method-title':
+          case 'payment-method-short-title':
+            $replacements[$original] = t('Unknown');
+            break;
+        }
       }
     }
   }
