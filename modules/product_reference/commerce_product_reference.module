@@ -1109,12 +1109,10 @@ function commerce_product_reference_entity_info_alter(&$entity_info) {
  *   The default weight of the field instance widget and display.
  */
 function commerce_product_reference_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0) {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_product_reference')) {
-    field_cache_clear();
-  }
-
   // Look for or add the specified field to the requested entity bundle.
+  commerce_activate_field($field_name);
+  field_cache_clear();
+
   $field = field_info_field($field_name);
   $instance = field_info_instance($entity_type, $field_name, $bundle);
 
@@ -1192,6 +1190,9 @@ function commerce_product_line_item_configuration($line_item_type) {
 
   // Look for or add a display path textfield to the product line item type.
   $field_name = 'commerce_display_path';
+  commerce_activate_field($field_name);
+  field_cache_clear();
+
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_line_item', $field_name, $type);
 

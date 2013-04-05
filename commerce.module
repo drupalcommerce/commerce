@@ -157,7 +157,7 @@ function commerce_entity_reference_delete($entity, $field_name, $col_name, $ref_
  *
  * The normal API function for updating fields, field_update_field(), will not
  * work on disabled fields. As a workaround, this function directly updates the
- * database and clears the field cache if necessary.
+ * database, but it is up to the caller to clear the cache.
  *
  * @param $field_name
  *   The name of the field to activate.
@@ -171,16 +171,10 @@ function commerce_activate_field($field_name) {
   $updated = db_update('field_config')
     ->fields(array('active' => 1))
     ->condition('field_name', $field_name, '=')
+    ->condition('deleted', 0, '=')
     ->execute();
 
-  // If a row was actually updated...
-  if ($updated) {
-    // Clear the field cache to refresh the field info data.
-    field_cache_clear();
-    return TRUE;
-  }
-
-  return FALSE;
+  return !empty($updated) ? TRUE : FALSE;
 }
 
 /**
@@ -209,8 +203,10 @@ function commerce_delete_fields($type) {
  *   The name of the field to enable and delete.
  */
 function commerce_delete_field($field_name) {
-  // In case the field is inactive, first activate it.
-  commerce_activate_field($field_name);
+  // In case the field is inactive, first activate it and clear the field cache.
+  if (commerce_activate_field($field_name)) {
+    field_cache_clear();
+  }
 
   // Delete the field.
   field_delete_field($field_name);
@@ -261,6 +257,11 @@ function commerce_delete_instance($instance) {
   // First activate the instance's field if necessary.
   $field_name = $instance['field_name'];
   $activated = commerce_activate_field($field_name);
+
+  // Clear the field cache if we just activated the field.
+  if ($activated) {
+    field_cache_clear();
+  }
 
   // Then delete the instance.
   field_delete_instance($instance, FALSE);

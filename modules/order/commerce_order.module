@@ -150,14 +150,11 @@ function commerce_order_modules_enabled($modules) {
  * Ensures the line item field is present on the default order bundle.
  */
 function commerce_order_configure_order_type($type = 'commerce_order') {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_line_item_reference') ||
-    !field_info_field_types('commerce_customer_profile_reference')) {
-    field_cache_clear();
-  }
-
   // Look for or add a line item reference field to the order type.
   $field_name = 'commerce_line_items';
+  commerce_activate_field($field_name);
+  field_cache_clear();
+
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_order', $field_name, $type);
 
@@ -225,6 +222,7 @@ function commerce_order_configure_customer_profile_type($customer_profile_type, 
   // First check to ensure this field doesn't already exist and was just inactive
   // because of the profile defining module being disabled previously.
   commerce_activate_field($field_name);
+  field_cache_clear();
 
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_order', $field_name, $order_type);

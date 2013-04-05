@@ -1951,8 +1951,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
     field_attach_form('commerce_line_item', $form_state['line_item'], $form['line_item_fields'], $form_state);
 
     // Loop over the fields we just added and remove any that haven't been
-    // marked for inclusion on this form. We do this instead of just setting
-    // '#access' => FALSE to avoid specifying empty values for hidden fields.
+    // marked for inclusion on this form.
     foreach (element_children($form['line_item_fields']) as $field_name) {
       $info = field_info_instance('commerce_line_item', $field_name, $form_state['line_item']->type);
       $form['line_item_fields'][$field_name]['#commerce_cart_settings'] = commerce_cart_field_instance_access_settings($info);

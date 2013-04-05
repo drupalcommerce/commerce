@@ -254,12 +254,10 @@ function commerce_price_field_is_empty($item, $field) {
  *   An array of default display data used for the entity's current view modes.
  */
 function commerce_price_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0, $calculation = FALSE, $display = array()) {
-  // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_price')) {
-    field_cache_clear();
-  }
-
   // Look for or add the specified price field to the requested entity bundle.
+  commerce_activate_field($field_name);
+  field_cache_clear();
+
   $field = field_info_field($field_name);
   $instance = field_info_instance($entity_type, $field_name, $bundle);
 

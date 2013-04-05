@@ -197,13 +197,11 @@ function commerce_customer_configure_customer_types() {
  */
 function commerce_customer_configure_customer_profile_type($profile_type) {
   if ($profile_type['addressfield']) {
-    // If a field type we know should exist isn't found, clear the Field cache.
-    if (!field_info_field_types('addressfield')) {
-      field_cache_clear();
-    }
-
     // Look for or add an address field to the customer profile type.
     $field_name = 'commerce_customer_address';
+    commerce_activate_field($field_name);
+    field_cache_clear();
+
     $field = field_info_field($field_name);
     $instance = field_info_instance('commerce_customer_profile', $field_name, $profile_type['type']);
 
@@ -278,13 +276,22 @@ function commerce_customer_configure_customer_fields($modules = NULL) {
 
       // If this profile type has been previously disabled, update any reference
       // fields to be active again before attempting to recreate them.
+      $activated = FALSE;
+
       foreach ($profile_types as $type => $profile_type) {
         foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference', 'active' => 0, 'storage_active' => 1, 'deleted' => 0), array('include_inactive' => TRUE)) as $field_name => $field) {
           // If this field references profiles of the re-enabled type...
           if ($field['settings']['profile_type'] == $type) {
-            commerce_activate_field($field_name);
+            if (commerce_activate_field($field_name)) {
+              $activated = TRUE;
+            }
           }
         }
+      }
+
+      // Clear the field cache if any profile reference fields were activated.
+      if ($activated) {
+        field_cache_clear();
       }
 
       // Loop through and configure the customer profile types defined by the module.
