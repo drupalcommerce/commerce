@@ -25,7 +25,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
       'profile_id' => NULL,
       'revision_id' => NULL,
       'type' => '',
-      'uid' => 0,
+      'uid' => '',
       'status' => 1,
       'created' => '',
       'changed' => '',
@@ -65,6 +65,18 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
       // Set the timestamp fields.
       if ($profile->is_new && empty($profile->created)) {
         $profile->created = REQUEST_TIME;
+      }
+      else {
+        // Otherwise if the profile is not new but comes from an entity_create()
+        // or similar function call that initializes the created timestamp and
+        // uid value to empty strings, unset them to prevent destroying existing
+        // data in those properties on update.
+        if ($profile->created === '') {
+          unset($profile->created);
+        }
+        if ($profile->uid === '') {
+          unset($profile->uid);
+        }
       }
 
       $profile->changed = REQUEST_TIME;

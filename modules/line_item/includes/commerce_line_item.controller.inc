@@ -59,6 +59,15 @@ class CommerceLineItemEntityController extends DrupalCommerceEntityController {
       if (empty($line_item->line_item_id) && empty($line_item->created)) {
         $line_item->created = REQUEST_TIME;
       }
+      else {
+        // Otherwise if the line item is not new but comes from an entity_create()
+        // or similar function call that initializes the created timestamp to an
+        // empty string, unset it to prevent destroying existing data in that
+        // property on update.
+        if ($line_item->created === '') {
+          unset($line_item->created);
+        }
+      }
 
       $line_item->changed = REQUEST_TIME;
 

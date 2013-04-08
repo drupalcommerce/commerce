@@ -78,6 +78,15 @@ class CommercePaymentTransactionEntityController extends DrupalCommerceEntityCon
       if (empty($transaction->created)) {
         $transaction->created = REQUEST_TIME;
       }
+      else {
+        // Otherwise if the payment transaction is not new but comes from an
+        // entity_create() or similar function call that initializes the created
+        // timestamp to an empty string, unset it to prevent destroying existing
+        // data in that property on update.
+        if ($transaction->created === '') {
+          unset($transaction->created);
+        }
+      }
 
       $transaction->changed = REQUEST_TIME;
 

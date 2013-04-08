@@ -60,6 +60,18 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
         $product->created = REQUEST_TIME;
       }
     }
+    else {
+      // Otherwise if the product is not new but comes from an entity_create()
+      // or similar function call that initializes the created timestamp and uid
+      // value to empty strings, unset them to prevent destroying existing data
+      // in those properties on update.
+      if ($product->created === '') {
+        unset($product->created);
+      }
+      if ($product->uid === '') {
+        unset($product->uid);
+      }
+    }
 
     $product->revision_timestamp = REQUEST_TIME;
     $product->revision_uid = $user->uid;
