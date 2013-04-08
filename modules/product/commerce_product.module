@@ -728,6 +728,19 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
 
   $matches = array();
 
+  // Extract the SKU string from the URL while preserving support for SKUs that
+  // contain slashes. Whereas we previously relied on the $string parameter, its
+  // value was being truncated when any SKUs in the autocomplete widget had a /.
+  // @see http://drupal.org/node/1962144
+  $args = explode('/', request_path());
+
+  if (count($args) <= 5) {
+    drupal_json_output($matches);
+  }
+
+  array_splice($args, 0, 5);
+  $string = implode('/', $args);
+
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
   $tags_typed = drupal_explode_tags($string);
   $tag_last = drupal_strtolower(array_pop($tags_typed));
