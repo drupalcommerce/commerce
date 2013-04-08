@@ -50,7 +50,18 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
     if (isset($value['amount']) && is_numeric($value['amount'])) {
       // Price amount should always be saved as integers (minor units), but in
       // case they're not we round them.
-      $default_amount = strpos($value['amount'], '.') === FALSE ? $value['amount'] : commerce_round(COMMERCE_ROUND_HALF_UP, $value['amount']);
+      if (strpos($value['amount'], '.') === FALSE) {
+        $default_amount = $value['amount'];
+      }
+      else {
+        commerce_round(COMMERCE_ROUND_HALF_UP, $value['amount']);
+      }
+
+      // Format the number to the proper decimal places for the textfield.
+      $default_amount = commerce_currency_amount_to_decimal($default_amount, $currency_code);
+
+      $currency = commerce_currency_load($currency_code);
+      $default_amount = number_format($default_amount, $currency['decimals'], '.', '');
     }
     else {
       $default_amount = NULL;
@@ -59,7 +70,7 @@ class RulesDataUICommercePrice extends RulesDataUI implements RulesDataDirectInp
     $form[$name]['#element_validate'] = array('_commerce_price_rules_data_ui_element_validate');
     $form[$name]['amount'] = array(
       '#type' => 'textfield',
-      '#default_value' => ($default_amount) ? commerce_currency_amount_to_decimal($default_amount, $currency_code) : NULL,
+      '#default_value' => $default_amount,
       '#size' => 10,
       '#required' => TRUE,
     );

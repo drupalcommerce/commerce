@@ -619,10 +619,9 @@ function commerce_price_field_widget_form(&$form, &$form_state, $field, $instanc
     // Convert the price amount to a user friendly decimal value.
     $default_amount = commerce_currency_amount_to_decimal($items[$delta]['amount'], $currency['code']);
 
-    // Run it through number_format() to add the decimal places in if necessary.
-    if (strpos($default_amount, '.') === FALSE || strpos($default_amount, '.') > strlen($default_amount) - $currency['decimals']) {
-      $default_amount = number_format($default_amount, $currency['decimals'], '.', '');
-    }
+    // Run it through number_format() to ensure it has the proper number of
+    // decimal places.
+    $default_amount = number_format($default_amount, $currency['decimals'], '.', '');
 
     $default_currency_code = $items[$delta]['currency_code'];
   }
