@@ -1405,12 +1405,38 @@ function commerce_order_get_properties($order, array $options, $name) {
       // leading and trailing spaces and replace simple illegal characters with
       // hyphens. More could be done with additional illegal characters if
       // necessary, but those typically won't pass e-mail validation anyways.
+      // We also limit the username to the maximum length for usernames.
       // @see user_validate_name()
       $username = preg_replace('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', '-', trim($order->mail));
-
-      // We also limit the username to the maximum length for usernames.
-      return substr($username, 0, USERNAME_MAX_LENGTH);
+      $username = substr($username, 0, USERNAME_MAX_LENGTH);
+      return commerce_order_unique_username($username);
   }
+}
+
+/**
+ * Takes a base username and returns a unique version of the username.
+ *
+ * @param $base
+ *   The base from which to construct a unique username.
+ *
+ * @return
+ *   A unique version of the username using appended numbers to avoid duplicates
+ *   if the base is already in use.
+ */
+function commerce_order_unique_username($base) {
+  $username = $base;
+  $i = 1;
+
+  while (db_query('SELECT 1 FROM {users} WHERE name = :name', array(':name' => $username))->fetchField()) {
+    // Ensure the username does not exceed the maximum character limit.
+    if (strlen($base . $i) > USERNAME_MAX_LENGTH) {
+      $base = substr($base, 0, strlen($base) - strlen($i));
+    }
+
+    $username = $base . $i++;
+  }
+
+  return $username;
 }
 
 /**
