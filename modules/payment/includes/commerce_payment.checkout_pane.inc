@@ -169,6 +169,11 @@ function commerce_payment_pane_checkout_form_validate($form, &$form_state, $chec
       return FALSE;
     }
   }
+  else {
+    // Otherwise ensure we don't have any leftover payment method data in the
+    // order's data array.
+    unset($order->data['payment_method'], $order->data['payment_redirect_key']);
+  }
 
   // Nothing to validate.
   return TRUE;
