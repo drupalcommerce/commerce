@@ -1717,10 +1717,23 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
           // a product attribute field and if its attribute field settings
           // specify that this functionality is enabled...
           if (commerce_cart_field_attribute_eligible($field) && commerce_cart_field_instance_is_attribute($instance)) {
-            // Get the options properties from the options module and store the
-            // options for the instance in select list format in the array of
-            // qualifying fields.
-            $properties = _options_properties('select', FALSE, TRUE, TRUE);
+            // Get the options properties from the options module for the
+            // attribute widget type selected for the field, defaulting to the
+            // select list options properties.
+            $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
+
+            switch ($commerce_cart_settings['attribute_widget']) {
+              case 'checkbox':
+                $widget_type = 'onoff';
+                break;
+              case 'radios':
+                $widget_type = 'buttons';
+                break;
+              default:
+                $widget_type = 'select';
+            }
+
+            $properties = _options_properties($widget_type, FALSE, TRUE, TRUE);
 
             // Try to fetch localized names.
             $allowed_values = NULL;
@@ -1749,7 +1762,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
               $qualifying_fields[$field_name] = array(
                 'field' => $field,
                 'instance' => $instance,
-                'commerce_cart_settings' => commerce_cart_field_instance_attribute_settings($instance),
+                'commerce_cart_settings' => $commerce_cart_settings,
                 'options' => $allowed_values,
                 'weight' => $instance['widget']['weight'],
                 'required' => $instance['required'],
