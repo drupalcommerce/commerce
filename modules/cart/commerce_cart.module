@@ -828,7 +828,15 @@ function commerce_cart_order_convert($order, $account) {
       $field_info = field_info_field($field_name);
 
       if ($field_info['type'] == 'commerce_customer_profile_reference') {
-        if (!is_null($order_wrapper->{$field_name}->value()) &&
+        if ($order_wrapper->{$field_name} instanceof EntityListWrapper) {
+          foreach ($order_wrapper->{$field_name} as $delta => $profile_wrapper) {
+            if ($profile_wrapper->uid->value() == 0) {
+              $profile_wrapper->uid = $account->uid;
+              $profile_wrapper->save();
+            }
+          }
+        }
+        elseif (!is_null($order_wrapper->{$field_name}->value()) &&
           $order_wrapper->{$field_name}->uid->value() == 0) {
           $order_wrapper->{$field_name}->uid = $account->uid;
           $order_wrapper->{$field_name}->save();
