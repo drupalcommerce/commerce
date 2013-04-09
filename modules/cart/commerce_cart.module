@@ -2295,10 +2295,10 @@ function commerce_cart_field_formatter_settings_summary($field, $instance, $view
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
     $summary = array(
-      t('Quantity widget: !status', array('!status' => $settings['show_quantity'] ? t('Enabled') : t('Disabled'))),
+      t('Quantity widget: !status', array('!status' => !empty($settings['show_quantity']) ? t('Enabled') : t('Disabled'))),
       t('Default quantity: @quantity', array('@quantity' => $settings['default_quantity'])),
-      t('Combine like items: !status', array('!status' => $settings['combine'] ? t('Enabled') : t('Disabled'))),
-      t('!visibility attributes on single product forms.', array('!visibility' => $settings['show_single_product_attributes'] ? t('Showing') : t('Hiding'))),
+      t('Combine like items: !status', array('!status' => !empty($settings['combine']) ? t('Enabled') : t('Disabled'))),
+      t('!visibility attributes on single product forms.', array('!visibility' => !empty($settings['show_single_product_attributes']) ? t('Showing') : t('Hiding'))),
     );
 
     if (count(commerce_product_line_item_types()) > 1) {
@@ -2332,8 +2332,8 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
       $type = !empty($settings['line_item_type']) ? $settings['line_item_type'] : 'product';
       $line_item = commerce_product_line_item_new(commerce_product_reference_default_product($products), $settings['default_quantity'], 0, array(), $type);
       $line_item->data['context']['product_ids'] = array_keys($products);
-      $line_item->data['context']['add_to_cart_combine'] = $settings['combine'];
-      $line_item->data['context']['show_single_product_attributes'] = $settings['show_single_product_attributes'];
+      $line_item->data['context']['add_to_cart_combine'] = !empty($settings['combine']);
+      $line_item->data['context']['show_single_product_attributes'] = !empty($settings['show_single_product_attributes']);
 
       $result[] = array(
         '#arguments' => array(
