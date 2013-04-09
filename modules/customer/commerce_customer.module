@@ -314,27 +314,29 @@ function commerce_customer_modules_disabled($modules) {
     if (module_hook($module, 'commerce_customer_profile_type_info')) {
       $profile_types = module_invoke($module, 'commerce_customer_profile_type_info');
 
-      // Disable any profiles of the types disabled.
-      $query = db_update('commerce_customer_profile')
-        ->fields(array('status' => 0))
-        ->condition('type', array_keys($profile_types), 'IN')
-        ->execute();
+      if (!empty($profile_types)) {
+        // Disable any profiles of the types disabled.
+        $query = db_update('commerce_customer_profile')
+          ->fields(array('status' => 0))
+          ->condition('type', array_keys($profile_types), 'IN')
+          ->execute();
 
-      // Ensure each profile's current revision is also disabled.
-      $query = db_update('commerce_customer_profile_revision')
-        ->fields(array('status' => 0))
-        ->where('revision_id IN (SELECT revision_id FROM {commerce_customer_profile} WHERE type IN (:profile_types))', array(':profile_types' => array_keys($profile_types)))
-        ->execute();
+        // Ensure each profile's current revision is also disabled.
+        $query = db_update('commerce_customer_profile_revision')
+          ->fields(array('status' => 0))
+          ->where('revision_id IN (SELECT revision_id FROM {commerce_customer_profile} WHERE type IN (:profile_types))', array(':profile_types' => array_keys($profile_types)))
+          ->execute();
 
-      // Loop through and disable customer profile reference fields that may
-      // correspond to the disabled profile types.
-      foreach ($profile_types as $type => $profile_type) {
-        foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference')) as $field_name => $field) {
-          // If this field references profiles of the disabled type...
-          if ($field['settings']['profile_type'] == $type) {
-            // Set it to inactive and save it.
-            $field['active'] = 0;
-            field_update_field($field);
+        // Loop through and disable customer profile reference fields that may
+        // correspond to the disabled profile types.
+        foreach ($profile_types as $type => $profile_type) {
+          foreach (field_read_fields(array('type' => 'commerce_customer_profile_reference')) as $field_name => $field) {
+            // If this field references profiles of the disabled type...
+            if ($field['settings']['profile_type'] == $type) {
+              // Set it to inactive and save it.
+              $field['active'] = 0;
+              field_update_field($field);
+            }
           }
         }
       }
