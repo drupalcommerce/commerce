@@ -88,7 +88,8 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
   $profile = NULL;
 
   // If the associated order field has been set...
-  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
+  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '') &&
+    isset($wrapper->{$field_name})) {
     $profile = $wrapper->{$field_name}->value();
   }
   else {
