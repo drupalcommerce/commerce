@@ -337,10 +337,12 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
       }
 
       // Find the default product based on the cardinality of the field.
+      $product = NULL;
+
       if ($field['cardinality'] == 1) {
         $product = $wrapper->{$field_name}->value();
       }
-      else {
+      elseif (count($wrapper->{$field_name}) > 0) {
         $product = commerce_product_reference_default_product($wrapper->{$field_name}->value());
 
         // If the product is disabled, attempt to find one that is active and
