@@ -1404,6 +1404,7 @@ function commerce_product_reference_commerce_product_can_delete($product) {
   $query = new EntityFieldQuery();
 
   $query
+    ->addTag('commerce_product_reference_commerce_product_can_delete')
     ->entityCondition('entity_type', 'commerce_line_item', '=')
     ->entityCondition('bundle', commerce_product_line_item_types(), 'IN')
     ->fieldCondition('commerce_product', 'product_id', $product->product_id, '=')

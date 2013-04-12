@@ -464,6 +464,7 @@ function commerce_order_commerce_customer_profile_can_delete($profile) {
     $query = new EntityFieldQuery();
 
     $query
+      ->addTag('commerce_order_commerce_customer_profile_can_delete')
       ->entityCondition('entity_type', 'commerce_order', '=')
       ->fieldCondition($field_name, 'profile_id', $profile->profile_id, '=')
       ->count();
