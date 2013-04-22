@@ -16,6 +16,7 @@ function commerce_payment_default_rules_configuration() {
     $rule = rules_reaction_rule();
 
     $rule->label = $payment_method['title'];
+    $rule->tags = array('Commerce Payment');
     $rule->active = $payment_method['active'];
 
     $rule

@@ -15,6 +15,7 @@ function commerce_cart_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Display an Add to Cart message');
+  $rule->tags = array('Commerce Cart');
   $rule->active = TRUE;
 
   $rule
@@ -30,6 +31,7 @@ function commerce_cart_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Reset the cart order status on product add or remove');
+  $rule->tags = array('Commerce Cart');
   $rule->active = TRUE;
 
   $rule
@@ -47,6 +49,7 @@ function commerce_cart_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Unset the price of disabled products in the cart');
+  $rule->tags = array('Commerce Cart');
   $rule->active = TRUE;
   $rule->weight = 10;
 

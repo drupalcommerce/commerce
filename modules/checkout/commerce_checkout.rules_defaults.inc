@@ -19,6 +19,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Update the order status on checkout completion');
+  $rule->tags = array('Commerce Checkout');
   $rule->active = TRUE;
 
   $rule
@@ -35,6 +36,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Assign an anonymous order to a pre-existing user');
+  $rule->tags = array('Commerce Checkout');
   $rule->active = TRUE;
 
   $rule
@@ -106,6 +108,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Create a new account for an anonymous order');
+  $rule->tags = array('Commerce Checkout');
   $rule->active = TRUE;
 
   $rule
@@ -192,6 +195,7 @@ function commerce_checkout_default_rules_configuration() {
   $rule = rules_reaction_rule();
 
   $rule->label = t('Send an order notification e-mail');
+  $rule->tags = array('Commerce Checkout');
   $rule->active = TRUE;
 
   $rule
