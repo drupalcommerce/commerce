@@ -17,7 +17,9 @@ function commerce_product_reference_commerce_product_uri($product) {
     if (empty($product->display_context['entity']) && !empty($product->display_context['entity_id'])) {
       $product->display_context['entity'] = entity_load_single($product->display_context['entity_type'], $product->display_context['entity_id']);
     }
-    else {
+
+    // Do not return a URI without a valid entity type or loaded entity.
+    if (empty($product->display_context['entity_type']) || empty($product->display_context['entity'])) {
       // Otherwise do not return a URI from this function.
       return NULL;
     }
@@ -362,6 +364,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
         // Add the display context for these field to the product.
         $product->display_context = array(
           'entity_type' => $entity_type,
+          'entity_id' => $id,
           'entity' => $entity,
           'view_mode' => $view_mode,
           'language' => $langcode,
