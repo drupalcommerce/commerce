@@ -600,7 +600,7 @@ function commerce_product_access($op, $product = NULL, $account = NULL) {
 }
 
 /**
- * Implementation of hook_query_commerce_product_access_alter().
+ * Implements hook_query_TAG_alter().
  */
 function commerce_product_query_commerce_product_access_alter(QueryAlterableInterface $query) {
   return commerce_entity_access_query_alter($query, 'commerce_product');

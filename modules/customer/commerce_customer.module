@@ -774,7 +774,7 @@ function commerce_customer_profile_access($op, $profile = NULL, $account = NULL)
 }
 
 /**
- * Implementation of hook_query_commerce_customer_profile_access_alter().
+ * Implements hook_query_TAG_alter().
  */
 function commerce_customer_profile_query_commerce_customer_profile_access_alter(QueryAlterableInterface $query) {
   return commerce_entity_access_query_alter($query, 'commerce_customer_profile');

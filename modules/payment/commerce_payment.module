@@ -998,7 +998,7 @@ function commerce_payment_transaction_order_access($op, $order, $account = NULL)
 }
 
 /**
- * Implementation of hook_query_commerce_payment_transaction_access_alter().
+ * Implements hook_query_TAG_alter().
  *
  * Implement access control on payment transaction. This is different from other
  * entities because the access to a payment transaction is partially delegated

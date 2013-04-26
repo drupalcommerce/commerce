@@ -707,7 +707,7 @@ function commerce_line_item_access($op, $line_item, $account = NULL) {
 }
 
 /**
- * Implementation of hook_query_commerce_line_item_access_alter().
+ * Implements hook_query_TAG_alter().
  *
  * Implement access control on line items. This is different from other entities
  * because the access to a line item is totally delegated to its order.
