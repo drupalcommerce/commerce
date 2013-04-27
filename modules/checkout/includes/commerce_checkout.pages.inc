@@ -350,7 +350,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
 function commerce_checkout_form_back_submit($form, &$form_state) {
   // If there is a previous page...
   if ($previous_page = commerce_checkout_page_load($form_state['checkout_page']['prev_page'])) {
-    $order = $form_state['order'];
+    $order = commerce_order_load($form_state['order']->order_id);
 
     // Move the form back to that page.
     if ($previous_page['prev_page']) {
