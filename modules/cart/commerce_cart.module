@@ -2398,7 +2398,9 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
         $arguments = $element[$key]['#arguments'];
 
         // Add the display path and referencing entity data to the line item.
-        $arguments['line_item']->data['context']['display_path'] = $entity_uri['path'];
+        if (!empty($entity_uri['path'])) {
+          $arguments['line_item']->data['context']['display_path'] = $entity_uri['path'];
+        }
 
         $arguments['line_item']->data['context']['entity'] = array(
           'entity_type' => $context['entity_type'],
