@@ -297,8 +297,10 @@ function commerce_checkout_form_validate($form, &$form_state) {
   $form_state['storage']['errors'] = $form_errors;
   $form_errors = array();
 
-  // Save the updated order object.
+  // Save the updated order object and reset the order in the form cache to
+  // ensure rebuilt forms use the updated order.
   commerce_order_save($order);
+  $form_state['build_info']['args'][0] = $order;
 
   // If a pane failed validation or the form state has otherwise been altered to
   // initiate a rebuild, return without moving to the next checkout page.
