@@ -736,6 +736,7 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
 
   if (count($args) <= 5) {
     drupal_json_output($matches);
+    return;
   }
 
   array_splice($args, 0, 5);
