@@ -54,7 +54,7 @@ function commerce_price_field_info() {
       'settings' => array(),
       'instance_settings' => array(),
       'default_widget' => 'commerce_price_simple',
-      'default_formatter' => 'commerce_price_default',
+      'default_formatter' => 'commerce_price_formatted_amount',
       'property_type' => 'commerce_price',
       'property_callbacks' => array('commerce_price_property_info_callback'),
       'default_token_formatter' => 'commerce_price_formatted_amount'
