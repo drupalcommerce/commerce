@@ -714,6 +714,11 @@ function commerce_payment_method_instance_load($instance_id) {
   // Then load the Rule configuration that enables the method.
   $rule = rules_config_load($rule_name);
 
+  // Return FALSE if it couldn't be loaded.
+  if (empty($rule)) {
+    return FALSE;
+  }
+
   // Iterate over its actions to find one with the matching element ID and pull
   // its settings into the payment method object.
   $payment_method['settings'] = array();
