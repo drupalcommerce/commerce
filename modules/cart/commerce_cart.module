@@ -874,7 +874,7 @@ function commerce_cart_order_refresh($order) {
     // If the current line item actually no longer exists...
     if (!$line_item_wrapper->value()) {
       // Remove the reference from the order and continue to the next value.
-      unset($order_wrapper->commerce_line_items[$delta]);
+      $order_wrapper->commerce_line_items->offsetUnset($delta);
       continue;
     }
 

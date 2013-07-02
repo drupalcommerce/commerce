@@ -1314,6 +1314,13 @@ function commerce_order_calculate_total($order) {
 
   // Populate an array of how many line items on the order use each currency.
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    // If the current line item actually no longer exists...
+    if (!$line_item_wrapper->value()) {
+      // Remove the reference from the order and continue to the next value.
+      $order_wrapper->commerce_line_items->offsetUnset($delta);
+      continue;
+    }
+
     $line_item_currency_code = $line_item_wrapper->commerce_total->currency_code->value();
 
     if (!in_array($line_item_currency_code, array_keys($currencies))) {
