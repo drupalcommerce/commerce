@@ -711,7 +711,7 @@ function commerce_order_type_options_list() {
  * @param $status
  *   Optionally the order status of the new order.
  * @param $type
- *   The type of the order; defaults to the standard 'order' type.
+ *   The type of the order; defaults to the standard 'commerce_order' type.
  *
  * @return
  *   An order object with all default fields initialized.
