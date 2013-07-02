@@ -12,7 +12,7 @@
         if (event.keyCode === 13) {
           // Prevent browser's default submit from being clicked.
           event.preventDefault();
-          $('input#edit-update', $(this).parents('form')).click();
+          $('input#edit-submit', $(this).parents('form')).click();
         }
       });
     }
