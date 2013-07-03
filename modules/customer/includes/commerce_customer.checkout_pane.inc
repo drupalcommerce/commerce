@@ -89,9 +89,13 @@ function commerce_customer_profile_pane_checkout_form($form, &$form_state, $chec
 
   // If the associated order field has been set...
   if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
-    if (isset($wrapper->{$field_name})) {
-      $profile = $wrapper->{$field_name}->value();
+    // Check to ensure the specified profile reference field exists on the
+    // current order type.
+    if (!field_info_instance('commerce_order', $field_name, $order->type)) {
+      return array();
     }
+
+    $profile = $wrapper->{$field_name}->value();
   }
   else {
     // Or try the association stored in the order's data array if no field is set.
@@ -236,6 +240,15 @@ function commerce_customer_profile_copy_refresh($form, &$form_state) {
  */
 function commerce_customer_profile_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
   $pane_id = $checkout_pane['pane_id'];
+
+  // Check to ensure the specified profile reference field exists on the
+  // current order type.
+  $field_name = variable_get('commerce_' . $pane_id . '_field', '');
+
+  if (!empty($field_name) && !field_info_instance('commerce_order', $field_name, $order->type)) {
+    return TRUE;
+  }
+
   $profile = $form_state['values'][$pane_id]['customer_profile'];
 
   // Notify field widgets to validate their data.
@@ -258,9 +271,18 @@ function commerce_customer_profile_pane_checkout_form_validate($form, &$form_sta
  * Checkout pane callback: submits a customer profile edit form.
  */
 function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  $profile = $form_state['values'][$checkout_pane['pane_id']]['customer_profile'];
+  $pane_id = $checkout_pane['pane_id'];
+
+  // Check to ensure the specified profile reference field exists on the
+  // current order type.
+  $field_name = variable_get('commerce_' . $pane_id . '_field', '');
+
+  if (!empty($field_name) && !field_info_instance('commerce_order', $field_name, $order->type)) {
+    return;
+  }
 
   // Ensure the profile is active.
+  $profile = $form_state['values'][$pane_id]['customer_profile'];
   $profile->status = TRUE;
 
   // Set the profile's uid if it's being created at this time.
