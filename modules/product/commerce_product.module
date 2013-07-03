@@ -739,7 +739,10 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
     return;
   }
 
-  array_splice($args, 0, 5);
+  // Trim off leading arguments from other modules such as Locale.
+  $offset = array_search('commerce_product', $args);
+
+  array_splice($args, 0, 5 + $offset);
   $string = implode('/', $args);
 
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
