@@ -1077,8 +1077,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       // Add a default save button.
       $element['actions'] += array(
         'save_line_item' => array(
-          '#type' => 'submit',
+          '#type' => 'button',
           '#value' => !empty($line_item_type['add_form_submit_value']) ? $line_item_type['add_form_submit_value'] : t('Save'),
+          '#limit_validation_errors' => array(array_merge($element['#field_parents'], array($field['field_name']))),
           '#ajax' => array(
             'callback' => 'commerce_line_item_manager_refresh',
             'wrapper' => 'line-item-manager',
@@ -1087,8 +1088,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
       );
 
       $element['actions']['cancel'] = array(
-        '#type' => 'submit',
+        '#type' => 'button',
         '#value' => t('Cancel'),
+        '#limit_validation_errors' => array(),
         '#ajax' => array(
           'callback' => 'commerce_line_item_manager_refresh',
           'wrapper' => 'line-item-manager',
@@ -1107,8 +1109,9 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
           '#prefix' => '<div class="add-line-item">',
         );
         $element['actions']['line_item_add'] = array(
-          '#type' => 'submit',
+          '#type' => 'button',
           '#value' => t('Add line item'),
+          '#limit_validation_errors' => array(array_merge($element['#field_parents'], array($field['field_name']))),
           '#ajax' => array(
             'callback' => 'commerce_line_item_manager_refresh',
             'wrapper' => 'line-item-manager',
