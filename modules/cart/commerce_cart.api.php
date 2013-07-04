@@ -199,6 +199,9 @@ function hook_commerce_cart_attributes_refresh_alter(&$commands, $form, $form_st
  * @param &$comparison_properties
  *   The array of property names (including field names) that map to properties
  *   on the line item wrappers being compared to check for combination.
+ * @param $line_item
+ *   A clone of the line item being added to the cart. Since this is a clone,
+ *   changes made to it will not propagate up to the Add to Cart process.
  */
 function hook_commerce_cart_product_comparison_properties_alter(&$comparison_properties) {
   // Force separate line items when the same product is added to the cart from

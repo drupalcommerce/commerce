@@ -1142,15 +1142,22 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
 
     // Allow other modules to specify what properties should be compared when
     // determining whether or not to combine line items.
-    drupal_alter('commerce_cart_product_comparison_properties', $comparison_properties);
+    drupal_alter('commerce_cart_product_comparison_properties', $comparison_properties, clone($line_item));
 
     // Loop over each line item on the order.
     foreach ($order_wrapper->commerce_line_items as $delta => $matching_line_item_wrapper) {
       // Examine each of the comparison properties on the line item.
       foreach ($comparison_properties as $property) {
+        // If the property is not present on either line item, bypass it.
+        if (!isset($matching_line_item_wrapper->value()->{$property}) && !isset($line_item_wrapper->value()->{$property})) {
+          continue;
+        }
+
         // If any property does not match the same property on the incoming line
-        // item...
-        if ($matching_line_item_wrapper->{$property}->raw() != $line_item_wrapper->{$property}->raw()) {
+        // item or exists on one line item but not the other...
+        if ((!isset($matching_line_item_wrapper->value()->{$property}) && isset($line_item_wrapper->value()->{$property})) ||
+          (isset($matching_line_item_wrapper->value()->{$property}) && !isset($line_item_wrapper->value()->{$property})) ||
+          $matching_line_item_wrapper->{$property}->raw() != $line_item_wrapper->{$property}->raw()) {
           // Continue the loop with the next line item.
           continue 2;
         }
