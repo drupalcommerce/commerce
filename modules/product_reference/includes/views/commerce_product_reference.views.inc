@@ -11,15 +11,6 @@
 function commerce_product_reference_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
 
-  // Add a join to commerce_product so that it can be used by the inverse relationship.
-  $data[_field_sql_storage_tablename($field)]['table']['join']['commerce_product'] = array(
-    'left_field' => 'product_id',
-    'field' => $field['field_name'] . '_product_id',
-    'extra' => array(
-      array('field' => 'deleted', 'value' => 0, 'numeric' => TRUE),
-    ),
-  );
-
   // Build an array of bundles the product reference field appears on.
   $bundles = array();
 
@@ -94,16 +85,19 @@ function commerce_product_reference_views_data_alter(&$data) {
       }
 
       $entity_info = entity_get_info($entity_type);
+      $replacements = array('@entity_type' => $entity_info['label'], '!field_name' => $field['field_name']);
+
       $data['commerce_product'][$field['field_name']]['relationship'] = array(
-        'handler' => 'views_handler_relationship',
+        'handler' => 'views_handler_relationship_entity_reverse',
+        'field_name' => $field['field_name'],
+        'field table' => _field_sql_storage_tablename($field),
+        'field field' => $field['field_name'] . '_product_id',
         'base' => $entity_info['base table'],
         'base field' => $entity_info['entity keys']['id'],
-        'relationship table' => _field_sql_storage_tablename($field),
-        'relationship field' => 'entity_id',
 
-        'label' => t('!entity_type referencing products from !field_name', array('!entity_type' => $entity_info['label'], '!field_name' => $field['field_name'])),
-        'title' => t('!entity_type referencing products from !field_name', array('!entity_type' => $entity_info['label'],  '!field_name' => $field['field_name'])),
-        'help' => t('Relate a product to the !entity_type referencing it.', array('!entity_type' => strtolower($entity_info['label']))),
+        'label' => t('@entity_type referencing products from !field_name', $replacements),
+        'title' => t('Referencing @entity_type', $replacements),
+        'help' => t('Relate a product to the @entity_type referencing it through !field_name.', $replacements),
       );
     }
   }
