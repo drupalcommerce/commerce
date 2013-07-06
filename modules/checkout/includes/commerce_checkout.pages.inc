@@ -129,7 +129,7 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
           $form_state['storage']['themed_messages'][$pane_id] = theme('status_messages');
 
           $pane_form[$pane_id . '_messages'] = array(
-            '#markup' =>  $form_state['storage']['themed_messages'][$pane_id],
+            '#markup' => $form_state['storage']['themed_messages'][$pane_id],
             '#weight' => -50,
           );
         }

@@ -18,16 +18,18 @@ function commerce_product_reference_field_views_data($field) {
     $bundles[] = $entity . ' (' . implode(', ', $entity_bundles) . ')';
   }
 
+  $replacements = array('!field_name' => $field['field_name'], '@bundles' => implode(', ', $bundles));
+
   foreach ($data as $table_name => $table_data) {
     foreach ($table_data as $field_name => $field_data) {
       if (isset($field_data['filter']['field_name']) && $field_name != 'delta') {
         $data[$table_name][$field_name]['relationship'] = array(
-          'title' => t('Referenced product'),
-          'help' => t('Appears in: @bundles.', array('@bundles' => implode(', ', $bundles))),
+          'title' => t('Referenced products'),
+          'label' => t('Products referenced by !field_name', $replacements),
+          'help' => t('Relate this entity to products referenced by its !field_name value.', $replacements) . '<br />' . t('Appears in: @bundles.', $replacements),
           'base' => 'commerce_product',
           'base field' => 'product_id',
           'handler' => 'views_handler_relationship',
-          'label' => t('Product'),
         );
       }
     }
