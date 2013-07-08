@@ -60,8 +60,8 @@ function commerce_tax_ui_schema() {
       'description' => array(
         'description' => 'A brief description of this type.',
         'type' => 'text',
-        'not null' => TRUE,
         'size' => 'medium',
+        'not null' => FALSE,
       ),
       'display_inclusive' => array(
         'description' => 'Boolean indicating whether or not taxes of this type display inclusively in product prices.',
@@ -115,8 +115,8 @@ function commerce_tax_ui_schema() {
       'description' => array(
         'description' => 'A brief description of this rate.',
         'type' => 'text',
-        'not null' => TRUE,
         'size' => 'medium',
+        'not null' => FALSE,
       ),
       'rate' => array(
         'description' => 'The percentage used to calculate this tax expressed as a decimal.',
@@ -203,4 +203,24 @@ function commerce_tax_ui_update_7001() {
   db_change_field('commerce_tax_rate', 'rules_component', 'default_rules_component', $spec);
 
   return t('The tax rate table has been updated properly.');
+}
+
+/**
+ * Update the tax type and tax rate descriptions to accept NULL values.
+ */
+function commerce_tax_ui_update_7002() {
+  $spec = array(
+    'description' => 'A brief description of this type.',
+    'type' => 'text',
+    'size' => 'medium',
+    'not null' => FALSE,
+  );
+
+  db_change_field('commerce_tax_type', 'description', 'description', $spec);
+
+  $spec['description'] = 'A brief description of this rate.';
+
+  db_change_field('commerce_tax_rate', 'description', 'description', $spec);
+
+  return t('The tax type and tax rate tables were updated properly.');
 }
