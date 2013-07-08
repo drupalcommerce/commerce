@@ -62,9 +62,10 @@ function commerce_commerce_currency_info() {
     ),
     'AUD' => array(
       'code' => 'AUD',
-      'symbol' => 'AU$',
+      'symbol' => '$',
       'name' => t('Australian Dollar'),
       'numeric_code' => '036',
+      'symbol_placement' => 'before',
       'minor_unit' => t('Cent'),
       'major_unit' => t('Dollar'),
     ),
