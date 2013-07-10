@@ -384,6 +384,36 @@ function commerce_email_from() {
 }
 
 /**
+ * Translate a data structure using i18n_string, if available.
+ *
+ * @param $type
+ *   The i18n object type.
+ * @param $object
+ *   The object or array to translate.
+ * @param $options
+ *   An array of options passed along to i18n.
+ *
+ * @return
+ *   The translated data structure if i18_string is available, the original
+ *   otherwise.
+ *
+ * @see i18n_string_object_translate()
+ */
+function commerce_i18n_object($type, $object, $options = array()) {
+  // Clone the object, to ensure the original remains untouched.
+  if (is_object($object)) {
+    $object = clone $object;
+  }
+
+  if (module_exists('i18n_string')) {
+    return i18n_string_object_translate($type, $object, $options);
+  }
+  else {
+    return $object;
+  }
+}
+
+/**
  * Returns the currency code of the site's default currency.
  */
 function commerce_default_currency() {

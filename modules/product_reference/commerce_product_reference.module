@@ -576,6 +576,8 @@ function commerce_product_reference_field_instance_settings_form($field, $instan
  *                         product id, or the product is not referenceable).
  */
 function commerce_product_reference_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  $translated_instance = commerce_i18n_object('field_instance', $instance);
+
   // Extract product_ids to check.
   $product_ids = array();
 
@@ -588,7 +590,7 @@ function commerce_product_reference_field_validate($entity_type, $entity, $field
       else {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_product_id',
-          'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $instance['label'])),
+          'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $translated_instance['label'])),
         );
       }
     }
@@ -603,7 +605,7 @@ function commerce_product_reference_field_validate($entity_type, $entity, $field
         if (!empty($item['product_id']) && !isset($refs[$item['product_id']])) {
           $errors[$field['field_name']][$langcode][$delta][] = array(
             'error' => 'invalid_product_id',
-            'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $instance['label'])),
+            'message' => t('%name: you have specified an invalid product for this reference field.', array('%name' => $translated_instance['label'])),
           );
         }
       }

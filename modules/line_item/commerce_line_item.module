@@ -798,6 +798,8 @@ function commerce_line_item_field_info() {
  *                           valid line item ID).
  */
 function commerce_line_item_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  $translated_instance = commerce_i18n_object('field_instance', $instance);
+
   // Extract line_item_ids to check.
   $line_item_ids = array();
 
@@ -810,7 +812,7 @@ function commerce_line_item_field_validate($entity_type, $entity, $field, $insta
       else {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_line_item_id',
-          'message' => t('%name: you have specified an invalid line item for this field.', array('%name' => $instance['label'])),
+          'message' => t('%name: you have specified an invalid line item for this field.', array('%name' => $translated_instance['label'])),
         );
       }
     }
@@ -825,7 +827,7 @@ function commerce_line_item_field_validate($entity_type, $entity, $field, $insta
         if (!empty($item['line_item_id']) && !isset($line_items[$item['line_item_id']])) {
           $errors[$field['field_name']][$langcode][$delta][] = array(
             'error' => 'invalid_line_item_id',
-            'message' => t('%name: you have specified an invalid line item for this reference field.', array('%name' => $instance['label'])),
+            'message' => t('%name: you have specified an invalid line item for this reference field.', array('%name' => $translated_instance['label'])),
           );
         }
       }

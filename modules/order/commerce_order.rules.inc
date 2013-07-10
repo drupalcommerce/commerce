@@ -177,8 +177,9 @@ function commerce_order_address_field_options_list() {
       if (in_array($type, $address_field['bundles']['commerce_customer_profile'])) {
         // Add it to the options list.
         $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', $type);
+        $translated_instance = commerce_i18n_object('field_instance', $instance);
 
-        $options[commerce_customer_profile_type_get_name($type)][$field_name . '|' . $address_field_name] = check_plain($instance['label']);
+        $options[commerce_customer_profile_type_get_name($type)][$field_name . '|' . $address_field_name] = check_plain($translated_instance['label']);
       }
     }
   }

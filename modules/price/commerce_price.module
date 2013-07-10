@@ -66,12 +66,14 @@ function commerce_price_field_info() {
  * Implements hook_field_validate().
  */
 function commerce_price_field_validate($entity_type, $entity, $field, $instance, $langcode, &$items, &$errors) {
+  $translated_instance = commerce_i18n_object('field_instance', $instance);
+
   // Ensure only numeric values are entered in price fields.
   foreach ($items as $delta => &$item) {
     if (!empty($item['amount']) && !is_numeric($item['amount'])) {
       $errors[$field['field_name']][$langcode][$delta][] = array(
         'error' => 'price_numeric',
-        'message' => t('%name: you must enter a numeric value for the price.', array('%name' => $instance['label'])),
+        'message' => t('%name: you must enter a numeric value for the price.', array('%name' => $translated_instance['label'])),
       );
     }
   }
@@ -432,6 +434,8 @@ function commerce_price_field_formatter_prepare_view($entity_type, $entities, $f
  * Implements hook_field_formatter_view().
  */
 function commerce_price_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $translated_instance = commerce_i18n_object('field_instance', $instance);
+
   $element = array();
 
   // Loop through each price value in this field.
@@ -482,15 +486,9 @@ function commerce_price_field_formatter_view($entity_type, $entity, $field, $ins
           $components = array();
         }
 
-        // If the i18n_field module is available, we'll use it to translate
-        // user-configurable field labels.
-        if (module_exists('i18n_field') && !empty($instance['label'])) {
-          $instance['label'] = i18n_field_translate_property($instance, 'label');
-        }
-
         // Add the actual field value to the array.
         $components['commerce_price_formatted_amount'] = array(
-          'title' => check_plain($instance['label']),
+          'title' => check_plain($translated_instance['label']),
           'price' => $item,
           'weight' => $weight + 1,
         );
