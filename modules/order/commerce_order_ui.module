@@ -177,6 +177,21 @@ function commerce_order_ui_menu_local_tasks_alter(&$data, $router_item, $root_pa
 }
 
 /**
+ * Implements hook_i18n_string_list().
+ */
+function commerce_order_ui_i18n_string_list($group) {
+  if ($group == 'commerce') {
+    // Allow the order creation help text to be translated.
+    $help = variable_get('commerce_order_help_text', '');
+    if ($help) {
+      $strings['commerce']['order']['help']['create'] = $help;
+    }
+
+    return $strings;
+  }
+}
+
+/**
  * Implements hook_help().
  */
 function commerce_order_ui_help($path, $arg) {
@@ -185,6 +200,7 @@ function commerce_order_ui_help($path, $arg) {
     $help = variable_get('commerce_order_help_text', '');
 
     if (!empty($help)) {
+      $help = commerce_i18n_string('commerce:order:help:create', $help, array('sanitize' => FALSE));
       return '<p>' . filter_xss_admin($help) . '</p>';
     }
   }
