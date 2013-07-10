@@ -904,13 +904,13 @@ function commerce_checkout_completion_message_default() {
   // If the Filtered HTML text format is available, use a default value with
   // links in it.
   if (filter_format_load('filtered_html')) {
-    $value = 'Your order is number [commerce-order:order-number]. You can <a href="[commerce-order:url]">view your order</a> on your account page when logged in.'
+    $value = 'Your order number is [commerce-order:order-number]. You can <a href="[commerce-order:url]">view your order</a> on your account page when logged in.'
       . "\n\n" . '<a href="[site:url]">Return to the front page.</a>';
     $format = 'filtered_html';
   }
   else {
     // Otherwise select a fallback format and use a plaint text default value.
-    $value = 'Your order is number [commerce-order:order-number]. You can view your order on your account page when logged in.';
+    $value = 'Your order number is [commerce-order:order-number]. You can view your order on your account page when logged in.';
     $format = filter_fallback_format();
   }
 
