@@ -414,6 +414,58 @@ function commerce_i18n_object($type, $object, $options = array()) {
 }
 
 /**
+ * Implements hook_i18n_string_info().
+ */
+function commerce_i18n_string_info() {
+  $groups['commerce'] = array(
+    'title' => t('Drupal Commerce'),
+    'format' => TRUE,
+  );
+  return $groups;
+}
+
+/**
+ * Translate a string using i18n_string, if available.
+ *
+ * @param $name
+ *   Textgroup and context glued with ':'.
+ * @param $default
+ *   String in default language. Default language may or may not be English.
+ * @param $options
+ *   An associative array of additional options, with the following keys:
+ *   - langcode: the language code to translate to a language other than what is
+ *     used to display the page; defaults to the current language
+ *   - filter: filtering callback to apply to the translated string only
+ *   - format: input format to apply to the translated string only
+ *   - callback: callback to apply to the result (both to the translated or
+ *     untranslated string)
+ *   - update: whether to update source table; defaults to FALSE
+ *   - translate: whether to return a translation; defaults to TRUE
+ *
+ * @return
+ *   The translated string if i18n_string is available, the original otherwise.
+ *
+ * @see i18n_string()
+ */
+function commerce_i18n_string($name, $default, $options = array()) {
+  if (module_exists('i18n_string')) {
+    $result = i18n_string($name, $default, $options);
+  }
+  else {
+    $result = $default;
+    $options += array(
+      'format' => NULL,
+      'sanitize' => FALSE,
+    );
+    if ($options['sanitize']) {
+      $result = check_markup($result, $options['format']);
+    }
+  }
+
+  return $result;
+}
+
+/**
  * Returns the currency code of the site's default currency.
  */
 function commerce_default_currency() {

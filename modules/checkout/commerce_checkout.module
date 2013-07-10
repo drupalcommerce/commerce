@@ -172,6 +172,19 @@ function commerce_checkout_theme() {
 }
 
 /**
+ * Implements hook_i18n_string_list().
+ */
+function commerce_checkout_i18n_string_list($group) {
+  if ($group == 'commerce') {
+    // Allow the checkout completion message to be translated.
+    $message = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
+    $strings['commerce']['checkout']['complete']['message'] = $message['value'];
+
+    return $strings;
+  }
+}
+
+/**
  * Implements hook_forms().
  *
  * Each page of the checkout form is actually a unique form as opposed to a
@@ -885,14 +898,21 @@ function commerce_checkout_create_account($name, $mail, $pass, $status, $notify 
 }
 
 /**
- * Returns the default checkout completion message.
+ * Returns the default value for the checkout completion message settings form.
  */
 function commerce_checkout_completion_message_default() {
+  // If the Filtered HTML text format is available, use a default value with
+  // links in it.
   if (filter_format_load('filtered_html')) {
-    return t('Your order is number [commerce-order:order-number]. You can <a href="[commerce-order:url]">view your order</a> on your account page when logged in.')
-      . "\n\n" . t('<a href="[site:url]">Return to the front page.</a>');
+    $value = 'Your order is number [commerce-order:order-number]. You can <a href="[commerce-order:url]">view your order</a> on your account page when logged in.'
+      . "\n\n" . '<a href="[site:url]">Return to the front page.</a>';
+    $format = 'filtered_html';
   }
   else {
-    return t('Your order is number [commerce-order:order-number]. You can view your order on your account page when logged in.');
+    // Otherwise select a fallback format and use a plaint text default value.
+    $value = 'Your order is number [commerce-order:order-number]. You can view your order on your account page when logged in.';
+    $format = filter_fallback_format();
   }
+
+  return array('value' => $value, 'format' => $format);
 }

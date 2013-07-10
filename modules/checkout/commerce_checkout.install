@@ -76,5 +76,11 @@ function commerce_checkout_schema() {
  */
 function commerce_checkout_uninstall() {
   variable_del('commerce_checkout_completion_message');
+}
+
+/**
+ * Delete the deprecated checkout completion message override variable.
+ */
+function commerce_checkout_update_7100() {
   variable_del('commerce_checkout_completion_message_override');
 }
