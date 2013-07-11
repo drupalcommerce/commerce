@@ -386,6 +386,25 @@ function commerce_cart_form_field_ui_field_edit_form_alter(&$form, &$form_state)
       ),
     );
 
+    // Determine the default attribute widget title.
+    $attribute_widget_title = $commerce_cart_settings['attribute_widget_title'];
+
+    if (empty($attribute_widget_title)) {
+      $attribute_widget_title = $instance['label'];
+    }
+
+    $form['instance']['commerce_cart_settings']['attribute_widget_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Attribute widget title'),
+      '#description' => t('Specify the title to use for the attribute widget on the Add to Cart form.'),
+      '#default_value' => $attribute_widget_title,
+      '#states' => array(
+        'visible' => array(
+          ':input[name="instance[commerce_cart_settings][attribute_field]"]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+
     $form['field']['cardinality']['#description'] .= '<br />' . t('Must be 1 for this field to function as an attribute selection field on Add to Cart forms.');
   }
 
@@ -1364,6 +1383,8 @@ function commerce_cart_field_attribute_eligible($field) {
  *   - attribute_widget: string indicating the type of form element to use on
  *     the Add to Cart form for customers to select the attribute option;
  *     defaults to 'select', may also be 'radios'
+ *   - attribute_widget_title: string used as the title of the attribute form
+ *     element on the Add to Cart form.
  */
 function commerce_cart_field_instance_attribute_settings($instance) {
   if (empty($instance['commerce_cart_settings']) || !is_array($instance['commerce_cart_settings'])) {
@@ -1378,6 +1399,7 @@ function commerce_cart_field_instance_attribute_settings($instance) {
   $commerce_cart_settings += array(
     'attribute_field' => FALSE,
     'attribute_widget' => 'select',
+    'attribute_widget_title' => '',
   );
 
   return $commerce_cart_settings;
@@ -1431,6 +1453,35 @@ function commerce_cart_field_instance_access_settings($instance) {
   );
 
   return $commerce_cart_settings;
+}
+
+/**
+ * Returns the title of an attribute widget for the Add to Cart form.
+ *
+ * @param $instance
+ *   The attribute field instance info array.
+ *
+ * @return
+ *   A sanitized string to use as the attribute widget title.
+ */
+function commerce_cart_attribute_widget_title($instance) {
+  // Translate the entire field instance and find the default title.
+  $translated_instance = commerce_i18n_object('field_instance', $instance);
+  $title = $translated_instance['label'];
+
+  // Use the customized attribute widget title if it exists.
+  $commerce_cart_settings = commerce_cart_field_instance_attribute_settings($instance);
+
+  if (!empty($commerce_cart_settings['attribute_widget_title'])) {
+    $title = $commerce_cart_settings['attribute_widget_title'];
+
+    // Use the translated customized title if it exists.
+    if (!empty($translated_instance['attribute_widget_title'])) {
+      $title = $translated_instance['attribute_widget_title'];
+    }
+  }
+
+  return check_plain($title);
 }
 
 /**
@@ -1753,11 +1804,6 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
                 $allowed_values = $translate($field);
                 _options_prepare_options($allowed_values, $properties);
               }
-
-              // Translate the field title if set.
-              if (!empty($instance['label'])) {
-                $instance['label'] = i18n_field_translate_property($instance, 'label');
-              }
             }
 
             // Otherwise just use the base language values.
@@ -1826,7 +1872,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
           else {
             $form['attributes'][$field_name] = array(
               '#type' => $data['commerce_cart_settings']['attribute_widget'],
-              '#title' => check_plain($data['instance']['label']),
+              '#title' => commerce_cart_attribute_widget_title($data['instance']),
               '#options' => array_intersect_key($data['options'], drupal_map_assoc($used_options[$field_name])),
               '#default_value' => $default_product_wrapper->{$field_name}->raw(),
               '#weight' => $data['instance']['widget']['weight'],
@@ -2439,5 +2485,20 @@ function commerce_cart_preprocess_views_view(&$vars) {
     if (!empty($view->result)) {
       drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
     }
+  }
+}
+
+/**
+ * Implements hook_i18n_string_list_TEXTGROUP_alter().
+ */
+function commerce_cart_i18n_string_list_field_alter(&$strings, $type = NULL, $object = NULL) {
+  if (!isset($strings['field']) || !is_array($object) || !commerce_cart_field_instance_is_attribute($object)) {
+    return;
+  }
+  if (!empty($object['commerce_cart_settings']['attribute_widget_title'])) {
+    $strings['field'][$object['field_name']][$object['bundle']]['attribute_widget_title'] = array(
+      'string' => $object['commerce_cart_settings']['attribute_widget_title'],
+      'title' => t('Attribute widget title'),
+    );
   }
 }
