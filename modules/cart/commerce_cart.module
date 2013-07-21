@@ -1529,6 +1529,12 @@ function commerce_cart_forms($form_id, $args) {
  *   ways by the form:
  *   - $line_item->data['context']['product_ids']: an array of product IDs to
  *     include on the form.
+ *   - $line_item->data['context']['add_to_cart_combine']: a boolean indicating
+ *     whether or not to attempt to combine the product added to the cart with
+ *     existing line items of matching fields.
+ *   - $line_item->data['context']['show_single_product_attributes']: a boolean
+ *     indicating whether or not product attribute fields with single options
+ *     should be shown on the Add to Cart form.
  *   - $line_item->quantity: the default value for the quantity widget if
  *     included (determined by the $show_quantity parameter).
  *   - $line_item->commerce_product: the value of this field will be used as the
