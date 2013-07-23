@@ -105,7 +105,9 @@ function hook_commerce_checkout_complete($order) {
  *   buttons for continuing and going back in the checkout process; defaults to
  *   TRUE
  * - back_value: the translatable value of the submit button used for going back
- *   in the checkout process; defaults to ‘Back’
+ *   to a previous page in the checkout process, which is different from the
+ *   cancel button used to exit the checkout process from the first checkout
+ *   page; defaults to ‘Go back’
  * - submit_value: the translatable value of the submit button used for going
  *   forward in the checkout process; defaults to ‘Continue’
  * - prev_page: the page_id of the previous page in the checkout process; should
