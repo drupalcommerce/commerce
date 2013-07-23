@@ -2,7 +2,6 @@ name = Price
 description = Defines the price field and a price alteration system.
 package = Commerce
 dependencies[] = commerce
-dependencies[] = rules
 core = 7.x
 
 ; Module file includes
