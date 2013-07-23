@@ -253,11 +253,14 @@ function commerce_commerce_currency_info() {
     ),
     'CNY' => array(
       'code' => 'CNY',
-      'symbol' => 'CN¥',
+      'symbol' => '¥',
       'name' => t('Chinese Yuan Renminbi'),
       'numeric_code' => '156',
-      'minor_unit' => t('Fe'),
-      'major_unit' => t('Yuan Renminbi'),
+      'symbol_placement' => 'before',
+      'code_placement' => 'hidden',
+      'thousands_separator' => '',
+      'minor_unit' => t('Fen'),
+      'major_unit' => t('Yuan'),
     ),
     'COP' => array(
       'code' => 'COP',
