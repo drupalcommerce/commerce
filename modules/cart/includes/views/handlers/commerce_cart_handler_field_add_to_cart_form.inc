@@ -91,7 +91,7 @@ class commerce_cart_handler_field_add_to_cart_form extends views_handler_field_e
       $line_item->data['context']['add_to_cart_combine'] = $this->options['combine'];
 
       // Generate a form ID for this add to cart form.
-      $form_id = commerce_cart_add_to_cart_form_id($product_ids, $default_quantity);
+      $form_id = commerce_cart_add_to_cart_form_id($product_ids);
 
       // Add the display path to the line item's context data array if specified.
       if ($this->options['display_path']) {
