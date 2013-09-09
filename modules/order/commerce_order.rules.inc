@@ -48,7 +48,7 @@ function commerce_order_rules_condition_info() {
       'value' => array(
         'type' => 'text',
         'label' => t('Value'),
-        'description' => t('The value to compare against the address component. Bear in mind that addresses using select lists for various components may use a value different from the option you select. For example, countries are selected by name, but the value is the two letter abbreviation.'),
+        'description' => t('The value to compare against the address component. Bear in mind that addresses using select lists for various components may use a value different from the option you select. For example, countries are selected by name, but the value is the two letter abbreviation. For comparisons with multiple possible values, place separate values on new lines.'),
       ),
     ),
     'group' => t('Commerce Order'),
@@ -220,6 +220,8 @@ function commerce_order_address_comparison_operator_options_list() {
     'equals' => t('equals'),
     'begins with' => t('begins with'),
     'contains' => t('contains'),
+    'is one of' => t('is one of'),
+    'begins with one of' => t('begins with one of'),
   );
 }
 
@@ -237,14 +239,29 @@ function commerce_order_rules_compare_address($order, $address_field, $component
     if (!empty($wrapper->{$field_name}) && !empty($wrapper->{$field_name}->{$address_field_name})) {
       $address = $wrapper->{$field_name}->{$address_field_name}->value();
 
+      // Perform the comparison in upper case.
+      $address_component = drupal_strtoupper($address[$component]);
+      $value = drupal_strtoupper($value);
+
       // Make a comparison based on the operator.
       switch ($operator) {
         case 'equals':
-          return $address[$component] == $value;
+          return $address_component == $value;
         case 'begins with':
-          return strpos($address[$component], $value) === 0;
+          return strpos($address_component, $value) === 0;
         case 'contains':
-          return strpos($address[$component], $value) !== FALSE;
+          return strpos($address_component, $value) !== FALSE;
+        case 'is one of':
+          $list = preg_split('/[\n\r]+/', $value);
+          return array_search($address_component, $list) !== FALSE;
+        case 'begins with one of':
+          $list = preg_split('/[\n\r]+/', $value);
+          foreach ($list as $item) {
+            if (strpos($address_component, $item) === 0) {
+              return TRUE;
+            }
+          }
+          break;
       }
     }
   }

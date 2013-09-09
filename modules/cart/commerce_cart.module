@@ -925,7 +925,7 @@ function commerce_cart_order_refresh($order) {
       rules_invoke_event('commerce_product_calculate_sell_price', $cloned_line_item);
     }
 
-    // Allow other modules alter line items on a shopping cart refresh.
+    // Allow other modules to alter line items on a shopping cart refresh.
     module_invoke_all('commerce_cart_line_item_refresh', $cloned_line_item, $order_wrapper);
 
     // Delete this line item if it no longer has a valid price.
