@@ -508,7 +508,7 @@ function commerce_cart_user_login(&$edit, $account) {
  */
 function commerce_cart_user_update(&$edit, $account, $category) {
   // If the e-mail address was changed...
-  if ($account->mail != $edit['original']->mail) {
+  if (!empty($edit['original']->mail) && $account->mail != $edit['original']->mail) {
     // Load the user's shopping cart orders.
     $query = new EntityFieldQuery();
 
