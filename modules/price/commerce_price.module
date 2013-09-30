@@ -216,7 +216,7 @@ function commerce_price_field_attach_insert($entity_type, $entity) {
 }
 
 /**
- * Implements hook_field_update().
+ * Implements hook_field_attach_update().
  *
  * This hook is used to unserialize the price field's data array after it has
  * been updated, because the data array is serialized before it is saved and
