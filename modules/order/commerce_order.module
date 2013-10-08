@@ -1249,7 +1249,7 @@ function commerce_order_status_options_list() {
  * Updates the status of an order to the specified status.
  *
  * While there is no explicit Rules event or hook devoted to an order status
- * being updated, you can use the commerce_order_updated event / hook to check
+ * being updated, you can use the commerce_order_update event / hook to check
  * for a changed order status by comparing $order->original->status to the
  * $order->status. If they are different, this will alert you that the order
  * status for the given order was just changed.
