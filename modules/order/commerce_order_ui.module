@@ -183,11 +183,11 @@ function commerce_order_ui_i18n_string_list($group) {
   if ($group == 'commerce') {
     // Allow the order creation help text to be translated.
     $help = variable_get('commerce_order_help_text', '');
-    if ($help) {
-      $strings['commerce']['order']['help']['create'] = $help;
-    }
 
-    return $strings;
+    if (!empty($help)) {
+      $strings['commerce']['order']['help']['create'] = $help;
+      return $strings;
+    }
   }
 }
 
