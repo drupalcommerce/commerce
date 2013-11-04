@@ -875,8 +875,10 @@ function commerce_commerce_currency_info() {
     ),
     'NZD' => array(
       'code' => 'NZD',
-      'symbol' => 'NZ$',
+      'symbol' => '$',
       'name' => t('New Zealand Dollar'),
+      'symbol_placement' => 'before',
+      'code_placement' => 'hidden',
       'numeric_code' => '554',
       'minor_unit' => t('Cent'),
       'major_unit' => t('Dollar'),
