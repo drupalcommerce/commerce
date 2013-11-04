@@ -231,8 +231,6 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
  * are happy, we move on to the next page.
  */
 function commerce_checkout_form_validate($form, &$form_state) {
-  global $user;
-
   $checkout_page = $form_state['checkout_page'];
 
   // Load a fresh copy of the order stored in the form.
