@@ -2442,6 +2442,15 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
       $cart_context['entity_id'] = $entity_id;
       unset($cart_context['entity']);
 
+      // Remove any Views data added to the context by views_handler_field_field.
+      // It unnecessarily increases the size of rows in the cache_form table for
+      // Add to Cart form state data.
+      if (!empty($cart_context['display']['views_view'])) {
+        unset($cart_context['display']['views_view']);
+        unset($cart_context['display']['views_field']);
+        unset($cart_context['display']['views_row_id']);
+      }
+
       // Add the context for displaying product fields in the context of an entity
       // that references the product by looking at the entity this product
       // reference field is attached to.
