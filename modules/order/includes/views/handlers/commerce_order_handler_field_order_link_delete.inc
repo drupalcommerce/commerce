@@ -16,7 +16,7 @@ class commerce_order_handler_field_order_link_delete extends commerce_order_hand
     $order->order_id = $this->get_value($values, 'order_id');
     $order->uid = $this->get_value($values, 'uid');
 
-    if (!commerce_order_access('update', $order)) {
+    if (!commerce_order_access('delete', $order)) {
       return;
     }
 

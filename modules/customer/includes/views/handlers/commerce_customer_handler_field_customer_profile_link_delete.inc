@@ -18,7 +18,7 @@ class commerce_customer_handler_field_customer_profile_link_delete extends comme
     $profile->type = $this->get_value($values, 'type');
     $profile->uid = $this->get_value($values, 'uid');
 
-    if (!commerce_customer_profile_access('update', $profile)) {
+    if (!commerce_customer_profile_access('delete', $profile)) {
       return;
     }
 
