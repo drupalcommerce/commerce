@@ -112,14 +112,3 @@ function commerce_line_item_ui_help($path, $arg) {
       return '<p>' . t('Line items represent anything on an order that affects the order total. Each line item must be of one of the line item types listed below, which define how these items interact with Add to Cart forms, the shopping cart, the order edit page, and more. Line item types are defined by modules, with some modules also allowing you to clone line item types through this interface.') . '</p>';
   }
 }
-
-
-/**
- * Implements hook_views_api().
- *
-function commerce_line_item_ui_views_api() {
-  return array(
-    'api' => 3,
-    'path' => drupal_get_path('module', 'commerce_line_item_ui') . '/includes/views',
-  );
-}*/
