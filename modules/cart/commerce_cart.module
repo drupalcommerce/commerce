@@ -2445,7 +2445,7 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
       // Remove any Views data added to the context by views_handler_field_field.
       // It unnecessarily increases the size of rows in the cache_form table for
       // Add to Cart form state data.
-      if (!empty($cart_context['display']['views_view'])) {
+      if (!empty($cart_context['display']) && is_array($cart_context['display'])) {
         unset($cart_context['display']['views_view']);
         unset($cart_context['display']['views_field']);
         unset($cart_context['display']['views_row_id']);
