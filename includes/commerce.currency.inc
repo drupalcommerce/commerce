@@ -753,6 +753,16 @@ function commerce_commerce_currency_info() {
       'minor_unit' => t('bani'),
       'major_unit' => t('Lei'),
     ),
+    'MKD' => array(
+      'code' => 'MKD',
+      'symbol' => 'ден',
+      'name' => t('Macedonian denar'),
+      'symbol_placement' => 'after',
+      'numeric_code' => '807',
+      'code_placement' => 'hidden',
+      'minor_unit' => t('Deni'),
+      'major_unit' => t('Denari'),
+    ),
     'MMK' => array(
       'code' => 'MMK',
       'symbol' => 'MMK',
