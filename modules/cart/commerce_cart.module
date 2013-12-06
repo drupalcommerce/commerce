@@ -2497,9 +2497,7 @@ function commerce_cart_preprocess_views_view(&$vars) {
 
   // Add the shopping cart stylesheet to the cart or form if they are not empty.
   if ($view->name == 'commerce_cart_block' || $view->name == 'commerce_cart_form') {
-    if (!empty($view->result)) {
-      drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
-    }
+    drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
   }
 }
 
