@@ -185,7 +185,7 @@ function commerce_customer_ui_help($path, $arg) {
 
   // Return the user defined help text per customer profile type when adding profiles.
   if ($arg[1] == 'commerce' && $arg[2] == 'customer-profiles' && $arg[3] == 'add' && $arg[4]) {
-    $profile_type = commerce_customer_profile_type_load($arg[5]);
+    $profile_type = commerce_customer_profile_type_load($arg[4]);
     return (!empty($profile_type['help']) ? '<p>' . filter_xss_admin($profile_type['help']) . '</p>' : '');
   }
 }
