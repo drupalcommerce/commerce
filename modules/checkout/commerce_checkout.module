@@ -569,6 +569,14 @@ function commerce_checkout_panes($conditions = array(), $skip_saved_data = FALSE
 }
 
 /**
+ * Resets the cached list of checkout panes.
+ */
+function commerce_checkout_panes_reset() {
+  $checkout_panes = &drupal_static('commerce_checkout_panes');
+  $checkout_panes = NULL;
+}
+
+/**
  * Saves a checkout pane's configuration to the database.
  *
  * @param $checkout_pane
