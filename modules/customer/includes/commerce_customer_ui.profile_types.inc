@@ -32,10 +32,10 @@ function commerce_customer_ui_customer_profile_types_overview() {
 
   // If no profile types are defined...
   if (empty($rows)) {
-    // Add a standard empty row with a link to add a new profile type.
+    // Add a standard empty row.
     $rows[] = array(
       array(
-        'data' => t('There are no customer profile types yet. <a href="@link">Add profile type</a>.', array('@link' => url('admin/commerce/customers/profiles/types/add'))),
+        'data' => t('There are no customer profile types defined on this site.'),
         'colspan' => 2,
       )
     );
