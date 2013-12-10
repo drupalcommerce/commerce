@@ -29,9 +29,13 @@
  * - name: the translatable name of the profile type, used as the title of the
  *   corresponding checkout pane
  * - description: a translatable description of the intended use of data
- *   contained in this type of customer information profile
+ *   contained in this type of customer profile. This description will be
+ *   displayed on the profile types administrative page and on the customer
+ *   profiles add page.
  * - help: a translatable help message to be displayed at the top of the
- *   administrative add / edit form for profiles of this type
+ *   administrative add / edit form for profiles of this type. The Drupal
+ *   core help module or any module invoking hook_help needs to be enabled
+ *   to take advantage of this help text.
  * - addressfield: boolean indicating whether or not the profile type should
  *   have a default address field; defaults to TRUE
  * - label_callback: name of the function to use to determine the label of
