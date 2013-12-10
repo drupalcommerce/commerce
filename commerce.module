@@ -537,7 +537,7 @@ function commerce_currencies($enabled = FALSE, $reset = FALSE) {
       // Include the currency file and invoke the currency info hook.
       module_load_include('inc', 'commerce', 'includes/commerce.currency');
       $currencies['all'] = module_invoke_all('commerce_currency_info');
-      drupal_alter('commerce_currency_info', $currencies['all']);
+      drupal_alter('commerce_currency_info', $currencies['all'], $language->language);
 
       // Add default values if they don't exist.
       foreach ($currencies['all'] as $currency_code => $currency) {
