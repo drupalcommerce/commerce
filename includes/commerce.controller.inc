@@ -94,17 +94,15 @@ class DrupalCommerceEntityController extends DrupalDefaultEntityController imple
       $function($this->entityType, $entity);
     }
 
-    // Invoke the hook. If rules is there, use the rule funtion so that a rules
-    // event is invoked too.
-    if (module_exists('rules')) {
-      rules_invoke_all($this->entityType . '_' . $hook, $entity);
-    }
-    else {
-      module_invoke_all($this->entityType . '_' . $hook, $entity);
-    }
+    // Invoke the hook.
+    module_invoke_all($this->entityType . '_' . $hook, $entity);
     // Invoke the respective entity level hook.
     if ($hook == 'presave' || $hook == 'insert' || $hook == 'update' || $hook == 'delete') {
       module_invoke_all('entity_' . $hook, $entity, $this->entityType);
+    }
+    // Invoke rules.
+    if (module_exists('rules')) {
+      rules_invoke_event($this->entityType . '_' . $hook, $entity);
     }
   }
 
