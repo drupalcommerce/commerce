@@ -12,9 +12,6 @@ core = 7.x
 ; Module includes
 files[] = includes/commerce_order.controller.inc
 
-; Views includes
-files[] = includes/views/commerce_order.views.inc
-
 ; Views handlers
 files[] = includes/views/handlers/commerce_order_handler_area_empty_text.inc
 files[] = includes/views/handlers/commerce_order_handler_area_order_total.inc
