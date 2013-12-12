@@ -61,7 +61,6 @@ class commerce_line_item_handler_field_edit_quantity extends views_handler_field
     $field_name = $this->options['id'];
     foreach (element_children($form[$field_name]) as $row_id) {
       // Ensure the quantity is actually a numeric value.
-      $line_item_id = $form[$field_name][$row_id]['#line_item_id'];
       if (!is_numeric($form_state['values'][$field_name][$row_id]) || $form_state['values'][$field_name][$row_id] < 0) {
         form_set_error($field_name . '][' . $row_id, t('You must specify a positive number for the quantity'));
       }
