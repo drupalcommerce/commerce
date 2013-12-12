@@ -724,7 +724,7 @@ function commerce_payment_method_instance_load($instance_id) {
   $payment_method['settings'] = array();
 
   foreach ($rule->actions() as $action) {
-    if ($action->getElementName() == 'commerce_payment_enable_' . $method_id) {
+    if (is_callable(array($action, 'getElementName')) && $action->getElementName() == 'commerce_payment_enable_' . $method_id) {
       if (is_array($action->settings['payment_method']) && !empty($action->settings['payment_method']['settings'])) {
         $payment_method['settings'] = $action->settings['payment_method']['settings'];
       }
