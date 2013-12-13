@@ -2337,7 +2337,7 @@ function commerce_cart_field_formatter_settings_form($field, $instance, $view_mo
     else {
       $element['line_item_type'] = array(
         '#type' => 'hidden',
-        '#value' => key($types),
+        '#value' => reset($types),
       );
     }
   }
