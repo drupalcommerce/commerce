@@ -55,14 +55,17 @@ function commerce_cart_contents_pane_settings_form($checkout_pane) {
 function commerce_cart_contents_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
   $pane_form = array();
 
-  drupal_add_css(drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css');
-
   // Extract the View and display keys from the cart contents pane setting.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
 
   $pane_form['cart_contents_view'] = array(
     '#markup' => commerce_embed_view($view_id, $display_id, array($order->order_id)),
   );
+
+  // Attach the Cart and Price module CSS to accommodate the order total area
+  // handler's CSS being reloaded properly on a form rebuild.
+  $pane_form['cart_contents_views']['#attached']['css'][] = drupal_get_path('module', 'commerce_cart') . '/theme/commerce_cart.theme.css';
+  $pane_form['cart_contents_views']['#attached']['css'][] = drupal_get_path('module', 'commerce_price') . '/theme/commerce_price.theme.css';
 
   return $pane_form;
 }
