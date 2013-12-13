@@ -2142,10 +2142,10 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
         $classes[] = 'commerce-product-field-empty';
       }
 
-      $element += array(
-        '#prefix' => '<div class="' . implode(' ', $classes) . '">',
-        '#suffix' => '</div>',
-      );
+      // Append the prefix and suffix around existing values if necessary.
+      $element += array('#prefix' => '', '#suffix' => '');
+      $element['#prefix'] = '<div class="' . implode(' ', $classes) . '">' . $element['#prefix'];
+      $element['#suffix'] .= '</div>';
 
       $commands[] = ajax_command_replace('.' . $replacement_class, drupal_render($element));
     }
