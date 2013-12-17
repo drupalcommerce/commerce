@@ -82,7 +82,7 @@ function theme_tax_rate_admin_overview($variables) {
     $description[] = filter_xss_admin($tax_rate['description']);
   }
 
-  $description[] = t('Rate: @rate', array('@rate' => $tax_rate['rate']));
+  $description[] = t('Rate: @rate', array('@rate' => $tax_rate['rate']), array('context' => 'tax rate'));
 
   // Build the actual output.
   $output = check_plain($tax_rate['title']);
@@ -181,7 +181,7 @@ function commerce_tax_ui_tax_rate_form($form, &$form_state, $tax_rate) {
 
   $form['tax_rate']['rate'] = array(
     '#type' => 'textfield',
-    '#title' => t('Rate'),
+    '#title' => t('Rate', array(), array('context' => 'tax rate')),
     '#description' => t('The percentage used to calculate this tax expressed as a decimal, e.g. .06 for a rate of 6%.'),
     '#default_value' => $tax_rate['rate'],
     '#size' => 16,
@@ -238,7 +238,7 @@ function commerce_tax_ui_tax_rate_form_validate($form, &$form_state) {
 
   // Validate the data type of the tax rate.
   if (!is_numeric($form_state['values']['tax_rate']['rate'])) {
-    form_set_error('tax_rate][rate', t('You must specify a numeric rate value.'));
+    form_set_error('tax_rate][rate', t('You must specify a numeric rate value.', array(), array('context' => 'tax rate')));
   }
 }
 
