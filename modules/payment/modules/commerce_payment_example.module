@@ -15,7 +15,7 @@ function commerce_payment_example_commerce_payment_method_info() {
 
   $payment_methods['commerce_payment_example'] = array(
     'title' => t('Example payment'),
-    'description' => t('Demonstrates complete payment during checkout and serves as a development example.'),
+    'description' => t('Demonstrates credit card payment during checkout and serves as a development example.'),
     'active' => TRUE,
   );
 
@@ -26,40 +26,30 @@ function commerce_payment_example_commerce_payment_method_info() {
  * Payment method callback: submit form.
  */
 function commerce_payment_example_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
-  $form = array();
+  module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.credit_card');
 
-  // Merge in values from the order.
-  if (!empty($order->data['commerce_payment_example'])) {
-    $pane_values += $order->data['commerce_payment_example'];
-  }
-
-  // Merge in default values.
-  $pane_values += array(
-    'name' => '',
-  );
-
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#description' => t('This is a demonstration field coded to fail validation for single character values.'),
-    '#default_value' => $pane_values['name'],
-    '#required' => TRUE,
-  );
-
-  return $form;
+  // Default to a known test credit card number. For valid numbers of other card
+  // types see: http://www.rimmkaufman.com/blog/credit-card-test-numbers/09112007/
+  return commerce_payment_credit_card_form(array(), array('number' => '4111111111111111'));
 }
 
 /**
  * Payment method callback: submit form validation.
  */
 function commerce_payment_example_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
-  // Throw an error if a long enough name was not provided.
-  if (strlen($pane_values['name']) < 2) {
-    form_set_error(implode('][', array_merge($form_parents, array('name'))), t('You must enter a name two or more characters long.'));
+  // Validate the credit card fields.
+  module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.credit_card');
 
-    // Even though the form error is enough to stop the submission of the form,
-    // it's not enough to stop it from a Commerce standpoint because of the
-    // combined validation / submission going on per-pane in the checkout form.
+  $settings = array(
+    'form_parents' => array_merge($form_parents, array('credit_card')),
+  );
+
+  // Even though a form error triggered by the validate handler would be enough
+  // to stop the submission of the form, it's not enough to stop it from a
+  // Commerce standpoint because of the combined validation / submission going
+  // on per-pane in the checkout form. Thus even with a call to form_set_error()
+  // this validate handler must still return FALSE.
+  if (!commerce_payment_credit_card_validate($pane_values['credit_card'], $settings)) {
     return FALSE;
   }
 }
@@ -68,9 +58,17 @@ function commerce_payment_example_submit_form_validate($payment_method, $pane_fo
  * Payment method callback: submit form submission.
  */
 function commerce_payment_example_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
+  // Just as an example, we might store information in the order object from the
+  // payment parameters, though we would never save a full credit card number,
+  // even in examples!
+  $number = $pane_values['credit_card']['number'];
+  $pane_values['credit_card']['number'] = substr($number, 0, 4) . str_repeat('-', strlen($number) - 8) . substr($number, -4);
+
   $order->data['commerce_payment_example'] = $pane_values;
 
-  commerce_payment_example_transaction($payment_method, $order, $charge, $pane_values['name']);
+  // Every attempted transaction should result in a new transaction entity being
+  // created for the order to log either the success or the failure.
+  commerce_payment_example_transaction($payment_method, $order, $charge);
 }
 
 /**
@@ -82,17 +80,22 @@ function commerce_payment_example_submit_form_submit($payment_method, $pane_form
  *   The order object the payment applies to.
  * @param $charge
  *   An array indicating the amount and currency code to charge.
- * @param $name
- *   The name entered on the submission form.
  */
-function commerce_payment_example_transaction($payment_method, $order, $charge, $name) {
+function commerce_payment_example_transaction($payment_method, $order, $charge) {
+  $card_details = $order->data['commerce_payment_example']['credit_card'];
+
   $transaction = commerce_payment_transaction_new('commerce_payment_example', $order->order_id);
   $transaction->instance_id = $payment_method['instance_id'];
   $transaction->amount = $charge['amount'];
   $transaction->currency_code = $charge['currency_code'];
   $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
-  $transaction->message = 'Name: @name';
-  $transaction->message_variables = array('@name' => $name);
+
+  $transaction->message = 'Number: @number<br/>Expiration: @month/@year';
+  $transaction->message_variables = array(
+    '@number' => $card_details['number'],
+    '@month' => $card_details['exp_month'],
+    '@year' => $card_details['exp_year'],
+  );
 
   commerce_payment_transaction_save($transaction);
 }
