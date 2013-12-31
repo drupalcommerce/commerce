@@ -1043,15 +1043,6 @@ function commerce_order_state_load($name) {
 }
 
 /**
- * Resets an order state by name to its module defined defaults.
- */
-function commerce_order_state_reset($name) {
-  db_delete('commerce_order_state')
-    ->condition('name', $name)
-    ->execute();
-}
-
-/**
  * Returns the human readable title of any or all order states.
  *
  * @param $name
@@ -1184,15 +1175,6 @@ function commerce_order_status_load($name) {
   }
 
   return FALSE;
-}
-
-/**
- * Resets an order status by name to its module defined defaults.
- */
-function commerce_order_status_reset($name) {
-  db_delete('commerce_order_status')
-    ->condition('name', $name)
-    ->execute();
 }
 
 /**
