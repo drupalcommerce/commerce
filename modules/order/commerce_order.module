@@ -1016,11 +1016,11 @@ function commerce_order_states() {
 }
 
 /**
- * Resets the cached list of order statuses.
+ * Resets the cached list of order states.
  */
 function commerce_order_states_reset() {
-  $order_statuses = &drupal_static('commerce_order_statuses');
-  $order_statuses = NULL;
+  $order_states = &drupal_static('commerce_order_states');
+  $order_states = NULL;
 }
 
 /**
