@@ -2273,7 +2273,7 @@ function commerce_cart_field_formatter_info() {
     'commerce_cart_add_to_cart_form' => array(
       'label' => t('Add to Cart form'),
       'description' => t('Display an Add to Cart form for the referenced product.'),
-      'field types' => array('commerce_product_reference'),
+      'field types' => array('commerce_product_reference', 'entityreference'),
       'settings' => array(
         'show_quantity' => FALSE,
         'default_quantity' => 1,
@@ -2390,7 +2390,12 @@ function commerce_cart_field_formatter_view($entity_type, $entity, $field, $inst
   $product_ids = array();
 
   foreach ($items as $delta => $item) {
-    $product_ids[] = $item['product_id'];
+    if (isset($item['product_id'])) {
+      $product_ids[] = $item['product_id'];
+    }
+    elseif (module_exists('entityreference') && isset($item['target_id'])) {
+      $product_ids[] = $item['target_id'];
+    }
   }
 
   if ($display['type'] == 'commerce_cart_add_to_cart_form') {
