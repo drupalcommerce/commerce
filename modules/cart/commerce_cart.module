@@ -877,7 +877,7 @@ function commerce_cart_order_convert($order, $account) {
 
 /**
  * Refreshes the contents of a shopping cart by finding the most current prices
- *   for any product line items on the order.
+ * for any product line items on the order.
  *
  * @param $order
  *   The order object whose line items should be refreshed.
@@ -1528,7 +1528,13 @@ function commerce_cart_forms($form_id, $args) {
  *   A fully formed product line item whose data will be used in the following
  *   ways by the form:
  *   - $line_item->data['context']['product_ids']: an array of product IDs to
- *     include on the form.
+ *     include on the form or the string 'entity' if the context array includes
+ *     an entity array with information for accessing the product IDs from an
+ *     entity's product reference field.
+ *   - $line_item->data['context']['entity']: if the product_ids value is the
+ *     string 'entity', an associative array with the keys 'entity_type',
+ *     'entity_id', and 'product_reference_field_name' that points to the
+ *     location of the product IDs used to build the form.
  *   - $line_item->data['context']['add_to_cart_combine']: a boolean indicating
  *     whether or not to attempt to combine the product added to the cart with
  *     existing line items of matching fields.
@@ -1574,24 +1580,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
   $default_quantity = $line_item->quantity;
 
   // Retrieve the array of product IDs from the line item's context data array.
-  $product_ids = array();
-
-  // If the product IDs setting tells us to use entity values...
-  if ($line_item->data['context']['product_ids'] == 'entity' &&
-    is_array($line_item->data['context']['entity'])) {
-    $entity_data = $line_item->data['context']['entity'];
-
-    // Load the specified entity.
-    $entity = entity_load_single($entity_data['entity_type'], $entity_data['entity_id']);
-
-    // Extract the product IDs from the specified product reference field.
-    if (!empty($entity->{$entity_data['product_reference_field_name']})) {
-      $product_ids = entity_metadata_wrapper($entity_data['entity_type'], $entity)->{$entity_data['product_reference_field_name']}->raw();
-    }
-  }
-  elseif (is_array($line_item->data['context']['product_ids'])) {
-    $product_ids = $line_item->data['context']['product_ids'];
-  }
+  $product_ids = commerce_cart_add_to_cart_form_product_ids($line_item);
 
   // If we don't have a list of products to load, just bail out early.
   // There is nothing we can or have to do in that case.
@@ -2492,6 +2481,48 @@ function commerce_cart_field_attach_view_alter(&$output, $context) {
       }
     }
   }
+}
+
+/**
+ * Returns an array of product IDs used for building an Add to Cart form from
+ * the context information in a line item's data array.
+ *
+ * @param $line_item
+ *   The line item whose data array includes a context array used for building
+ *   an Add to Cart form.
+ *
+ * @return
+ *   The array of product IDs extracted from the line item.
+ *
+ * @see commerce_cart_add_to_cart_form()
+ */
+function commerce_cart_add_to_cart_form_product_ids($line_item) {
+  $product_ids = array();
+
+  if (empty($line_item->data['context']) ||
+    empty($line_item->data['context']['product_ids']) ||
+    ($line_item->data['context']['product_ids'] == 'entity' && empty($line_item->data['context']['entity']))) {
+    return $product_ids;
+  }
+
+  // If the product IDs setting tells us to use entity values...
+  if ($line_item->data['context']['product_ids'] == 'entity' &&
+    is_array($line_item->data['context']['entity'])) {
+    $entity_data = $line_item->data['context']['entity'];
+
+    // Load the specified entity.
+    $entity = entity_load_single($entity_data['entity_type'], $entity_data['entity_id']);
+
+    // Extract the product IDs from the specified product reference field.
+    if (!empty($entity->{$entity_data['product_reference_field_name']})) {
+      $product_ids = entity_metadata_wrapper($entity_data['entity_type'], $entity)->{$entity_data['product_reference_field_name']}->raw();
+    }
+  }
+  elseif (is_array($line_item->data['context']['product_ids'])) {
+    $product_ids = $line_item->data['context']['product_ids'];
+  }
+
+  return $product_ids;
 }
 
 /**
