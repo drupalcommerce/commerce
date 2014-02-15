@@ -26,3 +26,11 @@ function commerce_cart_update_7100() {
 
   return t('All eligible product attribute fields have been updated to continue using the attribute selection widget.');
 }
+
+/**
+ * Disable the new local action to apply pricing rules to an order.
+ */
+function commerce_cart_update_7101() {
+  variable_set('commerce_order_apply_pricing_rules_link', FALSE);
+  return t('A new local action link on order edit forms for applying pricing rules to an order has been disabled by default; enable it on the order settings form if desired.');
+}

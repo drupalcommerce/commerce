@@ -39,6 +39,23 @@ function commerce_cart_menu() {
     'file' => 'includes/commerce_cart.pages.inc',
   );
 
+  // If the Order UI module is installed, add a local action to it that lets an
+  // administrator execute a cart order refresh on the order. Modules that
+  // define their own order edit menu item are also responsible for defining
+  // their own local action menu items if needed.
+  if (module_exists('commerce_order_ui')) {
+    $items['admin/commerce/orders/%commerce_order/edit/refresh'] = array(
+      'title' => 'Apply pricing rules',
+      'description' => 'Executes the cart order refresh used to apply all current pricing rules on the front end.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_cart_order_refresh_form', 3),
+      'access callback' => 'commerce_cart_order_refresh_form_access',
+      'access arguments' => array(3),
+      'type' => MENU_LOCAL_ACTION,
+      'file' => 'includes/commerce_cart.admin.inc',
+    );
+  }
+
   return $items;
 }
 
@@ -72,6 +89,20 @@ function commerce_cart_menu_item_title() {
  */
 function commerce_cart_menu_item_redirect() {
   drupal_goto('cart');
+}
+
+/**
+ * Access callback: determines access to the "Apply pricing rules" local action.
+ */
+function commerce_cart_order_refresh_form_access($order) {
+  // Do not show the link for cart orders as they're refreshed automatically.
+  if (commerce_cart_order_is_cart($order)) {
+    return FALSE;
+  }
+
+  // Returns TRUE if the link is enabled via the order settings form and the
+  // user has access to update the order.
+  return variable_get('commerce_order_apply_pricing_rules_link', TRUE) && commerce_order_access('update', 3);
 }
 
 /**
@@ -306,6 +337,22 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('%title removed from your cart.', array('%title' => $title)));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds a checkbox to the order settings form to enable the local action on
+ * order edit forms to apply pricing rules.
+ */
+function commerce_cart_form_commerce_order_settings_form_alter(&$form, &$form_state) {
+  $form['commerce_order_apply_pricing_rules_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable the local action link on order edit forms to apply pricing rules.'),
+    '#description' => t('Even if enabled the link will not appear on shopping cart order edit forms.'),
+    '#default_value' => variable_get('commerce_order_apply_pricing_rules_link', TRUE),
+    '#weight' => 10,
+  );
 }
 
 /**
