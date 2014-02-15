@@ -81,7 +81,34 @@ function commerce_checkout_menu() {
     'file' => 'includes/commerce_checkout.admin.inc',
   );
 
+  // If the Order UI module is installed, add a local action to it that lets an
+  // administrator invoke the checkout completion event on the order. Modules
+  // that define their own order edit menu item are also responsible for
+  // defining their own local action menu items if needed.
+  if (module_exists('commerce_order_ui')) {
+    $items['admin/commerce/orders/%commerce_order/edit/checkout'] = array(
+      'title' => 'Simulate checkout completion',
+      'description' => 'Directly invokes the checkout completion rules on the order.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('commerce_checkout_complete_form', 3),
+      'access callback' => 'commerce_checkout_complete_form_access',
+      'access arguments' => array(3),
+      'type' => MENU_LOCAL_ACTION,
+      'file' => 'includes/commerce_checkout.admin.inc',
+    );
+  }
+
   return $items;
+}
+
+/**
+ * Access callback: determines access to the "Simulate checkout completion"
+ * local action.
+ */
+function commerce_checkout_complete_form_access($order) {
+  // Returns TRUE if the link is enabled via the order settings form and the
+  // user has access to update the order.
+  return variable_get('commerce_order_simulate_checkout_link', TRUE) && commerce_order_access('update', 3);
 }
 
 /**
@@ -255,6 +282,21 @@ function commerce_checkout_line_item_views_form_submit($form, &$form_state) {
   if ($form_state['triggering_element']['#value'] == $form['actions']['checkout']['#value']) {
     $form_state['redirect'] = 'checkout/' . $order->order_id;
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds a checkbox to the order settings form to enable the local action on
+ * order edit forms to simulate checkout completion.
+ */
+function commerce_checkout_form_commerce_order_settings_form_alter(&$form, &$form_state) {
+  $form['commerce_order_simulate_checkout_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable the local action link on order edit forms to simulate checkout completion.'),
+    '#default_value' => variable_get('commerce_order_simulate_checkout_link', TRUE),
+    '#weight' => 20,
+  );
 }
 
 /**

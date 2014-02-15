@@ -84,3 +84,11 @@ function commerce_checkout_uninstall() {
 function commerce_checkout_update_7100() {
   variable_del('commerce_checkout_completion_message_override');
 }
+
+/**
+ * Disable the new local action to simulate checkout completion for an order.
+ */
+function commerce_checkout_update_7101() {
+  variable_set('commerce_order_simulate_checkout_link', FALSE);
+  return t('A new local action link on order edit forms for simulating checkout completion for an order has been disabled by default; enable it on the order settings form if desired.');
+}

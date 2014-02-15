@@ -398,3 +398,53 @@ function commerce_checkout_complete_rules() {
 
   return $content;
 }
+
+/**
+ * Form callback: confirmation form for manually invoking the checkout
+ * completion event for an order.
+ *
+ * @param $order
+ *   The order object to process checkout completion on.
+ *
+ * @return
+ *   The form array to confirm the process.
+ *
+ * @see confirm_form()
+ */
+function commerce_checkout_complete_form($form, &$form_state, $order) {
+  $form['order_id'] = array(
+    '#type' => 'value',
+    '#value' => $order->order_id,
+  );
+
+  // Build a description of what the user may expect to occur on submission.
+  $items = array(
+    t('The normal checkout completion process will be invoked on this order.'),
+    t('This may involve order status updates and e-mail notifications.'),
+  );
+
+  $form = confirm_form($form,
+    t('Are you sure you want to simulate checkout completion for order @number?', array('@number' => $order->order_number)),
+    'admin/commerce/orders/' . $order->order_id . '/edit',
+    '<p>' . theme('item_list', array('items' => $items)) . '</p>',
+    t('Simulate checkout completion'),
+    t('Cancel')
+  );
+
+  return $form;
+}
+
+/**
+ * Form submit callback for commerce_checkout_complete_form().
+ */
+function commerce_checkout_complete_form_submit($form, &$form_state) {
+  if ($order = commerce_order_load($form_state['values']['order_id'])) {
+    commerce_checkout_complete($order);
+    drupal_set_message(t('Checkout completion rules have been executed for the order.'));
+    $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/edit';
+  }
+  else {
+    drupal_set_message(t('Order not found.'), 'error');
+    $form_state['redirect'] = 'admin/commerce/orders';
+  }
+}

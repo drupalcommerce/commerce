@@ -62,7 +62,7 @@ function hook_commerce_price_field_calculation_options($field, $instance, $view_
  *   An array of price component type arrays keyed by name.
  */
 function hook_commerce_price_component_type_info() {
-    return array(
+  return array(
     'base_price' => array(
       'title' => t('Base price'),
       'display_title' => t('Subtotal'),
