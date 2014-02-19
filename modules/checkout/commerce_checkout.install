@@ -92,3 +92,12 @@ function commerce_checkout_update_7101() {
   variable_set('commerce_order_simulate_checkout_link', FALSE);
   return t('A new local action link on order edit forms for simulating checkout completion for an order has been disabled by default; enable it on the order settings form if desired.');
 }
+
+/**
+ * Disable the new checkout completion rule that updates order created dates to
+ * the checkout completion date.
+ */
+function commerce_checkout_update_7102() {
+  variable_set('enable_commerce_checkout_order_created_date_update', FALSE);
+  return t('A new core checkout completion rule has been added that updates order creation timestamps to the time of checkout completion. It has been disabled by default to not interfere with existing order workflows, but you may enable it in your checkout settings if desired.');
+}
