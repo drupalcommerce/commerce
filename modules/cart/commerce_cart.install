@@ -34,3 +34,12 @@ function commerce_cart_update_7101() {
   variable_set('commerce_order_apply_pricing_rules_link', FALSE);
   return t('A new local action link on order edit forms for applying pricing rules to an order has been disabled by default; enable it on the order settings form if desired.');
 }
+
+/**
+ * Adjust the new shopping cart refresh frequency to occur continuously to match
+ * the long-standing behavior of the process.
+ */
+function commerce_cart_update_7102() {
+  variable_set('commerce_cart_refresh_frequency', 0);
+  return t('New order settings have been added to let you reduce the frequency of the shopping cart refresh. This update set it to occur continuously as it has been, but we recommend you implement some delay unless you have a unique product pricing situation that demands pricing updates every time a shopping cart is loaded.');
+}

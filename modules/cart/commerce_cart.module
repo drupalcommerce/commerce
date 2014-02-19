@@ -379,7 +379,7 @@ function commerce_cart_form_commerce_order_settings_form_alter(&$form, &$form_st
     '#type' => 'textfield',
     '#title' => t('Shopping cart refresh frequency'),
     '#description' => t('Shopping carts will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
-    '#default_value' => variable_get('commerce_cart_refresh_frequency', 15),
+    '#default_value' => variable_get('commerce_cart_refresh_frequency', 30),
     '#required' => TRUE,
     '#size' => 32,
     '#field_suffix' => t('seconds'),
