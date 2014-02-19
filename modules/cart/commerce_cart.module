@@ -8,6 +8,10 @@
  * special considerations to associate it with a user and
  */
 
+// Define constants for the shopping cart refresh modes.
+define('COMMERCE_CART_REFRESH_ALWAYS', 'always');
+define('COMMERCE_CART_REFRESH_OWNER_ONLY', 'owner_only');
+define('COMMERCE_CART_REFRESH_ACTIVE_CART_ONLY', 'active_cart_only');
 
 /**
  * Implements hook_menu().
@@ -353,6 +357,50 @@ function commerce_cart_form_commerce_order_settings_form_alter(&$form, &$form_st
     '#default_value' => variable_get('commerce_order_apply_pricing_rules_link', TRUE),
     '#weight' => 10,
   );
+
+  // Add a fieldset for settings pertaining to the shopping cart refresh.
+  $form['cart_refresh'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Shopping cart refresh'),
+    '#description' => t('Shopping cart orders comprise orders in shopping cart and some checkout related order statuses. These settings let you control the shopping cart orders are refreshed, the process during which product prices are recalculated, to improve site performance in the case of excessive refreshes on sites with less dynamic pricing needs.'),
+    '#weight' => 40,
+  );
+  $form['cart_refresh']['commerce_cart_refresh_mode'] = array(
+    '#type' => 'radios',
+    '#title' => t('Shopping cart refresh mode'),
+    '#options' => array(
+      COMMERCE_CART_REFRESH_ALWAYS => t('Refresh a shopping cart when it is loaded regardless of who it belongs to.'),
+      COMMERCE_CART_REFRESH_OWNER_ONLY => t('Only refresh a shopping cart when it is loaded if it belongs to the current user.'),
+      COMMERCE_CART_REFRESH_ACTIVE_CART_ONLY => t("Only refresh a shopping cart when it is loaded if it is the current user's active shopping cart."),
+    ),
+    '#default_value' => variable_get('commerce_cart_refresh_mode', COMMERCE_CART_REFRESH_OWNER_ONLY),
+  );
+  $form['cart_refresh']['commerce_cart_refresh_frequency'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Shopping cart refresh frequency'),
+    '#description' => t('Shopping carts will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
+    '#default_value' => variable_get('commerce_cart_refresh_frequency', 15),
+    '#required' => TRUE,
+    '#size' => 32,
+    '#field_suffix' => t('seconds'),
+    '#element_validate' => array('commerce_cart_validate_refresh_frequency'),
+  );
+  $form['cart_refresh']['commerce_cart_refresh_force'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Always refresh shopping cart orders on shopping cart and checkout form pages regardless of other settings.'),
+    '#description' => t('Note: this option only applies to the core /cart and /checkout/* paths.'),
+    '#default_value' => variable_get('commerce_cart_refresh_force', TRUE),
+  );
+}
+
+/**
+ * Form element validation handler for the cart refresh frequency value.
+ */
+function commerce_cart_validate_refresh_frequency($element, &$form_state) {
+  $value = $element['#value'];
+  if ($value !== '' && (!is_numeric($value) || intval($value) != $value || $value < 0)) {
+    form_error($element, t('%name must be 0 or a positive integer.', array('%name' => $element['#title'])));
+  }
 }
 
 /**
@@ -626,6 +674,63 @@ function commerce_cart_block_view($delta) {
   }
 }
 
+ /**
+ * Checks if a cart order should be refreshed based on the shopping cart refresh
+ * settings on the order settings form.
+ *
+ * @param $order
+ *   The cart order to check.
+ *
+ * @return
+ *   Boolean indicating whether or not the cart order can be refreshed.
+ */
+function commerce_cart_order_can_refresh($order) {
+  global $user;
+
+  // Force the shopping cart refresh on /cart and /checkout/* paths if enabled.
+  if (variable_get('commerce_cart_refresh_force', TRUE) &&
+    (current_path() == 'cart' || strpos(current_path(), 'checkout/') === 0)) {
+    return TRUE;
+  }
+
+  // Prevent refresh for orders that don't match the current refresh mode.
+  switch (variable_get('commerce_cart_refresh_mode', COMMERCE_CART_REFRESH_OWNER_ONLY)) {
+    case COMMERCE_CART_REFRESH_OWNER_ONLY:
+      // If the order is anonymous, check the session to see if the order
+      // belongs to the current user. Otherwise just check that the order uid
+      // matches the current user.
+      if ($order->uid == 0 && !commerce_cart_order_session_exists($order->order_id)) {
+        return FALSE;
+      }
+      elseif ($order->uid != $user->uid) {
+        return FALSE;
+      }
+      break;
+
+    case COMMERCE_CART_REFRESH_ACTIVE_CART_ONLY:
+      // Check to see if the order ID matches the current user's cart order ID.
+      if (commerce_cart_order_id($user->uid) != $order->order_id) {
+        return FALSE;
+      }
+      break;
+
+    case COMMERCE_CART_REFRESH_ALWAYS:
+    default:
+      // Continue on if shopping cart orders should always refresh.
+      break;
+  }
+
+  // Check to see if the last cart refresh happened long enough ago.
+  $seconds = variable_get('commerce_cart_refresh_frequency', 15);
+
+  if (!empty($seconds) && !empty($order->data['last_cart_refresh']) &&
+    REQUEST_TIME - $order->data['last_cart_refresh'] < $seconds) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
 /**
  * Implements hook_commerce_order_load().
  *
@@ -639,13 +744,37 @@ function commerce_cart_commerce_order_load($orders) {
 
   foreach ($orders as $order) {
     // Refresh only if this order object represents the latest revision of a
-    // shopping cart order and it hasn't been refreshed already.
+    // shopping cart order, it hasn't been refreshed already in this request
+    // and it meets the criteria in the shopping cart refresh settings.
     if (!isset($refreshed[$order->order_id]) &&
       commerce_cart_order_is_cart($order) &&
-      commerce_order_is_latest_revision($order)) {
+      commerce_order_is_latest_revision($order) &&
+      commerce_cart_order_can_refresh($order)) {
+      // Update the last cart refresh timestamp and record the order's current
+      // changed timestamp to detect if the order is actually updated.
+      $order->data['last_cart_refresh'] = REQUEST_TIME;
+
+      $unchanged_data = $order->data;
+      $last_changed = $order->changed;
+
       // Refresh the order and add its ID to the refreshed array.
       $refreshed[$order->order_id] = TRUE;
       commerce_cart_order_refresh($order);
+
+      // If order wasn't updated during the refresh, we need to manually update
+      // the last cart refresh timestamp in the database.
+      if ($order->changed == $last_changed) {
+        db_update('commerce_order')
+          ->fields(array('data' => serialize($unchanged_data)))
+          ->condition('order_id', $order->order_id)
+          ->execute();
+
+        db_update('commerce_order_revision')
+          ->fields(array('data' => serialize($unchanged_data)))
+          ->condition('order_id', $order->order_id)
+          ->condition('revision_id', $order->revision_id)
+          ->execute();
+      }
     }
   }
 }
@@ -1173,6 +1302,7 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
   // If no order existed, create one now.
   if (empty($order)) {
     $order = commerce_cart_order_new($uid);
+    $order->data['last_cart_refresh'] = REQUEST_TIME;
   }
 
   // Set the incoming line item's order_id.
