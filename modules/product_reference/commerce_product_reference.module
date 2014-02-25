@@ -1437,9 +1437,9 @@ function commerce_product_reference_property_info_callback(&$info, $entity_type,
 function commerce_product_reference_node_types() {
   $list = array();
   $types = node_type_get_types();
-  foreach (field_info_fields() as $field_name => $field) {
-    if ($field['type'] == 'commerce_product_reference' && !empty($field['bundles']['node'])) {
-      foreach($field['bundles']['node'] as $bundle) {
+  foreach (field_info_field_map() as $field_name => $field_stub) {
+    if ($field_stub['type'] == 'commerce_product_reference' && !empty($field_stub['bundles']['node'])) {
+      foreach($field_stub['bundles']['node'] as $bundle) {
         $list[$bundle] = $types[$bundle];
       }
     }

@@ -76,11 +76,7 @@ function commerce_product_reference_views_data_alter(&$data) {
 
   // Adds inverse relationships between the product and entity types referencing
   // it (for example, nodes).
-  foreach (field_info_fields() as $field_name => $field) {
-    if ($field['type'] !== 'commerce_product_reference') {
-      continue;
-    }
-
+  foreach (commerce_info_fields('commerce_product_reference') as $field_name => $field) {
     foreach ($field['bundles'] as $entity_type => $bundles) {
       if ($entity_type == 'commerce_line_item') {
         continue;

@@ -95,11 +95,12 @@ function commerce_info_fields($field_type, $entity_type = NULL) {
   $fields = array();
 
   // Loop through the fields looking for any fields of the specified type.
-  foreach (field_info_fields() as $field_name => $field) {
-    if ($field['type'] == $field_type) {
+  foreach (field_info_field_map() as $field_name => $field_stub) {
+    if ($field_stub['type'] == $field_type) {
       // Add this field to the return array if no entity type was specified or
       // if the specified type exists in the field's bundles array.
-      if (empty($entity_type) || in_array($entity_type, array_keys($field['bundles']))) {
+      if (empty($entity_type) || in_array($entity_type, array_keys($field_stub['bundles']))) {
+        $field = field_info_field($field_name);
         $fields[$field_name] = $field;
       }
     }

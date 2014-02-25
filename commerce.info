@@ -4,7 +4,7 @@ package = Commerce
 dependencies[] = system
 dependencies[] = entity
 dependencies[] = rules
-core = 7.x
+core = 7.x (>=7.22)
 
 ; Tests
 files[] = tests/commerce_base.test

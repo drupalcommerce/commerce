@@ -116,14 +116,14 @@ function _commerce_price_get_price_fields($entity_type, $entity) {
   // Determine the list of instances to iterate on.
   list(, , $bundle) = entity_extract_ids($entity_type, $entity);
   $instances = field_info_instances($entity_type, $bundle);
-  $fields = field_info_fields();
 
   // Iterate through the instances and collect results.
   foreach ($instances as $instance) {
     $field_name = $instance['field_name'];
+    $field = field_info_field($field_name);
 
     // If the instance is a price field with data...
-    if ($fields[$field_name]['type'] == 'commerce_price' && isset($entity->{$field_name})) {
+    if ($field['type'] == 'commerce_price' && isset($entity->{$field_name})) {
       $commerce_price_fields[] = $field_name;
     }
   }
