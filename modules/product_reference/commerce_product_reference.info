@@ -7,7 +7,7 @@ dependencies[] = commerce_price
 dependencies[] = commerce_product
 dependencies[] = entity
 dependencies[] = options
-core = 7.x (>=7.22)
+core = 7.x
 
 ; Views handlers
 files[] = includes/views/handlers/commerce_product_reference_handler_filter_node_is_product_display.inc
