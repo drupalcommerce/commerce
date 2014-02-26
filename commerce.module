@@ -1243,3 +1243,86 @@ function commerce_options_list_limit_validate($element, &$form_state, $form) {
     form_error($element, t('Use a positive number for the options list limit or else leave it blank for no limit.'));
   }
 }
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * The Entity API theme function template_preprocess_entity() assumes the
+ * presence of a path key in an entity URI array, which isn't strictly required
+ * by Drupal core itself. Until this is fixed in the Entity API code, we replace
+ * that function with a Commerce specific version.
+ *
+ * @todo Remove when https://drupal.org/node/1934382 is resolved.
+ */
+function commerce_theme_registry_alter(&$theme_registry) {
+  // Copy the preprocess functions array and remove the core preprocess function
+  // along with the Entity API's and this module's.
+  $functions = drupal_map_assoc($theme_registry['entity']['preprocess functions']);
+  unset($functions['template_preprocess'], $functions['template_preprocess_entity'], $functions['commerce_preprocess_entity']);
+
+  // Unshift the core preprocess function and the Commerce specific function so
+  // they appear at the beginning of the array in the desired order.
+  array_unshift($functions, 'template_preprocess', 'commerce_preprocess_entity');
+
+  // Update the function list in the theme registry.
+  $theme_registry['entity']['preprocess functions'] = array_values($functions);
+}
+
+/**
+ * Processes variables for entity.tpl.php, replacing template_preprocess_entity().
+ *
+ * @see commerce_theme_registry_alter()
+ * @todo Remove when https://drupal.org/node/1934382 is resolved.
+ */
+function commerce_preprocess_entity(&$variables) {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $entity_type = $variables['elements']['#entity_type'];
+  $variables['entity_type'] = $entity_type;
+  $entity = $variables['elements']['#entity'];
+  $variables[$variables['elements']['#entity_type']] = $entity;
+  $info = entity_get_info($entity_type);
+
+  $variables['title'] = check_plain(entity_label($entity_type, $entity));
+
+  $uri = entity_uri($entity_type, $entity);
+  $variables['url'] = $uri && isset($uri['path']) ? url($uri['path'], $uri['options']) : FALSE;
+
+  if (isset($variables['elements']['#page'])) {
+    // If set by the caller, respect the page property.
+    $variables['page'] = $variables['elements']['#page'];
+  }
+  else {
+    // Else, try to automatically detect it.
+    $variables['page'] = $uri && isset($uri['path']) && $uri['path'] == $_GET['q'];
+  }
+
+  // Helpful $content variable for templates.
+  $variables['content'] = array();
+  foreach (element_children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  if (!empty($info['fieldable'])) {
+    // Make the field variables available with the appropriate language.
+    field_attach_preprocess($entity_type, $entity, $variables['content'], $variables);
+  }
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+
+  // Gather css classes.
+  $variables['classes_array'][] = drupal_html_class('entity-' . $entity_type);
+  $variables['classes_array'][] = drupal_html_class($entity_type . '-' . $bundle);
+
+  // Add RDF type and about URI.
+  if (module_exists('rdf')) {
+    $variables['attributes_array']['about'] = empty($uri['path']) ? NULL: url($uri['path']);
+    $variables['attributes_array']['typeof'] = empty($entity->rdf_mapping['rdftype']) ? NULL : $entity->rdf_mapping['rdftype'];
+  }
+
+  // Add suggestions.
+  $variables['theme_hook_suggestions'][] = $entity_type;
+  $variables['theme_hook_suggestions'][] = $entity_type . '__' . $bundle;
+  $variables['theme_hook_suggestions'][] = $entity_type . '__' . $bundle . '__' . $variables['view_mode'];
+  if ($id = entity_id($entity_type, $entity)) {
+    $variables['theme_hook_suggestions'][] = $entity_type . '__' . $id;
+  }
+}
