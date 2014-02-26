@@ -97,29 +97,8 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
 
     $this->assertText('Example payment', t('Example payment method pane is present'));
 
-    // Test validation messages not filling any information.
-    $this->drupalPost(NULL, array(), t('Continue to next step'));
-
-    // Get all panes from the system to get their forms.
-    $panes = commerce_checkout_panes();
-
-    // Check the validation message for the example payment pane.
-    $callback = commerce_checkout_pane_callback($panes['commerce_payment'], 'checkout_form');
-    $pane_form = drupal_get_form($callback, $panes['commerce_payment'], $this->order);
-    foreach (element_children($pane_form['payment_details']) as $key) {
-      if ($pane_form['payment_details'][$key]['#required']) {
-        $this->assertText(t('!pane_message field is required', array('!pane_message' => $pane_form['payment_details'][$key]['#title'])), t('Check required payment pane message'));
-      }
-    }
-
-    // Test payment information validation. Payment example module name field
-    // will fail for single character value.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName(1)), t('Continue to next step'));
-    $this->assertTitle(t('Review order') . ' | Drupal', t('We should still be on review order page'));
-    $this->assertText(t('You must enter a name two or more characters long.'), t('Validation error message found on the page'));
-
     // Finish checkout process.
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => $this->randomName()), t('Continue to next step'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
 
     // Load payment to check its status.
     $payment = commerce_payment_transaction_load_multiple(array(), array('order_id' => $this->order->order_id), TRUE);
@@ -154,13 +133,12 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPostAJAX(NULL, array('payment_method' => 'commerce_payment_example|commerce_payment_commerce_payment_example'), array('op' => t('Add payment')));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-amount')]", NULL, t('Amount field is present'));
     $this->assertFieldByXPath("//select[starts-with(@id, 'edit-currency-code')]", NULL, t('Currency code field is present'));
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-name')]", NULL, t('Name text field from payment example module is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-credit-card-number')]", NULL, t('Credit card number field from payment example module is present'));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-submit')]", NULL, t('Save button is present'));
     $payment_amount = intval($balance['amount'] / 2);
     $post_data = array(
       'amount' => (commerce_currency_amount_to_decimal($payment_amount, $balance['currency_code'])),
       'currency_code' => 'USD',
-      'payment_details[name]' => $this->randomName(),
     );
     $this->drupalPost(NULL, $post_data, t('Save'));
 
@@ -179,12 +157,11 @@ class CommercePaymentUITest extends CommerceBaseTestCase {
     $this->drupalPostAJAX(NULL, array('payment_method' => 'commerce_payment_example|commerce_payment_commerce_payment_example'), array('op' => t('Add payment')));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-amount')]", NULL, t('Amount field is present'));
     $this->assertFieldByXPath("//select[starts-with(@id, 'edit-currency-code')]", NULL, t('Currency code field is present'));
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-name')]", NULL, t('Name text field from payment example module is present'));
+    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-payment-details-credit-card-number')]", NULL, t('Credit card number field from payment example module is present'));
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-submit')]", NULL, t('Save button is present'));
     $post_data = array(
       'amount' => commerce_currency_amount_to_decimal($new_balance['amount'], $new_balance['currency_code']),
       'currency_code' => 'USD',
-      'payment_details[name]' => $this->randomName(),
     );
     $this->drupalPost(NULL, $post_data, t('Save'));
 

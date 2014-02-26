@@ -71,7 +71,7 @@ class CommerceTaxUIAdminTest extends CommerceBaseTestCase {
       'customer_profile_billing[commerce_customer_address][und][0][postal_code]' => rand(00000, 99999),
     );
     $this->drupalPost(NULL, $info, t('Continue to next step'));
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
   }
 
   /**

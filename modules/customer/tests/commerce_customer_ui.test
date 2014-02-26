@@ -407,7 +407,7 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Finish checkout process
-    $this->drupalPost(NULL, array('commerce_payment[payment_details][name]' => 'Example payment method'), t('Continue to next step'));
+    $this->drupalPost(NULL, array(), t('Continue to next step'));
 
     // Login with store admin.
     $this->drupalLogin($this->store_admin);
