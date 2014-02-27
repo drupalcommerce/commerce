@@ -1401,6 +1401,19 @@ function commerce_product_line_item_types() {
 }
 
 /**
+ * Implements hook_commerce_checkout_order_can_checkout().
+ */
+function commerce_product_reference_commerce_checkout_order_can_checkout($order) {
+  // Allow orders with one or more product line items to proceed to checkout.
+  // If there are no line items on the order, redirect away.
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
+    return TRUE;
+  }
+}
+
+/**
  * Implements hook_commerce_product_can_delete().
  */
 function commerce_product_reference_commerce_product_can_delete($product) {

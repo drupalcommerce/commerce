@@ -42,6 +42,29 @@ function hook_commerce_checkout_router($order, $checkout_page) {
 }
 
 /**
+ * Allows modules to confirm that an order may proceed to checkout.
+ *
+ * If any implementation of this hook returns TRUE, the given order can proceed
+ * to checkout. However, if no implementations of this hook exist and return
+ * TRUE, the checkout router will simply redirect away to the front page.
+ *
+ * @param $order
+ *   The order being confirmed for checkout.
+ *
+ * @return
+ *   Boolean value indicating whether or not the order can proceed to checkout.
+ */
+function hook_commerce_checkout_order_can_checkout($order) {
+  // Allow orders with one or more product line items to proceed to checkout.
+  // If there are no line items on the order, redirect away.
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  if (commerce_line_items_quantity($wrapper->commerce_line_items, commerce_product_line_item_types()) > 0) {
+    return TRUE;
+  }
+}
+
+/**
  * Allows modules to perform business logic when an order completes checkout.
  *
  * This hook coincides with the "Customer completes checkout" event. Only

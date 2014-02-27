@@ -899,6 +899,40 @@ function commerce_checkout_order_uri($order) {
 }
 
 /**
+ * Determines whether or not the given order can proceed to checkout.
+ *
+ * This function operates as a confirmation rather than a falsification, meaning
+ * that any module implementing hook_commerce_checkout_order_can_checkout() can
+ * confirm the order may proceed to checkout.
+ *
+ * The default core implementation is in commerce_product_reference.module and
+ * allows any order containing a product line item to proceed to checkout.
+ *
+ * More complex logic can be implemented via hook_commerce_checkout_router().
+ *
+ * @param $order
+ *   The order being confirmed for checkout.
+ *
+ * @return
+ *   Boolean value indicating whether or not the order can proceed to checkout.
+ *
+ * @see commerce_product_reference_commerce_checkout_order_can_checkout()
+ */
+function commerce_checkout_order_can_checkout($order) {
+  $proceed = FALSE;
+
+  // Manually invoke hook functions to use the bitwise operator that will update
+  // the return value to TRUE if any implementation returns TRUE and ignore any
+  // FALSE return values if it is already set to TRUE.
+  foreach (module_implements('commerce_checkout_order_can_checkout') as $module) {
+    $function = $module . '_commerce_checkout_order_can_checkout';
+    $proceed |= $function($order);
+  }
+
+  return $proceed;
+}
+
+/**
  * Completes the checkout process for the given order.
  */
 function commerce_checkout_complete($order) {
