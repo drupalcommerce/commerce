@@ -1140,17 +1140,6 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
     $account = $user;
   }
 
-  // Read the base table from the query if available or default to the first
-  // table in the query's tables array.
-  if (!isset($base_table) && !$base_table = $query->getMetaData('base_table')) {
-    // Assume that the base table is the first table if not set. It will result
-    // in an invalid query if the first table is not the table we expect,
-    // forcing the caller to actually properly pass a base table in that case.
-    $tables = &$query->getTables();
-    reset($tables);
-    $base_table = key($tables);
-  }
-
   // Do not apply any conditions for users with administrative view permissions.
   if (user_access('administer ' . $entity_type . ' entities', $account)
     || user_access('view any ' . $entity_type . ' entity', $account)) {
@@ -1160,9 +1149,44 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
   // Get the entity type info array for the current access check and prepare a
   // conditions object.
   $entity_info = entity_get_info($entity_type);
+
+  // If a base table wasn't specified, attempt to read it from the query if
+  // available, look for a table in the query's tables array that matches the
+  // base table of the given entity type, or just default to the first table.
+  if (!isset($base_table) && !$base_table = $query->getMetaData('base_table')) {
+    // Initialize the base table to the first table in the array. If a table can
+    // not be found that matches the entity type's base table, this will result
+    // in an invalid query if the first table is not the table we expect,
+    // forcing the caller to actually properly pass a base table in that case.
+    $tables = $query->getTables();
+    reset($tables);
+    $base_table = key($tables);
+
+    foreach ($tables as $table_info) {
+      if (!($table_info instanceof SelectQueryInterface)) {
+        // If this table matches the entity type's base table, use its table
+        // alias as the base table for the purposes of bundle and ownership
+        // access checks.
+        if ($table_info['table'] == $entity_info['base table']) {
+          $base_table = $table_info['alias'];
+        }
+      }
+    }
+  }
+
+  // Prepare an OR container for conditions. Conditions will be added that seek
+  // to grant access, meaning any particular type of permission check may grant
+  // access even if none of the others apply. At the end of this function, if no
+  // conditions have been added to the array, a condition will be added that
+  // always returns FALSE (1 = 0).
   $conditions = db_or();
 
   // Perform bundle specific permission checks for the specified entity type.
+  // In the event that the user has permission to view every bundle of the given
+  // entity type, $really_restricted will remain FALSE, indicating that it is
+  // safe to exit this function without applying any additional conditions. If
+  // the user only had such permission for a subset of the defined bundles,
+  // conditions representing those access checks would still be added.
   $really_restricted = FALSE;
 
   // Loop over every possible bundle for the given entity type.
