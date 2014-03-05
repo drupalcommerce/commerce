@@ -1,7 +1,6 @@
 name = Product UI
 description = Exposes a default UI for Products through product edit forms and default Views.
 package = Commerce
-dependencies[] = contextual
 dependencies[] = field_ui
 dependencies[] = commerce
 dependencies[] = commerce_ui

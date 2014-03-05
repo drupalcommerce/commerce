@@ -1,7 +1,6 @@
 name = Customer UI
 description = Exposes a default UI for Customers through profile edit forms and default Views.
 package = Commerce
-dependencies[] = contextual
 dependencies[] = field_ui
 dependencies[] = commerce
 dependencies[] = commerce_ui
