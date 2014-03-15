@@ -108,7 +108,7 @@ function commerce_checkout_menu() {
 function commerce_checkout_complete_form_access($order) {
   // Returns TRUE if the link is enabled via the order settings form and the
   // user has access to update the order.
-  return variable_get('commerce_order_simulate_checkout_link', TRUE) && commerce_order_access('update', 3);
+  return variable_get('commerce_order_simulate_checkout_link', TRUE) && commerce_order_access('update', $order);
 }
 
 /**
