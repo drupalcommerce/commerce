@@ -6,5 +6,4 @@ dependencies[] = commerce_price
 dependencies[] = commerce_product_reference
 dependencies[] = entity
 dependencies[] = rules
-dependencies[] = rules_admin
 core = 7.x
