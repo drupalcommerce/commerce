@@ -149,7 +149,7 @@ function _commerce_price_field_serialize_data($entity_type, $entity) {
       // Serialize data arrays before saving.
       foreach ($items as $delta => $item) {
         // Serialize an existing data array.
-        if (!empty($item['data']) && is_array($item['data'])) {
+        if (isset($item['data']) && is_array($item['data'])) {
           $entity->{$field_name}[$langcode][$delta]['data'] = serialize($item['data']);
         }
       }
