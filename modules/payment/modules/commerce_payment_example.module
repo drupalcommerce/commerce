@@ -98,4 +98,5 @@ function commerce_payment_example_transaction($payment_method, $order, $charge) 
   );
 
   commerce_payment_transaction_save($transaction);
+  return $transaction;
 }
