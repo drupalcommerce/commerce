@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Defines the Store entity type and common functions used by Commerce modules.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_permission() {
+  $permissions = array(
+    'administer commerce_store_type entities' => array(
+      'title' => t('Administer store types'),
+      'description' => t('Allows users to create, update, and delete store types.'),
+      'restrict access' => TRUE,
+    ),
+    'administer commerce_store entities' => array(
+      'title' => t('Administer stores'),
+      'description' => t('Allows users to create, update, and delete stores.'),
+      'restrict access' => TRUE,
+    ),
+    'configure store' => array(
+      'title' => t('Configure store settings'),
+      'description' => t('Allows users to update store currency and contact settings.'),
+      'restrict access' => TRUE,
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Menu argument loader: loads a store by its ID.
+ *
+ * @param integer $id
+ *   The ID of the store to load.
+ *
+ * @return \Drupal\commerce\CommerceStoreInterface
+ *   A store object or NULL if $id does not exist.
+ */
+function commerce_store_load($id) {
+  return entity_load('commerce_store', $id);
+}
+
+/**
+ * Menu argument loader: loads a store type by its machine name.
+ *
+ * @param string $type
+ *   The machine name of the store type to load.
+ *
+ * @return \Drupal\commerce\CommerceStoreTypeInterface
+ *   A store type object or NULL if $name does not exist.
+ */
+function commerce_store_type_load($type) {
+  return entity_load('commerce_store_type', $type);
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function commerce_toolbar(&$items) {
+  $items = array();
+
+  $items['commerce'] = array(
+    '#type' => 'toolbar_item',
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'commerce') . '/css/commerce.icons.css',
+      ),
+    ),
+  );
+
+  return $items;
+}
+
+/**
+ * Returns the e-mail address from which to send commerce related e-mails.
+ *
+ * Currently this is just using the site's e-mail address, but this may be
+ * updated to use a specific e-mail address when we add a settings form for the
+ * store's physical address and contact information.
+ */
+function commerce_email_from() {
+  return config('system.site')->get('mail');
+}
+
+/**
+ * Returns the currency code of the site's default currency.
+ */
+function commerce_default_currency() {
+  return config('commerce')->get('default_currency');
+}

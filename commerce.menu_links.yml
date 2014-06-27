@@ -1,0 +1,6 @@
+commerce.admin_commerce:
+  title: Commerce
+  route_name: commerce.admin_commerce
+  parent: system.admin
+  description: 'Administer your commerce data and configuration.'
+  weight: -9

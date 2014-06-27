@@ -1,0 +1,7 @@
+commerce.admin_commerce:
+  path: '/admin/commerce'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Commerce'
+  requirements:
+    _permission: 'access administration pages'
