@@ -59,7 +59,7 @@ function commerce_store_type_load($type) {
 /**
  * Implements hook_toolbar().
  */
-function commerce_toolbar(&$items) {
+function commerce_toolbar() {
   $items = array();
 
   $items['commerce'] = array(
