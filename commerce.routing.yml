@@ -1,0 +1,42 @@
+commerce.admin_commerce:
+  path: '/admin/commerce'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Commerce'
+  requirements:
+    _permission: 'access administration pages'
+commerce.configuration:
+  path: '/admin/commerce/config'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Configuration'
+  requirements:
+    _permission: 'access administration pages'
+commerce_store.list:
+  path: '/admin/commerce/config/store'
+  defaults:
+    _entity_list: 'commerce_store'
+    _title: 'Store information'
+  requirements:
+    _permission: 'view commerce_store entities'
+commerce_store.add:
+  path: '/admin/commerce/config/store/add'
+  defaults:
+    _entity_form: commerce_store.add
+    _title: 'Add a new store'
+  requirements:
+    _permission: 'create commerce_store entities'
+commerce_store.edit:
+  path: '/admin/commerce/config/store/{commerce_store}/edit'
+  defaults:
+    _entity_form: commerce_store.edit
+    _title: 'Edit a store'
+  requirements:
+    _permission: 'update commerce_store entities'
+commerce_store.delete:
+  path: '/admin/commerce/config/store/{commerce_store}/delete'
+  defaults:
+    _entity_form: commerce_store.delete
+    _title: 'Delete a store'
+  requirements:
+    _permission: 'delete commerce_store entities'
