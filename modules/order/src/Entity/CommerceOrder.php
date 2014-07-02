@@ -140,6 +140,20 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
+  public function getOwner() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setOwnerId($uid) {
     $this->set('uid', $uid);
     return $this;
@@ -225,7 +239,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setSetting('target_type', 'commerce_order_type')
       ->setReadOnly(TRUE)
       ->setDisplayOptions('form', array(
-        'type' => 'select',
+        'type' => 'options_select',
         'weight' => 0,
       ));;
 
