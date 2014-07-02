@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Default theme implementation to list order types available for creating an
+ * order.
+ *
+ * Available variables:
+ * - types: A list of content types, each with the following properties:
+ *   - add_link: Link to create a piece of content of this type.
+ *   - description: Description of this type of content.
+ *
+ * @see template_preprocess_commerce_order_add_list()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if types is not empty %}
+    <dl class="order-type-list">
+        {% for type in types %}
+            <dt>{{ type.add_link }}</dt>
+            <dd>{{ type.description }}</dd>
+        {% endfor %}
+    </dl>
+{% else %}
+    <p>
+        {% set create_order_type = url('admin/commerce/config/order/types/add') %}
+        {% trans %}
+        You have not created any order types yet. Go to the <a href="{{ create_order_type }}">order type creation page</a> to add a new order type.
+        {% endtrans %}
+    </p>
+{% endif %}
