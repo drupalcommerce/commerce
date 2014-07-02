@@ -5,6 +5,8 @@
  * Defines the Store entity type and common functions used by Commerce modules.
  */
 
+use Drupal\commerce\Entity\CommerceStoreType;
+
 /**
  * Implements hook_permission().
  */
@@ -28,6 +30,19 @@ function commerce_permission() {
   );
 
   return $permissions;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_theme() {
+  return array(
+    'commerce_store_add_list' => array(
+      'variables' => array('content' => NULL),
+      'file' => 'commerce.pages.inc',
+      'template' => 'commerce-store-add-list',
+    ),
+  );
 }
 
 /**

@@ -5,7 +5,7 @@ commerce.store_type_add:
     - commerce.store_type_list
 
 commerce.store_add:
-  route_name: commerce.store_add
+  route_name: commerce.store_add_page
   title: 'Add a new store'
   appears_on:
     - commerce.store_list

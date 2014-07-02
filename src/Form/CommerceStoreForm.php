@@ -28,10 +28,6 @@ class CommerceStoreForm extends ContentEntityForm {
       '#default_value' => $entity->getUntranslated()->language()->id,
       '#languages' => Language::STATE_ALL,
     );
-    $form['type'] = array(
-      '#type' => 'hidden',
-      '#default_value' => $entity->getEntityTypeId(),
-    );
     $form['name'] = array(
       '#type' => 'textfield',
       '#title' => t('Store name'),

@@ -54,11 +54,19 @@ commerce.store_list:
   requirements:
     _permission: 'view commerce_store entities'
 
-commerce.store_add:
+commerce.store_add_page:
   path: '/admin/commerce/config/store/add'
   defaults:
-    _entity_form: commerce_store.add
     _title: 'Add a new store'
+    _content: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
+  requirements:
+    _permission: 'administer commerce_store entities'
+
+commerce.store_add:
+  path: '/admin/commerce/config/store/add/{commerce_store_type}'
+  defaults:
+    _content: '\Drupal\commerce\Controller\CommerceStoreController::add'
+    _title_callback: '\Drupal\commerce\Controller\CommerceStoreController::addPageTitle'
   requirements:
     _permission: 'create commerce_store entities'
 

@@ -6,9 +6,9 @@ commerce.commerce_store_type.*:
   mapping:
     id:
       type: string
-      label: 'ID'
+      label: 'Type'
     label:
-        type: label
-        label: 'Label'
+      type: label
+      label: 'Label'
     uuid:
-        type: string
+      type: string
