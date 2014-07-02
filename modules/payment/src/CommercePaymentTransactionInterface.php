@@ -11,7 +11,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
- * Provides an interface defining a Commerce Transaction entity.
+ * Provides an interface defining a Commerce Payment Transaction entity.
  */
 interface CommercePaymentTransactionInterface extends ContentEntityInterface {
   /**
@@ -74,44 +74,6 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
   public function getMessage();
 
   /**
-   * Sets the amount of this transaction.
-   *
-   * @param int $amount
-   *   An integer amount.
-   *
-   * @return \Drupal\commerce_payment\CommercePaymentTransactionInterface
-   *   The class instance that this method is called on.
-   */
-  public function setAmount($amount);
-
-  /**
-   * Returns the amount of this transaction.
-   *
-   * @return int
-   *   The amount of this transaction.
-   */
-  public function getAmount();
-
-  /**
-   * Sets the currency code for a transaction.
-   *
-   * @param string $currency_code
-   *   The new default currency code of the transaction.
-   *
-   * @return \Drupal\commerce_payment\CommercePaymentTransactionInterface
-   *   The class instance that this method is called on.
-   */
-  public function setCurrencyCode($currency_code);
-
-  /**
-   * Returns the currency code for a transaction.
-   *
-   * @return string
-   *   The currency code.
-   */
-  public function getCurrencyCode();
-
-  /**
    * Sets the status of this transaction.
    *
    * @param string $status
@@ -126,7 +88,7 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
    * Returns the status of this transaction.
    *
    * @return string
-   *   The currency code.
+   *   The status of this transaction.
    */
   public function getStatus();
 
@@ -175,7 +137,7 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
    * @return int
    *   The Unix timestamp when this transaction was created.
    */
-  public function created();
+  public function getCreated();
 
   /**
    * Sets the Unix timestamp when this transaction was last changed.

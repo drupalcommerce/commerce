@@ -12,6 +12,8 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_payment\CommercePaymentTransactionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
+// TODO: We need to attach a price field by default on bundles.
+
 /**
  * Defines the Commerce Transaction entity.
  *
@@ -29,8 +31,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "commerce_payment_transaction",
- *   revision_table = "commerce_payment_transaction_revision",
- *   fieldable = FALSE,
+ *   fieldable = TRUE,
  *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "transaction_id",
@@ -94,36 +95,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function setAmount($amount) {
-    $this->set('amount', $amount);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAmount() {
-    return $this->get('amount')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCurrencyCode($currency_code) {
-    $this->set('currency_code', $currency_code);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCurrencyCode() {
-    return $this->get('currency_code')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function setStatus($status) {
     $this->set('status', $status);
     return $this;
@@ -169,8 +140,22 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function created() {
+  public function getCreated() {
     return $this->get('created')->value;
+  }
+
+  /**
+   * Sets the Unix timestamp when this transaction was created.
+   *
+   * @param array $created
+   *   An Unix timestamp.
+   *
+   * @return \Drupal\commerce_payment\Entity\CommercePaymentTransaction
+   *   The class instance that this method is called on.
+   */
+  protected function setCreated($created) {
+    $this->set('created', $created);
+    return $this;
   }
 
   /**
@@ -224,6 +209,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setDescription(t('The UUID of a transaction.'))
       ->setReadOnly(TRUE);
 
+    // TODO: Use entity_reference instead of integer when the commerce_oder codebase will be merged.
     $fields['order_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Order ID'))
       ->setDescription(t('The ID of an order.'))
@@ -268,21 +254,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setSettings(array(
           'default_value' => '',
           'size' => 'big',
-          'text_processing' => 0,
-        ));
-
-    $fields['amount'] = FieldDefinition::create('integer')
-      ->setLabel(t('Amount'))
-      ->setDescription(t('The amount of this transaction.'))
-      ->setRequired(TRUE)
-      ->setDefaultValue(0);
-
-    $fields['currency_code'] = FieldDefinition::create('string')
-      ->setLabel(t('Currency code'))
-      ->setDescription(t('The human-readable message associated to this transaction.'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-          'max_length' => 32,
           'text_processing' => 0,
         ));
 
