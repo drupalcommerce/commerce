@@ -1,10 +1,11 @@
 commerce_order.list:
-  path: '/admin/commerce/orders/list'
+  path: '/admin/commerce/orders'
   defaults:
     _entity_list: 'commerce_order'
     _title: 'Orders list'
   requirements:
     _permission: 'view commerce_order entities'
+
 commerce_order.add:
   path: '/admin/commerce/orders/add'
   defaults:
@@ -12,6 +13,7 @@ commerce_order.add:
     _title: 'Create an order'
   requirements:
     _entity_create_access: 'commerce_order'
+
 commerce_order.edit:
   path: '/admin/commerce/orders/{commerce_order}/edit'
   defaults:
@@ -19,6 +21,7 @@ commerce_order.edit:
     _title: 'Edit order'
   requirements:
     _permission: 'edit commerce_order entities'
+
 commerce_order.delete:
   path: '/admin/commerce/orders/{commerce_order}/delete'
   defaults:
@@ -26,6 +29,15 @@ commerce_order.delete:
     _title: 'Delete order'
   requirements:
     _permission: 'delete commerce_order entities'
+
+commerce_order.configuration:
+  path: '/admin/commerce/config/order'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Order configuration'
+  requirements:
+    _permission: 'access administration pages'
+
 commerce_order.type_list:
   path: '/admin/commerce/config/order/types'
   defaults:
@@ -33,6 +45,7 @@ commerce_order.type_list:
     _title: 'Order types'
   requirements:
     _permission: 'administer commerce_order_type entities'
+
 commerce_order.type_add:
   path: '/admin/commerce/config/order/types/add'
   defaults:
@@ -40,6 +53,7 @@ commerce_order.type_add:
     _title: 'Add a new order type'
   requirements:
     _entity_create_access: 'commerce_order_type'
+
 commerce_order.type_edit:
   path: '/admin/commerce/config/order/types/{commerce_order_type}'
   defaults:
@@ -47,6 +61,7 @@ commerce_order.type_edit:
     _title: 'Edit an order type'
   requirements:
     _permission: 'administer commerce_order_type entities'
+
 commerce_order.type_delete:
   path: '/admin/commerce/config/order/types/{commerce_order_type}/delete'
   defaults:
