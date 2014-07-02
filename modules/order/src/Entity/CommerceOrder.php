@@ -237,18 +237,13 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setLabel(t('Type'))
       ->setDescription(t('The order type.'))
       ->setSetting('target_type', 'commerce_order_type')
-      ->setReadOnly(TRUE)
-      ->setDisplayOptions('form', array(
-        'type' => 'options_select',
-        'weight' => 0,
-      ));;
+      ->setReadOnly(TRUE);
 
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
       ->setDescription(t('The user that owns this order.'))
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
-      ->setTranslatable(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
         'weight' => 0,
@@ -276,14 +271,12 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     $fields['created'] = FieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the order was created.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setRevisionable(TRUE);
 
     $fields['changed'] = FieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the order was last edited.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setRevisionable(TRUE);
 
     $fields['line_items'] = FieldDefinition::create('map')
       ->setLabel(t('Line items'))
@@ -305,8 +298,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     $fields['revision_log'] = FieldDefinition::create('string_long')
       ->setLabel(t('Revision log message'))
       ->setDescription(t('The log entry explaining the changes in this revision.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);
+      ->setRevisionable(TRUE);
 
     return $fields;
   }

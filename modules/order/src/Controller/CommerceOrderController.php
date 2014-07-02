@@ -49,15 +49,15 @@ class CommerceOrderController extends ControllerBase {
   /**
    * Provides the order add form.
    *
-   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $order_type
+   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $commerce_order_type
    *   The order type entity for the order.
    *
    * @return array
    *   An order add form.
    */
-  public function add(CommerceOrderTypeInterface $order_type) {
+  public function add(CommerceOrderTypeInterface $commerce_order_type) {
     $order = $this->entityManager()->getStorage('commerce_order')->create(array(
-      'type' => $order_type->id,
+      'type' => $commerce_order_type->id,
     ));
 
     $form = $this->entityFormBuilder()->getForm($order, 'add');
@@ -68,13 +68,13 @@ class CommerceOrderController extends ControllerBase {
   /**
    * The title_callback for the commerce_order.add route.
    *
-   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $order_type
+   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $commerce_order_type
    *   The current order type.
    *
    * @return string
    *   The page title.
    */
-  public function addPageTitle(CommerceOrderTypeInterface $order_type) {
-    return $this->t('Create @label', array('@label' => $order_type->label()));
+  public function addPageTitle(CommerceOrderTypeInterface $commerce_order_type) {
+    return $this->t('Create @label', array('@label' => $commerce_order_type->label()));
   }
 }

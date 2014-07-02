@@ -9,7 +9,7 @@ commerce_order.list:
 commerce_order.add_page:
   path: '/admin/commerce/orders/add'
   defaults:
-    _title: 'Add a new order'
+    _title: 'Create a new order'
     _content: '\Drupal\commerce_order\Controller\CommerceOrderController::addPage'
   requirements:
     _entity_create_access: 'commerce_order'
