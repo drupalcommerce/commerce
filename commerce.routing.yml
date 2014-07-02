@@ -5,6 +5,7 @@ commerce.admin_commerce:
     _title: 'Commerce'
   requirements:
     _permission: 'access administration pages'
+
 commerce.configuration:
   path: '/admin/commerce/config'
   defaults:
@@ -12,28 +13,64 @@ commerce.configuration:
     _title: 'Configuration'
   requirements:
     _permission: 'access administration pages'
-commerce_store.list:
+
+commerce.store_type_list:
+  path: '/admin/commerce/config/store/types'
+  defaults:
+    _entity_list: 'commerce_store_type'
+    _title: 'Store types'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+
+commerce.store_type_add:
+  path: '/admin/commerce/config/store/types/add'
+  defaults:
+    _entity_form: 'commerce_store_type.add'
+    _title: 'Add a new store type'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+    
+commerce.store_type_edit:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}'
+  defaults:
+    _entity_form: 'commerce_store_type.edit'
+    _title: 'Edit a store type'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+    
+commerce.store_type_delete:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}/delete'
+  defaults:
+    _entity_form: 'commerce_store_type.delete'
+    _title: 'Delete a store type'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+
+commerce.store_list:
   path: '/admin/commerce/config/store'
   defaults:
     _entity_list: 'commerce_store'
     _title: 'Store information'
   requirements:
     _permission: 'view commerce_store entities'
-commerce_store.add:
+
+commerce.store_add:
   path: '/admin/commerce/config/store/add'
   defaults:
     _entity_form: commerce_store.add
     _title: 'Add a new store'
   requirements:
     _permission: 'create commerce_store entities'
-commerce_store.edit:
+
+commerce.store_edit:
   path: '/admin/commerce/config/store/{commerce_store}/edit'
   defaults:
     _entity_form: commerce_store.edit
     _title: 'Edit a store'
   requirements:
     _permission: 'update commerce_store entities'
-commerce_store.delete:
+
+commerce.store_delete:
   path: '/admin/commerce/config/store/{commerce_store}/delete'
   defaults:
     _entity_form: commerce_store.delete

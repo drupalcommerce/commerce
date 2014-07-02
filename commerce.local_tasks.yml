@@ -1,9 +1,31 @@
-commerce_store.page_edit:
-  route_name: commerce_store.edit
-  base_route: commerce_store.edit
+commerce.store_list:
+  route_name: commerce.store_list
+  base_route: commerce.store_list
+  title: List
+  
+commerce.store_type_list:
+  route_name: commerce.store_type_list
+  base_route: commerce.store_list
+  title: Store types
+
+commerce.store_type_page_edit:
+  route_name: commerce.store_type_edit
+  base_route: commerce.store_type_edit
   title: Edit
-commerce_store.delete_confirm:
-  route_name: commerce_store.delete
-  base_route: commerce_store.edit
+
+commerce.store_type_delete_confirm:
+  route_name: commerce.store_type_delete
+  base_route: commerce.store_type_edit
+  title: Delete
+  weight: 10
+
+commerce.store_page_edit:
+  route_name: commerce.store_edit
+  base_route: commerce.store_edit
+  title: Edit
+
+commerce.store_delete_confirm:
+  route_name: commerce.store_delete
+  base_route: commerce.store_edit
   title: Delete
   weight: 10

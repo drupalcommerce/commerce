@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\commerce\CommerceStoreForm.
+ * Contains Drupal\commerce\Form\CommerceStoreForm.
  */
 
-namespace Drupal\commerce;
+namespace Drupal\commerce\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Language\Language;
@@ -60,7 +60,7 @@ class CommerceStoreForm extends ContentEntityForm {
   public function submit(array $form, array &$form_state) {
     // Build the entity object from the submitted values.
     $entity = parent::submit($form, $form_state);
-    $form_state['redirect_route']['route_name'] = 'commerce_store.list';
+    $form_state['redirect_route']['route_name'] = 'commerce.store_list';
     return $entity;
   }
 

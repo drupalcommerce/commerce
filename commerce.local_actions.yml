@@ -1,5 +1,11 @@
-commerce_store.add:
-  route_name: commerce_store.add
+commerce.store_type_add:
+  route_name: commerce.store_type_add
+  title: 'Add a new store type'
+  appears_on:
+    - commerce.store_type_list
+
+commerce.store_add:
+  route_name: commerce.store_add
   title: 'Add a new store'
   appears_on:
-    - commerce_store.list
+    - commerce.store_list

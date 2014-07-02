@@ -25,7 +25,7 @@ class CommerceStoreDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelRoute() {
-    return new Url('commerce_store.list');
+    return new Url('commerce.store_list');
   }
 
   /**
@@ -42,6 +42,6 @@ class CommerceStoreDeleteForm extends ContentEntityConfirmFormBase {
     $this->entity->delete();
     drupal_set_message($this->t('Store %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('commerce', 'Store %name has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
-    $form_state['redirect_route']['route_name'] = 'commerce_store.list';
+    $form_state['redirect_route']['route_name'] = 'commerce.store_list';
   }
 }

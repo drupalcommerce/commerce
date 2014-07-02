@@ -40,7 +40,7 @@ function commerce_permission() {
  *   A store object or NULL if $id does not exist.
  */
 function commerce_store_load($id) {
-  return entity_load('commerce_store', $id);
+  return CommerceStore::load($id);
 }
 
 /**
@@ -53,7 +53,7 @@ function commerce_store_load($id) {
  *   A store type object or NULL if $name does not exist.
  */
 function commerce_store_type_load($type) {
-  return entity_load('commerce_store_type', $type);
+  return CommerceStoreType::load($type);
 }
 
 /**

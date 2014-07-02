@@ -14,7 +14,7 @@ use Drupal\commerce\CommerceStoreInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
- * Defines the Commerce Store entity.
+ * Defines the Commerce Store entity type.
  *
  * @ContentEntityType(
  *   id = "commerce_store",
@@ -23,8 +23,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommerceStoreListBuilder",
  *     "form" = {
- *       "add" = "Drupal\commerce\CommerceStoreForm",
- *       "edit" = "Drupal\commerce\CommerceStoreForm",
+ *       "add" = "Drupal\commerce\Form\CommerceStoreForm",
+ *       "edit" = "Drupal\commerce\Form\CommerceStoreForm",
  *       "delete" = "Drupal\commerce\Form\CommerceStoreDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationController"
@@ -39,8 +39,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce_store.edit",
- *     "delete-form" = "commerce_store.delete"
+ *     "edit-form" = "commerce.store_edit",
+ *     "delete-form" = "commerce.store_delete"
  *   }
  * )
  */
