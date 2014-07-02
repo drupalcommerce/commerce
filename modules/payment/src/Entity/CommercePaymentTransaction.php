@@ -17,7 +17,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *
  * @ContentEntityType(
  *   id = "commerce_payment_transaction",
- *   label = @Translation("Transaction"),
+ *   label = @Translation("Payment Transaction"),
  *   controllers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommercePaymentTransactionListBuilder",
@@ -26,7 +26,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "edit" = "Drupal\commerce\CommercePaymentTransactionForm",
  *       "delete" = "Drupal\commerce\Form\CommercePaymentTransactionDeleteForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationController"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "commerce_payment_transaction",
  *   revision_table = "commerce_payment_transaction_revision",
@@ -34,9 +34,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "transaction_id",
- *     "revision" = "revision_id",
  *     "bundle" = "payment_method",
- *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
  *   permission_granularity = "bundle",
@@ -51,37 +49,61 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->get('transaction_id')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function revisionId() {
-    return $this->get('revision_id')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLabel() {
-    return $this->get('label')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setLabel($label) {
-    $this->set('name', $label);
+  public function setInstanceId($instance_id) {
+    $this->set('instance_id', $instance_id);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCurrencyCode() {
-    return $this->get('currency_code')->value;
+  public function getInstanceId() {
+    return $this->get('instance_id')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRemoteId($remote_id) {
+    $this->set('remote_id', $remote_id);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRemoteId() {
+    return $this->get('remote_id')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessage($message) {
+    $this->set('message', $message);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessage() {
+    return $this->get('message')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAmount($amount) {
+    $this->set('amount', $amount);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAmount() {
+    return $this->get('amount')->value;
   }
 
   /**
@@ -95,6 +117,95 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
+  public function getCurrencyCode() {
+    return $this->get('currency_code')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus($status) {
+    $this->set('status', $status);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatus() {
+    return $this->get('status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRemoteStatus($remote_status) {
+    $this->set('remote_status', $remote_status);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRemoteStatus() {
+    return $this->get('remote_status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPayload($payload) {
+    $this->set('payload', $payload);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPayload() {
+    return $this->get('payload')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function created() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setChanged($changed) {
+    $this->set('changed', $changed);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getChanged() {
+    return $this->get('changed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($data) {
+    $this->set('data', $data);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData() {
+    return $this->get('data')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['transaction_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Transaction ID'))
@@ -102,26 +213,9 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['revision_id'] = FieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The ID of a transaction.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['label'] = FieldDefinition::create('string')
-      ->setLabel('Label')
-      ->setDescription('The transation label.')
-      ->setReadOnly(True)
-      ->setSettings(array(
-          'default_value' => '',
-          'max_length' => 255,
-          'text_processing' => 0,
-        ));
-
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The user that created this transaction.'))
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setTranslatable(TRUE);
 
@@ -134,14 +228,12 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Order ID'))
       ->setDescription(t('The ID of an order.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setDefaultValue(0);
 
     $fields['instance_id'] = FieldDefinition::create('string')
       ->setLabel(t('Instance ID'))
       ->setDescription(t('The payment method instance ID for this transaction.'))
       ->setRequired(True)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
@@ -152,14 +244,13 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Remote ID'))
       ->setDescription(t('The remote identifier for this transaction.'))
       ->setRequired(True)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
           'default_value' => '',
           'max_length' => 255,
           'text_processing' => 0,
-        ))
-      ->setRevisionable(TRUE);
+        ));
 
+    // Bundle.
     $fields['payment_method'] = FieldDefinition::create('string')
       ->setLabel(t('Payment method'))
       ->setDescription(t('The payment method method_id for this transaction.'))
@@ -174,7 +265,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Message'))
       ->setDescription(t('The human-readable message associated to this transaction.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
           'default_value' => '',
           'size' => 'big',
@@ -185,14 +275,12 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Amount'))
       ->setDescription(t('The amount of this transaction.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setDefaultValue(0);
 
     $fields['currency_code'] = FieldDefinition::create('string')
       ->setLabel(t('Currency code'))
       ->setDescription(t('The human-readable message associated to this transaction.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
           'max_length' => 32,
           'text_processing' => 0,
@@ -202,7 +290,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Status'))
       ->setDescription(t('The status of this transaction (pending, success, or failure).'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
           'default_value' => '',
           'max_length' => 128,
@@ -213,7 +300,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setLabel(t('Remote status'))
       ->setDescription(t('The status of the transaction at the payment provider.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSettings(array(
           'default_value' => '',
           'max_length' => 128,
@@ -223,8 +309,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
     $fields['payload'] = FieldDefinition::create('map')
       ->setLabel(t('Payload'))
       ->setDescription(t('The payment-gateway specific payload associated with this transaction.'))
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE);
+      ->setRequired(TRUE);
 
     $fields['created'] = FieldDefinition::create('created')
       ->setLabel('Created')
@@ -241,29 +326,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
     $fields['data'] = FieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'))
-      ->setRequired(FALSE)
-      ->setRevisionable(TRUE);
-
-    // Here comes the specific fields relative to the revision table.
-    $fields['revision_log'] = FieldDefinition::create('string')
-      ->setLabel(t('Log'))
-      ->setDescription(t('The log entry explaining the changes in this version.'))
-      ->setRequired(TRUE)
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE)
-      ->setSettings(array(
-          'default_value' => '',
-          'size' => 'big',
-          'text_processing' => 0,
-        ));
-
-    $fields['revision_timestamp'] = FieldDefinition::create('changed')
-      ->setLabel('Revision timestamp')
-      ->setDescription(t('The Unix timestamp when this revision was created.'))
-      ->setRequired(TRUE)
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE)
-      ->setDefaultValue(0);
+      ->setRequired(FALSE);
 
     return $fields;
   }
