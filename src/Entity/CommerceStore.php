@@ -19,6 +19,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
+ *   bundle_label = @Translation("Store type"),
  *   controllers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommerceStoreListBuilder",
@@ -35,13 +36,16 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "store_id",
+ *     "bundle" = "type",
  *     "label" = "name",
  *     "uuid" = "uuid"
  *   },
  *   links = {
  *     "edit-form" = "commerce.store_edit",
- *     "delete-form" = "commerce.store_delete"
- *   }
+ *     "delete-form" = "commerce.store_delete",
+ *     "admin-form" = "commerce.store_type_edit"
+ *   },
+ *   bundle_entity_type = "commerce_store_type"
  * )
  */
 class CommerceStore extends ContentEntityBase implements CommerceStoreInterface {

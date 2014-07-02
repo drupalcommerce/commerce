@@ -8,6 +8,7 @@
 namespace Drupal\commerce\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\commerce\CommerceStoreTypeInterface;
 
 /**
@@ -24,8 +25,9 @@ use Drupal\commerce\CommerceStoreTypeInterface;
  *       "delete" = "Drupal\commerce\Form\CommerceStoreTypeDeleteForm"
  *     }
  *   },
- *   config_prefix = "commerce_store_type",
  *   admin_permission = "administer commerce_store_type entities",
+ *   config_prefix = "commerce_store_type",
+ *   bundle_of = "commerce_store",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
@@ -37,9 +39,9 @@ use Drupal\commerce\CommerceStoreTypeInterface;
  *   }
  * )
  */
-class CommerceStoreType extends ConfigEntityBase implements CommerceStoreTypeInterface {
+class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreTypeInterface {
   /**
-   * The store type ID.
+   * The store type machine name.
    *
    * @var string
    */
