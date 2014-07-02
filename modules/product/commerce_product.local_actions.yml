@@ -1,0 +1,5 @@
+commerce_product.add:
+  route_name: commerce_product.add
+  title: 'Add a new product'
+  appears_on:
+    - commerce_product.list
