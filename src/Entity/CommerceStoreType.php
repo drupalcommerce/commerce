@@ -8,6 +8,7 @@
 namespace Drupal\commerce\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\commerce\CommerceStoreTypeInterface;
 
 /**
