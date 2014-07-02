@@ -15,6 +15,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Defines the Commerce Product entity.
+ * 
+ * @TODO add a data table to this definition
  *
  * @ContentEntityType(
  *   id = "commerce_product",
@@ -29,14 +31,18 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationController"
  *   },
- *   base_table = "commerce_product",
  *   admin_permission = "administer commerce_product entities",
  *   fieldable = TRUE,
  *   translatable = TRUE,
+ *   base_table = "commerce_product",
+ *   revision_table = "commerce_product_revision",
+ *   revision_data_table = "commerce_product_field_revision",
+ *   uri_callback = "commerce_product_uri",
  *   entity_keys = {
  *     "id" = "product_id",
  *     "label" = "title",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "revision" = "revision_id"
  *   },
  *   links = {
  *     "edit-form" = "commerce_product.edit",
@@ -131,7 +137,8 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     // Language
     $fields['language'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of product.'));
+      ->setDescription(t('The language code of product.'))
+      ->setRevisionable(TRUE);
     
     // Title
     $fields['title'] = FieldDefinition::create('string')
