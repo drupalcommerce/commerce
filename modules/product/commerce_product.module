@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Defines the core Commerce product entity, including the entity itself, the
+ * bundle definitions (product types), and various API functions to manage
+ * products and interact with them through forms and autocompletes.
+ */
