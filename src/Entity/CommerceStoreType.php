@@ -38,7 +38,7 @@ use Drupal\commerce\CommerceStoreTypeInterface;
  *   }
  * )
  */
-class CommerceStoreType extends ConfigEntityBase implements CommerceStoreTypeInterface {
+class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreTypeInterface {
   /**
    * The store type machine name.
    *
