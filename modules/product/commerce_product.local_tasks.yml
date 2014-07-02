@@ -1,0 +1,10 @@
+commerce_product.page_edit:
+  route_name: commerce_product.edit
+  base_route: commerce_product.edit
+  title: Edit
+  
+commerce_product.delete_confirm:
+  route_name: commerce_product.delete
+  base_route: commerce_product.edit
+  title: Delete
+  weight: 10
