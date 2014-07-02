@@ -1,0 +1,56 @@
+commerce_order.list:
+  path: '/admin/commerce/orders/list'
+  defaults:
+    _entity_list: 'commerce_order'
+    _title: 'Orders list'
+  requirements:
+    _permission: 'view commerce_order entities'
+commerce_order.add:
+  path: '/admin/commerce/orders/add'
+  defaults:
+    _entity_form: commerce_order.add
+    _title: 'Create an order'
+  requirements:
+    _entity_create_access: 'commerce_order'
+commerce_order.edit:
+  path: '/admin/commerce/orders/{commerce_order}/edit'
+  defaults:
+    _entity_form: commerce_order.edit
+    _title: 'Edit order'
+  requirements:
+    _permission: 'edit commerce_order entities'
+commerce_order.delete:
+  path: '/admin/commerce/orders/{commerce_order}/delete'
+  defaults:
+    _entity_form: commerce_order.delete
+    _title: 'Delete order'
+  requirements:
+    _permission: 'delete commerce_order entities'
+commerce_order.type_list:
+  path: '/admin/commerce/config/order/types'
+  defaults:
+    _entity_list: 'commerce_order_type'
+    _title: 'Order types'
+  requirements:
+    _permission: 'administer commerce_order_type entities'
+commerce_order.type_add:
+  path: '/admin/commerce/config/order/types/add'
+  defaults:
+    _entity_form: 'commerce_order_type.add'
+    _title: 'Add a new order type'
+  requirements:
+    _entity_create_access: 'commerce_order_type'
+commerce_order.type_edit:
+  path: '/admin/commerce/config/order/types/{commerce_order_type}'
+  defaults:
+    _entity_form: 'commerce_order_type.edit'
+    _title: 'Edit an order type'
+  requirements:
+    _permission: 'administer commerce_order_type entities'
+commerce_order.type_delete:
+  path: '/admin/commerce/config/order/types/{commerce_order_type}/delete'
+  defaults:
+    _entity_form: 'commerce_order_type.delete'
+    _title: 'Delete an order type'
+  requirements:
+    _permission: 'administer commerce_order_type entities'

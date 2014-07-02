@@ -1,0 +1,13 @@
+commerce_order.commerce_order_type.*:
+  type: config_entity
+  label: 'Order type'
+  mapping:
+    label:
+      type: label
+      label: 'Label'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    description:
+      type: text
+      label: 'Description'

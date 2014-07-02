@@ -1,0 +1,11 @@
+commerce_order.add:
+  route_name: commerce_order.add
+  title: 'Create a new order'
+  appears_on:
+    - commerce_order.list
+
+commerce_order.type_add:
+  route_name: commerce_order.type_add
+  title: 'Add a new order type'
+  appears_on:
+    - commerce_order.type_list
