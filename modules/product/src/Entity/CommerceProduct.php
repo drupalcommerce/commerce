@@ -189,8 +189,8 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     // Type
     $fields['type'] = FieldDefinition::create('string')
       ->setLabel(t('Type'))
-      ->setDescription(t('The type of the product.'));
-      //->setRequired(TRUE);
+      ->setDescription(t('The type of the product.'))
+      ->setRequired(TRUE);
     
     // Data
     $fields['data'] = FieldDefinition::create('map')
