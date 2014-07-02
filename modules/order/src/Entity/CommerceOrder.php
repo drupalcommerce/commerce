@@ -39,12 +39,13 @@ use Drupal\user\UserInterface;
  *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
- *   bundle_entity_type = "commerce_order_type",
  *   links = {
+ *     "admin-form" = "commerce_order.type_edit",
  *     "canonical" = "commerce_order.view",
  *     "edit-form" = "commerce_order.edit",
  *     "delete-form" = "commerce_order.delete"
- *   }
+ *   },
+ *   bundle_entity_type = "commerce_order_type"
  * )
  */
 class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface {
@@ -55,7 +56,6 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
     $values += array(
-      'type' => 'commerce_order',
       'uid' => \Drupal::currentUser()->id(),
     );
   }

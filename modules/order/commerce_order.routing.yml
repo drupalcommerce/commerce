@@ -6,13 +6,21 @@ commerce_order.list:
   requirements:
     _permission: 'view commerce_order entities'
 
-commerce_order.add:
+commerce_order.add_page:
   path: '/admin/commerce/orders/add'
   defaults:
-    _entity_form: commerce_order.add
-    _title: 'Create an order'
+    _title: 'Add a new order'
+    _content: '\Drupal\commerce_order\Controller\CommerceOrderController::addPage'
   requirements:
     _entity_create_access: 'commerce_order'
+
+commerce_order.add:
+  path: '/admin/commerce/orders/add/{commerce_order_type}'
+  defaults:
+    _content: '\Drupal\commerce_order\Controller\CommerceOrderController::add'
+    _title_callback: '\Drupal\commerce_order\Controller\CommerceOrderController::addPageTitle'
+  requirements:
+    _permission: 'create commerce_order entities'
 
 commerce_order.edit:
   path: '/admin/commerce/orders/{commerce_order}/edit'

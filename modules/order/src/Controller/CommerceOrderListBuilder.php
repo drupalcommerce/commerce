@@ -23,7 +23,7 @@ class CommerceOrderListBuilder extends EntityListBuilder {
   protected $dateService;
 
   /**
-   * Constructs a new NodeListBuilder object.
+   * Constructs a new CommerceOrderListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -59,7 +59,7 @@ class CommerceOrderListBuilder extends EntityListBuilder {
         'class' => array(RESPONSIVE_PRIORITY_LOW),
       ),
       'type' => array(
-        'data' => $this->t('Content type'),
+        'data' => $this->t('Order type'),
         'class' => array(RESPONSIVE_PRIORITY_MEDIUM),
       ),
       'owner' => array(

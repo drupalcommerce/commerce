@@ -12,7 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Defines the Node type configuration entity.
+ * Defines the Order type configuration entity.
  *
  * @ConfigEntityType(
  *   id = "commerce_order_type",
@@ -21,7 +21,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
- *       "delete" = "Drupal\commerce_order\Form\CommerceOrderTypeDelete"
+ *       "delete" = "Drupal\commerce_order\Form\CommerceOrderTypeDeleteForm"
  *     },
  *     "list_builder" = "Drupal\commerce_order\Controller\CommerceOrderTypeListBuilder",
  *   },
@@ -30,7 +30,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   bundle_of = "commerce_order",
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label"
+ *     "label" = "label",
+ *     "uuid" = "uuid"
  *   },
  *   links = {
  *     "edit-form" = "commerce_order.type_edit",
