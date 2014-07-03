@@ -1,0 +1,15 @@
+{
+    "name": "Commerce/Commerce",
+    "description": "Drupal Commerce is used to build eCommerce websites and applications of all sizes",
+    "type": "drupal-commerce-core",
+    "license": "GPL-2.0+",
+    "require": {
+        "commerceguys/pricing": "dev-master"
+    },
+    "repositories": [
+        {
+            "url": "https://github.com/commerceguys/pricing.git",
+            "type": "git"
+        }
+    ]
+}

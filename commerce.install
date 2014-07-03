@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce module.
+ */
+
+use Symfony\Component\Process\Process;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_install() {
+  // Execute composer during Commerce module installation.
+  $commandline = 'composer install';
+  $process = new Process($commandline, __DIR__);
+  $process->run();
+
+  if ($process->getErrorOutput()) {
+    drupal_set_message(t('An error occurred and processing did downloaded the required libraries for Commerce'), 'error');
+  }
+}
