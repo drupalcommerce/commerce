@@ -26,14 +26,15 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *   },
  *   config_prefix = "commerce_product_type",
  *   admin_permission = "administer commerce_product_type entities",
+ *   bundle_of = "commerce_product",
  *   entity_keys = {
- *     "id" = "type",
- *     "label" = "name",
+ *     "id" = "id",
+ *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce.product_type_edit",
- *     "delete-form" = "commerce.product_type_delete"
+ *     "edit-form" = "commerce_product.product_type_edit",
+ *     "delete-form" = "commerce_product.product_type_delete"
  *   }
  * )
  */
@@ -43,7 +44,7 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    *
    * @var string
    */
-  public $type;
+  public $id;
 
   /**
    * The product type UUID.
@@ -53,9 +54,9 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
   public $uuid;
 
   /**
-   * The product type name.
+   * The product type label.
    *
    * @var string
    */
-  public $name;
+  public $label;
 }

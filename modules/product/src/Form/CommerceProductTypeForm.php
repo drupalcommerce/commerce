@@ -57,6 +57,6 @@ class CommerceProductTypeForm extends EntityForm {
       )));
     }
 
-    $form_state['redirect'] = 'admin/commerce/config/product/types';
+    $form_state['redirect'] = 'admin/commerce/products/types';
   }
 }

@@ -6,11 +6,19 @@ commerce_product.list:
   requirements:
     _permission: 'view commerce_product entities'
     
-commerce_product.add:
-  path: '/admin/commerce/products/add'
+commerce_product.product_add_page:
+  path: '/admin/commerce/config/product/add'
   defaults:
-    _entity_form: commerce_product.add
     _title: 'Add a new product'
+    _content: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'
+  requirements:
+    _permission: 'administer commerce_product entities'
+    
+commerce_product.add:
+  path: '/admin/commerce/products/add/{commerce_product_type}'
+  defaults:
+    _content: '\Drupal\commerce_product\Controller\CommerceProductController::add'
+    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::addPageTitle'
   requirements:
     _permission: 'create commerce_product entities'
     
@@ -47,7 +55,7 @@ commerce_product.product_type_add:
     _permission: 'administer commerce_product_type entities'
     
 commerce_product.product_type_edit:
-  path: '/admin/commerce/products/types/edit'
+  path: '/admin/commerce/products/types/{commerce_product_type}/edit'
   defaults:
     _entity_form: commerce_product_type.edit
     _title: 'Edit a product type'
@@ -55,7 +63,7 @@ commerce_product.product_type_edit:
     _permission: 'administer commerce_product_type entities'
   
 commerce_product.product_type_delete:
-  path: '/admin/commerce/product/types/{commerce_product_type}/delete'
+  path: '/admin/commerce/products/types/{commerce_product_type}/delete'
   defaults:
     _entity_form: 'commerce_product_type.delete'
     _title: 'Delete a product type'

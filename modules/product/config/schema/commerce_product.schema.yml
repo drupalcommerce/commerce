@@ -7,6 +7,6 @@ commerce_product.commerce_product_type.*:
       label: 'Type'
     label:
         type: label
-        label: 'Name'
+        label: 'Label'
     uuid:
         type: string

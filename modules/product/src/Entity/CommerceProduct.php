@@ -42,12 +42,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "id" = "product_id",
  *     "label" = "title",
  *     "uuid" = "uuid",
- *     "revision" = "revision_id"
+ *     "revision" = "revision_id",
+ *     "bundle" = "type"
  *   },
  *   links = {
  *     "edit-form" = "commerce_product.edit",
- *     "delete-form" = "commerce_product.delete"
- *   }
+ *     "delete-form" = "commerce_product.delete",
+ *     "admin-form" = "commerce_product.product_type_edit"
+ *   },
+ *   bundle_entity_type = "commerce_product_type"
  * )
  */
 class CommerceProduct extends ContentEntityBase implements CommerceProductInterface {

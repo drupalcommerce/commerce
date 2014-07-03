@@ -20,3 +20,16 @@ use Drupal\commerce_product\Entity\CommerceProductType;
 function commerce_product_type_load($type) {
   return CommerceProductType::load($type);
 }
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_product_theme() {
+  return array(
+    'commerce_product_add_list' => array(
+      'variables' => array('content' => NULL),
+      'file' => 'commerce_product.pages.inc',
+      'template' => 'commerce-product-add-list',
+    ),
+  );
+}
