@@ -11,13 +11,24 @@
 Drupal Commercce is an open source eCommerce framework that is designed to
 enable flexible eCommerce for websites and applications based on Drupal.
 
-Just Getting Started?
-=====================
+Getting Started?
+================
 
 We have a great community website where you can watch how-to videos, ask
 questions and read documentation.
 
 Learn more: https://www.drupalcommerce.org
+
+We strive to be developer friendly. We've included a lot of comments in the code
+itself to help developers understand the core APIs and inner-workings of the
+Commerce systems. We're continuing to flesh out the Developer Guide on
+DrupalCommerce.org, and we encourage developers to file bug reports in the issue
+tracker and find support in IRC (#drupal-commerce on irc.freenode.net) where we
+try to be very responsive.
+
+Developer Guide: http://www.drupalcommerce.org/developer-guide
+
+Issue Tracker: http://drupal.org/project/issues/commerce
 
 How to Install
 ==============
@@ -35,17 +46,3 @@ How to Install
 3) ...
 
 4) Profit!
-
-How to get involved
-===================
-
-We strive to be developer friendly. We've included a lot of comments in the code
-itself to help developers understand the core APIs and inner-workings of the
-Commerce systems. We're continuing to flesh out the Developer Guide here on
-DrupalCommerce.org, and we encourage developers to file bug reports in the issue
-tracker and find support in IRC (#drupal-commerce on irc.freenode.net) where we
-try to be very responsive.
-
-Developer Guide: http://www.drupalcommerce.org/developer-guide
-
-Issue Tracker: http://drupal.org/project/issues/commerce
