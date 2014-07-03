@@ -7,11 +7,135 @@
 
 namespace Drupal\commerce_order;
 
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface defining a Commerce Order entity.
  */
-interface CommerceOrderInterface extends EntityInterface {
+interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+
+  /**
+   * Returns the order number.
+   *
+   * @return string
+   *   The order number.
+   */
+  public function getOrderNumber();
+
+  /**
+   * Sets the order number.
+   *
+   * @param string $order_number
+   *   The order number.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setOrderNumber($order_number);
+
+  /**
+   * Returns the order type.
+   *
+   * @return string
+   *   The order type.
+   */
+  public function getType();
+
+  /**
+   * Returns the order status.
+   *
+   * @return string
+   *   The order status.
+   */
+  public function getStatus();
+
+  /**
+   * Sets the order status.
+   *
+   * @param string $status
+   *   The order status.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setStatus($status);
+
+  /**
+   * Returns the order creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the order.
+   */
+  public function getCreatedTime();
+
+  /**
+   * Sets the order creation timestamp.
+   *
+   * @param int $timestamp
+   *   The order creation timestamp.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setCreatedTime($timestamp);
+
+  /**
+   * Returns the order revision creation timestamp.
+   *
+   * @return int
+   *   The UNIX timestamp of when this revision was created.
+   */
+  public function getRevisionCreationTime();
+
+  /**
+   * Sets the order revision creation timestamp.
+   *
+   * @param int $timestamp
+   *   The UNIX timestamp of when this revision was created.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setRevisionCreationTime($timestamp);
+
+  /**
+   * Returns the order revision author.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The user entity for the revision author.
+   */
+  public function getRevisionAuthor();
+
+  /**
+   * Sets the order revision author.
+   *
+   * @param int $uid
+   *   The user ID of the revision author.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setRevisionAuthorId($uid);
+
+  /**
+   * Returns the line items associated with this order.
+   *
+   * @return array
+   *   The line items of this order.
+   */
+  public function getLineItems();
+
+  /**
+   * Sets the line items associated with this order.
+   *
+   * @param array $line_items
+   *   The line items associated with this order.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setLineItems($line_items);
 
 }

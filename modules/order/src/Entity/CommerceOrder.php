@@ -35,13 +35,13 @@ use Drupal\user\UserInterface;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",
+ *     "label" = "order_number",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
  *   links = {
  *     "admin-form" = "commerce_order.type_edit",
- *     "canonical" = "commerce_order.view",
  *     "edit-form" = "commerce_order.edit",
  *     "delete-form" = "commerce_order.delete"
  *   },
@@ -96,6 +96,34 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // If no order number has been set explicitly, set it to the order id.
+    if (!$this->getOrderNumber()) {
+      $this->setOrderNumber($this->id());
+      $this->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrderNumber() {
+    return $this->get('order_number')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOrderNumber($order_number) {
+    $this->set('order_number', $order_number);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getType() {
     return $this->bundle();
   }
@@ -110,8 +138,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public function setStatus($title) {
-    $this->set('status', $title);
+  public function setStatus($status) {
+    $this->set('status', $status);
     return $this;
   }
 
@@ -222,6 +250,24 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
+    $fields['order_number'] = FieldDefinition::create('string')
+      ->setLabel(t('Order number'))
+      ->setDescription(t('The order number displayed to the customer.'))
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setDefaultValue('')
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => -5,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'hidden',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
     $fields['uuid'] = FieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The order UUID.'))
@@ -253,7 +299,6 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setLabel(t('Status'))
       ->setDescription(t('The status name of this order.'))
       ->setRequired(TRUE)
-      ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
@@ -271,11 +316,13 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     $fields['created'] = FieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the order was created.'))
+      ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['changed'] = FieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the order was last edited.'))
+      ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
     $fields['line_items'] = FieldDefinition::create('map')

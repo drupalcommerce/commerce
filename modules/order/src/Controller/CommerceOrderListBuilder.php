@@ -55,7 +55,7 @@ class CommerceOrderListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header = array(
       'order_id' => array(
-        'data' => $this->t('Order id'),
+        'data' => $this->t('Order ID'),
         'class' => array(RESPONSIVE_PRIORITY_LOW),
       ),
       'type' => array(
