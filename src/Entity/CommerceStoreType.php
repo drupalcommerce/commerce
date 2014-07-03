@@ -60,4 +60,11 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
    * @var string
    */
   public $label;
+
+  /**
+   * A brief description of this store type.
+   *
+   * @var string
+   */
+  public $description;
 }
