@@ -11,8 +11,8 @@
 Drupal Commercce is an open source eCommerce framework that is designed to
 enable flexible eCommerce for websites and applications based on Drupal.
 
-Getting Started?
-================
+Getting Started
+===============
 
 We have a great community website where you can watch how-to videos, ask
 questions and read documentation.
