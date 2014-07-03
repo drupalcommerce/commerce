@@ -1,0 +1,11 @@
+commerce_product.list:
+  title: 'Products'
+  route_name: commerce_product.list
+  parent: commerce.admin_commerce
+  description: 'List of products.'
+
+commerce_product.product_type_list:
+  title: 'Product types'
+  route_name: commerce_product.product_type_list
+  parent: commerce.admin_commerce
+  description: 'List of product types'

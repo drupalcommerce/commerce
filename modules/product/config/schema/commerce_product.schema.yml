@@ -1,0 +1,12 @@
+commerce_product.commerce_product_type.*:
+  type: config_entity
+  label: 'Product type'
+  mapping:
+    id:
+      type: string
+      label: 'Type'
+    label:
+        type: label
+        label: 'Label'
+    uuid:
+        type: string
