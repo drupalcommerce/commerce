@@ -51,20 +51,19 @@ class CommerceStoreForm extends ContentEntityForm {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
-   */
-  public function submit(array $form, array &$form_state) {
-    // Build the entity object from the submitted values.
-    $entity = parent::submit($form, $form_state);
-    $form_state['redirect_route']['route_name'] = 'commerce.store_list';
-    return $entity;
-  }
-
-  /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
-    $entity = $this->entity;
-    $entity->save();
+    try {
+      $this->entity->save();
+      drupal_set_message($this->t('Saved the %label store.', array(
+        '%label' => $this->entity->label(),
+      )));
+    }
+    catch (\Exception $e) {
+      drupal_set_message($this->t('The store could not be saved.'), 'error');
+      watchdog_exception('commerce', $e);
+    }
+    $form_state['redirect_route']['route_name'] = 'commerce.store_list';
   }
 }
