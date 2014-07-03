@@ -82,8 +82,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
         $this->setHostname(\Drupal::request()->getClientIp());
       }
 
-      if (!$this->getMail()) {
-        $this->setMail($this->getOwner()->getEmail());
+      if (!$this->getEmail()) {
+        $this->setEmail($this->getOwner()->getEmail());
       }
     }
   }
@@ -268,14 +268,14 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public function getMail() {
+  public function getEmail() {
     return $this->get('mail')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setMail($mail) {
+  public function setEmail($mail) {
     $this->set('mail', $mail);
     return $this;
   }
@@ -351,8 +351,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
         'weight' => 0,
       ));
 
-    $fields['mail'] = FieldDefinition::create('string')
-      ->setLabel(t('Mail'))
+    $fields['mail'] = FieldDefinition::create('email')
+      ->setLabel(t('Email'))
       ->setDescription(t('The e-mail address associated with the order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 255)

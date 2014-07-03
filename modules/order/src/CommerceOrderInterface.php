@@ -182,7 +182,7 @@ interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface
    * @return string
    *   The order mail.
    */
-  public function getMail();
+  public function getEmail();
 
   /**
    * Sets the order mail.
@@ -193,6 +193,6 @@ interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface
    * @return \Drupal\commerce_order\CommerceOrderInterface
    *   The called order entity.
    */
-  public function setMail($mail);
+  public function setEmail($mail);
 
 }
