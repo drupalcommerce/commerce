@@ -7,7 +7,7 @@ commerce_product.list:
     _permission: 'view commerce_product entities'
     
 commerce_product.product_add_page:
-  path: '/admin/commerce/config/product/add'
+  path: '/admin/commerce/products/add'
   defaults:
     _title: 'Add a new product'
     _content: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'

@@ -165,6 +165,26 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -5,
       ))
       ->setDisplayConfigurable('form', TRUE);
+        
+    // Description
+    $fields['description'] = FieldDefinition::create('text_long')
+      ->setLabel(t('Description'))
+      ->setDescription(t('The description of this product.'))      
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSettings(array(
+        'default_value' => '',        
+      ))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => -3,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textarea',
+        'weight' => -3,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
     
     // SKU
     $fields['sku'] = FieldDefinition::create('string')
@@ -172,20 +192,15 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ))
+      ->setRevisionable(TRUE)      
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'string',
-        'weight' => -5,
+        'weight' => -4,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'string',
-        'weight' => -5,
+        'weight' => -4,
       ))
       ->setDisplayConfigurable('form', TRUE);    
     
@@ -202,15 +217,28 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setRevisionable(TRUE);
     
     // Status
-    $fields['status'] = FieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
+    // @todo there should be a way to set the default value from here but I 
+    // haven't figured out how yet.
+    $fields['status'] = FieldDefinition::create('list_boolean')
+      ->setLabel(t('Status'))
       ->setDescription(t('A boolean indicating whether the product is active.'))
-      ->setRevisionable(TRUE)
+      ->setRevisionable(TRUE)      
       ->setTranslatable(TRUE)
+      ->setSettings(array(
+        'default_value' => 1,
+        'allowed_values' => array(
+          0 => 'No',
+          1 => 'Yes'
+        )
+      ))
       ->setDisplayOptions('form', array(
         'type' => 'options_onoff',
-        'weight' => -5,
-      ));
+        'weight' => -5,     
+        'settings' => array(
+          'display_label' => TRUE
+        )
+      ))
+      ->setDisplayConfigurable('form', TRUE);
     
     // Created
     $fields['created'] = FieldDefinition::create('created')

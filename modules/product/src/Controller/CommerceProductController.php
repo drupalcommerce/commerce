@@ -83,7 +83,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
     // is available.
     if (count($content) == 1) {
       $commerce_product_type = array_shift($content);
-      return $this->redirect('commerce.product_add', array('commerce_product_type' => $commerce_product_type->id));
+      return $this->redirect('commerce_product.add', array('commerce_product_type' => $commerce_product_type->id));
     }
 
     return array(
@@ -116,7 +116,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   }
 
   /**
-   * The _title_callback for the commerce.product_add route.
+   * The _title_callback for the commerce_product.add route.
    *
    * @param \Drupal\commerce\CommerceProductTypeInterface $commerce_product_type
    *   The current product.
