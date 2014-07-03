@@ -138,4 +138,61 @@ interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface
    */
   public function setLineItems($line_items);
 
+  /**
+   * Returns the additional data stored in this order.
+   *
+   * @return array
+   *   An array of additional data.
+   */
+  public function getData();
+
+  /**
+   * Sets random information related to this order.
+   *
+   * @param array $data
+   *   An array of additional data.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setData($data);
+
+  /**
+   * Returns the IP address that created this order.
+   *
+   * @return string
+   *   The ip address.
+   */
+  public function getHostname();
+
+  /**
+   * Sets the IP address associated with this order.
+   *
+   * @param string $hostname
+   *   The IP address to associate to this order.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setHostname($hostname);
+
+  /**
+   * Returns the e-mail address associated with the order.
+   *
+   * @return string
+   *   The order mail.
+   */
+  public function getMail();
+
+  /**
+   * Sets the order mail.
+   *
+   * @param string $mail
+   *   The e-mail address associated with the order.
+   *
+   * @return \Drupal\commerce_order\CommerceOrderInterface
+   *   The called order entity.
+   */
+  public function setMail($mail);
+
 }

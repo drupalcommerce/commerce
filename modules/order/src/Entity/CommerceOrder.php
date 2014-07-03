@@ -76,6 +76,16 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     if (!$this->getRevisionAuthor()) {
       $this->setRevisionAuthorId($this->getOwnerId());
     }
+
+    if ($this->isNew()) {
+      if (!$this->getHostname()) {
+        $this->setHostname(\Drupal::request()->getClientIp());
+      }
+
+      if (!$this->getMail()) {
+        $this->setMail($this->getOwner()->getEmail());
+      }
+    }
   }
 
   /**
@@ -243,6 +253,52 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
+  public function getHostname() {
+    return $this->get('hostname')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setHostname($hostname) {
+    $this->set('hostname', $hostname);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMail() {
+    return $this->get('mail')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMail($mail) {
+    $this->set('mail', $mail);
+    return $this;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData() {
+    return $this->get('data')->first()->getValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($data) {
+    $this->set('data', array($data));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['order_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Order ID'))
@@ -260,11 +316,11 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'string',
-        'weight' => -5,
+        'weight' => 0,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'hidden',
-        'weight' => -5,
+        'weight' => 0,
       ))
       ->setDisplayConfigurable('form', TRUE);
 
@@ -295,6 +351,22 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
         'weight' => 0,
       ));
 
+    $fields['mail'] = FieldDefinition::create('string')
+      ->setLabel(t('Mail'))
+      ->setDescription(t('The e-mail address associated with the order.'))
+      ->setDefaultValue('')
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textfield',
+        'weight' => 1,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
     $fields['status'] = FieldDefinition::create('string')
       ->setLabel(t('Status'))
       ->setDescription(t('The status name of this order.'))
@@ -305,11 +377,11 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'string',
-        'weight' => -5,
+        'weight' => 0,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'hidden',
-        'weight' => -5,
+        'weight' => 0,
       ))
       ->setDisplayConfigurable('form', TRUE);
 
@@ -328,6 +400,26 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     $fields['line_items'] = FieldDefinition::create('map')
       ->setLabel(t('Line items'))
       ->setDescription(t('A serialized array of line items.'));
+
+    $fields['hostname'] = FieldDefinition::create('string')
+      ->setLabel(t('Hostname'))
+      ->setDescription(t('The IP address that created this order.'))
+      ->setDefaultValue('')
+      ->setSetting('max_length', 128)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'hidden',
+        'weight' => 0,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['data'] = FieldDefinition::create('map')
+      ->setLabel(t('Data'))
+      ->setDescription(t('A serialized array of additional data.'));
 
     $fields['revision_timestamp'] = FieldDefinition::create('created')
       ->setLabel(t('Revision timestamp'))
