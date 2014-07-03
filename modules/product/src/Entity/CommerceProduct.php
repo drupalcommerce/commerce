@@ -29,7 +29,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "edit" = "Drupal\commerce_product\Form\CommerceProductForm",
  *       "delete" = "Drupal\commerce_product\Form\CommerceProductDeleteForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationController"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer commerce_product entities",
  *   fieldable = TRUE,
@@ -57,28 +57,6 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->get('product_id')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTitle() {
-    return $this->get('title')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTitle($title) {
-    $this->set('title', $title);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getSku() {
     return $this->get('sku')->value;
   }
@@ -90,20 +68,93 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     $this->set('sku', $sku);
     return $this;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTitle() {
+    return $this->get('title')->value;    
+  }
   
   /**
    * {@inheritdoc}
    */
-  public function getRevisionId() {
-    return $this->get('revision_id')->value;
+  public function setTitle($title) {
+    $this->set('title', $title);
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatus() {
+    return $this->get('status')->value;    
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function setStatus($status) {
+    $this->set('status', $status);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRevisionId($id) {
-    $this->set('revision_id', $id);
+  public function getDescription() {
+    return $this->get('description')->value;  
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->set('description', $description);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;    
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getType() {
+    return $this->get('type')->value;    
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function getData() {
+    return $this->get('data')->value;    
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getUid() {
+    $this->get('uid')->value;
+    return $this;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function setUid($uid) {
+    return $this->set('uid', $uid);    
   }
 
   /**

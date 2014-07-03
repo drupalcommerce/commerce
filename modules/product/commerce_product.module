@@ -8,6 +8,7 @@ use Drupal\commerce_product\Entity\CommerceProductType;
  * bundle definitions (product types), and various API functions to manage
  * products and interact with them through forms and autocompletes.
  */
+
 /**
  * Menu argument loader: loads a product type by its machine name.
  *

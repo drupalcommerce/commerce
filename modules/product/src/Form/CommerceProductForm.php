@@ -34,7 +34,6 @@ class CommerceProductForm extends ContentEntityForm {
   /**
    * Overrides \Drupal\Core\Entity\EntityFormController::submit().
    */
-  
   public function submit(array $form, array &$form_state) {
     // Build the entity object from the submitted values.
     $entity = parent::submit($form, $form_state);
