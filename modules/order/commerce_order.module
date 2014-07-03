@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * @file
+ * Defines the core Commerce order entity type and API functions to manage
+ * orders and interact with them.
+ */
+
+/**
  * Implements hook_theme().
  */
 function commerce_order_theme() {

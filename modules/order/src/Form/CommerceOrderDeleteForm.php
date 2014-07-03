@@ -41,7 +41,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete the order %order_id?', array('%order' => $this->entity->id()));
+    return t('Are you sure you want to delete the order %order_label?', array('%order_label' => $this->entity->label()));
   }
 
   /**
@@ -62,12 +62,18 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submit(array $form, array &$form_state) {
-    $this->entity->delete();
-    watchdog('commerce_order', '@type: deleted %order_id.', array('@type' => $this->entity->bundle(), '%order_id' => $this->entity->id()));
-    $order_type_storage = $this->entityManager->getStorage('commerce_order_type');
-    $order_type = $order_type_storage->load($this->entity->bundle())->label();
-    drupal_set_message(t('@type %order_id has been deleted.', array('@type' => $order_type, '%order_id' => $this->entity->id())));
-    $form_state['redirect_route'] = $this->getCancelRoute();
+    try {
+      $this->entity->delete();
+      $order_type_storage = $this->entityManager->getStorage('commerce_order_type');
+      $order_type = $order_type_storage->load($this->entity->bundle())->label();
+      $form_state['redirect_route'] = $this->getCancelRoute();
+      drupal_set_message($this->t('@type %order_label has been deleted.', array('@type' => $order_type, '%order_label' => $this->entity->label())));
+      watchdog('commerce_order', '@type: deleted %order_label.', array('@type' => $this->entity->bundle(), '%order_label' => $this->entity->label()));
+    }
+    catch (\Exception $e) {
+      drupal_set_message($this->t('The order %order_label could not be deleted.', array('%order_label' => $this->entity->label())), 'error');
+      watchdog_exception('commerce_order', $e);
+    }
   }
 
 }
