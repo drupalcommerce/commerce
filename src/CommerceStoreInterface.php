@@ -15,25 +15,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
  */
 interface CommerceStoreInterface extends EntityInterface {
   /**
-   * Returns the identifier.
-   *
-   * @return int
-   *   The entity identifier.
-   */
-  public function id();
-
-  /**
-   * Returns the entity UUID (Universally Unique Identifier).
-   *
-   * The UUID is guaranteed to be unique and can be used to identify an entity
-   * across multiple systems.
-   *
-   * @return string
-   *   The UUID of the entity.
-   */
-  public function uuid();
-
-  /**
    * Return the name of the store.
    *
    * @return string
