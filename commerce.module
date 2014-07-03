@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce\Entity\CommerceStoreType;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_permission().
@@ -98,6 +99,32 @@ function commerce_toolbar() {
  */
 function commerce_email_from() {
   return config('system.site')->get('mail');
+}
+
+/**
+ * Implements hook_entity_operation().
+ *
+ * Add devel link if this entity type is /commerce_store[_type]/.
+ */
+function commerce_entity_operation(EntityInterface $entity) {
+  $operations = array();
+  $entity_routes =
+    array(
+      'commerce_store' => 'commerce.store_devel',
+      'commerce_store_type' => 'commerce.store_type_devel',
+    );
+
+  $entity_type_id = $entity->getEntityTypeId();
+  if (user_access('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
+    $operations['devel'] = array(
+      'route_name' => $entity_routes[$entity_type_id],
+      'route_parameters' => array($entity_type_id => $entity->id()),
+      'title' => t('Devel'),
+      'weight' => 15,
+    );
+  }
+
+  return $operations;
 }
 
 /**

@@ -1,12 +1,24 @@
+commerce.store_page_devel:
+  route_name: commerce.store_devel
+  base_route: commerce.store_edit
+  title: Devel
+  weight: 10
+
 commerce.store_list:
   route_name: commerce.store_list
   base_route: commerce.store_list
   title: List
-  
+
 commerce.store_type_list:
   route_name: commerce.store_type_list
   base_route: commerce.store_list
   title: Store types
+
+commerce.store_type_page_devel:
+  route_name: commerce.store_type_devel
+  base_route: commerce.store_type_edit
+  title: Devel
+  weight: 10
 
 commerce.store_type_page_edit:
   route_name: commerce.store_type_edit
