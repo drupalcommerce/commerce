@@ -2,7 +2,7 @@ commerce.store_list:
   route_name: commerce.store_list
   base_route: commerce.store_list
   title: List
-  
+
 commerce.store_type_list:
   route_name: commerce.store_type_list
   base_route: commerce.store_list
@@ -17,6 +17,12 @@ commerce.store_type_delete_confirm:
   route_name: commerce.store_type_delete
   base_route: commerce.store_type_edit
   title: Delete
+  weight: 8
+
+commerce.store_type_page_devel:
+  route_name: commerce.store_type_devel
+  base_route: commerce.store_type_edit
+  title: Devel
   weight: 10
 
 commerce.store_page_edit:
@@ -28,4 +34,10 @@ commerce.store_delete_confirm:
   route_name: commerce.store_delete
   base_route: commerce.store_edit
   title: Delete
+  weight: 8
+
+commerce.store_page_devel:
+  route_name: commerce.store_devel
+  base_route: commerce.store_edit
+  title: Devel
   weight: 10

@@ -9,4 +9,3 @@ commerce_product.product_type_add:
   title: 'Add a new product type'
   appears_on:
     - commerce_product.product_type_list
-    

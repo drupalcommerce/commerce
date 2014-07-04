@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Defines the Commerce Product entity.
- * 
+ *
  * @TODO add a data table to this definition
  *
  * @ContentEntityType(
@@ -73,9 +73,9 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
    * {@inheritdoc}
    */
   public function getTitle() {
-    return $this->get('title')->value;    
+    return $this->get('title')->value;
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -83,14 +83,14 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     $this->set('title', $title);
     return $this;
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function getStatus() {
-    return $this->get('status')->value;    
+    return $this->get('status')->value;
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -103,9 +103,9 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->get('description')->value;  
+    return $this->get('description')->value;
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -118,7 +118,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return $this->get('created')->value;    
+    return $this->get('created')->value;
   }
 
   /**
@@ -128,20 +128,20 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     $this->set('created', $timestamp);
     return $this;
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function getType() {
-    return $this->get('type')->value;    
+    return $this->get('type')->value;
   }
   /**
    * {@inheritdoc}
    */
   public function getData() {
-    return $this->get('data')->value;    
+    return $this->get('data')->value;
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -149,12 +149,12 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     $this->get('uid')->value;
     return $this;
   }
-  
+
   /**
    * {@inheritdoc}
    */
   public function setUid($uid) {
-    return $this->set('uid', $uid);    
+    return $this->set('uid', $uid);
   }
 
   /**
@@ -166,14 +166,14 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setLabel(t('Product ID'))
       ->setDescription(t('The ID of the product.'))
       ->setReadOnly(TRUE);
-    
+
     // Revision ID
     $fields['revision_id'] = FieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The product revision ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
-    
+
     // uid
     $fields['uid'] = FieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
@@ -181,7 +181,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setTranslatable(TRUE);
-    
+
     // UUID
     $fields['uuid'] = FieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
@@ -193,7 +193,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of product.'))
       ->setRevisionable(TRUE);
-    
+
     // Title
     $fields['title'] = FieldDefinition::create('string')
       ->setLabel(t('Title'))
@@ -216,15 +216,15 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -5,
       ))
       ->setDisplayConfigurable('form', TRUE);
-        
+
     // Description
     $fields['description'] = FieldDefinition::create('text_long')
       ->setLabel(t('Description'))
-      ->setDescription(t('The description of this product.'))      
+      ->setDescription(t('The description of this product.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setSettings(array(
-        'default_value' => '',        
+        'default_value' => '',
       ))
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -236,14 +236,14 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -3,
       ))
       ->setDisplayConfigurable('form', TRUE);
-    
+
     // SKU
     $fields['sku'] = FieldDefinition::create('string')
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)      
+      ->setRevisionable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'string',
@@ -253,27 +253,27 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'type' => 'string',
         'weight' => -4,
       ))
-      ->setDisplayConfigurable('form', TRUE);    
-    
+      ->setDisplayConfigurable('form', TRUE);
+
     // Type
     $fields['type'] = FieldDefinition::create('string')
       ->setLabel(t('Type'))
       ->setDescription(t('The type of the product.'))
       ->setRequired(TRUE);
-    
+
     // Data
     $fields['data'] = FieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'))
       ->setRevisionable(TRUE);
-    
+
     // Status
-    // @todo there should be a way to set the default value from here but I 
+    // @todo there should be a way to set the default value from here but I
     // haven't figured out how yet.
     $fields['status'] = FieldDefinition::create('list_boolean')
       ->setLabel(t('Status'))
       ->setDescription(t('A boolean indicating whether the product is active.'))
-      ->setRevisionable(TRUE)      
+      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
         'default_value' => 1,
@@ -284,13 +284,13 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ))
       ->setDisplayOptions('form', array(
         'type' => 'options_onoff',
-        'weight' => -5,     
+        'weight' => -5,
         'settings' => array(
           'display_label' => TRUE
         )
       ))
       ->setDisplayConfigurable('form', TRUE);
-    
+
     // Created
     $fields['created'] = FieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -303,7 +303,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the product was last edited.'))
       ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE);    
+      ->setTranslatable(TRUE);
 
     // @todo add price field once price field type exists.
 

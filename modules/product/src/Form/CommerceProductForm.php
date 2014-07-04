@@ -22,12 +22,12 @@ class CommerceProductForm extends ContentEntityForm {
     $form = parent::form($form, $form_state);
     $product = $this->entity;
 
-    // There appears to be no way to set default value for checkboxes in the 
+    // There appears to be no way to set default value for checkboxes in the
     // field definitions yet ...
     if ($product->isNew()) {
       $form['status']['widget']['#default_value'] = 1;
     }
-    
+
     return $form;
   }
 
