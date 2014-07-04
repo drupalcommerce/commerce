@@ -7,16 +7,10 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\CommerceEntityTypeInterface;
 
 /**
  * Provides an interface defining a commerce order type entity.
  */
-interface CommerceOrderTypeInterface extends ConfigEntityInterface {
-  /**
-   * Returns the number of order entities existing with this type.
-   *
-   * @return int
-   */
-  public function getOrderCount();
+interface CommerceOrderTypeInterface extends CommerceEntityTypeInterface {
 }

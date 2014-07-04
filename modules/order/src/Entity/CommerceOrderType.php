@@ -7,8 +7,10 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_order\CommerceOrderTypeInterface;
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\CommerceConfigEntityBundleBase;
+use Drupal\commerce\CommerceEntityTypeInterface;
+use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the Order type configuration entity.
@@ -17,7 +19,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
  *   controllers = {
- *     "access" = "Drupal\commerce_order\CommerceOrderTypeAccessController",
+ *     "access" = "Drupal\commerce\CommerceConfigEntityAccessController",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
@@ -39,7 +41,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderTypeInterface {
+class CommerceOrderType extends CommerceConfigEntityBundleBase implements CommerceEntityTypeInterface {
 
   /**
    * The order type ID.
@@ -61,24 +63,6 @@ class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderT
    * @var string
    */
   public $description;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOrderCount() {
-    $instance_type = $this->getEntityType()->getBundleOf();
-    $query = $this->entityManager()
-      ->getListBuilder($instance_type)
-      ->getStorage()
-      ->getQuery();
-
-    $count = $query
-      ->condition('type', $this->id())
-      ->count()
-      ->execute();
-
-    return $count;
-  }
 
   /**
    * {@inheritdoc}

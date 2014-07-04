@@ -7,17 +7,10 @@
 
 namespace Drupal\commerce_product;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\CommerceEntityTypeInterface;
 
 /**
- * Provides an interface defining a Example entity.
+ * Provides an interface defining a Product Type entity.
  */
-interface CommerceProductTypeInterface extends ConfigEntityInterface {
-
-  /**
-   * Returns the number of product entities existing with this type.
-   *
-   * @return int
-   */
-  public function getProductCount();
+interface CommerceProductTypeInterface extends CommerceEntityTypeInterface {
 }

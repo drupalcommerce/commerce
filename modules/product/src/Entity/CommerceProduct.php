@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_product\CommerceProductInterface;

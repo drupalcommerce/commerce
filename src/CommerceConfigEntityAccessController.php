@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\CommerceOrderTypeAccessController.
+ * Contains \Drupal\commerce\CommerceConfigEntityAccessController.
  */
 
-namespace Drupal\commerce_order;
+namespace Drupal\commerce;
 
 use Drupal\Core\Entity\EntityAccessController;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Provides a Commerce Order Type access controller.
+ * Provides a Commerce entity type access controller.
  */
-class CommerceOrderTypeAccessController extends EntityAccessController {
+class CommerceConfigEntityAccessController extends EntityAccessController {
 
   /**
    * {@inheritdoc}
@@ -22,14 +22,14 @@ class CommerceOrderTypeAccessController extends EntityAccessController {
   protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
 
     if ($operation === 'delete') {
-      /** @var $entity \Drupal\commerce\CommerceOrderTypeInterface */
-      $count = $entity->getOrderCount();
+      /** @var $entity \Drupal\commerce\CommerceEntityTypeInterface */
+      $count = $entity->getContentCount();
       if ($count > 0) {
         return FALSE;
       }
     }
 
-    /** @var $entity \Drupal\commerce\CommerceOrderTypeInterface */
+    /** @var $entity \Drupal\commerce\CommerceEntityTypeInterface */
     return parent::checkAccess($entity, $operation, $langcode, $account);
   }
 

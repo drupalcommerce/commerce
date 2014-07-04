@@ -7,8 +7,10 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce_product\CommerceProductTypeInterface;
+use Drupal\commerce\CommerceConfigEntityBundleBase;
+use Drupal\commerce\CommerceEntityTypeInterface;
+use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the Commerce Product Type entity type.
@@ -17,7 +19,7 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
  *   controllers = {
- *     "access" = "Drupal\commerce_product\CommerceProductTypeAccessController",
+ *     "access" = "Drupal\commerce\CommerceConfigEntityAccessController",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\CommerceProductTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\CommerceProductTypeForm",
@@ -39,7 +41,7 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *   }
  * )
  */
-class CommerceProductType extends ConfigEntityBundleBase implements CommerceProductTypeInterface {
+class CommerceProductType extends CommerceConfigEntityBundleBase implements CommerceEntityTypeInterface {
   /**
    * The product type machine name and primary ID.
    *
@@ -60,24 +62,6 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    * @var string
    */
   public $label;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getProductCount() {
-    $instance_type = $this->getEntityType()->getBundleOf();
-    $query = $this->entityManager()
-                  ->getListBuilder($instance_type)
-                  ->getStorage()
-                  ->getQuery();
-
-    $count = $query
-      ->condition('type', $this->id())
-      ->count()
-      ->execute();
-
-    return $count;
-  }
 
   /**
    * {@inheritdoc}
