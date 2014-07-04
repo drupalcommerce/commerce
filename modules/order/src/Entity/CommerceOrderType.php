@@ -34,8 +34,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce_order.type_edit",
- *     "delete-form" = "commerce_order.type_delete"
+ *     "edit-form" = "entity.commerce_order.admin_form",
+ *     "delete-form" = "entity.commerce_order_type.delete_form"
  *   }
  * )
  */

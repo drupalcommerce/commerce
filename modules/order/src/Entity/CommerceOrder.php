@@ -41,9 +41,9 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "admin-form" = "commerce_order.type_edit",
- *     "edit-form" = "commerce_order.edit",
- *     "delete-form" = "commerce_order.delete"
+ *     "admin-form" = "entity.commerce_order.admin_form",
+ *     "edit-form" = "entity.commerce_order.edit_form",
+ *     "delete-form" = "entity.commerce_order.delete_form"
  *   },
  *   bundle_entity_type = "commerce_order_type"
  * )

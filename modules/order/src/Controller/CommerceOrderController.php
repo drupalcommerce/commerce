@@ -37,7 +37,7 @@ class CommerceOrderController extends ControllerBase {
 
     if (count($types) == 1) {
       $type = array_shift($types);
-      return $this->redirect('commerce_order.add', array('commerce_order_type' => $type->id));
+      return $this->redirect('entity.commerce_order.add', array('commerce_order_type' => $type->id));
     }
 
     return array(
