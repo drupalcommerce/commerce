@@ -23,22 +23,24 @@ commerce_product.add:
     _permission: 'create commerce_product entities'
     
 commerce_product.view:
-  path: '/commerce_product/{commerce_product}'
+  path: '/product/{commerce_product}'
   defaults:
     _entity_view: 'commerce_product'
   requirements:
     _entity_access: 'commerce_product.view'
     
 commerce_product.edit:
-  path: '/commerce_product/{commerce_product}/edit'
+  path: '/product/{commerce_product}/edit'
   defaults:
     _entity_form: commerce_product.edit
     _title: 'Edit a product'
   requirements:
     _permission: 'update commerce_product entities'
+  options:
+    _admin_route: TRUE    
 
 commerce_product.delete:
-  path: '/commerce_product/{commerce_product}/delete'
+  path: '/product/{commerce_product}/delete'
   defaults:
     _entity_form: commerce_product.delete
     _title: 'Delete a product'
