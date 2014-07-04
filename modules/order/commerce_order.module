@@ -20,8 +20,8 @@ function commerce_order_entity_operation(EntityInterface $entity) {
 
   $entity_routes =
     array(
-      'commerce_order' => 'commerce_order.devel',
-      'commerce_order_type' => 'commerce_order.type_devel',
+      'commerce_order' => 'entity.commerce_order.devel',
+      'commerce_order_type' => 'entity.commerce_order_type.devel',
     );
 
   $entity_type_id = $entity->getEntityTypeId();
