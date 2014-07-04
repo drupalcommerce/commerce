@@ -1,19 +1,19 @@
 commerce.admin_commerce:
-  title: Commerce
-  route_name: commerce.admin_commerce
-  parent: system.admin
+  title: 'Commerce'
+  route_name: 'commerce.admin_commerce'
+  parent: 'system.admin'
   description: 'Administer your commerce data and configuration.'
   weight: -9
 
 commerce.configuration:
-  title: Configuration
-  route_name: commerce.configuration
-  parent: commerce.admin_commerce
+  title: 'Configuration'
+  route_name: 'commerce.configuration'
+  parent: 'commerce.admin_commerce'
   description: 'Configure your store and Commerce module settings.'
   weight: 10
 
 commerce.store_list:
-  title: Store information
-  route_name: commerce.store_list
-  parent: commerce.configuration
+  title: 'Store information'
+  route_name: 'commerce.store_list'
+  parent: 'commerce.configuration'
   description: 'Configure your store settings.'

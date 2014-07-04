@@ -5,11 +5,10 @@ commerce_order.list:
   description: 'Manage your orders.'
 
 commerce_order.configuration:
-  title: 'Order configuration'
+  title: 'Order settings'
   route_name: 'commerce_order.configuration'
   parent: 'commerce.configuration'
-  description: 'Configure your order settings.'
-  weight: 10
+  description: 'Configure your order types and settings.'
 
 commerce_order.type_list:
   title: 'Order types'
