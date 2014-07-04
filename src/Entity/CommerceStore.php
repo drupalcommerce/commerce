@@ -28,7 +28,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "edit" = "Drupal\commerce\Form\CommerceStoreForm",
  *       "delete" = "Drupal\commerce\Form\CommerceStoreDeleteForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationController"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "commerce_store",
  *   admin_permission = "administer commerce_store entities",

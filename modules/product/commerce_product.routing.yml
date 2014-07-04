@@ -1,0 +1,71 @@
+commerce_product.list:
+  path: '/admin/commerce/products'
+  defaults:
+    _entity_list: 'commerce_product'
+    _title: 'Products'
+  requirements:
+    _permission: 'view commerce_product entities'
+    
+commerce_product.product_add_page:
+  path: '/admin/commerce/products/add'
+  defaults:
+    _title: 'Add a new product'
+    _content: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'
+  requirements:
+    _permission: 'administer commerce_product entities'
+    
+commerce_product.add:
+  path: '/admin/commerce/products/add/{commerce_product_type}'
+  defaults:
+    _content: '\Drupal\commerce_product\Controller\CommerceProductController::add'
+    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::addPageTitle'
+  requirements:
+    _permission: 'create commerce_product entities'
+    
+commerce_product.edit:
+  path: '/admin/commerce/products/{commerce_product}/edit'
+  defaults:
+    _entity_form: commerce_product.edit
+    _title: 'Edit a product'
+  requirements:
+    _permission: 'update commerce_product entities'
+    
+commerce_product.delete:
+  path: '/admin/commerce/products/{commerce_product}/delete'
+  defaults:
+    _entity_form: commerce_product.delete
+    _title: 'Delete a product'
+  requirements:
+    _permission: 'delete commerce_product entities'
+    
+commerce_product.product_type_list:
+  path: '/admin/commerce/products/types'
+  defaults:
+    _entity_list: 'commerce_product_type'
+    _title: 'Product types'
+  requirements:     
+    _permission: 'administer commerce_product_type entities'
+    
+commerce_product.product_type_add:
+  path: '/admin/commerce/products/types/add'
+  defaults:
+    _entity_form: commerce_product_type.edit
+    _title: 'Add a product type'
+  requirements:
+    _permission: 'administer commerce_product_type entities'
+    
+commerce_product.product_type_edit:
+  path: '/admin/commerce/products/types/{commerce_product_type}/edit'
+  defaults:
+    _entity_form: commerce_product_type.edit
+    _title: 'Edit a product type'
+  requirements:
+    _permission: 'administer commerce_product_type entities'
+  
+commerce_product.product_type_delete:
+  path: '/admin/commerce/products/types/{commerce_product_type}/delete'
+  defaults:
+    _entity_form: 'commerce_product_type.delete'
+    _title: 'Delete a product type'
+  requirements:
+    _permission: 'administer commerce_product_type entities'

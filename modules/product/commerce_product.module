@@ -1,0 +1,36 @@
+<?php
+
+use Drupal\commerce_product\Entity\CommerceProductType;
+
+/**
+ * @file
+ * Defines the core Commerce product entity, including the entity itself, the
+ * bundle definitions (product types), and various API functions to manage
+ * products and interact with them through forms and autocompletes.
+ */
+
+/**
+ * Menu argument loader: loads a product type by its machine name.
+ *
+ * @param string $type
+ *   The machine name of the product type to load.
+ *
+ * @return \Drupal\commerce\CommerceStoreTypeInterface
+ *   A product type object or NULL if $name does not exist.
+ */
+function commerce_product_type_load($type) {
+  return CommerceProductType::load($type);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_product_theme() {
+  return array(
+    'commerce_product_add_list' => array(
+      'variables' => array('content' => NULL),
+      'file' => 'commerce_product.pages.inc',
+      'template' => 'commerce-product-add-list',
+    ),
+  );
+}
