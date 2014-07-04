@@ -23,7 +23,7 @@
     </dl>
 {% else %}
     <p>
-        {% set create_order_type = url('admin/commerce/config/order/types/add') %}
+        {% set create_order_type = url('admin/commerce/config/order-types/add') %}
         {% trans %}
         You have not created any order types yet. Go to the <a href="{{ create_order_type }}">order type creation page</a> to add a new order type.
         {% endtrans %}

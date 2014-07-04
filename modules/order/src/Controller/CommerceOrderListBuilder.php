@@ -4,12 +4,16 @@
  * Contains \Drupal\commerce_order\Controller\CommerceOrderListBuilder.
  */
 namespace Drupal\commerce_order\Controller;
+
+use Drupal\commerce_order\Entity\CommerceOrderType;
+use Drupal\Component\Utility\String;
 use Drupal\Core\Datetime\Date;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Provides a list controller for commerce_order entity.
  */
@@ -82,9 +86,19 @@ class CommerceOrderListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    /* @var $entity \Drupal\commerce_order\Entity\CommerceOrder */
+    $commerce_order_type = CommerceOrderType::load($entity->bundle());
+
+    if (!empty($commerce_order_type)) {
+      $type = String::checkPlain($commerce_order_type->label());
+    }
+    else {
+      $type = String::checkPlain($entity->bundle());
+    }
+
     $row = array(
       'order_id' => $entity->id(),
-      'type' => $entity->bundle(),
+      'type' => $type,
       'owner' => array(
         'data' => array(
           '#theme' => 'username',

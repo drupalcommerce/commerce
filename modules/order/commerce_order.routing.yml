@@ -49,16 +49,8 @@ commerce_order.devel:
     _module_dependencies: 'devel'
     _permission: 'access devel information'
 
-commerce_order.configuration:
-  path: '/admin/commerce/config/order'
-  defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Order configuration'
-  requirements:
-    _permission: 'access administration pages'
-
 commerce_order.type_list:
-  path: '/admin/commerce/config/order/types'
+  path: '/admin/commerce/config/order-types'
   defaults:
     _entity_list: 'commerce_order_type'
     _title: 'Order types'
@@ -66,7 +58,7 @@ commerce_order.type_list:
     _permission: 'administer commerce_order_type entities'
 
 commerce_order.type_add:
-  path: '/admin/commerce/config/order/types/add'
+  path: '/admin/commerce/config/order-types/add'
   defaults:
     _entity_form: 'commerce_order_type.add'
     _title: 'Add a new order type'
@@ -74,7 +66,7 @@ commerce_order.type_add:
     _entity_create_access: 'commerce_order_type'
 
 commerce_order.type_edit:
-  path: '/admin/commerce/config/order/types/{commerce_order_type}'
+  path: '/admin/commerce/config/order-types/{commerce_order_type}'
   defaults:
     _entity_form: 'commerce_order_type.edit'
     _title: 'Edit an order type'
@@ -82,7 +74,7 @@ commerce_order.type_edit:
     _permission: 'administer commerce_order_type entities'
 
 commerce_order.type_delete:
-  path: '/admin/commerce/config/order/types/{commerce_order_type}/delete'
+  path: '/admin/commerce/config/order-types/{commerce_order_type}/delete'
   defaults:
     _entity_form: 'commerce_order_type.delete'
     _title: 'Delete an order type'
@@ -90,7 +82,7 @@ commerce_order.type_delete:
     _permission: 'administer commerce_order_type entities'
 
 commerce_order.type_devel:
-  path: '/admin/commerce/config/order/types/{commerce_order_type}/devel'
+  path: '/admin/commerce/config/order-types/{commerce_order_type}/devel'
   defaults:
     _content: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderTypeLoad'
     _title: 'Dump an order type'
