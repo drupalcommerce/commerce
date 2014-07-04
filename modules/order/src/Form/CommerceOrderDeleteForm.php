@@ -8,8 +8,6 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -17,16 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a form for deleting an order.
  */
 class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
-
-  /**
-   * Constructs a CommerceOrderDeleteForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
-   */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    parent::__construct($entity_manager);
-  }
 
   /**
    * {@inheritdoc}
@@ -48,7 +36,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelRoute() {
-    return new Url('commerce_order.list');
+    return new Url('entity.commerce_order.list');
   }
 
   /**

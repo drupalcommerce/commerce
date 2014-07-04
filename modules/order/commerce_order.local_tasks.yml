@@ -1,21 +1,21 @@
-commerce_order.page_edit:
-  route_name: commerce_order.edit
-  base_route: commerce_order.edit
-  title: Edit
+entity.commerce_order.edit_form:
+  route_name: 'entity.commerce_order.edit_form'
+  base_route: 'entity.commerce_order.edit_form'
+  title: 'Edit'
 
-commerce_order.page_devel:
-  route_name: commerce_order.devel
-  base_route: commerce_order.edit
-  title: Devel
+entity.commerce_order.devel:
+  route_name: 'entity.commerce_order.devel'
+  base_route: 'entity.commerce_order.edit_form'
+  title: 'Devel'
   weight: 10
 
-commerce_order.order_type_page_edit:
-  route_name: commerce_order.type_edit
-  base_route: commerce_order.type_edit
-  title: Edit
+entity.commerce_order.admin_form:
+  route_name: 'entity.commerce_order.admin_form'
+  base_route: 'entity.commerce_order.admin_form'
+  title: 'Edit'
 
-commerce_order.order_type_page_devel:
-  route_name: commerce_order.type_devel
-  base_route: commerce_order.type_edit
-  title: Devel
+entity.commerce_order_type.devel:
+  route_name: 'entity.commerce_order_type.devel'
+  base_route: 'entity.commerce_order.admin_form'
+  title: 'Devel'
   weight: 10
