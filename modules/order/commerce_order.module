@@ -21,7 +21,7 @@ function commerce_order_entity_operation(EntityInterface $entity) {
     );
 
   $entity_type_id = $entity->getEntityTypeId();
-  if (user_access('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
+  if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
     $operations['devel'] = array(
       'route_name' => $entity_routes[$entity_type_id],
       'route_parameters' => array($entity_type_id => $entity->id()),
