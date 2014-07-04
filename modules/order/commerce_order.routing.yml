@@ -77,7 +77,7 @@ entity.commerce_order.list:
   options:
     _admin_route: TRUE
   requirements:
-    _entity_access: 'commerce_order.view'
+    _permission: 'administer commerce_order entities'
 
 entity.commerce_order_type.add:
   path: '/admin/commerce/config/order/types/add'
@@ -118,4 +118,4 @@ entity.commerce_order_type.list:
   options:
     _admin_route: TRUE
   requirements:
-    _entity_access: 'commerce_order_type.view'
+    _permission: 'administer commerce_order_type entities'

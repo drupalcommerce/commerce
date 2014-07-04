@@ -22,7 +22,6 @@ use Drupal\user\UserInterface;
  *   id = "commerce_order",
  *   label = @Translation("Order"),
  *   controllers = {
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_order\Controller\CommerceOrderListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderForm",
