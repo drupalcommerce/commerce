@@ -29,7 +29,7 @@ class CommerceProductListBuilder extends EntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce\Entity\CommerceProduct */
     $row['title'] = $entity->getTitle();
-    $row['sku'] = $entity->getSku();    
+    $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);
   }
 }

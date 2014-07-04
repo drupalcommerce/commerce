@@ -2,20 +2,32 @@ commerce_product.page_edit:
   route_name: commerce_product.edit
   base_route: commerce_product.edit
   title: Edit
-  
+
 commerce_product.delete_confirm:
   route_name: commerce_product.delete
   base_route: commerce_product.edit
   title: Delete
   weight: 10
-  
+
+commerce_product.page_devel:
+  route_name: commerce_product.devel
+  base_route: commerce_product.edit
+  title: Devel
+  weight: 10
+
 commerce_product.product_type_page_edit:
   route_name: commerce_product.product_type_edit
   base_route: commerce_product.product_type_edit
   title: Edit
-  
+
 commerce_product.product_type_delete_confirm:
   route_name: commerce_product.product_type_delete
   base_route: commerce_product.product_type_edit
   title: Delete
+  weight: 10
+
+commerce_product.product_type_page_devel:
+  route_name: commerce_product.product_type_devel
+  base_route: commerce_product.product_type_edit
+  title: Devel
   weight: 10
