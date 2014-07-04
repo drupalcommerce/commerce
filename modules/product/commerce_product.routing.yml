@@ -38,6 +38,14 @@ commerce_product.delete:
   requirements:
     _permission: 'delete commerce_product entities'
 
+commerce_product.configuration:
+  path: '/admin/commerce/config/product'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Product configuration'
+  requirements:
+    _permission: 'access administration pages'
+
 commerce_product.devel:
   path: '/admin/commerce/products/{commerce_product}/devel'
   defaults:
@@ -50,7 +58,7 @@ commerce_product.devel:
     _permission: 'access devel information'
 
 commerce_product.product_type_list:
-  path: '/admin/commerce/products/types'
+  path: '/admin/commerce/config/product/types'
   defaults:
     _entity_list: 'commerce_product_type'
     _title: 'Product types'
@@ -58,7 +66,7 @@ commerce_product.product_type_list:
     _permission: 'administer commerce_product_type entities'
 
 commerce_product.product_type_add:
-  path: '/admin/commerce/products/types/add'
+  path: '/admin/commerce/config/product/types/add'
   defaults:
     _entity_form: commerce_product_type.edit
     _title: 'Add a product type'
@@ -66,7 +74,7 @@ commerce_product.product_type_add:
     _permission: 'administer commerce_product_type entities'
 
 commerce_product.product_type_edit:
-  path: '/admin/commerce/products/types/{commerce_product_type}/edit'
+  path: '/admin/commerce/config/product/types/{commerce_product_type}/edit'
   defaults:
     _entity_form: commerce_product_type.edit
     _title: 'Edit a product type'
@@ -74,7 +82,7 @@ commerce_product.product_type_edit:
     _permission: 'administer commerce_product_type entities'
 
 commerce_product.product_type_delete:
-  path: '/admin/commerce/products/types/{commerce_product_type}/delete'
+  path: '/admin/commerce/config/product/types/{commerce_product_type}/delete'
   defaults:
     _entity_form: 'commerce_product_type.delete'
     _title: 'Delete a product type'
@@ -82,7 +90,7 @@ commerce_product.product_type_delete:
     _permission: 'administer commerce_product_type entities'
 
 commerce_product.product_type_devel:
-  path: '/admin/commerce/products/types/{commerce_product_type}/devel'
+  path: '/admin/commerce/config/product/types/{commerce_product_type}/devel'
   defaults:
     _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
     _title: 'Dump a product type'
