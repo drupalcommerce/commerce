@@ -7,9 +7,12 @@
 
 namespace Drupal\commerce\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\commerce\CommerceStoreTypeInterface;
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\system\Tests\Entity\EntityQueryTest;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the Commerce Store Type entity type.
@@ -40,6 +43,7 @@ use Drupal\commerce\CommerceStoreTypeInterface;
  * )
  */
 class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreTypeInterface {
+
   /**
    * The store type machine name.
    *
@@ -67,4 +71,39 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
    * @var string
    */
   public $description;
+
+  /**
+   * How many stores exist with this type ?
+   *
+   * @return int
+   */
+  public function getStoreCount() {
+    $instance_type = $this->getEntityType()->getBundleOf();
+    $query = $this->entityManager()
+      ->getListBuilder($instance_type)
+      ->getStorage()
+      ->getQuery();
+
+
+    $count = $query
+      ->condition('type', $this->id())
+      ->count()
+      ->execute();
+
+    return $count;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function delete() {
+    if ($this->getStoreCount() > 0) {
+      throw new EntityStorageException(strtr("Store Type @type may not be deleted while stores exists for it.", array(
+        '@type' => String::checkPlain($this->entityTypeId),
+      )));
+    }
+    parent::delete();
+  }
 }
