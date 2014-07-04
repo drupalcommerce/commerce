@@ -38,8 +38,7 @@ class CommerceProductListBuilder extends EntityListBuilder {
       '#type' => 'link',
       '#title' => $entity->label(),      
     ) + $uri->toRenderArray();
-    
-    $row['title'] = $entity->getTitle();
+        
     $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);
   }

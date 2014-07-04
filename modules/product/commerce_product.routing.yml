@@ -26,6 +26,7 @@ commerce_product.view:
   path: '/product/{commerce_product}'
   defaults:
     _entity_view: 'commerce_product'
+    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::viewProductTitle'
   requirements:
     _entity_access: 'commerce_product.view'
     
@@ -33,7 +34,7 @@ commerce_product.edit:
   path: '/product/{commerce_product}/edit'
   defaults:
     _entity_form: commerce_product.edit
-    _title: 'Edit a product'
+    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::editPageTitle'
   requirements:
     _permission: 'update commerce_product entities'
   options:
