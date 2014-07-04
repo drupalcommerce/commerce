@@ -1,19 +1,19 @@
 commerce_order.list:
-  title: Orders
-  route_name: commerce_order.list
-  parent: commerce.admin_commerce
+  title: 'Orders'
+  route_name: 'commerce_order.list'
+  parent: 'commerce.admin_commerce'
   description: 'Manage your orders.'
 
 commerce_order.configuration:
-  title: Order configuration
-  route_name: commerce_order.configuration
-  parent: commerce.configuration
+  title: 'Order configuration'
+  route_name: 'commerce_order.configuration'
+  parent: 'commerce.configuration'
   description: 'Configure your order settings.'
   weight: 10
 
 commerce_order.type_list:
-  title: Order types
-  route_name: commerce_order.type_list
-  parent: commerce_order.configuration
+  title: 'Order types'
+  route_name: 'commerce_order.type_list'
+  parent: 'commerce_order.configuration'
   description: 'Manage your order types.'
 
