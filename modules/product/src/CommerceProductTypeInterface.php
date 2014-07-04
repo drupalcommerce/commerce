@@ -14,4 +14,10 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface CommerceProductTypeInterface extends ConfigEntityInterface {
 
+  /**
+   * Returns the number of product entities existing with this type.
+   *
+   * @return int
+   */
+  public function getProductCount();
 }

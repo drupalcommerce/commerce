@@ -17,12 +17,13 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
  *   controllers = {
- *     "list_builder" = "Drupal\commerce_product\CommerceProductTypeListBuilder",
+ *     "access" = "Drupal\commerce_product\CommerceProductTypeAccessController",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\CommerceProductTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\CommerceProductTypeForm",
  *       "delete" = "Drupal\commerce_product\Form\CommerceProductTypeDeleteForm"
- *     }
+ *     },
+ *     "list_builder" = "Drupal\commerce_product\CommerceProductTypeListBuilder"
  *   },
  *   config_prefix = "commerce_product_type",
  *   admin_permission = "administer commerce_product_type entities",
@@ -59,4 +60,34 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    * @var string
    */
   public $label;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProductCount() {
+    $instance_type = $this->getEntityType()->getBundleOf();
+    $query = $this->entityManager()
+                  ->getListBuilder($instance_type)
+                  ->getStorage()
+                  ->getQuery();
+
+    $count = $query
+      ->condition('type', $this->id())
+      ->count()
+      ->execute();
+
+    return $count;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    if (!$this->access('delete')) {
+      throw new EntityStorageException(strtr("Product Type %type may not be deleted.", array(
+        '%type' => String::checkPlain($this->entityTypeId),
+      )));
+    }
+    parent::delete();
+  }
 }
