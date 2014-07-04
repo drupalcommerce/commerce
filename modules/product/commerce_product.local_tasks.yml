@@ -7,7 +7,7 @@ commerce_product.delete_confirm:
   route_name: commerce_product.delete
   base_route: commerce_product.edit
   title: Delete
-  weight: 10
+  weight: 8
 
 commerce_product.page_devel:
   route_name: commerce_product.devel
@@ -24,7 +24,7 @@ commerce_product.product_type_delete_confirm:
   route_name: commerce_product.product_type_delete
   base_route: commerce_product.product_type_edit
   title: Delete
-  weight: 10
+  weight: 8
 
 commerce_product.product_type_page_devel:
   route_name: commerce_product.product_type_devel

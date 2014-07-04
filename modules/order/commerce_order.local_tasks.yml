@@ -1,10 +1,20 @@
+commerce_order.page_edit:
+  route_name: commerce_order.edit
+  base_route: commerce_order.edit
+  title: Edit
+
 commerce_order.page_devel:
-  route_name: commerce_order.evel
+  route_name: commerce_order.devel
   base_route: commerce_order.edit
   title: Devel
   weight: 10
 
-commerce_order.store_type_page_devel:
+commerce_order.order_type_page_edit:
+  route_name: commerce_order.type_edit
+  base_route: commerce_order.type_edit
+  title: Edit
+
+commerce_order.order_type_page_devel:
   route_name: commerce_order.type_devel
   base_route: commerce_order.type_edit
   title: Devel
