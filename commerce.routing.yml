@@ -29,7 +29,7 @@ commerce.store_type_add:
     _title: 'Add a new store type'
   requirements:
     _permission: 'administer commerce_store_type entities'
-    
+
 commerce.store_type_edit:
   path: '/admin/commerce/config/store/types/{commerce_store_type}'
   defaults:
@@ -37,7 +37,7 @@ commerce.store_type_edit:
     _title: 'Edit a store type'
   requirements:
     _permission: 'administer commerce_store_type entities'
-    
+
 commerce.store_type_delete:
   path: '/admin/commerce/config/store/types/{commerce_store_type}/delete'
   defaults:
@@ -45,6 +45,17 @@ commerce.store_type_delete:
     _title: 'Delete a store type'
   requirements:
     _permission: 'administer commerce_store_type entities'
+
+commerce.store_type_devel:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
+  defaults:
+    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
+    _title: 'Dump a store type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
 
 commerce.store_list:
   path: '/admin/commerce/config/store'
@@ -85,3 +96,15 @@ commerce.store_delete:
     _title: 'Delete a store'
   requirements:
     _permission: 'delete commerce_store entities'
+
+commerce.store_devel:
+  path: '/admin/commerce/config/store/{commerce_store}/devel'
+  defaults:
+    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeLoad'
+    _title: 'Dump a store'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+

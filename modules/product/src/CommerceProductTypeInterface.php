@@ -13,5 +13,5 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  * Provides an interface defining a Example entity.
  */
 interface CommerceProductTypeInterface extends ConfigEntityInterface {
-  
+
 }

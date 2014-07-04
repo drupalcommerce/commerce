@@ -38,6 +38,17 @@ commerce_order.delete:
   requirements:
     _permission: 'delete commerce_order entities'
 
+commerce_order.devel:
+  path: '/admin/commerce/orders/{commerce_order}/devel'
+  defaults:
+    _content: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderLoad'
+    _title: 'Dump an order'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+
 commerce_order.configuration:
   path: '/admin/commerce/config/order'
   defaults:
@@ -77,3 +88,15 @@ commerce_order.type_delete:
     _title: 'Delete an order type'
   requirements:
     _permission: 'administer commerce_order_type entities'
+
+commerce_order.type_devel:
+  path: '/admin/commerce/config/order/types/{commerce_order_type}/devel'
+  defaults:
+    _content: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderTypeLoad'
+    _title: 'Dump an order type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+
