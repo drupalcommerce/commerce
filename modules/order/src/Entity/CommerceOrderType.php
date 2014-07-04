@@ -46,20 +46,20 @@ class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderT
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The order type label.
    *
    * @var string
    */
-  public $label;
+  protected $label;
 
   /**
    * A brief description of this order type.
    *
    * @var string
    */
-  public $description;
+  protected $description;
 
 }
