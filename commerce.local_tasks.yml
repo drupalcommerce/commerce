@@ -13,12 +13,6 @@ commerce.store_type_page_edit:
   base_route: commerce.store_type_edit
   title: Edit
 
-commerce.store_type_delete_confirm:
-  route_name: commerce.store_type_delete
-  base_route: commerce.store_type_edit
-  title: Delete
-  weight: 8
-
 commerce.store_type_page_devel:
   route_name: commerce.store_type_devel
   base_route: commerce.store_type_edit
@@ -29,12 +23,6 @@ commerce.store_page_edit:
   route_name: commerce.store_edit
   base_route: commerce.store_edit
   title: Edit
-
-commerce.store_delete_confirm:
-  route_name: commerce.store_delete
-  base_route: commerce.store_edit
-  title: Delete
-  weight: 8
 
 commerce.store_page_devel:
   route_name: commerce.store_devel
