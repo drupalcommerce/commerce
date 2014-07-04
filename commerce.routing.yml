@@ -44,7 +44,7 @@ commerce.store_type_delete:
     _entity_form: 'commerce_store_type.delete'
     _title: 'Delete a store type'
   requirements:
-    _permission: 'administer commerce_store_type entities'
+    _entity_access: 'commerce_store_type.delete'
 
 commerce.store_type_devel:
   path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
@@ -95,7 +95,7 @@ commerce.store_delete:
     _entity_form: commerce_store.delete
     _title: 'Delete a store'
   requirements:
-    _permission: 'delete commerce_store entities'
+    _entity_access: 'commerce_store.delete'
 
 commerce.store_devel:
   path: '/admin/commerce/config/store/{commerce_store}/devel'
