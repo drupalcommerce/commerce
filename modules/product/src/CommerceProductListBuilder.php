@@ -9,6 +9,7 @@ namespace Drupal\commerce_product;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Provides a list controller for stores.
@@ -28,6 +29,16 @@ class CommerceProductListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce\Entity\CommerceProduct */
+    
+    $uri = $entity->urlInfo();
+    $options = $uri->getOptions();
+    $options += ($langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED && isset($languages[$langcode]) ? array('language' => $languages[$langcode]) : array());
+    $uri->setOptions($options);
+    $row['title']['data'] = array(
+      '#type' => 'link',
+      '#title' => $entity->label(),      
+    ) + $uri->toRenderArray();
+    
     $row['title'] = $entity->getTitle();
     $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);

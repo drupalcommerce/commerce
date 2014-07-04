@@ -45,7 +45,13 @@ class CommerceProductForm extends ContentEntityForm {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
-    $entity = $this->entity;
-    $entity->save();
+    try {
+      $this->entity->save();      
+      drupal_set_message($this->t('The product %product_label has been successfully saved.', array('%product_label' => $this->entity->label())));
+    }
+    catch (\Exception $e) {
+      drupal_set_message($this->t('The product %product_label could not be saved.', array('%product_label' => $this->entity->label())), 'error');
+      watchdog_exception('commerce_product', $e);      
+    }
   }
 }

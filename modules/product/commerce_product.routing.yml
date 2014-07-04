@@ -21,9 +21,16 @@ commerce_product.add:
     _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::addPageTitle'
   requirements:
     _permission: 'create commerce_product entities'
-
+    
+commerce_product.view:
+  path: '/commerce_product/{commerce_product}'
+  defaults:
+    _entity_view: 'commerce_product'
+  requirements:
+    _entity_access: 'commerce_product.view'
+    
 commerce_product.edit:
-  path: '/admin/commerce/products/{commerce_product}/edit'
+  path: '/commerce_product/{commerce_product}/edit'
   defaults:
     _entity_form: commerce_product.edit
     _title: 'Edit a product'
@@ -31,7 +38,7 @@ commerce_product.edit:
     _permission: 'update commerce_product entities'
 
 commerce_product.delete:
-  path: '/admin/commerce/products/{commerce_product}/delete'
+  path: '/commerce_product/{commerce_product}/delete'
   defaults:
     _entity_form: commerce_product.delete
     _title: 'Delete a product'
