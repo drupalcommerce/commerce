@@ -81,7 +81,6 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
       ->getStorage()
       ->getQuery();
 
-
     $count = $query
       ->condition('type', $this->id())
       ->count()

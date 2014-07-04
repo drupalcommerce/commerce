@@ -14,7 +14,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface CommerceStoreTypeInterface extends ConfigEntityInterface {
   /**
-   * How many stores exist with this type ?
+   * Returns the number of store entities exist of this type.
    *
    * @return int
    */

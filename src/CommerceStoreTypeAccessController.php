@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_type\CommerceStoreTypeAccessController.
+ * Contains \Drupal\commerce\CommerceStoreTypeAccessController.
  */
 
 namespace Drupal\commerce;
@@ -25,7 +25,7 @@ class CommerceStoreTypeAccessController extends EntityAccessController {
       /** @var $entity \Drupal\commerce\CommerceStoreTypeInterface */
       $count = $entity->getStoreCount();
       if ($count > 0) {
-        return false;
+        return FALSE;
       }
     }
 
