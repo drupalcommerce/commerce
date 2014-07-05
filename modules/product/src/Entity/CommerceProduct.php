@@ -271,8 +271,8 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     // @todo there should be a way to set the default value from here but I
     // haven't figured out how yet.
     $fields['status'] = FieldDefinition::create('list_boolean')
-      ->setLabel(t('Status'))
-      ->setDescription(t('A boolean indicating whether the product is active.'))
+      ->setLabel(t('Active'))
+      ->setDescription(t('Disabled products cannot be added to shopping carts and may be hidden in administrative product lists.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
