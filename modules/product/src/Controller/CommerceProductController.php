@@ -7,14 +7,11 @@
 
 namespace Drupal\commerce_product\Controller;
 
-use Drupal\Component\Utility\String;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\Date;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\commerce_product\CommerceProductTypeInterface;
-use Drupal\commerce_product\CommerceProductInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -95,14 +92,13 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * Provides the product add form.
    *
-   * @param \Drupal\commerce\CommerceProductTypeInterface $commerce_product_type
+   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *   The product type entity for the product.
    *
    * @return array
    *   A product add form.
    */
   public function add(CommerceProductTypeInterface $commerce_product_type) {
-    $account = $this->currentUser();
     $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id));
 
     $commerce_product = $this->entityManager()->getStorage('commerce_product')->create(array(
@@ -118,7 +114,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * The _title_callback for the commerce_product.add route.
    *
-   * @param \Drupal\commerce\CommerceProductTypeInterface $commerce_product_type
+   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *   The current product.
    *
    * @return string

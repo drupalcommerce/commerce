@@ -7,9 +7,9 @@
 
 namespace Drupal\commerce\Entity;
 
+use Drupal\commerce\CommerceConfigEntityBundleBase;
+use Drupal\commerce\CommerceEntityTypeInterface;
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce\CommerceStoreTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
@@ -19,13 +19,13 @@ use Drupal\Core\Entity\EntityStorageException;
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
  *   controllers = {
- *     "access" = "Drupal\commerce\CommerceStoreTypeAccessController",
- *     "list_builder" = "Drupal\commerce\CommerceStoreTypeListBuilder",
+ *     "access" = "Drupal\commerce\CommerceConfigEntityAccessController",
  *     "form" = {
  *       "add" = "Drupal\commerce\Form\CommerceStoreTypeForm",
  *       "edit" = "Drupal\commerce\Form\CommerceStoreTypeForm",
  *       "delete" = "Drupal\commerce\Form\CommerceStoreTypeDeleteForm"
- *     }
+ *     },
+ *     "list_builder" = "Drupal\commerce\CommerceStoreTypeListBuilder"
  *   },
  *   admin_permission = "administer commerce_store_type entities",
  *   config_prefix = "commerce_store_type",
@@ -41,7 +41,7 @@ use Drupal\Core\Entity\EntityStorageException;
  *   }
  * )
  */
-class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreTypeInterface {
+class CommerceStoreType extends CommerceConfigEntityBundleBase implements CommerceEntityTypeInterface {
 
   /**
    * The store type machine name.
@@ -70,24 +70,6 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
    * @var string
    */
   public $description;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getStoreCount() {
-    $instance_type = $this->getEntityType()->getBundleOf();
-    $query = $this->entityManager()
-      ->getListBuilder($instance_type)
-      ->getStorage()
-      ->getQuery();
-
-    $count = $query
-      ->condition('type', $this->id())
-      ->count()
-      ->execute();
-
-    return $count;
-  }
 
   /**
    * {@inheritdoc}

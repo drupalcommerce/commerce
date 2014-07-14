@@ -9,7 +9,6 @@ namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

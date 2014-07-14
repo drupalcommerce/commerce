@@ -27,7 +27,7 @@ class CommerceProductListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce\Entity\CommerceProduct */
+    /* @var $entity \Drupal\commerce_product\Entity\CommerceProduct */
     $row['title'] = $entity->getTitle();
     $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);

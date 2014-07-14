@@ -1,3 +1,46 @@
+commerce_product.product_type_list:
+  path: '/admin/commerce/products/types'
+  defaults:
+    _entity_list: 'commerce_product_type'
+    _title: 'Product types'
+  requirements:
+    _permission: 'administer commerce_product_type entities'
+
+commerce_product.product_type_add:
+  path: '/admin/commerce/products/types/add'
+  defaults:
+    _entity_form: commerce_product_type.edit
+    _title: 'Add a product type'
+  requirements:
+    _permission: 'administer commerce_product_type entities'
+
+commerce_product.product_type_edit:
+  path: '/admin/commerce/products/types/{commerce_product_type}/edit'
+  defaults:
+    _entity_form: commerce_product_type.edit
+    _title: 'Edit a product type'
+  requirements:
+    _permission: 'administer commerce_product_type entities'
+
+commerce_product.product_type_delete:
+  path: '/admin/commerce/products/types/{commerce_product_type}/delete'
+  defaults:
+    _entity_form: 'commerce_product_type.delete'
+    _title: 'Delete a product type'
+  requirements:
+    _entity_access: 'commerce_product_type.delete'
+
+commerce_product.product_type_devel:
+  path: '/admin/commerce/products/types/{commerce_product_type}/devel'
+  defaults:
+    _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
+    _title: 'Dump a product type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+
 commerce_product.list:
   path: '/admin/commerce/products'
   defaults:
@@ -36,7 +79,7 @@ commerce_product.delete:
     _entity_form: commerce_product.delete
     _title: 'Delete a product'
   requirements:
-    _permission: 'delete commerce_product entities'
+    _entity_access: 'commerce_product.delete'
 
 commerce_product.configuration:
   path: '/admin/commerce/config/product'
@@ -51,49 +94,6 @@ commerce_product.devel:
   defaults:
     _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productLoad'
     _title: 'Dump a product'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
-commerce_product.product_type_list:
-  path: '/admin/commerce/config/product-types'
-  defaults:
-    _entity_list: 'commerce_product_type'
-    _title: 'Product types'
-  requirements:
-    _permission: 'administer commerce_product_type entities'
-
-commerce_product.product_type_add:
-  path: '/admin/commerce/config/product-types/add'
-  defaults:
-    _entity_form: commerce_product_type.edit
-    _title: 'Add a product type'
-  requirements:
-    _permission: 'administer commerce_product_type entities'
-
-commerce_product.product_type_edit:
-  path: '/admin/commerce/config/product-types/{commerce_product_type}/edit'
-  defaults:
-    _entity_form: commerce_product_type.edit
-    _title: 'Edit a product type'
-  requirements:
-    _permission: 'administer commerce_product_type entities'
-
-commerce_product.product_type_delete:
-  path: '/admin/commerce/config/product-types/{commerce_product_type}/delete'
-  defaults:
-    _entity_form: 'commerce_product_type.delete'
-    _title: 'Delete a product type'
-  requirements:
-    _permission: 'administer commerce_product_type entities'
-
-commerce_product.product_type_devel:
-  path: '/admin/commerce/config/product-types/{commerce_product_type}/devel'
-  defaults:
-    _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
-    _title: 'Dump a product type'
   options:
     _admin_route: TRUE
   requirements:

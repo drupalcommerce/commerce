@@ -74,7 +74,7 @@ interface CommerceStoreInterface extends EntityInterface {
   /**
    * Defines the base fields of the entity type.
    *
-   * @param string $entity_type
+   * @param \Drupal\core\Entity\EntityTypeInterface $entity_type
    *   Name of the entity type
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]

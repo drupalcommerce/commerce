@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce\Form;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
 
 class CommerceStoreTypeForm extends EntityForm {

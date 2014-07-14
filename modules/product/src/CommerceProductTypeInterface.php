@@ -7,11 +7,10 @@
 
 namespace Drupal\commerce_product;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\CommerceEntityTypeInterface;
 
 /**
- * Provides an interface defining a Example entity.
+ * Provides an interface defining a Product Type entity.
  */
-interface CommerceProductTypeInterface extends ConfigEntityInterface {
-
+interface CommerceProductTypeInterface extends CommerceEntityTypeInterface {
 }
