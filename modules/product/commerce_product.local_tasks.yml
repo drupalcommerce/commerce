@@ -1,6 +1,11 @@
+commerce_product.view:
+  route_name: commerce_product.view
+  base_route: commerce_product.view
+  title: 'View'
+
 commerce_product.page_edit:
   route_name: commerce_product.edit
-  base_route: commerce_product.edit
+  base_route: commerce_product.view
   title: Edit
 
 commerce_product.page_devel:

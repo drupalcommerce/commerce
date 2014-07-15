@@ -127,4 +127,30 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   public function addPageTitle(CommerceProductTypeInterface $commerce_product_type) {
     return $this->t('Create @label', array('@label' => $commerce_product_type->label()));
   }
+  
+  /**
+   * The _title_callback for the commerce_product.edit route
+   * 
+   * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
+   *   The current product.
+   * 
+   * @return string
+   *   The page title
+   */
+  public function editPageTitle(CommerceProductInterface $commerce_product) {
+    return $this->t('Editing @label', array('@label' => $commerce_product->label()));
+  }
+  
+  /**
+   * The _title_callback for the commerce_product.view route
+   * 
+   * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
+   *   The current product.
+   * 
+   * @return string
+   *   The page title
+   */  
+  public function viewProductTitle(CommerceProductInterface $commerce_product) {
+    return \Drupal\Component\Utility\Xss::filter($commerce_product->label());
+  }
 }
