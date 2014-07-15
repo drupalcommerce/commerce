@@ -62,4 +62,19 @@ class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderT
    */
   protected $description;
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
+  }
+
 }
