@@ -12,24 +12,6 @@ use Drupal\Core\Entity\ContentEntityForm;
 class CommerceOrderForm extends ContentEntityForm {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
-   */
-  public function form(array $form, array &$form_state) {
-    $form = parent::form($form, $form_state);
-    return $form;
-  }
-
-  /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
-   */
-  public function submit(array $form, array &$form_state) {
-    // Build the entity object from the submitted values.
-    $entity = parent::submit($form, $form_state);
-    $form_state['redirect_route']['route_name'] = 'commerce_order.list';
-    return $entity;
-  }
-
-  /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
@@ -41,6 +23,7 @@ class CommerceOrderForm extends ContentEntityForm {
       drupal_set_message($this->t('The order %order_label could not be saved.', array('%order_label' => $this->entity->label())), 'error');
       watchdog_exception('commerce_order', $e);
     }
+    $form_state['redirect_route']['route_name'] = 'entity.commerce_order.list';
   }
 
 }

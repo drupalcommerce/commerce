@@ -1,44 +1,54 @@
-commerce_order.list:
-  path: '/admin/commerce/orders'
+commerce_order.order_configuration:
+  path: '/admin/commerce/config/order'
   defaults:
-    _entity_list: 'commerce_order'
-    _title: 'Orders list'
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Order configuration'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'view commerce_order entities'
+    _permission: 'access administration pages'
 
-commerce_order.add_page:
-  path: '/admin/commerce/orders/add'
-  defaults:
-    _title: 'Create a new order'
-    _content: '\Drupal\commerce_order\Controller\CommerceOrderController::addPage'
-  requirements:
-    _entity_create_access: 'commerce_order'
-
-commerce_order.add:
+entity.commerce_order.add:
   path: '/admin/commerce/orders/add/{commerce_order_type}'
   defaults:
     _content: '\Drupal\commerce_order\Controller\CommerceOrderController::add'
     _title_callback: '\Drupal\commerce_order\Controller\CommerceOrderController::addPageTitle'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'create commerce_order entities'
+    _entity_create_access: 'commerce_order'
 
-commerce_order.edit:
-  path: '/admin/commerce/orders/{commerce_order}/edit'
+entity.commerce_order.add_page:
+  path: '/admin/commerce/orders/add'
   defaults:
-    _entity_form: commerce_order.edit
-    _title: 'Edit order'
+    _title: 'Create a new order'
+    _content: '\Drupal\commerce_order\Controller\CommerceOrderController::addPage'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'edit commerce_order entities'
+    _entity_create_access: 'commerce_order'
 
-commerce_order.delete:
+entity.commerce_order.admin_form:
+  path: '/admin/commerce/config/order-types/{commerce_order_type}'
+  defaults:
+    _entity_form: 'commerce_order_type.edit'
+    _title: 'Edit an order type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_order_type.update'
+
+entity.commerce_order.delete_form:
   path: '/admin/commerce/orders/{commerce_order}/delete'
   defaults:
     _entity_form: commerce_order.delete
     _title: 'Delete order'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'delete commerce_order entities'
+    _entity_access: 'commerce_order.delete'
 
-commerce_order.devel:
+entity.commerce_order.devel:
   path: '/admin/commerce/orders/{commerce_order}/devel'
   defaults:
     _content: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderLoad'
@@ -49,19 +59,43 @@ commerce_order.devel:
     _module_dependencies: 'devel'
     _permission: 'access devel information'
 
-commerce_order.type_list:
+entity.commerce_order_type.list:
   path: '/admin/commerce/config/order-types'
   defaults:
     _entity_list: 'commerce_order_type'
     _title: 'Order types'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: 'administer commerce_order_type entities'
 
-commerce_order.type_add:
+entity.commerce_order.edit_form:
+  path: '/admin/commerce/orders/{commerce_order}/edit'
+  defaults:
+    _entity_form: commerce_order.edit
+    _title: 'Edit order'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_order.update'
+
+entity.commerce_order.list:
+  path: '/admin/commerce/orders'
+  defaults:
+    _entity_list: 'commerce_order'
+    _title: 'Orders list'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer commerce_order entities'
+
+entity.commerce_order_type.add:
   path: '/admin/commerce/config/order-types/add'
   defaults:
     _entity_form: 'commerce_order_type.add'
     _title: 'Add a new order type'
+  options:
+    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_order_type'
 
@@ -73,15 +107,17 @@ commerce_order.type_edit:
   requirements:
     _permission: 'administer commerce_order_type entities'
 
-commerce_order.type_delete:
+entity.commerce_order_type.delete_form:
   path: '/admin/commerce/config/order-types/{commerce_order_type}/delete'
   defaults:
     _entity_form: 'commerce_order_type.delete'
     _title: 'Delete an order type'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_order_type entities'
+    _entity_access: 'commerce_order_type.delete'
 
-commerce_order.type_devel:
+entity.commerce_order_type.devel:
   path: '/admin/commerce/config/order-types/{commerce_order_type}/devel'
   defaults:
     _content: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderTypeLoad'
