@@ -18,10 +18,10 @@ use Drupal\Component\Utility\Xss;
 function template_preprocess_commerce_order_add_list(&$variables) {
   if (!empty($variables['types'])) {
     foreach ($variables['types'] as $order_type) {
-      $variables['types'][$order_type->id] = array(
-        'type' => $order_type->id,
-        'add_link' => l($order_type->label(), 'admin/commerce/orders/add/' . $order_type->id),
-        'description' => Xss::filterAdmin($order_type->description),
+      $variables['types'][$order_type->id()] = array(
+        'type' => $order_type->id(),
+        'add_link' => l($order_type->label(), 'admin/commerce/orders/add/' . $order_type->id()),
+        'description' => Xss::filterAdmin($order_type->getDescription()),
       );
     }
   }

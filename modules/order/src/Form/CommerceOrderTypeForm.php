@@ -72,7 +72,7 @@ class CommerceOrderTypeForm extends EntityForm {
     $form['description'] = array(
       '#title' => t('Description'),
       '#type' => 'textarea',
-      '#default_value' => $order_type->description,
+      '#default_value' => $order_type->getDescription(),
       '#description' => $this->t('Description of this order type'),
     );
 

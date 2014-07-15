@@ -30,14 +30,14 @@ class CommerceOrderController extends ControllerBase {
 
     // Only use order types the user has access to.
     foreach ($this->entityManager()->getStorage('commerce_order_type')->loadMultiple() as $order_type) {
-      if ($this->entityManager()->getAccessController('commerce_order')->createAccess($order_type->id)) {
-        $types[$order_type->id] = $order_type;
+      if ($this->entityManager()->getAccessController('commerce_order')->createAccess($order_type->id())) {
+        $types[$order_type->id()] = $order_type;
       }
     }
 
     if (count($types) == 1) {
       $type = array_shift($types);
-      return $this->redirect('entity.commerce_order.add', array('commerce_order_type' => $type->id));
+      return $this->redirect('entity.commerce_order.add', array('commerce_order_type' => $type->id()));
     }
 
     return array(
