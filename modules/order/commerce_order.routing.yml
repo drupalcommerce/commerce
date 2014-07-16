@@ -99,14 +99,6 @@ entity.commerce_order_type.add:
   requirements:
     _entity_create_access: 'commerce_order_type'
 
-commerce_order.type_edit:
-  path: '/admin/commerce/config/order-types/{commerce_order_type}'
-  defaults:
-    _entity_form: 'commerce_order_type.edit'
-    _title: 'Edit an order type'
-  requirements:
-    _permission: 'administer commerce_order_type entities'
-
 entity.commerce_order_type.delete_form:
   path: '/admin/commerce/config/order-types/{commerce_order_type}/delete'
   defaults:
