@@ -1,14 +1,14 @@
 Drupal Commerce
 ===============
 
-Drupal Commercce is an open source eCommerce framework that is designed to
+Drupal Commerce is an open source eCommerce framework that is designed to
 enable flexible eCommerce for websites and applications based on Drupal.
 
 NOTE!! Unstable Dev Version
 ---------------------------
 
 This is a non-functional dev version. You're welcome to interact with us in the
-issue queue and submit patches / pull requests. 
+issue queue and submit patches / pull requests.
 
 [Issue Tracker](https://drupal.org/project/issues/commerce)
 
@@ -35,6 +35,6 @@ Zone checks if an address matches a set of conditions.
 Maintainers
 -----------
 
-Maintained by [Ryan Szrama](https://www.drupal.org/u/rszrama) and 
-[Bojan Zivanovic](https://www.drupal.org/u/bojanz) of 
+Maintained by [Ryan Szrama](https://www.drupal.org/u/rszrama) and
+[Bojan Zivanovic](https://www.drupal.org/u/bojanz) of
 [Commerce Guys](http://commerceguys.com/).
