@@ -72,7 +72,7 @@ class CommerceOrderTypeForm extends EntityForm {
     $form['description'] = array(
       '#title' => t('Description'),
       '#type' => 'textarea',
-      '#default_value' => $order_type->description,
+      '#default_value' => $order_type->getDescription(),
       '#description' => $this->t('Description of this order type'),
     );
 
@@ -101,7 +101,7 @@ class CommerceOrderTypeForm extends EntityForm {
         '%label' => $order_type->label(),
       )));
       $form_state['redirect_route'] = array(
-        'route_name' => 'commerce_order.type_list',
+        'route_name' => 'entity.commerce_order_type.list',
       );
     }
     catch (\Exception $e) {

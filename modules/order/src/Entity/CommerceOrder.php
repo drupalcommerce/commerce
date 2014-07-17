@@ -22,7 +22,6 @@ use Drupal\user\UserInterface;
  *   id = "commerce_order",
  *   label = @Translation("Order"),
  *   controllers = {
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_order\Controller\CommerceOrderListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderForm",
@@ -41,9 +40,9 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "admin-form" = "commerce_order.type_edit",
- *     "edit-form" = "commerce_order.edit",
- *     "delete-form" = "commerce_order.delete"
+ *     "admin-form" = "entity.commerce_order.admin_form",
+ *     "edit-form" = "entity.commerce_order.edit_form",
+ *     "delete-form" = "entity.commerce_order.delete_form"
  *   },
  *   bundle_entity_type = "commerce_order_type"
  * )

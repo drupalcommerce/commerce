@@ -34,8 +34,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce_order.type_edit",
- *     "delete-form" = "commerce_order.type_delete"
+ *     "edit-form" = "entity.commerce_order.admin_form",
+ *     "delete-form" = "entity.commerce_order_type.delete_form"
  *   }
  * )
  */
@@ -46,20 +46,35 @@ class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderT
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The order type label.
    *
    * @var string
    */
-  public $label;
+  protected $label;
 
   /**
    * A brief description of this order type.
    *
    * @var string
    */
-  public $description;
+  protected $description;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
+  }
 
 }

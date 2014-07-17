@@ -235,7 +235,8 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'type' => 'text_textarea',
         'weight' => -3,
       ))
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     // SKU
     $fields['sku'] = FieldDefinition::create('string')
@@ -253,7 +254,8 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'type' => 'string',
         'weight' => -4,
       ))
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     // Type
     $fields['type'] = FieldDefinition::create('string')

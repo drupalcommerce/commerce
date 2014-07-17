@@ -2,6 +2,9 @@
 
 use Drupal\commerce_product\Entity\CommerceProductType;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_product\CommerceProductInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * @file
@@ -41,16 +44,18 @@ function commerce_product_entity_operation(EntityInterface $entity) {
 }
 
 /**
- * Menu argument loader: loads a product type by its machine name.
+ * Entity URI callback.
  *
- * @param string $type
- *   The machine name of the product type to load.
+ * @param \Drupal\node\NodeInterface $node
+ *   A node entity.
  *
- * @return \Drupal\commerce\CommerceStoreTypeInterface
- *   A product type object or NULL if $name does not exist.
+ * @return \Drupal\core\Url
+ *   A Url object that provides a URL to the view page for $node.
  */
-function commerce_product_type_load($type) {
-  return CommerceProductType::load($type);
+function commerce_product_uri(CommerceProductInterface $product) {
+  return new Url('commerce_product.view', array(
+    'commerce_product' => $product->id(),
+  ));
 }
 
 /**

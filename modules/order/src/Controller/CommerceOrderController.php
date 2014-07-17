@@ -19,30 +19,28 @@ class CommerceOrderController extends ControllerBase {
    * Displays add content links for available order types.
    *
    * Redirects to admin/commerce/config/orders/add/{order-type} if only one
-   * type is available. however, if there is only one order type defined for
-   * the site, the function redirects to the order add page for that type.
+   * type is available.
    *
    * @return array
    *   A render array for a list of the order types that can be added.
    */
   public function addPage() {
-    $types = array();
-
-    // Only use order types the user has access to.
-    foreach ($this->entityManager()->getStorage('commerce_order_type')->loadMultiple() as $order_type) {
-      if ($this->entityManager()->getAccessController('commerce_order')->createAccess($order_type->id)) {
-        $types[$order_type->id] = $order_type;
+    $order_types = $this->entityManager()->getStorage('commerce_order_type')->loadMultiple();
+    // Filter out the order types the user doesn't have access to.
+    foreach ($order_types as $order_type_id => $order_type) {
+      if (!$this->entityManager()->getAccessController('commerce_order')->createAccess($order_type_id)) {
+        unset($order_types[$order_type_id]);
       }
     }
 
-    if (count($types) == 1) {
-      $type = array_shift($types);
-      return $this->redirect('commerce_order.add', array('commerce_order_type' => $type->id));
+    if (count($order_types) == 1) {
+      $order_type = reset($order_types);
+      return $this->redirect('entity.commerce_order.add', array('commerce_order_type' => $order_type->id()));
     }
 
     return array(
       '#theme' => 'commerce_order_add_list',
-      '#types' => $types,
+      '#types' => $order_types,
     );
   }
 
@@ -57,9 +55,8 @@ class CommerceOrderController extends ControllerBase {
    */
   public function add(CommerceOrderTypeInterface $commerce_order_type) {
     $order = $this->entityManager()->getStorage('commerce_order')->create(array(
-      'type' => $commerce_order_type->id,
+      'type' => $commerce_order_type->id(),
     ));
-
     $form = $this->entityFormBuilder()->getForm($order, 'add');
 
     return $form;
