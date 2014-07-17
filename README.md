@@ -1,7 +1,7 @@
 Drupal Commerce
 ===============
 
-Drupal Commercce is an open source eCommerce framework that is designed to
+Drupal Commerce is an open source eCommerce framework that is designed to
 enable flexible eCommerce for websites and applications based on Drupal.
 
 NOTE!! Unstable Dev Version
