@@ -35,7 +35,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('entity.commerce_order.list');
   }
 
@@ -54,7 +54,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
       $this->entity->delete();
       $order_type_storage = $this->entityManager->getStorage('commerce_order_type');
       $order_type = $order_type_storage->load($this->entity->bundle())->label();
-      $form_state['redirect_route'] = $this->getCancelRoute();
+      $form_state['redirect_route'] = $this->getCancelUrl();
       drupal_set_message($this->t('@type %order_label has been deleted.', array('@type' => $order_type, '%order_label' => $this->entity->label())));
       watchdog('commerce_order', '@type: deleted %order_label.', array('@type' => $this->entity->bundle(), '%order_label' => $this->entity->label()));
     }

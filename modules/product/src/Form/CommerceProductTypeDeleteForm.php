@@ -24,7 +24,7 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('commerce_product.product_type_list');
   }
 
@@ -41,6 +41,6 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
   public function submit(array $form, array &$form_state) {
     $this->entity->delete();
     drupal_set_message($this->t('Store type %label has been deleted.', array('%label' => $this->entity->label())));
-    $form_state['redirect_route'] = $this->getCancelRoute();
+    $form_state['redirect_route'] = $this->getCancelUrl();
   }
 }

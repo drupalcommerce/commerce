@@ -24,7 +24,7 @@ class CommerceProductDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('commerce_product.list');
   }
 
