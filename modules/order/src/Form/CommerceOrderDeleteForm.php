@@ -8,6 +8,7 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -49,7 +50,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       $order_type_storage = $this->entityManager->getStorage('commerce_order_type');

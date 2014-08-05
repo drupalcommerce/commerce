@@ -9,12 +9,13 @@ namespace Drupal\commerce\Form;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Form\FormStateInterface;
 
 class CommerceStoreTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $commerce_store_type = $this->entity;
 
@@ -43,7 +44,7 @@ class CommerceStoreTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->save();
       drupal_set_message($this->t('Saved the %label store type.', array(

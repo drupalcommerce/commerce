@@ -9,6 +9,7 @@ namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CommerceOrderTypeForm extends EntityForm {
@@ -46,7 +47,7 @@ class CommerceOrderTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $order_type = $this->entity;
 
@@ -92,7 +93,7 @@ class CommerceOrderTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     $order_type = $this->entity;
 
     try {
@@ -109,7 +110,7 @@ class CommerceOrderTypeForm extends EntityForm {
       drupal_set_message($this->t('The %label order type was not saved.', array(
         '%label' => $order_type->label(),
       )), 'error');
-      $form_state['rebuild'] = TRUE;
+      $form_state->setRebuild();
     }
   }
 }

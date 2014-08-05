@@ -8,6 +8,7 @@
 namespace Drupal\commerce\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\Language;
 
 /**
@@ -17,7 +18,7 @@ class CommerceStoreForm extends ContentEntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     /* @var $entity \Drupal\commerce\Entity\CommerceStore */
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
@@ -53,7 +54,7 @@ class CommerceStoreForm extends ContentEntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->save();
       drupal_set_message($this->t('Saved the %label store.', array(

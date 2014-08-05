@@ -9,12 +9,13 @@ namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Form\FormStateInterface;
 
 class CommerceProductTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $product_type = $this->entity;
     $form['label'] = array(
@@ -42,14 +43,14 @@ class CommerceProductTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     try {
-      $this->entity->save();      
+      $this->entity->save();
       drupal_set_message($this->t('The product type %product_type_label has been successfully saved.', array('%product_type_label' => $this->entity->label())));
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The product type %product_type_label could not be saved.', array('%product_type_label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_product', $e);      
+      watchdog_exception('commerce_product', $e);
     }
 
     $form_state['redirect_route']['route_name'] = 'commerce_product.product_type_list';

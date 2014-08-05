@@ -8,6 +8,7 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
@@ -38,7 +39,7 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       $form_state['redirect_route'] = $this->getCancelUrl();
