@@ -29,7 +29,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   entity_keys = {
  *     "id" = "currencyCode",
  *     "label" = "name",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "status" = "status"
  *   },
  *   links = {
  *     "edit-form" = "entity.commerce_currency.edit_form",

@@ -18,3 +18,6 @@ commerce_price.commerce_currency.*:
     decimals:
       type: integer
       label: 'Decimals'
+    status:
+      label: Status
+      type: boolean

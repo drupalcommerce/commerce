@@ -58,7 +58,6 @@ class CommerceCurrencyForm extends EntityForm {
       '#default_value' => $currency->getName(),
       '#required' => TRUE,
     );
-
     $form['currencyCode'] = array(
       '#type' => 'machine_name',
       '#title' => $this->t('Currency code'),
@@ -69,7 +68,6 @@ class CommerceCurrencyForm extends EntityForm {
       ),
       '#disabled' => !$currency->isNew(),
     );
-
     $form['numericCode'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
@@ -77,7 +75,6 @@ class CommerceCurrencyForm extends EntityForm {
       '#default_value' => $currency->getNumericCode(),
       '#required' => TRUE,
     );
-
     $form['symbol'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
@@ -85,7 +82,6 @@ class CommerceCurrencyForm extends EntityForm {
       '#default_value' => $currency->getSymbol(),
       '#required' => TRUE,
     );
-
     $form['decimals'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Decimals'),
@@ -93,6 +89,11 @@ class CommerceCurrencyForm extends EntityForm {
       '#default_value' => $currency->getDecimals(),
       '#description' => $this->t('The number of digits after the decimal sign.'),
       '#required' => TRUE,
+    );
+    $form['status'] = array(
+      '#default_value' => $currency->status(),
+      '#title' => $this->t('Enabled'),
+      '#type' => 'checkbox',
     );
 
     return $form;
