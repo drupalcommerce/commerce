@@ -1,0 +1,17 @@
+id: commerce_payment_info.card_number
+name: card_number
+entity_type: commerce_payment_info
+type: text
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_payment
+    - text
+settings:
+  max_length: 4
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }

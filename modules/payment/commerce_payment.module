@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Payment information entity type permissions and operations.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_payment_permission() {
+  $permissions = array(
+    'administer commerce_payment_info_type entities' => array(
+      'title' => t('Administer payment information types'),
+      'description' => t('Allows users to create, update, and delete payment information types.'),
+      'restrict access' => TRUE,
+    ),
+    'administer commerce_payment_info entities' => array(
+      'title' => t('Administer payment information entities'),
+      'description' => t('Allows users to create, update, and delete payment information entities.'),
+      'restrict access' => TRUE,
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_payment_theme() {
+  return array(
+    'commerce_payment_info_add_list' => array(
+      'variables' => array('types' => NULL),
+      'file' => 'commerce_payment.pages.inc',
+      'template' => 'commerce-payment-info-add-list',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_operation().
+ *
+ * Add devel link if this entity type is /commerce_payment_info[_type]/.
+ */
+function commerce_payment_entity_operation(EntityInterface $entity) {
+  $operations = array();
+  if (!\Drupal::moduleHandler()->moduleExists('devel')) {
+    return $operations;
+  }
+
+  $entity_routes = array(
+    'commerce_payment_info' => 'entity.commerce_payment_info.devel',
+    'commerce_payment_info_type' => 'entity.commerce_payment_info_type.devel',
+  );
+
+  $entity_type_id = $entity->getEntityTypeId();
+  if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
+    $operations['devel'] = array(
+      'route_name' => $entity_routes[$entity_type_id],
+      'route_parameters' => array($entity_type_id => $entity->id()),
+      'title' => t('Devel'),
+      'weight' => 15,
+    );
+  }
+
+  return $operations;
+}
