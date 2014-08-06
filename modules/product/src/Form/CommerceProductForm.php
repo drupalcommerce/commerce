@@ -38,7 +38,7 @@ class CommerceProductForm extends ContentEntityForm {
   public function submit(array $form, FormStateInterface $form_state) {
     // Build the entity object from the submitted values.
     $entity = parent::submit($form, $form_state);
-    $form_state['redirect_route']['route_name'] = 'commerce_product.list';
+    $form_state->setRedirect('commerce_product.list');
     return $entity;
   }
 

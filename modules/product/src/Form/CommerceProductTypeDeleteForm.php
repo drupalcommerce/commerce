@@ -42,6 +42,6 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
   public function submit(array $form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message($this->t('Store type %label has been deleted.', array('%label' => $this->entity->label())));
-    $form_state['redirect_route'] = $this->getCancelUrl();
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

@@ -53,6 +53,6 @@ class CommerceProductTypeForm extends EntityForm {
       watchdog_exception('commerce_product', $e);
     }
 
-    $form_state['redirect_route']['route_name'] = 'commerce_product.product_type_list';
+    $form_state->setRedirect('commerce_product.product_type_list');
   }
 }

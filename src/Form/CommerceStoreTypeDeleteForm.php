@@ -48,6 +48,6 @@ class CommerceStoreTypeDeleteForm extends EntityConfirmFormBase {
       drupal_set_message($this->t('Store type %label could not be deleted.', array('%label' => $this->entity->label())));
       watchdog_exception('commerce', $e);
     }
-    $form_state['redirect_route'] = $this->getCancelUrl();
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

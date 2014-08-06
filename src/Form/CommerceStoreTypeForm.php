@@ -55,6 +55,6 @@ class CommerceStoreTypeForm extends EntityForm {
       drupal_set_message($this->t('The store type could not be saved.'), 'error');
       watchdog_exception('commerce', $e);
     }
-    $form_state['redirect_route']['route_name'] = 'commerce.store_type_list';
+    $form_state->setRedirect('commerce.store_type_list');
   }
 }
