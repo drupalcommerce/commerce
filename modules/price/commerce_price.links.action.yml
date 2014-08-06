@@ -1,0 +1,5 @@
+entity.commerce_currency.add:
+  route_name: entity.commerce_currency.add_form
+  title: 'Add a new currency'
+  appears_on:
+    - entity.commerce_currency.list

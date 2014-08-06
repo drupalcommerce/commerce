@@ -1,0 +1,5 @@
+entity.commerce_currency.list:
+  title: Currencies
+  route_name: entity.commerce_currency.list
+  parent: commerce.configuration
+  description: 'Manage your currencies.'

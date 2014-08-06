@@ -1,0 +1,23 @@
+<?php
+
+use CommerceGuys\Pricing\DefaultCurrencyManager;
+
+/**
+ * Implements hook_install().
+ *
+ * Import the default currencies from the library.
+ */
+function commerce_price_install() {
+  $default_manager = new DefaultCurrencyManager;
+  foreach ($default_manager->getAll() as $default_currency) {
+    $values = array(
+      'currencyCode' => $default_currency->getCurrencyCode(),
+      'name' => $default_currency->getName(),
+      'numericCode' => $default_currency->getNumericCode(),
+      'symbol' => $default_currency->getSymbol(),
+      'decimals' => $default_currency->getDecimals(),
+    );
+    $currency = entity_create('commerce_currency', $values);
+    $currency->save();
+  }
+}

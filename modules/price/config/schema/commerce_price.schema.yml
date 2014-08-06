@@ -1,0 +1,20 @@
+commerce_price.commerce_currency.*:
+  type: config_entity
+  label: 'Currency'
+  mapping:
+    currencyCode:
+      type: string
+      label: 'Currency code'
+    name:
+      type: label
+      label: 'Name'
+      translatable: true
+    numericCode:
+      type: integer
+      label: 'Numeric code'
+    symbol:
+      type: string
+      label: 'Symbol'
+    decimals:
+      type: integer
+      label: 'Decimals'
