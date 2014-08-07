@@ -11,7 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Datetime\Date;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\commerce_product\CommerceProductTypeInterface;
 use Drupal\commerce_product\CommerceProductInterface;
@@ -32,28 +32,31 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * The date service.
    *
-   * @var \Drupal\Core\Datetime\Date
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $date;
+  protected $date_formatter;
 
   /**
    * Constructs a CommerceProductController object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Datetime\Date $date
+   * @param \Drupal\Core\Datetime\DateFormatter $date
    *   The date service.
    */
-  public function __construct(Connection $database, Date $date) {
-    $this->date = $date;
+  public function __construct(Connection $database, DateFormatter $date_formatter) {
     $this->database = $database;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('database'), $container->get('date'));
+    return new static(
+      $container->get('database'),
+      $container->get('date.formatter')
+    );
   }
 
 
@@ -127,29 +130,29 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   public function addPageTitle(CommerceProductTypeInterface $commerce_product_type) {
     return $this->t('Create @label', array('@label' => $commerce_product_type->label()));
   }
-  
+
   /**
    * The _title_callback for the commerce_product.edit route
-   * 
+   *
    * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.
-   * 
+   *
    * @return string
    *   The page title
    */
   public function editPageTitle(CommerceProductInterface $commerce_product) {
     return $this->t('Editing @label', array('@label' => $commerce_product->label()));
   }
-  
+
   /**
    * The _title_callback for the commerce_product.view route
-   * 
+   *
    * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.
-   * 
+   *
    * @return string
    *   The page title
-   */  
+   */
   public function viewProductTitle(CommerceProductInterface $commerce_product) {
     return \Drupal\Component\Utility\Xss::filter($commerce_product->label());
   }

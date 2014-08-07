@@ -11,7 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Datetime\Date;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\commerce\CommerceStoreTypeInterface;
 use Drupal\commerce\CommerceStoreInterface;
@@ -32,28 +32,31 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
   /**
    * The date service.
    *
-   * @var \Drupal\Core\Datetime\Date
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $date;
+  protected $date_formatter;
 
   /**
    * Constructs a CommerceStoreController object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Datetime\Date $date
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date service.
    */
-  public function __construct(Connection $database, Date $date) {
-    $this->date = $date;
+  public function __construct(Connection $database, DateFormatter $date_formatter) {
     $this->database = $database;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('database'), $container->get('date'));
+    return new static(
+      $container->get('database'),
+      $container->get('date.formatter')
+    );
   }
 
 
