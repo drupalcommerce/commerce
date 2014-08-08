@@ -22,7 +22,7 @@
   </dl>
 {% else %}
   <p>
-    {% set create_store_type = url('admin/commerce/config/store/types/add') %}
+    {% set create_store_type = path('commerce.store_type_add') %}
     {% trans %}
       You have not created any store types yet. Go to the <a href="{{ create_store_type }}">store type creation page</a> to add a new store type.
     {% endtrans %}

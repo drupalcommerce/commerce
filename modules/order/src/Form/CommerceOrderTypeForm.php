@@ -101,7 +101,7 @@ class CommerceOrderTypeForm extends EntityForm {
       drupal_set_message($this->t('Saved the %label order type.', array(
         '%label' => $order_type->label(),
       )));
-      $form_state->setRedirect('entity.commerce_order_type.list'),
+      $form_state->setRedirect('entity.commerce_order_type.list');
     }
     catch (\Exception $e) {
       watchdog_exception('commerce_order', $e);

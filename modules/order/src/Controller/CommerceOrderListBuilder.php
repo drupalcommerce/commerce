@@ -7,7 +7,7 @@ namespace Drupal\commerce_order\Controller;
 
 use Drupal\commerce_order\Entity\CommerceOrderType;
 use Drupal\Component\Utility\String;
-use Drupal\Core\Datetime\Date;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -22,9 +22,9 @@ class CommerceOrderListBuilder extends EntityListBuilder {
   /**
    * The date service.
    *
-   * @var \Drupal\Core\Datetime\Date
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $dateService;
+  protected $date_formatter;
 
   /**
    * Constructs a new CommerceOrderListBuilder object.
@@ -33,13 +33,13 @@ class CommerceOrderListBuilder extends EntityListBuilder {
    *   The entity type definition.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Datetime\Date $date_service
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, Date $date_service) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatter $date_formatter) {
     parent::__construct($entity_type, $storage);
 
-    $this->dateService = $date_service;
+    $this->date_formatter = $date_formatter;
   }
 
   /**
@@ -49,7 +49,7 @@ class CommerceOrderListBuilder extends EntityListBuilder {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('date')
+      $container->get('date.formatter')
     );
   }
 
@@ -106,8 +106,8 @@ class CommerceOrderListBuilder extends EntityListBuilder {
         ),
       ),
       'status' => $entity->getStatus(),
-      'created' => $this->dateService->format($entity->getCreatedTime(), 'short'),
-      'changed' => $this->dateService->format($entity->getChangedTime(), 'short'),
+      'created' => $this->date_formatter->format($entity->getCreatedTime(), 'short'),
+      'changed' => $this->date_formatter->format($entity->getChangedTime(), 'short'),
     );
     return $row + parent::buildRow($entity);
   }
