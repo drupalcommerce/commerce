@@ -14,4 +14,22 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface CommerceProductTypeInterface extends ConfigEntityInterface {
 
+  /**
+   * Returns the product type description.
+   *
+   * @return string
+   *   The product type description.
+   */
+  public function getDescription();
+
+  /**
+   * Sets the description of the product type.
+   *
+   * @param string $description
+   *   The new description.
+   *
+   * @return $this
+   */
+  public function setDescription($description);
+
 }

@@ -45,20 +45,42 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The product type UUID.
    *
    * @var string
    */
-  public $uuid;
+  protected $uuid;
 
   /**
    * The product type label.
    *
    * @var string
    */
-  public $label;
+  protected $label;
+
+  /**
+   * The product type description.
+   *
+   * @var string
+   */
+  protected $description;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
+  }
 
 }

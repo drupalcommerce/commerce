@@ -73,25 +73,22 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *   return at all.
    */
   public function addPage() {
-    $content = array();
-
-    // Only use product types the user has access to.
-    foreach ($this->entityManager()->getStorage('commerce_product_type')->loadMultiple() as $commerce_product_type) {
-      if ($this->entityManager()->getAccessControlHandler('commerce_product')->createAccess($commerce_product_type->id)) {
-        $content[$commerce_product_type->id] = $commerce_product_type;
+    $product_types = $this->entityManager()->getStorage('commerce_product_type')->loadMultiple();
+    // Filter out the product types the user doesn't have access to.
+    foreach ($product_types as $product_type_id => $product_type) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_product')->createAccess($product_type_id)) {
+        unset($product_types[$product_type_id]);
       }
     }
 
-    // Bypass the admin/commerce/config/product/add listing if only one product type
-    // is available.
-    if (count($content) == 1) {
-      $commerce_product_type = array_shift($content);
-      return $this->redirect('commerce_product.add', array('commerce_product_type' => $commerce_product_type->id));
+    if (count($product_types) == 1) {
+      $product_type = reset($product_types);
+      return $this->redirect('commerce_product.add', array('commerce_product_type' => $product_type->id()));
     }
 
     return array(
       '#theme' => 'commerce_product_add_list',
-      '#content' => $content,
+      '#content' => $product_types,
     );
   }
 
@@ -106,10 +103,10 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    */
   public function add(CommerceProductTypeInterface $commerce_product_type) {
     $account = $this->currentUser();
-    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id));
+    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id()));
 
     $commerce_product = $this->entityManager()->getStorage('commerce_product')->create(array(
-      'type' => $commerce_product_type->id,
+      'type' => $commerce_product_type->id(),
       'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->id,
     ));
 

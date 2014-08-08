@@ -19,6 +19,7 @@ class CommerceProductTypeForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $product_type = $this->entity;
+
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
@@ -27,17 +28,20 @@ class CommerceProductTypeForm extends EntityForm {
       '#description' => $this->t('Label for the product type.'),
       '#required' => TRUE,
     );
-
     $form['id'] = array(
       '#type' => 'machine_name',
       '#default_value' => $product_type->id(),
       '#machine_name' => array(
-        'exists' => 'commerce_product_type_load',
+        'exists' => '\Drupal\commerce_product\Entity\CommerceProductType::load',
       ),
       '#disabled' => !$product_type->isNew(),
     );
+    $form['description'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Description'),
+      '#default_value' => $product_type->getDescription(),
+    );
 
-    // You will need additional form elements for your custom properties.
     return $form;
   }
 

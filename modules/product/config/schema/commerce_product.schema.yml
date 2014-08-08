@@ -8,5 +8,6 @@ commerce_product.commerce_product_type.*:
     label:
         type: label
         label: 'Label'
-    uuid:
-        type: string
+    description:
+      type: text
+      label: 'Description'

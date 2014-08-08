@@ -21,10 +21,10 @@ function template_preprocess_commerce_product_add_list(&$variables) {
 
   if (!empty($variables['content'])) {
     foreach ($variables['content'] as $commerce_product_type) {
-      $variables['types'][$commerce_product_type->id] = array(
-        'type' => $commerce_product_type->id,
-        'add_link' => l($commerce_product_type->label(), 'admin/commerce/products/add/' . $commerce_product_type->id),
-        // 'description' => Xss::filterAdmin($type->description),
+      $variables['types'][$commerce_product_type->id()] = array(
+        'type' => $commerce_product_type->id(),
+        'add_link' => l($commerce_product_type->label(), 'admin/commerce/products/add/' . $commerce_product_type->id()),
+         'description' => Xss::filterAdmin($commerce_product_type->getDescription()),
       );
     }
   }
