@@ -28,7 +28,7 @@ class CommerceOrderController extends ControllerBase {
     $order_types = $this->entityManager()->getStorage('commerce_order_type')->loadMultiple();
     // Filter out the order types the user doesn't have access to.
     foreach ($order_types as $order_type_id => $order_type) {
-      if (!$this->entityManager()->getAccessController('commerce_order')->createAccess($order_type_id)) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_order')->createAccess($order_type_id)) {
         unset($order_types[$order_type_id]);
       }
     }

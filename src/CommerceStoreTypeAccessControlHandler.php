@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\CommerceStoreTypeAccessController.
+ * Contains \Drupal\commerce\CommerceStoreTypeAccessControlHandler.
  */
 
 namespace Drupal\commerce;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Provides a Commerce Store Type access controller.
+ * Provides a Commerce Store Type access control handler.
  */
-class CommerceStoreTypeAccessController extends EntityAccessController {
+class CommerceStoreTypeAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

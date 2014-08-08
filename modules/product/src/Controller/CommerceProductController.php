@@ -77,7 +77,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
 
     // Only use product types the user has access to.
     foreach ($this->entityManager()->getStorage('commerce_product_type')->loadMultiple() as $commerce_product_type) {
-      if ($this->entityManager()->getAccessController('commerce_product')->createAccess($commerce_product_type->id)) {
+      if ($this->entityManager()->getAccessControlHandler('commerce_product')->createAccess($commerce_product_type->id)) {
         $content[$commerce_product_type->id] = $commerce_product_type;
       }
     }
