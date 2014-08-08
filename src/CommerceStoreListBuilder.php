@@ -32,17 +32,10 @@ class CommerceStoreListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce\Entity\CommerceStore */
-    $commerce_store_type = commerce_store_type_load($entity->bundle());
-
-    if (!empty($commerce_store_type)) {
-      $type = String::checkPlain($commerce_store_type->label());
-    }
-    else {
-      $type = String::checkPlain($entity->bundle());
-    }
+    $commerce_store_type = entity_load('commerce_store_type', $entity->bundle());
 
     $row['name'] = $entity->getName();
-    $row['type'] = $type;
+    $row['type'] = String::checkPlain($commerce_store_type->label());
     $row['mail'] = $entity->getEmail();
     $row['default_currency'] = $entity->getDefaultCurrency();
 

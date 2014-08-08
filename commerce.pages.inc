@@ -21,10 +21,10 @@ function template_preprocess_commerce_store_add_list(&$variables) {
 
   if (!empty($variables['content'])) {
     foreach ($variables['content'] as $commerce_store_type) {
-      $variables['types'][$commerce_store_type->id] = array(
-        'type' => $commerce_store_type->id,
-        'add_link' => l($commerce_store_type->label(), 'admin/commerce/config/store/add/' . $commerce_store_type->id),
-        'description' => Xss::filterAdmin('Not implemented yet.'),
+      $variables['types'][$commerce_store_type->id()] = array(
+        'type' => $commerce_store_type->id(),
+        'add_link' => l($commerce_store_type->label(), 'admin/commerce/config/store/add/' . $commerce_store_type->id()),
+        'description' => Xss::filterAdmin($commerce_store_type->getDescription()),
       );
     }
   }

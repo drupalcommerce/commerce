@@ -72,25 +72,22 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    *   return at all.
    */
   public function addPage() {
-    $content = array();
-
-    // Only use store types the user has access to.
-    foreach ($this->entityManager()->getStorage('commerce_store_type')->loadMultiple() as $commerce_store_type) {
-      if ($this->entityManager()->getAccessControlHandler('commerce_store')->createAccess($commerce_store_type->id)) {
-        $content[$commerce_store_type->id] = $commerce_store_type;
+    $store_types = $this->entityManager()->getStorage('commerce_store_type')->loadMultiple();
+    // Filter out the store types the user doesn't have access to.
+    foreach ($store_types as $store_type_id => $store_type) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_store')->createAccess($store_type_id)) {
+        unset($store_types[$store_type_id]);
       }
     }
 
-    // Bypass the admin/commerce/config/store/add listing if only one store type
-    // is available.
-    if (count($content) == 1) {
-      $commerce_store_type = array_shift($content);
-      return $this->redirect('commerce.store_add', array('commerce_store_type' => $commerce_store_type->id));
+    if (count($store_types) == 1) {
+      $store_type = reset($store_types);
+      return $this->redirect('commerce.store_add', array('commerce_store_type' => $store_type->id()));
     }
 
     return array(
       '#theme' => 'commerce_store_add_list',
-      '#content' => $content,
+      '#content' => $store_types,
     );
   }
 
@@ -105,10 +102,10 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    */
   public function add(CommerceStoreTypeInterface $commerce_store_type) {
     $account = $this->currentUser();
-    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_store', $commerce_store_type->id));
+    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_store', $commerce_store_type->id()));
 
     $commerce_store = $this->entityManager()->getStorage('commerce_store')->create(array(
-      'type' => $commerce_store_type->id,
+      'type' => $commerce_store_type->id(),
       'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->id,
     ));
 

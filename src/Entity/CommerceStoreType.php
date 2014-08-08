@@ -48,28 +48,43 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The store type UUID.
    *
    * @var string
    */
-  public $uuid;
+  protected $uuid;
 
   /**
    * The store type label.
    *
    * @var string
    */
-  public $label;
+  protected $label;
 
   /**
    * A brief description of this store type.
    *
    * @var string
    */
-  public $description;
+  protected $description;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
