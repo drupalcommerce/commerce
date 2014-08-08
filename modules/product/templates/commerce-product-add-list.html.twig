@@ -22,7 +22,7 @@
   </dl>
 {% else %}
   <p>
-    {% set create_product_type = url('admin/commerce/products/types/add') %}
+    {% set create_product_type = path('commerce.product_type_add') %}
     {% trans %}
       You have not created any product types yet. Go to the <a href="{{ create_product_type }}">product type creation page</a> to add a new product type.
     {% endtrans %}
