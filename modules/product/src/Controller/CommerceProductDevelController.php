@@ -37,4 +37,5 @@ class CommerceProductDevelController extends DevelController {
   public function productLoad(CommerceProductInterface $commerce_product) {
     return $this->loadObject('commerce_product', $commerce_product);
   }
+
 }

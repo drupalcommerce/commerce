@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 class CommerceProductTypeForm extends EntityForm {
+
   /**
    * {@inheritdoc}
    */
@@ -55,4 +56,5 @@ class CommerceProductTypeForm extends EntityForm {
 
     $form_state->setRedirect('commerce_product.product_type_list');
   }
+
 }

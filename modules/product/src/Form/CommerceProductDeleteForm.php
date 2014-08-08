@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Provides a form for deleting a product.
  */
 class CommerceProductDeleteForm extends ContentEntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -45,4 +46,5 @@ class CommerceProductDeleteForm extends ContentEntityConfirmFormBase {
     watchdog('commerce', 'Product %name has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
     $form_state->setRedirect('commerce_product.list');
   }
+
 }

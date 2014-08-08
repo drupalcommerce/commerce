@@ -59,7 +59,6 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
     );
   }
 
-
   /**
    * Displays add content links for available store types.
    *
@@ -130,4 +129,5 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
   public function addPageTitle(CommerceStoreTypeInterface $commerce_store_type) {
     return $this->t('Create @label', array('@label' => $commerce_store_type->label()));
   }
+
 }

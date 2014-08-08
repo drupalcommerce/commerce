@@ -39,6 +39,7 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  * )
  */
 class CommerceProductType extends ConfigEntityBundleBase implements CommerceProductTypeInterface {
+
   /**
    * The product type machine name and primary ID.
    *
@@ -59,4 +60,5 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    * @var string
    */
   public $label;
+
 }

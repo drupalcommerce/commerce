@@ -100,4 +100,5 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
     }
     parent::delete();
   }
+
 }

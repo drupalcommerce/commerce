@@ -130,4 +130,5 @@ class CommerceCurrencyForm extends EntityForm {
       $form_state->setRebuild();
     }
   }
+
 }

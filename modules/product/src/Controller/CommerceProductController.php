@@ -156,4 +156,5 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   public function viewProductTitle(CommerceProductInterface $commerce_product) {
     return \Drupal\Component\Utility\Xss::filter($commerce_product->label());
   }
+
 }

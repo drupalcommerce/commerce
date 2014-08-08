@@ -18,11 +18,10 @@ function commerce_order_entity_operation(EntityInterface $entity) {
     return $operations;
   }
 
-  $entity_routes =
-    array(
-      'commerce_order' => 'entity.commerce_order.devel',
-      'commerce_order_type' => 'entity.commerce_order_type.devel',
-    );
+  $entity_routes = array(
+    'commerce_order' => 'entity.commerce_order.devel',
+    'commerce_order_type' => 'entity.commerce_order_type.devel',
+  );
 
   $entity_type_id = $entity->getEntityTypeId();
   if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {

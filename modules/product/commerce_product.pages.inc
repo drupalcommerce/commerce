@@ -6,8 +6,6 @@
  */
 
 use Drupal\Component\Utility\Xss;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Drupal\commerce_product\CommerceProductInterface;
 
 /**
  * Prepares variables for list of available product type templates.

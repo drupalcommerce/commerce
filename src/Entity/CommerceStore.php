@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce\Entity;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce\CommerceStoreInterface;
@@ -49,6 +48,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class CommerceStore extends ContentEntityBase implements CommerceStoreInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -145,8 +145,7 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setPropertyConstraints('value', array('length' => array('max' => 3)))
       ->setSetting('max_length', 32);
 
-    // @todo make enabled currencies a store setting as well.
-
     return $fields;
   }
+
 }

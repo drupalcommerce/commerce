@@ -15,6 +15,7 @@ use Drupal\Core\Language\Language;
  * Form controller for the product edit form.
  */
 class CommerceProductForm extends ContentEntityForm {
+
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
@@ -55,4 +56,5 @@ class CommerceProductForm extends ContentEntityForm {
       watchdog_exception('commerce_product', $e);
     }
   }
+
 }

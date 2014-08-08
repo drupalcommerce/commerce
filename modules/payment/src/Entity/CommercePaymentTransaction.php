@@ -12,8 +12,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_payment\CommercePaymentTransactionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
-// TODO: We need to attach a price field by default on bundles.
-
 /**
  * Defines the Commerce Transaction entity.
  *
@@ -47,6 +45,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class CommercePaymentTransaction extends ContentEntityBase implements CommercePaymentTransactionInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -301,4 +300,5 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
 
     return $fields;
   }
+
 }

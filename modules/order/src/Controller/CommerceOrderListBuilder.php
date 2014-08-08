@@ -111,4 +111,5 @@ class CommerceOrderListBuilder extends EntityListBuilder {
     );
     return $row + parent::buildRow($entity);
   }
+
 }

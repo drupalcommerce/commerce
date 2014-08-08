@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * Provides an interface defining a Commerce Store entity.
  */
 interface CommerceStoreInterface extends EntityInterface {
+
   /**
    * Return the name of the store.
    *
@@ -71,14 +72,4 @@ interface CommerceStoreInterface extends EntityInterface {
    */
   public function setDefaultCurrency($currency_code);
 
-  /**
-   * Defines the base fields of the entity type.
-   *
-   * @param string $entity_type
-   *   Name of the entity type
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
-   *   An array of entity field definitions, keyed by field name.
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type);
 }

@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Builds the form to delete a currency.
  */
 class CommerceCurrencyDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -50,4 +51,5 @@ class CommerceCurrencyDeleteForm extends EntityConfirmFormBase {
       watchdog_exception('commerce_price', $e);
     }
   }
+
 }

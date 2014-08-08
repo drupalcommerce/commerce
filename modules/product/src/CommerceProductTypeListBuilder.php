@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of Example.
  */
 class CommerceProductTypeListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */
@@ -31,4 +32,5 @@ class CommerceProductTypeListBuilder extends ConfigEntityListBuilder {
     $row['type'] = $entity->id();
     return $row + parent::buildRow($entity);
   }
+
 }

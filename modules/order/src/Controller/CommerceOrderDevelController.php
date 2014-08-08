@@ -37,4 +37,5 @@ class CommerceOrderDevelController extends DevelController {
   public function orderLoad(CommerceOrderInterface $commerce_order) {
     return $this->loadObject('commerce_order', $commerce_order);
   }
+
 }

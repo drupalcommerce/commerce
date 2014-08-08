@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Provides a form for deleting a store.
  */
 class CommerceStoreDeleteForm extends ContentEntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -51,4 +52,5 @@ class CommerceStoreDeleteForm extends ContentEntityConfirmFormBase {
     }
     $form_state->setRedirect('commerce.store_list');
   }
+
 }

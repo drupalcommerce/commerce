@@ -54,6 +54,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class CommerceProduct extends ContentEntityBase implements CommerceProductInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -307,4 +308,5 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
 
     return $fields;
   }
+
 }

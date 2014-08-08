@@ -48,32 +48,6 @@ function commerce_theme() {
 }
 
 /**
- * Menu argument loader: loads a store by its ID.
- *
- * @param integer $id
- *   The ID of the store to load.
- *
- * @return \Drupal\commerce\CommerceStoreInterface
- *   A store object or NULL if $id does not exist.
- */
-function commerce_store_load($id) {
-  return CommerceStore::load($id);
-}
-
-/**
- * Menu argument loader: loads a store type by its machine name.
- *
- * @param string $type
- *   The machine name of the store type to load.
- *
- * @return \Drupal\commerce\CommerceStoreTypeInterface
- *   A store type object or NULL if $name does not exist.
- */
-function commerce_store_type_load($type) {
-  return CommerceStoreType::load($type);
-}
-
-/**
  * Implements hook_toolbar().
  */
 function commerce_toolbar() {
@@ -113,11 +87,10 @@ function commerce_entity_operation(EntityInterface $entity) {
     return $operations;
   }
 
-  $entity_routes =
-    array(
-      'commerce_store' => 'commerce.store_devel',
-      'commerce_store_type' => 'commerce.store_type_devel',
-    );
+  $entity_routes = array(
+    'commerce_store' => 'commerce.store_devel',
+    'commerce_store_type' => 'commerce.store_type_devel',
+  );
 
   $entity_type_id = $entity->getEntityTypeId();
   if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {

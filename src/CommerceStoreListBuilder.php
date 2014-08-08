@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityListBuilder;
  * Provides a list controller for stores.
  */
 class CommerceStoreListBuilder extends EntityListBuilder {
+
   /**
    * {@inheritdoc}
    */
@@ -47,4 +48,5 @@ class CommerceStoreListBuilder extends EntityListBuilder {
 
     return $row + parent::buildRow($entity);
   }
+
 }

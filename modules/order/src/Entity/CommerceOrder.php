@@ -14,7 +14,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
-
 /**
  * Defines the Commerce Order entity.
  *

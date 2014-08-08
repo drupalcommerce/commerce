@@ -74,4 +74,5 @@ class CommerceOrderController extends ControllerBase {
   public function addPageTitle(CommerceOrderTypeInterface $commerce_order_type) {
     return $this->t('Create @label', array('@label' => $commerce_order_type->label()));
   }
+
 }

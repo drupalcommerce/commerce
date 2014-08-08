@@ -25,4 +25,5 @@ class CommerceCurrencyDevelController extends DevelController {
   public function currencyLoad(CurrencyInterface $commerce_currency) {
     return $this->loadObject('commerce_currency', $commerce_currency);
   }
+
 }

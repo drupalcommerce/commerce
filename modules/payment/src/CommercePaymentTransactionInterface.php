@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * Provides an interface defining a Commerce Payment Transaction entity.
  */
 interface CommercePaymentTransactionInterface extends ContentEntityInterface {
+
   /**
    * Sets the instance identifier for a transaction.
    *
@@ -24,7 +25,6 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
    *   The class instance that this method is called on.
    */
   public function setInstanceId($instance_id);
-
 
   /**
    * Returns the instance identifier for a transaction.
@@ -177,14 +177,4 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
    */
   public function getData();
 
-  /**
-   * Defines the base fields of the entity type.
-   *
-   * @param EntityTypeInterface $entity_type
-   *   Name of the entity type
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
-   *   An array of entity field definitions, keyed by field name.
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type);
 }

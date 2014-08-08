@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Builds the form to delete an order type.
  */
 class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -50,4 +51,5 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
       watchdog_exception('commerce_order', $e);
     }
   }
+
 }

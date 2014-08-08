@@ -37,4 +37,5 @@ class CommerceDevelController extends DevelController {
   public function storeLoad(CommerceStoreInterface $commerce_store) {
     return $this->loadObject('commerce_store', $commerce_store);
   }
+
 }

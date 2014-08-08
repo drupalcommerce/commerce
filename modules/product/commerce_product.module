@@ -1,17 +1,17 @@
 <?php
 
-use Drupal\commerce_product\Entity\CommerceProductType;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\commerce_product\CommerceProductInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Language\LanguageInterface;
-
 /**
  * @file
  * Defines the core Commerce product entity, including the entity itself, the
  * bundle definitions (product types), and various API functions to manage
  * products and interact with them through forms and autocompletes.
  */
+
+use Drupal\commerce_product\Entity\CommerceProductType;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_product\CommerceProductInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Implements hook_entity_operation().
@@ -24,11 +24,10 @@ function commerce_product_entity_operation(EntityInterface $entity) {
     return $operations;
   }
 
-  $entity_routes =
-    array(
-      'commerce_product' => 'commerce_product.devel',
-      'commerce_product_type' => 'commerce_product.product_type_devel',
-    );
+  $entity_routes = array(
+    'commerce_product' => 'commerce_product.devel',
+    'commerce_product_type' => 'commerce_product.product_type_devel',
+  );
 
   $entity_type_id = $entity->getEntityTypeId();
   if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
@@ -46,11 +45,11 @@ function commerce_product_entity_operation(EntityInterface $entity) {
 /**
  * Entity URI callback.
  *
- * @param \Drupal\node\NodeInterface $node
- *   A node entity.
+ * @param \Drupal\commerce_product\CommerceProductInterface $product
+ *   A product entity.
  *
  * @return \Drupal\core\Url
- *   A Url object that provides a URL to the view page for $node.
+ *   A Url object that provides a URL to the view page for $product.
  */
 function commerce_product_uri(CommerceProductInterface $product) {
   return new Url('commerce_product.view', array(

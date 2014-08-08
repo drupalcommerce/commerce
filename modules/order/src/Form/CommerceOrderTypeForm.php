@@ -111,4 +111,5 @@ class CommerceOrderTypeForm extends EntityForm {
       $form_state->setRebuild();
     }
   }
+
 }

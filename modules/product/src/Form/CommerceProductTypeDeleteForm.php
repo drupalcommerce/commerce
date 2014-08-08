@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Builds the form to delete a store type.
  */
 class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -44,4 +45,5 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
     drupal_set_message($this->t('Store type %label has been deleted.', array('%label' => $this->entity->label())));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
+
 }

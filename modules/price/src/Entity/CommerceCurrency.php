@@ -161,4 +161,5 @@ class CommerceCurrency extends ConfigEntityBase implements CurrencyInterface {
 
     return $this;
   }
+
 }

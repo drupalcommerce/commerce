@@ -34,4 +34,5 @@ class CommerceCurrencyListBuilder extends ConfigEntityListBuilder {
     $row['status'] = $entity->status() ? t('Enabled') : t('Disabled');
     return $row + parent::buildRow($entity);
   }
+
 }

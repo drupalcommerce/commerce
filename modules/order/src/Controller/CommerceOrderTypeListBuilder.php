@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of Order types.
  */
 class CommerceOrderTypeListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */
@@ -31,4 +32,5 @@ class CommerceOrderTypeListBuilder extends ConfigEntityListBuilder {
     $row['id'] = $entity->id();
     return $row + parent::buildRow($entity);
   }
+
 }

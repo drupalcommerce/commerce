@@ -15,6 +15,7 @@ use Drupal\Core\Language\Language;
  * Form controller for the store edit form.
  */
 class CommerceStoreForm extends ContentEntityForm {
+
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
@@ -67,4 +68,5 @@ class CommerceStoreForm extends ContentEntityForm {
     }
     $form_state->setRedirect('commerce.store_list');
   }
+
 }

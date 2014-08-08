@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * Provides an interface defining a Commerce Product entity.
  */
 interface CommerceProductInterface extends EntityInterface {
+
   /**
    * Get the SKU of this product.
    *
@@ -142,4 +143,5 @@ interface CommerceProductInterface extends EntityInterface {
    * @return \Drupal\product\CommerceProductInterfaceInterface
    */
   public function setUid($uid);
+
 }
