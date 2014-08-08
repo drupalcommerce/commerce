@@ -41,7 +41,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Datetime\DateFormatter $date
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date service.
    */
   public function __construct(Connection $database, DateFormatter $date_formatter) {
@@ -98,7 +98,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * Provides the product add form.
    *
-   * @param \Drupal\commerce\CommerceProductTypeInterface $commerce_product_type
+   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *   The product type entity for the product.
    *
    * @return array
@@ -121,7 +121,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * The _title_callback for the commerce_product.add route.
    *
-   * @param \Drupal\commerce\CommerceProductTypeInterface $commerce_product_type
+   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *   The current product.
    *
    * @return string
