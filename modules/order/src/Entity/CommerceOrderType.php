@@ -23,7 +23,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
  *       "delete" = "Drupal\commerce_order\Form\CommerceOrderTypeDeleteForm"
  *     },
- *     "list_builder" = "Drupal\commerce_order\Controller\CommerceOrderTypeListBuilder",
+ *     "list_builder" = "Drupal\commerce_order\CommerceOrderTypeListBuilder",
  *   },
  *   admin_permission = "administer commerce_order_type entities",
  *   config_prefix = "commerce_order_type",
