@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\Entity\Controller\CommerceOrderTypeListBuilder.
+ * Contains \Drupal\commerce_order\Entity\CommerceOrderTypeListBuilder.
  */
 
-namespace Drupal\commerce_order\Controller;
+namespace Drupal\commerce_order;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;

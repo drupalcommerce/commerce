@@ -1,9 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\commerce_order\Controller\CommerceOrderListBuilder.
+ * Contains \Drupal\commerce_order\CommerceOrderListBuilder.
  */
-namespace Drupal\commerce_order\Controller;
+
+namespace Drupal\commerce_order;
 
 use Drupal\commerce_order\Entity\CommerceOrderType;
 use Drupal\Component\Utility\String;

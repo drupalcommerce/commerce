@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\example\Form\ExampleDeleteForm.
+ * Contains \Drupal\commerce_order\Form\CommerceOrderTypeDeleteForm.
  */
 
 namespace Drupal\commerce_order\Form;
