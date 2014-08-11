@@ -9,7 +9,7 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\CommerceOrderInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
@@ -298,13 +298,13 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['order_id'] = FieldDefinition::create('integer')
+    $fields['order_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Order ID'))
       ->setDescription(t('The order ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['order_number'] = FieldDefinition::create('string')
+    $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))
       ->setDescription(t('The order number displayed to the customer.'))
       ->setRequired(TRUE)
@@ -322,24 +322,24 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The order UUID.'))
       ->setReadOnly(TRUE);
 
-    $fields['revision_id'] = FieldDefinition::create('integer')
+    $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The order revision ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['type'] = FieldDefinition::create('entity_reference')
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The order type.'))
       ->setSetting('target_type', 'commerce_order_type')
       ->setReadOnly(TRUE);
 
-    $fields['uid'] = FieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
       ->setDescription(t('The user that owns this order.'))
       ->setRevisionable(TRUE)
@@ -349,7 +349,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
         'weight' => 0,
       ));
 
-    $fields['mail'] = FieldDefinition::create('email')
+    $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
       ->setDescription(t('The e-mail address associated with the order.'))
       ->setDefaultValue('')
@@ -365,7 +365,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['status'] = FieldDefinition::create('string')
+    $fields['status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Status'))
       ->setDescription(t('The status name of this order.'))
       ->setRequired(TRUE)
@@ -383,23 +383,23 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['created'] = FieldDefinition::create('created')
+    $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the order was created.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['changed'] = FieldDefinition::create('changed')
+    $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the order was last edited.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['line_items'] = FieldDefinition::create('map')
+    $fields['line_items'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Line items'))
       ->setDescription(t('A serialized array of line items.'));
 
-    $fields['hostname'] = FieldDefinition::create('string')
+    $fields['hostname'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Hostname'))
       ->setDescription(t('The IP address that created this order.'))
       ->setDefaultValue('')
@@ -415,24 +415,24 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['data'] = FieldDefinition::create('map')
+    $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
 
-    $fields['revision_timestamp'] = FieldDefinition::create('created')
+    $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Revision timestamp'))
       ->setDescription(t('The time that the current revision was created.'))
       ->setQueryable(FALSE)
       ->setRevisionable(TRUE);
 
-    $fields['revision_uid'] = FieldDefinition::create('entity_reference')
+    $fields['revision_uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Revision user ID'))
       ->setDescription(t('The user ID of the author of the current revision.'))
       ->setSetting('target_type', 'user')
       ->setQueryable(FALSE)
       ->setRevisionable(TRUE);
 
-    $fields['revision_log'] = FieldDefinition::create('string_long')
+    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Revision log message'))
       ->setDescription(t('The log entry explaining the changes in this revision.'))
       ->setRevisionable(TRUE);

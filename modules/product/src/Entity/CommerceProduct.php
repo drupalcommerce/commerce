@@ -8,7 +8,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -163,20 +163,20 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     // Product ID
-    $fields['product_id'] = FieldDefinition::create('integer')
+    $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
       ->setDescription(t('The ID of the product.'))
       ->setReadOnly(TRUE);
 
     // Revision ID
-    $fields['revision_id'] = FieldDefinition::create('integer')
+    $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
       ->setDescription(t('The product revision ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     // uid
-    $fields['uid'] = FieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The user that created this product.'))
       ->setRevisionable(TRUE)
@@ -184,19 +184,19 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setTranslatable(TRUE);
 
     // UUID
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the product.'))
       ->setReadOnly(TRUE);
 
     // Language
-    $fields['language'] = FieldDefinition::create('language')
+    $fields['language'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of product.'))
       ->setRevisionable(TRUE);
 
     // Title
-    $fields['title'] = FieldDefinition::create('string')
+    $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The title of this node, always treated as non-markup plain text.'))
       ->setRequired(TRUE)
@@ -219,7 +219,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setDisplayConfigurable('form', TRUE);
 
     // Description
-    $fields['description'] = FieldDefinition::create('text_long')
+    $fields['description'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Description'))
       ->setDescription(t('The description of this product.'))
       ->setTranslatable(TRUE)
@@ -240,7 +240,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setDisplayConfigurable('view', TRUE);
 
     // SKU
-    $fields['sku'] = FieldDefinition::create('string')
+    $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
@@ -259,13 +259,13 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setDisplayConfigurable('view', TRUE);
 
     // Type
-    $fields['type'] = FieldDefinition::create('string')
+    $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
       ->setDescription(t('The type of the product.'))
       ->setRequired(TRUE);
 
     // Data
-    $fields['data'] = FieldDefinition::create('map')
+    $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'))
       ->setRevisionable(TRUE);
@@ -273,7 +273,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
     // Status
     // @todo there should be a way to set the default value from here but I
     // haven't figured out how yet.
-    $fields['status'] = FieldDefinition::create('boolean')
+    $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
       ->setDescription(t('Disabled products cannot be added to shopping carts and may be hidden in administrative product lists.'))
       ->setRevisionable(TRUE)
@@ -291,14 +291,14 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setDisplayConfigurable('form', TRUE);
 
     // Created
-    $fields['created'] = FieldDefinition::create('created')
+    $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the product was created.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
 
     // Changed
-    $fields['changed'] = FieldDefinition::create('changed')
+    $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the product was last edited.'))
       ->setRevisionable(TRUE)

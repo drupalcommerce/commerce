@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_payment\Entity;
 
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_payment\CommercePaymentTransactionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -191,31 +191,31 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['transaction_id'] = FieldDefinition::create('integer')
+    $fields['transaction_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Transaction ID'))
       ->setDescription(t('The ID of a transaction.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['uid'] = FieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The user that created this transaction.'))
       ->setSetting('target_type', 'user')
       ->setTranslatable(TRUE);
 
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of a transaction.'))
       ->setReadOnly(TRUE);
 
     // TODO: Use entity_reference instead of integer when the commerce_oder codebase will be merged.
-    $fields['order_id'] = FieldDefinition::create('integer')
+    $fields['order_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Order ID'))
       ->setDescription(t('The ID of an order.'))
       ->setRequired(TRUE)
       ->setDefaultValue(0);
 
-    $fields['instance_id'] = FieldDefinition::create('string')
+    $fields['instance_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Instance ID'))
       ->setDescription(t('The payment method instance ID for this transaction.'))
       ->setRequired(True)
@@ -225,7 +225,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
         'text_processing' => 0,
       ));
 
-    $fields['remote_id'] = FieldDefinition::create('string')
+    $fields['remote_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote ID'))
       ->setDescription(t('The remote identifier for this transaction.'))
       ->setRequired(True)
@@ -236,7 +236,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
         ));
 
     // Bundle.
-    $fields['payment_method'] = FieldDefinition::create('string')
+    $fields['payment_method'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Payment method'))
       ->setDescription(t('The payment method method_id for this transaction.'))
       ->setRequired(TRUE)
@@ -246,7 +246,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
           'text_processing' => 0,
         ));
 
-    $fields['message'] = FieldDefinition::create('string')
+    $fields['message'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Message'))
       ->setDescription(t('The human-readable message associated to this transaction.'))
       ->setRequired(TRUE)
@@ -256,7 +256,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
           'text_processing' => 0,
         ));
 
-    $fields['status'] = FieldDefinition::create('string')
+    $fields['status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Status'))
       ->setDescription(t('The status of this transaction (pending, success, or failure).'))
       ->setRequired(TRUE)
@@ -266,7 +266,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
           'text_processing' => 0,
         ));
 
-    $fields['remote_status'] = FieldDefinition::create('string')
+    $fields['remote_status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote status'))
       ->setDescription(t('The status of the transaction at the payment provider.'))
       ->setRequired(TRUE)
@@ -276,24 +276,24 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
           'text_processing' => 0,
         ));
 
-    $fields['payload'] = FieldDefinition::create('map')
+    $fields['payload'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Payload'))
       ->setDescription(t('The payment-gateway specific payload associated with this transaction.'))
       ->setRequired(TRUE);
 
-    $fields['created'] = FieldDefinition::create('created')
+    $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel('Created')
       ->setDescription(t('The Unix timestamp when this transaction was created.'))
       ->setRequired(TRUE)
       ->setDefaultValue(0);
 
-    $fields['changed'] = FieldDefinition::create('changed')
+    $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The Unix timestamp when this transaction was last changed.'))
       ->setRequired(TRUE)
       ->setDefaultValue(0);
 
-    $fields['data'] = FieldDefinition::create('map')
+    $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'))
       ->setRequired(FALSE);
