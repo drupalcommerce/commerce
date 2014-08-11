@@ -244,6 +244,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
+      ->addConstraint('ProductSku', array())
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setDisplayOptions('view', array(
