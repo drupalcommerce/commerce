@@ -15,17 +15,21 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class ProductSkuConstraintValidator extends ConstraintValidator {
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($field_item, Constraint $constraint) {
-        $sku= $field_item->value;
-        if (isset($sku) && $sku !== '') {
-            $commerce_products = \Drupal::entityManager()->getStorage('commerce_product')->loadByProperties(array('sku' => $sku));
-            if (!empty($commerce_products)) {
-                $this->context->addViolation($constraint->message, array('%sku' => $sku));
-            }
-        }
+  /**
+   * {@inheritdoc}
+   */
+  public function validate($field_item, Constraint $constraint) {
+    $sku = $field_item->value;
+    if (isset($sku) && $sku !== '') {
+      $sku_exists = (bool) \Drupal::entityQuery('commerce_product')
+        ->condition("sku", $sku)
+        ->range(0, 1)
+        ->count()
+        ->execute();
+      if ($sku_exists) {
+        $this->context->addViolation($constraint->message, array('%sku' => $sku));
+      }
     }
+  }
 
 }
