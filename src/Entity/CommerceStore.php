@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce\Entity;
 
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce\CommerceStoreInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -105,21 +105,21 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['store_id'] = FieldDefinition::create('integer')
+    $fields['store_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Store ID'))
       ->setDescription(t('The ID of the store.'))
       ->setReadOnly(TRUE);
 
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the store.'))
       ->setReadOnly(TRUE);
 
-    $fields['langcode'] = FieldDefinition::create('language')
+    $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of store.'));
 
-    $fields['name'] = FieldDefinition::create('string')
+    $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('The name of the store.'))
       ->setTranslatable(TRUE)
@@ -129,17 +129,17 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
         'text_processing' => 0,
       ));
 
-    $fields['type'] = FieldDefinition::create('string')
+    $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
       ->setDescription(t('The type of the store.'))
       ->setRequired(TRUE);
 
-    $fields['mail'] = FieldDefinition::create('email')
+    $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
       ->setDescription(t('The e-mail address of this store.'))
       ->setSetting('default_value', '');
 
-    $fields['default_currency'] = FieldDefinition::create('string')
+    $fields['default_currency'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Default currency'))
       ->setDescription(t('The default currency of this store.'))
       ->setPropertyConstraints('value', array('length' => array('max' => 3)))
