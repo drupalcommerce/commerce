@@ -15,6 +15,7 @@ use Drupal\Core\Url;
  * Builds the form to delete an payment information type.
  */
 class CommercePaymentInfoTypeDeleteForm extends EntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -50,4 +51,5 @@ class CommercePaymentInfoTypeDeleteForm extends EntityConfirmFormBase {
       watchdog_exception('commerce_payment', $e);
     }
   }
+
 }

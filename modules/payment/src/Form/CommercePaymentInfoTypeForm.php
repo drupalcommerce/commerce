@@ -111,4 +111,5 @@ class CommercePaymentInfoTypeForm extends EntityForm {
       $form_state->setRebuild();
     }
   }
+
 }

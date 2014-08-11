@@ -14,4 +14,22 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface CommercePaymentInfoTypeInterface extends ConfigEntityInterface {
 
+  /**
+   * Returns the payment information type description.
+   *
+   * @return string
+   *   The payment information type description.
+   */
+  public function getDescription();
+
+  /**
+   * Sets the description of the payment information type.
+   *
+   * @param string $description
+   *   The new description.
+   *
+   * @return $this
+   */
+  public function setDescription($description);
+
 }

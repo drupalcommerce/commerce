@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * Provides an interface defining a Commerce Payment Information entity.
  */
 interface CommercePaymentInfoInterface extends ContentEntityInterface {
+
   /**
    * Sets the method_id of the payment method that stored the card.
    *
@@ -155,14 +156,4 @@ interface CommercePaymentInfoInterface extends ContentEntityInterface {
    */
   public function getData();
 
-  /**
-   * Defines the base fields of the entity type.
-   *
-   * @param EntityTypeInterface $entity_type
-   *   Name of the entity type
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
-   *   An array of entity field definitions, keyed by field name.
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type);
 }

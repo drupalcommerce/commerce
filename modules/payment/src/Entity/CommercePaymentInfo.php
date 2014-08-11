@@ -7,13 +7,13 @@
 
 namespace Drupal\commerce_payment\Entity;
 
-use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce_payment\CommercePaymentInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
- * Defines the Commerce payment information entity. It aims for storing card's
+ * Defines the Commerce payment information entity. It aims for storing payment
  * information and payment tokens.
  *
  * @ContentEntityType(
@@ -47,6 +47,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentInfoInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -177,13 +178,13 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['information_id'] = FieldDefinition::create('integer')
+    $fields['information_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Payment information ID'))
       ->setDescription(t('Primary key: numeric payment information id.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['uid'] = FieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment information owner'))
       ->setDescription(t('The payment information owner.'))
       ->setSetting('target_type', 'user')
@@ -192,21 +193,21 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
         'weight' => 0,
       ));
 
-    $fields['uuid'] = FieldDefinition::create('uuid')
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
-      ->setDescription(t('The card owner UUID.'))
+      ->setDescription(t('The payment information UUID.'))
       ->setReadOnly(TRUE);
 
     // Bundle.
-    $fields['payment_method'] = FieldDefinition::create('string')
+    $fields['payment_method'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Payment method'))
-      ->setDescription(t('The method_id of the payment method that stored the card.'))
+      ->setDescription(t('The method_id of the payment method that stored the payment information.'))
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_payment_info_type');
 
-    $fields['instance_id'] = FieldDefinition::create('string')
+    $fields['instance_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Instance ID'))
-      ->setDescription(t('The instance_id of the payment method that stored the card.'))
+      ->setDescription(t('The instance_id of the payment method that stored the payment information.'))
       ->setRequired(TRUE)
       ->setSettings(array(
         'default_value' => '',
@@ -219,9 +220,9 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['remote_id'] = FieldDefinition::create('string')
+    $fields['remote_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote ID'))
-      ->setDescription(t('The id of the card at the payment gateway.'))
+      ->setDescription(t('The id of the payment at the payment gateway.'))
       ->setRequired(TRUE)
       ->setSettings(array(
         'default_value' => '',
@@ -234,55 +235,7 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    /*$fields['card_type'] = FieldDefinition::create('string')
-      ->setLabel(t('Card Type'))
-      ->setDescription(t('The card type.'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ));
-
-    $fields['card_name'] = FieldDefinition::create('string')
-      ->setLabel(t('Card Name'))
-      ->setDescription(t('The card name.'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ));
-
-    $fields['card_number'] = FieldDefinition::create('string')
-      ->setLabel(t('Card Number'))
-      ->setDescription(t('Truncated card number (last 4 digits).'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'default_value' => '',
-        'max_length' => 4,
-        'text_processing' => 0,
-      ));
-
-    $fields['card_exp_month'] = FieldDefinition::create('integer')
-      ->setLabel(t('Card Expiration Month'))
-      ->setDescription(t('The card expiration month.'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'size' => 'tiny',
-        'default_value' => 0,
-      ));
-
-    $fields['card_exp_year'] = FieldDefinition::create('integer')
-      ->setLabel(t('Card Expiration Year'))
-      ->setDescription(t('The card expiration year.'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'size' => 'tiny',
-        'default_value' => 0,
-      ));*/
-
-    $fields['is_default'] = FieldDefinition::create('boolean')
+    $fields['is_default'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Default'))
       ->setDescription(t('Whether this is the default element for this payment method instance.'))
       ->setRequired(TRUE)
@@ -298,15 +251,20 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['status'] = FieldDefinition::create('boolean')
+    $fields['status'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Status'))
-      ->setDescription(t('Card status: inactive (0), active (1), not deletable (2), declined (3).'))
+      ->setDescription(t('Payment information status: inactive (0), active (1), declined (2).'))
       ->setRequired(TRUE)
       ->setSettings(array(
         'default_value' => 1,
+        'allowed_values' => array(
+          0 => 'Inactive',
+          1 => 'Active',
+          2 => 'Declined',
+        ),
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'boolean_checkbox',
+        'type' => 'options_select',
         'weight' => 3,
         'settings' => array(
           'display_label' => TRUE
@@ -314,23 +272,24 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['created'] = FieldDefinition::create('created')
+    $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel('Created')
-      ->setDescription(t('The Unix timestamp when the card was first stored.'))
+      ->setDescription(t('The Unix timestamp when the payment information was first stored.'))
       ->setRequired(TRUE)
       ->setDefaultValue(0);
 
-    $fields['changed'] = FieldDefinition::create('changed')
+    $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The Unix timestamp when the card was last updated.'))
+      ->setDescription(t('The Unix timestamp when the payment information was last updated.'))
       ->setRequired(TRUE)
       ->setDefaultValue(0);
 
-    $fields['data'] = FieldDefinition::create('map')
+    $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'))
       ->setRequired(FALSE);
 
     return $fields;
   }
+
 }

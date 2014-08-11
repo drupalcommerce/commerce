@@ -39,6 +39,7 @@ use Drupal\commerce_payment\CommercePaymentInfoTypeInterface;
  * )
  */
 class CommercePaymentInfoType extends ConfigEntityBundleBase implements CommercePaymentInfoTypeInterface {
+
   /**
    * The payment information type ID.
    *
