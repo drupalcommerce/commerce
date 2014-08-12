@@ -7,9 +7,10 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\CommerceConfigEntityBundleBase;
 use Drupal\commerce_order\CommerceOrderTypeInterface;
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the Order type configuration entity.
@@ -18,6 +19,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
  *   controllers = {
+ *     "access" = "Drupal\commerce\CommerceConfigEntityAccessController",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
@@ -39,7 +41,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   }
  * )
  */
-class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderTypeInterface {
+class CommerceOrderType extends CommerceConfigEntityBundleBase implements CommerceOrderTypeInterface {
 
   /**
    * The order type ID.
@@ -77,4 +79,22 @@ class CommerceOrderType extends ConfigEntityBundleBase implements CommerceOrderT
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function delete() {
+    if (!$this->access('delete')) {
+      throw new EntityStorageException(strtr("Order Type %type may not be deleted.", array(
+        '%type' => String::checkPlain($this->entityTypeId),
+      )));
+    }
+    parent::delete();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrderCount() {
+    return $this->getContentCount();
+  }
 }

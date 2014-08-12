@@ -7,14 +7,11 @@
 
 namespace Drupal\commerce\Controller;
 
-use Drupal\Component\Utility\String;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\commerce\CommerceStoreTypeInterface;
-use Drupal\commerce\CommerceStoreInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -101,7 +98,6 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    *   A store add form.
    */
   public function add(CommerceStoreTypeInterface $commerce_store_type) {
-    $account = $this->currentUser();
     $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_store', $commerce_store_type->id()));
 
     $commerce_store = $this->entityManager()->getStorage('commerce_store')->create(array(
