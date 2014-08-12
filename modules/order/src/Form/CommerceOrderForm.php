@@ -23,7 +23,7 @@ class CommerceOrderForm extends ContentEntityForm {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The order %order_label could not be saved.', array('%order_label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_order', $e);
+      $this->logger('commerce_order')->error($e);
     }
     $form_state->setRedirect('entity.commerce_order.list');
   }
