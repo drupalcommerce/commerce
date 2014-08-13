@@ -64,7 +64,7 @@ class CommerceStoreForm extends ContentEntityForm {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The store could not be saved.'), 'error');
-      watchdog_exception('commerce', $e);
+      $this->logger('commerce')->error($e);
     }
     $form_state->setRedirect('commerce.store_list');
   }

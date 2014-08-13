@@ -48,7 +48,7 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('Order type %label could not be deleted.', array('%label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_order', $e);
+      $this->logger('commerce_order')->error($e);
     }
   }
 

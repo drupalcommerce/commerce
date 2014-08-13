@@ -53,7 +53,7 @@ class CommerceProductForm extends ContentEntityForm {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The product %product_label could not be saved.', array('%product_label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_product', $e);
+      $this->logger('commerce_product')->error($e);
     }
   }
 

@@ -48,7 +48,7 @@ class CommerceCurrencyDeleteForm extends EntityConfirmFormBase {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('Currency %label could not be deleted.', array('%label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_price', $e);
+      $this->logger('commerce_price')->error($e);
     }
   }
 

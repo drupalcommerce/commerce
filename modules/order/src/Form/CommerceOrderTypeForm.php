@@ -104,7 +104,7 @@ class CommerceOrderTypeForm extends EntityForm {
       $form_state->setRedirect('entity.commerce_order_type.list');
     }
     catch (\Exception $e) {
-      watchdog_exception('commerce_order', $e);
+      $this->logger('commerce_order')->error($e);
       drupal_set_message($this->t('The %label order type was not saved.', array(
         '%label' => $order_type->label(),
       )), 'error');
