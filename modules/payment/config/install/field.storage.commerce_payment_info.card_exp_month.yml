@@ -1,0 +1,16 @@
+id: commerce_payment_info.card_exp_month
+name: card_exp_month
+entity_type: commerce_payment_info
+type: integer
+langcode: und
+status: true
+dependencies:
+  module:
+    - commerce_payment
+settings:
+  unsigned: ''
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }

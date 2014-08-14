@@ -1,0 +1,19 @@
+id: commerce_payment_info.card.card_type
+entity_type: commerce_payment_info
+bundle: card
+field_name: card_type
+label: Card type
+description: 'The card type.'
+required: true
+translatable: true
+default_value: {  }
+default_value_function: ''
+settings:
+  text_processing: 0
+status: true
+langcode: und
+field_type: text
+dependencies:
+  entity:
+    - commerce_payment.commerce_payment_info_type.card
+    - field.storage.commerce_payment_info.card_type

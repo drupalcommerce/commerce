@@ -1,0 +1,23 @@
+id: commerce_payment_info.card.card_exp_year
+label: 'Card Expiration Year'
+field_name: card_exp_year
+entity_type: commerce_payment_info
+bundle: card
+description: 'The card expiration year.'
+langcode: und
+status: true
+dependencies:
+  entity:
+    - commerce_payment.commerce_payment_info_type.card
+    - field.storage.commerce_payment_info.card_exp_year
+required: true
+translatable: false
+default_value: {  }
+default_value_function: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+  size: normal
+field_type: integer

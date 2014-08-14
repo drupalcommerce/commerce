@@ -1,0 +1,13 @@
+commerce_payment.commerce_payment_info_type.*:
+  type: config_entity
+  label: 'Payment information type'
+  mapping:
+    label:
+      type: label
+      label: 'Label'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    description:
+      type: text
+      label: 'Description'

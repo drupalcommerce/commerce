@@ -1,0 +1,121 @@
+commerce_payment.payment_configuration:
+  path: '/admin/commerce/config/payment'
+  defaults:
+    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Payment configuration'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'access administration pages'
+
+entity.commerce_payment_info.add:
+  path: '/admin/commerce/payment-info/add/{commerce_payment_info_type}'
+  defaults:
+    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::add'
+    _title_callback: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPageTitle'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_payment_info'
+
+entity.commerce_payment_info.add_page:
+  path: '/admin/commerce/payment-info/add'
+  defaults:
+    _title: 'Create a new payment information entity'
+    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPage'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_payment_info'
+
+entity.commerce_payment_info.admin_form:
+  path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}'
+  defaults:
+    _entity_form: 'commerce_payment_info_type.edit'
+    _title: 'Edit a payment information entity type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_payment_info_type.update'
+
+entity.commerce_payment_info.delete_form:
+  path: '/admin/commerce/payment-info/{commerce_payment_info}/delete'
+  defaults:
+    _entity_form: commerce_payment_info.delete
+    _title: 'Delete payment information'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_payment_info.delete'
+
+entity.commerce_payment_info.devel:
+  path: '/admin/commerce/payment-info/{commerce_payment_info}/devel'
+  defaults:
+    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoLoad'
+    _title: 'Dump a payment information entity'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+
+entity.commerce_payment_info.edit_form:
+  path: '/admin/commerce/payment-info/{commerce_payment_info}/edit'
+  defaults:
+    _entity_form: commerce_payment_info.edit
+    _title: 'Edit payment information'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_payment_info.update'
+
+entity.commerce_payment_info.list:
+  path: '/admin/commerce/payment-info'
+  defaults:
+    _entity_list: 'commerce_payment_info'
+    _title: 'Payment information list'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer commerce_payment_info entities'
+
+entity.commerce_payment_info_type.list:
+  path: '/admin/commerce/config/payment-info-types'
+  defaults:
+    _entity_list: 'commerce_payment_info_type'
+    _title: 'Payment information types'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer commerce_payment_info_type entities'
+
+entity.commerce_payment_info_type.add:
+  path: '/admin/commerce/config/payment-info-types/add'
+  defaults:
+    _entity_form: 'commerce_payment_info_type.add'
+    _title: 'Add a new payment info type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_payment_info_type'
+
+entity.commerce_payment_info_type.delete_form:
+  path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/delete'
+  defaults:
+    _entity_form: 'commerce_payment_info_type.delete'
+    _title: 'Delete a payment info type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_payment_info_type.delete'
+
+entity.commerce_payment_info_type.devel:
+  path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/devel'
+  defaults:
+    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoTypeLoad'
+    _title: 'Dump an payment info type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'

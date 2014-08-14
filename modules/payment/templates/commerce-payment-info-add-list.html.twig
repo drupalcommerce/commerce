@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Default theme implementation to list payment information types available for
+ * creating a payment information entity.
+ *
+ * Available variables:
+ * - types: A list of payment information types, each with the following
+ *   properties:
+ *   - add_link: Link to create a piece of content of this type.
+ *   - description: Description of this type of content.
+ *
+ * @see template_preprocess_commerce_payment_info_add_list()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if types is not empty %}
+    <dl class="payment-info-type-list">
+        {% for type in types %}
+            <dt>{{ type.add_link }}</dt>
+            <dd>{{ type.description }}</dd>
+        {% endfor %}
+    </dl>
+{% else %}
+    <p>
+        {% set create_payment_info_type = path('entity.commerce_payment_info_type.add') %}
+        {% trans %}
+        You have not created any payment information types yet. Go to the <a href="{{ create_payment_info_type }}">payment information type creation page</a> to add a new payment information type.
+        {% endtrans %}
+    </p>
+{% endif %}
