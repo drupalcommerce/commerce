@@ -7,8 +7,6 @@
 
 namespace Drupal\commerce_product\Controller;
 
-use Drupal\Component\Utility\String;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DateFormatter;
@@ -102,7 +100,6 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *   A product add form.
    */
   public function add(CommerceProductTypeInterface $commerce_product_type) {
-    $account = $this->currentUser();
     $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id()));
 
     $commerce_product = $this->entityManager()->getStorage('commerce_product')->create(array(

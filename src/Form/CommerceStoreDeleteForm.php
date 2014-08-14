@@ -44,7 +44,7 @@ class CommerceStoreDeleteForm extends ContentEntityConfirmFormBase {
     try {
       $this->entity->delete();
       drupal_set_message($this->t('Store %label has been deleted.', array('%label' => $this->entity->label())));
-      $this->logger('commerce')->notice('Store %name has been deleted.', array('%label' => $this->entity->label());
+      $this->logger('commerce')->notice('Store %name has been deleted.', array('%label' => $this->entity->label()));
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('Store %label could not be deleted.', array('%label' => $this->entity->label()), 'error'));

@@ -32,11 +32,4 @@ interface CommerceStoreTypeInterface extends ConfigEntityInterface {
    */
   public function setDescription($description);
 
-  /**
-   * Returns the number of store entities exist of this type.
-   *
-   * @return int
-   */
-  public function getStoreCount();
-
 }
