@@ -29,7 +29,7 @@ class CommerceProductListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce\Entity\CommerceProduct */
+    /* @var $entity \Drupal\commerce_product\Entity\CommerceProduct */
 
     $uri = $entity->urlInfo();
     $options = $uri->getOptions();

@@ -9,7 +9,6 @@ namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\Language;
 
 /**
  * Form controller for the product edit form.
@@ -20,7 +19,7 @@ class CommerceProductForm extends ContentEntityForm {
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\commerce\Entity\CommerceProduct */
+    /* @var $entity \Drupal\commerce_product\Entity\CommerceProduct */
     $form = parent::form($form, $form_state);
     $product = $this->entity;
 

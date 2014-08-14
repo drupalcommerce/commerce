@@ -12,7 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 /**
  * Provides an interface defining a store type entity.
  */
-interface CommerceStoreTypeInterface extends ConfigEntityInterface {
+interface CommerceStoreTypeInterface extends CommerceEntityTypeInterface {
 
   /**
    * Returns the store type description.
