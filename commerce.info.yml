@@ -3,5 +3,6 @@ type: module
 description: 'Defines features and functions common to the Commerce modules.'
 package: Commerce
 core: 8.x
+configure: commerce.admin_commerce
 dependencies:
   - composer_manager
