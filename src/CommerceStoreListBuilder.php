@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce;
 
+use Drupal\commerce\Entity\CommerceStoreType;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -32,7 +33,7 @@ class CommerceStoreListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce\Entity\CommerceStore */
-    $commerce_store_type = entity_load('commerce_store_type', $entity->bundle());
+    $commerce_store_type = CommerceStoreType::load($entity->bundle());
 
     $row['name'] = $entity->getName();
     $row['type'] = String::checkPlain($commerce_store_type->label());
