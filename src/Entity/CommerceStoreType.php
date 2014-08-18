@@ -19,7 +19,6 @@ use Drupal\Core\Entity\EntityStorageException;
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
  *   controllers = {
- *     "access" = "Drupal\commerce\CommerceStoreTypeAccessControlHandler",
  *     "list_builder" = "Drupal\commerce\CommerceStoreTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce\Form\CommerceStoreTypeForm",
@@ -84,24 +83,6 @@ class CommerceStoreType extends ConfigEntityBundleBase implements CommerceStoreT
   public function setDescription($description) {
     $this->description = $description;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getStoreCount() {
-    $instance_type = $this->getEntityType()->getBundleOf();
-    $query = $this->entityManager()
-      ->getListBuilder($instance_type)
-      ->getStorage()
-      ->getQuery();
-
-    $count = $query
-      ->condition('type', $this->id())
-      ->count()
-      ->execute();
-
-    return $count;
   }
 
   /**

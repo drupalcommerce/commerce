@@ -8,7 +8,6 @@
 namespace Drupal\commerce_product;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Provides an interface defining a Commerce Product entity.
@@ -83,7 +82,7 @@ interface CommerceProductInterface extends EntityInterface {
    * @param string $description
    *   The product description
    *
-   * @return \Drupal\commerce_product\CommerceProductInterfaceInterface
+   * @return \Drupal\commerce_product\CommerceProductInterface
    */
   public function setDescription($description);
 
@@ -101,7 +100,7 @@ interface CommerceProductInterface extends EntityInterface {
    * @param int $timestamp
    *   The product creation timestamp.
    *
-   * @return \Drupal\product\CommerceProductInterfaceInterface
+   * @return \Drupal\commerce_product\CommerceProductInterface
    *   The called product entity.
    */
   public function setCreatedTime($timestamp);
@@ -140,7 +139,7 @@ interface CommerceProductInterface extends EntityInterface {
    * @param integer $uid
    *   User id
    *
-   * @return \Drupal\product\CommerceProductInterfaceInterface
+   * @return \Drupal\commerce_product\CommerceProductInterface
    */
   public function setUid($uid);
 
