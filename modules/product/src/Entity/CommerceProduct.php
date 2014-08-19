@@ -34,6 +34,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",
+ *   data_table = "commerce_product_field_data",
  *   revision_table = "commerce_product_revision",
  *   revision_data_table = "commerce_product_field_revision",
  *   uri_callback = "commerce_product_uri",
@@ -189,7 +190,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setReadOnly(TRUE);
 
     // Language
-    $fields['language'] = BaseFieldDefinition::create('language')
+    $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of product.'))
       ->setRevisionable(TRUE);
