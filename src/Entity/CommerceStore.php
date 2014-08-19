@@ -30,6 +30,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "commerce_store",
+ *   data_table = "commerce_store_field_data",
  *   admin_permission = "administer commerce_store entities",
  *   fieldable = TRUE,
  *   translatable = TRUE,
