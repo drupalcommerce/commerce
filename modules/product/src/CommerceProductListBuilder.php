@@ -33,6 +33,7 @@ class CommerceProductListBuilder extends EntityListBuilder {
 
     $uri = $entity->urlInfo();
     $options = $uri->getOptions();
+    $langcode = $entity->language()->id;
     $options += ($langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED && isset($languages[$langcode]) ? array('language' => $languages[$langcode]) : array());
     $uri->setOptions($options);
     $row['title']['data'] = array(
