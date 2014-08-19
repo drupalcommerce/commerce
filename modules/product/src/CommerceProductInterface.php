@@ -68,24 +68,6 @@ interface CommerceProductInterface extends EntityInterface {
    */
   public function setStatus($status);
 
- /**
-   * Get the description of this product.
-   *
-   * @return string
-   *   The product description
-   */
-  public function getDescription();
-
-  /**
-   * Set the description of this product
-   *
-   * @param string $description
-   *   The product description
-   *
-   * @return \Drupal\commerce_product\CommerceProductInterface
-   */
-  public function setDescription($description);
-
   /**
    * Returns the product creation timestamp.
    *

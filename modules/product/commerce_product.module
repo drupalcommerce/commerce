@@ -12,6 +12,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldInstanceConfig;
 
 /**
  * Implements hook_entity_operation().
@@ -99,4 +101,55 @@ function commerce_product_theme() {
       'template' => 'commerce-product-add-list',
     ),
   );
+}
+
+/**
+ * Adds the default body field to a product type.
+ *
+ * @param string $product_type_id
+ *   Id of the Commerce Product type.
+ * @param string $label
+ *   (optional) The label for the body instance. Defaults to 'Body'
+ *
+ * @return array
+ *   Body field instance.
+ */
+function commerce_product_add_body_field($product_type_id, $label = 'Body') {
+  // Add or remove the body field, as needed.
+  $field_storage = FieldStorageConfig::loadByName('commerce_product', 'body');
+  $instance = FieldInstanceConfig::loadByName('commerce_product', $product_type_id, 'body');
+  if (empty($field_storage)) {
+    $field_storage = entity_create('field_storage_config', array(
+      'name' => 'body',
+      'entity_type' => 'commerce_product',
+      'type' => 'text_with_summary',
+    ));
+    $field_storage->save();
+  }
+  if (empty($instance)) {
+    $instance = entity_create('field_instance_config', array(
+      'field_storage' => $field_storage,
+      'bundle' => $product_type_id,
+      'label' => $label,
+      'settings' => array('display_summary' => FALSE),
+    ));
+    $instance->save();
+
+    // Assign widget settings for the 'default' form mode.
+    entity_get_form_display('commerce_product', $product_type_id, 'default')
+      ->setComponent('body', array(
+        'type' => 'text_textarea_with_summary',
+      ))
+      ->save();
+
+    // Assign display settings for 'default' view mode.
+    entity_get_display('commerce_product', $product_type_id, 'default')
+      ->setComponent('body', array(
+        'label' => 'hidden',
+        'type' => 'text_default',
+      ))
+      ->save();
+  }
+
+  return $instance;
 }
