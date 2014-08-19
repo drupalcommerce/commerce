@@ -37,10 +37,10 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   bundle_entity_type = "commerce_payment_info_type",
+ *   field_ui_base_route = "entity.commerce_payment_info.admin_form",
  *   permission_granularity = "bundle",
  *   admin_permission = "administer commerce_payment_info entities",
  *   links = {
- *     "admin-form" = "entity.commerce_payment_info.admin_form",
  *     "edit-form" = "entity.commerce_payment_info.edit_form",
  *     "delete-form" = "entity.commerce_payment_info.delete_form"
  *   },
