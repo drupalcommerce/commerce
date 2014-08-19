@@ -43,9 +43,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   links = {
  *     "edit-form" = "commerce.store_edit",
  *     "delete-form" = "commerce.store_delete",
- *     "admin-form" = "commerce.store_type_edit"
  *   },
- *   bundle_entity_type = "commerce_store_type"
+ *   bundle_entity_type = "commerce_store_type",
+ *   field_ui_base_route = "commerce.store_type_edit",
  * )
  */
 class CommerceStore extends ContentEntityBase implements CommerceStoreInterface {

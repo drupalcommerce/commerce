@@ -39,11 +39,11 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "admin-form" = "entity.commerce_order.admin_form",
  *     "edit-form" = "entity.commerce_order.edit_form",
  *     "delete-form" = "entity.commerce_order.delete_form"
  *   },
- *   bundle_entity_type = "commerce_order_type"
+ *   bundle_entity_type = "commerce_order_type",
+ *   field_ui_base_route = "entity.commerce_order.admin_form",
  * )
  */
 class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface {
