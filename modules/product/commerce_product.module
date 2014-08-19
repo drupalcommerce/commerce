@@ -43,6 +43,37 @@ function commerce_product_entity_operation(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function commerce_product_permission() {
+  $permissions = array(
+    'create commerce_product entities' => array(
+      'title' => t('Create commerce_product entities'),
+      'description' => t('Allows users to create commerce product entities.'),
+      'restrict access' => TRUE,
+    ),
+    'administer commerce_product entities' => array(
+      'title' => t('administer commerce_product entities'),
+      'description' => t('Allows users to administer commerce product entities.'),
+      'restrict access' => TRUE,
+    ),
+    'view commerce_product entities' => array(
+      'title' => t('View commerce_product entities'),
+      'description' => t('Allows users to view commerce product entities.'),
+      'restrict access' => TRUE,
+    ),
+    'delete commerce_product entities' => array(
+      'title' => t('Delete commerce_product entities'),
+      'description' => t('Allows users to delete commerce product entities.'),
+      'restrict access' => TRUE,
+    ),
+  );
+
+  return $permissions;
+}
+
+
+/**
  * Entity URI callback.
  *
  * @param \Drupal\commerce_product\CommerceProductInterface $product
