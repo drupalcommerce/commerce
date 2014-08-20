@@ -103,21 +103,6 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
-    return $this->get('description')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDescription($description) {
-    $this->set('description', $description);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -217,27 +202,6 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -5,
       ))
       ->setDisplayConfigurable('form', TRUE);
-
-    // Description
-    $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
-      ->setDescription(t('The description of this product.'))
-      ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)
-      ->setSettings(array(
-        'default_value' => '',
-      ))
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -3,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'text_textarea',
-        'weight' => -3,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     // SKU
     $fields['sku'] = BaseFieldDefinition::create('string')

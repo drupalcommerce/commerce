@@ -8,6 +8,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\commerce_product\CommerceProductTypeInterface;
 
 /**
@@ -69,6 +70,24 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
   protected $description;
 
   /**
+   * Indicates whether a body field should be created for this product type.
+   *
+   * This property affects entity creation only. It allows default configuration
+   * of modules and installation profiles to specify whether a Body field should
+   * be created for this bundle.
+   *
+   * @var bool
+   */
+  protected $create_body = TRUE;
+
+  /**
+   * The label to use for the body field upon entity creation.
+   *
+   * @var string
+   */
+  protected $create_body_label = 'Body';
+
+  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -82,5 +101,19 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
     $this->description = $description;
     return $this;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Create a body if the create_body property is true and we're not in
+    // the syncing process.
+    if ($this->get('create_body') && !$this->isSyncing()) {
+      $label = $this->get('create_body_label');
+      commerce_product_add_body_field($this->id, $label);
+    }
+   }
 
 }
