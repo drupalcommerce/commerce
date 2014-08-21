@@ -70,6 +70,13 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
   protected $description;
 
   /**
+   * The default revision setting for products of this type.
+   *
+   * @var bool
+   */
+  public $revision;
+
+  /**
    * Indicates whether a body field should be created for this product type.
    *
    * This property affects entity creation only. It allows default configuration

@@ -8,6 +8,9 @@ commerce_product.commerce_product_type.*:
     label:
         type: label
         label: 'Label'
+    revision:
+      type: integer
+      label: 'Create new revision'
     description:
       type: text
       label: 'Description'

@@ -9,6 +9,7 @@ namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
@@ -146,6 +147,20 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   /**
    * {@inheritdoc}
    */
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
+    parent::preSaveRevision($storage, $record);
+
+    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
+      // If we are updating an existing product without adding a new
+      // revision and the user did not supply a revision log, keep the existing
+      // one.
+      $record->revision_log = $this->original->getRevisionLog();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     // Product ID
     $fields['product_id'] = BaseFieldDefinition::create('integer')
@@ -269,9 +284,28 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
 
+    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Revision log message'))
+      ->setDescription(t('The log entry explaining the changes in this revision.'))
+      ->setRevisionable(TRUE);
+
     // @todo add price field once price field type exists.
 
     return $fields;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionLog() {
+    return $this->get('revision_log')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionLog($revision_log) {
+    $this->set('revision_log', $revision_log);
+    return $this;
+  }
 }
