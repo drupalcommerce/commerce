@@ -20,7 +20,7 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
- *   controllers = {
+ *   handlers = {
  *     "list_builder" = "Drupal\commerce_order\CommerceOrderListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderForm",

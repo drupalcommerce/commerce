@@ -16,7 +16,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_currency",
  *   label = @Translation("Currency"),
- *   controllers = {
+ *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_price\Form\CommerceCurrencyForm",
  *       "edit" = "Drupal\commerce_price\Form\CommerceCurrencyForm",

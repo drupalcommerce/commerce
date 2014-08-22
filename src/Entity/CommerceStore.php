@@ -19,7 +19,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   id = "commerce_store",
  *   label = @Translation("Store"),
  *   bundle_label = @Translation("Store type"),
- *   controllers = {
+ *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommerceStoreListBuilder",
  *     "form" = {

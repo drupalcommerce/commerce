@@ -17,7 +17,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
- *   controllers = {
+ *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderTypeForm",
