@@ -18,7 +18,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * @ContentEntityType(
  *   id = "commerce_payment_transaction",
  *   label = @Translation("Payment Transaction"),
- *   controllers = {
+ *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommercePaymentTransactionListBuilder",
  *     "form" = {

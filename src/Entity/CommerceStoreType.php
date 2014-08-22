@@ -18,7 +18,7 @@ use Drupal\Core\Entity\EntityStorageException;
  * @ConfigEntityType(
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
- *   controllers = {
+ *   handlers = {
  *     "list_builder" = "Drupal\commerce\CommerceStoreTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce\Form\CommerceStoreTypeForm",

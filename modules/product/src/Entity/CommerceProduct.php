@@ -20,7 +20,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
- *   controllers = {
+ *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\CommerceProductListBuilder",
  *     "form" = {

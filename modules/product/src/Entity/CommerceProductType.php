@@ -17,7 +17,7 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
- *   controllers = {
+ *   handlers = {
  *     "list_builder" = "Drupal\commerce_product\CommerceProductTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\CommerceProductTypeForm",

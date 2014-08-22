@@ -16,7 +16,7 @@ use Drupal\commerce_payment\CommercePaymentInfoTypeInterface;
  * @ConfigEntityType(
  *   id = "commerce_payment_info_type",
  *   label = @Translation("Payment information type"),
- *   controllers = {
+ *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_payment\Form\CommercePaymentInfoTypeForm",
  *       "edit" = "Drupal\commerce_payment\Form\CommercePaymentInfoTypeForm",
