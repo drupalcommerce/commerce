@@ -63,7 +63,7 @@ commerce.store_list:
     _entity_list: 'commerce_store'
     _title: 'Store information'
   requirements:
-    _permission: 'view commerce_store entities'
+    _permission: 'administer commerce_store entities'
 
 commerce.store_add_page:
   path: '/admin/commerce/config/store/add'
@@ -79,7 +79,7 @@ commerce.store_add:
     _content: '\Drupal\commerce\Controller\CommerceStoreController::add'
     _title_callback: '\Drupal\commerce\Controller\CommerceStoreController::addPageTitle'
   requirements:
-    _permission: 'create commerce_store entities'
+    _permission: 'administer commerce_store entities'
 
 commerce.store_edit:
   path: '/admin/commerce/config/store/{commerce_store}/edit'
@@ -87,7 +87,7 @@ commerce.store_edit:
     _entity_form: commerce_store.edit
     _title: 'Edit a store'
   requirements:
-    _permission: 'update commerce_store entities'
+    _entity_access: 'commerce_store.edit'
 
 commerce.store_delete:
   path: '/admin/commerce/config/store/{commerce_store}/delete'
