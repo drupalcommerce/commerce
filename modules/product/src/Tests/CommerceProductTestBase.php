@@ -38,7 +38,8 @@ abstract class CommerceProductTestBase extends WebTestBase {
       'administer commerce_product entities',
       'create commerce_product entities',
       'delete commerce_product entities',
-      'view commerce_product entities'
+      'view commerce_product entities',
+      'administer product types',
     ));
     $this->drupalLogin($this->admin_user);
   }
