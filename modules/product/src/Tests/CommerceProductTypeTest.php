@@ -23,8 +23,8 @@ class CommerceProductTypeTest extends CommerceProductTestBase {
     $product_types = CommerceProductType::loadMultiple();
     $this->assertTrue(isset($product_types['product']), 'Product Type Product is available');
 
-    $commerce_product_type = CommerceProductType::load('product');
-    $this->assertEqual($product_types['product'], $commerce_product_type, 'The correct Product Type is loaded');
+    $product_type = CommerceProductType::load('product');
+    $this->assertEqual($product_types['product'], $product_type, 'The correct Product Type is loaded');
   }
 
   /**
@@ -61,13 +61,13 @@ class CommerceProductTypeTest extends CommerceProductTestBase {
       'title' => $this->randomMachineName(),
       'type' => "product"
     );
-    $commerce_product = $this->createEntity('commerce_product', $values);
+    $product = $this->createEntity('commerce_product', $values);
 
     // Try to delete the product type.
     $type->delete();
 
     // Deleting the product type when its not being referenced by a product.
-    $commerce_product->delete();
+    $product->delete();
     $type_exists = (bool) CommerceProductType::load($type->id());
     $this->assertFalse($type_exists, 'The new product type has been deleted from the database.');
 

@@ -25,8 +25,8 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
 
     $this->assertTrue(isset($product_types['product']), 'Found the product type "Product"');
 
-    $commerce_product_type = CommerceProductType::load('product');
-    $this->assertEqual($product_types['product'], $commerce_product_type, 'The correct product type is loaded');
+    $product_type = CommerceProductType::load('product');
+    $this->assertEqual($product_types['product'], $product_type, 'The correct product type is loaded');
   }
 
   /**
@@ -42,7 +42,7 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
     $product_types = $this->cssSelect($table_selector);
     $this->assertEqual(count($product_types), 1, '1 Products types are correctly listed');
 
-    // Create a new commerce product type entity and see if the list has two product types.
+    // Create a new product type entity and see if the list has two product types.
     $this->createEntity('commerce_product_type', array(
         'id' => $title,
         'label' => $title
@@ -119,7 +119,7 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
       'title' => $this->randomMachineName(),
       'type' => $type->id()
     );
-    $commerce_product = $this->createEntity('commerce_product', $values);
+    $product = $this->createEntity('commerce_product', $values);
 
     // Try to delete the product type.
     $this->drupalGet('admin/commerce/config/product-types/' . $type->id() . '/delete');
@@ -130,7 +130,7 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
     $this->assertNoText(t('This action cannot be undone.'), 'The product type deletion confirmation form is not available');
 
     // Deleting the product type when its not being referenced by a product.
-    $commerce_product->delete();
+    $product->delete();
     $this->drupalGet('admin/commerce/config/product-types/' . $type->id() . '/delete');
     $this->assertRaw(
       t('Are you sure you want to delete %type?', array('%type' => $type->label())),
