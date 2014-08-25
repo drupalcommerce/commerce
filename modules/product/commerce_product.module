@@ -69,6 +69,11 @@ function commerce_product_permission() {
       'description' => t('Allows users to delete commerce product entities.'),
       'restrict access' => TRUE,
     ),
+    'administer product types' => array(
+      'title' => t('Administer product types'),
+      'description' => t('Allows users to administer product types.'),
+      'restrict access' => TRUE,
+    ),
   );
 
   return $permissions;
