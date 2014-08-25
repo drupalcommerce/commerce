@@ -1,5 +1,5 @@
-entity.commerce_product.add_form:
-  route_name: entity.commerce_product.add_form
+entity.commerce_product.add_page:
+  route_name: entity.commerce_product.add_page
   title: 'Add a new product'
   appears_on:
     - entity.commerce_product.list
