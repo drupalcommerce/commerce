@@ -1,0 +1,49 @@
+id: commerce_product.product.default
+targetEntityType: commerce_product
+bundle: product
+mode: default
+langcode: en
+status: true
+dependencies:
+  entity:
+    - commerce_product.commerce_product_type.product
+    - field.instance.commerce_product.product.body
+    - field.instance.commerce_product.product.commerce_price
+  module:
+    - commerce_price
+    - text
+content:
+  title:
+    type: string
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 1
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sku:
+    type: string
+    weight: 2
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  body:
+    type: text_textarea_with_summary
+    weight: 3
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  commerce_price:
+    type: price_simple
+    weight: 4
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

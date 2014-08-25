@@ -1,0 +1,15 @@
+id: commerce_payment_transaction.commerce_price
+name: commerce_price
+entity_type: commerce_payment_transaction
+type: price
+settings: {  }
+langcode: und
+status: true
+module: commerce_price
+locked: false
+cardinality: 1
+translatable: true
+dependencies:
+  module:
+    - commerce_price
+    - commerce_payment

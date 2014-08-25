@@ -1,0 +1,18 @@
+id: commerce_product.product.commerce_price
+label: Price
+field_name: commerce_price
+entity_type: commerce_product
+bundle: product
+description: 'Price field for products'
+langcode: und
+status: true
+required: false
+translatable: false
+default_value: {  }
+default_value_function: ''
+field_type: price
+dependencies:
+  entity:
+    - commerce_product.commerce_product_type.product
+    - field.storage.commerce_product.commerce_price
+settings: {  }
