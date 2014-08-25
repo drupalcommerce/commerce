@@ -4,34 +4,21 @@
  */
 
 /* Bar formatting */
-.toolbar-bar .toolbar-icon-commerce:before {
+.toolbar-bar .toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/bebebe/drupal-cart.svg");
 }
-.no-svg .toolbar-bar .toolbar-icon-commerce:before {
-  background-image: url("../icons/bebebe/drupal-cart.png");
-}
-.toolbar-bar .toolbar-icon-commerce:active:before,
-.toolbar-bar .toolbar-icon-commerce.active:before {
+
+.toolbar-bar .toolbar-icon-commerce-admin-commerce:active:before,
+.toolbar-bar .toolbar-icon-commerce-admin-commerce.active:before {
   background-image: url("../icons/ffffff/drupal-cart.svg");
 }
-.no-svg .toolbar-bar .toolbar-icon-commerce:active:before,
-.no-svg .toolbar-bar .toolbar-icon-commerce.active:before {
-  background-image: url("../icons/ffffff/drupal-cart.png");
-}
-
 
 /* Tray formatting */
-.toolbar-tray .toolbar-icon-commerce:before {
+.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/787878/drupal-cart.svg");
 }
-.no-svg .toolbar-tray .toolbar-icon-commerce:before {
-  background-image: url("../icons/787878/drupal-cart.png");
-}
-.toolbar-tray .toolbar-icon-commerce:active:before,
-.toolbar-tray .toolbar-icon-commerce.active:before {
+
+.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce:active:before,
+.toolbar .toolbar-tray .toolbar-icon.toolbar-icon-commerce-admin-commerce.active:before {
   background-image: url("../icons/000000/drupal-cart.svg");
-}
-.no-svg .toolbar-tray .toolbar-icon-commerce:active:before,
-.no-svg .toolbar-tray .toolbar-icon-commerce.active:before {
-  background-image: url("../icons/000000/drupal-cart.png");
 }
