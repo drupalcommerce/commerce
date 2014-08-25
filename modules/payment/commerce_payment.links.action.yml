@@ -4,8 +4,8 @@ entity.commerce_payment_info.add_page:
   appears_on:
     - entity.commerce_payment_info.list
 
-entity.commerce_payment_info_type.add:
-  route_name: entity.commerce_payment_info_type.add
+entity.commerce_payment_info_type.add_form:
+  route_name: entity.commerce_payment_info_type.add_form
   title: 'Add a new payment information entity type'
   appears_on:
     - entity.commerce_payment_info_type.list

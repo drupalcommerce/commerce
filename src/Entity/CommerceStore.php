@@ -41,11 +41,11 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce.store_edit",
- *     "delete-form" = "commerce.store_delete",
+ *     "edit-form" = "entity.commerce_store.edit_form",
+ *     "delete-form" = "entity.commerce_store.delete_form",
  *   },
  *   bundle_entity_type = "commerce_store_type",
- *   field_ui_base_route = "commerce.store_type_edit",
+ *   field_ui_base_route = "entity.commerce_store_type.edit_form",
  * )
  */
 class CommerceStore extends ContentEntityBase implements CommerceStoreInterface {

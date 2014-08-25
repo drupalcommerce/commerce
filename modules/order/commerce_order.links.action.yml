@@ -4,8 +4,8 @@ entity.commerce_order.add_page:
   appears_on:
     - entity.commerce_order.list
 
-entity.commerce_order_type.add:
-  route_name: entity.commerce_order_type.add
+entity.commerce_order_type.add_form:
+  route_name: entity.commerce_order_type.add_form
   title: 'Add a new order type'
   appears_on:
     - entity.commerce_order_type.list

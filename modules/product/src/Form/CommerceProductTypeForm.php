@@ -58,7 +58,7 @@ class CommerceProductTypeForm extends EntityForm {
       $this->logger('commerce_product')->error($e);
     }
 
-    $form_state->setRedirect('commerce_product.product_type_list');
+    $form_state->setRedirect('entity.commerce_product_type.list');
   }
 
 }

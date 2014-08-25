@@ -34,8 +34,8 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce_product.product_type_edit",
- *     "delete-form" = "commerce_product.product_type_delete"
+ *     "edit-form" = "entity.commerce_product_type.edit_form",
+ *     "delete-form" = "entity.commerce_product_type.delete_form"
  *   }
  * )
  */

@@ -8,7 +8,7 @@ commerce_order.order_configuration:
   requirements:
     _permission: 'access administration pages'
 
-entity.commerce_order.add:
+entity.commerce_order.add_form:
   path: '/admin/commerce/orders/add/{commerce_order_type}'
   defaults:
     _content: '\Drupal\commerce_order\Controller\CommerceOrderController::add'
@@ -89,7 +89,7 @@ entity.commerce_order.list:
   requirements:
     _permission: 'administer commerce_order entities'
 
-entity.commerce_order_type.add:
+entity.commerce_order_type.add_form:
   path: '/admin/commerce/config/order-types/add'
   defaults:
     _entity_form: 'commerce_order_type.add'

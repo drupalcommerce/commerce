@@ -30,7 +30,7 @@ entity.commerce_currency.delete_form:
   requirements:
     _permission: 'administer commerce_store entities'
 
-commerce_price.commerce_currency.devel:
+entity.commerce_currency.devel:
   path: '/admin/commerce/config/currency/{commerce_currency}/devel'
   defaults:
     _content: '\Drupal\commerce_price\Controller\CommerceCurrencyDevelController::currencyLoad'

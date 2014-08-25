@@ -81,7 +81,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
 
     if (count($product_types) == 1) {
       $product_type = reset($product_types);
-      return $this->redirect('commerce_product.add', array('commerce_product_type' => $product_type->id()));
+      return $this->redirect('entity.commerce_product.add_form', array('commerce_product_type' => $product_type->id()));
     }
 
     return array(
@@ -113,7 +113,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   }
 
   /**
-   * The _title_callback for the commerce_product.add route.
+   * The _title_callback for the entity.commerce_product.add_form route.
    *
    * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *   The current product.
@@ -126,7 +126,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   }
 
   /**
-   * The _title_callback for the commerce_product.edit route
+   * The _title_callback for the entity.commerce_product.edit_form route
    *
    * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.
@@ -139,7 +139,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   }
 
   /**
-   * The _title_callback for the commerce_product.view route
+   * The _title_callback for the entity.commerce_product.view route
    *
    * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.
