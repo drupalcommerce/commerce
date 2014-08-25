@@ -15,9 +15,9 @@ commerce_price.commerce_currency.*:
     symbol:
       type: string
       label: 'Symbol'
-    decimals:
+    fractionDigits:
       type: integer
-      label: 'Decimals'
+      label: 'Fraction digits'
     status:
       label: Status
       type: boolean

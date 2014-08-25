@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price\Entity;
 
-use CommerceGuys\Pricing\CurrencyInterface;
+use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -69,11 +69,11 @@ class CommerceCurrency extends ConfigEntityBase implements CurrencyInterface {
   protected $symbol;
 
   /**
-   * The number of decimals.
+   * The number of fraction digits.
    *
-   * @var integer
+   * @var int
    */
-  protected $decimals = 2;
+  protected $fractionDigits;
 
   /**
    * Overrides \Drupal\Core\Entity\Entity::id().
@@ -149,15 +149,15 @@ class CommerceCurrency extends ConfigEntityBase implements CurrencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDecimals() {
-    return $this->decimals;
+  public function getFractionDigits() {
+    return $this->fractionDigits;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDecimals($decimals) {
-    $this->decimals = $decimals;
+  public function setFractionDigits($fractionDigits) {
+    $this->fractionDigits = $fractionDigits;
 
     return $this;
   }

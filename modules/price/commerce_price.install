@@ -1,6 +1,6 @@
 <?php
 
-use CommerceGuys\Pricing\DefaultCurrencyManager;
+use CommerceGuys\Intl\Currency\DefaultCurrencyManager;
 
 /**
  * Implements hook_install().
@@ -18,7 +18,7 @@ function commerce_price_install() {
       'name' => $default_currency->getName(),
       'numericCode' => $default_currency->getNumericCode(),
       'symbol' => $default_currency->getSymbol(),
-      'decimals' => $default_currency->getDecimals(),
+      'fractionDigits' => $default_currency->getFractionDigits(),
       'status' => (in_array($default_currency->getCurrencyCode(), $enable)) ? 1 : 0,
     );
     $currency = entity_create('commerce_currency', $values);

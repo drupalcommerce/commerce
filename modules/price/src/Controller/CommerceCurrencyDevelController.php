@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price\Controller;
 
-use CommerceGuys\Pricing\CurrencyInterface;
+use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\devel\Controller\DevelController;
 
 /**
@@ -18,7 +18,7 @@ class CommerceCurrencyDevelController extends DevelController {
   /**
    * Dump devel information for a commerce_currency entity.
    *
-   * @param \CommerceGuys\Pricing\CurrencyInterface $commerce_currency
+   * @param \CommerceGuys\Intl\Currency\CurrencyInterface $commerce_currency
    *
    * @return string
    */
