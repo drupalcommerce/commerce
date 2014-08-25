@@ -1,11 +1,11 @@
-commerce_product.add:
-  route_name: commerce_product.product_add_page
+entity.commerce_product.add_form:
+  route_name: entity.commerce_product.add_form
   title: 'Add a new product'
   appears_on:
-    - commerce_product.list
+    - entity.commerce_product.list
 
-commerce_product.product_type_add:
-  route_name: commerce_product.product_type_add
+entity.commerce_product_type.add_form:
+  route_name: entity.commerce_product_type.add_form
   title: 'Add a new product type'
   appears_on:
-    - commerce_product.product_type_list
+    - entity.commerce_product_type.list

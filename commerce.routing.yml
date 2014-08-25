@@ -14,66 +14,7 @@ commerce.configuration:
   requirements:
     _permission: 'access administration pages'
 
-commerce.store_type_list:
-  path: '/admin/commerce/config/store/types'
-  defaults:
-    _entity_list: 'commerce_store_type'
-    _title: 'Store types'
-  requirements:
-    _permission: 'administer commerce_store_type entities'
-
-commerce.store_type_add:
-  path: '/admin/commerce/config/store/types/add'
-  defaults:
-    _entity_form: 'commerce_store_type.add'
-    _title: 'Add a new store type'
-  requirements:
-    _permission: 'administer commerce_store_type entities'
-
-commerce.store_type_edit:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}'
-  defaults:
-    _entity_form: 'commerce_store_type.edit'
-    _title: 'Edit a store type'
-  requirements:
-    _permission: 'administer commerce_store_type entities'
-
-commerce.store_type_delete:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}/delete'
-  defaults:
-    _entity_form: 'commerce_store_type.delete'
-    _title: 'Delete a store type'
-  requirements:
-    _entity_access: 'commerce_store_type.delete'
-
-commerce.store_type_devel:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
-  defaults:
-    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
-    _title: 'Dump a store type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
-commerce.store_list:
-  path: '/admin/commerce/config/store'
-  defaults:
-    _entity_list: 'commerce_store'
-    _title: 'Store information'
-  requirements:
-    _permission: 'administer commerce_store entities'
-
-commerce.store_add_page:
-  path: '/admin/commerce/config/store/add'
-  defaults:
-    _title: 'Add a new store'
-    _content: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
-  requirements:
-    _permission: 'administer commerce_store entities'
-
-commerce.store_add:
+entity.commerce_store.add_form:
   path: '/admin/commerce/config/store/add/{commerce_store_type}'
   defaults:
     _content: '\Drupal\commerce\Controller\CommerceStoreController::add'
@@ -81,7 +22,23 @@ commerce.store_add:
   requirements:
     _permission: 'administer commerce_store entities'
 
-commerce.store_edit:
+entity.commerce_store.add_page:
+  path: '/admin/commerce/config/store/add'
+  defaults:
+    _title: 'Add a new store'
+    _content: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
+  requirements:
+    _permission: 'administer commerce_store entities'
+
+entity.commerce_store.list:
+  path: '/admin/commerce/config/store'
+  defaults:
+    _entity_list: 'commerce_store'
+    _title: 'Store information'
+  requirements:
+    _permission: 'administer commerce_store entities'
+
+entity.commerce_store.edit_form:
   path: '/admin/commerce/config/store/{commerce_store}/edit'
   defaults:
     _entity_form: commerce_store.edit
@@ -89,7 +46,7 @@ commerce.store_edit:
   requirements:
     _entity_access: 'commerce_store.edit'
 
-commerce.store_delete:
+entity.commerce_store.delete_form:
   path: '/admin/commerce/config/store/{commerce_store}/delete'
   defaults:
     _entity_form: commerce_store.delete
@@ -97,7 +54,7 @@ commerce.store_delete:
   requirements:
     _entity_access: 'commerce_store.delete'
 
-commerce.store_devel:
+entity.commerce_store.devel:
   path: '/admin/commerce/config/store/{commerce_store}/devel'
   defaults:
     _content: '\Drupal\commerce\Controller\CommerceDevelController::storeLoad'
@@ -108,3 +65,45 @@ commerce.store_devel:
     _module_dependencies: 'devel'
     _permission: 'access devel information'
 
+entity.commerce_store_type.add_form:
+  path: '/admin/commerce/config/store/types/add'
+  defaults:
+    _entity_form: 'commerce_store_type.add'
+    _title: 'Add a new store type'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+
+entity.commerce_store_type.list:
+  path: '/admin/commerce/config/store/types'
+  defaults:
+    _entity_list: 'commerce_store_type'
+    _title: 'Store types'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+
+entity.commerce_store_type.edit_form:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}'
+  defaults:
+    _entity_form: 'commerce_store_type.edit'
+    _title: 'Edit a store type'
+  requirements:
+    _permission: 'administer commerce_store_type entities'
+
+entity.commerce_store_type.delete_form:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}/delete'
+  defaults:
+    _entity_form: 'commerce_store_type.delete'
+    _title: 'Delete a store type'
+  requirements:
+    _entity_access: 'commerce_store_type.delete'
+
+entity.commerce_store_type.devel:
+  path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
+  defaults:
+    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
+    _title: 'Dump a store type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'

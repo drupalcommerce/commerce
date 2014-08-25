@@ -24,7 +24,7 @@
     </dl>
 {% else %}
     <p>
-        {% set create_payment_info_type = path('entity.commerce_payment_info_type.add') %}
+        {% set create_payment_info_type = path('entity.commerce_payment_info_type.add_form') %}
         {% trans %}
         You have not created any payment information types yet. Go to the <a href="{{ create_payment_info_type }}">payment information type creation page</a> to add a new payment information type.
         {% endtrans %}

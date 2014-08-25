@@ -1,11 +1,11 @@
-commerce.store_type_add:
-  route_name: commerce.store_type_add
-  title: 'Add a new store type'
-  appears_on:
-    - commerce.store_type_list
-
-commerce.store_add:
-  route_name: commerce.store_add_page
+entity.commerce_store.add_form:
+  route_name: entity.commerce_store.add_page
   title: 'Add a new store'
   appears_on:
-    - commerce.store_list
+    - entity.commerce_store.list
+
+entity.commerce_store_type.add_form:
+  route_name: entity.commerce_store_type.add_form
+  title: 'Add a new store type'
+  appears_on:
+    - entity.commerce_store_type.list

@@ -8,7 +8,7 @@ commerce_payment.payment_configuration:
   requirements:
     _permission: 'access administration pages'
 
-entity.commerce_payment_info.add:
+entity.commerce_payment_info.add_form:
   path: '/admin/commerce/payment-info/add/{commerce_payment_info_type}'
   defaults:
     _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::add'
@@ -89,7 +89,7 @@ entity.commerce_payment_info_type.list:
   requirements:
     _permission: 'administer commerce_payment_info_type entities'
 
-entity.commerce_payment_info_type.add:
+entity.commerce_payment_info_type.add_form:
   path: '/admin/commerce/config/payment-info-types/add'
   defaults:
     _entity_form: 'commerce_payment_info_type.add'

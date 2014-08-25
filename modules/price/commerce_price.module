@@ -16,7 +16,7 @@ function commerce_price_entity_operation(EntityInterface $entity) {
   $entity_type_id = $entity->getEntityTypeId();
   if (\Drupal::currentUser()->hasPermission('access devel information') && $entity_type_id == 'commerce_currency') {
     $operations['devel'] = array(
-      'route_name' => 'commerce_price.commerce_currency.devel',
+      'route_name' => 'entity.commerce_currency.devel',
       'route_parameters' => array($entity_type_id => $entity->id()),
       'title' => t('Devel'),
       'weight' => 15,

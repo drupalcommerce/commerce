@@ -1,31 +1,31 @@
-commerce.store_list:
-  route_name: commerce.store_list
-  base_route: commerce.store_list
+entity.commerce_store.list:
+  route_name: entity.commerce_store.list
+  base_route: entity.commerce_store.list
   title: List
 
-commerce.store_type_list:
-  route_name: commerce.store_type_list
-  base_route: commerce.store_list
-  title: Store types
-
-commerce.store_type_page_edit:
-  route_name: commerce.store_type_edit
-  base_route: commerce.store_type_edit
+entity.commerce_store.edit_form:
+  route_name: entity.commerce_store.edit_form
+  base_route: entity.commerce_store.edit_form
   title: Edit
 
-commerce.store_type_page_devel:
-  route_name: commerce.store_type_devel
-  base_route: commerce.store_type_edit
+entity.commerce_store.devel:
+  route_name: entity.commerce_store.devel
+  base_route: entity.commerce_store.edit_form
   title: Devel
   weight: 10
 
-commerce.store_page_edit:
-  route_name: commerce.store_edit
-  base_route: commerce.store_edit
+entity.commerce_store_type.list:
+  route_name: entity.commerce_store_type.list
+  base_route: entity.commerce_store.list
+  title: Store types
+
+entity.commerce_store_type.edit_form:
+  route_name: entity.commerce_store_type.edit_form
+  base_route: entity.commerce_store_type.edit_form
   title: Edit
 
-commerce.store_page_devel:
-  route_name: commerce.store_devel
-  base_route: commerce.store_edit
+entity.commerce_store_type.devel:
+  route_name: entity.commerce_store_type.devel
+  base_route: entity.commerce_store_type.edit_form
   title: Devel
   weight: 10

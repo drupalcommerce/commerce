@@ -46,11 +46,11 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "edit-form" = "commerce_product.edit",
- *     "delete-form" = "commerce_product.delete",
+ *     "edit-form" = "entity.commerce_product.edit_form",
+ *     "delete-form" = "entity.commerce_product.delete_form",
  *   },
  *   bundle_entity_type = "commerce_product_type",
- *   field_ui_base_route = "commerce_product.product_type_edit",
+ *   field_ui_base_route = "entity.commerce_product_type.edit_form",
  * )
  */
 class CommerceProduct extends ContentEntityBase implements CommerceProductInterface {

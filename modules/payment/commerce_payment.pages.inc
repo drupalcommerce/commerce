@@ -20,7 +20,7 @@ function template_preprocess_commerce_payment_info_add_list(&$variables) {
     foreach ($variables['types'] as $payment_info_type) {
       $variables['types'][$payment_info_type->id()] = array(
         'type' => $payment_info_type->id(),
-        'add_link' => l($payment_info_type->label(), 'admin/commerce/payment-info/add/' . $payment_info_type->id()),
+        'add_link' => Drupal::l($payment_info_type->label(), 'entity.payment_info.add_form' . $payment_info_type->id()),
         'description' => Xss::filterAdmin($payment_info_type->getDescription()),
       );
     }

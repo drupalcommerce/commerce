@@ -35,7 +35,7 @@ class CommercePaymentInfoController extends ControllerBase {
 
     if (count($payment_info_types) == 1) {
       $payment_info_type = reset($payment_info_types);
-      return $this->redirect('entity.commerce_payment_info.add', array('commerce_payment_info_type' => $payment_info_type->id()));
+      return $this->redirect('entity.commerce_payment_info.add_form', array('commerce_payment_info_type' => $payment_info_type->id()));
     }
 
     return array(
@@ -63,7 +63,7 @@ class CommercePaymentInfoController extends ControllerBase {
   }
 
   /**
-   * The title_callback for the commerce_payment_info.add route.
+   * The title_callback for the entity.commerce_payment_info.add_form route.
    *
    * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $commerce_payment_info_type
    *   The current payment information type.

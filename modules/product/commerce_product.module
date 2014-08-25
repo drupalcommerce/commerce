@@ -27,8 +27,8 @@ function commerce_product_entity_operation(EntityInterface $entity) {
   }
 
   $entity_routes = array(
-    'commerce_product' => 'commerce_product.devel',
-    'commerce_product_type' => 'commerce_product.product_type_devel',
+    'commerce_product' => 'entity.commerce_product.devel',
+    'commerce_product_type' => 'entity.commerce_product_type.devel',
   );
 
   $entity_type_id = $entity->getEntityTypeId();
@@ -85,7 +85,7 @@ function commerce_product_permission() {
  *   A Url object that provides a URL to the view page for $product.
  */
 function commerce_product_uri(CommerceProductInterface $product) {
-  return new Url('commerce_product.view', array(
+  return new Url('entity.commerce_product.view', array(
     'commerce_product' => $product->id(),
   ));
 }

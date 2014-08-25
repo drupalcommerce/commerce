@@ -88,8 +88,8 @@ function commerce_entity_operation(EntityInterface $entity) {
   }
 
   $entity_routes = array(
-    'commerce_store' => 'commerce.store_devel',
-    'commerce_store_type' => 'commerce.store_type_devel',
+    'commerce_store' => 'entity.commerce_store.devel',
+    'commerce_store_type' => 'entity.commerce_store_type.devel',
   );
 
   $entity_type_id = $entity->getEntityTypeId();

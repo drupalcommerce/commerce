@@ -35,7 +35,7 @@ class CommerceOrderController extends ControllerBase {
 
     if (count($order_types) == 1) {
       $order_type = reset($order_types);
-      return $this->redirect('entity.commerce_order.add', array('commerce_order_type' => $order_type->id()));
+      return $this->redirect('entity.commerce_order.add_form', array('commerce_order_type' => $order_type->id()));
     }
 
     return array(
@@ -63,7 +63,7 @@ class CommerceOrderController extends ControllerBase {
   }
 
   /**
-   * The title_callback for the commerce_order.add route.
+   * The title_callback for the entity.commerce_order.add_form route.
    *
    * @param \Drupal\commerce_order\CommerceOrderTypeInterface $commerce_order_type
    *   The current order type.

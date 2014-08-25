@@ -35,8 +35,8 @@ use Drupal\Core\Entity\EntityStorageException;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "commerce.store_type_edit",
- *     "delete-form" = "commerce.store_type_delete"
+ *     "edit-form" = "entity.commerce_store_type.edit_form",
+ *     "delete-form" = "entity.commerce_store_type.delete_form"
  *   }
  * )
  */
