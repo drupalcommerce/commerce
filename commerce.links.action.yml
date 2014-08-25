@@ -1,4 +1,4 @@
-entity.commerce_store.add_form:
+entity.commerce_store.add_page:
   route_name: entity.commerce_store.add_page
   title: 'Add a new store'
   appears_on:
