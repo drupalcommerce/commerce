@@ -51,22 +51,22 @@ function commerce_product_permission() {
   $permissions = array(
     'create commerce_product entities' => array(
       'title' => t('Create commerce_product entities'),
-      'description' => t('Allows users to create commerce product entities.'),
+      'description' => t('Allows users to create product entities.'),
       'restrict access' => TRUE,
     ),
     'administer commerce_product entities' => array(
       'title' => t('administer commerce_product entities'),
-      'description' => t('Allows users to administer commerce product entities.'),
+      'description' => t('Allows users to administer product entities.'),
       'restrict access' => TRUE,
     ),
     'view commerce_product entities' => array(
       'title' => t('View commerce_product entities'),
-      'description' => t('Allows users to view commerce product entities.'),
+      'description' => t('Allows users to view product entities.'),
       'restrict access' => TRUE,
     ),
     'delete commerce_product entities' => array(
       'title' => t('Delete commerce_product entities'),
-      'description' => t('Allows users to delete commerce product entities.'),
+      'description' => t('Allows users to delete product entities.'),
       'restrict access' => TRUE,
     ),
     'administer product types' => array(

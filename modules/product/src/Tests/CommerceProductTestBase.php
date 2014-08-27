@@ -23,14 +23,14 @@ abstract class CommerceProductTestBase extends WebTestBase {
   public static $modules = array('commerce', 'devel', 'commerce_product');
 
   /**
-   * User with permission to administer commerce products.
+   * User with permission to administer products.
    */
   protected $admin_user;
 
   /**
-   * The commerce product to test against
+   * The product to test against
    */
-  protected $commerce_product;
+  protected $product;
 
   protected function setUp() {
     parent::setUp();
