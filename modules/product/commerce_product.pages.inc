@@ -20,11 +20,11 @@ function template_preprocess_commerce_product_add_list(&$variables) {
   $variables['types'] = array();
 
   if (!empty($variables['content'])) {
-    foreach ($variables['content'] as $commerce_product_type) {
-      $variables['types'][$commerce_product_type->id()] = array(
-        'type' => $commerce_product_type->id(),
-        'add_link' => Drupal::l($commerce_product_type->label(), 'entity.commerce_product.add_form', array('commerce_product_type' => $commerce_product_type->id())),
-        'description' => Xss::filterAdmin($commerce_product_type->getDescription()),
+    foreach ($variables['content'] as $product_type) {
+      $variables['types'][$product_type->id()] = array(
+        'type' => $product_type->id(),
+        'add_link' => Drupal::l($product_type->label(), 'entity.commerce_product.add_form', array('commerce_product_type' => $product_type->id())),
+        'description' => Xss::filterAdmin($product_type->getDescription()),
       );
     }
   }
