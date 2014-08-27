@@ -42,6 +42,13 @@ class CommerceProductTypeForm extends EntityForm {
       '#default_value' => $product_type->getDescription(),
     );
 
+    $form['revision'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Create new revision'),
+      '#default_value' => $product_type->revision,
+      '#description' => t('Create a new revision by default for this product type.')
+    );
+
     return $form;
   }
 

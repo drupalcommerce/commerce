@@ -1,0 +1,8 @@
+drupal.commerce_product:
+  version: VERSION
+  js:
+    js/commerce_product.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupal.form
