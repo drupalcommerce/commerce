@@ -12,12 +12,31 @@ issue queue and submit patches / pull requests.
 
 [Issue Tracker](https://drupal.org/project/issues/commerce)
 
+Installation
+------------------
+
+1. Install the latest -dev version of Drupal 8.
+2. Install the latest -dev versions of devel* and composer_manager.
+3. Go to your sites/default/files/composer directory and run `composer install`.
+
+   This will download the required libraries into your sites/all/vendor directory.
+4. Enable commerce and its submodules. Use the admin/modules page, Drush won't work currently**.
+
+Notes:
+- Devel is currently not optional because of a core bug: https://www.drupal.org/node/2315801
+- Drush is currently incompatible with composer_manager, causing the library classes to not be found in all commands (enabling a module, clearing cache, etc). The bug is tracked at https://www.drupal.org/node/2208949
+
 Related Libraries
 ------------------
 
 For the 2.x branch of Drupal Commerce, Commerce Guys has moved some of the logic
 out of the Drupal world and into the greater PHP community. This effort has
-produced three unique eCommerce-related PHP libraries (please star on github):
+produced four unique eCommerce-related PHP libraries
+
+###[Intl](https://github.com/commerceguys/intl)
+
+An internationalization library powered by CLDR data.
+Handles currencies, currency formatting, and more.
 
 ###[Address](https://github.com/commerceguys/address)
 
