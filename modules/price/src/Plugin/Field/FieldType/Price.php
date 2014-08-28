@@ -45,8 +45,9 @@ class Price extends FieldItemBase {
       'columns' => array(
         'amount' => array(
           'description' => 'The price amount.',
-          'type' => 'float',
-          'size' => 'big',
+          'type' => 'numeric',
+          'precision' => 19,
+          'scale' => 6,
           'not null' => FALSE,
         ),
         'currency_code' => array(

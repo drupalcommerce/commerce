@@ -12,7 +12,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'link' widget.
+ * Plugin implementation of the commerce price widget.
  *
  * @FieldWidget(
  *   id = "price_simple",
@@ -28,6 +28,10 @@ class PriceSimpleWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    // Get the enabled currencies.
+    $enabled_currencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
+    $currency_codes = array_keys($enabled_currencies);
+
     $element['amount'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Amount'),
@@ -37,12 +41,11 @@ class PriceSimpleWidget extends WidgetBase {
       '#maxlength' => 255,
     );
     $element['currency_code'] = array(
-      '#type' => 'textfield',
+      '#type' => 'select',
       '#title' => $this->t('Currency code'),
       '#default_value' => isset($items[$delta]->currency_code) ? $items[$delta]->currency_code : NULL,
       '#required' => $element['#required'],
-      '#maxlength' => 3,
-      '#size' => 3,
+      '#options' => array_combine($currency_codes, $currency_codes),
     );
 
     return $element;
