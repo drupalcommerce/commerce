@@ -29,7 +29,7 @@ use Drupal\user\UserInterface;
  *     }
  *   },
  *   base_table = "commerce_order",
- *   admin_permission = "administer commerce_order entities",
+ *   admin_permission = "administer orders",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",

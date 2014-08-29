@@ -1,0 +1,14 @@
+'administer payment information':
+  title: 'Administer payment information'
+  description: 'Allows users to create, update, and delete payment information.'
+  'restrict access': TRUE
+
+'administer payment information types':
+  title: 'Administer payment information types'
+  description: 'Allows users to create, update, and delete payment information types.'
+  'restrict access': TRUE
+
+'administer payment transactions':
+  title: 'Administer payment transactions'
+  description: 'Allows users to create, update, and delete payment transactions.'
+  'restrict access': TRUE

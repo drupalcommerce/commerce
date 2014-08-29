@@ -3,6 +3,8 @@ entity.commerce_product.configuration:
   defaults:
     _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Product configuration'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: 'access administration pages'
 
@@ -11,16 +13,20 @@ entity.commerce_product.add_form:
   defaults:
     _content: '\Drupal\commerce_product\Controller\CommerceProductController::add'
     _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::addPageTitle'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'create commerce_product entities'
+    _entity_create_access: 'commerce_product'
 
 entity.commerce_product.add_page:
   path: '/admin/commerce/products/add'
   defaults:
     _title: 'Add a new product'
     _content: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_product entities'
+    _permission: 'administer products'
 
 entity.commerce_product.view:
   path: '/product/{commerce_product}'
@@ -35,8 +41,10 @@ entity.commerce_product.list:
   defaults:
     _entity_list: 'commerce_product'
     _title: 'Products'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'view commerce_product entities'
+    _permission: 'administer products'
     
 entity.commerce_product.edit_form:
   path: '/product/{commerce_product}/edit'
@@ -44,9 +52,7 @@ entity.commerce_product.edit_form:
     _entity_form: commerce_product.edit
     _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::editPageTitle'
   requirements:
-    _permission: 'update commerce_product entities'
-  options:
-    _admin_route: TRUE    
+    _entity_access: 'commerce_product.edit'
 
 entity.commerce_product.delete_form:
   path: '/product/{commerce_product}/delete'
@@ -54,7 +60,7 @@ entity.commerce_product.delete_form:
     _entity_form: commerce_product.delete
     _title: 'Delete a product'
   requirements:
-    _permission: 'delete commerce_product entities'
+    _entity_access: 'commerce_product.delete'
 
 entity.commerce_product.devel:
   path: '/admin/commerce/products/{commerce_product}/devel'
@@ -72,32 +78,40 @@ entity.commerce_product_type.add_form:
   defaults:
     _entity_form: commerce_product_type.edit
     _title: 'Add a product type'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_product_type entities'
+    _entity_create_access: 'commerce_product_type'
 
 entity.commerce_product_type.list:
   path: '/admin/commerce/config/product-types'
   defaults:
     _entity_list: 'commerce_product_type'
     _title: 'Product types'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_product_type entities'
+    _permission: 'administer product types'
 
 entity.commerce_product_type.edit_form:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/edit'
   defaults:
     _entity_form: commerce_product_type.edit
     _title: 'Edit a product type'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_product_type entities'
+   _entity_access: 'commerce_product_type.edit'
 
 entity.commerce_product_type.delete_form:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/delete'
   defaults:
     _entity_form: 'commerce_product_type.delete'
     _title: 'Delete a product type'
+  options:
+    _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_product_type entities'
+    _entity_access: 'commerce_product_type.delete'
 
 entity.commerce_product_type.devel:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/devel'

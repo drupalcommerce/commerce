@@ -26,7 +26,7 @@ use Drupal\commerce_product\CommerceProductTypeInterface;
  *     }
  *   },
  *   config_prefix = "commerce_product_type",
- *   admin_permission = "administer commerce_product_type entities",
+ *   admin_permission = "administer product types",
  *   bundle_of = "commerce_product",
  *   entity_keys = {
  *     "id" = "id",

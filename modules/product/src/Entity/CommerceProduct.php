@@ -31,7 +31,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer commerce_product entities",
+ *   admin_permission = "administer products",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",

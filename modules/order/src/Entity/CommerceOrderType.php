@@ -25,7 +25,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *     "list_builder" = "Drupal\commerce_order\CommerceOrderTypeListBuilder",
  *   },
- *   admin_permission = "administer commerce_order_type entities",
+ *   admin_permission = "administer order types",
  *   config_prefix = "commerce_order_type",
  *   bundle_of = "commerce_order",
  *   entity_keys = {

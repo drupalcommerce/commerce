@@ -37,7 +37,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   permission_granularity = "bundle",
- *   admin_permission = "administer commerce_payment_transaction entities",
+ *   admin_permission = "administer payment transactions",
  *   links = {
  *     "edit-form" = "entity.commerce_payment_transaction.edit_form",
  *     "delete-form" = "entity.commerce_payment_transaction.delete_form"

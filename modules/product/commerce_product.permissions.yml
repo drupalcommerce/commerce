@@ -1,0 +1,9 @@
+'administer products':
+  title: 'Administer products'
+  description: 'Allows users to administer products.'
+  'restrict access': TRUE
+
+'administer product types':
+  title: 'Administer product types'
+  description: 'Allows users to administer product types.'
+  'restrict access': TRUE

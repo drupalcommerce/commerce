@@ -31,7 +31,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   },
  *   base_table = "commerce_store",
  *   data_table = "commerce_store_field_data",
- *   admin_permission = "administer commerce_store entities",
+ *   admin_permission = "administer stores",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {

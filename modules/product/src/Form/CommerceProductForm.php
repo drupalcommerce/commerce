@@ -67,14 +67,14 @@ class CommerceProductForm extends ContentEntityForm {
         'library' => array('commerce_product/drupal.commerce_product'),
       ),
       '#weight' => 20,
-      '#access' => $product->isNewRevision() || $account->hasPermission('administer commerce_product entities'),
+      '#access' => $product->isNewRevision() || $account->hasPermission('administer products'),
     );
 
     $form['revision_information']['revision'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $product->isNewRevision(),
-      '#access' => $account->hasPermission('administer commerce_product entities'),
+      '#access' => $account->hasPermission('administer products'),
     );
 
     // Check the revision log checkbox when the log textarea is filled in.
