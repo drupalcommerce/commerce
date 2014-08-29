@@ -43,10 +43,8 @@ class CommerceProductForm extends ContentEntityForm {
     $product = $this->entity;
     $account = $this->currentUser();
 
-    // There appears to be no way to set default value for checkboxes in the
-    // field definitions yet ...
     if ($product->isNew()) {
-      $form['status']['widget']['#default_value'] = 1;
+      $form['status']['widget'];
     }
 
     $form['advanced'] = array(

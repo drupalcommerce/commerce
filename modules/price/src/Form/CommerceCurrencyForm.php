@@ -86,7 +86,7 @@ class CommerceCurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Fraction digits'),
       '#maxlength' => 255,
-      '#default_value' => $currency->getDecimals(),
+      '#default_value' => $currency->getFractionDigits(),
       '#description' => $this->t('The number of digits after the decimal sign.'),
       '#required' => TRUE,
     );

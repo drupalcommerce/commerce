@@ -44,7 +44,7 @@ class CommerceProductDeleteForm extends ContentEntityConfirmFormBase {
     $this->entity->delete();
     drupal_set_message($this->t('Product %label has been deleted.', array('%label' => $this->entity->label())));
     $this->logger('commerce_product')->notice('Product %name has been deleted.', array('%label' => $this->entity->label()));
-    $form_state->setRedirect($this->getCancelUrl());
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }
