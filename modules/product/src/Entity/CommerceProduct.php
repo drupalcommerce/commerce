@@ -262,7 +262,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ))
       ->setDisplayOptions('form', array(
         'type' => 'boolean_checkbox',
-        'weight' => -5,
+        'weight' => 10,
         'settings' => array(
           'display_label' => TRUE
         )
