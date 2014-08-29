@@ -82,7 +82,7 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
 
     if (count($store_types) == 1) {
       $store_type = reset($store_types);
-      return $this->redirect('entity.commerce_store.add', array('commerce_store_type' => $store_type->id()));
+      return $this->redirect('entity.commerce_store.add_form', array('commerce_store_type' => $store_type->id()));
     }
 
     return array(
@@ -115,7 +115,7 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
   }
 
   /**
-   * The _title_callback for the entity.commerce_store.add route.
+   * The _title_callback for the entity.commerce_store.add_form route.
    *
    * @param \Drupal\commerce\CommerceStoreTypeInterface $commerce_store_type
    *   The current store.

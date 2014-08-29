@@ -77,7 +77,7 @@ entity.commerce_payment_info.list:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_payment_info entities'
+    _permission: 'administer payment information'
 
 entity.commerce_payment_info_type.list:
   path: '/admin/commerce/config/payment-info-types'
@@ -87,7 +87,7 @@ entity.commerce_payment_info_type.list:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_payment_info_type entities'
+    _permission: 'administer payment information types'
 
 entity.commerce_payment_info_type.add_form:
   path: '/admin/commerce/config/payment-info-types/add'

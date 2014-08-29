@@ -35,10 +35,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
   protected function setUp() {
     parent::setUp();
     $this->admin_user = $this->drupalCreateUser(array(
-      'administer commerce_product entities',
-      'create commerce_product entities',
-      'delete commerce_product entities',
-      'view commerce_product entities',
+      'administer products',
       'administer product types',
     ));
     $this->drupalLogin($this->admin_user);

@@ -32,8 +32,8 @@ abstract class CommerceTestBase extends WebTestBase {
 
     $permissions = array(
       'view the administration theme',
-      'administer commerce_store_type entities',
-      'administer commerce_store entities',
+      'administer store types',
+      'administer stores',
       'configure store'
     );
 

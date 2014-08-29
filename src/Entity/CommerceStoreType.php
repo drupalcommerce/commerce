@@ -26,7 +26,7 @@ use Drupal\Core\Entity\EntityStorageException;
  *       "delete" = "Drupal\commerce\Form\CommerceStoreTypeDeleteForm"
  *     }
  *   },
- *   admin_permission = "administer commerce_store_type entities",
+ *   admin_permission = "administer store types",
  *   config_prefix = "commerce_store_type",
  *   bundle_of = "commerce_store",
  *   entity_keys = {

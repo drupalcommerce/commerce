@@ -67,7 +67,7 @@ entity.commerce_order_type.list:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_order_type entities'
+    _permission: 'administer order types'
 
 entity.commerce_order.edit_form:
   path: '/admin/commerce/orders/{commerce_order}/edit'
@@ -87,7 +87,7 @@ entity.commerce_order.list:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer commerce_order entities'
+    _permission: 'administer orders'
 
 entity.commerce_order_type.add_form:
   path: '/admin/commerce/config/order-types/add'

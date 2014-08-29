@@ -39,7 +39,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   bundle_entity_type = "commerce_payment_info_type",
  *   field_ui_base_route = "entity.commerce_payment_info.admin_form",
  *   permission_granularity = "bundle",
- *   admin_permission = "administer commerce_payment_info entities",
+ *   admin_permission = "administer payment information",
  *   links = {
  *     "edit-form" = "entity.commerce_payment_info.edit_form",
  *     "delete-form" = "entity.commerce_payment_info.delete_form"

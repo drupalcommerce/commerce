@@ -24,7 +24,7 @@ use Drupal\commerce_payment\CommercePaymentInfoTypeInterface;
  *     },
  *     "list_builder" = "Drupal\commerce_payment\CommercePaymentInfoTypeListBuilder",
  *   },
- *   admin_permission = "administer commerce_payment_info_type entities",
+ *   admin_permission = "administer payment information types",
  *   config_prefix = "commerce_payment_info_type",
  *   bundle_of = "commerce_payment_info",
  *   entity_keys = {

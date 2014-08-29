@@ -10,31 +10,6 @@ use Drupal\commerce\Entity\CommerceStoreType;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Implements hook_permission().
- */
-function commerce_permission() {
-  $permissions = array(
-    'administer commerce_store_type entities' => array(
-      'title' => t('Administer store types'),
-      'description' => t('Allows users to create, update, and delete store types.'),
-      'restrict access' => TRUE,
-    ),
-    'administer commerce_store entities' => array(
-      'title' => t('Administer stores'),
-      'description' => t('Allows users to create, update, and delete stores.'),
-      'restrict access' => TRUE,
-    ),
-    'configure store' => array(
-      'title' => t('Configure store settings'),
-      'description' => t('Allows users to update store currency and contact settings.'),
-      'restrict access' => TRUE,
-    ),
-  );
-
-  return $permissions;
-}
-
-/**
  * Implements hook_theme().
  */
 function commerce_theme() {

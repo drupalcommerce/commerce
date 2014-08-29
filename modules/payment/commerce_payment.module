@@ -8,26 +8,6 @@
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Implements hook_permission().
- */
-function commerce_payment_permission() {
-  $permissions = array(
-    'administer commerce_payment_info_type entities' => array(
-      'title' => t('Administer payment information types'),
-      'description' => t('Allows users to create, update, and delete payment information types.'),
-      'restrict access' => TRUE,
-    ),
-    'administer commerce_payment_info entities' => array(
-      'title' => t('Administer payment information entities'),
-      'description' => t('Allows users to create, update, and delete payment information entities.'),
-      'restrict access' => TRUE,
-    ),
-  );
-
-  return $permissions;
-}
-
-/**
  * Implements hook_theme().
  */
 function commerce_payment_theme() {
