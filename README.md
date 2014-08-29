@@ -1,5 +1,6 @@
 Drupal Commerce
 ===============
+[![Build Status](https://travis-ci.org/commerceguys/commerce.svg?branch=8.x-2.x)](https://travis-ci.org/commerceguys/commerce)
 
 Drupal Commerce is an open source eCommerce framework that is designed to
 enable flexible eCommerce for websites and applications based on Drupal.

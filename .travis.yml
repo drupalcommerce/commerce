@@ -1,0 +1,43 @@
+language: php
+
+php:
+  - 5.4
+  - 5.5
+
+mysql:
+  database: drupal
+  username: root
+  encoding: utf8
+
+install:
+  - "mysql -e 'create database drupal;'"
+
+  # Install latest Drush 7.
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer global require --no-interaction --prefer-source drush/drush:dev-master
+
+  # Disable sendmail.
+  - echo sendmail_path=`which true` >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+  # Build Codebase.
+  - TESTDIR=$(pwd)
+  - cd ..
+  - git clone --branch 8.0.x http://git.drupal.org/project/drupal.git drupal
+  - git clone --branch 8.x-1.x http://git.drupal.org/project/devel.git drupal/modules/devel
+  - git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git drupal/modules/composer_manager
+  - cd drupal
+  # Apply core patch untill https://www.drupal.org/node/2189345 gets merged.
+  - wget https://www.drupal.org/files/issues/2189345-runtests-exitcode_16.patch
+  - git apply -v -p1 < 2189345-runtests-exitcode_16.patch
+
+before_script:
+  - ln -s $TESTDIR modules/commerce
+  - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
+  - drush pm-enable devel composer_manager simpletest commerce commerce_product commerce_order --yes
+  - drush pm-uninstall dblog --yes
+  - drush runserver 8888 > /dev/null &
+  - until netstat -an 2>/dev/null | grep '8888.*LISTEN'; do true; done
+
+script:
+  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://127.0.0.1:8888 --verbose --color commerce
+  - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/commerce
