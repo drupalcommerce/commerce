@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\Controller\CommerceProductController.
+ * Contains \Drupal\commerce_product\Controller\CommerceProductController.
  */
 
 namespace Drupal\commerce_product\Controller;

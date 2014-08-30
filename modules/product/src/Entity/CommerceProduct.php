@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\Entity\CommerceProduct.
+ * Contains \Drupal\commerce_product\Entity\CommerceProduct.
  */
 
 namespace Drupal\commerce_product\Entity;
@@ -114,6 +114,13 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getChangedTime() {
+    return $this->get('changed')->value;
   }
 
   /**

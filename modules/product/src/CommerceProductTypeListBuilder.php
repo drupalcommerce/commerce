@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\CommerceProductTypeListBuilder.
+ * Contains \Drupal\commerce_product\CommerceProductTypeListBuilder.
  */
 
 namespace Drupal\commerce_product;
