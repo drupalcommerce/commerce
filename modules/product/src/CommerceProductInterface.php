@@ -2,17 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\CommerceProductInterface.
+ * Contains \Drupal\commerce_product\CommerceProductInterface.
  */
 
 namespace Drupal\commerce_product;
 
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface defining a Commerce Product entity.
  */
-interface CommerceProductInterface extends EntityInterface {
+interface CommerceProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
    * Get the SKU of this product.
