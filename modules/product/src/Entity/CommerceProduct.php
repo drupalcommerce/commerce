@@ -139,15 +139,30 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   /**
    * {@inheritdoc}
    */
-  public function getUid() {
-    $this->get('uid')->value;
+  public function getOwner() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setUid($uid) {
+  public function getOwnerId() {
+    $this->get('uid')->target_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
     return $this->set('uid', $uid);
   }
 

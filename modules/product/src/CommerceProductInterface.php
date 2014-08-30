@@ -110,24 +110,6 @@ interface CommerceProductInterface extends EntityChangedInterface, EntityInterfa
   // you wanted to set/replace.
 
   /**
-   * Returns the product uid
-   *
-   * @return integer
-   *   Product user id
-   */
-  public function getUid();
-
-  /**
-   * Sets the product uid
-   *
-   * @param integer $uid
-   *   User id
-   *
-   * @return \Drupal\commerce_product\CommerceProductInterface
-   */
-  public function setUid($uid);
-
-  /**
    * Returns the product revision log message.
    *
    * @return string
