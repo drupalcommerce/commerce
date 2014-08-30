@@ -35,9 +35,9 @@ before_script:
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
   - drush pm-enable devel composer_manager simpletest commerce commerce_product commerce_order --yes
   - drush pm-uninstall dblog --yes
-  - drush runserver 8888 > /dev/null &
+  - drush runserver localhost:8888 &
   - until netstat -an 2>/dev/null | grep '8888.*LISTEN'; do true; done
 
 script:
-  - php ./core/scripts/run-tests.sh --php `which php` --concurrency 12 --url http://127.0.0.1:8888 --verbose --color commerce
+  - php ./core/scripts/run-tests.sh --php `which php` --url http://localhost:8888 --color "commerce"
   - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/commerce
