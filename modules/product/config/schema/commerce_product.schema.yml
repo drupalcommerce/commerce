@@ -14,3 +14,21 @@ commerce_product.commerce_product_type.*:
     description:
       type: text
       label: 'Description'
+
+field_config.third_party.commerce_product:
+  type: mapping
+  label: 'Product attributes'
+  mapping:
+    attributes:
+      type: sequence
+      label: 'Field properties for which to synchronize product attributes'
+      attribute_field:
+        - type: boolean
+          label: 'Whether or not this field should be used as a product attribute'
+      attribute_widget:
+        - type: string
+          label: 'The widget to use for the product attribute'
+      attribute_widget_title:
+        - type: translatable
+          translatable: true
+          label: 'The title of the product attribute for the Add to Cart form'
