@@ -12,6 +12,8 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\EntityOwnerInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the Commerce Product entity.
@@ -327,6 +329,36 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
    */
   public function setRevisionLog($revision_log) {
     $this->set('revision_log', $revision_log);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('uid', $uid);
     return $this;
   }
 }
