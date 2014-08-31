@@ -8,20 +8,21 @@ use CommerceGuys\Intl\Currency\DefaultCurrencyManager;
  * Import the default currencies from the library.
  */
 function commerce_price_install() {
-  // A list of currencies to enable by default.
-  $enable = array('USD', 'EUR');
+  // A list of currencies to import and enable by default.
+  $preloaded_currencies = array('USD', 'EUR', 'GBP');
 
   $default_manager = new DefaultCurrencyManager;
-  foreach ($default_manager->getAll() as $default_currency) {
+  foreach ($preloaded_currencies as $currency) {
+    $default_currency = $default_manager->get($currency);
     $values = array(
       'currencyCode' => $default_currency->getCurrencyCode(),
       'name' => $default_currency->getName(),
       'numericCode' => $default_currency->getNumericCode(),
       'symbol' => $default_currency->getSymbol(),
       'fractionDigits' => $default_currency->getFractionDigits(),
-      'status' => (in_array($default_currency->getCurrencyCode(), $enable)) ? 1 : 0,
+      'status' => TRUE,
     );
-    $currency = entity_create('commerce_currency', $values);
-    $currency->save();
+    $entity = entity_create('commerce_currency', $values);
+    $entity->save();
   }
 }

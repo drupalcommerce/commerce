@@ -1,0 +1,4 @@
+services:
+  commerce_currency_importer:
+    class: Drupal\commerce_price\CurrencyImporter
+    arguments: ['@entity.manager', '@language_manager']

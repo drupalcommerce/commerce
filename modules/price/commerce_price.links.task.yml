@@ -8,3 +8,13 @@ entity.commerce_currency.devel:
   base_route: 'entity.commerce_currency.edit_form'
   title: 'Devel'
   weight: 10
+
+entity.commerce_currency.list:
+  route_name: 'entity.commerce_currency.list'
+  base_route: 'entity.commerce_currency.list'
+  title: 'List'
+
+entity.commerce_currency.import:
+  route_name: 'entity.commerce_currency.import'
+  base_route: 'entity.commerce_currency.list'
+  title: 'Import'
