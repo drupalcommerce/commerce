@@ -1,0 +1,15 @@
+id: commerce_product.commerce_price
+name: commerce_price
+entity_type: commerce_product
+type: price
+settings: {  }
+langcode: en
+status: true
+module: commerce_price
+locked: false
+cardinality: 1
+translatable: true
+dependencies:
+  module:
+    - commerce_price
+    - commerce_product
