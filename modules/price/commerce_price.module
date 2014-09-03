@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Implements hook_entity_operation().
@@ -24,4 +25,14 @@ function commerce_price_entity_operation(EntityInterface $entity) {
   }
 
   return $operations;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for 'configurable_language'.
+ **/
+function commerce_price_configurable_language_insert(ConfigurableLanguage $language) {
+  $currency_importer = \Drupal::service('commerce_price.currency_importer');
+
+  $currencies = \Drupal\commerce_price\Entity\CommerceCurrency::loadMultiple();
+  $currency_importer->importCurrencyTranslations($currencies, array($language));
 }
