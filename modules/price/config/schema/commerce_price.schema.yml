@@ -15,6 +15,7 @@ commerce_price.commerce_currency.*:
     symbol:
       type: string
       label: 'Symbol'
+      translatable: true
     fractionDigits:
       type: integer
       label: 'Fraction digits'

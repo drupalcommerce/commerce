@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_price\Form;
 
+use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use SebastianBergmann\Exporter\Exception;
@@ -22,7 +23,7 @@ class CommerceCurrencyImporterForm extends FormBase {
   protected $currencyImporter;
 
   public function __construct() {
-    $this->currencyImporter = \Drupal::service('commerce_currency_importer');
+    $this->currencyImporter = \Drupal::service('commerce_price.currency_importer');
   }
 
   /**
@@ -51,14 +52,12 @@ class CommerceCurrencyImporterForm extends FormBase {
         '#button_type' => 'primary',
         '#name' => 'import',
         '#value' => $this->t('Import'),
-        '#validate' => array('::validateForm'),
         '#submit' => array('::submitForm'),
       );
       $form['actions']['import_new'] = array(
         '#type' => 'submit',
         '#name' => 'import_and_new',
         '#value' => $this->t('Import and new'),
-        '#validate' => array('::validateForm'),
         '#submit' => array('::submitForm'),
       );
     }
@@ -67,14 +66,14 @@ class CommerceCurrencyImporterForm extends FormBase {
   }
 
   /**
-   * Returns an options list of all currencies.
+   * Returns an options list for currencies.
    *
-   * @param $currencies
+   * @param CurrencyInterface[] $currencies
    *   An array of currencies.
    * @return array
    *   The list of options for a select widget.
    */
-  public function getCurrencyOptions($currencies) {
+  public function getCurrencyOptions(array $currencies) {
     $options = array();
     foreach ($currencies as $currency_code => $currency) {
       $options[$currency_code] = $currency->getName();

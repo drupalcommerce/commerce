@@ -8,15 +8,12 @@
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\Currency\DefaultCurrencyManager;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
+use CommerceGuys\Intl\Currency\UnknownCurrencyException;
+use Drupal\commerce_price\Entity\CommerceCurrency;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 
 class CurrencyImporter implements CurrencyImporterInterface {
-
-  /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $currencyStorage;
 
   /**
    * @var \CommerceGuys\Intl\Currency\CurrencyManagerInterface
@@ -24,20 +21,17 @@ class CurrencyImporter implements CurrencyImporterInterface {
   protected $currencyManager;
 
   /**
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new CurrencyImporter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
-    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+  public function __construct(ConfigurableLanguageManagerInterface $languageManager) {
     $this->languageManager = $languageManager;
     $this->currencyManager = new DefaultCurrencyManager();
   }
@@ -48,7 +42,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   public function getImportableCurrencies() {
     $language = $this->languageManager->getCurrentLanguage();
     $importable_currencies = $this->currencyManager->getAll($language->getId());
-    $imported_currencies = $this->currencyStorage->loadMultiple();
+    $imported_currencies = CommerceCurrency::loadMultiple();
 
     // Remove any already imported currencies.
     foreach($imported_currencies as $currency) {
@@ -64,7 +58,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
    * {@inheritdoc}
    */
   public function importCurrency($currency_code) {
-    if ($this->currencyStorage->load($currency_code)) {
+    if (CommerceCurrency::load($currency_code)) {
       return FALSE;
     }
     $language = $this->languageManager->getCurrentLanguage();
@@ -77,8 +71,41 @@ class CurrencyImporter implements CurrencyImporterInterface {
       'symbol' => $currency->getSymbol(),
       'fractionDigits' => $currency->getFractionDigits(),
     );
-    $entity = $this->currencyStorage->create($values);
+    $entity = CommerceCurrency::create($values);
+
+    // Import translations for the new currency.
+    $this->importCurrencyTranslations(array($entity), $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE));
 
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function importCurrencyTranslations($currencies = array(), $languages = array()) {
+    // Skip importing translations if the site it not multilingual.
+    if (!$this->languageManager->isMultilingual()) {
+      return FALSE;
+    }
+
+    foreach ($currencies as $currency) {
+      foreach ($languages as $language) {
+        try {
+          $translated_entity = $this->currencyManager->get($currency->getCurrencyCode(), $language->getId());
+        }
+        catch (UnknownCurrencyException $e) {
+          // Since currencies manually entered could not be available in the library we ignore them.
+          continue;
+        }
+
+        $config_name = $currency->getConfigDependencyName();
+        if (!$this->languageManager->getLanguageConfigOverrideStorage($language->getId())->exists($config_name)) {
+          $config_translation = $this->languageManager->getLanguageConfigOverride($language->getId(), $config_name);
+          $config_translation->set('name', $translated_entity->getName());
+          $config_translation->set('symbol', $translated_entity->getSymbol());
+          $config_translation->save();
+        }
+      }
+    }
   }
 }

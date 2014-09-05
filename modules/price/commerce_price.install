@@ -1,28 +1,18 @@
 <?php
 
-use CommerceGuys\Intl\Currency\DefaultCurrencyManager;
-
 /**
  * Implements hook_install().
  *
  * Import the default currencies from the library.
  */
 function commerce_price_install() {
+  /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
+  $currency_importer = \Drupal::service('commerce_price.currency_importer');
   // A list of currencies to import and enable by default.
   $preloaded_currencies = array('USD', 'EUR', 'GBP');
 
-  $default_manager = new DefaultCurrencyManager;
-  foreach ($preloaded_currencies as $currency) {
-    $default_currency = $default_manager->get($currency);
-    $values = array(
-      'currencyCode' => $default_currency->getCurrencyCode(),
-      'name' => $default_currency->getName(),
-      'numericCode' => $default_currency->getNumericCode(),
-      'symbol' => $default_currency->getSymbol(),
-      'fractionDigits' => $default_currency->getFractionDigits(),
-      'status' => TRUE,
-    );
-    $entity = entity_create('commerce_currency', $values);
+  foreach ($preloaded_currencies as $currency_code) {
+    $entity = $currency_importer->importCurrency($currency_code);
     $entity->save();
   }
 }
