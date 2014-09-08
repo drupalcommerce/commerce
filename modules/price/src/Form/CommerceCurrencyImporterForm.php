@@ -18,10 +18,15 @@ use SebastianBergmann\Exporter\Exception;
 class CommerceCurrencyImporterForm extends FormBase {
 
   /**
+   * The currency importer.
+   *
    * @var \Drupal\commerce_price\CurrencyImporterInterface
    */
   protected $currencyImporter;
 
+  /**
+   * Constructs a new CommerceCurrencyImporterForm.
+   */
   public function __construct() {
     $this->currencyImporter = \Drupal::service('commerce_price.currency_importer');
   }
@@ -70,6 +75,7 @@ class CommerceCurrencyImporterForm extends FormBase {
    *
    * @param CurrencyInterface[] $currencies
    *   An array of currencies.
+   *
    * @return array
    *   The list of options for a select widget.
    */
@@ -103,7 +109,8 @@ class CommerceCurrencyImporterForm extends FormBase {
       else {
         $form_state->setRedirect('entity.commerce_currency.list');
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       drupal_set_message(
         $this->t(
           'The %label currency was not imported.',
