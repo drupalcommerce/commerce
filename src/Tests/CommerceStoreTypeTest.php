@@ -34,23 +34,23 @@ class CommerceStoreTypeTest extends CommerceTestBase {
    */
   public function testListStoreType() {
     $title = strtolower($this->randomMachineName(8));
-    $tableSelector = 'table tbody tr';
+    $table_selector = 'table tbody tr';
 
     // The store shows one default store type.
     $this->drupalGet('admin/commerce/config/store/types');
-    $storeTypes = $this->cssSelect($tableSelector);
-    $this->assertEqual(count($storeTypes), 1, 'Stores types are correctly listed');
+    $store_types = $this->cssSelect($table_selector);
+    $this->assertEqual(count($store_types), 1, 'Stores types are correctly listed');
 
     // Create a new commerce store type entity and see if the list has two store types.
     $this->createEntity('commerce_store_type', array(
         'id' => $title,
-        'label' => $title
+        'label' => $title,
       )
     );
 
     $this->drupalGet('admin/commerce/config/store/types');
-    $storeTypes = $this->cssSelect($tableSelector);
-    $this->assertEqual(count($storeTypes), 2, 'Stores types are correctly listed');
+    $store_types = $this->cssSelect($table_selector);
+    $this->assertEqual(count($store_types), 2, 'Stores types are correctly listed');
   }
 
   /**
@@ -72,7 +72,7 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     // Create a store type through the form.
     $edit = array(
       'id' => 'foo',
-      'label' => 'Label of foo'
+      'label' => 'Label of foo',
     );
     $this->drupalPostForm('admin/commerce/config/store/types/add', $edit, t('Save'));
     $type_exists = (bool) CommerceStoreType::load($edit['id']);
@@ -86,7 +86,7 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     // Create a new store type.
     $store_type = $this->createEntity('commerce_store_type', array(
         'id' => 'foo',
-        'label' => 'Label for foo'
+        'label' => 'Label for foo',
       )
     );
 
@@ -106,7 +106,7 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     // Create a store type programmaticaly.
     $type = $this->createEntity('commerce_store_type', array(
         'id' => 'foo',
-        'label' => 'Label for foo'
+        'label' => 'Label for foo',
       )
     );
 
@@ -114,11 +114,11 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     $store = $this->createEntity('commerce_store', array(
       'type' => $type->id(),
       'name' => $this->randomMachineName(8),
-      'email' => \Drupal::currentUser()->getEmail()
+      'email' => \Drupal::currentUser()->getEmail(),
     ));
 
     // Try to delete the store type.
-    $this->drupalGet('admin/commerce/config/store/types/'.$type->id().'/delete');
+    $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
     $this->assertRaw(
       t('%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', array('%type' => $type->label())),
       'The store type will not be deleted until all stores of that type are deleted'
@@ -127,13 +127,13 @@ class CommerceStoreTypeTest extends CommerceTestBase {
 
     // Deleting the store type when its not being referenced by a store.
     $store->delete();
-    $this->drupalGet('admin/commerce/config/store/types/'.$type->id().'/delete');
+    $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
     $this->assertRaw(
       t('Are you sure you want to delete %type?', array('%type' => $type->label())),
       'The store type is available for deletion'
     );
     $this->assertText(t('This action cannot be undone.'), 'The store type deletion confirmation form is available');
-    $this->drupalPostForm(NULL, NULL,t('Delete'));
+    $this->drupalPostForm(NULL, NULL, t('Delete'));
     $type_exists = (bool) CommerceStoreType::load($type->id());
     $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
 

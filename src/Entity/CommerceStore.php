@@ -7,10 +7,12 @@
 
 namespace Drupal\commerce\Entity;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\commerce\CommerceStoreInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the Commerce Store entity type.
@@ -53,6 +55,18 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    // If no owner has been set explicitly, make the current user the owner.
+    if (!$this->getOwner()) {
+      $this->setOwnerId($this->getCurrentUserId());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function id() {
     return $this->get('store_id')->value;
   }
@@ -69,6 +83,36 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
    */
   public function setName($name) {
     $this->set('name', $name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
     return $this;
   }
 
@@ -116,18 +160,32 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setDescription(t('The UUID of the store.'))
       ->setReadOnly(TRUE);
 
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Store owner'))
+      ->setDescription(t('The user that owns this store.'))
+      ->setDefaultValueCallback(array('Drupal\commerce\Entity\CommerceStore', 'getCurrentUserId'))
+      ->setSetting('target_type', 'user')
+      ->setDisplayOptions('form', array(
+        'type' => 'entity_reference_autocomplete',
+      ));
+
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of store.'));
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
+      ->setLabel(t('Store name'))
       ->setDescription(t('The name of the store.'))
+      ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
         'text_processing' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'textfield',
+        'weight' => 0,
       ));
 
     $fields['type'] = BaseFieldDefinition::create('string')
@@ -136,9 +194,12 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setRequired(TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Email'))
-      ->setDescription(t('The e-mail address of this store.'))
-      ->setSetting('default_value', '');
+      ->setLabel(t('E-mail address'))
+      ->setDescription(t('A valid e-mail address. Store e-mail notifications will be sent to and from this address.'))
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'email',
+      ));
 
     $fields['default_currency'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Default currency'))
@@ -147,6 +208,18 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setSetting('max_length', 32);
 
     return $fields;
+  }
+
+  /**
+   * Default value callback for 'uid' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getCurrentUserId() {
+    return array(\Drupal::currentUser()->id());
   }
 
 }
