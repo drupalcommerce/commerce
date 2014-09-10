@@ -5,6 +5,14 @@
  * Callback functions for the Payment module's checkout panes.
  */
 
+// Constants that govern the behavior of the payment method checkout pane when
+// no payment methods are enabled for an order.
+define('COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY', 'empty');
+define('COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY_EVENT', 'empty_event');
+define('COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE', 'message');
+define('COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE_EVENT', 'message_event');
+
+
 /**
  * Checkout pane callback: returns the payment pane's settings form.
  */
@@ -15,6 +23,23 @@ function commerce_payment_pane_settings_form($checkout_pane) {
     '#type' => 'checkbox',
     '#title' => t('Require a payment method at all times, preventing checkout if none is available.'),
     '#default_value' => variable_get('commerce_payment_pane_require_method', FALSE),
+  );
+  $form['commerce_payment_pane_no_method_behavior'] = array(
+    '#type' => 'radios',
+    '#title' => t('Checkout pane behavior when no payment methods are enabled for an order'),
+    '#description' => t('Note: regardless of your selection, no payment transaction will be created for the order upon checkout completion as they represent actual financial transactions.'),
+    '#options' => array(
+      COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY => t('Leave the payment checkout pane empty.'),
+      COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY_EVENT => t('Leave the payment checkout pane empty and trigger <em>When an order is first paid in full</em> on submission of free orders.'),
+      COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE => t('Display a message in the pane indicating payment is not required for the order.'),
+      COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE_EVENT => t('Display a message in the pane indicating payment is not required and trigger <em>When an order is first paid in full</em> on submission of free orders.'),
+    ),
+    '#default_value' => variable_get('commerce_payment_pane_no_method_behavior', COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="commerce_payment_pane_require_method"]' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   return $form;
@@ -50,6 +75,22 @@ function commerce_payment_pane_checkout_form($form, &$form_state, $checkout_pane
   // If no payment methods were found, return the empty form.
   if (empty($options)) {
     if (!variable_get('commerce_payment_pane_require_method', FALSE)) {
+      $behavior = variable_get('commerce_payment_pane_no_method_behavior', COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE);
+
+      switch ($behavior) {
+        case COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE:
+        case COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE_EVENT:
+          $pane_form['message'] = array(
+            '#markup' => '<div>' . t('Payment is not required to complete your order.') . '</div>',
+          );
+          break;
+
+        case COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY:
+        case COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY_EVENT:
+        default:
+          break;
+      }
+
       return $pane_form;
     }
     else {
@@ -221,6 +262,28 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
             $form_state['rebuild'] = TRUE;
           }
         }
+      }
+    }
+  }
+  else {
+    // If there were no payment methods on the form, check to see if the pane is
+    // configured to trigger "When an order is first paid in full" on submission
+    // for free orders.
+    $behavior = variable_get('commerce_payment_pane_no_method_behavior', COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE);
+
+    if (in_array($behavior, array(COMMERCE_PAYMENT_PANE_NO_METHOD_EMPTY_EVENT, COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE_EVENT))) {
+      // Check the balance of the order.
+      $balance = commerce_payment_order_balance($order);
+
+      if (!empty($balance) && $balance['amount'] <= 0) {
+        // Trigger the event now for free orders, simulating payment being
+        // submitted on pane submission that brings the balance to 0. Use an
+        // empty transaction, as we wouldn't typically save a transaction where
+        // a financial transaction has not actually occurred.
+        rules_invoke_all('commerce_payment_order_paid_in_full', $order, commerce_payment_transaction_new('', $order->order_id));
+
+        // Update the order's data array to indicate this just happened.
+        $order->data['commerce_payment_order_paid_in_full_invoked'] = TRUE;
       }
     }
   }

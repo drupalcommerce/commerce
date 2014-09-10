@@ -454,7 +454,7 @@ function commerce_payment_commerce_payment_transaction_insert($transaction) {
       // Check the order balance and invoke the event.
       $balance = commerce_payment_order_balance($order);
 
-      if ($balance['amount'] <= 0) {
+      if (!empty($balance) && $balance['amount'] <= 0) {
         // Invoke the event including a hook of the same name.
         rules_invoke_all('commerce_payment_order_paid_in_full', $order, $transaction);
 
