@@ -294,7 +294,7 @@ function commerce_order_order_form_submit($form, &$form_state) {
   foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
     if ($line_item_wrapper->order_id->value() == 0) {
       $line_item_wrapper->order_id = $order->order_id;
-      $line_item_wrapper->save();
+      commerce_line_item_save($line_item_wrapper->value());
     }
   }
 }
