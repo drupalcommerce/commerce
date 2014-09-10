@@ -101,3 +101,43 @@ function commerce_checkout_update_7102() {
   variable_set('enable_commerce_checkout_order_created_date_update', FALSE);
   return t('A new core checkout completion rule has been added that updates order creation timestamps to the time of checkout completion. It has been disabled by default to not interfere with existing order workflows, but you may enable it in your checkout settings if desired.');
 }
+
+/**
+ * If the variable commerce_checkout_run_update_7103 is set, change all user
+ * names that contain @ and look like an e-mail address to prevent the
+ * disclosure of e-mail addresses to non-trusted users. Refer to the release
+ * notes for Commerce 1.10 for instructions on how to set this variable.
+ * Otherwise you are responsible to clean the usernames on your own.
+ */
+function commerce_checkout_update_7103(&$sandbox) {
+  // Every site may not want to disrupt all their account usernames with this
+  // update, so we require sites to set a variable explicitly to run the update.
+  // Sites that do not must do their own handling of the security issue.
+  if (!variable_get('commerce_checkout_run_update_7103', FALSE)) {
+    return t('Skipped update 7103 because the variable commerce_checkout_run_update_7103 is not set. You must make sure usernames are not valid e-mail adresses on your own.');
+  }
+
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(*) FROM {users} WHERE name LIKE '%@%'")->fetchField();
+  }
+
+  // Update 100 user names at a time.
+  $names = db_query("SELECT uid, name FROM {users} WHERE name LIKE '%@%' LIMIT 100")->fetchAllKeyed();
+  $order = new stdClass();
+  foreach ($names as $uid => $name) {
+    $order->mail = $name;
+    $new_name = commerce_order_get_properties($order, array(), 'mail_username');
+    db_update('users')
+      ->fields(array(
+        'name' => $new_name,
+      ))
+      ->condition('uid', $uid)
+      ->execute();
+    $sandbox['progress']++;
+  }
+
+  $sandbox['#finished'] = empty($names) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t('Usernames resembling e-mail addresses have been cleaned.');
+}

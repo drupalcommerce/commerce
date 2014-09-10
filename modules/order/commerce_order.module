@@ -1398,6 +1398,10 @@ function commerce_order_get_properties($order, array $options, $name) {
       // We also limit the username to the maximum length for usernames.
       // @see user_validate_name()
       $username = preg_replace('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', '-', trim($order->mail));
+      // Remove the e-mail host name so usernames are not valid email adresses.
+      // Since usernames are considered public information in Drupal, we must
+      // not leak e-mail adresses through usernames.
+      $username = preg_replace('/@.*$/', '', $username);
       $username = substr($username, 0, USERNAME_MAX_LENGTH);
       return commerce_order_unique_username($username);
   }
