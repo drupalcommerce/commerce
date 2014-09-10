@@ -90,6 +90,8 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
     $form_errors = $form_state['storage']['errors'];
   }
 
+  $form['#after_build'][] = 'commerce_checkout_form_process_errors';
+
   // Catch and clear already pushed messages.
   $previous_messages = drupal_get_messages();
   $show_errors_message = FALSE;
@@ -218,6 +220,41 @@ function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   $form['#submit'] = array();
 
   return $form;
+}
+
+/**
+ * After build callback for the checkout form.
+ */
+function commerce_checkout_form_process_errors($form, $form_state) {
+  // Do this only on form rebuild (when the form will not be validated anymore):
+  if (!empty($form_state['storage']['errors']) && !empty($form_state['rebuild'])) {
+    foreach (array_keys($form_state['storage']['errors']) as $element_name) {
+      // Look for all elements which have $element_name as parents, and
+      // restore their #validated property (so _form_set_class() will set
+      // the error class even though the rebuilt form is not validated).
+      // We can't simply use drupal_array_get_nested_value(), since the #parents
+      // property may have been changed and not match the form structure.
+      _commerce_checkout_set_validated($form, $element_name);
+    }
+  }
+
+  return $form;
+}
+
+/**
+ * Set '#validated' on elements which have the specified parents.
+ */
+function _commerce_checkout_set_validated(&$element, $imploded_parents) {
+  // Recurse to child elements if the current element is a container.
+  foreach (element_children($element) as $key) {
+    _commerce_checkout_set_validated($element[$key], $imploded_parents);
+  }
+
+  // This will also set #validated on all elements where #needs_validation would
+  // be FALSE, but that doesn't hurt anything.
+  if (!empty($element['#parents']) && strpos($imploded_parents, implode('][', $element['#parents'])) === 0) {
+    $element['#validated'] = TRUE;
+  }
 }
 
 /**
