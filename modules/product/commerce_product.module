@@ -832,8 +832,9 @@ function commerce_product_match_products($field, $instance = NULL, $string = '',
  * Returns an array of products matching the specific parameters.
  */
 function _commerce_product_match_products_standard($instance, $string = '', $match = 'contains', $ids = array(), $limit = NULL, $access_tag = FALSE) {
-  // Build the query object with the necessary fields.
-  $query = db_select('commerce_product', 'cp');
+  $query = new EntityFieldQuery;
+
+  $query->entityCondition('entity_type', 'commerce_product');
 
   // Add the access control tag if specified.
   if ($access_tag) {
@@ -843,79 +844,102 @@ function _commerce_product_match_products_standard($instance, $string = '', $mat
   // Add a global query tag so anyone can alter this query.
   $query->addTag('commerce_product_match');
 
-  $product_id_alias = $query->addField('cp', 'product_id');
-  $product_sku_alias = $query->addField('cp', 'sku');
-  $product_title_alias = $query->addField('cp', 'title');
-  $product_type_alias = $query->addField('cp', 'type');
-
   // Add a condition to the query to filter by matching product types.
   if (!empty($instance['settings']['referenceable_types'])) {
     $types = array_diff(array_values($instance['settings']['referenceable_types']), array(0, NULL));
 
     // Only filter by type if some types have been specified.
     if (!empty($types)) {
-      $query->condition('cp.type', $types, 'IN');
+      $query->propertyCondition('type', $types, 'IN');
     }
   }
 
   if ($string !== '') {
-    $args = array();
+    // EntityFieldQuery cannot do OR clauses, so we use hook_query_TAG_alter.
+    $query->addTag('commerce_sku_or_title_match');
 
-    // Build a where clause matching on either the SKU or title.
-    switch ($match) {
-      case 'contains':
-        $where = '(cp.sku LIKE :sku_match OR cp.title LIKE :title_match)';
-        $args['sku_match'] = '%' . $string . '%';
-        $args['title_match'] = '%' . $string . '%';
-        break;
+    $sku_title_meta = new stdClass();
+    $sku_title_meta->properties = array(
+      'sku',
+      'title',
+    );
+    $sku_title_meta->string = $string;
+    $sku_title_meta->match = $match;
 
-      case 'starts_with':
-        $where = '(cp.sku LIKE :sku_match OR cp.title LIKE :title_match)';
-        $args['sku_match'] = $string . '%';
-        $args['title_match'] = $string . '%';
-        break;
-
-      case 'equals':
-      default:
-        $where = '(cp.sku = :sku_match OR cp.title = :title_match)';
-        $args['sku_match'] = $string;
-        $args['title_match'] = $string;
-        break;
-    }
-
-    $query->where($where, $args);
+    $query->addMetaData('commerce_sku_or_title_match', $sku_title_meta);
   }
   elseif ($ids) {
     // Otherwise add a product_id specific condition if specified.
-    $query->condition($product_id_alias, $ids, 'IN', $ids);
+    $query->propertyCondition('product_id', $ids, 'IN');
   }
 
   // Order the results by SKU, title, and then product type.
   $query
-    ->orderBy($product_sku_alias)
-    ->orderBy($product_title_alias)
-    ->orderBy($product_type_alias);
+    ->propertyOrderBy('sku')
+    ->propertyOrderBy('title')
+    ->propertyOrderBy('type');
 
   // Add a limit if specified.
   if ($limit) {
     $query->range(0, $limit);
   }
 
-  // Execute the query and build the results array.
-  $result = $query->execute();
+  $entities = $query->execute();
 
   $matches = array();
 
-  foreach ($result->fetchAll() as $product) {
-    $matches[$product->product_id] = array(
-      'sku' => $product->sku,
-      'type' => $product->type,
-      'title' => $product->title,
-      'rendered' => t('@sku: @title', array('@sku' => $product->sku, '@title' => $product->title)),
-    );
+  if (isset($entities['commerce_product'])) {
+    $pids = array_keys($entities['commerce_product']);
+
+    // EntityFieldQuery doesn't return sku and title, so we have to load again.
+    $products = commerce_product_load_multiple($pids);
+    foreach ($products AS $product) {
+      $matches[$product->product_id] = array(
+        'sku' => $product->sku,
+        'type' => $product->type,
+        'title' => $product->title,
+        'rendered' => t('@sku: @title', array('@sku' => $product->sku, '@title' => $product->title)),
+      );
+    }
   }
 
   return $matches;
+}
+
+/**
+ * Implements hook_query_TAG_alter.
+ *
+ * EntityFieldQuery used in _commerce_product_match_products_standard() does not
+ * allow OR clauses. Alter the SQL query to string match on sku OR title.
+ *
+ * @param QueryAlterableInterface $query
+ */
+function commerce_product_query_commerce_sku_or_title_match_alter(QueryAlterableInterface $query) {
+  $string = $query->alterMetaData['commerce_sku_or_title_match']->string;
+  $match = $query->alterMetaData['commerce_sku_or_title_match']->match;
+
+  if (isset($string, $match)) {
+    // Build a where clause matching on either the SKU or title.
+    switch ($match) {
+      case 'contains':
+        $or = db_or()->condition('sku', '%' . $string . '%', 'LIKE')
+          ->condition('title', '%' . $string . '%', 'LIKE');
+        break;
+
+      case 'starts_with':
+        $or = db_or()->condition('sku', $string . '%', 'LIKE')
+          ->condition('title', $string . '%', 'LIKE');
+        break;
+
+      case 'equals':
+      default:
+        $or = db_or()->condition('sku', $string, '=')
+          ->condition('title', $string, '=');
+        break;
+    }
+
+    $query->condition($or);
+  }
 }
 
 /**
