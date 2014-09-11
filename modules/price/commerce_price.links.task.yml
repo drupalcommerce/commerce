@@ -18,3 +18,19 @@ entity.commerce_currency.import:
   route_name: 'entity.commerce_currency.import'
   base_route: 'entity.commerce_currency.list'
   title: 'Import'
+
+entity.commerce_number_format.edit_form:
+  route_name: 'entity.commerce_number_format.edit_form'
+  base_route: 'entity.commerce_number_format.edit_form'
+  title: 'Edit'
+
+entity.commerce_number_format.devel:
+  route_name: 'entity.commerce_number_format.devel'
+  base_route: 'entity.commerce_number_format.edit_form'
+  title: 'Devel'
+  weight: 10
+
+entity.commerce_number_format.list:
+  route_name: 'entity.commerce_number_format.list'
+  base_route: 'entity.commerce_number_format.list'
+  title: 'List'

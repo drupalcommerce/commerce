@@ -3,3 +3,9 @@ entity.commerce_currency.list:
   route_name: entity.commerce_currency.list
   parent: commerce.configuration
   description: 'Manage your currencies.'
+
+entity.commerce_number_format.list:
+  title: Number Formats
+  route_name: entity.commerce_number_format.list
+  parent: commerce.configuration
+  description: 'Manage your number formats.'

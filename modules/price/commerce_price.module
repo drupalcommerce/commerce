@@ -33,10 +33,18 @@ function commerce_price_entity_operation(EntityInterface $entity) {
  */
 function commerce_price_configurable_language_insert(ConfigurableLanguage $language) {
   // Ignore 'und' and 'zxx'.
-  if (!($language->getId() == LanguageInterface::LANGCODE_NOT_SPECIFIED || $language->getId() == LanguageInterface::LANGCODE_NOT_APPLICABLE)) {
+  if (!($language->getId() === LanguageInterface::LANGCODE_NOT_SPECIFIED || $language->getId() === LanguageInterface::LANGCODE_NOT_APPLICABLE)) {
+    // Import currencies.
     $currency_importer = \Drupal::service('commerce_price.currency_importer');
 
     $currencies = \Drupal\commerce_price\Entity\CommerceCurrency::loadMultiple();
     $currency_importer->importCurrencyTranslations($currencies, array($language));
+
+    // Import number formats.
+    $format_importer = \Drupal::service('commerce_price.number_format_importer');
+    $number_format = $format_importer->importNumberFormat($language);
+    if ($number_format) {
+      $number_format->save();
+    }
   }
 }

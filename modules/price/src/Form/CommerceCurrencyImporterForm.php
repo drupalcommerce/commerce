@@ -10,7 +10,6 @@ namespace Drupal\commerce_price\Form;
 use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use SebastianBergmann\Exporter\Exception;
 
 /**
  * Builds the form to import a currency.
@@ -103,19 +102,17 @@ class CommerceCurrencyImporterForm extends FormBase {
       drupal_set_message(
         $this->t('Imported the %label currency.', array('%label' => $currency->label()))
       );
-      if ($form_state['triggering_element']['#name'] == 'import_and_new') {
+      $triggering_element = $form_state->getTriggeringElement();
+      if ($triggering_element['#name'] == 'import_and_new') {
         $form_state->setRebuild();
       }
       else {
         $form_state->setRedirect('entity.commerce_currency.list');
       }
     }
-    catch (Exception $e) {
-      drupal_set_message(
-        $this->t(
-          'The %label currency was not imported.',
-          array('%label' => $currency->label())),
-        'error');
+    catch (\Exception $e) {
+      drupal_set_message($this->t('The %label currency was not imported.', array('%label' => $currency->label())), 'error');
+      $this->logger('commerce_price')->error($e);
       $form_state->setRebuild();
     }
   }

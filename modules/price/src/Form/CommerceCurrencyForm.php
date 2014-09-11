@@ -123,10 +123,8 @@ class CommerceCurrencyForm extends EntityForm {
       $form_state->setRedirect('entity.commerce_currency.list');
     }
     catch (\Exception $e) {
+      drupal_set_message($this->t('The %label currency was not saved.', array('%label' => $currency->label())), 'error');
       $this->logger('commerce_price')->error($e);
-      drupal_set_message($this->t('The %label currency was not saved.', array(
-        '%label' => $currency->label(),
-      )), 'error');
       $form_state->setRebuild();
     }
   }
