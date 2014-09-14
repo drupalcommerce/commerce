@@ -29,7 +29,7 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
    * Constructs a new CommerceOrderTypeDeleteForm object.
    *
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   * The entity query object.
+   *   The entity query object.
    */
   public function __construct(QueryFactory $query_factory) {
     $this->queryFactory = $query_factory;
@@ -85,7 +85,7 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       $form_state->setRedirectUrl($this->getCancelUrl());
