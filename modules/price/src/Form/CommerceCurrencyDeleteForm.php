@@ -40,7 +40,7 @@ class CommerceCurrencyDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       $form_state->setRedirectUrl($this->getCancelUrl());

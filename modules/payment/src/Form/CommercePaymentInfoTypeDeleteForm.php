@@ -40,7 +40,7 @@ class CommercePaymentInfoTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       $form_state->setRedirectUrl($this->getCancelUrl());
@@ -48,7 +48,7 @@ class CommercePaymentInfoTypeDeleteForm extends EntityConfirmFormBase {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('Payment information type %payment_info_type_label could not be deleted.', array('%payment_info_type_label' => $this->entity->label())), 'error');
-      watchdog_exception('commerce_payment', $e);
+      $this->logger('commerce_payment')->error($e);
     }
   }
 

@@ -16,9 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
 class CommerceProductForm extends ContentEntityForm {
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityForm::prepareEntity().
-   *
-   * Prepares the product object.
+   * {@inheritdoc}
    *
    * Fills in a few default values, and then invokes hook_commerce_product_prepare()
    * on all modules.
@@ -35,16 +33,16 @@ class CommerceProductForm extends ContentEntityForm {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
+   * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\commerce_product\Entity\CommerceProduct */
+    /* @var \Drupal\commerce_product\Entity\CommerceProduct $product */
     $form = parent::form($form, $form_state);
     $product = $this->entity;
     $account = $this->currentUser();
 
     if ($product->isNew()) {
-      $form['status']['widget'];
+      $form['status'];
     }
 
     $form['advanced'] = array(
@@ -100,33 +98,34 @@ class CommerceProductForm extends ContentEntityForm {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::submit().
+   * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
-    // Build the entity object from the submitted values.
-    $entity = parent::submit($form, $form_state);
-
-    $form_state->setRedirect('entity.commerce_product.list');
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+    /** @var \Drupal\commerce_product\entity\CommerceProduct $product */
+    $product = $this->getEntity();
 
     // Save as a new revision if requested to do so.
     if (!$form_state->isValueEmpty('revision')) {
-      $entity->setNewRevision();
+      $product->setNewRevision();
     }
-
-    return $entity;
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce_product\entity\CommerceProduct $product */
+    $product = $this->getEntity();
     try {
-      $this->entity->save();
-      drupal_set_message($this->t('The product %product_label has been successfully saved.', array('%product_label' => $this->entity->label())));
+      $product->save();
+      drupal_set_message($this->t('The product %product_label has been successfully saved.', array('%product_label' => $product->label())));
+      $form_state->setRedirect('entity.commerce_product.view', array('commerce_product' => $product->id()));
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The product %product_label could not be saved.', array('%product_label' => $this->entity->label())), 'error');
+      drupal_set_message($this->t('The product %product_label could not be saved.', array('%product_label' => $product->label())), 'error');
       $this->logger('commerce_product')->error($e);
+      $form_state->setRebuild();
     }
   }
 

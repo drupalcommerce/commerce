@@ -85,7 +85,7 @@ class CommerceStoreTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
       drupal_set_message($this->t('Store type %label has been deleted.', array('%label' => $this->entity->label())));
