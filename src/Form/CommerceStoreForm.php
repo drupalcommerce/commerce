@@ -30,19 +30,6 @@ class CommerceStoreForm extends ContentEntityForm {
       '#default_value' => $entity->getUntranslated()->language()->id,
       '#languages' => Language::STATE_ALL,
     );
-    $form['name'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Store name'),
-      '#default_value' => $entity->getName(),
-      '#required' => TRUE,
-    );
-    $form['mail'] = array(
-      '#type' => 'email',
-      '#title' => $this->t('E-mail address'),
-      '#description' => $this->t('A valid e-mail address. Store e-mail notifications will be sent to and from this address.'),
-      '#default_value' => $entity->getEmail(),
-      '#required' => TRUE,
-    );
     $form['default_currency'] = array(
       '#type' => 'select',
       '#title' => t('Default currency'),

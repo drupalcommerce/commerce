@@ -17,15 +17,22 @@ use Drupal\commerce\Entity\CommerceStoreType;
  */
 class CommerceStoreCRUDTest extends CommerceTestBase {
 
-  /** @var CommerceStoreType */
+  /**
+   * A store type entity to use in the tests.
+   *
+   * @var CommerceStoreType
+   */
   protected $type;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
     $this->type = $this->createEntity('commerce_store_type', array(
         'id' => 'foo',
-        'label' => 'Label of foo'
+        'label' => 'Label of foo',
       )
     );
   }
@@ -40,7 +47,7 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
         'type' => $this->type->id(),
         'name' => $name,
         'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'EUR'
+        'default_currency' => 'EUR',
       )
     );
     $store_exist = (bool) CommerceStore::load($store->id());
@@ -53,7 +60,7 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
     $edit = array(
       'name' => 'Foo Store',
       'mail' => \Drupal::currentUser()->getEmail(),
-      'default_currency' => 'EUR'
+      'default_currency' => 'EUR',
     );
     $this->drupalPostForm(NULL, $edit, t('Save'));
   }
@@ -66,7 +73,7 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
     $store = $this->createEntity('commerce_store', array(
         'type' => $this->type->id(),
         'name' => $this->randomMachineName(8),
-        'email' => \Drupal::currentUser()->getEmail()
+        'email' => \Drupal::currentUser()->getEmail(),
       )
     );
 
@@ -89,7 +96,7 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
     $store = $this->createEntity('commerce_store', array(
         'type' => $this->type->id(),
         'name' => $this->randomMachineName(8),
-        'email' => \Drupal::currentUser()->getEmail()
+        'email' => \Drupal::currentUser()->getEmail(),
       )
     );
     $store_exist = (bool) CommerceStore::load($store->id());

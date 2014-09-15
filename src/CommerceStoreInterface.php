@@ -9,11 +9,13 @@ namespace Drupal\commerce;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\EntityOwnerInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Provides an interface defining a Commerce Store entity.
  */
-interface CommerceStoreInterface extends EntityInterface {
+interface CommerceStoreInterface extends EntityInterface, EntityOwnerInterface {
 
   /**
    * Return the name of the store.

@@ -25,8 +25,11 @@ abstract class CommerceTestBase extends WebTestBase {
   /**
    * User with permission to administer the commerce store.
    */
-  protected $admin_user;
+  protected $adminUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -34,25 +37,27 @@ abstract class CommerceTestBase extends WebTestBase {
       'view the administration theme',
       'administer store types',
       'administer stores',
-      'configure store'
+      'configure store',
     );
 
-    $this->admin_user = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($this->admin_user);
+    $this->adminUser = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->adminUser);
   }
 
   /**
-   * Creates a new entity
+   * Creates a new entity.
    *
-   * @param $entityType
+   * @param string $entity_type
+   *   The entity type to be created.
    * @param array $values
    *   An array of settings.
    *   Example: 'id' => 'foo'.
    *
    * @return \Drupal\Core\Entity\EntityInterface
+   *   A new entity.
    */
-  function createEntity($entityType, $values) {
-    $entity = entity_create($entityType, $values);
+  protected function createEntity($entity_type, array $values) {
+    $entity = entity_create($entity_type, $values);
     $status = $entity->save();
 
     $this->assertEqual(
