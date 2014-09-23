@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price;
 
-use CommerceGuys\Intl\Currency\DefaultCurrencyManager;
+use CommerceGuys\Intl\Currency\CurrencyRepository;
 use CommerceGuys\Intl\Currency\UnknownCurrencyException;
 use CommerceGuys\Intl\UnknownLocaleException;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -20,9 +20,9 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * The currency manager.
    *
-   * @var \CommerceGuys\Intl\Currency\CurrencyManagerInterface
+   * @var \CommerceGuys\Intl\Currency\CurrencyRepositoryInterface
    */
-  protected $currencyManager;
+  protected $currencyRepository;
 
   /**
    * The currency storage.
@@ -49,7 +49,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   public function __construct(EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
     $this->currencyStorage = $entity_manager->getStorage('commerce_currency');
     $this->languageManager = $language_manager;
-    $this->currencyManager = new DefaultCurrencyManager();
+    $this->currencyRepository = new CurrencyRepository();
   }
 
   /**
@@ -57,7 +57,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
    */
   public function getImportableCurrencies($fallback = CurrencyImporterInterface::FALLBACK_LANGUAGE) {
     $language = $this->languageManager->getCurrentLanguage();
-    $importable_currencies = $this->currencyManager->getAll($language->getId(), $fallback);
+    $importable_currencies = $this->currencyRepository->getAll($language->getId(), $fallback);
     $imported_currencies = $this->currencyStorage->loadMultiple();
 
     // Remove any already imported currencies.
@@ -144,7 +144,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
    */
   protected function getCurrency($currency_code, LanguageInterface $language, $fallback = NULL) {
     try {
-      $currency = $this->currencyManager->get($currency_code, $language->getId(), $fallback);
+      $currency = $this->currencyRepository->get($currency_code, $language->getId(), $fallback);
     }
     catch (UnknownLocaleException $e) {
       return FALSE;
