@@ -96,7 +96,7 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
     $field_storage->save();
   }
   if (empty($instance)) {
-    $instance = entity_create('field_instance_config', array(
+    $instance = entity_create('field_config', array(
       'field_storage' => $field_storage,
       'bundle' => $product_type_id,
       'label' => $label,
