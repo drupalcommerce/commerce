@@ -29,4 +29,60 @@ class CommercePaymentInfoForm extends ContentEntityForm {
     $form_state->setRedirect('entity.commerce_payment_info.list');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function form(array $form, FormStateInterface $form_state) {
+
+    $form['advanced'] = array(
+      '#type' => 'vertical_tabs',
+      '#attributes' => array('class' => array('entity-meta')),
+      '#weight' => 99,
+    );
+    $form = parent::form($form, $form_state);
+
+    $form['payment_status'] = array(
+      '#type' => 'details',
+      '#title' => t('Payment status'),
+      '#group' => 'advanced',
+      '#attributes' => array(
+        'class' => array('order-form-order-status'),
+      ),
+      '#attached' => array(
+        'library' => array('commerce_order/drupal.commerce_order'),
+      ),
+      '#weight' => 90,
+      '#optional' => TRUE,
+    );
+
+    if (isset($form['status'])) {
+      $form['status']['#group'] = 'payment_status';
+    }
+
+    // Payment info authoring information for administrators.
+    $form['author'] = array(
+      '#type' => 'details',
+      '#title' => t('Authoring information'),
+      '#group' => 'advanced',
+      '#attributes' => array(
+        'class' => array('order-form-author'),
+      ),
+      '#attached' => array(
+        'library' => array('commerce_order/drupal.commerce_order'),
+      ),
+      '#weight' => 91,
+      '#optional' => TRUE,
+    );
+
+    if (isset($form['uid'])) {
+      $form['uid']['#group'] = 'author';
+    }
+
+    if (isset($form['created'])) {
+      $form['created']['#group'] = 'author';
+    }
+
+    return $form;
+  }
+
 }

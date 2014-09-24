@@ -188,10 +188,25 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setLabel(t('Payment information owner'))
       ->setDescription(t('The payment information owner.'))
       ->setSetting('target_type', 'user')
+      ->setSetting('handler', 'default')
+      ->setDefaultValueCallback(array('Drupal\commerce_payment\Entity\CommercePaymentInfo', 'getCurrentUserId'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ))
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
-        'weight' => 0,
-      ));
+        'weight' => 5,
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
@@ -276,7 +291,17 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setLabel('Created')
       ->setDescription(t('The Unix timestamp when the payment information was first stored.'))
       ->setRequired(TRUE)
-      ->setDefaultValue(0);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'datetime_timestamp',
+        'weight' => 10,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
@@ -290,6 +315,18 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setRequired(FALSE);
 
     return $fields;
+  }
+
+  /**
+   * Default value callback for 'uid' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getCurrentUserId() {
+    return array(\Drupal::currentUser()->id());
   }
 
 }
