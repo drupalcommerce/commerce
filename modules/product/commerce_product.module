@@ -108,6 +108,7 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
     entity_get_form_display('commerce_product', $product_type_id, 'default')
       ->setComponent('body', array(
         'type' => 'text_textarea_with_summary',
+        'weight' => 1,
       ))
       ->save();
 
