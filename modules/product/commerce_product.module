@@ -78,7 +78,7 @@ function commerce_product_theme() {
  * @param string $product_type_id
  *   Id of the Commerce Product type.
  * @param string $label
- *   (optional) The label for the body instance. Defaults to 'Body'
+ *   (optional) The label for the body instance. Defaults to 'Body'.
  *
  * @return array
  *   Body field instance.
@@ -89,7 +89,7 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
   $instance = FieldConfig::loadByName('commerce_product', $product_type_id, 'body');
   if (empty($field_storage)) {
     $field_storage = entity_create('field_storage_config', array(
-      'name' => 'body',
+      'field_name' => 'body',
       'entity_type' => 'commerce_product',
       'type' => 'text_with_summary',
     ));
