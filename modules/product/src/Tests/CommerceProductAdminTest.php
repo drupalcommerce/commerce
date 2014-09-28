@@ -91,4 +91,56 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
     $this->assertFalse($product_exists, 'The new product has been deleted from the database.');
   }
 
+  /**
+   * Tests adding product attributes to a field with just the attribute field checked.
+   */
+  function testProductAttributesAdmin() {
+    $this->testAddCommerceProductFieldAdmin();
+    $edit = array(
+      'field[commerce_product][attribute_field]' => 1,
+      'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
+    );
+    $this->drupalPostForm(NULL, $edit, t('Save settings'));
+    $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
+    $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-select", "Product attribute widget select list field is checked");
+    $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
+  }
+
+  /**
+   * Tests adding product attributes to a field with the attribute field checked, and changing the radios.
+   */
+  function testAddProductAttributesFieldsAdmin() {
+    $attribute_widgets = array("select", "radios");
+    foreach ($attribute_widgets as $attribute_widget) {
+      $this->testAddCommerceProductFieldAdmin();
+      $edit = array(
+        'field[commerce_product][attribute_field]' => 1,
+        'field[commerce_product][attribute_widget]' => $attribute_widget,
+        'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
+      );
+      $this->drupalPostForm(NULL, $edit, t('Save settings'));
+      file_put_contents("1.html", $this->getRawContent());
+      $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
+      $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-" . $attribute_widget, "Product attribute widget select list field is checked");
+      $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
+    }
+  }
+
+  /**
+   * Tests adding product fields.
+   */
+  function testAddCommerceProductFieldAdmin() {
+    $this->drupalGet('admin/commerce/config/product-types/product/edit/fields');
+
+    // Create a new field.
+    $edit = array(
+      'fields[_add_new_field][label]' => $label = $this->randomMachineName(),
+      'fields[_add_new_field][field_name]' => $name = strtolower($this->randomMachineName()),
+      'fields[_add_new_field][type]' => 'list_text',
+    );
+    $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields', $edit, t('Save'));
+
+    $edit = array('field[settings][allowed_values]' => '1|1\n2|2');
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+  }
 }

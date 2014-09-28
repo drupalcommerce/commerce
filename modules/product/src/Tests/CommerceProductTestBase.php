@@ -20,7 +20,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('commerce', 'devel', 'commerce_product');
+  public static $modules = array('commerce', 'devel', 'commerce_product', 'field', 'field_ui', 'options');
 
   /**
    * User with permission to administer products.
@@ -37,6 +37,8 @@ abstract class CommerceProductTestBase extends WebTestBase {
     $this->admin_user = $this->drupalCreateUser(array(
       'administer products',
       'administer product types',
+      'administer commerce_product fields',
+      'access administration pages',
     ));
     $this->drupalLogin($this->admin_user);
   }

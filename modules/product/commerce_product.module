@@ -7,13 +7,12 @@
  * products and interact with them through forms and autocompletes.
  */
 
-use Drupal\commerce_product\Entity\CommerceProductType;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_entity_operation().
@@ -122,4 +121,89 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
   }
 
   return $instance;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'field_ui_field_edit_form'.
+ */
+function commerce_product_form_field_ui_field_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  $field = $form_state->get('field');
+  // If the current field instance is attached to a product type,
+  // and of a field type that defines an options list.
+  $allowed_fields = array('options', 'taxonomy', 'entity_reference');
+  if ($field->entity_type == 'commerce_product' && in_array($form['#field']->module, $allowed_fields)) {
+    // Get the current instance's attribute settings for use as default values.
+    $default_attribute_field = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
+    $default_attribute_widget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
+    $default_attribute_widget_title = $field->getThirdPartySetting('commerce_product', 'attribute_widget_title', NULL);
+
+    $form['field']['commerce_product'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Attribute field settings'),
+      '#description' => t('Single value fields attached to products can function as attribute selection fields on Add to Cart forms. When an Add to Cart form contains multiple products, attribute field data can be used to allow customers to select a product based on the values of the field instead of just from a list of product titles.'),
+      '#weight' => 5,
+      '#collapsible' => FALSE,
+    );
+
+    $form['field']['commerce_product']['attribute_field'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable this field to function as a product attribute field on Add to Cart forms.'),
+      '#default_value' => $default_attribute_field,
+    );
+    $form['field']['commerce_product']['attribute_widget'] = array(
+      '#type' => 'radios',
+      '#title' => t('Product attribute selection widget'),
+      '#description' => t('The type of element used to select an option if used on an Add to Cart form.'),
+      '#options' => array(
+        'select' => t('Select list'),
+        'radios' => t('Radio buttons'),
+      ),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="field[commerce_product][attribute_field]"]' => array('checked' => TRUE),
+        ),
+      ),
+      '#default_value' => $default_attribute_widget,
+    );
+    // Determine the default attribute widget title.
+    $form['field']['commerce_product']['attribute_widget_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Attribute widget title'),
+      '#description' => t('Specify the title to use for the attribute widget on the Add to Cart form.'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="field[commerce_product][attribute_field]"]' => array('checked' => TRUE),
+        ),
+      ),
+      '#default_value' => $default_attribute_widget_title,
+    );
+    $form['actions']['submit']['#submit'][] = 'commerce_product_form_field_ui_field_edit_form_submit';
+  }
+}
+
+/**
+ * Form submission handler for commerce_product_form_field_ui_field_edit_form_alter
+ *
+ * @param $form
+ * @param FormStateInterface $form_state
+ */
+function commerce_product_form_field_ui_field_edit_form_submit($form, FormStateInterface $form_state) {
+  $field = $form_state->get('field');
+  $values = $form_state->getValues();
+  $allowed_fields = array('options', 'taxonomy', 'entity_reference');
+  if ($field->entity_type == 'commerce_product' && in_array($form['#field']->module, $allowed_fields)) {
+    // If the attribute field is checked, update the attribute fields.
+    if ($values['field']['commerce_product']['attribute_field']) {
+      $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', $values['field']['commerce_product']['attribute_widget_title']);
+      $field->setThirdPartySetting('commerce_product', 'attribute_widget', $values['field']['commerce_product']['attribute_widget']);
+      $field->setThirdPartySetting('commerce_product', 'attribute_field', TRUE);
+      $field->save();
+    }
+    else {
+      $field->unsetThirdPartySetting('commerce_product', 'attribute_widget_title');
+      $field->unsetThirdPartySetting('commerce_product', 'attribute_widget');
+      $field->unsetThirdPartySetting('commerce_product', 'attribute_field');
+      $field->save();
+    }
+  }
 }
