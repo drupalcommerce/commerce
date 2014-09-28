@@ -1,5 +1,5 @@
 id: commerce_product.commerce_price
-name: commerce_price
+field_name: commerce_price
 entity_type: commerce_product
 type: price
 settings: {  }
