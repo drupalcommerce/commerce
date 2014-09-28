@@ -16,3 +16,26 @@ function commerce_price_install() {
     $entity->save();
   }
 }
+
+/**
+ * Implements hook_requirements().
+ *
+ * Check that the Commerce Guys' Libraries have been installed.
+ */
+function commerce_price_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'install') {
+    /* @var $packages Drupal\composer_manager\ComposerPackages */
+    $packages = \Drupal::service('composer_manager.packages');
+
+    if (!array_key_exists('commerceguys/intl', $packages->getInstalled())){
+      $requirements['commerce_price_library'] = array(
+        'description' => t("Commerce Price requires the Commerce Guys' International Library, run !command on the command line", array('!command' => 'drush composer install')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+
+  return $requirements;
+}
