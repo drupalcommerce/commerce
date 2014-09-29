@@ -22,6 +22,7 @@ class CommerceProductForm extends ContentEntityForm {
    * on all modules.
    */
   protected function prepareEntity() {
+    /* @var \Drupal\commerce_product\Entity\CommerceProduct $product */
     $product = $this->entity;
     // Set up default values, if required.
     $product_type = entity_load('commerce_product_type', $product->bundle());
@@ -37,27 +38,24 @@ class CommerceProductForm extends ContentEntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     /* @var \Drupal\commerce_product\Entity\CommerceProduct $product */
-    $form = parent::form($form, $form_state);
     $product = $this->entity;
-    $account = $this->currentUser();
-
-    if ($product->isNew()) {
-      $form['status'];
-    }
+    $current_user = $this->currentUser();
 
     $form['advanced'] = array(
       '#type' => 'vertical_tabs',
+      '#attributes' => array('class' => array('entity-meta')),
       '#weight' => 99,
     );
+    $form = parent::form($form, $form_state);
 
     // Add a log field if the "Create new revision" option is checked, or if the
     // current user has the ability to check that option.
     $form['revision_information'] = array(
       '#type' => 'details',
-      '#title' => $this->t('Revision information'),
+      '#group' => 'advanced',
+      '#title' => t('Revision information'),
       // Open by default when "Create new revision" is checked.
       '#open' => $product->isNewRevision(),
-      '#group' => 'advanced',
       '#attributes' => array(
         'class' => array('product-form-revision-information'),
       ),
@@ -65,34 +63,49 @@ class CommerceProductForm extends ContentEntityForm {
         'library' => array('commerce_product/drupal.commerce_product'),
       ),
       '#weight' => 20,
-      '#access' => $product->isNewRevision() || $account->hasPermission('administer products'),
+      '#optional' => TRUE,
+      '#access' => $product->isNewRevision() || $current_user->hasPermission('administer products'),
     );
 
-    $form['revision_information']['revision'] = array(
+    $form['revision'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $product->isNewRevision(),
-      '#access' => $account->hasPermission('administer products'),
+      '#access' => $current_user->hasPermission('administer products'),
+      '#group' => 'revision_information',
     );
 
-    // Check the revision log checkbox when the log textarea is filled in.
-    // This must not happen if "Create new revision" is enabled by default,
-    // since the state would auto-disable the checkbox otherwise.
-    if (!$product->isNewRevision()) {
-      $form['revision_information']['revision']['#states'] = array(
-        'checked' => array(
-          'textarea[name="revision_log"]' => array('empty' => FALSE),
+    $form['revision_log'] += array(
+      '#states' => array(
+        'visible' => array(
+          ':input[name="revision"]' => array('checked' => TRUE),
         ),
-      );
+      ),
+      '#group' => 'revision_information',
+    );
+
+    // Product author information for administrators.
+    $form['author'] = array(
+      '#type' => 'details',
+      '#title' => t('Authoring information'),
+      '#group' => 'advanced',
+      '#attributes' => array(
+        'class' => array('product-form-author'),
+      ),
+      '#attached' => array(
+        'library' => array('commerce_product/drupal.commerce_product'),
+      ),
+      '#weight' => 90,
+      '#optional' => TRUE,
+    );
+
+    if (isset($form['uid'])) {
+      $form['uid']['#group'] = 'author';
     }
 
-    $form['revision_information']['revision_log'] = array(
-      '#type' => 'textarea',
-      '#title' => $this->t('Revision log message'),
-      '#rows' => 4,
-      '#default_value' => $product->getRevisionLog(),
-      '#description' => $this->t('Briefly describe the changes you have made.'),
-    );
+    if (isset($form['created'])) {
+      $form['created']['#group'] = 'author';
+    }
 
     return $form;
   }

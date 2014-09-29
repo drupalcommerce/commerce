@@ -344,10 +344,25 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setDescription(t('The user that owns this order.'))
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
+      ->setSetting('handler', 'default')
+      ->setDefaultValueCallback(array('Drupal\commerce_order\Entity\CommerceOrder', 'getCurrentUserId'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 0,
+      ))
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
-        'weight' => 0,
-      ));
+        'weight' => 5,
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ),
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
@@ -379,7 +394,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayOptions('form', array(
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => -1,
       ))
       ->setDisplayConfigurable('form', TRUE);
 
@@ -387,7 +402,18 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the order was created.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE);
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'datetime_timestamp',
+        'weight' => 10,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
@@ -435,9 +461,29 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     $fields['revision_log'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Revision log message'))
       ->setDescription(t('The log entry explaining the changes in this revision.'))
-      ->setRevisionable(TRUE);
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textarea',
+        'weight' => 25,
+        'settings' => array(
+          'rows' => 4,
+        ),
+      ));
 
     return $fields;
+  }
+
+  /**
+   * Default value callback for 'uid' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getCurrentUserId() {
+    return array(\Drupal::currentUser()->id());
   }
 
 }
