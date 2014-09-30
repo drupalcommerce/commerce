@@ -3,3 +3,9 @@ entity.commerce_currency.add_form:
   title: 'Add a new currency'
   appears_on:
     - entity.commerce_currency.list
+
+entity.commerce_number_format.add_form:
+  route_name: entity.commerce_number_format.add_form
+  title: 'Add a new number format'
+  appears_on:
+    - entity.commerce_number_format.list

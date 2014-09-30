@@ -56,3 +56,55 @@ entity.commerce_currency.devel:
   requirements:
     _module_dependencies: 'devel'
     _permission: 'access devel information'
+
+entity.commerce_number_format.list:
+  path: '/admin/commerce/config/number-format'
+  defaults:
+    _entity_list: 'commerce_number_format'
+    _title: 'Number formats'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_number_format.add_form:
+  path: '/admin/commerce/config/number-format/add'
+  defaults:
+    _entity_form: 'commerce_number_format.add'
+    _title: 'Add a new number format'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_number_format'
+
+entity.commerce_number_format.edit_form:
+  path: '/admin/commerce/config/number-format/{commerce_number_format}'
+  defaults:
+    _entity_form: 'commerce_number_format.edit'
+    _title: 'Edit a number format'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_number_format.delete_form:
+  path: '/admin/commerce/config/number-format/{commerce_number_format}/delete'
+  defaults:
+    _entity_form: 'commerce_number_format.delete'
+    _title: 'Delete a number format'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_number_format.devel:
+  path: '/admin/commerce/config/number-format/{commerce_number_format}/devel'
+  defaults:
+    _content: '\Drupal\commerce_price\Controller\CommerceNumberFormatDevelController::numberFormatLoad'
+    _title: 'Dump a number format'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'
+
