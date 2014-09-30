@@ -163,7 +163,7 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Store owner'))
       ->setDescription(t('The user that owns this store.'))
-      ->setDefaultValueCallback(array('Drupal\commerce\Entity\CommerceStore', 'getCurrentUserId'))
+      ->setDefaultValueCallback('Drupal\commerce\Entity\CommerceStore::getCurrentUserId')
       ->setSetting('target_type', 'user')
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
