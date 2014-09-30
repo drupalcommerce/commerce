@@ -345,7 +345,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback(array('Drupal\commerce_order\Entity\CommerceOrder', 'getCurrentUserId'))
+      ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder:getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',

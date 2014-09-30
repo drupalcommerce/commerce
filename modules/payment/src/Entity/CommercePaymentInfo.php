@@ -189,7 +189,7 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setDescription(t('The payment information owner.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback(array('Drupal\commerce_payment\Entity\CommercePaymentInfo', 'getCurrentUserId'))
+      ->setDefaultValueCallback('Drupal\commerce_payment\Entity\CommercePaymentInfo::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',

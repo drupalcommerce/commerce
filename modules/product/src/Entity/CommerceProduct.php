@@ -202,7 +202,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback(array('Drupal\commerce_product\Entity\CommerceProduct', 'getCurrentUserId'))
+      ->setDefaultValueCallback('Drupal\commerce_product\Entity\CommerceProduct::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
