@@ -18,10 +18,11 @@ Installation
 
 1. Install the latest -dev version of Drupal 8.
 2. Install the latest -dev versions of devel* and composer_manager.
-3. Go to your sites/default/files/composer directory and run `composer install`.
+3. Enable Commerce (but not any of the submodules!)
+4. Go to your sites/default/files/composer directory and run `composer install`.
 
    This will download the required libraries into your sites/all/vendor directory.
-4. Enable commerce and its submodules. Use the admin/modules page, Drush won't work currently**.
+4. Enable the Commerce submodules. Use the admin/modules page, Drush won't work currently**.
 
 Notes:
 - Devel is currently not optional because of a core bug: https://www.drupal.org/node/2315801
@@ -39,10 +40,10 @@ produced four unique eCommerce-related PHP libraries
 An internationalization library powered by CLDR data.
 Handles currencies, currency formatting, and more.
 
-###[Address](https://github.com/commerceguys/address)
+###[Addressing](https://github.com/commerceguys/addressing)
 
-This library manipulates postal addresses, more precisely the kind of postal
-addresses meant to identify a precise recipient location for shipping purposes.
+An addressing library, powered by Google's dataset.
+Stores and manipulates postal addresses, meant to identify a precise recipient location for shipping or billing purposes.
 
 ###[Pricing](https://github.com/commerceguys/pricing)
 
