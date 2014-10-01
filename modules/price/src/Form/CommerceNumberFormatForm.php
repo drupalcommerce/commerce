@@ -8,40 +8,37 @@
 namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CommerceNumberFormatForm extends EntityForm {
 
   /**
-   * The entity manager.
+   * The number format storage.
    *
-   * This object members must be set to anything other than private in order for
-   * \Drupal\Core\DependencyInjection\DependencySerialization to detected.
-   *
-   * @var \Drupal\Core\Entity\EntityManager
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $numberFormatStorage;
 
   /**
-   * Create a CommerceCurrencyForm object.
+   * Creates a CommerceNumberFormatForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $number_format_storage
+   *   The number format storage.
    */
-  public function __construct(EntityManager $entity_manager) {
-    // Setup object members.
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityStorageInterface $number_format_storage) {
+    $this->numberFormatStorage = $number_format_storage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager')
-    );
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+    $entity_manager = $container->get('entity.manager');
+
+    return new static($entity_manager->getStorage('commerce_number_format'));
   }
 
   /**
@@ -53,14 +50,16 @@ class CommerceNumberFormatForm extends EntityForm {
     $number_format = $this->entity;
 
     $form['locale'] = array(
-      '#type' => 'textfield',
+      '#type' => 'machine_name',
       '#title' => $this->t('Locale'),
-      '#maxlength' => 255,
+      '#description' => t('A unique machine-readable name. Can only contain letters and dashes'),
       '#default_value' => $number_format->getLocale(),
+      '#placeholder' => 'en-US',
+      '#maxlength' => 255,
       '#required' => TRUE,
       '#machine_name' => array(
-        'exists' => array($this->getStorage(), 'load'),
-        'replace_pattern' => '[^A-Za-z0-9_]+',
+        'exists' => array($this->numberFormatStorage, 'load'),
+        'replace_pattern' => '[^A-Za-z_]+',
       ),
       '#disabled' => !$number_format->isNew(),
     );
@@ -143,16 +142,6 @@ class CommerceNumberFormatForm extends EntityForm {
     );
 
     return $form;
-  }
-
-  /**
-   * Get the storage controller.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
-   *   An instance of EntityStorageInterface.
-   */
-  protected function getStorage() {
-    return $this->entityManager->getStorage('commerce_number_format');
   }
 
   /**
