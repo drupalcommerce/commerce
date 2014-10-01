@@ -8,40 +8,37 @@
 namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CommerceCurrencyForm extends EntityForm {
 
   /**
-   * The entity manager.
+   * The currency storage.
    *
-   * This object members must be set to anything other than private in order for
-   * \Drupal\Core\DependencyInjection\DependencySerialization to detected.
-   *
-   * @var \Drupal\Core\Entity\EntityManager
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $currencyStorage;
 
   /**
-   * Create an CommerceCurrencyForm object.
+   * Creates a CommerceCurrencyForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $currency_storage
+   *   The currency storage.
    */
-  public function __construct(EntityManager $entity_manager) {
-    // Setup object members.
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityStorageInterface $currency_storage) {
+    $this->currencyStorage = $currency_storage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager')
-    );
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+    $entity_manager = $container->get('entity.manager');
+
+    return new static($entity_manager->getStorage('commerce_currency'));
   }
 
   /**
@@ -54,59 +51,91 @@ class CommerceCurrencyForm extends EntityForm {
     $form['name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
-      '#maxlength' => 255,
       '#default_value' => $currency->getName(),
+      '#maxlength' => 255,
       '#required' => TRUE,
     );
     $form['currencyCode'] = array(
-      '#type' => 'machine_name',
+      '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
       '#default_value' => $currency->getCurrencyCode(),
-      '#machine_name' => array(
-        'exists' => array($this->getStorage(), 'load'),
-        'replace_pattern' => '[^A-Za-z0-9_]+',
-      ),
+      '#element_validate' => array('::validateCurrencyCode'),
+      '#pattern' => '[A-Z]{3}',
+      '#placeholder' => 'XXX',
+      '#maxlength' => 3,
+      '#size' => 3,
       '#disabled' => !$currency->isNew(),
+      '#required' => TRUE,
     );
     $form['numericCode'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
-      '#maxlength' => 255,
       '#default_value' => $currency->getNumericCode(),
+      '#element_validate' => array('::validateNumericCode'),
+      '#pattern' => '[\d]{3}',
+      '#placeholder' => '999',
+      '#maxlength' => 3,
+      '#size' => 3,
       '#required' => TRUE,
     );
     $form['symbol'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
-      '#maxlength' => 255,
       '#default_value' => $currency->getSymbol(),
+      '#maxlength' => 255,
       '#required' => TRUE,
     );
     $form['fractionDigits'] = array(
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
-      '#maxlength' => 255,
-      '#default_value' => $currency->getFractionDigits(),
       '#description' => $this->t('The number of digits after the decimal sign.'),
+      '#default_value' => $currency->getFractionDigits() ?: 2,
+      '#min' => 0,
       '#required' => TRUE,
     );
     $form['status'] = array(
-      '#default_value' => $currency->status(),
-      '#title' => $this->t('Enabled'),
       '#type' => 'checkbox',
+      '#title' => $this->t('Enabled'),
+      '#default_value' => $currency->status(),
     );
 
     return $form;
   }
 
   /**
-   * Get the storage controller.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
-   *   An instance of EntityStorageInterface.
+   * Validates the currency code.
    */
-  protected function getStorage() {
-    return $this->entityManager->getStorage('commerce_currency');
+  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
+    $currency = $this->getEntity();
+    $currency_code = $element['#value'];
+    if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
+      $form_state->setError($element, $this->t('The currency code must consist of three uppercase letters.'));
+    }
+    elseif ($currency->isNew()) {
+      $loaded_currency = $this->currencyStorage->load($currency_code);
+      if ($loaded_currency) {
+        $form_state->setError($element, $this->t('The currency code is already in use.'));
+      }
+    }
+  }
+
+  /**
+   * Validates the numeric code.
+   */
+  public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
+    $currency = $this->getEntity();
+    $numeric_code = $element['#value'];
+    if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {
+      $form_state->setError($element, $this->t('The numeric code must consist of three digits.'));
+    }
+    elseif ($currency->isNew()) {
+      $loaded_currencies = $this->currencyStorage->loadByProperties(array(
+        'numericCode' => $numeric_code,
+      ));
+      if ($loaded_currencies) {
+        $form_state->setError($element, $this->t('The numeric code is already in use.'));
+      }
+    }
   }
 
   /**
