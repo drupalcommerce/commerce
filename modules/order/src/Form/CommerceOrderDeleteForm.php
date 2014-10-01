@@ -20,15 +20,6 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getQuestion() {
     return t('Are you sure you want to delete the order %order_label?', array('%order_label' => $this->entity->label()));
   }
@@ -53,8 +44,7 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
-      $order_type_storage = $this->entityManager->getStorage('commerce_order_type');
-      $order_type = $order_type_storage->load($this->entity->bundle())->label();
+      $order_type = $this->entity->type->entity->label();
       $form_state->setRedirectUrl($this->getCancelUrl());
       drupal_set_message($this->t('@type %order_label has been deleted.', array('@type' => $order_type, '%order_label' => $this->entity->label())));
       $this->logger('commerce_order')->notice('@type: deleted %order_label.', array('@type' => $this->entity->bundle(), '%order_label' => $this->entity->label()));
