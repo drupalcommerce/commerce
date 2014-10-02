@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\comment\Plugin\Validation\Constraint\ProductSkuConstraintValidator.
+ * Contains \Drupal\commerce_product\Plugin\Validation\Constraint\ProductSkuConstraintValidator.
  */
 
 namespace Drupal\commerce_product\Plugin\Validation\Constraint;
@@ -18,10 +18,10 @@ class ProductSkuConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function validate($field_item, Constraint $constraint) {
-    $sku = $field_item->value;
+  public function validate($items, Constraint $constraint) {
+    $sku = $items->first()->value;
     if (isset($sku) && $sku !== '') {
-      $product_id = $field_item->getParent()->id();
+      $product_id = $items->getEntity()->product_id->value;
       $sku_exists = (bool) \Drupal::entityQuery('commerce_product')
         ->condition("sku", $sku)
         ->condition('product_id', (int) $product_id, '<>')
@@ -34,5 +34,4 @@ class ProductSkuConstraintValidator extends ConstraintValidator {
       }
     }
   }
-
 }
