@@ -3,6 +3,7 @@ language: php
 php:
   - 5.4
   - 5.5
+  - 5.6
 
 mysql:
   database: drupal
@@ -16,6 +17,9 @@ install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - composer global require --no-interaction --prefer-source drush/drush:dev-master
 
+  # Make sure we don't fail when checking out projects
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
   # Disable sendmail.
   - echo sendmail_path=`which true` >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
@@ -26,18 +30,27 @@ install:
   - git clone --branch 8.x-1.x http://git.drupal.org/project/devel.git drupal/modules/devel
   - git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git drupal/modules/composer_manager
   - cd drupal
-  # Apply core patch untill https://www.drupal.org/node/2189345 gets merged.
-  - wget https://www.drupal.org/files/issues/2189345-runtests-exitcode_16.patch
-  - git apply -v -p1 < 2189345-runtests-exitcode_16.patch
+  - wget https://www.drupal.org/files/issues/run_tests_sh_should-2189345-28.patch
+  - git apply -v -p1 < run_tests_sh_should-2189345-28.patch
 
 before_script:
   - ln -s $TESTDIR modules/commerce
+  # Mysql might time out for long tests, increase the wait timeout.
+  - mysql -e 'SET @@GLOBAL.wait_timeout=1200'
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
-  - drush pm-enable devel composer_manager simpletest commerce commerce_product commerce_order --yes
+  - drush en -y devel composer_manager simpletest commerce
+  - echo "require 'sites/all/vendor/autoload.php';" | sudo tee -a sites/default/settings.php
+  - cd sites/default/files/composer
+  - composer install
+  - cd ../../../../
+  - drush pm-enable commerce_product commerce_order --yes
   - drush pm-uninstall dblog --yes
   - drush runserver localhost:8888 &
   - until netstat -an 2>/dev/null | grep '8888.*LISTEN'; do true; done
 
 script:
-  - php ./core/scripts/run-tests.sh --php `which php` --url http://localhost:8888 --color "commerce"
-  - ./core/vendor/phpunit/phpunit/phpunit -c ./core/phpunit.xml.dist ./modules/commerce
+  - php ./core/scripts/run-tests.sh --php `which php` --die-on-fail --url http://localhost:8888 --color "commerce"
+  #  Enable once PHPUnit tests are in Commerce
+  #  - cd $TRAVIS_BUILD_DIR/../drupal/core
+  #  - ./vendor/bin/phpunit --verbose --debug ../modules/commerce/; TEST_PHPUNIT=$?; echo $TEST_PHPUNIT
+  #  - if [ $TEST_EXIT -eq 0 ] && [ $TEST_OUTPUT -eq 0 ] && [ $TEST_PHPUNIT -eq 0 ]; then exit 0; else exit 1; fi
