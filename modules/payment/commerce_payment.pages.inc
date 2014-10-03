@@ -5,6 +5,7 @@
  */
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Url;
 
 /**
  * Prepares variables for list of available order type templates.
@@ -18,9 +19,11 @@ use Drupal\Component\Utility\Xss;
 function template_preprocess_commerce_payment_info_add_list(&$variables) {
   if (!empty($variables['types'])) {
     foreach ($variables['types'] as $payment_info_type) {
+      $url = Url::fromRoute('entity.payment_info.add_form' . $payment_info_type->id());
+
       $variables['types'][$payment_info_type->id()] = array(
         'type' => $payment_info_type->id(),
-        'add_link' => Drupal::l($payment_info_type->label(), 'entity.payment_info.add_form' . $payment_info_type->id()),
+        'add_link' => \Drupal::l($payment_info_type->label(), $url),
         'description' => Xss::filterAdmin($payment_info_type->getDescription()),
       );
     }

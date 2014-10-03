@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Url;
 
 /**
  * Prepares variables for list of available store type templates.
@@ -21,9 +22,11 @@ function template_preprocess_commerce_store_add_list(&$variables) {
 
   if (!empty($variables['content'])) {
     foreach ($variables['content'] as $commerce_store_type) {
+      $url = Url::fromRoute('entity.commerce_store.add_form', array('commerce_store_type' => $commerce_store_type->id()));
+
       $variables['types'][$commerce_store_type->id()] = array(
         'type' => $commerce_store_type->id(),
-        'add_link' => Drupal::l($commerce_store_type->label(), 'entity.commerce_store.add_form', array('commerce_store_type' => $commerce_store_type->id())),
+        'add_link' => \Drupal::l($commerce_store_type->label(), $url),
         'description' => Xss::filterAdmin($commerce_store_type->getDescription()),
       );
     }
