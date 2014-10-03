@@ -24,6 +24,7 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce\CommerceStoreListBuilder",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\commerce\Form\CommerceStoreForm",
  *       "edit" = "Drupal\commerce\Form\CommerceStoreForm",
