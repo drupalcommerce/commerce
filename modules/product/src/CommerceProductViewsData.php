@@ -106,7 +106,7 @@ class CommerceProductViewsData implements EntityViewsDataInterface {
       'field' => array(
         'title' => t('Link'),
         'help' => t('Provide a simple link to the administrator view of the product.'),
-        'id' => 'node_link',
+        'id' => 'commerce_product_link',
       ),
     );
 

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\commerce_product\Plugin\views\field\User.
+ * Definition of Drupal\commerce_product\Plugin\views\field\CommerceProduct.
  */
 
 namespace Drupal\commerce_product\Plugin\views\field;
@@ -53,7 +53,7 @@ class CommerceProduct extends FieldPluginBase {
   }
 
   /**
-   * Prepares a link to the user.
+   * Prepares a link to the commerce product.
    *
    * @param string $data
    *   The XSS safe string for the link text.
