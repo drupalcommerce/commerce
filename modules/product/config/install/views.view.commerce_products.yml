@@ -3,10 +3,10 @@ status: true
 dependencies:
   module:
     - commerce_product
-id: products
+id: commerce_products
 label: Products
 module: views
-description: ''
+description: 'Display a list of products for store admin.'
 tag: ''
 base_table: commerce_product
 base_field: product_id
@@ -86,9 +86,33 @@ display:
           summary: ''
           description: ''
           columns:
-            product_id: product_id
+            title: title
+            sku: sku
+            type: type
+            operations: operations
           info:
-            product_id:
+            title:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            sku:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            type:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            operations:
               sortable: false
               default_sort_order: asc
               align: ''
@@ -96,7 +120,7 @@ display:
               empty_column: false
               responsive: ''
           default: '-1'
-          empty_table: false
+          empty_table: true
         provider: views
       row:
         type: fields
@@ -329,7 +353,22 @@ display:
       sorts: {  }
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          dependencies:
+            module:
+              - views
+          empty: true
+          tokenize: false
+          content: 'No products available.'
+          plugin_id: text_custom
+          provider: views
       relationships: {  }
       arguments: {  }
       field_langcode: '***LANGUAGE_language_content***'

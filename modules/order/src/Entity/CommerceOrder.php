@@ -22,6 +22,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Order"),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_order\CommerceOrderListBuilder",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\CommerceOrderForm",
  *       "edit" = "Drupal\commerce_order\Form\CommerceOrderForm",
