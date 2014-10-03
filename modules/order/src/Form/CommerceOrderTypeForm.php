@@ -8,40 +8,37 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CommerceOrderTypeForm extends EntityForm {
 
   /**
-   * The entity manager.
+   * The order type storage.
    *
-   * This object members must be set to anything other than private in order for
-   * \Drupal\Core\DependencyInjection\DependencySerialization to detected.
-   *
-   * @var \Drupal\Core\Entity\EntityManager
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $orderTypeStorage;
 
   /**
    * Create an IndexForm object.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $order_type_storage
+   *   The order type storage.
    */
-  public function __construct(EntityManager $entity_manager) {
+  public function __construct(EntityStorageInterface $order_type_storage) {
     // Setup object members.
-    $this->entityManager = $entity_manager;
+    $this->orderTypeStorage = $order_type_storage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager')
-    );
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+   $entity_manager = $container->get('entity.manager');
+   return new static($entity_manager->getStorage('commerce_order_type'));
   }
 
   /**
@@ -64,7 +61,7 @@ class CommerceOrderTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $order_type->id(),
       '#machine_name' => array(
-        'exists' => array($this->getTypeStorage(), 'load'),
+        'exists' => array($this->orderTypeStorage(), 'load'),
         'source' => array('label'),
       ),
       '#disabled' => !$order_type->isNew(),
@@ -78,16 +75,6 @@ class CommerceOrderTypeForm extends EntityForm {
     );
 
     return $form;
-  }
-
-  /**
-   * Get the type storage controller.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
-   *   An instance of EntityStorageInterface.
-   */
-  protected function getTypeStorage() {
-    return $this->entityManager->getStorage('commerce_order_type');
   }
 
   /**
