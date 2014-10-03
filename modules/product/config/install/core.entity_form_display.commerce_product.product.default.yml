@@ -20,12 +20,6 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  status:
-    type: boolean_checkbox
-    weight: 1
-    settings:
-      display_label: true
-    third_party_settings: {  }
   sku:
     type: string
     weight: 2
@@ -45,5 +39,11 @@ content:
     type: price_simple
     weight: 4
     settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 5
+    settings:
+      display_label: true
     third_party_settings: {  }
 hidden: {  }
