@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommercePaymentInfoTypeForm extends EntityForm {
 
   /**
-   * The payment type storage.
+   * The payment info type storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
@@ -25,7 +25,7 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    * Create an IndexForm object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $payment_info_type_storage
-   *   The payment type storage.
+   *   The payment info type storage.
    */
   public function __construct(EntityStorageInterface $payment_info_type_storage) {
     // Setup object members.
@@ -36,9 +36,9 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-	  /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-	 $entity_manager = $container->get('entity.manager');
-	 return new static($entity_manager->getStorage('commerce_payment_info_type'));
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+   $entity_manager = $container->get('entity.manager');
+   return new static($entity_manager->getStorage('commerce_payment_info_type'));
   }
 
   /**
