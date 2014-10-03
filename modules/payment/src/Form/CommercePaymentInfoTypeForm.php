@@ -25,7 +25,7 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    * Create an IndexForm object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $payment_info_type_storage
-   *   The payment type storage.
+   *   The payment info type storage.
    */
   public function __construct(EntityStorageInterface $payment_info_type_storage) {
     // Setup object members.
