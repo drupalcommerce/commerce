@@ -36,9 +36,9 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-	  /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-	 $entity_manager = $container->get('entity.manager');
-	 return new static($entity_manager->getStorage('commerce_payment_info_type'));
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+   $entity_manager = $container->get('entity.manager');
+   return new static($entity_manager->getStorage('commerce_payment_info_type'));
   }
 
   /**
