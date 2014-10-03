@@ -25,6 +25,7 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\CommerceProductListBuilder",
+ *     "views_data" = "Drupal\commerce_product\CommerceProductViewsData",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\CommerceProductForm",
  *       "edit" = "Drupal\commerce_product\Form\CommerceProductForm",
@@ -48,6 +49,7 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
+ *     "canonical" = "entity.commerce_product.view",
  *     "edit-form" = "entity.commerce_product.edit_form",
  *     "delete-form" = "entity.commerce_product.delete_form",
  *   },
