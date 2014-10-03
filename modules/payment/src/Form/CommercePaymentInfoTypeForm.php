@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommercePaymentInfoTypeForm extends EntityForm {
 
   /**
-   * The payment type storage.
+   * The payment info type storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
