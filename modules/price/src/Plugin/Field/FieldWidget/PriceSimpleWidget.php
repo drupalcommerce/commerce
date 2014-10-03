@@ -34,11 +34,16 @@ class PriceSimpleWidget extends WidgetBase {
 
     $element['amount'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Amount'),
+      '#title' => $element['#title'],
       '#default_value' => isset($items[$delta]->amount) ? $items[$delta]->amount : NULL,
       '#required' => $element['#required'],
       '#size' => 10,
       '#maxlength' => 255,
+      '#attached' => array(
+        'css' => array(
+          drupal_get_path('module', 'commerce_price') . '/css/commerce_price.css',
+        ),
+      ),
     );
     $element['currency_code'] = array(
       '#type' => 'select',
@@ -46,6 +51,7 @@ class PriceSimpleWidget extends WidgetBase {
       '#default_value' => isset($items[$delta]->currency_code) ? $items[$delta]->currency_code : NULL,
       '#required' => $element['#required'],
       '#options' => array_combine($currency_codes, $currency_codes),
+      '#title_display' => 'invisible',
     );
 
     return $element;

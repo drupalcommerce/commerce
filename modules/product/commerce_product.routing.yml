@@ -45,12 +45,14 @@ entity.commerce_product.list:
     _admin_route: TRUE
   requirements:
     _permission: 'administer products'
-    
+
 entity.commerce_product.edit_form:
   path: '/product/{commerce_product}/edit'
   defaults:
     _entity_form: commerce_product.edit
     _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::editPageTitle'
+  options:
+    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_product.edit'
 

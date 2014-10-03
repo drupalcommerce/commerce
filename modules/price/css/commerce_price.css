@@ -1,0 +1,8 @@
+
+/**
+ * @file
+ * Styling for Commerce Price.
+ */
+.field-widget-price-simple .form-type-textfield, .field-widget-price-simple .form-type-select {
+  display: inline;
+}
