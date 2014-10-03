@@ -8,40 +8,37 @@
 namespace Drupal\commerce_payment\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityManager;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CommercePaymentInfoTypeForm extends EntityForm {
 
   /**
-   * The entity manager.
+   * The payment info type storage.
    *
-   * This object members must be set to anything other than private in order for
-   * \Drupal\Core\DependencyInjection\DependencySerialization to detected.
-   *
-   * @var \Drupal\Core\Entity\EntityManager
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityManager;
+  protected $paymentInfoTypeStorage;
 
   /**
    * Create an IndexForm object.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $payment_info_type_storage
+   *   The payment info type storage.
    */
-  public function __construct(EntityManager $entity_manager) {
+  public function __construct(EntityStorageInterface $payment_info_type_storage) {
     // Setup object members.
-    $this->entityManager = $entity_manager;
+    $this->paymentInfoTypeStorage = $payment_info_type_storage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager')
-    );
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+   $entity_manager = $container->get('entity.manager');
+   return new static($entity_manager->getStorage('commerce_payment_info_type'));
   }
 
   /**
@@ -64,7 +61,7 @@ class CommercePaymentInfoTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $payment_information_type->id(),
       '#machine_name' => array(
-        'exists' => array($this->getTypeStorage(), 'load'),
+        'exists' => array($this->paymentInfoTypeStorage(), 'load'),
         'source' => array('label'),
       ),
       '#disabled' => !$payment_information_type->isNew(),
@@ -78,16 +75,6 @@ class CommercePaymentInfoTypeForm extends EntityForm {
     );
 
     return $form;
-  }
-
-  /**
-   * Get the type storage controller.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
-   *   An instance of EntityStorageInterface.
-   */
-  protected function getTypeStorage() {
-    return $this->entityManager->getStorage('commerce_payment_info_type');
   }
 
   /**
