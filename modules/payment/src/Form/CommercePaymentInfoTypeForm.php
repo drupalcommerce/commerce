@@ -61,7 +61,7 @@ class CommercePaymentInfoTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $payment_information_type->id(),
       '#machine_name' => array(
-        'exists' => array($this->paymentInfoTypeStorage(), 'load'),
+        'exists' => array($this->paymentInfoTypeStorage, 'load'),
         'source' => array('label'),
       ),
       '#disabled' => !$payment_information_type->isNew(),

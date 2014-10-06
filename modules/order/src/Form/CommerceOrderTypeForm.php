@@ -61,7 +61,7 @@ class CommerceOrderTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $order_type->id(),
       '#machine_name' => array(
-        'exists' => array($this->orderTypeStorage(), 'load'),
+        'exists' => array($this->orderTypeStorage, 'load'),
         'source' => array('label'),
       ),
       '#disabled' => !$order_type->isNew(),
