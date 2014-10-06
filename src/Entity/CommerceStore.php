@@ -168,6 +168,7 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setSetting('target_type', 'user')
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
+        'weight' => 0,
       ));
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
@@ -200,6 +201,7 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setRequired(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'email',
+        'weight' => 0,
       ));
 
     $fields['default_currency'] = BaseFieldDefinition::create('string')
