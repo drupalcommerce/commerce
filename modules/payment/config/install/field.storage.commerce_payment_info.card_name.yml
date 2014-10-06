@@ -1,5 +1,5 @@
 id: commerce_payment_info.card_name
-name: card_name
+field_name: card_name
 entity_type: commerce_payment_info
 type: text
 langcode: en

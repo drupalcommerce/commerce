@@ -1,5 +1,5 @@
 id: commerce_payment_info.card_exp_month
-name: card_exp_month
+field_name: card_exp_month
 entity_type: commerce_payment_info
 type: integer
 langcode: und
