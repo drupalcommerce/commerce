@@ -28,6 +28,54 @@ Notes:
 - * Devel is currently not optional because of a core bug: https://www.drupal.org/node/2315801
 - ** Drush is currently incompatible with composer_manager, causing the library classes to not be found in all commands (enabling a module, clearing cache, etc). The bug is tracked at https://www.drupal.org/node/2208949
 
+Step by Step Advanced Installation using Drush
+------------------
+1. Download and install the latest [Drush 7](https://github.com/drush-ops/drush#installupdate---composer)
+2. Download the latest -dev version of Drupal 8.
+
+    `git clone --branch 8.0.x http://git.drupal.org/project/drupal.git`
+
+3. Download the latest -dev versions of [devel*](https://www.drupal.org/project/devel) and [composer_manager](https://drupal.org/project/composer_manager).
+
+    `git clone --branch 8.x-1.x http://git.drupal.org/project/devel.git modules/devel`
+
+    `git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git modules/composer_manager`
+    
+4. Download the latest 8.x-2.x versions of [commerce](https://github.com/commerceguys/commerce) *.
+
+    `git clone --branch 8.x-2.x https://github.com/commerceguys/commerce modules/commerce`
+
+4. Install Drupal 8 *
+
+    `drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes`
+5. Enable devel, composer manager, commerce
+
+    `drush pm-enable devel composer_manager simpletest commerce --yes`
+6. Add autoload to settings.php
+    Mac / Linux: 
+    
+    `echo "require 'sites/all/vendor/autoload.php';" | sudo tee -a sites/default/settings.php`
+    
+    Windows: Add `require 'sites/all/vendor/autoload.php';` to sites/default/settings.php
+7. Install composer dependencies
+
+    `cd sites/default/files/composer`
+
+    `composer install`
+
+    `cd ../../../../`
+8. Enable commerce product and commerce order.
+
+    `drush pm-enable commerce_product commerce_order --yes`
+
+Notes:
+
+- You can run steps 4, 5, 6 and 8, skipping 1, 2, 3, 7 when reinstalling.
+
+- Replace MySQL details with your MySQL details
+
+- Replace the https://github.com/commerceguys/commerce with your fork link.
+
 Related Libraries
 ------------------
 
