@@ -58,8 +58,8 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
     $this->clickLink('Add a new store');
     $this->clickLink($this->type->label());
     $edit = array(
-      'name' => 'Foo Store',
-      'mail' => \Drupal::currentUser()->getEmail(),
+      'name[0][value]' => 'Foo Store',
+      'mail[0][value]' => \Drupal::currentUser()->getEmail(),
       'default_currency' => 'EUR',
     );
     $this->drupalPostForm(NULL, $edit, t('Save'));
@@ -81,7 +81,7 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
     $this->clickLink(t('Edit'));
     // Only change the name.
     $edit = array(
-      'name' => $this->randomMachineName(8),
+      'name[0][value]' => $this->randomMachineName(8),
     );
     $this->drupalPostForm(NULL, $edit, 'Save');
     $store_changed = CommerceStore::load($store->id());
