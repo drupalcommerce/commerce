@@ -136,11 +136,11 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
     $edit = array(
       'fields[_add_new_field][label]' => $label = $this->randomMachineName(),
       'fields[_add_new_field][field_name]' => $name = strtolower($this->randomMachineName()),
-      'fields[_add_new_field][type]' => 'list_text',
+      'fields[_add_new_field][type]' => 'list_string',
     );
     $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields', $edit, t('Save'));
 
-    $edit = array('field[settings][allowed_values]' => '1|1\n2|2');
+    $edit = array('field_storage[settings][allowed_values]' => '1|1\n2|2');
     $this->drupalPostForm(NULL, $edit, t('Save field settings'));
   }
 }
