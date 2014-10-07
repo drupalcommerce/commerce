@@ -1,10 +1,10 @@
 id: commerce_payment_info.card_type
-name: card_type
+field_name: card_type
 entity_type: commerce_payment_info
-type: text
+type: string
 settings:
   max_length: 255
-module: text
+module: core
 locked: false
 cardinality: 1
 translatable: true
@@ -13,4 +13,3 @@ langcode: und
 dependencies:
   module:
     - commerce_payment
-    - text

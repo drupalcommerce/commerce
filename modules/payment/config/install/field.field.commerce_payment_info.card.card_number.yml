@@ -14,6 +14,5 @@ required: true
 translatable: false
 default_value: {  }
 default_value_function: ''
-settings:
-  text_processing: 0
-field_type: text
+settings: {  }
+field_type: string
