@@ -1,16 +1,15 @@
 id: commerce_payment_info.card_name
 field_name: card_name
 entity_type: commerce_payment_info
-type: text
+type: string
 langcode: en
 status: true
 dependencies:
   module:
     - commerce_payment
-    - text
 settings:
   max_length: 255
-module: text
+module: core
 locked: false
 cardinality: 1
 translatable: true
