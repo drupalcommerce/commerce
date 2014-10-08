@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_price\Form;
 
+use CommerceGuys\Intl\NumberFormat\NumberFormatInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -55,7 +56,8 @@ class CommerceNumberFormatForm extends EntityForm {
       '#description' => t('A unique machine-readable name. Can only contain letters and dashes'),
       '#default_value' => $number_format->getLocale(),
       '#placeholder' => 'en-US',
-      '#maxlength' => 255,
+      '#maxlength' => 10,
+      '#size' => 10,
       '#required' => TRUE,
       '#machine_name' => array(
         'exists' => array($this->numberFormatStorage, 'load'),
@@ -66,77 +68,94 @@ class CommerceNumberFormatForm extends EntityForm {
     $form['name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
-      '#maxlength' => 255,
+      '#maxlength' => 30,
+      '#size' => 30,
       '#default_value' => $number_format->getName(),
       '#required' => TRUE,
     );
     $form['numberingSystem'] = array(
-      '#type' => 'textfield',
+      '#type' => 'select',
       '#title' => $this->t('Numbering system'),
       '#maxlength' => 255,
       '#default_value' => $number_format->getNumberingSystem() ? $number_format->getNumberingSystem() : 'latn',
+      '#options' => array(
+        NumberFormatInterface::NUMBERING_SYSTEM_ARABIC => $this->t('Arabic'),
+        NumberFormatInterface::NUMBERING_SYSTEM_ARABIC_EXTENDED => $this->t('Arabic Extended'),
+        NumberFormatInterface::NUMBERING_SYSTEM_BENGALI => $this->t('Bengali'),
+        NumberFormatInterface::NUMBERING_SYSTEM_DEVANAGARI => $this->t('Devanagari'),
+        NumberFormatInterface::NUMBERING_SYSTEM_LATIN => $this->t('Latin')
+      ),
       '#required' => TRUE,
     );
     $form['decimalSeparator'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Decimal separator'),
-      '#maxlength' => 255,
+      '#maxlength' => 5,
+      '#size' => 5,
       '#default_value' => $number_format->getDecimalSeparator() ? $number_format->getDecimalSeparator() : '.',
       '#required' => TRUE,
     );
     $form['groupingSeparator'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Grouping separator'),
-      '#maxlength' => 255,
+      '#maxlength' => 5,
+      '#size' => 5,
       '#default_value' => $number_format->getGroupingSeparator() ? $number_format->getGroupingSeparator() : ',',
       '#required' => TRUE,
     );
     $form['plusSign'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Plug sign'),
-      '#maxlength' => 255,
+      '#maxlength' => 5,
+      '#size' => 5,
       '#default_value' => $number_format->getPlusSign() ? $number_format->getPlusSign() : '=',
       '#required' => TRUE,
     );
     $form['minusSign'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Minus sign'),
-      '#maxlength' => 255,
+      '#maxlength' => 5,
+      '#size' => 5,
       '#default_value' => $number_format->getMinusSign() ? $number_format->getMinusSign() : '-',
       '#required' => TRUE,
     );
     $form['percentSign'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Percent sign'),
-      '#maxlength' => 255,
+      '#maxlength' => 5,
+      '#size' => 5,
       '#default_value' => $number_format->getPercentSign() ? $number_format->getPercentSign() : '%',
       '#required' => TRUE,
     );
     $form['decimalPattern'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Decimal pattern'),
-      '#maxlength' => 255,
+      '#maxlength' => 30,
+      '#size' => 30,
       '#default_value' => $number_format->getDecimalPattern(),
       '#required' => TRUE,
     );
     $form['percentPattern'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Percent pattern'),
-      '#maxlength' => 255,
+      '#maxlength' => 30,
+      '#size' => 30,
       '#default_value' => $number_format->getPercentPattern(),
       '#required' => TRUE,
     );
     $form['currencyPattern'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Currency pattern'),
-      '#maxlength' => 255,
+      '#maxlength' => 30,
+      '#size' => 30,
       '#default_value' => $number_format->getCurrencyPattern(),
       '#required' => TRUE,
     );
     $form['accountingCurrencyPattern'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Accounting currency pattern'),
-      '#maxlength' => 255,
+      '#maxlength' => 30,
+      '#size' => 30,
       '#default_value' => $number_format->getAccountingCurrencyPattern(),
       '#required' => TRUE,
     );
