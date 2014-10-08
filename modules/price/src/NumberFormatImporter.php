@@ -8,7 +8,7 @@
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\NumberFormat\NumberFormatRepository;
-use CommerceGuys\Intl\UnknownLocaleException;
+use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 

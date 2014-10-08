@@ -8,8 +8,8 @@
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\Currency\CurrencyRepository;
-use CommerceGuys\Intl\Currency\UnknownCurrencyException;
-use CommerceGuys\Intl\UnknownLocaleException;
+use CommerceGuys\Intl\Exception\UnknownCurrencyException;
+use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
