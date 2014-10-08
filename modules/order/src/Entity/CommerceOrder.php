@@ -183,6 +183,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
 
   /**
    * {@inheritdoc}
+   * @return integer
    */
   public function getOwnerId() {
     return $this->get('uid')->target_id;
