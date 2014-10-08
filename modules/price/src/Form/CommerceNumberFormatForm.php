@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_price\Form;
 
+use CommerceGuys\Intl\NumberFormat\NumberFormatInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -71,10 +72,17 @@ class CommerceNumberFormatForm extends EntityForm {
       '#required' => TRUE,
     );
     $form['numberingSystem'] = array(
-      '#type' => 'textfield',
+      '#type' => 'select',
       '#title' => $this->t('Numbering system'),
       '#maxlength' => 255,
       '#default_value' => $number_format->getNumberingSystem() ? $number_format->getNumberingSystem() : 'latn',
+      '#options' => array(
+        NumberFormatInterface::NUMBERING_SYSTEM_ARABIC => $this->t('Arabic'),
+        NumberFormatInterface::NUMBERING_SYSTEM_ARABIC_EXTENDED => $this->t('Arabic Extended'),
+        NumberFormatInterface::NUMBERING_SYSTEM_BENGALI => $this->t('Bengali'),
+        NumberFormatInterface::NUMBERING_SYSTEM_DEVANAGARI => $this->t('Devanagari'),
+        NumberFormatInterface::NUMBERING_SYSTEM_LATIN => $this->t('Latin')
+      ),
       '#required' => TRUE,
     );
     $form['decimalSeparator'] = array(
