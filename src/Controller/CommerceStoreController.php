@@ -106,7 +106,7 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
 
     $commerce_store = $this->entityManager()->getStorage('commerce_store')->create(array(
       'type' => $commerce_store_type->id(),
-      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->id,
+      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->getId(),
     ));
 
     $form = $this->entityFormBuilder()->getForm($commerce_store, 'add');

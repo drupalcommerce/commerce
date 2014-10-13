@@ -104,7 +104,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
 
     $product = $this->entityManager()->getStorage('commerce_product')->create(array(
       'type' => $commerce_product_type->id(),
-      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->id,
+      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->getId(),
     ));
 
     $form = $this->entityFormBuilder()->getForm($product, 'add');
