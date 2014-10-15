@@ -39,6 +39,7 @@ class CommerceProductLinkEdit extends CommerceProductLink {
       $text = !empty($this->options['text']) ? $this->options['text'] : $this->t('Edit');
       return $text;
     }
+
   }
 }
 
