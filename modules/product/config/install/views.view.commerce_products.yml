@@ -295,15 +295,124 @@ display:
           machine_name: 0
           plugin_id: commerce_product_type
           provider: commerce_product
-        operations:
-          id: operations
+        edit_product:
+          id: edit_product
           table: commerce_product
-          field: operations
+          field: edit_product
           relationship: none
           group_type: group
           admin_label: ''
           dependencies:
             module:
+              - commerce_product
+          label: 'Edit Link'
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: ''
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          text: ''
+          plugin_id: commerce_product_link_edit
+          provider: commerce_product
+        delete_product:
+          id: delete_product
+          table: commerce_product
+          field: delete_product
+          relationship: none
+          group_type: group
+          admin_label: ''
+          dependencies:
+            module:
+              - commerce_product
+          label: 'Delete Link'
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: ''
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          text: ''
+          plugin_id: commerce_product_link_delete
+          provider: commerce_product
+        dropbutton:
+          id: dropbutton
+          table: views
+          field: dropbutton
+          relationship: none
+          group_type: group
+          admin_label: ''
+          dependencies:
+            module:
+              - views
               - views
           label: Operations
           exclude: false
@@ -346,8 +455,14 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          fields:
+            edit_product: edit_product
+            delete_product: delete_product
+            title: '0'
+            sku: '0'
+            type: '0'
           destination: true
-          plugin_id: entity_operations
+          plugin_id: dropbutton
           provider: views
       filters: {  }
       sorts: {  }
