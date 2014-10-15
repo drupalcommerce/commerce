@@ -26,6 +26,12 @@ class CommerceProductLink extends FieldPluginBase {
     return FALSE;
   }
 
+  /**
+   * Defines the override text option for the product link.
+   * 
+   * @return array
+   *   returns an array defining the options available for the handler
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['text'] = array('default' => '', 'translatable' => TRUE);
