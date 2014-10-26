@@ -4,16 +4,17 @@ field_name: card_type
 entity_type: commerce_payment_info
 bundle: card
 description: 'The card type.'
-langcode: und
+langcode: en
 status: true
-dependencies:
-  entity:
-    - commerce_payment.commerce_payment_info_type.card
-    - field.storage.commerce_payment_info.card_type
 required: true
 translatable: false
 default_value: {  }
 default_value_function: ''
 settings: {  }
+third_party_settings: {  }
 field_type: string
+dependencies:
+  config:
+    - commerce_payment.commerce_payment_info_type.card
+    - field.storage.commerce_payment_info.card_type
 

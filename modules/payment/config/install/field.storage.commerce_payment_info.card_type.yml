@@ -9,7 +9,7 @@ locked: false
 cardinality: 1
 translatable: true
 status: true
-langcode: und
+langcode: en
 dependencies:
   module:
     - commerce_payment

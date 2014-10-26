@@ -4,10 +4,10 @@ field_name: card_exp_year
 entity_type: commerce_payment_info
 bundle: card
 description: 'The card expiration year.'
-langcode: und
+langcode: en
 status: true
 dependencies:
-  entity:
+  config:
     - commerce_payment.commerce_payment_info_type.card
     - field.storage.commerce_payment_info.card_exp_year
 required: true
@@ -20,4 +20,5 @@ settings:
   prefix: ''
   suffix: ''
   size: normal
+third_party_settings: {  }
 field_type: integer
