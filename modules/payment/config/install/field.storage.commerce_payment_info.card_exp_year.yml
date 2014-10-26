@@ -2,7 +2,7 @@ id: commerce_payment_info.card_exp_year
 field_name: card_exp_year
 entity_type: commerce_payment_info
 type: integer
-langcode: und
+langcode: en
 status: true
 dependencies:
   module:

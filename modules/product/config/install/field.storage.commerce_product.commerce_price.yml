@@ -9,6 +9,7 @@ module: commerce_price
 locked: false
 cardinality: 1
 translatable: true
+indexes: {  }
 dependencies:
   module:
     - commerce_price

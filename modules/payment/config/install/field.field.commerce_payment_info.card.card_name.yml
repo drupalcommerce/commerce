@@ -4,10 +4,10 @@ field_name: card_name
 entity_type: commerce_payment_info
 bundle: card
 description: 'The name in the card.'
-langcode: und
+langcode: en
 status: true
 dependencies:
-  entity:
+  config:
     - commerce_payment.commerce_payment_info_type.card
     - field.storage.commerce_payment_info.card_name
 required: true
@@ -15,4 +15,5 @@ translatable: false
 default_value: {  }
 default_value_function: ''
 settings: {  }
+third_party_settings: {  }
 field_type: string
