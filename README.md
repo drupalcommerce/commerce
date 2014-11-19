@@ -45,13 +45,17 @@ Handles currencies, currency formatting, and more.
 An addressing library, powered by Google's dataset.
 Stores and manipulates postal addresses, meant to identify a precise recipient location for shipping or billing purposes.
 
+###[Zone](https://github.com/commerceguys/zone)
+
+A zone library. Zones are territorial groupings mostly used for shipping or tax purposes.
+
+###[Tax](https://github.com/commerceguys/tax)
+
+A tax library with a flexible data model, predefined tax rates, powerful resolving logic.
+
 ###[Pricing](https://github.com/commerceguys/pricing)
 
 A component for managing prices, taxes, discounts, fees.
-
-###[Zone](https://github.com/commerceguys/zone)
-
-Zone checks if an address matches a set of conditions.
 
 Maintainers
 -----------
