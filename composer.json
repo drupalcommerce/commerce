@@ -6,6 +6,7 @@
     "license": "GPL-2.0+",
     "require": {
         "commerceguys/intl": "dev-master",
-        "commerceguys/pricing": "dev-master"
+        "commerceguys/pricing": "dev-master",
+        "commerceguys/addressing": "dev-master"
     }
 }
