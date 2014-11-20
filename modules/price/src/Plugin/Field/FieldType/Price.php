@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldType;
 
-use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
