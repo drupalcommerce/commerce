@@ -7,14 +7,11 @@
 
 namespace Drupal\commerce\Controller;
 
-use Drupal\Component\Utility\String;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\commerce\CommerceStoreTypeInterface;
-use Drupal\commerce\CommerceStoreInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

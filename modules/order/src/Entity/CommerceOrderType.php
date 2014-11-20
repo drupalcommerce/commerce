@@ -9,7 +9,6 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\CommerceOrderTypeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the Order type configuration entity.

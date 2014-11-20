@@ -46,7 +46,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
   /**
    * Creates a new entity
    *
-   * @param $entityType
+   * @param string $entityType
    * @param array $values
    *   An array of settings.
    *   Example: 'id' => 'foo'.
