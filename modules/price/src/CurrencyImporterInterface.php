@@ -23,7 +23,7 @@ interface CurrencyImporterInterface {
    * @param string $fallback
    *   The fallback language code.
    *
-   * @return array
+   * @return \CommerceGuys\Intl\Currency\CurrencyInterface[]
    *    Array of importable currencies.
    */
   public function getImportableCurrencies($fallback = self::FALLBACK_LANGUAGE);

@@ -8,7 +8,6 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Provides an interface defining a Commerce Payment Information entity.
