@@ -1,7 +1,7 @@
 commerce_payment.payment_configuration:
   path: '/admin/commerce/config/payment'
   defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Payment configuration'
   options:
     _admin_route: TRUE
@@ -11,7 +11,7 @@ commerce_payment.payment_configuration:
 entity.commerce_payment_info.add_form:
   path: '/admin/commerce/payment-info/add/{commerce_payment_info_type}'
   defaults:
-    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::add'
+    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::add'
     _title_callback: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPageTitle'
   options:
     _admin_route: TRUE
@@ -22,7 +22,7 @@ entity.commerce_payment_info.add_page:
   path: '/admin/commerce/payment-info/add'
   defaults:
     _title: 'Create a new payment information entity'
-    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPage'
+    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPage'
   options:
     _admin_route: TRUE
   requirements:
@@ -51,7 +51,7 @@ entity.commerce_payment_info.delete_form:
 entity.commerce_payment_info.devel:
   path: '/admin/commerce/payment-info/{commerce_payment_info}/devel'
   defaults:
-    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoLoad'
+    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoLoad'
     _title: 'Dump a payment information entity'
   options:
     _admin_route: TRUE
@@ -112,7 +112,7 @@ entity.commerce_payment_info_type.delete_form:
 entity.commerce_payment_info_type.devel:
   path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/devel'
   defaults:
-    _content: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoTypeLoad'
+    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoTypeLoad'
     _title: 'Dump an payment info type'
   options:
     _admin_route: TRUE

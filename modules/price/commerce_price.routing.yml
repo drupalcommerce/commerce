@@ -49,7 +49,7 @@ entity.commerce_currency.delete_form:
 entity.commerce_currency.devel:
   path: '/admin/commerce/config/currency/{commerce_currency}/devel'
   defaults:
-    _content: '\Drupal\commerce_price\Controller\CommerceCurrencyDevelController::currencyLoad'
+    _controller: '\Drupal\commerce_price\Controller\CommerceCurrencyDevelController::currencyLoad'
     _title: 'Dump a currency'
   options:
     _admin_route: TRUE
@@ -100,7 +100,7 @@ entity.commerce_number_format.delete_form:
 entity.commerce_number_format.devel:
   path: '/admin/commerce/config/number-format/{commerce_number_format}/devel'
   defaults:
-    _content: '\Drupal\commerce_price\Controller\CommerceNumberFormatDevelController::numberFormatLoad'
+    _controller: '\Drupal\commerce_price\Controller\CommerceNumberFormatDevelController::numberFormatLoad'
     _title: 'Dump a number format'
   options:
     _admin_route: TRUE

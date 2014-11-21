@@ -1,7 +1,7 @@
 commerce.admin_commerce:
   path: '/admin/commerce'
   defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Commerce'
   options:
     _admin_route: TRUE
@@ -11,7 +11,7 @@ commerce.admin_commerce:
 commerce.configuration:
   path: '/admin/commerce/config'
   defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Configuration'
   options:
     _admin_route: TRUE
@@ -21,7 +21,7 @@ commerce.configuration:
 entity.commerce_store.add_form:
   path: '/admin/commerce/config/store/add/{commerce_store_type}'
   defaults:
-    _content: '\Drupal\commerce\Controller\CommerceStoreController::add'
+    _controller: '\Drupal\commerce\Controller\CommerceStoreController::add'
     _title_callback: '\Drupal\commerce\Controller\CommerceStoreController::addPageTitle'
   options:
     _admin_route: TRUE
@@ -32,7 +32,7 @@ entity.commerce_store.add_page:
   path: '/admin/commerce/config/store/add'
   defaults:
     _title: 'Add a new store'
-    _content: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
+    _controller: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
   options:
     _admin_route: TRUE
   requirements:
@@ -71,7 +71,7 @@ entity.commerce_store.delete_form:
 entity.commerce_store.devel:
   path: '/admin/commerce/config/store/{commerce_store}/devel'
   defaults:
-    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeLoad'
+    _controller: '\Drupal\commerce\Controller\CommerceDevelController::storeLoad'
     _title: 'Dump a store'
   options:
     _admin_route: TRUE
@@ -122,7 +122,7 @@ entity.commerce_store_type.delete_form:
 entity.commerce_store_type.devel:
   path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
   defaults:
-    _content: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
+    _controller: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
     _title: 'Dump a store type'
   options:
     _admin_route: TRUE

@@ -1,7 +1,7 @@
 entity.commerce_product.configuration:
   path: '/admin/commerce/config/product'
   defaults:
-    _content: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Product configuration'
   options:
     _admin_route: TRUE
@@ -11,7 +11,7 @@ entity.commerce_product.configuration:
 entity.commerce_product.add_form:
   path: '/admin/commerce/products/add/{commerce_product_type}'
   defaults:
-    _content: '\Drupal\commerce_product\Controller\CommerceProductController::add'
+    _controller: '\Drupal\commerce_product\Controller\CommerceProductController::add'
     _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::addPageTitle'
   options:
     _admin_route: TRUE
@@ -22,7 +22,7 @@ entity.commerce_product.add_page:
   path: '/admin/commerce/products/add'
   defaults:
     _title: 'Add a new product'
-    _content: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'
+    _controller: '\Drupal\commerce_product\Controller\CommerceProductController::addPage'
   options:
     _admin_route: TRUE
   requirements:
@@ -67,7 +67,7 @@ entity.commerce_product.delete_form:
 entity.commerce_product.devel:
   path: '/admin/commerce/products/{commerce_product}/devel'
   defaults:
-    _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productLoad'
+    _controller: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productLoad'
     _title: 'Dump a product'
   options:
     _admin_route: TRUE
@@ -118,7 +118,7 @@ entity.commerce_product_type.delete_form:
 entity.commerce_product_type.devel:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/devel'
   defaults:
-    _content: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
+    _controller: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
     _title: 'Dump a product type'
   options:
     _admin_route: TRUE
