@@ -27,7 +27,7 @@ class CommerceStoreForm extends ContentEntityForm {
     $form['langcode'] = array(
       '#title' => t('Language'),
       '#type' => 'language_select',
-      '#default_value' => $entity->getUntranslated()->language()->id,
+      '#default_value' => $entity->getUntranslated()->language()->getId(),
       '#languages' => Language::STATE_ALL,
     );
     $form['default_currency'] = array(
