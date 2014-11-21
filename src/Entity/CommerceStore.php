@@ -183,10 +183,9 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'textfield',
+        'type' => 'string_textfield',
         'weight' => 0,
       ));
 

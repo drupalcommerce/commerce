@@ -227,10 +227,9 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'text_textfield',
+        'type' => 'string_textfield',
         'weight' => 1,
       ))
       ->setDisplayConfigurable('form', TRUE);
@@ -242,10 +241,9 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'text_textfield',
+        'type' => 'string_textfield',
         'weight' => 2,
       ))
       ->setDisplayConfigurable('form', TRUE);

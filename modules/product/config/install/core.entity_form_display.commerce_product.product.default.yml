@@ -14,14 +14,14 @@ dependencies:
     - text
 content:
   title:
-    type: string
+    type: string_textfield
     weight: 0
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
   sku:
-    type: string
+    type: string_textfield
     weight: 2
     settings:
       size: 60

@@ -222,7 +222,6 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ));
 
     $fields['remote_id'] = BaseFieldDefinition::create('string')
@@ -230,10 +229,9 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setDescription(t('The remote identifier for this transaction.'))
       ->setRequired(True)
       ->setSettings(array(
-          'default_value' => '',
-          'max_length' => 255,
-          'text_processing' => 0,
-        ));
+        'default_value' => '',
+        'max_length' => 255,
+      ));
 
     // Bundle.
     $fields['payment_method'] = BaseFieldDefinition::create('string')
@@ -241,40 +239,36 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
       ->setDescription(t('The payment method method_id for this transaction.'))
       ->setRequired(TRUE)
       ->setSettings(array(
-          'default_value' => '',
-          'max_length' => 128,
-          'text_processing' => 0,
-        ));
+        'default_value' => '',
+        'max_length' => 128,
+      ));
 
     $fields['message'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Message'))
       ->setDescription(t('The human-readable message associated to this transaction.'))
       ->setRequired(TRUE)
       ->setSettings(array(
-          'default_value' => '',
-          'size' => 'big',
-          'text_processing' => 0,
-        ));
+        'default_value' => '',
+        'size' => 'big',
+      ));
 
     $fields['status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Status'))
       ->setDescription(t('The status of this transaction (pending, success, or failure).'))
       ->setRequired(TRUE)
       ->setSettings(array(
-          'default_value' => '',
-          'max_length' => 128,
-          'text_processing' => 0,
-        ));
+        'default_value' => '',
+        'max_length' => 128,
+      ));
 
     $fields['remote_status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote status'))
       ->setDescription(t('The status of the transaction at the payment provider.'))
       ->setRequired(TRUE)
       ->setSettings(array(
-          'default_value' => '',
-          'max_length' => 128,
-          'text_processing' => 0,
-        ));
+        'default_value' => '',
+        'max_length' => 128,
+      ));
 
     $fields['payload'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Payload'))

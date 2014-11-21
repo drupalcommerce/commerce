@@ -241,7 +241,6 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
       ))
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -249,7 +248,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -5,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'string',
+        'type' => 'string_textfield',
         'weight' => -5,
       ))
       ->setDisplayConfigurable('form', TRUE);
@@ -267,7 +266,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
         'weight' => -4,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'string',
+        'type' => 'string_textfield',
         'weight' => -4,
       ))
       ->setDisplayConfigurable('form', TRUE)
