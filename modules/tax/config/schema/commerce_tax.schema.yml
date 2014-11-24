@@ -1,0 +1,24 @@
+commerce_tax.commerce_tax_type.*:
+  type: config_entity
+  label: 'Tax type'
+  mapping:
+    id:
+      type: string
+      label: 'Tax type id'
+    name:
+      type: string
+      label: 'Tax type name'
+    compound:
+      type: boolean
+      label: 'Tax type compoundness'
+    roundingMode:
+      type: integer
+      label: 'Tax type rounding mode'
+    tag:
+      type: string
+      label: 'Tax type tag'
+    rates:
+      type: sequence
+      label: 'Tax type rates'
+      sequence:
+        - type: commerce_tax.commerce_tax_rate.[%key]

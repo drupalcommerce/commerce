@@ -1,0 +1,39 @@
+entity.commerce_tax_type.list:
+  path: '/admin/commerce/config/tax_type'
+  defaults:
+    _entity_list: 'commerce_tax_type'
+    _title: 'Tax types'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_tax_type.add_form:
+  path: '/admin/commerce/config/tax_type/add'
+  defaults:
+    _entity_form: 'commerce_tax_type.add'
+    _title: 'Add a new tax type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_tax_type'
+
+entity.commerce_tax_type.edit_form:
+  path: '/admin/commerce/config/tax_type/{commerce_tax_type}'
+  defaults:
+    _entity_form: 'commerce_tax_type.edit'
+    _title: 'Edit a tax type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_tax_type.delete_form:
+  path: '/admin/commerce/config/tax_type/{commerce_tax_type}/delete'
+  defaults:
+    _entity_form: 'commerce_tax_type.delete'
+    _title: 'Delete a tax type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer stores'
