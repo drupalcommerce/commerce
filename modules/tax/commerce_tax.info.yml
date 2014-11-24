@@ -1,0 +1,7 @@
+name: Commerce Tax
+type: module
+description: 'Defines the Tax entities.'
+package: Commerce
+core: 8.x
+dependencies:
+- commerce
