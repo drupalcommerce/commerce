@@ -22,3 +22,30 @@ commerce_tax.commerce_tax_type.*:
       label: 'Tax type rates'
       sequence:
         - type: commerce_tax.commerce_tax_rate.[%key]
+
+commerce_tax.commerce_tax_rate.*:
+  type: config_entity
+  label: 'Tax rate'
+  mapping:
+    id:
+      type: string
+      label: 'Tax rate id'
+    name:
+      type: string
+      label: 'Tax rate name'
+    displayName:
+      type: string
+      label: 'Tax rate display name'
+    default:
+      type: boolean
+      label: 'Tax type defaultness'
+    amounts:
+      type: sequence
+      label: 'Tax rate amounts'
+      sequence:
+        - type: commerce_tax.commerce_tax_rate_amount.[%key]
+    type:
+      type: sequence
+      label: 'Tax rate type'
+      sequence:
+        -type: commerce_tax.commerce_tax_type.[%key]
