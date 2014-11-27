@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\commerce_tax\Entity\CommerceTaxRate;
 
 class CommerceTaxRateForm extends EntityForm {
 
@@ -98,7 +97,7 @@ class CommerceTaxRateForm extends EntityForm {
   /**
    * Validates the id field.
    */
-  public function validateId(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateId(array $element, FormStateInterface $form_state, array $form) {
     $tax_rate = $this->getEntity();
     $id = $element['#value'];
     if (!preg_match('/[a-z_]+/', $id)) {
@@ -117,7 +116,7 @@ class CommerceTaxRateForm extends EntityForm {
   /**
    * Validates that there is only one default per tax type.
    */
-  public function validateDefaultness(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateDefaultness(array $element, FormStateInterface $form_state, array $form) {
     $tax_rate = $this->getEntity();
     $default = $element['#value'];
     if ($default) {
@@ -147,8 +146,8 @@ class CommerceTaxRateForm extends EntityForm {
         '%label' => $tax_rate->label(),
       )));
 
+      $tax_type = $this->taxTypeStorage->load($tax_rate->getType());
       try {
-        $tax_type = $this->taxTypeStorage->load($tax_rate->getType());
         if (!$tax_type->hasRate($tax_rate)) {
           $tax_type->addRate($tax_rate);
           $tax_type->save();
@@ -162,6 +161,8 @@ class CommerceTaxRateForm extends EntityForm {
         drupal_set_message($this->t('The %label tax type was not saved.', array(
           '%label' => $tax_type->label(),
         )));
+        $this->logger('commerce_tax')->error($e);
+        $form_state->setRebuild();
       }
 
     }

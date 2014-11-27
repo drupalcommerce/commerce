@@ -196,7 +196,7 @@ class CommerceTaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function addAmount(TaxRateAmountInterface $amount) {
-    $this->amounts[$amount->getId()] = $amount;
+    $this->amounts[] = $amount->getId();
 
     return $this;
   }
@@ -205,7 +205,7 @@ class CommerceTaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function removeAmount(TaxRateAmountInterface $amount) {
-    unset($this->amounts[$amount->getId()]);
+    unset($this->amounts[array_search($amount->getId(), $this->amounts)]);
 
     return $this;
   }
@@ -214,7 +214,7 @@ class CommerceTaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function hasAmount(TaxRateAmountInterface $amount) {
-    return isset($this->amounts[$amount->getId()]);
+    return array_search($amount->getId(), $this->amounts) !== FALSE;
   }
 
 }

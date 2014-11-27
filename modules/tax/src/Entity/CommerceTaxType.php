@@ -207,7 +207,7 @@ class CommerceTaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function addRate(TaxRateInterface $rate) {
-    $this->rates[$rate->getId()] = $rate;
+    $this->rates[] = $rate->getId();
 
     return $this;
   }
@@ -216,7 +216,7 @@ class CommerceTaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function removeRate(TaxRateInterface $rate) {
-    unset($this->rates[$rate->getId()]);
+    unset($this->rates[array_search($rate->getId(), $this->rates)]);
 
     return $this;
   }
@@ -225,7 +225,7 @@ class CommerceTaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function hasRate(TaxRateInterface $rate) {
-    return isset($this->rates[$rate->getId()]);
+    return array_search($rate, $this->rates) !== FALSE;
   }
 
 }

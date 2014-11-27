@@ -8,7 +8,6 @@
 namespace Drupal\commerce_tax\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Url;
 
 /**
  * Provides route responses for tax rates.

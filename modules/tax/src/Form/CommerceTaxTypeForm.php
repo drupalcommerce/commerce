@@ -99,7 +99,7 @@ class CommerceTaxTypeForm extends EntityForm {
   /**
    * Validates the id field.
    */
-  public function validateId(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateId(array $element, FormStateInterface $form_state, array $form) {
     $tax_type = $this->getEntity();
     $id = $element['#value'];
     if (!preg_match('/[a-z_]+/', $id)) {
@@ -118,7 +118,7 @@ class CommerceTaxTypeForm extends EntityForm {
   /**
    * Validates the tag field.
    */
-  public function validateTag(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateTag(array $element, FormStateInterface $form_state, array $form) {
     $tag = $element['#value'];
     if (!preg_match('/[a-zA-Z0-9]+/', $tag)) {
       $form_state->setError($element, $this->t('The tag must be a single word.'));
