@@ -1,0 +1,9 @@
+{
+    "name": "VAT",
+    "displayName": "VAT",
+    "compound": false,
+    "roundingMode": 1,
+    "tag": "vat",
+    "rates": [],
+    "zone": ""
+}
