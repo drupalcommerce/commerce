@@ -52,7 +52,7 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
    * @param string
    *   The tax types folder of definitions.
    */
-  public function __construct(EntityManagerInterface $entity_manager, $tax_types_folder) {
+  public function __construct(EntityManagerInterface $entity_manager, TranslationInterface $string_translation, $tax_types_folder = NULL) {
     $this->taxTypeStorage = $entity_manager->getStorage('commerce_tax_type');
     $this->taxRateStorage = $entity_manager->getStorage('commerce_tax_rate');
     $this->taxRateAmountStorage = $entity_manager->getStorage('commerce_tax_rate_amount');

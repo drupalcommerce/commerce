@@ -1,9 +1,0 @@
-{
-    "name": "Sales tax",
-    "displayName": "Sales tax",
-    "compound": false,
-    "roundingMode": 1,
-    "tag": "sales",
-    "rates": [],
-    "zone": ""
-}
