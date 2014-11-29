@@ -206,48 +206,50 @@ function commerce_product_file_download_access($field, $entity_type, $entity) {
  * Implements hook_field_extra_fields().
  */
 function commerce_product_field_extra_fields() {
-  $extra = array();
+  $extra = &drupal_static(__FUNCTION__);
 
-  foreach (commerce_product_types() as $type => $product_type) {
-    $extra['commerce_product'][$type] = array(
-      'form' => array(
-        'sku' => array(
-          'label' => t('Product SKU'),
-          'description' => t('Product module SKU form element'),
-          'weight' => -10,
+  if (!isset($extra)) {
+    foreach (commerce_product_types() as $type => $product_type) {
+      $extra['commerce_product'][$type] = array(
+        'form' => array(
+          'sku' => array(
+            'label' => t('Product SKU'),
+            'description' => t('Product module SKU form element'),
+            'weight' => -10,
+          ),
+          'title' => array(
+            'label' => t('Title'),
+            'description' => t('Product module title form element'),
+            'weight' => -5,
+          ),
+          'status' => array(
+            'label' => t('Status'),
+            'description' => t('Product module status form element'),
+            'weight' => 35,
+          ),
         ),
-        'title' => array(
-          'label' => t('Title'),
-          'description' => t('Product module title form element'),
-          'weight' => -5,
+        'display' => array(
+          'sku' => array(
+            'label' => t('SKU'),
+            'description' => t('The human readable identifier of the product'),
+            'theme' => 'commerce_product_sku',
+            'weight' => -10,
+          ),
+          'title' => array(
+            'label' => t('Title'),
+            'description' => t('Full product title'),
+            'theme' => 'commerce_product_title',
+            'weight' => -5,
+          ),
+          'status' => array(
+            'label' => t('Status'),
+            'description' => t('Whether the product is active or disabled'),
+            'theme' => 'commerce_product_status',
+            'weight' => 5,
+          ),
         ),
-        'status' => array(
-          'label' => t('Status'),
-          'description' => t('Product module status form element'),
-          'weight' => 35,
-        ),
-      ),
-      'display' => array(
-        'sku' => array(
-          'label' => t('SKU'),
-          'description' => t('The human readable identifier of the product'),
-          'theme' => 'commerce_product_sku',
-          'weight' => -10,
-        ),
-        'title' => array(
-          'label' => t('Title'),
-          'description' => t('Full product title'),
-          'theme' => 'commerce_product_title',
-          'weight' => -5,
-        ),
-        'status' => array(
-          'label' => t('Status'),
-          'description' => t('Whether the product is active or disabled'),
-          'theme' => 'commerce_product_status',
-          'weight' => 5,
-        ),
-      ),
-    );
+      );
+    }
   }
 
   return $extra;
