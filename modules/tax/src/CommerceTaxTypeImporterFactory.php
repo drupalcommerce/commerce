@@ -8,6 +8,7 @@
 namespace Drupal\commerce_tax;
 
 use \Drupal\Core\Entity\EntityManagerInterface;
+use \Drupal\Core\StringTranslation\TranslationInterface;
 
 class CommerceTaxTypeImporterFactory implements CommerceTaxTypeImporterFactoryInterface {
 
@@ -19,10 +20,18 @@ class CommerceTaxTypeImporterFactory implements CommerceTaxTypeImporterFactoryIn
   protected $entityManager;
 
   /**
+   * The translation manager.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  protected $stringTranslation;
+
+  /**
    * Constructs the factory.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, TranslationInterface $string_translation) {
     $this->entityManager = $entity_manager;
+    $this->stringTranslation = $string_translation;
   }
 
   /**

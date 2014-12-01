@@ -13,8 +13,12 @@ use \Drupal\Core\Entity\EntityStorageInterface;
 use \CommerceGuys\Tax\Model\TaxTypeInterface;
 use \CommerceGuys\Tax\Model\TaxRateInterface;
 use \CommerceGuys\Tax\Model\TaxRateAmountInterface;
+use \Drupal\Core\StringTranslation\StringTranslationTrait;
+use \Drupal\Core\StringTranslation\TranslationInterface;
 
 class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The tax type storage.
@@ -56,6 +60,7 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
     $this->taxTypeStorage = $entity_manager->getStorage('commerce_tax_type');
     $this->taxRateStorage = $entity_manager->getStorage('commerce_tax_rate');
     $this->taxRateAmountStorage = $entity_manager->getStorage('commerce_tax_rate_amount');
+    $this->stringTranslation = $string_translation;
     $this->taxTypeRepository = new TaxTypeRepository($tax_types_folder);
   }
 
@@ -81,7 +86,7 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
 
     $values = array(
       'id' => $tax_type->getId(),
-      'name' => $tax_type->getName(),
+      'name' => $this->t($tax_type->getName()),
       'compound' => $tax_type->isCompound(),
       'roundingMode' => $tax_type->getRoundingMode(),
       'tag' => $tax_type->getTag(),
@@ -105,8 +110,8 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
     $values = array(
       'type' => $tax_rate->getType()->getId(),
       'id' => $tax_rate->getId(),
-      'name' => $tax_rate->getName(),
-      'displayName' => $tax_rate->getDisplayName(),
+      'name' => $this->t($tax_rate->getName()),
+      'displayName' => $this->t($tax_rate->getDisplayName()),
       'default' => $tax_rate->isDefault(),
       'amounts' => array_keys($tax_rate->getAmounts()),
     );
