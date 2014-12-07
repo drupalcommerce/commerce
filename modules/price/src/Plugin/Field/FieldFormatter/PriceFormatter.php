@@ -98,7 +98,7 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $elements, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements['show_currency_code'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Display the currency code instead of the currency symbol.'),
