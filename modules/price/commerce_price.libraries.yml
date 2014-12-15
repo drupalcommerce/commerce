@@ -1,0 +1,5 @@
+drupal.commerce_price.simple-widget:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_price.css: {}

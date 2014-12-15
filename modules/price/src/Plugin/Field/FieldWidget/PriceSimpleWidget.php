@@ -40,8 +40,8 @@ class PriceSimpleWidget extends WidgetBase {
       '#size' => 10,
       '#maxlength' => 255,
       '#attached' => array(
-        'css' => array(
-          drupal_get_path('module', 'commerce_price') . '/css/commerce_price.css',
+        'library' => array(
+          'commerce_price/drupal.commerce_price.simple-widget',
         ),
       ),
     );

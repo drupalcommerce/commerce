@@ -1,0 +1,5 @@
+drupal.commerce.toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/commerce.icons.css: {}
