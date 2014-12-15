@@ -53,8 +53,8 @@ install:
   - git clone --branch 8.x-1.x http://git.drupal.org/project/devel.git drupal/modules/devel
   - git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git drupal/modules/composer_manager
   - cd drupal
-  - wget https://www.drupal.org/files/issues/run_tests_sh_should-2189345-51.patch
-  - git apply -v -p1 < run_tests_sh_should-2189345-51.patch
+  - wget https://www.drupal.org/files/issues/run_tests_sh_should-2189345-53.patch
+  - git apply -v -p1 < run_tests_sh_should-2189345-53.patch
 
   # Restart apache and test it
   - sudo service apache2 restart
