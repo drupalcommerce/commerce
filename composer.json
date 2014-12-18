@@ -7,6 +7,8 @@
     "require": {
         "commerceguys/intl": "dev-master",
         "commerceguys/pricing": "dev-master",
-        "commerceguys/addressing": "dev-master"
+        "commerceguys/addressing": "dev-master",
+        "commerceguys/tax": "dev-master",
+        "commerceguys/zone": "dev-master"
     }
 }

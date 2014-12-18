@@ -1,0 +1,5 @@
+entity.commerce_tax_type.list:
+  title: Tax types
+  route_name: entity.commerce_tax_type.list
+  parent: commerce.configuration
+  description: 'Manage your taxes.'

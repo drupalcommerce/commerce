@@ -1,0 +1,71 @@
+# Schema for the configuration files of the commerce_tax module.
+
+commerce_tax.commerce_tax_type.*:
+  type: config_entity
+  label: 'Tax type'
+  mapping:
+    id:
+      type: string
+      label: 'Tax type id'
+    name:
+      type: string
+      label: 'Tax type name'
+    compound:
+      type: boolean
+      label: 'Tax type compoundness'
+    roundingMode:
+      type: integer
+      label: 'Tax type rounding mode'
+    tag:
+      type: string
+      label: 'Tax type tag'
+    rates:
+      type: sequence
+      label: 'Tax type rates'
+      sequence:
+        - type: string
+
+commerce_tax.commerce_tax_rate.*:
+  type: config_entity
+  label: 'Tax rate'
+  mapping:
+    id:
+      type: string
+      label: 'Tax rate id'
+    name:
+      type: string
+      label: 'Tax rate name'
+    displayName:
+      type: string
+      label: 'Tax rate display name'
+    default:
+      type: boolean
+      label: 'Tax type defaultness'
+    amounts:
+      type: sequence
+      label: 'Tax rate amounts'
+      sequence:
+        - type: string
+    type:
+      type: string
+      label: 'Tax rate type'
+
+commerce_tax.commerce_tax_rate_amount.*:
+  type: config_entity
+  label: 'Tax rate amount'
+  mapping:
+    id:
+      type: string
+      label: 'Tax rate amount id'
+    amount:
+      type: float
+      label: 'Tax rate amount amount'
+    startDate:
+      type: date_format
+      label: 'Tax rate amount start date'
+    endDate:
+      type: date_format
+      label: 'Tax rate amount end date'
+    rate:
+      type: string
+      label: 'Tax rate amount tax rate'
