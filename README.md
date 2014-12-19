@@ -32,8 +32,7 @@ Related Libraries
 ------------------
 
 For the 2.x branch of Drupal Commerce, Commerce Guys has moved some of the logic
-out of the Drupal world and into the greater PHP community. This effort has
-produced four unique eCommerce-related PHP libraries
+out of the Drupal world and into the greater PHP community.
 
 ###[Intl](https://github.com/commerceguys/intl)
 
