@@ -422,9 +422,11 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['line_items'] = BaseFieldDefinition::create('map')
+    $fields['line_items'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Line items'))
-      ->setDescription(t('A serialized array of line items.'));
+      ->setDescription(t('An entity reference to line items.'))
+      ->setCardinality(-1)
+      ->setSetting('target_type', 'commerce_line_item');
 
     $fields['hostname'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Hostname'))
