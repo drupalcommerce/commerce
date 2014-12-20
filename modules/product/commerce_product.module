@@ -24,17 +24,21 @@ function commerce_product_entity_base_field_info(EntityTypeInterface $entity_typ
   $default_price_field = \Drupal::config('commerce_product.settings')->get('default_price_field');
   if ($entity_type->id() == 'commerce_product' && $default_price_field) {
 
-    $fields['price'] = BaseFieldDefinition::create('price')
-      ->setLabel(t('Price'))
-      ->setDescription(t('Price field for products'))
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
-      ->setDisplayOptions('form', array(
-        'type' => 'price_simple',
-        'weight' => -3,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+    $currencies = entity_load_multiple('commerce_currency');
+    foreach ($currencies as $currency) {
+      $fields['price_' . $currency->getCurrencyCode()] = BaseFieldDefinition::create('price')
+        ->setLabel(t('@currency_code Price', array('@currency_code' => $currency->getCurrencyCode())))
+        ->setDescription(t('@currency_code Price field for products', array('@currency_code' => $currency->getCurrencyCode())))
+        ->setRequired(TRUE)
+        ->setRevisionable(TRUE)
+        ->setDisplayOptions('form', array(
+          'type' => 'price_simple',
+          'weight' => -3,
+        ))
+        ->setDefaultValue(array('amount' => '0', 'currency_code' => $currency->getCurrencyCode()))
+        ->setDisplayConfigurable('form', TRUE)
+        ->setDisplayConfigurable('view', TRUE);
+    }
 
     return $fields;
   }
