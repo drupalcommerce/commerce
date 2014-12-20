@@ -248,17 +248,6 @@ class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInte
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'author',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => array(
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ),
       ))
       ->setDisplayConfigurable('form', TRUE);
 
@@ -303,9 +292,37 @@ class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInte
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['line_items'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Line items'))
-      ->setDescription(t('A serialized array of line items.'));
+    $fields['quantity'] = BaseFieldDefinition::create('decimal')
+      ->setLabel(t('Quantity'))
+      ->setDescription(t('The quantity of units.'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setRevisionable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => 1,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['unit_price'] = BaseFieldDefinition::create('price')
+      ->setLabel(t('Unit Price'))
+      ->setDescription(t('Unit Price of the Line Item'))
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'price_simple',
+        'weight' => 2,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['line_total'] = BaseFieldDefinition::create('price')
+      ->setLabel(t('Line Item Total Price'))
+      ->setDescription(t('The total price of the line item.'))
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
