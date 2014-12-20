@@ -1,0 +1,50 @@
+entity.commerce_line_item_type.list:
+  path: '/admin/commerce/config/line-item-types'
+  defaults:
+    _entity_list: 'commerce_line_item_type'
+    _title: 'Line item types'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer line item types'
+
+entity.commerce_line_item_type.edit_form:
+  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit'
+  defaults:
+    _entity_form: commerce_line_item_type.edit
+    _title: 'Edit a line item type'
+  options:
+    _admin_route: TRUE
+  requirements:
+   _entity_access: 'commerce_line_item_type.edit'
+
+entity.commerce_line_item_type.add_form:
+  path: '/admin/commerce/config/line-item-types/add'
+  defaults:
+    _entity_form: 'commerce_line_item_type.add'
+    _title: 'Add a new line item type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_line_item_type'
+
+entity.commerce_line_item_type.delete_form:
+  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/delete'
+  defaults:
+    _entity_form: 'commerce_line_item_type.delete'
+    _title: 'Delete a line item type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_line_item_type.delete'
+
+entity.commerce_line_item_type.devel:
+  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/devel'
+  defaults:
+    _controller: '\Drupal\commerce_line_item\Controller\CommerceLineItemDevelController::lineItemTypeLoad'
+    _title: 'Dump an line item type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _module_dependencies: 'devel'
+    _permission: 'access devel information'

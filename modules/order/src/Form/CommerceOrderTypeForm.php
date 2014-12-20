@@ -22,7 +22,7 @@ class CommerceOrderTypeForm extends EntityForm {
   protected $orderTypeStorage;
 
   /**
-   * Create an IndexForm object.
+   * Create an CommerceOrderTypeForm object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $order_type_storage
    *   The order type storage.
