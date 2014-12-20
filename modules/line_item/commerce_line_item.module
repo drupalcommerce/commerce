@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Defines the core Commerce line item entity type and API functions to manage
+ * line items and interact with them.
+ */
+

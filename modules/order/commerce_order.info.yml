@@ -5,3 +5,5 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce
+  - commerce_line_item
+  - entity_reference

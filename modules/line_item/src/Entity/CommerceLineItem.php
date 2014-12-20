@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\Entity\CommerceOrder.
+ * Contains \Drupal\commerce_line_item\Entity\CommerceLineItem.
  */
 
-namespace Drupal\commerce_order\Entity;
+namespace Drupal\commerce_line_item\Entity;
 
-use Drupal\commerce_order\CommerceOrderInterface;
+use Drupal\commerce_line_item\CommerceLineItemInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -15,39 +15,38 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Defines the Commerce Order entity.
+ * Defines the Commerce Line item entity.
  *
  * @ContentEntityType(
- *   id = "commerce_order",
- *   label = @Translation("Order"),
+ *   id = "commerce_line_item",
+ *   label = @Translation("Line Item"),
  *   handlers = {
- *     "list_builder" = "Drupal\commerce_order\CommerceOrderListBuilder",
+ *     "list_builder" = "Drupal\commerce_line_item\CommerceLineItemListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\commerce_order\Form\CommerceOrderForm",
- *       "edit" = "Drupal\commerce_order\Form\CommerceOrderForm",
- *       "delete" = "Drupal\commerce_order\Form\CommerceOrderDeleteForm"
+ *       "add" = "Drupal\commerce_line_item\Form\CommerceLineItemForm",
+ *       "edit" = "Drupal\commerce_line_item\Form\CommerceLineItemForm",
+ *       "delete" = "Drupal\commerce_line_item\Form\CommerceLineItemDeleteForm"
  *     }
  *   },
- *   base_table = "commerce_order",
+ *   base_table = "commerce_line_item",
  *   admin_permission = "administer orders",
  *   fieldable = TRUE,
  *   entity_keys = {
- *     "id" = "order_id",
- *     "label" = "order_number",
+ *     "id" = "line_item_id",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_order.edit_form",
- *     "delete-form" = "entity.commerce_order.delete_form"
+ *     "edit-form" = "entity.commerce_line_item.edit_form",
+ *     "delete-form" = "entity.commerce_line_item.delete_form"
  *   },
- *   bundle_entity_type = "commerce_order_type",
- *   field_ui_base_route = "entity.commerce_order.admin_form",
+ *   bundle_entity_type = "commerce_line_item_type",
+ *   field_ui_base_route = "entity.commerce_line_item_type.edit_form",
  * )
  */
-class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface {
+class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInterface {
 
   /**
    * {@inheritdoc}
@@ -70,20 +69,10 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       $this->setOwnerId(\Drupal::currentUser()->id());
     }
 
-    // If no revision author has been set explicitly, make the order owner the
+    // If no revision author has been set explicitly, make the line item owner the
     // revision author.
     if (!$this->getRevisionAuthor()) {
       $this->setRevisionAuthorId($this->getOwnerId());
-    }
-
-    if ($this->isNew()) {
-      if (!$this->getHostname()) {
-        $this->setHostname(\Drupal::request()->getClientIp());
-      }
-
-      if (!$this->getEmail()) {
-        $this->setEmail($this->getOwner()->getEmail());
-      }
     }
   }
 
@@ -94,40 +83,12 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
     parent::preSaveRevision($storage, $record);
 
     if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing order without adding a new revision, we
+      // If we are updating an existing line item without adding a new revision, we
       // need to make sure $entity->revision_log is reset whenever it is empty.
       // Therefore, this code allows us to avoid clobbering an existing log
       // entry with an empty one.
       $record->revision_log = $this->original->revision_log->value;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
-
-    // If no order number has been set explicitly, set it to the order id.
-    if (!$this->getOrderNumber()) {
-      $this->setOrderNumber($this->id());
-      $this->save();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOrderNumber() {
-    return $this->get('order_number')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOrderNumber($order_number) {
-    $this->set('order_number', $order_number);
-    return $this;
   }
 
   /**
@@ -237,52 +198,6 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public function getLineItems() {
-    return $this->get('line_items')->first()->getValue();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setLineItems($line_items) {
-    $this->set('line_items', array($line_items));
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getHostname() {
-    return $this->get('hostname')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setHostname($hostname) {
-    $this->set('hostname', $hostname);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEmail() {
-    return $this->get('mail')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEmail($mail) {
-    $this->set('mail', $mail);
-    return $this;
-  }
-
-
-  /**
-   * {@inheritdoc}
-   */
   public function getData() {
     return $this->get('data')->first()->getValue();
   }
@@ -299,54 +214,36 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['order_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Order ID'))
-      ->setDescription(t('The order ID.'))
+    $fields['line_item_id'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Line Item ID'))
+      ->setDescription(t('The line item ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
-    $fields['order_number'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Order number'))
-      ->setDescription(t('The order number displayed to the customer.'))
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
-      ->setDefaultValue('')
-      ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'hidden',
-        'weight' => 0,
-      ))
-      ->setDisplayConfigurable('form', TRUE);
-
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
-      ->setDescription(t('The order UUID.'))
+      ->setDescription(t('The line item UUID.'))
       ->setReadOnly(TRUE);
 
     $fields['revision_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Revision ID'))
-      ->setDescription(t('The order revision ID.'))
+      ->setDescription(t('The line item revision ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
-      ->setDescription(t('The order type.'))
-      ->setSetting('target_type', 'commerce_order_type')
+      ->setDescription(t('The line item type.'))
+      ->setSetting('target_type', 'commerce_line_item_type')
       ->setReadOnly(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
-      ->setDescription(t('The user that owns this order.'))
+      ->setDescription(t('The user that owns this line item.'))
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\commerce_line_item\Entity\CommerceLineItem::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -365,25 +262,9 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ))
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Email'))
-      ->setDescription(t('The e-mail address associated with the order.'))
-      ->setDefaultValue('')
-      ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'text_textfield',
-        'weight' => 1,
-      ))
-      ->setDisplayConfigurable('form', TRUE);
-
     $fields['status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Status'))
-      ->setDescription(t('The status name of this order.'))
+      ->setDescription(t('The status name of this line item.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
@@ -401,7 +282,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the order was created.'))
+      ->setDescription(t('The time that the line item was created.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
@@ -418,31 +299,13 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the order was last edited.'))
+      ->setDescription(t('The time that the line item was last edited.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['line_items'] = BaseFieldDefinition::create('entity_reference')
+    $fields['line_items'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Line items'))
-      ->setDescription(t('An entity reference to line items.'))
-      ->setCardinality(-1)
-      ->setSetting('target_type', 'commerce_line_item');
-
-    $fields['hostname'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Hostname'))
-      ->setDescription(t('The IP address that created this order.'))
-      ->setDefaultValue('')
-      ->setSetting('max_length', 128)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'hidden',
-        'weight' => 0,
-      ))
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDescription(t('A serialized array of line items.'));
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))

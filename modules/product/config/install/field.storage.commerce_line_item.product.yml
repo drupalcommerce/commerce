@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_line_item
+    - entity_reference
+id: commerce_line_item.field_product
+field_name: product
+entity_type: commerce_line_item
+type: entity_reference
+settings:
+  target_type: commerce_product
+module: entity_reference
+locked: false
+cardinality: 1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false

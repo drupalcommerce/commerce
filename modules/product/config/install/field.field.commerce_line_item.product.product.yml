@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_line_item.commerce_line_item_type.product
+    - field.storage.commerce_line_item.product
+  module:
+    - entity_reference
+id: commerce_line_item.product.field_product
+field_name: product
+entity_type: commerce_line_item
+bundle: product
+label: Product
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: default
+  handler_settings:
+    sort:
+      field: _none
+third_party_settings: {  }
+field_type: entity_reference

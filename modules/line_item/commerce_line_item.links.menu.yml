@@ -1,0 +1,5 @@
+entity.commerce_line_item_type.list:
+  title: Line item types
+  route_name: entity.commerce_line_item_type.list
+  parent: commerce.configuration
+  description: 'Manage your line item types.'

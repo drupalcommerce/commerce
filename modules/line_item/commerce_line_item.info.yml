@@ -1,0 +1,7 @@
+name: Commerce Line Item
+type: module
+description: 'Defines the Line Item entity and associated features.'
+package: Commerce
+core: 8.x
+dependencies:
+  - commerce
