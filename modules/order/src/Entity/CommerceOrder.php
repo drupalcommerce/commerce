@@ -428,6 +428,13 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
       ->setCardinality(-1)
       ->setSetting('target_type', 'commerce_line_item');
 
+    $fields['order_total'] = BaseFieldDefinition::create('price')
+      ->setLabel(t('Order Total Price'))
+      ->setDescription(t('The total price of the order.'))
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['hostname'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Hostname'))
       ->setDescription(t('The IP address that created this order.'))
