@@ -6,4 +6,5 @@ core: 8.x
 dependencies:
   - commerce
   - commerce_line_item
+  - commerce_price
   - entity_reference
