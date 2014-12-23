@@ -24,46 +24,46 @@ commerce_price.commerce_currency.*:
       type: boolean
 
 commerce_price.commerce_number_format.*:
- type: config_entity
- label: 'Number Format'
- mapping:
-   locale:
-     type: string
-     label: 'Locale'
-   name:
-     type: label
-     label: 'Name'
-     translatable: true
-   numberingSystem:
-     type: array
-     label: 'Numbering System'
-   decimalSeparator:
-     type: array
-     label: 'Decimal Separator'
-   plusSign:
-     type: array
-     label: 'Plus sign'
-   minusSign:
-     type: array
-     label: 'Minus sign'
-   percentSign:
-     type: array
-     label: 'Percent sign'
-   decimalPattern:
-     type: string
-     label: 'Decimal pattern'
-   percentPattern:
-     type: string
-     label: 'Percent pattern'
-   currencyPattern:
-     type: string
-     label: 'Currency pattern'
-   accountingCurrencyPattern:
-     type: string
-     label: 'Accounting currency pattern'
-   groupingSeparator:
-     type: array
-     label: 'Grouping Separator'
-   status:
-     label: Status
-     type: boolean
+  type: config_entity
+  label: 'Number Format'
+  mapping:
+    locale:
+      type: string
+      label: 'Locale'
+    name:
+      type: label
+      label: 'Name'
+      translatable: true
+    numberingSystem:
+      type: string
+      label: 'Numbering System'
+    decimalSeparator:
+      type: string
+      label: 'Decimal Separator'
+    plusSign:
+      type: string
+      label: 'Plus sign'
+    minusSign:
+      type: string
+      label: 'Minus sign'
+    percentSign:
+      type: string
+      label: 'Percent sign'
+    decimalPattern:
+      type: string
+      label: 'Decimal pattern'
+    percentPattern:
+      type: string
+      label: 'Percent pattern'
+    currencyPattern:
+      type: string
+      label: 'Currency pattern'
+    accountingCurrencyPattern:
+      type: string
+      label: 'Accounting currency pattern'
+    groupingSeparator:
+      type: string
+      label: 'Grouping Separator'
+    status:
+      label: Status
+      type: boolean
