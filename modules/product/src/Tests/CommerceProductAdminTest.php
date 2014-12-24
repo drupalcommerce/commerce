@@ -130,15 +130,15 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
    * Tests adding product fields.
    */
   function testAddCommerceProductFieldAdmin() {
-    $this->drupalGet('admin/commerce/config/product-types/product/edit/fields');
+    $this->drupalGet('admin/commerce/config/product-types/product/edit/fields/add-field');
 
     // Create a new field.
     $edit = array(
-      'fields[_add_new_field][label]' => $label = $this->randomMachineName(),
-      'fields[_add_new_field][field_name]' => $name = strtolower($this->randomMachineName()),
-      'fields[_add_new_field][type]' => 'list_string',
+      'label' => $label = $this->randomMachineName(),
+      'field_name' => $name = strtolower($this->randomMachineName()),
+      'new_storage_type' => 'list_string',
     );
-    $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields', $edit, t('Save'));
+    $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields/add-field', $edit, t('Save and continue'));
 
     $edit = array('field_storage[settings][allowed_values]' => '1|1\n2|2');
     $this->drupalPostForm(NULL, $edit, t('Save field settings'));
