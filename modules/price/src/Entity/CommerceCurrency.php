@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\Entity\CommerceOrderType.
+ * Contains \Drupal\commerce_price\Entity\CommerceCurrency.
  */
 
 namespace Drupal\commerce_price\Entity;
