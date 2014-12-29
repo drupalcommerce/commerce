@@ -15,3 +15,9 @@ entity.commerce_tax_rate_amount.add_form:
   title: 'Add a new tax rate amount'
   appears_on:
     - entity.commerce_tax_rate_amount.list
+
+entity.commerce_tax_type.import_form:
+  route_name: entity.commerce_tax_type.import_form
+  title: 'Import a tax type'
+  appears_on:
+    - entity.commerce_tax_type.list

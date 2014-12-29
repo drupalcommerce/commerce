@@ -38,6 +38,16 @@ entity.commerce_tax_type.delete_form:
   requirements:
     _permission: 'administer stores'
 
+entity.commerce_tax_type.import_form:
+  path: '/admin/commerce/config/tax/type/import'
+  defaults:
+    _form: '\Drupal\commerce_tax\Form\CommerceTaxTypeImporterForm'
+    _title: 'Import form'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'commerce_tax_type'
+
 entity.commerce_tax_rate.list:
   path: '/admin/commerce/config/tax/rate/{commerce_tax_type}'
   defaults:

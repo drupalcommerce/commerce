@@ -13,8 +13,21 @@ namespace Drupal\commerce_tax;
 interface CommerceTaxTypeImporterInterface {
 
   /**
-   * Imports all the defined tax types.
+   * Returns all importable tax types.
+   *
+   * @return \CommerceGuys\Tax\Model\TaxTypeInterface
+   *   Array of importable tax types.
    */
-  public function import();
+  public function getImportableTaxTypes();
+
+  /**
+   * Creates a tax type entity from an id.
+   *
+   * @param id
+   *   The id of a tax type.
+   *
+   * @return \CommerceGuys\Tax\Model\TaxTypeInterface
+   */
+  public function createTaxType($tax_type_id);
 
 }
