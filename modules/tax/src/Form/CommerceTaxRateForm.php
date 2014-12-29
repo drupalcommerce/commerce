@@ -86,9 +86,9 @@ class CommerceTaxRateForm extends EntityForm {
     );
     $form['default'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Defaultness'),
+      '#title' => $this->t('Default'),
       '#default_value' => $tax_rate->isDefault(),
-      '#element_validate' => array('::validateDefaultness'),
+      '#element_validate' => array('::validateDefault'),
     );
 
     return $form;
@@ -116,7 +116,7 @@ class CommerceTaxRateForm extends EntityForm {
   /**
    * Validates that there is only one default per tax type.
    */
-  public function validateDefaultness(array $element, FormStateInterface $form_state, array $form) {
+  public function validateDefault(array $element, FormStateInterface $form_state, array $form) {
     $tax_rate = $this->getEntity();
     $default = $element['#value'];
     if ($default) {
