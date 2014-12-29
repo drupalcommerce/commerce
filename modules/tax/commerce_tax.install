@@ -5,8 +5,6 @@
  * Contains the install-related tasks of commerce_tax.
  */
 
-define('COMMERCE_TAX_DEFAULT_TAX_TYPES', __DIR__ . '/default/');
-
 /**
  * Implements hook_install().
  *
@@ -16,7 +14,7 @@ function commerce_tax_install() {
   /** @var \Drupal\commerce_tax\CommerceTaxTypeImporterFactoryInterface $tax_type_importer_factory */
   $tax_type_importer_factory = \Drupal::service('commerce_tax.commerce_tax_type_importer_factory');
 
-  $tax_type_importer_factory->createInstance(COMMERCE_TAX_DEFAULT_TAX_TYPES)->import();
+  $tax_type_importer_factory->createInstance()->import();
 }
 
 /**
