@@ -6,18 +6,6 @@
  */
 
 /**
- * Implements hook_install().
- *
- * Imports the default tax types/rates/rate amounts.
- */
-function commerce_tax_install() {
-  /** @var \Drupal\commerce_tax\CommerceTaxTypeImporterFactoryInterface $tax_type_importer_factory */
-  $tax_type_importer_factory = \Drupal::service('commerce_tax.commerce_tax_type_importer_factory');
-
-  $tax_type_importer_factory->createInstance()->import();
-}
-
-/**
  * Implements hook_requirements().
  *
  * Checks that the necessary libraries have been installed.
