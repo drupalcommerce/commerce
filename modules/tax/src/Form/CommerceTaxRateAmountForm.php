@@ -74,7 +74,7 @@ class CommerceTaxRateAmountForm extends EntityForm {
       '#required' => TRUE,
     );
     $form['amount'] = array(
-      '#type' => 'number',
+      '#type' => 'textfield',
       '#title' => $this->t('Amount'),
       '#default_value' => $tax_rate_amount->getAmount(),
       '#element_validate' => array('::validateAmount'),
