@@ -67,10 +67,26 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function import() {
-    foreach ($this->taxTypeRepository->getAll() as $tax_type) {
-      $this->importTaxType($tax_type);
+  public function getImportableTaxTypes() {
+    $importable_tax_types = $this->taxTypeRepository->getAll();
+    $imported_tax_types = $this->taxTypeStorage->loadMultiple();
+
+    // Remove any already imported tax types.
+    foreach ($imported_tax_types as $tax_type) {
+      if (isset($importable_tax_types[$tax_type->getId()])) {
+        unset($importable_tax_types[$tax_type->getId()]);
+      }
     }
+
+    return $importable_tax_types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createTaxType($tax_type_id) {
+    $tax_type = $this->taxTypeRepository->get($tax_type_id);
+    return $this->importTaxType($tax_type);
   }
 
   /**
@@ -93,11 +109,7 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
       'rates' => array_keys($tax_type->getRates()),
     );
 
-    foreach ($tax_type->getRates() as $tax_rate) {
-      $this->importTaxRate($tax_rate);
-    }
-
-    $this->taxTypeStorage->create($values)->save();
+    return $this->taxTypeStorage->create($values);
   }
 
   /**
@@ -116,11 +128,7 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
       'amounts' => array_keys($tax_rate->getAmounts()),
     );
 
-    foreach ($tax_rate->getAmounts() as $tax_rate_amount) {
-      $this->importTaxRateAmount($tax_rate_amount);
-    }
-
-    $this->taxRateStorage->create($values)->save();
+    return $this->taxRateStorage->create($values);
   }
 
   /**
@@ -130,15 +138,17 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
    *   The tax rate amount to import.
    */
   protected function importTaxRateAmount(TaxRateAmountInterface $tax_rate_amount) {
+    $start_date = $tax_rate_amount->getStartDate() ? $tax_rate_amount->getStartDate()->getTimestamp() : NULL;
+    $end_date = $tax_rate_amount->getEndDate() ? $tax_rate_amount->getEndDate()->getTimestamp() : NULL;
     $values = array(
       'rate' => $tax_rate_amount->getRate()->getId(),
       'id' => $tax_rate_amount->getId(),
       'amount' => $tax_rate_amount->getAmount(),
-      'startDate' => $tax_rate_amount->getStartDate(),
-      'endDate' => $tax_rate_amount->getEndDate(),
+      'startDate' => $start_date,
+      'endDate' => $end_date,
     );
 
-    $this->taxRateAmountStorage->create($values)->save();
+    return $this->taxRateAmountStorage->create($values);
   }
 
 }
