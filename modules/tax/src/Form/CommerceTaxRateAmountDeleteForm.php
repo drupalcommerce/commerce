@@ -14,7 +14,7 @@ use Drupal\Core\Url;
 /**
  * Builds the form to delete a tax type.
  */
-class CommerceTaxRateDeleteAmountForm extends EntityConfirmFormBase {
+class CommerceTaxRateAmountDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}
@@ -28,8 +28,8 @@ class CommerceTaxRateDeleteAmountForm extends EntityConfirmFormBase {
    */
   public function getCancelUrl() {
     return Url::fromRoute('entity.commerce_tax_rate_amount.list', array(
-        'commerce_tax_rate' => $this->entity->getRate(),
-      ));
+      'commerce_tax_rate' => $this->entity->getRate(),
+    ));
   }
 
   /**
