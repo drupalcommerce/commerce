@@ -41,6 +41,7 @@ use Drupal\user\UserInterface;
  *     "id" = "store_id",
  *     "bundle" = "type",
  *     "label" = "name",
+ *     "langcode" = "langcode",
  *     "uuid" = "uuid"
  *   },
  *   links = {

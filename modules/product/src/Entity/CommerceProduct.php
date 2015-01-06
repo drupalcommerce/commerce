@@ -44,6 +44,7 @@ use Drupal\user\UserInterface;
  *   entity_keys = {
  *     "id" = "product_id",
  *     "label" = "title",
+ *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
  *     "bundle" = "type"
