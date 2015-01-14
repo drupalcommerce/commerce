@@ -593,7 +593,7 @@ function commerce_checkout_panes($conditions = array(), $skip_saved_data = FALSE
       foreach ($conditions as $property => $value) {
         // If the current value for the specified property on the pane does not
         // match the filter value...
-        if ($checkout_pane[$property] != $value) {
+        if (!isset($checkout_pane[$property]) || $checkout_pane[$property] != $value) {
           // Do not add it to the temporary array.
           $valid = FALSE;
         }
