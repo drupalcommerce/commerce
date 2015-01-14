@@ -363,7 +363,7 @@ function commerce_cart_form_commerce_order_settings_form_alter(&$form, &$form_st
   $form['cart_refresh'] = array(
     '#type' => 'fieldset',
     '#title' => t('Shopping cart refresh'),
-    '#description' => t('Shopping cart orders comprise orders in shopping cart and some checkout related order statuses. These settings let you control the shopping cart orders are refreshed, the process during which product prices are recalculated, to improve site performance in the case of excessive refreshes on sites with less dynamic pricing needs.'),
+    '#description' => t('Shopping cart orders comprise orders in shopping cart and some checkout related order statuses. These settings let you control how the shopping cart orders are refreshed, the process during which product prices are recalculated, to improve site performance in the case of excessive refreshes on sites with less dynamic pricing needs.'),
     '#weight' => 40,
   );
   $form['cart_refresh']['commerce_cart_refresh_mode'] = array(
