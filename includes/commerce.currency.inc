@@ -239,6 +239,7 @@ function commerce_commerce_currency_info() {
       'name' => t('Swiss Franc'),
       'rounding_step' => '0.05',
       'numeric_code' => '756',
+      'thousands_separator' => "'",
       'minor_unit' => t('Rappen'),
       'major_unit' => t('Franc'),
     ),
