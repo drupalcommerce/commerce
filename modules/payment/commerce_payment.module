@@ -796,7 +796,7 @@ function commerce_payment_transaction_status_options_list() {
  */
 function theme_commerce_payment_transaction_status_icon($variables) {
   $transaction_status = $variables['transaction_status'];
-  return theme('image', array('path' => $transaction_status['icon'], 'alt' => $transaction_status['title'], 'title' => $transaction_status['title'], 'attributes' => array('class' => drupal_html_class($transaction_status['status']))));
+  return theme('image', array('path' => $transaction_status['icon'], 'alt' => $transaction_status['title'], 'title' => $transaction_status['title'], 'attributes' => array('class' => array(drupal_html_class($transaction_status['status'])))));
 }
 
 /**
