@@ -40,12 +40,9 @@ function commerce_price_requirements($phase) {
   $requirements = array();
 
   if ($phase == 'install') {
-    /* @var $packages Drupal\composer_manager\ComposerPackages */
-    $packages = \Drupal::service('composer_manager.packages');
-
-    if (!array_key_exists('commerceguys/intl', $packages->getInstalled())){
+    if (!class_exists('\CommerceGuys\Intl\Currency\CurrencyRepository')) {
       $requirements['commerce_price_library'] = array(
-        'description' => t("Commerce Price requires the Commerce Guys' International Library, run !command on the command line", array('!command' => 'drush composer install')),
+        'description' => t("Commerce Price requires the commerceguys/intl library."),
         'severity' => REQUIREMENT_ERROR,
       );
     }

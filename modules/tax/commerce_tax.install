@@ -14,12 +14,9 @@ function commerce_tax_requirements($phase) {
   $requirements = array();
 
   if ($phase === 'install') {
-    /* @var $packages Drupal\composer_manager\ComposerPackages */
-    $packages = \Drupal::service('composer_manager.packages');
-
-    if (!array_key_exists('commerceguys/tax', $packages->getInstalled())){
+    if (!class_exists('\CommerceGuys\Addressing\Repository\AddressFormatRepository')) {
       $requirements['commerce_tax_library'] = array(
-        'description' => t("Commerce Tax requires the Commerce Guys' Tax Library, run !command on the command line", array('!command' => 'drush composer install')),
+        'description' => t("Commerce Tax requires the commerceguys/tax library."),
         'severity' => REQUIREMENT_ERROR,
       );
     }
