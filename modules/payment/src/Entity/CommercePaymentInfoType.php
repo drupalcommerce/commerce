@@ -33,8 +33,8 @@ use Drupal\commerce_payment\CommercePaymentInfoTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_payment_info.admin_form",
- *     "delete-form" = "entity.commerce_payment_info_type.delete_form"
+ *     "edit-form" = "/admin/commerce/config/payment-info-types/{commerce_payment_info_type}",
+ *     "delete-form" = "/admin/commerce/payment-info/{commerce_payment_info}/delete"
  *   }
  * )
  */

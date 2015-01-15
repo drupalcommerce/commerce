@@ -100,7 +100,7 @@ entity.commerce_store_type.list:
     _permission: 'administer store types'
 
 entity.commerce_store_type.edit_form:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}'
+  path: '/admin/commerce/config/store/types/{commerce_store_type}/edit'
   defaults:
     _entity_form: 'commerce_store_type.edit'
     _title: 'Edit a store type'

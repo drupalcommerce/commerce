@@ -69,6 +69,16 @@ entity.commerce_order_type.list:
   requirements:
     _permission: 'administer order types'
 
+entity.commerce_order_type.admin_form:
+  path: '/admin/commerce/config/order-types/{commerce_order_type}'
+  defaults:
+    _entity_form: 'commerce_order_type.edit'
+    _title: 'Edit an order type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_order_type.update'
+
 entity.commerce_order.edit_form:
   path: '/admin/commerce/orders/{commerce_order}/edit'
   defaults:
@@ -88,6 +98,16 @@ entity.commerce_order.list:
     _admin_route: TRUE
   requirements:
     _permission: 'administer orders'
+
+entity.commerce_order_type.edit_form:
+  path: '/admin/commerce/config/order-types/{commerce_order_type}/edit'
+  defaults:
+    _entity_form: commerce_order_type.edit
+    _title: 'Edit order type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_order_type.update'
 
 entity.commerce_order_type.add_form:
   path: '/admin/commerce/config/order-types/add'

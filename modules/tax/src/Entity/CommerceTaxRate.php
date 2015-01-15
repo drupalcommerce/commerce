@@ -37,8 +37,8 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *     "type" = "type"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_tax_rate.edit_form",
- *     "delete-form" = "entity.commerce_tax_rate.delete_form"
+ *     "edit-form" = "/admin/commerce/config/tax/rate/{commerce_tax_rate}/edit",
+ *     "delete-form" = "/admin/commerce/config/tax/rate/{commerce_tax_rate}/delete"
  *   }
  * )
  */
