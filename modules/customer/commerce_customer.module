@@ -1052,10 +1052,10 @@ function commerce_customer_field_widget_form(&$form, &$form_state, $field, $inst
     $key = 0;
 
     foreach ($profiles as $profile) {
-      // Add a fieldset around the profile form.
       $element['profiles'][$key] = array(
         '#type' => 'fieldset',
         '#title' => check_plain($profile_type['name']),
+        '#parents' => array_merge($element['#field_parents'], array($element['#field_name'], $langcode, 'profiles', $key)),
       );
 
       // Store the original customer profile for later comparison.
