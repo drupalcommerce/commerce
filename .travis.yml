@@ -67,12 +67,12 @@ before_script:
   # Update drupal core
   - git pull origin 8.0.x
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
-  - drush en -y devel composer_manager simpletest commerce
-  - echo "require 'sites/all/vendor/autoload.php';" | sudo tee -a sites/default/settings.php
-  - cd sites/default/files/composer
-  - composer install
-  - cd ../../../../
-  - drush pm-enable commerce_product commerce_order --yes
+  - drush en -y devel composer_manager simpletest
+  - drush composer-manager-init
+  - cd core
+  - composer drupal-update
+  - cd ..
+  - drush en -y commerce commerce_product commerce_order
 
 script:
   # Run the tests
