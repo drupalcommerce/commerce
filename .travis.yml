@@ -21,6 +21,7 @@ install:
 
   # Install latest Drush 7.
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer self-update
   - composer global require --no-interaction --prefer-source drush/drush:dev-master
 
   # Make sure we don't fail when checking out projects
@@ -70,7 +71,7 @@ before_script:
   - drush en -y devel composer_manager simpletest
   - drush composer-manager-init
   - cd core
-  - composer drupal-update
+  - composer drupal-rebuild && composer update --prefer-source
   - cd ..
   - drush en -y commerce commerce_product commerce_order
 
