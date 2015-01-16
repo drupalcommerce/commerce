@@ -238,7 +238,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  FALSE if the appropiate modules were not available.
    */
   public function createDummyProductType($type = 'product_type', $name = 'Product Type', $description = '', $help = '', $append_random = TRUE) {
-    if (module_exists('commerce_product')) {
+    if (module_exists('commerce_product_ui')) {
       if ($append_random) {
         $type = $type .'_'. $this->randomName(20 - strlen($type) - 1);
         $name = $name .' '. $this->randomName(40 - strlen($name) - 1);
