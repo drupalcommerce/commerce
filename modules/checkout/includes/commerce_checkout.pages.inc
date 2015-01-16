@@ -67,6 +67,9 @@ function commerce_checkout_router($order, $checkout_page = NULL) {
 function commerce_checkout_form($form, &$form_state, $order, $checkout_page) {
   global $user;
 
+  // Ensure this include file is loaded when the form is rebuilt from the cache.
+  $form_state['build_info']['files']['form'] = drupal_get_path('module', 'commerce_checkout') . '/includes/commerce_checkout.pages.inc';
+
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.base.css';
   $form['#attached']['css'][] = drupal_get_path('module', 'commerce_checkout') .'/theme/commerce_checkout.theme.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'commerce_checkout') . '/commerce_checkout.js';
