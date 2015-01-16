@@ -15,7 +15,7 @@ function commerce_checkout_builder_form($form, &$form_state) {
   $checkout_pages = commerce_checkout_pages();
 
   // Add a "disabled" pseudo-page.
-  $checkout_pages['disabled'] = array('page_id' => 'disabled', 'title' => t('Disabled'));
+  $checkout_pages['disabled'] = array('page_id' => 'disabled', 'name' => t('Disabled'));
 
   $form['checkout_pages'] = array(
     '#type' => 'value',
@@ -29,7 +29,7 @@ function commerce_checkout_builder_form($form, &$form_state) {
     $form['page'][$page_id]['panes'] = array('#tree' => TRUE);
 
     // Build the options list for selecting the pane's checkout page.
-    $checkout_pages_options[$page_id] = $checkout_pages[$page_id]['title'];
+    $checkout_pages_options[$page_id] = $checkout_pages[$page_id]['name'];
   }
 
   // Loop through all the checkout panes on the site.
@@ -114,7 +114,7 @@ function commerce_checkout_builder_form_validate(&$form, &$form_state) {
         drupal_set_message(t('%pane must be configured before it can be enabled. It has been moved back to a disabled position.', array('%pane' => $panes[$pane_id]['title'])), 'warning');
       }
       else {
-        drupal_set_message(t('%pane is locked in the code to the %page page and was repositioned accordingly.', array('%pane' => $panes[$pane_id]['title'], '%page' => $pages[$panes[$pane_id]['page']]['title'])), 'warning');
+        drupal_set_message(t('%pane is locked in the code to the %page page and was repositioned accordingly.', array('%pane' => $panes[$pane_id]['title'], '%page' => $pages[$panes[$pane_id]['page']]['name'])), 'warning');
       }
 
       form_set_value($element, $panes[$pane_id]['page'], $form_state);
@@ -181,7 +181,7 @@ function theme_commerce_checkout_builder_form($variables) {
 
     // Add a non-draggable header row for each checkout page.
     $row = array(
-      array('data' => $checkout_page['title'], 'colspan' => 4),
+      array('data' => $checkout_page['name'], 'colspan' => 4),
     );
 
     $rows[] = array('data' => $row, 'class' => array('page-header'));
