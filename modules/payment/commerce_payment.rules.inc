@@ -180,7 +180,60 @@ function commerce_payment_rules_action_info() {
     );
   }
 
+  $actions['commerce_payment_redirect_pane_previous_page'] = array(
+    'label' => t('Redirect the checkout to the previous pane'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order', array(), array(
+          'context' => 'a drupal commerce order',
+        )),
+        'skip save' => TRUE,
+      ),
+    ),
+    'group' => t('Commerce Payment'),
+    'callbacks' => array(
+      'execute' => 'commerce_payment_rules_redirect_pane_previous_page',
+    ),
+  );
+  $actions['commerce_payment_redirect_pane_next_page'] = array(
+    'label' => t('Redirect the checkout to the next pane'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order', array(), array(
+          'context' => 'a drupal commerce order',
+        )),
+        'skip save' => TRUE,
+      ),
+    ),
+    'group' => t('Commerce Payment'),
+    'callbacks' => array(
+      'execute' => 'commerce_payment_rules_redirect_pane_next_page',
+    ),
+  );
+
   return $actions;
+}
+
+/**
+ * Implements Rules action execution callback.
+ *
+ * @param stdClass $order
+ *   An order.
+ */
+function commerce_payment_rules_redirect_pane_previous_page($order) {
+  commerce_payment_redirect_pane_previous_page($order);
+}
+
+/**
+ * Implements Rules action execution callback.
+ *
+ * @param stdClass $order
+ *   An order.
+ */
+function commerce_payment_rules_redirect_pane_next_page($order) {
+  commerce_payment_redirect_pane_next_page($order);
 }
 
 /**
