@@ -48,6 +48,7 @@ function commerce_line_item_entity_info() {
     ),
   );
 
+  $return['commerce_line_item']['bundles'] = array();
   foreach (commerce_line_item_type_get_name() as $type => $name) {
     $return['commerce_line_item']['bundles'][$type] = array(
       'label' => $name,
@@ -499,7 +500,7 @@ function commerce_line_item_type_get_name($type = NULL) {
   // Otherwise turn the array values into the type name only.
   $line_item_type_names = array();
 
-  foreach ((array) $line_item_types as $key => $value) {
+  foreach ($line_item_types as $key => $value) {
     $line_item_type_names[$key] = $value['name'];
   }
 

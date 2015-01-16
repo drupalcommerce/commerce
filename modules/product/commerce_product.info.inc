@@ -102,6 +102,13 @@ function commerce_product_entity_property_info() {
     'clear' => array('uid'),
   );
 
+  $info['commerce_product']['bundles'] = array();
+  foreach (commerce_product_type_get_name() as $type => $name) {
+    $info['commerce_product']['bundles'][$type] = array(
+      'label' => $name,
+    );
+  }
+
   return $info;
 }
 
@@ -109,18 +116,16 @@ function commerce_product_entity_property_info() {
  * Implements hook_entity_property_info_alter() on top of the Product module.
  */
 function commerce_product_entity_property_info_alter(&$info) {
-  if (!empty($info['commerce_product']['bundles'])) {
-    // Move the default price property to the product by default; as it is a
-    // required default field, this makes dealing with it more convenient.
-    $properties = array();
+  // Move the default price property to the product by default; as it is a
+  // required default field, this makes dealing with it more convenient.
+  $properties = array();
 
-    foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
-      $bundle_info += array('properties' => array());
-      $properties += $bundle_info['properties'];
-    }
+  foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
+    $bundle_info += array('properties' => array());
+    $properties += $bundle_info['properties'];
+  }
 
-    if (!empty($properties['commerce_price'])) {
-      $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
-    }
+  if (!empty($properties['commerce_price'])) {
+    $info['commerce_product']['properties']['commerce_price'] = $properties['commerce_price'];
   }
 }

@@ -81,6 +81,13 @@ function commerce_line_item_entity_property_info() {
     'schema field' => 'changed',
   );
 
+  $info['commerce_line_item']['bundles'] = array();
+  foreach (commerce_line_item_type_get_name() as $type => $name) {
+    $info['commerce_line_item']['bundles'][$type] = array(
+      'label' => $name,
+    );
+  }
+
   return $info;
 }
 
@@ -88,17 +95,19 @@ function commerce_line_item_entity_property_info() {
  * Implements hook_entity_property_info_alter() on top of the Line Item module.
  */
 function commerce_line_item_entity_property_info_alter(&$info) {
-  if (!empty($info['commerce_line_item']['bundles'])) {
-    // Move the price properties to the line item by default; as they are required
-    // default fields, this makes dealing with them more convenient.
-    $properties = array();
+  // Move the price properties to the line item by default; as they are required
+  // default fields, this makes dealing with them more convenient.
+  $properties = array();
 
-    foreach ($info['commerce_line_item']['bundles'] as $bundle => $bundle_info) {
-      $bundle_info += array('properties' => array());
-      $properties += $bundle_info['properties'];
-    }
+  foreach ($info['commerce_line_item']['bundles'] as $bundle => $bundle_info) {
+    $bundle_info += array('properties' => array());
+    $properties += $bundle_info['properties'];
+  }
 
+  if (!empty($properties['commerce_unit_price'])) {
     $info['commerce_line_item']['properties']['commerce_unit_price'] = $properties['commerce_unit_price'];
+  }
+  if (!empty($properties['commerce_total'])) {
     $info['commerce_line_item']['properties']['commerce_total'] = $properties['commerce_total'];
   }
 }
