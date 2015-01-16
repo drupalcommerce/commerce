@@ -2236,6 +2236,7 @@ function commerce_cart_add_to_cart_form($form, &$form_state, $line_item, $show_q
   // form with form IDs based on the $product_ids.
   $form['#validate'][] = 'commerce_cart_add_to_cart_form_validate';
   $form['#submit'][] = 'commerce_cart_add_to_cart_form_submit';
+  $form['#after_build'][] = 'commerce_cart_add_to_cart_form_after_build';
 
   return $form;
 }
@@ -2287,7 +2288,8 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
   // Then render and return the various product fields that might need to be
   // updated on the page.
   if (!empty($form_state['context'])) {
-    $product = $form_state['default_product'];
+    $product = commerce_product_load($form_state['default_product_id']);
+    $form_state['default_product'] = $product;
     $product->display_context = $form_state['context'];
 
     // First render the actual fields attached to the referenced product.
@@ -2421,6 +2423,18 @@ function commerce_cart_add_to_cart_form_submit($form, &$form_state) {
       drupal_set_message(t('%title could not be added to your cart.', array('%title' => $product->title)), 'error');
     }
   }
+}
+
+/**
+ * After build callback for the Add to Cart form.
+ */
+function commerce_cart_add_to_cart_form_after_build(&$form, &$form_state) {
+  // Remove the default_product entity to mitigate cache_form bloat and performance issues.
+  if (isset($form_state['default_product'])) {
+    $form_state['default_product_id'] = $form_state['default_product']->product_id;
+    unset($form_state['default_product']);
+  }
+  return $form;
 }
 
 /**
