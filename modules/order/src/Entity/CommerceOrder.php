@@ -40,8 +40,8 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_order.edit_form",
- *     "delete-form" = "entity.commerce_order.delete_form"
+ *     "edit-form" = "/admin/commerce/orders/{commerce_order}/edit",
+ *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete"
  *   },
  *   bundle_entity_type = "commerce_order_type",
  *   field_ui_base_route = "entity.commerce_order.admin_form",

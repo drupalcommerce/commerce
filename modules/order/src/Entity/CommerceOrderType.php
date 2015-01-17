@@ -33,8 +33,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_order.admin_form",
- *     "delete-form" = "entity.commerce_order_type.delete_form"
+ *     "edit-form" = "/admin/commerce/config/order-types/{commerce_order_type}/edit",
+ *     "delete-form" = "/admin/commerce/config/order-types/{commerce_order_type}/delete"
  *   }
  * )
  */

@@ -33,8 +33,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "status" = "status"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_currency.edit_form",
- *     "delete-form" = "entity.commerce_currency.delete_form"
+ *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
+ *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete"
  *   }
  * )
  */

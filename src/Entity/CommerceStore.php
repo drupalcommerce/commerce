@@ -45,8 +45,8 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_store.edit_form",
- *     "delete-form" = "entity.commerce_store.delete_form",
+ *     "edit-form" = "/admin/commerce/config/store/{commerce_store}/edit",
+ *     "delete-form" = "/admin/commerce/config/store/{commerce_store}/delete",
  *   },
  *   bundle_entity_type = "commerce_store_type",
  *   field_ui_base_route = "entity.commerce_store_type.edit_form",

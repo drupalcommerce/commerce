@@ -33,8 +33,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "status" = "status"
  *   },
  *   links = {
- *     "edit-form" = "entity.commerce_number_format.edit_form",
- *     "delete-form" = "entity.commerce_number_format.delete_form"
+ *     "edit-form" = "/admin/commerce/config/number-format/{commerce_number_format}",
+ *     "delete-form" = "/admin/commerce/config/number-format/{commerce_number_format}/delete"
  *   }
  * )
  */
