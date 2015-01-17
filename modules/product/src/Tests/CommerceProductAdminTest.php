@@ -119,7 +119,6 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
         'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
       );
       $this->drupalPostForm(NULL, $edit, t('Save settings'));
-      file_put_contents("1.html", $this->getRawContent());
       $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
       $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-" . $attribute_widget, "Product attribute widget select list field is checked");
       $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
