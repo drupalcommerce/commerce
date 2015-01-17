@@ -94,7 +94,7 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     $edit = array(
       'label' => $this->randomMachineName(8),
     );
-    $this->drupalPostForm('admin/commerce/config/store/types/online', $edit, 'Save');
+    $this->drupalPostForm('admin/commerce/config/store/types/online/edit', $edit, 'Save');
     $store_type_changed = CommerceStoreType::load($store_type->id());
     $this->assertEqual($store_type->label(), $store_type_changed->label(), 'The label of the store type has been changed.');
   }
