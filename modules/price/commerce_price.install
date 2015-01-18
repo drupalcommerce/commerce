@@ -21,13 +21,10 @@ function commerce_price_install() {
   // Import default number formats.
   /** @var \Drupal\commerce_price\NumberFormatImporterInterface $format_importer */
   $format_importer = \Drupal::service('commerce_price.number_format_importer');
-  $preloaded_number_formats = \Drupal::languageManager()->getLanguages();
+  $active_languages = \Drupal::languageManager()->getLanguages();
 
-  foreach ($preloaded_number_formats as $language) {
-    $entity = $format_importer->importNumberFormat($language);
-    if ($entity) {
-      $entity->save();
-    }
+  foreach ($active_languages as $language) {
+    $format_importer->importNumberFormats($language);
   }
 }
 
