@@ -29,10 +29,12 @@ class Price extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['amount'] = DataDefinition::create('float')
-      ->setLabel(t('Amount'));
+      ->setLabel(t('Amount'))
+      ->setRequired(FALSE);
 
     $properties['currency_code'] = DataDefinition::create('string')
-      ->setLabel(t('Currency code'));
+      ->setLabel(t('Currency code'))
+      ->setRequired(FALSE);
 
     return $properties;
   }
@@ -48,13 +50,11 @@ class Price extends FieldItemBase {
           'type' => 'numeric',
           'precision' => 19,
           'scale' => 6,
-          'not null' => FALSE,
         ),
         'currency_code' => array(
           'description' => 'The currency code for the price.',
           'type' => 'varchar',
           'length' => 3,
-          'not null' => FALSE,
         ),
       ),
     );
