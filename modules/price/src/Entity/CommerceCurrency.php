@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   admin_permission = "administer stores",
  *   config_prefix = "commerce_currency",
  *   entity_keys = {
- *     "id" = "currencyCode",
+ *     "id" = "currency_code",
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "status" = "status"
@@ -45,7 +45,7 @@ class CommerceCurrency extends ConfigEntityBase implements CurrencyInterface {
    *
    * @var string
    */
-  protected $currencyCode;
+  protected $currency_code;
 
   /**
    * The currency name.
@@ -86,14 +86,14 @@ class CommerceCurrency extends ConfigEntityBase implements CurrencyInterface {
    * {@inheritdoc}
    */
   public function getCurrencyCode() {
-    return $this->currencyCode;
+    return $this->currency_code;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCurrencyCode($currencyCode) {
-    $this->currencyCode = $currencyCode;
+  public function setCurrencyCode($currency_code) {
+    $this->currency_code = $currency_code;
 
     return $this;
   }

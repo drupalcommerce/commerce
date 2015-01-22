@@ -25,7 +25,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
   /**
    * User with permission to administer products.
    */
-  protected $admin_user;
+  protected $adminUser;
 
   /**
    * The product to test against
@@ -34,13 +34,13 @@ abstract class CommerceProductTestBase extends WebTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser(array(
       'administer products',
       'administer product types',
       'administer commerce_product fields',
       'access administration pages',
     ));
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
   }
 
   /**

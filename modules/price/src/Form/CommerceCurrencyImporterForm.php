@@ -102,8 +102,8 @@ class CommerceCurrencyImporterForm extends FormBase {
       drupal_set_message(
         $this->t('Imported the %label currency.', array('%label' => $currency->label()))
       );
-      $triggering_element = $form_state->getTriggeringElement();
-      if ($triggering_element['#name'] == 'import_and_new') {
+      $triggeringElement = $form_state->getTriggeringElement();
+      if ($triggeringElement['#name'] == 'import_and_new') {
         $form_state->setRebuild();
       }
       else {

@@ -85,14 +85,14 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    *
    * @var bool
    */
-  protected $create_body = TRUE;
+  protected $createBody = TRUE;
 
   /**
    * The label to use for the body field upon entity creation.
    *
    * @var string
    */
-  protected $create_body_label = 'Body';
+  protected $createBodyLabel = 'Body';
 
   /**
    * {@inheritdoc}

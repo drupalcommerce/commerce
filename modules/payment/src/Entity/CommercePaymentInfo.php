@@ -51,8 +51,8 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
   /**
    * {@inheritdoc}
    */
-  public function setPaymentMethod($method_id) {
-    $this->set('payment_method', $method_id);
+  public function setPaymentMethod($methodId) {
+    $this->set('payment_method', $methodId);
     return $this;
   }
 
@@ -66,8 +66,8 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
   /**
    * {@inheritdoc}
    */
-  public function setInstanceId($instance_id) {
-    $this->set('instance_id', $instance_id);
+  public function setInstanceId($instanceId) {
+    $this->set('instance_id', $instanceId);
     return $this;
   }
 
@@ -81,8 +81,8 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
   /**
    * {@inheritdoc}
    */
-  public function setRemoteId($remote_id) {
-    $this->set('remote_id', $remote_id);
+  public function setRemoteId($remoteId) {
+    $this->set('remote_id', $remoteId);
     return $this;
   }
 
@@ -177,7 +177,7 @@ class CommercePaymentInfo extends ContentEntityBase implements CommercePaymentIn
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['information_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Payment information ID'))
       ->setDescription(t('Primary key: numeric payment information id.'))

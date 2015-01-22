@@ -25,22 +25,22 @@ class CommerceLineItemController extends ControllerBase {
    *   A render array for a list of the line item types that can be added.
    */
   public function addPage() {
-    $line_item_types = $this->entityManager()->getStorage('commerce_line_item_type')->loadMultiple();
+    $lineItemTypes = $this->entityManager()->getStorage('commerce_line_item_type')->loadMultiple();
     // Filter out the line item types the user doesn't have access to.
-    foreach ($line_item_types as $line_item_type_id => $line_item_type) {
-      if (!$this->entityManager()->getAccessControlHandler('commerce_line_item')->createAccess($line_item_type_id)) {
-        unset($line_item_types[$line_item_type_id]);
+    foreach ($lineItemTypes as $lineItemTypeId => $lineItemType) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_line_item')->createAccess($lineItemTypeId)) {
+        unset($lineItemTypes[$lineItemTypeId]);
       }
     }
 
-    if (count($line_item_types) == 1) {
-      $line_item_type = reset($line_item_types);
-      return $this->redirect('entity.commerce_line_item.add_form', array('commerce_line_item_type' => $line_item_type->id()));
+    if (count($lineItemTypes) == 1) {
+      $lineItemType = reset($lineItemTypes);
+      return $this->redirect('entity.commerce_line_item.add_form', array('commerce_line_item_type' => $lineItemType->id()));
     }
 
     return array(
       '#theme' => 'commerce_line_item_add_list',
-      '#types' => $line_item_types,
+      '#types' => $lineItemTypes,
     );
   }
 
@@ -54,10 +54,10 @@ class CommerceLineItemController extends ControllerBase {
    *   An line_item add form.
    */
   public function add(CommerceLineItemTypeInterface $commerce_line_item_type) {
-    $line_item = $this->entityManager()->getStorage('commerce_line_item')->create(array(
+    $lineItem = $this->entityManager()->getStorage('commerce_line_item')->create(array(
       'type' => $commerce_line_item_type->id(),
     ));
-    $form = $this->entityFormBuilder()->getForm($line_item, 'add');
+    $form = $this->entityFormBuilder()->getForm($lineItem, 'add');
 
     return $form;
   }

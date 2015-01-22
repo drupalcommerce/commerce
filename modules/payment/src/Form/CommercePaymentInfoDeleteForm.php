@@ -43,9 +43,9 @@ class CommercePaymentInfoDeleteForm extends ContentEntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
-      $payment_info_type = $this->entity->payment_method->entity->label();
+      $paymentInfoType = $this->entity->payment_method->entity->label();
       $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('@type %payment_info_label has been deleted.', array('@type' => $payment_info_type, '%payment_info_label' => $this->entity->label())));
+      drupal_set_message($this->t('@type %payment_info_label has been deleted.', array('@type' => $paymentInfoType, '%payment_info_label' => $this->entity->label())));
       $this->logger('commerce_payment')->notice('commerce_payment', '@type: deleted %payment_info_label.', array('@type' => $this->entity->bundle(), '%payment_info_label' => $this->entity->label()));
     }
     catch (\Exception $e) {

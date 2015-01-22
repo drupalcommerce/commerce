@@ -43,9 +43,9 @@ class CommerceOrderDeleteForm extends ContentEntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     try {
       $this->entity->delete();
-      $order_type = $this->entity->type->entity->label();
+      $orderType = $this->entity->type->entity->label();
       $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('@type %order_label has been deleted.', array('@type' => $order_type, '%order_label' => $this->entity->label())));
+      drupal_set_message($this->t('@type %order_label has been deleted.', array('@type' => $orderType, '%order_label' => $this->entity->label())));
       $this->logger('commerce_order')->notice('@type: deleted %order_label.', array('@type' => $this->entity->bundle(), '%order_label' => $this->entity->label()));
     }
     catch (\Exception $e) {

@@ -24,21 +24,21 @@ class CommercePaymentInfoTypeForm extends EntityForm {
   /**
    * Create an IndexForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $payment_info_type_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $paymentInfoTypeStorage
    *   The payment info type storage.
    */
-  public function __construct(EntityStorageInterface $payment_info_type_storage) {
+  public function __construct(EntityStorageInterface $paymentInfoTypeStorage) {
     // Setup object members.
-    $this->paymentInfoTypeStorage = $payment_info_type_storage;
+    $this->paymentInfoTypeStorage = $paymentInfoTypeStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-   $entity_manager = $container->get('entity.manager');
-   return new static($entity_manager->getStorage('commerce_payment_info_type'));
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+   $entityManager = $container->get('entity.manager');
+   return new static($entityManager->getStorage('commerce_payment_info_type'));
   }
 
   /**
@@ -46,31 +46,31 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $payment_information_type = $this->entity;
+    $paymentInformationType = $this->entity;
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $payment_information_type->label(),
+      '#default_value' => $paymentInformationType->label(),
       '#description' => $this->t('Label for the payment information type.'),
       '#required' => TRUE,
     );
 
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $payment_information_type->id(),
+      '#default_value' => $paymentInformationType->id(),
       '#machine_name' => array(
         'exists' => array($this->paymentInfoTypeStorage, 'load'),
         'source' => array('label'),
       ),
-      '#disabled' => !$payment_information_type->isNew(),
+      '#disabled' => !$paymentInformationType->isNew(),
     );
 
     $form['description'] = array(
       '#title' => t('Description'),
       '#type' => 'textarea',
-      '#default_value' => $payment_information_type->getDescription(),
+      '#default_value' => $paymentInformationType->getDescription(),
       '#description' => $this->t('Description of this payment information type'),
     );
 
@@ -81,19 +81,19 @@ class CommercePaymentInfoTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $payment_information_type = $this->entity;
+    $paymentInformationType = $this->entity;
 
     try {
-      $payment_information_type->save();
+      $paymentInformationType->save();
       drupal_set_message($this->t('Saved the %payment_info_type_label payment information type.', array(
-        '%payment_info_type_label' => $payment_information_type->label(),
+        '%payment_info_type_label' => $paymentInformationType->label(),
       )));
       $form_state->setRedirect('entity.commerce_payment_info_type.list');
     }
     catch (\Exception $e) {
       watchdog_exception('commerce_payment', $e);
       drupal_set_message($this->t('The %payment_info_type_label payment information type was not saved.', array(
-        '%payment_info_type_label' => $payment_information_type->label(),
+        '%payment_info_type_label' => $paymentInformationType->label(),
       )), 'error');
       $form_state->setRebuild();
     }

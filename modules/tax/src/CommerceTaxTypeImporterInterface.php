@@ -28,6 +28,6 @@ interface CommerceTaxTypeImporterInterface {
    *
    * @return \CommerceGuys\Tax\Model\TaxTypeInterface
    */
-  public function createTaxType($tax_type_id);
+  public function createTaxType($taxTypeId);
 
 }

@@ -51,8 +51,8 @@ class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInte
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
+  public static function preCreate(EntityStorageInterface $storageController, array &$values) {
+    parent::preCreate($storageController, $values);
     $values += array(
       'uid' => \Drupal::currentUser()->id(),
     );
@@ -213,7 +213,7 @@ class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInte
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['line_item_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Line Item ID'))
       ->setDescription(t('The line item ID.'))

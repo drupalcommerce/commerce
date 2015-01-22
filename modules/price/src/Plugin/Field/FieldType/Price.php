@@ -27,7 +27,7 @@ class Price extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
     $properties['amount'] = DataDefinition::create('float')
       ->setLabel(t('Amount'))
       ->setRequired(FALSE);
@@ -42,7 +42,7 @@ class Price extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $fieldDefinition) {
     return array(
       'columns' => array(
         'amount' => array(

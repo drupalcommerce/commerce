@@ -27,8 +27,8 @@ class CommerceTaxTypeImporterForm extends FormBase {
    * Constructs a new CommerceTaxTypeImporterForm.
    */
   public function __construct() {
-    $tax_type_factory = \Drupal::service('commerce_tax.tax_type_importer_factory');
-    $this->taxTypeImporter = $tax_type_factory->createInstance();
+    $taxTypeFactory = \Drupal::service('commerce_tax.tax_type_importer_factory');
+    $this->taxTypeImporter = $taxTypeFactory->createInstance();
   }
 
   /**
@@ -42,9 +42,9 @@ class CommerceTaxTypeImporterForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $tax_types = $this->taxTypeImporter->getImportableTaxTypes();
+    $taxTypes = $this->taxTypeImporter->getImportableTaxTypes();
 
-    if (!$tax_types) {
+    if (!$taxTypes) {
       $form['message'] = array(
         '#markup' => $this->t('All tax types are already imported'),
       );
@@ -56,7 +56,7 @@ class CommerceTaxTypeImporterForm extends FormBase {
       '#title' => $this->t('Tax type'),
       '#description' => $this->t('Please select the tax type you would like to import.'),
       '#required' => TRUE,
-      '#options' => $this->getTaxTypeOptions($tax_types),
+      '#options' => $this->getTaxTypeOptions($taxTypes),
     );
 
     $form['actions']['#type'] = 'actions';
@@ -80,16 +80,16 @@ class CommerceTaxTypeImporterForm extends FormBase {
   /**
    * Returns an options list for tax types.
    *
-   * @param TaxTypeInterface[] $tax_types
+   * @param TaxTypeInterface[] $taxTypes
    *   An array of tax types.
    *
    * @return array
    *   The list of options for a select widget.
    */
-  public function getTaxTypeOptions($tax_types) {
+  public function getTaxTypeOptions($taxTypes) {
     $options = array();
-    foreach ($tax_types as $tax_type) {
-      $options[$tax_type->getId()] = $tax_type->getName();
+    foreach ($taxTypes as $taxType) {
+      $options[$taxType->getId()] = $taxType->getName();
     }
     asort($options);
 
@@ -101,15 +101,15 @@ class CommerceTaxTypeImporterForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $tax_type = $this->taxTypeImporter->createTaxType($values['tax_type']);
+    $taxType = $this->taxTypeImporter->createTaxType($values['tax_type']);
 
     try {
-      $tax_type->save();
+      $taxType->save();
       drupal_set_message(
-        $this->t('Imported the %label tax type.', array('%label' => $tax_type->label()))
+        $this->t('Imported the %label tax type.', array('%label' => $taxType->label()))
       );
-      $triggering_element['#name'] = $form_state->getTriggeringElement();
-      if ($triggering_element['#name'] == 'import_and_new') {
+      $triggeringElement['#name'] = $form_state->getTriggeringElement();
+      if ($triggeringElement['#name'] == 'import_and_new') {
         $form_state->setRebuild();
       }
       else {
@@ -117,7 +117,7 @@ class CommerceTaxTypeImporterForm extends FormBase {
       }
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label tax type was not imported.', array('%label' => $tax_type->label())), 'error');
+      drupal_set_message($this->t('The %label tax type was not imported.', array('%label' => $taxType->label())), 'error');
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();
     }

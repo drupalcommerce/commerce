@@ -21,12 +21,12 @@ class CommerceStoreTypeTest extends CommerceTestBase {
    */
   public function testDefaultStoreType() {
     $this->drupalGet('admin/commerce/config/store/types');
-    $store_types = CommerceStoreType::loadMultiple();
+    $storeTypes = CommerceStoreType::loadMultiple();
 
-    $this->assertTrue(isset($store_types['online']), 'Store Type Web is available');
+    $this->assertTrue(isset($storeTypes['online']), 'Store Type Web is available');
 
-    $commerce_store_type = CommerceStoreType::load('online');
-    $this->assertEqual($store_types['online'], $commerce_store_type, 'The correct Store Type is loaded');
+    $commerceStoreType = CommerceStoreType::load('online');
+    $this->assertEqual($storeTypes['online'], $commerceStoreType, 'The correct Store Type is loaded');
   }
 
   /**
@@ -34,12 +34,12 @@ class CommerceStoreTypeTest extends CommerceTestBase {
    */
   public function testListStoreType() {
     $title = strtolower($this->randomMachineName(8));
-    $table_selector = 'table tbody tr';
+    $tableSelector = 'table tbody tr';
 
     // The store shows one default store type.
     $this->drupalGet('admin/commerce/config/store/types');
-    $store_types = $this->cssSelect($table_selector);
-    $this->assertEqual(count($store_types), 1, 'Stores types are correctly listed');
+    $storeTypes = $this->cssSelect($tableSelector);
+    $this->assertEqual(count($storeTypes), 1, 'Stores types are correctly listed');
 
     // Create a new commerce store type entity and see if the list has two store types.
     $this->createEntity('commerce_store_type', array(
@@ -49,8 +49,8 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     );
 
     $this->drupalGet('admin/commerce/config/store/types');
-    $store_types = $this->cssSelect($table_selector);
-    $this->assertEqual(count($store_types), 2, 'Stores types are correctly listed');
+    $storeTypes = $this->cssSelect($tableSelector);
+    $this->assertEqual(count($storeTypes), 2, 'Stores types are correctly listed');
   }
 
   /**
@@ -66,8 +66,8 @@ class CommerceStoreTypeTest extends CommerceTestBase {
       )
     );
 
-    $type_exists = (bool) CommerceStoreType::load($type->id());
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $typeExists = (bool) CommerceStoreType::load($type->id());
+    $this->assertTrue($typeExists, 'The new store type has been created in the database.');
 
     // Create a store type through the form.
     $edit = array(
@@ -75,8 +75,8 @@ class CommerceStoreTypeTest extends CommerceTestBase {
       'label' => 'Label of foo',
     );
     $this->drupalPostForm('admin/commerce/config/store/types/add', $edit, t('Save'));
-    $type_exists = (bool) CommerceStoreType::load($edit['id']);
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $typeExists = (bool) CommerceStoreType::load($edit['id']);
+    $this->assertTrue($typeExists, 'The new store type has been created in the database.');
   }
 
   /**
@@ -84,7 +84,7 @@ class CommerceStoreTypeTest extends CommerceTestBase {
    */
   public function testUpdateStoreType() {
     // Create a new store type.
-    $store_type = $this->createEntity('commerce_store_type', array(
+    $storeType = $this->createEntity('commerce_store_type', array(
         'id' => 'foo',
         'label' => 'Label for foo',
       )
@@ -95,8 +95,8 @@ class CommerceStoreTypeTest extends CommerceTestBase {
       'label' => $this->randomMachineName(8),
     );
     $this->drupalPostForm('admin/commerce/config/store/types/online/edit', $edit, 'Save');
-    $store_type_changed = CommerceStoreType::load($store_type->id());
-    $this->assertEqual($store_type->label(), $store_type_changed->label(), 'The label of the store type has been changed.');
+    $storeTypeChanged = CommerceStoreType::load($storeType->id());
+    $this->assertEqual($storeType->label(), $storeTypeChanged->label(), 'The label of the store type has been changed.');
   }
 
   /**
@@ -134,8 +134,8 @@ class CommerceStoreTypeTest extends CommerceTestBase {
     );
     $this->assertText(t('This action cannot be undone.'), 'The store type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $type_exists = (bool) CommerceStoreType::load($type->id());
-    $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
+    $typeExists = (bool) CommerceStoreType::load($type->id());
+    $this->assertFalse($typeExists, 'The new store type has been deleted from the database.');
 
   }
 }

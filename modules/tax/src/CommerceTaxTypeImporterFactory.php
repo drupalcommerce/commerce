@@ -29,16 +29,16 @@ class CommerceTaxTypeImporterFactory implements CommerceTaxTypeImporterFactoryIn
   /**
    * Constructs the factory.
    */
-  public function __construct(EntityManagerInterface $entity_manager, TranslationInterface $string_translation) {
-    $this->entityManager = $entity_manager;
-    $this->stringTranslation = $string_translation;
+  public function __construct(EntityManagerInterface $entityManager, TranslationInterface $stringTranslation) {
+    $this->entityManager = $entityManager;
+    $this->stringTranslation = $stringTranslation;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createInstance($tax_types_folder = NULL) {
-    return new CommerceTaxTypeImporter($this->entityManager, $this->stringTranslation, $tax_types_folder);
+  public function createInstance($taxTypesFolder = NULL) {
+    return new CommerceTaxTypeImporter($this->entityManager, $this->stringTranslation, $taxTypesFolder);
   }
 
 }

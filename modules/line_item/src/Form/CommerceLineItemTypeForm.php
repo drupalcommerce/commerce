@@ -24,21 +24,21 @@ class CommerceLineItemTypeForm extends EntityForm {
   /**
    * Create an CommerceLineItemTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $line_item_type_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $lineItemTypeStorage
    *   The line_item type storage.
    */
-  public function __construct(EntityStorageInterface $line_item_type_storage) {
+  public function __construct(EntityStorageInterface $lineItemTypeStorage) {
     // Setup object members.
-    $this->lineItemTypeStorage = $line_item_type_storage;
+    $this->lineItemTypeStorage = $lineItemTypeStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-   $entity_manager = $container->get('entity.manager');
-   return new static($entity_manager->getStorage('commerce_line_item_type'));
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+   $entityManager = $container->get('entity.manager');
+   return new static($entityManager->getStorage('commerce_line_item_type'));
   }
 
   /**
@@ -46,31 +46,31 @@ class CommerceLineItemTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $line_item_type = $this->entity;
+    $lineItemType = $this->entity;
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $line_item_type->label(),
+      '#default_value' => $lineItemType->label(),
       '#description' => $this->t('Label for the line item type.'),
       '#required' => TRUE,
     );
 
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $line_item_type->id(),
+      '#default_value' => $lineItemType->id(),
       '#machine_name' => array(
-        'exists' => array($this->line_itemTypeStorage, 'load'),
+        'exists' => array($this->lineItemTypeStorage, 'load'),
         'source' => array('label'),
       ),
-      '#disabled' => !$line_item_type->isNew(),
+      '#disabled' => !$lineItemType->isNew(),
     );
 
     $form['description'] = array(
       '#title' => t('Description'),
       '#type' => 'textarea',
-      '#default_value' => $line_item_type->getDescription(),
+      '#default_value' => $lineItemType->getDescription(),
       '#description' => $this->t('Description of this line item type'),
     );
 
@@ -81,19 +81,19 @@ class CommerceLineItemTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $line_item_type = $this->entity;
+    $lineItemType = $this->entity;
 
     try {
-      $line_item_type->save();
+      $lineItemType->save();
       drupal_set_message($this->t('Saved the %label line item type.', array(
-        '%label' => $line_item_type->label(),
+        '%label' => $lineItemType->label(),
       )));
       $form_state->setRedirect('entity.commerce_line_item_type.list');
     }
     catch (\Exception $e) {
       $this->logger('commerce_line_item')->error($e);
       drupal_set_message($this->t('The %label line item type was not saved.', array(
-        '%label' => $line_item_type->label(),
+        '%label' => $lineItemType->label(),
       )), 'error');
       $form_state->setRebuild();
     }

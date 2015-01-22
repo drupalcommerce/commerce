@@ -34,7 +34,7 @@ class CommerceOrderForm extends ContentEntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     /* @var \Drupal\commerce_order\Entity\CommerceOrder $order */
     $order = $this->entity;
-    $current_user = $this->currentUser();
+    $currentUser = $this->currentUser();
 
     $form['advanced'] = array(
       '#type' => 'vertical_tabs',
@@ -65,7 +65,7 @@ class CommerceOrderForm extends ContentEntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $order->isNewRevision(),
-      '#access' => $current_user->hasPermission('administer products'),
+      '#access' => $currentUser->hasPermission('administer products'),
       '#group' => 'order_status',
       '#weight' => 10,
     );

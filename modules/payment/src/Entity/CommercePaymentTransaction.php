@@ -49,8 +49,8 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function setInstanceId($instance_id) {
-    $this->set('instance_id', $instance_id);
+  public function setInstanceId($instanceId) {
+    $this->set('instance_id', $instanceId);
     return $this;
   }
 
@@ -64,8 +64,8 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function setRemoteId($remote_id) {
-    $this->set('remote_id', $remote_id);
+  public function setRemoteId($remoteId) {
+    $this->set('remote_id', $remoteId);
     return $this;
   }
 
@@ -109,8 +109,8 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public function setRemoteStatus($remote_status) {
-    $this->set('remote_status', $remote_status);
+  public function setRemoteStatus($remoteStatus) {
+    $this->set('remote_status', $remoteStatus);
     return $this;
   }
 
@@ -190,7 +190,7 @@ class CommercePaymentTransaction extends ContentEntityBase implements CommercePa
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['transaction_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Transaction ID'))
       ->setDescription(t('The ID of a transaction.'))

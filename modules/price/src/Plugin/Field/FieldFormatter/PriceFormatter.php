@@ -46,37 +46,37 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
   /**
    * Constructs a PriceFormatter object.
    *
-   * @param string $plugin_id
+   * @param string $pluginId
    *   The plugin_id for the formatter.
-   * @param mixed $plugin_definition
+   * @param mixed $pluginDefinition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
    * @param string $label
    *   The formatter label display setting.
-   * @param string $view_mode
+   * @param string $viewMode
    *   The view mode.
-   * @param array $third_party_settings
+   * @param array $thirdPartySettings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityManagerInterface $entityManager) {
+    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
 
-    $this->currencyStorage = $entity_manager->getStorage('commerce_currency');
-    $this->numberFormatterStorage = $entity_manager->getStorage('commerce_number_format');
+    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->numberFormatterStorage = $entityManager->getStorage('commerce_number_format');
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['label'],
@@ -114,14 +114,14 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
   public function viewElements(FieldItemListInterface $items) {
     $elements = array();
     $format = $this->getNumberFormat();
-    $display_mode = $this->getSetting('show_currency_code') ? NumberFormatter::CURRENCY_DISPLAY_CODE : NumberFormatter::CURRENCY_DISPLAY_SYMBOL;
+    $displayMode = $this->getSetting('show_currency_code') ? NumberFormatter::CURRENCY_DISPLAY_CODE : NumberFormatter::CURRENCY_DISPLAY_SYMBOL;
 
-    $number_formatter = new NumberFormatter($format, NumberFormatter::CURRENCY);
-    $number_formatter->setCurrencyDisplay($display_mode);
+    $numberFormatter = new NumberFormatter($format, NumberFormatter::CURRENCY);
+    $numberFormatter->setCurrencyDisplay($displayMode);
 
     foreach ($items as $delta => $item) {
       $currency = $this->currencyStorage->load($item->currency_code);
-      $elements[$delta] = array('#markup' => $number_formatter->formatCurrency($item->amount, $currency));
+      $elements[$delta] = array('#markup' => $numberFormatter->formatCurrency($item->amount, $currency));
     }
 
     return $elements;
@@ -137,9 +137,9 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
     $language = \Drupal::languageManager()->getCurrentLanguage();
 
     // @TODO a fallback number format provided us or configured by the user.
-    $number_format = $this->numberFormatterStorage->load($language->getId());
+    $numberFormat = $this->numberFormatterStorage->load($language->getId());
 
-    return $number_format;
+    return $numberFormat;
   }
 
 }

@@ -31,19 +31,19 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    *
    * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $date_formatter;
+  protected $dateFormatter;
 
   /**
    * Constructs a CommerceStoreController object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
    *   The date service.
    */
-  public function __construct(Connection $database, DateFormatter $date_formatter) {
+  public function __construct(Connection $database, DateFormatter $dateFormatter) {
     $this->database = $database;
-    $this->dateFormatter = $date_formatter;
+    $this->dateFormatter = $dateFormatter;
   }
 
   /**
@@ -69,22 +69,22 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    *   return at all.
    */
   public function addPage() {
-    $store_types = $this->entityManager()->getStorage('commerce_store_type')->loadMultiple();
+    $storeTypes = $this->entityManager()->getStorage('commerce_store_type')->loadMultiple();
     // Filter out the store types the user doesn't have access to.
-    foreach ($store_types as $store_type_id => $store_type) {
-      if (!$this->entityManager()->getAccessControlHandler('commerce_store')->createAccess($store_type_id)) {
-        unset($store_types[$store_type_id]);
+    foreach ($storeTypes as $storeTypeId => $storeType) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_store')->createAccess($storeTypeId)) {
+        unset($storeTypes[$storeTypeId]);
       }
     }
 
-    if (count($store_types) == 1) {
-      $store_type = reset($store_types);
-      return $this->redirect('entity.commerce_store.add_form', array('commerce_store_type' => $store_type->id()));
+    if (count($storeTypes) == 1) {
+      $storeType = reset($storeTypes);
+      return $this->redirect('entity.commerce_store.add_form', array('commerce_store_type' => $storeType->id()));
     }
 
     return array(
       '#theme' => 'commerce_store_add_list',
-      '#content' => $store_types,
+      '#content' => $storeTypes,
     );
   }
 
@@ -98,15 +98,14 @@ class CommerceStoreController extends ControllerBase implements ContainerInjecti
    *   A store add form.
    */
   public function add(CommerceStoreTypeInterface $commerce_store_type) {
-    $account = $this->currentUser();
-    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_store', $commerce_store_type->id()));
+    $langCode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_store', $commerce_store_type->id()));
 
-    $commerce_store = $this->entityManager()->getStorage('commerce_store')->create(array(
+    $commerceStore = $this->entityManager()->getStorage('commerce_store')->create(array(
       'type' => $commerce_store_type->id(),
-      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->getId(),
+      'langcode' => $langCode ? $langCode : $this->languageManager()->getCurrentLanguage()->getId(),
     ));
 
-    $form = $this->entityFormBuilder()->getForm($commerce_store, 'add');
+    $form = $this->entityFormBuilder()->getForm($commerceStore, 'add');
 
     return $form;
   }

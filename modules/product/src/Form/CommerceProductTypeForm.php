@@ -17,34 +17,34 @@ class CommerceProductTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $product_type = $this->entity;
+    $productType = $this->entity;
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $product_type->label(),
+      '#default_value' => $productType->label(),
       '#description' => $this->t('Label for the product type.'),
       '#required' => TRUE,
     );
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $product_type->id(),
+      '#default_value' => $productType->id(),
       '#machine_name' => array(
         'exists' => '\Drupal\commerce_product\Entity\CommerceProductType::load',
       ),
-      '#disabled' => !$product_type->isNew(),
+      '#disabled' => !$productType->isNew(),
     );
     $form['description'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
-      '#default_value' => $product_type->getDescription(),
+      '#default_value' => $productType->getDescription(),
     );
 
     $form['revision'] = array(
       '#type' => 'checkbox',
       '#title' => t('Create new revision'),
-      '#default_value' => $product_type->revision,
+      '#default_value' => $productType->revision,
       '#description' => t('Create a new revision by default for this product type.')
     );
 

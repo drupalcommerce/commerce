@@ -21,15 +21,15 @@ class ProductSkuConstraintValidator extends ConstraintValidator {
   public function validate($items, Constraint $constraint) {
     $sku = $items->first()->value;
     if (isset($sku) && $sku !== '') {
-      $product_id = $items->getEntity()->product_id->value;
-      $sku_exists = (bool) \Drupal::entityQuery('commerce_product')
+      $productId = $items->getEntity()->product_id->value;
+      $skuExists = (bool) \Drupal::entityQuery('commerce_product')
         ->condition("sku", $sku)
-        ->condition('product_id', (int) $product_id, '<>')
+        ->condition('product_id', (int) $productId, '<>')
         ->range(0, 1)
         ->count()
         ->execute();
 
-      if ($sku_exists) {
+      if ($skuExists) {
         $this->context->addViolation($constraint->message, array('%sku' => $sku));
       }
     }

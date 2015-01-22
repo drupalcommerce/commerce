@@ -52,8 +52,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
+  public static function preCreate(EntityStorageInterface $storageController, array &$values) {
+    parent::preCreate($storageController, $values);
     $values += array(
       'uid' => \Drupal::currentUser()->id(),
     );
@@ -125,8 +125,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public function setOrderNumber($order_number) {
-    $this->set('order_number', $order_number);
+  public function setOrderNumber($orderNumber) {
+    $this->set('order_number', $orderNumber);
     return $this;
   }
 
@@ -244,8 +244,8 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public function setLineItems($line_items) {
-    $this->set('line_items', array($line_items));
+  public function setLineItems($lineItems) {
+    $this->set('line_items', array($lineItems));
     return $this;
   }
 
@@ -298,7 +298,7 @@ class CommerceOrder extends ContentEntityBase implements CommerceOrderInterface 
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['order_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Order ID'))
       ->setDescription(t('The order ID.'))

@@ -25,21 +25,21 @@ class CommerceNumberFormatForm extends EntityForm {
   /**
    * Creates a CommerceNumberFormatForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $number_format_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $numberFormatStorage
    *   The number format storage.
    */
-  public function __construct(EntityStorageInterface $number_format_storage) {
-    $this->numberFormatStorage = $number_format_storage;
+  public function __construct(EntityStorageInterface $numberFormatStorage) {
+    $this->numberFormatStorage = $numberFormatStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-    $entity_manager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+    $entityManager = $container->get('entity.manager');
 
-    return new static($entity_manager->getStorage('commerce_number_format'));
+    return new static($entityManager->getStorage('commerce_number_format'));
   }
 
   /**
@@ -47,14 +47,14 @@ class CommerceNumberFormatForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    /** @var \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $number_format */
-    $number_format = $this->entity;
+    /** @var \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $numberFormat */
+    $numberFormat = $this->entity;
 
     $form['locale'] = array(
       '#type' => 'machine_name',
       '#title' => $this->t('Locale'),
       '#description' => t('A unique machine-readable name. Can only contain letters and dashes'),
-      '#default_value' => $number_format->getLocale(),
+      '#default_value' => $numberFormat->getLocale(),
       '#placeholder' => 'en-US',
       '#maxlength' => 10,
       '#size' => 10,
@@ -63,21 +63,21 @@ class CommerceNumberFormatForm extends EntityForm {
         'exists' => array($this->numberFormatStorage, 'load'),
         'replace_pattern' => '[^A-Za-z_]+',
       ),
-      '#disabled' => !$number_format->isNew(),
+      '#disabled' => !$numberFormat->isNew(),
     );
     $form['name'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#maxlength' => 30,
       '#size' => 30,
-      '#default_value' => $number_format->getName(),
+      '#default_value' => $numberFormat->getName(),
       '#required' => TRUE,
     );
     $form['numberingSystem'] = array(
       '#type' => 'select',
       '#title' => $this->t('Numbering system'),
       '#maxlength' => 255,
-      '#default_value' => $number_format->getNumberingSystem() ? $number_format->getNumberingSystem() : 'latn',
+      '#default_value' => $numberFormat->getNumberingSystem() ? $numberFormat->getNumberingSystem() : 'latn',
       '#options' => array(
         NumberFormatInterface::NUMBERING_SYSTEM_ARABIC => $this->t('Arabic'),
         NumberFormatInterface::NUMBERING_SYSTEM_ARABIC_EXTENDED => $this->t('Arabic Extended'),
@@ -92,7 +92,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Decimal separator'),
       '#maxlength' => 5,
       '#size' => 5,
-      '#default_value' => $number_format->getDecimalSeparator() ? $number_format->getDecimalSeparator() : '.',
+      '#default_value' => $numberFormat->getDecimalSeparator() ? $numberFormat->getDecimalSeparator() : '.',
       '#required' => TRUE,
     );
     $form['groupingSeparator'] = array(
@@ -100,7 +100,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Grouping separator'),
       '#maxlength' => 5,
       '#size' => 5,
-      '#default_value' => $number_format->getGroupingSeparator() ? $number_format->getGroupingSeparator() : ',',
+      '#default_value' => $numberFormat->getGroupingSeparator() ? $numberFormat->getGroupingSeparator() : ',',
       '#required' => TRUE,
     );
     $form['plusSign'] = array(
@@ -108,7 +108,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Plug sign'),
       '#maxlength' => 5,
       '#size' => 5,
-      '#default_value' => $number_format->getPlusSign() ? $number_format->getPlusSign() : '=',
+      '#default_value' => $numberFormat->getPlusSign() ? $numberFormat->getPlusSign() : '=',
       '#required' => TRUE,
     );
     $form['minusSign'] = array(
@@ -116,7 +116,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Minus sign'),
       '#maxlength' => 5,
       '#size' => 5,
-      '#default_value' => $number_format->getMinusSign() ? $number_format->getMinusSign() : '-',
+      '#default_value' => $numberFormat->getMinusSign() ? $numberFormat->getMinusSign() : '-',
       '#required' => TRUE,
     );
     $form['percentSign'] = array(
@@ -124,7 +124,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Percent sign'),
       '#maxlength' => 5,
       '#size' => 5,
-      '#default_value' => $number_format->getPercentSign() ? $number_format->getPercentSign() : '%',
+      '#default_value' => $numberFormat->getPercentSign() ? $numberFormat->getPercentSign() : '%',
       '#required' => TRUE,
     );
     $form['decimalPattern'] = array(
@@ -132,7 +132,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Decimal pattern'),
       '#maxlength' => 30,
       '#size' => 30,
-      '#default_value' => $number_format->getDecimalPattern(),
+      '#default_value' => $numberFormat->getDecimalPattern(),
       '#required' => TRUE,
     );
     $form['percentPattern'] = array(
@@ -140,7 +140,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Percent pattern'),
       '#maxlength' => 30,
       '#size' => 30,
-      '#default_value' => $number_format->getPercentPattern(),
+      '#default_value' => $numberFormat->getPercentPattern(),
       '#required' => TRUE,
     );
     $form['currencyPattern'] = array(
@@ -148,7 +148,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Currency pattern'),
       '#maxlength' => 30,
       '#size' => 30,
-      '#default_value' => $number_format->getCurrencyPattern(),
+      '#default_value' => $numberFormat->getCurrencyPattern(),
       '#required' => TRUE,
     );
     $form['accountingCurrencyPattern'] = array(
@@ -156,7 +156,7 @@ class CommerceNumberFormatForm extends EntityForm {
       '#title' => $this->t('Accounting currency pattern'),
       '#maxlength' => 30,
       '#size' => 30,
-      '#default_value' => $number_format->getAccountingCurrencyPattern(),
+      '#default_value' => $numberFormat->getAccountingCurrencyPattern(),
       '#required' => TRUE,
     );
 

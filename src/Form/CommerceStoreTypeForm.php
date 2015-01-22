@@ -17,28 +17,28 @@ class CommerceStoreTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $store_type = $this->entity;
+    $storeType = $this->entity;
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $store_type->label(),
+      '#default_value' => $storeType->label(),
       '#description' => $this->t('Label for the store type.'),
       '#required' => TRUE,
     );
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $store_type->id(),
+      '#default_value' => $storeType->id(),
       '#machine_name' => array(
         'exists' => '\Drupal\commerce\Entity\CommerceStoreType::load',
       ),
-      '#disabled' => !$store_type->isNew(),
+      '#disabled' => !$storeType->isNew(),
     );
     $form['description'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
-      '#default_value' => $store_type->getDescription(),
+      '#default_value' => $storeType->getDescription(),
     );
 
     return $form;

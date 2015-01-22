@@ -19,23 +19,23 @@ class CommerceOrderDevelController extends DevelController {
   /**
    * Dump devel information for a Commerce Order Type.
    *
-   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $commerce_order_type
+   * @param \Drupal\commerce_order\CommerceOrderTypeInterface $commerceOrderType
    *
    * @return string
    */
-  public function orderTypeLoad(CommerceOrderTypeInterface $commerce_order_type) {
-    return $this->loadObject('commerce_order_type', $commerce_order_type);
+  public function orderTypeLoad(CommerceOrderTypeInterface $commerceOrderType) {
+    return $this->loadObject('commerce_order_type', $commerceOrderType);
   }
 
   /**
    * Dump devel information for a Commerce Order.
    *
-   * @param \Drupal\commerce_order\CommerceOrderInterface $commerce_order
+   * @param \Drupal\commerce_order\CommerceOrderInterface $commerceOrder
    *
    * @return string
    */
-  public function orderLoad(CommerceOrderInterface $commerce_order) {
-    return $this->loadObject('commerce_order', $commerce_order);
+  public function orderLoad(CommerceOrderInterface $commerceOrder) {
+    return $this->loadObject('commerce_order', $commerceOrder);
   }
 
 }

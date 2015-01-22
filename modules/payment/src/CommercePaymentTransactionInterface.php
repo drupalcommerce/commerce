@@ -17,13 +17,13 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
   /**
    * Sets the instance identifier for a transaction.
    *
-   * @param string $instance_id
+   * @param string $instanceId
    *   The instance identifier of the transaction.
    *
    * @return \Drupal\commerce_payment\CommercePaymentTransactionInterface
    *   The class instance that this method is called on.
    */
-  public function setInstanceId($instance_id);
+  public function setInstanceId($instanceId);
 
   /**
    * Returns the instance identifier for a transaction.
@@ -36,13 +36,13 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
   /**
    * Sets the remote identifier for a transaction.
    *
-   * @param string $remote_id
+   * @param string $remoteId
    *   The remote transaction identifier.
    *
    * @return \Drupal\commerce_payment\CommercePaymentTransactionInterface
    *   The class instance that this method is called on.
    */
-  public function setRemoteId($remote_id);
+  public function setRemoteId($remoteId);
 
   /**
    * Returns the remote identifier for a transaction.
@@ -94,13 +94,13 @@ interface CommercePaymentTransactionInterface extends ContentEntityInterface {
   /**
    * Sets the remote status of this transaction
    *
-   * @param string $remote_status
+   * @param string $remoteStatus
    *   The status of the transaction at the payment provider.
    *
    * @return \Drupal\commerce_payment\CommercePaymentTransactionInterface
    *   The class instance that this method is called on.
    */
-  public function setRemoteStatus($remote_status);
+  public function setRemoteStatus($remoteStatus);
 
   /**
    * Returns the status of this transaction.

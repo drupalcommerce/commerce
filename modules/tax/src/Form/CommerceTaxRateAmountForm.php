@@ -32,24 +32,24 @@ class CommerceTaxRateAmountForm extends EntityForm {
   /**
    * Creates a CommerceTaxRateAmountForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $tax_rate_amount_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $taxRateAmountStorage
    *   The tax rate amount storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $tax_rate_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $taxRateStorage
    *   The tax rate storage.
    */
-  public function __construct(EntityStorageInterface $tax_rate_amount_storage, EntityStorageInterface $tax_rate_storage) {
-    $this->taxRateAmountStorage = $tax_rate_amount_storage;
-    $this->taxRateStorage = $tax_rate_storage;
+  public function __construct(EntityStorageInterface $taxRateAmountStorage, EntityStorageInterface $taxRateStorage) {
+    $this->taxRateAmountStorage = $taxRateAmountStorage;
+    $this->taxRateStorage = $taxRateStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-    $entity_manager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+    $entityManager = $container->get('entity.manager');
 
-    return new static($entity_manager->getStorage('commerce_tax_rate_amount'), $entity_manager->getStorage('commerce_tax_rate'));
+    return new static($entityManager->getStorage('commerce_tax_rate_amount'), $entityManager->getStorage('commerce_tax_rate'));
   }
 
   /**
@@ -57,16 +57,16 @@ class CommerceTaxRateAmountForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $tax_rate_amount = $this->entity;
+    $taxRateAmount = $this->entity;
 
     $form['rate'] = array(
       '#type' => 'hidden',
-      '#value' => $tax_rate_amount->getRate(),
+      '#value' => $taxRateAmount->getRate(),
     );
     $form['id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Machine name'),
-      '#default_value' => $tax_rate_amount->getId(),
+      '#default_value' => $taxRateAmount->getId(),
       '#element_validate' => array('::validateId'),
       '#description' => $this->t('Only lowercase, underscore-separated letters allowed.'),
       '#pattern' => '[a-z_]+',
@@ -76,7 +76,7 @@ class CommerceTaxRateAmountForm extends EntityForm {
     $form['amount'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Amount'),
-      '#default_value' => $tax_rate_amount->getAmount(),
+      '#default_value' => $taxRateAmount->getAmount(),
       '#element_validate' => array('::validateAmount'),
       '#maxlength' => 255,
       '#required' => TRUE,
@@ -84,12 +84,12 @@ class CommerceTaxRateAmountForm extends EntityForm {
     $form['startDate'] = array(
       '#type' => 'date',
       '#title' => $this->t('Start date'),
-      '#default_value' => $tax_rate_amount->getStartDate(),
+      '#default_value' => $taxRateAmount->getStartDate(),
     );
     $form['endDate'] = array(
       '#type' => 'date',
       '#title' => $this->t('End date'),
-      '#default_value' => $tax_rate_amount->getEndDate(),
+      '#default_value' => $taxRateAmount->getEndDate(),
     );
 
     return $form;
@@ -99,16 +99,16 @@ class CommerceTaxRateAmountForm extends EntityForm {
    * Validates the id field.
    */
   public function validateId(array $element, FormStateInterface $form_state, array $form) {
-    $tax_rate_amount = $this->getEntity();
+    $taxRateAmount = $this->getEntity();
     $id = $element['#value'];
     if (!preg_match('/[a-z_]+/', $id)) {
       $form_state->setError($element, $this->t('The machine name must be in lowercase, underscore-separated letters only.'));
     }
-    elseif ($tax_rate_amount->isNew()) {
-      $loaded_tax_rate_amounts = $this->taxRateAmountStorage->loadByProperties(array(
+    elseif ($taxRateAmount->isNew()) {
+      $loadedTaxRateAmounts = $this->taxRateAmountStorage->loadByProperties(array(
         'id' => $id,
       ));
-      if ($loaded_tax_rate_amounts) {
+      if ($loadedTaxRateAmounts) {
         $form_state->setError($element, $this->t('The machine name is already in use.'));
       }
     }
@@ -127,28 +127,28 @@ class CommerceTaxRateAmountForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $tax_rate_amount = $this->entity;
+    $taxRateAmount = $this->entity;
 
     try {
-      $tax_rate_amount->save();
+      $taxRateAmount->save();
       drupal_set_message($this->t('Saved the %label tax rate.', array(
-        '%label' => $tax_rate_amount->label(),
+        '%label' => $taxRateAmount->label(),
       )));
 
-      $tax_rate = $this->taxRateStorage->load($tax_rate_amount->getRate());
+      $taxRate = $this->taxRateStorage->load($taxRateAmount->getRate());
       try {
-        if (!$tax_rate->hasAmount($tax_rate_amount)) {
-          $tax_rate->addAmount($tax_rate_amount);
-          $tax_rate->save();
+        if (!$taxRate->hasAmount($taxRateAmount)) {
+          $taxRate->addAmount($taxRateAmount);
+          $taxRate->save();
         }
 
         $form_state->setRedirect('entity.commerce_tax_rate_amount.list', array(
-          'commerce_tax_rate' => $tax_rate->getId(),
+          'commerce_tax_rate' => $taxRate->getId(),
         ));
       }
       catch (\Exception $e) {
         drupal_set_message($this->t('The %label tax rate was not saved.', array(
-          '%label' => $tax_rate->label(),
+          '%label' => $taxRate->label(),
         )));
         $this->logger('commerce_tax')->error($e);
         $form_state->setRebuild();
@@ -157,7 +157,7 @@ class CommerceTaxRateAmountForm extends EntityForm {
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The %label tax rate amount was not saved.', array(
-        '%label' => $tax_rate->label()
+        '%label' => $taxRate->label()
       )), 'error');
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();

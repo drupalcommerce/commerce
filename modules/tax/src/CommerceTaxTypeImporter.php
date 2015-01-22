@@ -51,62 +51,62 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
   /**
    * Constructs a new CommerceTaxTypeImporter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    * @param string
    *   The tax types folder of definitions.
    */
-  public function __construct(EntityManagerInterface $entity_manager, TranslationInterface $string_translation, $tax_types_folder = NULL) {
-    $this->taxTypeStorage = $entity_manager->getStorage('commerce_tax_type');
-    $this->taxRateStorage = $entity_manager->getStorage('commerce_tax_rate');
-    $this->taxRateAmountStorage = $entity_manager->getStorage('commerce_tax_rate_amount');
-    $this->stringTranslation = $string_translation;
-    $this->taxTypeRepository = new TaxTypeRepository($tax_types_folder);
+  public function __construct(EntityManagerInterface $entityManager, TranslationInterface $stringTranslation, $taxTypesFolder = NULL) {
+    $this->taxTypeStorage = $entityManager->getStorage('commerce_tax_type');
+    $this->taxRateStorage = $entityManager->getStorage('commerce_tax_rate');
+    $this->taxRateAmountStorage = $entityManager->getStorage('commerce_tax_rate_amount');
+    $this->stringTranslation = $stringTranslation;
+    $this->taxTypeRepository = new TaxTypeRepository($taxTypesFolder);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getImportableTaxTypes() {
-    $importable_tax_types = $this->taxTypeRepository->getAll();
-    $imported_tax_types = $this->taxTypeStorage->loadMultiple();
+    $importableTaxTypes = $this->taxTypeRepository->getAll();
+    $importedTaxTypes = $this->taxTypeStorage->loadMultiple();
 
     // Remove any already imported tax types.
-    foreach ($imported_tax_types as $tax_type) {
-      if (isset($importable_tax_types[$tax_type->getId()])) {
-        unset($importable_tax_types[$tax_type->getId()]);
+    foreach ($importedTaxTypes as $taxType) {
+      if (isset($importableTaxTypes[$taxType->getId()])) {
+        unset($importableTaxTypes[$taxType->getId()]);
       }
     }
 
-    return $importable_tax_types;
+    return $importableTaxTypes;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createTaxType($tax_type_id) {
-    $tax_type = $this->taxTypeRepository->get($tax_type_id);
-    return $this->importTaxType($tax_type);
+  public function createTaxType($taxTypeId) {
+    $taxType = $this->taxTypeRepository->get($taxTypeId);
+    return $this->importTaxType($taxType);
   }
 
   /**
    * Imports a single tax type.
    *
-   * @param \CommerceGuys\Tax\Model\TaxTypeInterface $tax_type
+   * @param \CommerceGuys\Tax\Model\TaxTypeInterface $taxType
    *   The tax type.
    */
-  protected function importTaxType(TaxTypeInterface $tax_type) {
-    if ($this->taxTypeStorage->load($tax_type->getId())) {
+  protected function importTaxType(TaxTypeInterface $taxType) {
+    if ($this->taxTypeStorage->load($taxType->getId())) {
       return;
     }
 
     $values = array(
-      'id' => $tax_type->getId(),
-      'name' => $this->t($tax_type->getName()),
-      'compound' => $tax_type->isCompound(),
-      'roundingMode' => $tax_type->getRoundingMode(),
-      'tag' => $tax_type->getTag(),
-      'rates' => array_keys($tax_type->getRates()),
+      'id' => $taxType->getId(),
+      'name' => $this->t($taxType->getName()),
+      'compound' => $taxType->isCompound(),
+      'roundingMode' => $taxType->getRoundingMode(),
+      'tag' => $taxType->getTag(),
+      'rates' => array_keys($taxType->getRates()),
     );
 
     return $this->taxTypeStorage->create($values);
@@ -115,17 +115,17 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
   /**
    * Imports a single tax rate.
    *
-   * @param \CommerceGuys\Tax\Model\TaxRateInterface $tax_rate
+   * @param \CommerceGuys\Tax\Model\TaxRateInterface $taxRate
    *   The tax rate to import.
    */
-  public function importTaxRate(TaxRateInterface $tax_rate) {
+  public function importTaxRate(TaxRateInterface $taxRate) {
     $values = array(
-      'type' => $tax_rate->getType()->getId(),
-      'id' => $tax_rate->getId(),
-      'name' => $this->t($tax_rate->getName()),
-      'displayName' => $this->t($tax_rate->getDisplayName()),
-      'default' => $tax_rate->isDefault(),
-      'amounts' => array_keys($tax_rate->getAmounts()),
+      'type' => $taxRate->getType()->getId(),
+      'id' => $taxRate->getId(),
+      'name' => $this->t($taxRate->getName()),
+      'displayName' => $this->t($taxRate->getDisplayName()),
+      'default' => $taxRate->isDefault(),
+      'amounts' => array_keys($taxRate->getAmounts()),
     );
 
     return $this->taxRateStorage->create($values);
@@ -134,18 +134,18 @@ class CommerceTaxTypeImporter implements CommerceTaxTypeImporterInterface {
   /**
    * Imports a single tax rate amount.
    *
-   * @param \CommerceGuys\Tax\Model\TaxRateAmountInterface $tax_rate_amount
+   * @param \CommerceGuys\Tax\Model\TaxRateAmountInterface $taxRateAmount
    *   The tax rate amount to import.
    */
-  protected function importTaxRateAmount(TaxRateAmountInterface $tax_rate_amount) {
-    $start_date = $tax_rate_amount->getStartDate() ? $tax_rate_amount->getStartDate()->getTimestamp() : NULL;
-    $end_date = $tax_rate_amount->getEndDate() ? $tax_rate_amount->getEndDate()->getTimestamp() : NULL;
+  protected function importTaxRateAmount(TaxRateAmountInterface $taxRateAmount) {
+    $startDate = $taxRateAmount->getStartDate() ? $taxRateAmount->getStartDate()->getTimestamp() : NULL;
+    $endDate = $taxRateAmount->getEndDate() ? $taxRateAmount->getEndDate()->getTimestamp() : NULL;
     $values = array(
-      'rate' => $tax_rate_amount->getRate()->getId(),
-      'id' => $tax_rate_amount->getId(),
-      'amount' => $tax_rate_amount->getAmount(),
-      'startDate' => $start_date,
-      'endDate' => $end_date,
+      'rate' => $taxRateAmount->getRate()->getId(),
+      'id' => $taxRateAmount->getId(),
+      'amount' => $taxRateAmount->getAmount(),
+      'startDate' => $startDate,
+      'endDate' => $endDate,
     );
 
     return $this->taxRateAmountStorage->create($values);

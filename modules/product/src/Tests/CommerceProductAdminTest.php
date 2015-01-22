@@ -65,10 +65,10 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
     // Assert that two products with the same SKU exist.
-    $duplicate_commerce_product_skus = \Drupal::entityQuery('commerce_product')
+    $duplicateCommerceProductSkus = \Drupal::entityQuery('commerce_product')
       ->count()
       ->execute();
-    $this->assertEqual($duplicate_commerce_product_skus, 1, "Only one product exists");
+    $this->assertEqual($duplicateCommerceProductSkus, 1, "Only one product exists");
 
     $this->assertText("is already in use", "Commerce Product failure text is showing");
   }
@@ -87,8 +87,8 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
     $this->assertText(t("Are you sure you want to delete the product @product?", array('@product' => $product->getTitle())), "Commerce Product deletion confirmation text is showing");
     $this->assertText(t('This action cannot be undone.'), 'The product deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $product_exists = (bool) CommerceProduct::load($product->id());
-    $this->assertFalse($product_exists, 'The new product has been deleted from the database.');
+    $productExists = (bool) CommerceProduct::load($product->id());
+    $this->assertFalse($productExists, 'The new product has been deleted from the database.');
   }
 
   /**
@@ -110,17 +110,17 @@ class CommerceProductAdminTest extends CommerceProductTestBase {
    * Tests adding product attributes to a field with the attribute field checked, and changing the radios.
    */
   function testAddProductAttributesFieldsAdmin() {
-    $attribute_widgets = array("select", "radios");
-    foreach ($attribute_widgets as $attribute_widget) {
+    $attributeWidgets = array("select", "radios");
+    foreach ($attributeWidgets as $attributeWidget) {
       $this->testAddCommerceProductFieldAdmin();
       $edit = array(
         'field[commerce_product][attribute_field]' => 1,
-        'field[commerce_product][attribute_widget]' => $attribute_widget,
+        'field[commerce_product][attribute_widget]' => $attributeWidget,
         'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
       );
       $this->drupalPostForm(NULL, $edit, t('Save settings'));
       $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
-      $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-" . $attribute_widget, "Product attribute widget select list field is checked");
+      $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-" . $attributeWidget, "Product attribute widget select list field is checked");
       $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
     }
   }

@@ -21,7 +21,7 @@ class CommerceTaxRateAmountListBuilder extends ConfigEntityListBuilder {
    *
    * @var string
    */
-  protected $tax_rate;
+  protected $taxRate;
 
   /**
    * {@inheritdoc}
@@ -44,12 +44,12 @@ class CommerceTaxRateAmountListBuilder extends ConfigEntityListBuilder {
   /**
    * Sets the tax rate.
    *
-   * @param string $tax_rate
+   * @param string $taxRate
    *
    * @return \Drupal\commerce_tax\Controller\CommerceTaxRateAmountListBuilder
    */
-  public function setTaxRate($tax_rate) {
-    $this->tax_rate = $tax_rate;
+  public function setTaxRate($taxRate) {
+    $this->taxRate = $taxRate;
 
     return $this;
   }
@@ -59,7 +59,7 @@ class CommerceTaxRateAmountListBuilder extends ConfigEntityListBuilder {
    */
   public function load() {
     return $this->storage->loadByProperties(array(
-      'rate' => $this->tax_rate,
+      'rate' => $this->taxRate,
     ));
   }
 
