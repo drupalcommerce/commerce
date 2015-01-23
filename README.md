@@ -20,14 +20,16 @@ Installation
 2. Install the latest -dev versions of [devel*](https://www.drupal.org/project/devel) and [composer_manager](https://drupal.org/project/composer_manager).
 3. Download Commerce
 4. Init composer manager.
-```Shell
+  
+  ```Shell
 drush composer-manager-init
-```
+  ```
 5. Go to core/ directory and update drupal components with composer.
-```Shell
+  
+  ```Shell
 cd core/
 composer drupal-update
-```
+  ```
 6. Enable the Commerce modules and submodules.
 
 Notes:
