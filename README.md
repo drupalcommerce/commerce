@@ -18,7 +18,7 @@ Installation
 
 1. Install the latest -dev version of Drupal 8.
 2. Install the latest -dev versions of [devel*](https://www.drupal.org/project/devel) and [composer_manager](https://drupal.org/project/composer_manager).
-3. Enable Commerce (but not any of the submodules!)
+3. Download Commerce
 4. Init composer manager.
 ```Shell
 drush composer-manager-init
@@ -28,7 +28,7 @@ drush composer-manager-init
 cd core/
 composer drupal-update
 ```
-6. Enable the Commerce submodules.
+6. Enable the Commerce modules and submodules.
 
 Notes:
 - * Devel is currently not optional because of a core bug: https://www.drupal.org/node/2315801
