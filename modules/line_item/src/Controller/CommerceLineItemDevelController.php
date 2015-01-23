@@ -19,23 +19,23 @@ class CommerceLineItemDevelController extends DevelController {
   /**
    * Dump devel information for a Commerce Line item Type.
    *
-   * @param \Drupal\commerce_line_item\CommerceLineItemTypeInterface $line_item_type
+   * @param \Drupal\commerce_line_item\CommerceLineItemTypeInterface $lineItemType
    *
    * @return string
    */
-  public function lineItemTypeLoad(CommerceLineItemTypeInterface $line_item_type) {
-    return $this->loadObject('line_item_type', $line_item_type);
+  public function lineItemTypeLoad(CommerceLineItemTypeInterface $lineItemType) {
+    return $this->loadObject('line_item_type', $lineItemType);
   }
 
   /**
    * Dump devel information for a Commerce Line item.
    *
-   * @param \Drupal\commerce_line_item\CommerceLineItemInterface $line_item
+   * @param \Drupal\commerce_line_item\CommerceLineItemInterface $lineItem
    *
    * @return string
    */
-  public function lineItemLoad(CommerceLineItemInterface $line_item) {
-    return $this->loadObject('line_item', $line_item);
+  public function lineItemLoad(CommerceLineItemInterface $lineItem) {
+    return $this->loadObject('line_item', $lineItem);
   }
 
 }

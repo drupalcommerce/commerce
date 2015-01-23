@@ -31,11 +31,11 @@ class NumberFormatImporter {
   /**
    * Constructs a new NumberFormatImporter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
-    $this->numberFormatStorage = $entity_manager->getStorage('commerce_number_format');
+  public function __construct(EntityManagerInterface $entityManager) {
+    $this->numberFormatStorage = $entityManager->getStorage('commerce_number_format');
     $this->numberFormatRepository = new NumberFormatRepository();
   }
 
@@ -47,20 +47,20 @@ class NumberFormatImporter {
       return FALSE;
     }
 
-    if ($number_format = $this->getNumberFormat($language)) {
+    if ($numberFormat = $this->getNumberFormat($language)) {
       $values = array(
-        'locale' => $number_format->getLocale(),
+        'locale' => $numberFormat->getLocale(),
         'name' => $language->getName(),
-        'numberingSystem' => $number_format->getNumberingSystem(),
-        'decimalSeparator' => $number_format->getDecimalSeparator(),
-        'groupingSeparator' => $number_format->getGroupingSeparator(),
-        'plusSign' => $number_format->getPlusSign(),
-        'minusSign' => $number_format->getMinusSign(),
-        'percentSign' => $number_format->getPercentSign(),
-        'decimalPattern' => $number_format->getDecimalPattern(),
-        'percentPattern' => $number_format->getPercentPattern(),
-        'currencyPattern' => $number_format->getCurrencyPattern(),
-        'accountingCurrencyPattern' => $number_format->getAccountingCurrencyPattern(),
+        'numberingSystem' => $numberFormat->getNumberingSystem(),
+        'decimalSeparator' => $numberFormat->getDecimalSeparator(),
+        'groupingSeparator' => $numberFormat->getGroupingSeparator(),
+        'plusSign' => $numberFormat->getPlusSign(),
+        'minusSign' => $numberFormat->getMinusSign(),
+        'percentSign' => $numberFormat->getPercentSign(),
+        'decimalPattern' => $numberFormat->getDecimalPattern(),
+        'percentPattern' => $numberFormat->getPercentPattern(),
+        'currencyPattern' => $numberFormat->getCurrencyPattern(),
+        'accountingCurrencyPattern' => $numberFormat->getAccountingCurrencyPattern(),
       );
       $entity = $this->numberFormatStorage->create($values);
       return $entity;
@@ -80,11 +80,11 @@ class NumberFormatImporter {
    */
   protected function getNumberFormat(LanguageInterface $language) {
     try {
-      $number_format = $this->numberFormatRepository->get($language->getId());
+      $numberFormat = $this->numberFormatRepository->get($language->getId());
     }
     catch (UnknownLocaleException $e) {
       return FALSE;
     }
-    return $number_format;
+    return $numberFormat;
   }
 }

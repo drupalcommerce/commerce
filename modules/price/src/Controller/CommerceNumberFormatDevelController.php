@@ -18,13 +18,13 @@ class CommerceNumberFormatDevelController extends DevelController {
   /**
    * Dump devel information for a commerce_number_format entity.
    *
-   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $commerce_number_format
+   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $commerceNumberFormat
    *   The number format.
    *
    * @return string
    */
-  public function numberFormatLoad(NumberFormatInterface $commerce_number_format) {
-    return $this->loadObject('commerce_number_format', $commerce_number_format);
+  public function numberFormatLoad(NumberFormatInterface $commerceNumberFormat) {
+    return $this->loadObject('commerce_number_format', $commerceNumberFormat);
   }
 
 }

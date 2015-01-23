@@ -28,11 +28,11 @@ class CommerceLineItemTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * Constructs a new CommerceLineItemTypeDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   * @param \Drupal\Core\Entity\Query\QueryFactory $queryFactory
    *   The entity query object.
    */
-  public function __construct(QueryFactory $query_factory) {
-    $this->queryFactory = $query_factory;
+  public function __construct(QueryFactory $queryFactory) {
+    $this->queryFactory = $queryFactory;
   }
 
   /**
@@ -69,12 +69,12 @@ class CommerceLineItemTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $num_orders = $this->queryFactory->get('commerce_line_item')
+    $numOrders = $this->queryFactory->get('commerce_line_item')
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();
-    if ($num_orders) {
-      $caption = '<p>' . $this->formatPlural($num_orders, '%type is used by 1 line item on your site. You can not remove this line item type until you have removed all of the %type line items.', '%type is used by @count line items on your site. You may not remove %type until you have removed all of the %type line items.', array('%type' => $this->entity->label())) . '</p>';
+    if ($numOrders) {
+      $caption = '<p>' . $this->formatPlural($numOrders, '%type is used by 1 line item on your site. You can not remove this line item type until you have removed all of the %type line items.', '%type is used by @count line items on your site. You may not remove %type until you have removed all of the %type line items.', array('%type' => $this->entity->label())) . '</p>';
       $form['#title'] = $this->getQuestion();
       $form['description'] = array('#markup' => $caption);
       return $form;

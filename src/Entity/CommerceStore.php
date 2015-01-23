@@ -151,7 +151,7 @@ class CommerceStore extends ContentEntityBase implements CommerceStoreInterface 
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['store_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Store ID'))
       ->setDescription(t('The ID of the store.'))

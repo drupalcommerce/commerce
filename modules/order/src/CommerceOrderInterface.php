@@ -27,13 +27,13 @@ interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface
   /**
    * Sets the order number.
    *
-   * @param string $order_number
+   * @param string $orderNumber
    *   The order number.
    *
    * @return \Drupal\commerce_order\CommerceOrderInterface
    *   The called order entity.
    */
-  public function setOrderNumber($order_number);
+  public function setOrderNumber($orderNumber);
 
   /**
    * Returns the order type.
@@ -130,13 +130,13 @@ interface CommerceOrderInterface extends EntityChangedInterface, EntityInterface
   /**
    * Sets the line items associated with this order.
    *
-   * @param array $line_items
+   * @param array $lineItems
    *   The line items associated with this order.
    *
    * @return \Drupal\commerce_order\CommerceOrderInterface
    *   The called order entity.
    */
-  public function setLineItems($line_items);
+  public function setLineItems($lineItems);
 
   /**
    * Returns the additional data stored in this order.

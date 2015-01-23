@@ -20,11 +20,11 @@ class CommerceProductTypeTest extends CommerceProductTestBase {
    * Tests if the default Product Type was created.
    */
   public function testDefaultProductType() {
-    $product_types = CommerceProductType::loadMultiple();
-    $this->assertTrue(isset($product_types['product']), 'Product Type Product is available');
+    $productTypes = CommerceProductType::loadMultiple();
+    $this->assertTrue(isset($productTypes['product']), 'Product Type Product is available');
 
-    $product_type = CommerceProductType::load('product');
-    $this->assertEqual($product_types['product'], $product_type, 'The correct Product Type is loaded');
+    $productType = CommerceProductType::load('product');
+    $this->assertEqual($productTypes['product'], $productType, 'The correct Product Type is loaded');
   }
 
   /**
@@ -40,8 +40,8 @@ class CommerceProductTypeTest extends CommerceProductTestBase {
       )
     );
 
-    $type_exists = (bool) CommerceProductType::load($type->id());
-    $this->assertTrue($type_exists, 'The new product type has been created in the database.');
+    $typeExists = (bool) CommerceProductType::load($type->id());
+    $this->assertTrue($typeExists, 'The new product type has been created in the database.');
   }
 
   /**
@@ -68,8 +68,8 @@ class CommerceProductTypeTest extends CommerceProductTestBase {
 
     // Deleting the product type when its not being referenced by a product.
     $product->delete();
-    $type_exists = (bool) CommerceProductType::load($type->id());
-    $this->assertFalse($type_exists, 'The new product type has been deleted from the database.');
+    $typeExists = (bool) CommerceProductType::load($type->id());
+    $this->assertFalse($typeExists, 'The new product type has been deleted from the database.');
 
   }
 }

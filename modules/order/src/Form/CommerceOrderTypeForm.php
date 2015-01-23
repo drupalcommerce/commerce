@@ -24,21 +24,21 @@ class CommerceOrderTypeForm extends EntityForm {
   /**
    * Create an CommerceOrderTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $order_type_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $orderTypeStorage
    *   The order type storage.
    */
-  public function __construct(EntityStorageInterface $order_type_storage) {
+  public function __construct(EntityStorageInterface $orderTypeStorage) {
     // Setup object members.
-    $this->orderTypeStorage = $order_type_storage;
+    $this->orderTypeStorage = $orderTypeStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-   $entity_manager = $container->get('entity.manager');
-   return new static($entity_manager->getStorage('commerce_order_type'));
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+   $entityManager = $container->get('entity.manager');
+   return new static($entityManager->getStorage('commerce_order_type'));
   }
 
   /**
@@ -46,31 +46,31 @@ class CommerceOrderTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $order_type = $this->entity;
+    $orderType = $this->entity;
 
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $order_type->label(),
+      '#default_value' => $orderType->label(),
       '#description' => $this->t('Label for the order type.'),
       '#required' => TRUE,
     );
 
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $order_type->id(),
+      '#default_value' => $orderType->id(),
       '#machine_name' => array(
         'exists' => array($this->orderTypeStorage, 'load'),
         'source' => array('label'),
       ),
-      '#disabled' => !$order_type->isNew(),
+      '#disabled' => !$orderType->isNew(),
     );
 
     $form['description'] = array(
       '#title' => t('Description'),
       '#type' => 'textarea',
-      '#default_value' => $order_type->getDescription(),
+      '#default_value' => $orderType->getDescription(),
       '#description' => $this->t('Description of this order type'),
     );
 
@@ -81,19 +81,19 @@ class CommerceOrderTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $order_type = $this->entity;
+    $orderType = $this->entity;
 
     try {
-      $order_type->save();
+      $orderType->save();
       drupal_set_message($this->t('Saved the %label order type.', array(
-        '%label' => $order_type->label(),
+        '%label' => $orderType->label(),
       )));
       $form_state->setRedirect('entity.commerce_order_type.list');
     }
     catch (\Exception $e) {
       $this->logger('commerce_order')->error($e);
       drupal_set_message($this->t('The %label order type was not saved.', array(
-        '%label' => $order_type->label(),
+        '%label' => $orderType->label(),
       )), 'error');
       $form_state->setRebuild();
     }

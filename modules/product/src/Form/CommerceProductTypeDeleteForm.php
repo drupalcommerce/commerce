@@ -28,11 +28,11 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * Constructs a new CommerceProductTypeDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   * @param \Drupal\Core\Entity\Query\QueryFactory $queryFactory
    *    The entity query object.
    */
-  public function __construct(QueryFactory $query_factory) {
-    $this->queryFactory = $query_factory;
+  public function __construct(QueryFactory $queryFactory) {
+    $this->queryFactory = $queryFactory;
   }
 
   /**
@@ -69,12 +69,12 @@ class CommerceProductTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $num_products = $this->queryFactory->get('commerce_product')
+    $numProducts = $this->queryFactory->get('commerce_product')
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();
-    if ($num_products) {
-      $caption = '<p>' . $this->formatPlural($num_products, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', array('%type' => $this->entity->label())) . '</p>';
+    if ($numProducts) {
+      $caption = '<p>' . $this->formatPlural($numProducts, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', array('%type' => $this->entity->label())) . '</p>';
 
       $form['#title'] = $this->getQuestion();
       $form['description'] = array('#markup' => $caption);

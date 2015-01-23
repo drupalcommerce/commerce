@@ -41,14 +41,14 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * Constructs a new CurrencyImporter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
-    $this->currencyStorage = $entity_manager->getStorage('commerce_currency');
-    $this->languageManager = $language_manager;
+  public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
+    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->languageManager = $languageManager;
     $this->currencyRepository = new CurrencyRepository();
   }
 
@@ -57,17 +57,17 @@ class CurrencyImporter implements CurrencyImporterInterface {
    */
   public function getImportableCurrencies($fallback = CurrencyImporterInterface::FALLBACK_LANGUAGE) {
     $language = $this->languageManager->getCurrentLanguage();
-    $importable_currencies = $this->currencyRepository->getAll($language->getId(), $fallback);
-    $imported_currencies = $this->currencyStorage->loadMultiple();
+    $importableCurrencies = $this->currencyRepository->getAll($language->getId(), $fallback);
+    $importedCurrencies = $this->currencyStorage->loadMultiple();
 
     // Remove any already imported currencies.
-    foreach ($imported_currencies as $currency) {
-      if (isset($importable_currencies[$currency->id()])) {
-        unset($importable_currencies[$currency->id()]);
+    foreach ($importedCurrencies as $currency) {
+      if (isset($importableCurrencies[$currency->id()])) {
+        unset($importableCurrencies[$currency->id()]);
       }
     }
 
-    return $importable_currencies;
+    return $importableCurrencies;
   }
 
   /**
@@ -82,7 +82,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
 
     if ($currency) {
       $values = array(
-        'currencyCode' => $currency->getCurrencyCode(),
+        'currency_code' => $currency->getCurrencyCode(),
         'name' => $currency->getName(),
         'numericCode' => $currency->getNumericCode(),
         'symbol' => $currency->getSymbol(),
@@ -114,15 +114,15 @@ class CurrencyImporter implements CurrencyImporterInterface {
         if ($currency->language()->getId() === $language->getId()) {
           continue;
         }
-        $config_name = $currency->getConfigDependencyName();
+        $configName = $currency->getConfigDependencyName();
 
-        $translated_currency = $this->getCurrency($currency->getCurrencyCode(), $language);
-        $translation_exists = $this->languageManager->getLanguageConfigOverrideStorage($language->getId())->exists($config_name);
-        if (!$translation_exists && $translated_currency) {
-          $config_translation = $this->languageManager->getLanguageConfigOverride($language->getId(), $config_name);
-          $config_translation->set('name', $translated_currency->getName());
-          $config_translation->set('symbol', $translated_currency->getSymbol());
-          $config_translation->save();
+        $translatedCurrency = $this->getCurrency($currency->getCurrencyCode(), $language);
+        $translationExists = $this->languageManager->getLanguageConfigOverrideStorage($language->getId())->exists($configName);
+        if (!$translationExists && $translatedCurrency) {
+          $configTranslation = $this->languageManager->getLanguageConfigOverride($language->getId(), $configName);
+          $configTranslation->set('name', $translatedCurrency->getName());
+          $configTranslation->set('symbol', $translatedCurrency->getSymbol());
+          $configTranslation->save();
         }
       }
     }

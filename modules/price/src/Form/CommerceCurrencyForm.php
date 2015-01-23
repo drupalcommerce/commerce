@@ -24,21 +24,21 @@ class CommerceCurrencyForm extends EntityForm {
   /**
    * Creates a CommerceCurrencyForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $currency_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $currencyStorage
    *   The currency storage.
    */
-  public function __construct(EntityStorageInterface $currency_storage) {
-    $this->currencyStorage = $currency_storage;
+  public function __construct(EntityStorageInterface $currencyStorage) {
+    $this->currencyStorage = $currencyStorage;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-    $entity_manager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
+    $entityManager = $container->get('entity.manager');
 
-    return new static($entity_manager->getStorage('commerce_currency'));
+    return new static($entityManager->getStorage('commerce_currency'));
   }
 
   /**
@@ -55,11 +55,11 @@ class CommerceCurrencyForm extends EntityForm {
       '#maxlength' => 255,
       '#required' => TRUE,
     );
-    $form['currencyCode'] = array(
+    $form['currency_code'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
       '#default_value' => $currency->getCurrencyCode(),
-      '#element_validate' => array('::validateCurrencyCode'),
+      '#element_validate' => array('::validatecurrency_code'),
       '#pattern' => '[A-Z]{3}',
       '#placeholder' => 'XXX',
       '#maxlength' => 3,
@@ -105,15 +105,15 @@ class CommerceCurrencyForm extends EntityForm {
   /**
    * Validates the currency code.
    */
-  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validatecurrency_code(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
     $currency_code = $element['#value'];
     if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
       $form_state->setError($element, $this->t('The currency code must consist of three uppercase letters.'));
     }
     elseif ($currency->isNew()) {
-      $loaded_currency = $this->currencyStorage->load($currency_code);
-      if ($loaded_currency) {
+      $loadedCurrency = $this->currencyStorage->load($currency_code);
+      if ($loadedCurrency) {
         $form_state->setError($element, $this->t('The currency code is already in use.'));
       }
     }
@@ -124,15 +124,15 @@ class CommerceCurrencyForm extends EntityForm {
    */
   public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
-    $numeric_code = $element['#value'];
-    if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {
+    $numericCode = $element['#value'];
+    if ($numericCode && !preg_match('/^\d{3}$/i', $numericCode)) {
       $form_state->setError($element, $this->t('The numeric code must consist of three digits.'));
     }
     elseif ($currency->isNew()) {
-      $loaded_currencies = $this->currencyStorage->loadByProperties(array(
-        'numericCode' => $numeric_code,
+      $loadedCurrencies = $this->currencyStorage->loadByProperties(array(
+        'numericCode' => $numericCode,
       ));
-      if ($loaded_currencies) {
+      if ($loadedCurrencies) {
         $form_state->setError($element, $this->t('The numeric code is already in use.'));
       }
     }

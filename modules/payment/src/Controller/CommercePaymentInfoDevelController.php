@@ -19,23 +19,23 @@ class CommercePaymentInfoDevelController extends DevelController {
   /**
    * Dump devel information for a Commerce payment information type.
    *
-   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $payment_info_type
+   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $paymentInfoType
    *
    * @return string
    */
-  public function paymentInfoTypeLoad(CommercePaymentInfoTypeInterface $payment_info_type) {
-    return $this->loadObject('commerce_payment_info_type', $payment_info_type);
+  public function paymentInfoTypeLoad(CommercePaymentInfoTypeInterface $paymentInfoType) {
+    return $this->loadObject('commerce_payment_info_type', $paymentInfoType);
   }
 
   /**
    * Dump devel information for a Commerce payment information.
    *
-   * @param \Drupal\commerce_payment\CommercePaymentInfoInterface $payment_info
+   * @param \Drupal\commerce_payment\CommercePaymentInfoInterface $paymentInfo
    *
    * @return string
    */
-  public function paymentInfoLoad(CommercePaymentInfoInterface $payment_info) {
-    return $this->loadObject('commerce_payment_info', $payment_info);
+  public function paymentInfoLoad(CommercePaymentInfoInterface $paymentInfo) {
+    return $this->loadObject('commerce_payment_info', $paymentInfo);
   }
 
 }

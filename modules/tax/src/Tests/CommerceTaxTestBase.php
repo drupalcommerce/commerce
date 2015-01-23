@@ -25,14 +25,14 @@ abstract class CommerceTaxTestBase extends WebTestBase {
   /**
    * User with permission to administer products.
    */
-  protected $admin_user;
+  protected $adminUser;
 
   protected function setUp() {
     parent::setUp();
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser(array(
       'administer stores',
       'access administration pages',
     ));
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
   }
 }

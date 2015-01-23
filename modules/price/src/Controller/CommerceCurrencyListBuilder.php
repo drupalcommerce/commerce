@@ -20,7 +20,7 @@ class CommerceCurrencyListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header['name'] = $this->t('Name');
-    $header['currencyCode'] = $this->t('Currency code');
+    $header['currency_code'] = $this->t('Currency code');
     $header['status'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
@@ -30,7 +30,7 @@ class CommerceCurrencyListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['name'] = $this->getLabel($entity);
-    $row['currencyCode'] = $entity->id();
+    $row['currency_code'] = $entity->id();
     $row['status'] = $entity->status() ? t('Enabled') : t('Disabled');
     return $row + parent::buildRow($entity);
   }

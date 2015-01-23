@@ -38,9 +38,9 @@ class CommerceProductTest extends CommerceProductTestBase {
     );
     $this->createEntity('commerce_product', $values);
 
-    $product_duplicate = entity_create("commerce_product", $values);
+    $productDuplicate = entity_create("commerce_product", $values);
 
-    $violations = $product_duplicate->sku->validate();
+    $violations = $productDuplicate->sku->validate();
     $this->assertNotEqual($violations->count(), 0, 'Validation fails when creating a product with the same SKU.');
   }
 
@@ -55,13 +55,13 @@ class CommerceProductTest extends CommerceProductTestBase {
       'type' => "product"
     );
     $product = $this->createEntity('commerce_product', $values);
-    $product_exists = (bool) CommerceProduct::load($product->id());
-    $this->assertTrue($product_exists, 'The new product has been created in the database.');
+    $productExists = (bool) CommerceProduct::load($product->id());
+    $this->assertTrue($productExists, 'The new product has been created in the database.');
 
     // Delete the product and verify deletion.
     $product->delete();
 
-    $product_exists = (bool) CommerceProduct::load($product->id());
-    $this->assertFalse($product_exists, 'The new product has been deleted from the database.');
+    $productExists = (bool) CommerceProduct::load($product->id());
+    $this->assertFalse($productExists, 'The new product has been deleted from the database.');
   }
 }

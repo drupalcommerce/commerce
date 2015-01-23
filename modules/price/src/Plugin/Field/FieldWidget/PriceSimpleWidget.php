@@ -29,8 +29,8 @@ class PriceSimpleWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Get the enabled currencies.
-    $enabled_currencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
-    $currency_codes = array_keys($enabled_currencies);
+    $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
+    $currency_codes = array_keys($enabledCurrencies);
 
     $element['amount'] = array(
       '#type' => 'textfield',

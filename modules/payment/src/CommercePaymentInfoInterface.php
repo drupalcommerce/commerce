@@ -17,13 +17,13 @@ interface CommercePaymentInfoInterface extends ContentEntityInterface {
   /**
    * Sets the method_id of the payment method that stored the card.
    *
-   * @param string $method_id
+   * @param string $methodId
    *   The method_id of the payment method that stored the card.
    *
    * @return \Drupal\commerce_payment\CommercePaymentInfoInterface
    *   The class instance that this method is called on.
    */
-  public function setPaymentMethod($method_id);
+  public function setPaymentMethod($methodId);
 
   /**
    * Returns the method_id of the payment method that stored the card.
@@ -36,13 +36,13 @@ interface CommercePaymentInfoInterface extends ContentEntityInterface {
   /**
    * Sets the instance identifier for a payment.
    *
-   * @param string $instance_id
+   * @param string $instanceId
    *   The instance identifier of the payment.
    *
    * @return \Drupal\commerce_payment\CommercePaymentInfoInterface
    *   The class instance that this method is called on.
    */
-  public function setInstanceId($instance_id);
+  public function setInstanceId($instanceId);
 
   /**
    * Returns the instance identifier for a payment.
@@ -55,13 +55,13 @@ interface CommercePaymentInfoInterface extends ContentEntityInterface {
   /**
    * Sets the remote identifier for a payment.
    *
-   * @param string $remote_id
+   * @param string $remoteId
    *   The remote transaction identifier.
    *
    * @return \Drupal\commerce_payment\CommercePaymentInfoInterface
    *   The class instance that this method is called on.
    */
-  public function setRemoteId($remote_id);
+  public function setRemoteId($remoteId);
 
   /**
    * Returns the remote identifier for a payment.

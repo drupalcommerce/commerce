@@ -47,7 +47,7 @@ abstract class CommerceTestBase extends WebTestBase {
   /**
    * Creates a new entity.
    *
-   * @param string $entity_type
+   * @param string $entityType
    *   The entity type to be created.
    * @param array $values
    *   An array of settings.
@@ -56,8 +56,8 @@ abstract class CommerceTestBase extends WebTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   A new entity.
    */
-  protected function createEntity($entity_type, array $values) {
-    $entity = entity_create($entity_type, $values);
+  protected function createEntity($entityType, array $values) {
+    $entity = entity_create($entityType, $values);
     $status = $entity->save();
 
     $this->assertEqual(

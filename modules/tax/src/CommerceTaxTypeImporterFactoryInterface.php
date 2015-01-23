@@ -15,12 +15,12 @@ interface CommerceTaxTypeImporterFactoryInterface {
   /**
    * Creates an instance of a CommerceTaxTypeImporter.
    *
-   * @param string $tax_types_folder
+   * @param string $taxTypesFolder
    *   The tax types folder of definitions.
    *
    * @return \Drupal\commerce_tax\CommerceTaxTypeImporterInterface
    *   A tax type importer.
    */
-  public function createInstance($tax_types_folder);
+  public function createInstance($taxTypesFolder);
 
 }

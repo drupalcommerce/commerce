@@ -25,12 +25,12 @@ class CommerceProductForm extends ContentEntityForm {
     /* @var \Drupal\commerce_product\Entity\CommerceProduct $product */
     $product = $this->entity;
     // Set up default values, if required.
-    $product_type = entity_load('commerce_product_type', $product->bundle());
+    $productType = entity_load('commerce_product_type', $product->bundle());
     if (!$product->isNew()) {
       $product->setRevisionLog(NULL);
     }
     // Always use the default revision setting.
-    $product->setNewRevision($product_type->revision);
+    $product->setNewRevision($productType->revision);
   }
 
   /**
@@ -39,7 +39,7 @@ class CommerceProductForm extends ContentEntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     /* @var \Drupal\commerce_product\Entity\CommerceProduct $product */
     $product = $this->entity;
-    $current_user = $this->currentUser();
+    $currentUser = $this->currentUser();
 
     $form['advanced'] = array(
       '#type' => 'vertical_tabs',
@@ -64,14 +64,14 @@ class CommerceProductForm extends ContentEntityForm {
       ),
       '#weight' => 20,
       '#optional' => TRUE,
-      '#access' => $product->isNewRevision() || $current_user->hasPermission('administer products'),
+      '#access' => $product->isNewRevision() || $currentUser->hasPermission('administer products'),
     );
 
     $form['revision'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $product->isNewRevision(),
-      '#access' => $current_user->hasPermission('administer products'),
+      '#access' => $currentUser->hasPermission('administer products'),
       '#group' => 'revision_information',
     );
 

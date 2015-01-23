@@ -21,12 +21,12 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
    */
   public function testDefaultProductTypeAdmin() {
     $this->drupalGet('admin/commerce/config/product-types');
-    $product_types = CommerceProductType::loadMultiple();
+    $productTypes = CommerceProductType::loadMultiple();
 
-    $this->assertTrue(isset($product_types['product']), 'Found the product type "Product"');
+    $this->assertTrue(isset($productTypes['product']), 'Found the product type "Product"');
 
-    $product_type = CommerceProductType::load('product');
-    $this->assertEqual($product_types['product'], $product_type, 'The correct product type is loaded');
+    $productType = CommerceProductType::load('product');
+    $this->assertEqual($productTypes['product'], $productType, 'The correct product type is loaded');
   }
 
   /**
@@ -34,13 +34,13 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
    */
   public function testListProductTypeAdmin() {
     $title = strtolower($this->randomMachineName(8));
-    $table_selector = 'table tbody tr';
+    $tableSelector = 'table tbody tr';
 
     // The product shows one default product type.
     $this->drupalGet('admin/commerce/config/product-types');
 
-    $product_types = $this->cssSelect($table_selector);
-    $this->assertEqual(count($product_types), 1, '1 Products types are correctly listed');
+    $productTypes = $this->cssSelect($tableSelector);
+    $this->assertEqual(count($productTypes), 1, '1 Products types are correctly listed');
 
     // Create a new product type entity and see if the list has two product types.
     $this->createEntity('commerce_product_type', array(
@@ -50,8 +50,8 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
     );
 
     $this->drupalGet('admin/commerce/config/product-types');
-    $product_types = $this->cssSelect($table_selector);
-    $this->assertEqual(count($product_types), 2, '2 Products types are correctly listed');
+    $productTypes = $this->cssSelect($tableSelector);
+    $this->assertEqual(count($productTypes), 2, '2 Products types are correctly listed');
   }
 
   /**
@@ -67,8 +67,8 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
       )
     );
 
-    $type_exists = (bool) CommerceProductType::load($type->id());
-    $this->assertTrue($type_exists, 'The new product type has been created in the database.');
+    $typeExists = (bool) CommerceProductType::load($type->id());
+    $this->assertTrue($typeExists, 'The new product type has been created in the database.');
 
     $this->drupalGet('admin/commerce/config/product-types/add');
 
@@ -78,8 +78,8 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
       'id' => 'foo'
     );
     $this->drupalPostForm('admin/commerce/config/product-types/add', $edit, t('Save'));
-    $type_exists = (bool) CommerceProductType::load($edit['label']);
-    $this->assertTrue($type_exists, 'The new product type has been created in the database.');
+    $typeExists = (bool) CommerceProductType::load($edit['label']);
+    $this->assertTrue($typeExists, 'The new product type has been created in the database.');
   }
 
   /**
@@ -87,7 +87,7 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
    */
   public function testUpdateProductTypeAdmin() {
     // Create a new product type.
-    $product_type = $this->createEntity('commerce_product_type', array(
+    $productType = $this->createEntity('commerce_product_type', array(
         'id' => 'foo',
         'label' => 'Label for foo'
       )
@@ -97,9 +97,9 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
     $edit = array(
       'label' => $this->randomMachineName(8),
     );
-    $this->drupalPostForm('admin/commerce/config/product-types/' . $product_type->id() . '/edit', $edit, 'Save');
-    $product_type_changed = CommerceProductType::load($product_type->id());
-    $this->assertNotEqual($product_type->label(), $product_type_changed->label(), 'The label of the product type has been changed.');
+    $this->drupalPostForm('admin/commerce/config/product-types/' . $productType->id() . '/edit', $edit, 'Save');
+    $productTypeChanged = CommerceProductType::load($productType->id());
+    $this->assertNotEqual($productType->label(), $productTypeChanged->label(), 'The label of the product type has been changed.');
   }
 
   /**
@@ -138,8 +138,8 @@ class CommerceProductTypeAdminTest extends CommerceProductTestBase {
     );
     $this->assertText(t('This action cannot be undone.'), 'The product type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $type_exists = (bool) CommerceProductType::load($type->id());
-    $this->assertFalse($type_exists, 'The new product type has been deleted from the database.');
+    $typeExists = (bool) CommerceProductType::load($type->id());
+    $this->assertFalse($typeExists, 'The new product type has been deleted from the database.');
 
   }
 }

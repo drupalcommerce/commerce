@@ -186,7 +186,7 @@ class CommerceProduct extends ContentEntityBase implements CommerceProductInterf
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
       ->setDescription(t('The ID of the product.'))

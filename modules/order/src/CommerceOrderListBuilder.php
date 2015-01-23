@@ -25,31 +25,31 @@ class CommerceOrderListBuilder extends EntityListBuilder {
    *
    * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $date_formatter;
+  protected $dateFormatter;
 
   /**
    * Constructs a new CommerceOrderListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type definition.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatter $date_formatter) {
-    parent::__construct($entity_type, $storage);
+  public function __construct(EntityTypeInterface $entityType, EntityStorageInterface $storage, DateFormatter $dateFormatter) {
+    parent::__construct($entityType, $storage);
 
-    $this->date_formatter = $date_formatter;
+    $this->dateFormatter = $dateFormatter;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entityType) {
     return new static(
-      $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $entityType,
+      $container->get('entity.manager')->getStorage($entityType->id()),
       $container->get('date.formatter')
     );
   }
@@ -88,10 +88,10 @@ class CommerceOrderListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_order\Entity\CommerceOrder */
-    $commerce_order_type = CommerceOrderType::load($entity->bundle());
+    $commerceOrderType = CommerceOrderType::load($entity->bundle());
 
-    if (!empty($commerce_order_type)) {
-      $type = String::checkPlain($commerce_order_type->label());
+    if (!empty($commerceOrderType)) {
+      $type = String::checkPlain($commerceOrderType->label());
     }
     else {
       $type = String::checkPlain($entity->bundle());
@@ -107,8 +107,8 @@ class CommerceOrderListBuilder extends EntityListBuilder {
         ),
       ),
       'status' => $entity->getStatus(),
-      'created' => $this->date_formatter->format($entity->getCreatedTime(), 'short'),
-      'changed' => $this->date_formatter->format($entity->getChangedTime(), 'short'),
+      'created' => $this->dateFormatter->format($entity->getCreatedTime(), 'short'),
+      'changed' => $this->dateFormatter->format($entity->getChangedTime(), 'short'),
     );
     return $row + parent::buildRow($entity);
   }

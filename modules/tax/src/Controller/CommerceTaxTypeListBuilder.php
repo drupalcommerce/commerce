@@ -43,20 +43,20 @@ class CommerceTaxTypeListBuilder extends ConfigEntityListBuilder {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 
-    $rates_route = Url::fromRoute('entity.commerce_tax_rate.list', array(
+    $ratesRoute = Url::fromRoute('entity.commerce_tax_rate.list', array(
       'commerce_tax_type' => $entity->getId()
     ));
-    $add_rate_route = Url::fromRoute('entity.commerce_tax_rate.add_form', array(
+    $addRateRoute = Url::fromRoute('entity.commerce_tax_rate.add_form', array(
       'commerce_tax_type' => $entity->getId(),
     ));
 
     $operations['rates'] = array(
       'title' => $this->t('View rates'),
-      'url' => $rates_route,
+      'url' => $ratesRoute,
     );
     $operations['add_rate'] = array(
       'title' => $this->t('Add rate'),
-      'url' => $add_rate_route,
+      'url' => $addRateRoute,
     );
 
     return $operations;

@@ -18,12 +18,12 @@ class CommerceCurrencyDevelController extends DevelController {
   /**
    * Dump devel information for a commerce_currency entity.
    *
-   * @param \CommerceGuys\Intl\Currency\CurrencyInterface $commerce_currency
+   * @param \CommerceGuys\Intl\Currency\CurrencyInterface $commerceCurrency
    *
    * @return string
    */
-  public function currencyLoad(CurrencyInterface $commerce_currency) {
-    return $this->loadObject('commerce_currency', $commerce_currency);
+  public function currencyLoad(CurrencyInterface $commerceCurrency) {
+    return $this->loadObject('commerce_currency', $commerceCurrency);
   }
 
 }

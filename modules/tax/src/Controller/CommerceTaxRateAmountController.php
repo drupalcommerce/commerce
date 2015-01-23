@@ -23,13 +23,13 @@ class CommerceTaxRateAmountController extends ControllerBase {
    * @return array
    *   The commerce_tax_rate_amount add form.
    */
-  public function addForm($commerce_tax_rate) {
-    $rate_amount = $this
+  public function addForm($commerceTaxRate) {
+    $rateAmount = $this
       ->entityManager()
       ->getStorage('commerce_tax_rate_amount')
-      ->create(array('rate' => $commerce_tax_rate));
+      ->create(array('rate' => $commerceTaxRate));
 
-    return $this->entityFormBuilder()->getForm($rate_amount, 'add');
+    return $this->entityFormBuilder()->getForm($rateAmount, 'add');
   }
 
   /**
@@ -41,11 +41,11 @@ class CommerceTaxRateAmountController extends ControllerBase {
    * @return array
    *   The list of commerce_tax_rate_amounts.
    */
-  public function buildList($commerce_tax_rate) {
+  public function buildList($commerceTaxRate) {
     $build = array();
-    $list_builder = $this->entityManager()->getListBuilder('commerce_tax_rate_amount');
+    $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate_amount');
 
-    $build['commerce_tax_rate_amounts_table'] = $list_builder->setTaxRate($commerce_tax_rate)->render();
+    $build['commerce_tax_rate_amounts_table'] = $listBuilder->setTaxRate($commerceTaxRate)->render();
     return $build;
   }
 

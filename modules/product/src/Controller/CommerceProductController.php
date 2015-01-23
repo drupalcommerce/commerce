@@ -32,19 +32,19 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *
    * @var \Drupal\Core\Datetime\DateFormatter
    */
-  protected $date_formatter;
+  protected $dateFormatter;
 
   /**
    * Constructs a CommerceProductController object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
    *   The date service.
    */
-  public function __construct(Connection $database, DateFormatter $date_formatter) {
+  public function __construct(Connection $database, DateFormatter $dateFormatter) {
     $this->database = $database;
-    $this->dateFormatter = $date_formatter;
+    $this->dateFormatter = $dateFormatter;
   }
 
   /**
@@ -71,22 +71,22 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *   return at all.
    */
   public function addPage() {
-    $product_types = $this->entityManager()->getStorage('commerce_product_type')->loadMultiple();
+    $productTypes = $this->entityManager()->getStorage('commerce_product_type')->loadMultiple();
     // Filter out the product types the user doesn't have access to.
-    foreach ($product_types as $product_type_id => $product_type) {
-      if (!$this->entityManager()->getAccessControlHandler('commerce_product')->createAccess($product_type_id)) {
-        unset($product_types[$product_type_id]);
+    foreach ($productTypes as $productTypeId => $productType) {
+      if (!$this->entityManager()->getAccessControlHandler('commerce_product')->createAccess($productTypeId)) {
+        unset($productTypes[$productTypeId]);
       }
     }
 
-    if (count($product_types) == 1) {
-      $product_type = reset($product_types);
-      return $this->redirect('entity.commerce_product.add_form', array('commerce_product_type' => $product_type->id()));
+    if (count($productTypes) == 1) {
+      $productType = reset($productTypes);
+      return $this->redirect('entity.commerce_product.add_form', array('commerce_product_type' => $productType->id()));
     }
 
     return array(
       '#theme' => 'commerce_product_add_list',
-      '#content' => $product_types,
+      '#content' => $productTypes,
     );
   }
 
@@ -100,11 +100,11 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
    *   A product add form.
    */
   public function add(CommerceProductTypeInterface $commerce_product_type) {
-    $langcode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id()));
+    $langCode = $this->moduleHandler()->invoke('language', 'get_default_langcode', array('commerce_product', $commerce_product_type->id()));
 
     $product = $this->entityManager()->getStorage('commerce_product')->create(array(
       'type' => $commerce_product_type->id(),
-      'langcode' => $langcode ? $langcode : $this->languageManager()->getCurrentLanguage()->getId(),
+      'langcode' => $langCode ? $langCode : $this->languageManager()->getCurrentLanguage()->getId(),
     ));
 
     $form = $this->entityFormBuilder()->getForm($product, 'add');
@@ -128,14 +128,14 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * The _title_callback for the entity.commerce_product.edit_form route
    *
-   * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
+   * @param \Drupal\commerce_product\CommerceProductInterface $commerceProduct
    *   The current product.
    *
    * @return string
    *   The page title
    */
-  public function editPageTitle(CommerceProductInterface $commerce_product) {
-    return $this->t('Editing @label', array('@label' => $commerce_product->label()));
+  public function editPageTitle(CommerceProductInterface $commerceProduct) {
+    return $this->t('Editing @label', array('@label' => $commerceProduct->label()));
   }
 
   /**

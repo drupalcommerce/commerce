@@ -50,8 +50,8 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
         'default_currency' => 'EUR',
       )
     );
-    $store_exist = (bool) CommerceStore::load($store->id());
-    $this->assertTrue($store_exist, 'The new store has been created in the database.');
+    $storeExist = (bool) CommerceStore::load($store->id());
+    $this->assertTrue($storeExist, 'The new store has been created in the database.');
 
     // Create a store through the form.
     $this->drupalGet('admin/commerce/config/store');
@@ -84,8 +84,8 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
       'name[0][value]' => $this->randomMachineName(8),
     );
     $this->drupalPostForm(NULL, $edit, 'Save');
-    $store_changed = CommerceStore::load($store->id());
-    $this->assertEqual($store->getName(), $store_changed->getName(), 'The name of the store has been changed.');
+    $storeChanged = CommerceStore::load($store->id());
+    $this->assertEqual($store->getName(), $storeChanged->getName(), 'The name of the store has been changed.');
   }
 
   /**
@@ -99,12 +99,12 @@ class CommerceStoreCRUDTest extends CommerceTestBase {
         'email' => \Drupal::currentUser()->getEmail(),
       )
     );
-    $store_exist = (bool) CommerceStore::load($store->id());
-    $this->assertTrue($store_exist, 'The new store has been created in the database.');
+    $storeExist = (bool) CommerceStore::load($store->id());
+    $this->assertTrue($storeExist, 'The new store has been created in the database.');
 
     // Delete the Store and verify deletion.
     $store->delete();
-    $store_exist = (bool) CommerceStore::load($store->id());
-    $this->assertFalse($store_exist, 'The new store has been deleted from the database.');
+    $storeExist = (bool) CommerceStore::load($store->id());
+    $this->assertFalse($storeExist, 'The new store has been deleted from the database.');
   }
 }
