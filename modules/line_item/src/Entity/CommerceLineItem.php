@@ -43,7 +43,7 @@ use Drupal\user\UserInterface;
  *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete"
  *   },
  *   bundle_entity_type = "commerce_line_item_type",
- *   field_ui_base_route = "/admin/commerce/config/line-item/{commerce_line_item}/edit",
+ *   field_ui_base_route = "entity.commerce_line_item_type.edit_form",
  * )
  */
 class CommerceLineItem extends ContentEntityBase implements CommerceLineItemInterface {
