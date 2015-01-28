@@ -23,11 +23,11 @@ class CommerceTaxRateController extends ControllerBase {
    * @return array
    *   The commerce_tax_rate add form.
    */
-  public function addForm($commerceTaxType) {
+  public function addForm($commerce_tax_type) {
     $rate = $this
       ->entityManager()
       ->getStorage('commerce_tax_rate')
-      ->create(array('type' => $commerceTaxType));
+      ->create(array('type' => $commerce_tax_type));
 
     return $this->entityFormBuilder()->getForm($rate, 'add');
   }
@@ -41,11 +41,11 @@ class CommerceTaxRateController extends ControllerBase {
    * @return array
    *   The list of commerce_tax_rates.
    */
-  public function buildList($commerceTaxType) {
+  public function buildList($commerce_tax_type) {
     $build = array();
     $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate');
 
-    $build['commerce_tax_rates_table'] = $listBuilder->setTaxType($commerceTaxType)->render();
+    $build['commerce_tax_rates_table'] = $listBuilder->setTaxType($commerce_tax_type)->render();
     return $build;
   }
 

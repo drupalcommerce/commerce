@@ -19,23 +19,23 @@ class CommerceProductDevelController extends DevelController {
   /**
    * Dump devel information for a Commerce Product Type.
    *
-   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerceProductType
+   * @param \Drupal\commerce_product\CommerceProductTypeInterface $commerce_product_type
    *
    * @return string
    */
-  public function productTypeLoad(CommerceProductTypeInterface $commerceProductType) {
-    return $this->loadObject('commerce_product_type', $commerceProductType);
+  public function productTypeLoad(CommerceProductTypeInterface $commerce_product_type) {
+    return $this->loadObject('commerce_product_type', $commerce_product_type);
   }
 
   /**
    * Dump devel information for a Commerce Product.
    *
-   * @param \Drupal\commerce_product\CommerceProductInterface $commerceProduct
+   * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *
    * @return string
    */
-  public function productLoad(CommerceProductInterface $commerceProduct) {
-    return $this->loadObject('commerce_product', $commerceProduct);
+  public function productLoad(CommerceProductInterface $commerce_product) {
+    return $this->loadObject('commerce_product', $commerce_product);
   }
 
 }

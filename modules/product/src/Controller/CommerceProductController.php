@@ -128,14 +128,14 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   /**
    * The _title_callback for the entity.commerce_product.edit_form route
    *
-   * @param \Drupal\commerce_product\CommerceProductInterface $commerceProduct
+   * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.
    *
    * @return string
    *   The page title
    */
-  public function editPageTitle(CommerceProductInterface $commerceProduct) {
-    return $this->t('Editing @label', array('@label' => $commerceProduct->label()));
+  public function editPageTitle(CommerceProductInterface $commerce_product) {
+    return $this->t('Editing @label', array('@label' => $commerce_product->label()));
   }
 
   /**
