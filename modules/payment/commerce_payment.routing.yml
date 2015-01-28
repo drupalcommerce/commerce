@@ -119,3 +119,13 @@ entity.commerce_payment_info_type.devel:
   requirements:
     _module_dependencies: 'devel'
     _permission: 'access devel information'
+
+entity.commerce_payment_info_type.edit_form:
+  path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/edit'
+  defaults:
+    _entity_form: commerce_payment_info_type.edit
+    _title: 'Edit payment info type'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: 'commerce_payment_info_type.update'
