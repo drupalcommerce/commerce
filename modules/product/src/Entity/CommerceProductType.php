@@ -70,6 +70,13 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
   protected $description;
 
   /**
+   * Option to specify if the product type is a digital service.
+   *
+   * @var bool
+   */
+  protected $digital;
+
+  /**
    * The default revision setting for products of this type.
    *
    * @var bool
@@ -106,6 +113,21 @@ class CommerceProductType extends ConfigEntityBundleBase implements CommerceProd
    */
   public function setDescription($description) {
     $this->description = $description;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDigital() {
+    return $this->digital ? TRUE : FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDigital($digital) {
+    $this->digital = $digital;
     return $this;
   }
 

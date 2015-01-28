@@ -11,6 +11,9 @@ commerce_product.commerce_product_type.*:
     revision:
       type: integer
       label: 'Create new revision'
+    digital:
+      type: integer
+      label: 'Products of this type represent digital services.'
     description:
       type: text
       label: 'Description'

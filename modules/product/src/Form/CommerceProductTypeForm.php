@@ -40,7 +40,12 @@ class CommerceProductTypeForm extends EntityForm {
       '#title' => $this->t('Description'),
       '#default_value' => $productType->getDescription(),
     );
-
+    $form['digital'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Digital'),
+      '#default_value' => $productType->isDigital(),
+      '#description' => t('Products of this type represent digital services.')
+    );
     $form['revision'] = array(
       '#type' => 'checkbox',
       '#title' => t('Create new revision'),
