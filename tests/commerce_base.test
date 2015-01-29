@@ -739,68 +739,6 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
 }
 
-
-/**
- * Sandbox for trying new things with tests. Eases development so only one test
- * has to run at a time. Move everything to CommerceBaseTesterTestCase after it
- * is functioning here.
- */
-class CommerceSandboxTestCase extends CommerceBaseTestCase {
-  protected $site_admin;
-
-  /**
-   * getInfo() returns properties that are displayed in the test selection form.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => t('Commerce sandbox'),
-      'description' => t('Sandbox for trying new things with tests. Eases development so only one test has to run at a time.'),
-      'group' => t('Drupal Commerce'),
-    );
-  }
-
-  /**
-   * setUp() performs any pre-requisite tasks that need to happen.
-   */
-  public function setUp() {
-    $modules = parent::setUpHelper('all');
-    parent::setUp($modules);
-
-    $this->site_admin = $this->createSiteAdmin();
-    cache_clear_all(); // Just in case
-  }
-
-  /**
-   * Sandbox for test development
-   */
-  public function testTestTest() {
-
-  }
-
-  /**
-   * Test the createDummyCustomerProfile function.
-   */
-  public function testTestCreateDummyCustomerProfile() {
-    $store_admin = $this->createStoreAdmin();
-    // Create a new customer profile for the store admin.
-    $profile = $this->createDummyCustomerProfile('billing', $store_admin->uid);
-
-    // Load profile reseting cache.
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
-
-    $this->assertFalse(empty($profile), t('Profile can be loaded from database'));
-
-    // Login with store admin user and navigate to the profile listing page.
-    $this->drupalLogin($store_admin);
-    $this->drupalGet('admin/commerce/customer-profiles');
-
-    $this->assertText($profile->commerce_customer_address[LANGUAGE_NONE][0]['name_line'], t('\'Name line\' field for the profile created is present in the customer profile listing'));
-    $type = commerce_customer_profile_type_load($profile->type);
-    $this->assertText($type['name'], t('The type of the profile is informed in the profile listing page'));
-  }
-
-}
-
 /**
  * Test class to test the CommerceBaseTestCase functions. All testTestFoo
  * functions have "testTest" in the name to indicate that they are verifying
