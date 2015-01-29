@@ -263,7 +263,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     }
 
     // Load the profile and check if the field is filled.
-    $profile = commerce_customer_profile_load(reset($this->loadCustomerProfile($conditions))->profile_id);
+    $profiles = $this->loadCustomerProfile($conditions);
+    $profile = commerce_customer_profile_load(reset($profiles)->profile_id);
     $this->assertTrue($profile->{'field_' . $edit['fields[_add_new_field][field_name]']}[LANGUAGE_NONE][0]['value'] == $field_value, t('The extra field !field created for the customer profile exists and it has the correct value: !value', array('!field' => $edit['fields[_add_new_field][field_name]'], '!value' => $field_value)));
   }
 
@@ -305,7 +306,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->assertFieldByName('name', NULL, t('Name field is present and empty'));
 
     // Check at database level.
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+    $profiles = commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE);
+    $profile = reset($profiles);
     $this->assertTrue($profile->commerce_customer_address[LANGUAGE_NONE][0]['name_line'] == $edit['commerce_customer_address[und][0][name_line]'], t('\'Name line\' field has been correctly modified in the customer profile'));
     $this->assertTrue($profile->commerce_customer_address[LANGUAGE_NONE][0]['locality'] == $edit['commerce_customer_address[und][0][locality]'], t('\'Locality\' field has been correctly modified in the customer profile'));
     $this->assertTrue($profile->uid == 0, t('Profile owner is now anonymous user'));
@@ -326,7 +328,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
 
     $this->drupalGet('admin/commerce/customer-profiles');
     $this->assertText(t('Disabled'), t('\'Disabled\' text for the profile appears in the profile listing page'));
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+    $profiles = commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE);
+    $profile = reset($profiles);
     $this->assertTrue($profile->status == 0, t('Profile status is Disabled'));
   }
 
@@ -364,7 +367,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->assertText(t('No customer profiles have been created yet.'), t('\'No customer profiles have been created yet\' message is displayed'));
 
     // Check at database level.
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+    $profiles = commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE);
+    $profile = reset($profiles);
     $this->assertTrue(empty($profile), t('Profile can\'t be loaded from database after deleting it'));
   }
 
@@ -413,7 +417,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->drupalLogin($this->store_admin);
 
     // Check the customer profile at database level.
-    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
     $profile = $order_wrapper->commerce_customer_billing->value();
     $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
@@ -466,7 +471,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
       	'value' => $element,
       );
     }
-    $profile = commerce_customer_profile_load(reset($this->loadCustomerProfile($conditions))->profile_id);
+    $profiles = $this->loadCustomerProfile($conditions);
+    $profile = commerce_customer_profile_load(reset($profiles)->profile_id);
     $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
     $this->assertFalse(empty($profile), t('Profile has been created in database'));
     foreach ($address_info as $name => $info) {
@@ -498,7 +504,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->assertTrue($edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][name_line]'], t('\'Name line\' text is present with the correct value: !value', array('!value' => $edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][name_line]'])));
 
     // Check the customer profile at database level.
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+    $profiles = commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE);
+    $profile = reset($profiles);
     $profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $profile);
     $this->assertEqual($profile_wrapper->commerce_customer_address->name_line->value(), $edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][name_line]'], t('\'Name line\' property value !value match', array('!value' => $edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][name_line]'])));
     $this->assertEqual($profile_wrapper->commerce_customer_address->locality->value(), $edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][locality]'], t('\'Locality\' property value !value match', array('!value' => $edit['commerce_customer_billing[und][profiles][0][commerce_customer_address][und][0][locality]'])));
@@ -523,7 +530,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->assertNoText($profile_wrapper->commerce_customer_address->name_line->value(), t('\'Name line\' for the profile is not present in the customer profiles listing'));
 
     // Check the customer profile has been deleted at database level.
-    $profile = reset(commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE));
+    $profiles = commerce_customer_profile_load_multiple(array($profile->profile_id), array(), TRUE);
+    $profile = reset($profiles);
     $this->assertTrue(empty($profile), t('Profile has been delete from database'));
   }
 
@@ -613,7 +621,8 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->drupalPost(NULL, $info, t('Continue to next step'));
 
     // Check the customer profile at database level.
-    $order = reset(commerce_order_load_multiple(array($order->order_id), array(), TRUE));
+    $orders = commerce_order_load_multiple(array($order->order_id), array(), TRUE);
+    $order = reset($orders);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
     // Extract the address field value from the billing profile.

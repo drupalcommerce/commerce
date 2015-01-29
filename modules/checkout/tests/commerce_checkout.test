@@ -76,7 +76,8 @@ class CommerceCheckoutTestProcess extends CommerceBaseTestCase {
     $this->drupalPost('node/' . $this->product_node->nid, array(), t('Add to cart'));
 
     // Get the order for the anonymous user.
-    $this->order = reset(commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE));
+    $orders = commerce_order_load_multiple(array(), array('uid' => $user->uid, 'status' => 'cart'), TRUE);
+    $this->order = reset($orders);
     // Reset the cache as we don't want to keep the lock.
     entity_get_controller('commerce_order')->resetCache();
   }
