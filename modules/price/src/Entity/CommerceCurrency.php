@@ -22,7 +22,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\commerce_price\Form\CommerceCurrencyForm",
  *       "delete" = "Drupal\commerce_price\Form\CommerceCurrencyDeleteForm"
  *     },
- *     "list_builder" = "Drupal\commerce_price\Controller\CommerceCurrencyListBuilder",
+ *     "list_builder" = "Drupal\commerce_price\CommerceCurrencyListBuilder",
  *   },
  *   admin_permission = "administer stores",
  *   config_prefix = "commerce_currency",

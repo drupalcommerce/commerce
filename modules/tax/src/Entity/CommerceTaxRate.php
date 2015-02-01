@@ -24,7 +24,7 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *       "edit" = "Drupal\commerce_tax\Form\CommerceTaxRateForm",
  *       "delete" = "Drupal\commerce_tax\Form\CommerceTaxRateDeleteForm",
  *     },
- *     "list_builder" = "Drupal\commerce_tax\Controller\CommerceTaxRateListBuilder"
+ *     "list_builder" = "Drupal\commerce_tax\CommerceTaxRateListBuilder"
  *   },
  *   admin_permission = "administer stores",
  *   config_prefix = "commerce_tax_rate",

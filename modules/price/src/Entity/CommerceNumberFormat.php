@@ -22,7 +22,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\commerce_price\Form\CommerceNumberFormatForm",
  *       "delete" = "Drupal\commerce_price\Form\CommerceNumberFormatDeleteForm"
  *     },
- *     "list_builder" = "Drupal\commerce_price\Controller\CommerceNumberFormatListBuilder",
+ *     "list_builder" = "Drupal\commerce_price\CommerceNumberFormatListBuilder",
  *   },
  *   admin_permission = "administer stores",
  *   config_prefix = "commerce_number_format",
