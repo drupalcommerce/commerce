@@ -47,17 +47,17 @@ class CommercePaymentInfoController extends ControllerBase {
   /**
    * Provides the payment information add form.
    *
-   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $commercePaymentInfoType
+   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $commerce_payment_info_type
    *   The payment information type entity.
    *
    * @return array
    *   An payment information add form.
    */
-  public function add(CommercePaymentInfoTypeInterface $commercePaymentInfoType) {
-    $commercePaymentInfoType = $this->entityManager()->getStorage('commerce_payment_info')->create(array(
-      'payment_method' => $commercePaymentInfoType->id(),
+  public function add(CommercePaymentInfoTypeInterface $commerce_payment_info_type) {
+    $commerce_payment_info_type = $this->entityManager()->getStorage('commerce_payment_info')->create(array(
+      'payment_method' => $commerce_payment_info_type->id(),
     ));
-    $form = $this->entityFormBuilder()->getForm($commercePaymentInfoType, 'add');
+    $form = $this->entityFormBuilder()->getForm($commerce_payment_info_type, 'add');
 
     return $form;
   }
@@ -65,14 +65,14 @@ class CommercePaymentInfoController extends ControllerBase {
   /**
    * The title_callback for the entity.commerce_payment_info.add_form route.
    *
-   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $commercePaymentInfoType
+   * @param \Drupal\commerce_payment\CommercePaymentInfoTypeInterface $commerce_payment_info_type
    *   The current payment information type.
    *
    * @return string
    *   The page title.
    */
-  public function addPageTitle(CommercePaymentInfoTypeInterface $commercePaymentInfoType) {
-    return $this->t('Create @label', array('@label' => $commercePaymentInfoType->label()));
+  public function addPageTitle(CommercePaymentInfoTypeInterface $commerce_payment_info_type) {
+    return $this->t('Create @label', array('@label' => $commerce_payment_info_type->label()));
   }
 
 }
