@@ -2,14 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_tax\Controller\CommerceTaxRateListBuilder.
+ * Contains \Drupal\commerce_tax\CommerceTaxRateListBuilder.
  */
 
-namespace Drupal\commerce_tax\Controller;
+namespace Drupal\commerce_tax;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use CommerceGuys\Tax\Model\TaxTypeInterface;
 use Drupal\Core\Url;
 
 /**
@@ -49,7 +48,7 @@ class CommerceTaxRateListBuilder extends ConfigEntityListBuilder {
    *
    * @param string $taxType
    *
-   * @return \Drupal\commerce_tax\Controller\CommerceTaxRateListBuilder
+   * @return \Drupal\commerce_tax\CommerceTaxRateListBuilder
    */
   public function setTaxType($taxType) {
     $this->taxType = $taxType;

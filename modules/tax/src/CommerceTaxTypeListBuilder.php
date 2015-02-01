@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_tax\Controller\CommerceTaxTypeListBuilder.
+ * Contains \Drupal\commerce_tax\CommerceTaxTypeListBuilder.
  */
 
-namespace Drupal\commerce_tax\Controller;
+namespace Drupal\commerce_tax;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
