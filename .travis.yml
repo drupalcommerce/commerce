@@ -51,7 +51,6 @@ install:
   - TESTDIR=$(pwd)
   - cd ..
   - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git drupal
-  - git clone --branch 8.x-1.x http://git.drupal.org/project/devel.git drupal/modules/devel
   - git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git drupal/modules/composer_manager
   - cd drupal
   - wget https://www.drupal.org/files/issues/run_tests_sh_should-2189345-53.patch
@@ -68,7 +67,7 @@ before_script:
   # Update drupal core
   - git pull origin 8.0.x
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
-  - drush en -y devel composer_manager simpletest
+  - drush en -y composer_manager simpletest
   - drush composer-manager-init
   - cd core
   - composer drupal-rebuild

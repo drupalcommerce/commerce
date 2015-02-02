@@ -48,17 +48,6 @@ entity.commerce_order.delete_form:
   requirements:
     _entity_access: 'commerce_order.delete'
 
-entity.commerce_order.devel:
-  path: '/admin/commerce/orders/{commerce_order}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderLoad'
-    _title: 'Dump an order'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
 entity.commerce_order_type.list:
   path: '/admin/commerce/config/order-types'
   defaults:
@@ -128,14 +117,3 @@ entity.commerce_order_type.delete_form:
     _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_order_type.delete'
-
-entity.commerce_order_type.devel:
-  path: '/admin/commerce/config/order-types/{commerce_order_type}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_order\Controller\CommerceOrderDevelController::orderTypeLoad'
-    _title: 'Dump an order type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'

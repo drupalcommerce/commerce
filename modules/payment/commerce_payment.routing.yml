@@ -48,17 +48,6 @@ entity.commerce_payment_info.delete_form:
   requirements:
     _entity_access: 'commerce_payment_info.delete'
 
-entity.commerce_payment_info.devel:
-  path: '/admin/commerce/payment-info/{commerce_payment_info}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoLoad'
-    _title: 'Dump a payment information entity'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
 entity.commerce_payment_info.edit_form:
   path: '/admin/commerce/payment-info/{commerce_payment_info}/edit'
   defaults:
@@ -108,17 +97,6 @@ entity.commerce_payment_info_type.delete_form:
     _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info_type.delete'
-
-entity.commerce_payment_info_type.devel:
-  path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoDevelController::paymentInfoTypeLoad'
-    _title: 'Dump an payment info type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
 
 entity.commerce_payment_info_type.edit_form:
   path: '/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/edit'

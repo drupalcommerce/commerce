@@ -8,19 +8,7 @@ entity.commerce_product.page_edit:
   base_route: entity.commerce_product.view
   title: Edit
 
-entity.commerce_product.devel:
-  route_name: entity.commerce_product.devel
-  base_route: entity.commerce_product.edit_form
-  title: Devel
-  weight: 10
-
 entity.commerce_product_type.edit_form:
   route_name: entity.commerce_product_type.edit_form
   base_route: entity.commerce_product_type.edit_form
   title: Edit
-
-entity.commerce_product_type.devel:
-  route_name: entity.commerce_product_type.devel
-  base_route: entity.commerce_product_type.edit_form
-  title: Devel
-  weight: 10

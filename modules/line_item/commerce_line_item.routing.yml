@@ -37,14 +37,3 @@ entity.commerce_line_item_type.delete_form:
     _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_line_item_type.delete'
-
-entity.commerce_line_item_type.devel:
-  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_line_item\Controller\CommerceLineItemDevelController::lineItemTypeLoad'
-    _title: 'Dump an line item type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'

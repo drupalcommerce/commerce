@@ -18,8 +18,8 @@ Installation
 
 Preparation:
 
-1.  Install the -dev versions of Drupal 8, [devel*](https://www.drupal.org/project/devel) and [composer_manager](https://drupal.org/project/composer_manager).
-2. Initialize composer_manager** (`drush composer-manager-init` or `php modules/composer_manager/scripts/init.sh`).
+1.  Install the -dev versions of Drupal 8 and [composer_manager](https://drupal.org/project/composer_manager).
+2. Initialize composer_manager* (`drush composer-manager-init` or `php modules/composer_manager/scripts/init.sh`).
 
 With Drush:
 
@@ -34,8 +34,7 @@ Without Drush:
 3. Enable the Commerce modules.
 
 Notes:
-- * Devel is currently not optional because of a [core bug](https://www.drupal.org/node/2315801)
-- ** Find out more about composer_manager usage [here](https://www.drupal.org/node/2405811).
+- * Find out more about composer_manager usage [here](https://www.drupal.org/node/2405811).
 
 Related Libraries
 ------------------

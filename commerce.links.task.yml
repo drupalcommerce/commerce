@@ -8,12 +8,6 @@ entity.commerce_store.edit_form:
   base_route: entity.commerce_store.edit_form
   title: Edit
 
-entity.commerce_store.devel:
-  route_name: entity.commerce_store.devel
-  base_route: entity.commerce_store.edit_form
-  title: Devel
-  weight: 10
-
 entity.commerce_store_type.list:
   route_name: entity.commerce_store_type.list
   base_route: entity.commerce_store.list
@@ -23,9 +17,3 @@ entity.commerce_store_type.edit_form:
   route_name: entity.commerce_store_type.edit_form
   base_route: entity.commerce_store_type.edit_form
   title: Edit
-
-entity.commerce_store_type.devel:
-  route_name: entity.commerce_store_type.devel
-  base_route: entity.commerce_store_type.edit_form
-  title: Devel
-  weight: 10

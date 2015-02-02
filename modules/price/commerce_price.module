@@ -5,30 +5,6 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * Implements hook_entity_operation().
- *
- * Adds the devel link for the commerce_currency entity type.
- */
-function commerce_price_entity_operation(EntityInterface $entity) {
-  $operations = array();
-  if (!\Drupal::moduleHandler()->moduleExists('devel')) {
-    return $operations;
-  }
-
-  $entity_type_id = $entity->getEntityTypeId();
-  if (\Drupal::currentUser()->hasPermission('access devel information') && $entity_type_id == 'commerce_currency') {
-    $operations['devel'] = array(
-      'route_name' => 'entity.commerce_currency.devel',
-      'route_parameters' => array($entity_type_id => $entity->id()),
-      'title' => t('Devel'),
-      'weight' => 15,
-    );
-  }
-
-  return $operations;
-}
-
-/**
  * Implements hook_ENTITY_TYPE_insert() for 'configurable_language'.
  */
 function commerce_price_configurable_language_insert(ConfigurableLanguage $language) {

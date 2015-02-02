@@ -7,41 +7,11 @@
  * products and interact with them through forms and autocompletes.
  */
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
-
-/**
- * Implements hook_entity_operation().
- *
- * Add devel link if this entity type is /commerce_product[_type]/.
- */
-function commerce_product_entity_operation(EntityInterface $entity) {
-  $operations = array();
-  if (!\Drupal::moduleHandler()->moduleExists('devel')) {
-    return $operations;
-  }
-
-  $entity_routes = array(
-    'commerce_product' => 'entity.commerce_product.devel',
-    'commerce_product_type' => 'entity.commerce_product_type.devel',
-  );
-
-  $entity_type_id = $entity->getEntityTypeId();
-  if (\Drupal::currentUser()->hasPermission('access devel information') && in_array($entity_type_id, array_keys($entity_routes))) {
-    $operations['devel'] = array(
-      'route_name' => $entity_routes[$entity_type_id],
-      'route_parameters' => array($entity_type_id => $entity->id()),
-      'title' => t('Devel'),
-      'weight' => 15,
-    );
-  }
-
-  return $operations;
-}
 
 /**
  * Entity URI callback.

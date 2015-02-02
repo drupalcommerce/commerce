@@ -3,19 +3,7 @@ entity.commerce_order.edit_form:
   base_route: 'entity.commerce_order.edit_form'
   title: 'Edit'
 
-entity.commerce_order.devel:
-  route_name: 'entity.commerce_order.devel'
-  base_route: 'entity.commerce_order.edit_form'
-  title: 'Devel'
-  weight: 10
-
 entity.commerce_order.admin_form:
   route_name: 'entity.commerce_order.admin_form'
   base_route: 'entity.commerce_order.admin_form'
   title: 'Edit'
-
-entity.commerce_order_type.devel:
-  route_name: 'entity.commerce_order_type.devel'
-  base_route: 'entity.commerce_order.admin_form'
-  title: 'Devel'
-  weight: 10

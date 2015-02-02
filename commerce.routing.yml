@@ -68,17 +68,6 @@ entity.commerce_store.delete_form:
   requirements:
     _entity_access: 'commerce_store.delete'
 
-entity.commerce_store.devel:
-  path: '/admin/commerce/config/store/{commerce_store}/devel'
-  defaults:
-    _controller: '\Drupal\commerce\Controller\CommerceDevelController::storeLoad'
-    _title: 'Dump a store'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
 entity.commerce_store_type.add_form:
   path: '/admin/commerce/config/store/types/add'
   defaults:
@@ -118,14 +107,3 @@ entity.commerce_store_type.delete_form:
     _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_store_type.delete'
-
-entity.commerce_store_type.devel:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}/devel'
-  defaults:
-    _controller: '\Drupal\commerce\Controller\CommerceDevelController::storeTypeLoad'
-    _title: 'Dump a store type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'

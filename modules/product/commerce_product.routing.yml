@@ -64,17 +64,6 @@ entity.commerce_product.delete_form:
   requirements:
     _entity_access: 'commerce_product.delete'
 
-entity.commerce_product.devel:
-  path: '/admin/commerce/products/{commerce_product}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productLoad'
-    _title: 'Dump a product'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
-
 entity.commerce_product_type.add_form:
   path: '/admin/commerce/config/product-types/add'
   defaults:
@@ -114,14 +103,3 @@ entity.commerce_product_type.delete_form:
     _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_product_type.delete'
-
-entity.commerce_product_type.devel:
-  path: '/admin/commerce/config/product-types/{commerce_product_type}/devel'
-  defaults:
-    _controller: '\Drupal\commerce_product\Controller\CommerceProductDevelController::productTypeLoad'
-    _title: 'Dump a product type'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _module_dependencies: 'devel'
-    _permission: 'access devel information'
