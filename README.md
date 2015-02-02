@@ -18,15 +18,22 @@ Installation
 
 1. Install the latest -dev version of Drupal 8.
 2. Install the latest -dev versions of [devel*](https://www.drupal.org/project/devel) and [composer_manager](https://drupal.org/project/composer_manager).
-3. Enable Commerce (but not any of the submodules!)
-4. Go to your sites/default/files/composer directory and run `composer install`.
-
-   This will download the required libraries into your sites/all/vendor directory.
-4. Enable the Commerce submodules. Use the admin/modules page, Drush won't work currently**.
+3. Download Commerce
+4. Init composer manager.
+  
+  ```Shell
+drush composer-manager-init
+  ```
+5. Go to core/ directory and update drupal components with composer.
+  
+  ```Shell
+cd core/
+composer drupal-update
+  ```
+6. Enable the Commerce modules and submodules.
 
 Notes:
 - * Devel is currently not optional because of a core bug: https://www.drupal.org/node/2315801
-- ** Drush is currently incompatible with composer_manager, causing the library classes to not be found in all commands (enabling a module, clearing cache, etc). The bug is tracked at https://www.drupal.org/node/2208949
 
 Related Libraries
 ------------------
