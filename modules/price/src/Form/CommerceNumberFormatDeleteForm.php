@@ -27,7 +27,7 @@ class CommerceNumberFormatDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.commerce_number_format.list');
+    return new Url('entity.commerce_number_format.collection');
   }
 
   /**

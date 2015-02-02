@@ -2,10 +2,10 @@ entity.commerce_product.add_page:
   route_name: entity.commerce_product.add_page
   title: 'Add a new product'
   appears_on:
-    - entity.commerce_product.list
+    - entity.commerce_product.collection
 
 entity.commerce_product_type.add_form:
   route_name: entity.commerce_product_type.add_form
   title: 'Add a new product type'
   appears_on:
-    - entity.commerce_product_type.list
+    - entity.commerce_product_type.collection

@@ -30,7 +30,7 @@ entity.commerce_store.add_page:
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_store.list:
+entity.commerce_store.collection:
   path: '/admin/commerce/config/store'
   defaults:
     _entity_list: 'commerce_store'
@@ -62,7 +62,7 @@ entity.commerce_store_type.add_form:
   requirements:
     _permission: 'administer store types'
 
-entity.commerce_store_type.list:
+entity.commerce_store_type.collection:
   path: '/admin/commerce/config/store/types'
   defaults:
     _entity_list: 'commerce_store_type'

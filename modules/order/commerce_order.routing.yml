@@ -38,7 +38,7 @@ entity.commerce_order.delete_form:
   requirements:
     _entity_access: 'commerce_order.delete'
 
-entity.commerce_order_type.list:
+entity.commerce_order_type.collection:
   path: '/admin/commerce/config/order-types'
   defaults:
     _entity_list: 'commerce_order_type'
@@ -62,7 +62,7 @@ entity.commerce_order.edit_form:
   requirements:
     _entity_access: 'commerce_order.update'
 
-entity.commerce_order.list:
+entity.commerce_order.collection:
   path: '/admin/commerce/orders'
   defaults:
     _entity_list: 'commerce_order'

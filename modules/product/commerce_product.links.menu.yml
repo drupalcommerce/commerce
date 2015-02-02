@@ -1,11 +1,11 @@
-entity.commerce_product.list:
+entity.commerce_product.collection:
   title: 'Products'
-  route_name: 'entity.commerce_product.list'
+  route_name: 'entity.commerce_product.collection'
   parent: 'commerce.admin_commerce'
   description: 'Manage your products.'
 
-entity.commerce_product_type.list:
+entity.commerce_product_type.collection:
   title: 'Product types'
-  route_name: 'entity.commerce_product_type.list'
+  route_name: 'entity.commerce_product_type.collection'
   parent: 'commerce.configuration'
   description: 'Manage your product types.'

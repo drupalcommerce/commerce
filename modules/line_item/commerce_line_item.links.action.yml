@@ -2,4 +2,4 @@ entity.commerce_line_item_type.add_form:
   route_name: entity.commerce_line_item_type.add_form
   title: 'Add a new line item type'
   appears_on:
-    - entity.commerce_line_item_type.list
+    - entity.commerce_line_item_type.collection

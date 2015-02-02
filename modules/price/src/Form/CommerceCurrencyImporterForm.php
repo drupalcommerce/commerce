@@ -107,7 +107,7 @@ class CommerceCurrencyImporterForm extends FormBase {
         $form_state->setRebuild();
       }
       else {
-        $form_state->setRedirect('entity.commerce_currency.list');
+        $form_state->setRedirect('entity.commerce_currency.collection');
       }
     }
     catch (\Exception $e) {

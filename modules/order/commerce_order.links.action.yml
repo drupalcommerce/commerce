@@ -2,10 +2,10 @@ entity.commerce_order.add_page:
   route_name: entity.commerce_order.add_page
   title: 'Create a new order'
   appears_on:
-    - entity.commerce_order.list
+    - entity.commerce_order.collection
 
 entity.commerce_order_type.add_form:
   route_name: entity.commerce_order_type.add_form
   title: 'Add a new order type'
   appears_on:
-    - entity.commerce_order_type.list
+    - entity.commerce_order_type.collection

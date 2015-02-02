@@ -88,7 +88,7 @@ class CommerceLineItemTypeForm extends EntityForm {
       drupal_set_message($this->t('Saved the %label line item type.', array(
         '%label' => $lineItemType->label(),
       )));
-      $form_state->setRedirect('entity.commerce_line_item_type.list');
+      $form_state->setRedirect('entity.commerce_line_item_type.collection');
     }
     catch (\Exception $e) {
       $this->logger('commerce_line_item')->error($e);

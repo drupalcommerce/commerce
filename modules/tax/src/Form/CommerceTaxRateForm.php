@@ -153,7 +153,7 @@ class CommerceTaxRateForm extends EntityForm {
           $taxType->save();
         }
 
-        $form_state->setRedirect('entity.commerce_tax_rate.list', array(
+        $form_state->setRedirect('entity.commerce_tax_rate.collection', array(
           'commerce_tax_type' => $taxType->getId(),
         ));
       }

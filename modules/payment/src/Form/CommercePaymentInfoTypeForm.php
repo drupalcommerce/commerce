@@ -88,7 +88,7 @@ class CommercePaymentInfoTypeForm extends EntityForm {
       drupal_set_message($this->t('Saved the %payment_info_type_label payment information type.', array(
         '%payment_info_type_label' => $paymentInformationType->label(),
       )));
-      $form_state->setRedirect('entity.commerce_payment_info_type.list');
+      $form_state->setRedirect('entity.commerce_payment_info_type.collection');
     }
     catch (\Exception $e) {
       watchdog_exception('commerce_payment', $e);

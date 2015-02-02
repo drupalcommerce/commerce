@@ -2,10 +2,10 @@ entity.commerce_payment_info.add_page:
   route_name: entity.commerce_payment_info.add_page
   title: 'Create a new payment information entity'
   appears_on:
-    - entity.commerce_payment_info.list
+    - entity.commerce_payment_info.collection
 
 entity.commerce_payment_info_type.add_form:
   route_name: entity.commerce_payment_info_type.add_form
   title: 'Add a new payment information entity type'
   appears_on:
-    - entity.commerce_payment_info_type.list
+    - entity.commerce_payment_info_type.collection

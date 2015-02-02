@@ -1,11 +1,11 @@
-entity.commerce_currency.list:
+entity.commerce_currency.collection:
   title: Currencies
-  route_name: entity.commerce_currency.list
+  route_name: entity.commerce_currency.collection
   parent: commerce.configuration
   description: 'Manage your currencies.'
 
-entity.commerce_number_format.list:
+entity.commerce_number_format.collection:
   title: Number Formats
-  route_name: entity.commerce_number_format.list
+  route_name: entity.commerce_number_format.collection
   parent: commerce.configuration
   description: 'Manage your number formats.'

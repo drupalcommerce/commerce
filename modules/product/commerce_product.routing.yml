@@ -32,7 +32,7 @@ entity.commerce_product.view:
   requirements:
     _entity_access: 'commerce_product.view'
 
-entity.commerce_product.list:
+entity.commerce_product.collection:
   path: '/admin/commerce/products'
   defaults:
     _entity_list: 'commerce_product'
@@ -68,7 +68,7 @@ entity.commerce_product_type.add_form:
   requirements:
     _entity_create_access: 'commerce_product_type'
 
-entity.commerce_product_type.list:
+entity.commerce_product_type.collection:
   path: '/admin/commerce/config/product-types'
   defaults:
     _entity_list: 'commerce_product_type'

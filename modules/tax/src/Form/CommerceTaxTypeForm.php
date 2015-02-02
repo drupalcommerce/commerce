@@ -137,7 +137,7 @@ class CommerceTaxTypeForm extends EntityForm {
       drupal_set_message($this->t('Saved the %label tax type.', array(
         '%label' => $taxType->label(),
       )));
-      $form_state->setRedirect('entity.commerce_tax_type.list');
+      $form_state->setRedirect('entity.commerce_tax_type.collection');
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The %label tax type was not saved.', array(

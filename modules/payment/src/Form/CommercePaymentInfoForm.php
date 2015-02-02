@@ -26,7 +26,7 @@ class CommercePaymentInfoForm extends ContentEntityForm {
       drupal_set_message($this->t('The payment information %payment_info_label could not be saved.', array('%payment_info_label' => $this->entity->label())), 'error');
       watchdog_exception('commerce_payment', $e);
     }
-    $form_state->setRedirect('entity.commerce_payment_info.list');
+    $form_state->setRedirect('entity.commerce_payment_info.collection');
   }
 
   /**

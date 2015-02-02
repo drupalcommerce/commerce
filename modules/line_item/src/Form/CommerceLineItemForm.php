@@ -25,7 +25,7 @@ class CommerceLineItemForm extends ContentEntityForm {
       drupal_set_message($this->t('The order %order_label could not be saved.', array('%order_label' => $this->entity->label())), 'error');
       $this->logger('commerce_line_item')->error($e);
     }
-    $form_state->setRedirect('entity.commerce_line_item.list');
+    $form_state->setRedirect('entity.commerce_line_item.collection');
   }
 
   /**

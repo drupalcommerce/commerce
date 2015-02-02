@@ -174,7 +174,7 @@ class CommerceNumberFormatForm extends EntityForm {
       drupal_set_message($this->t('Saved the %label number format.', array(
         '%label' => $currency->label(),
       )));
-      $form_state->setRedirect('entity.commerce_number_format.list');
+      $form_state->setRedirect('entity.commerce_number_format.collection');
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The %label number format was not saved.', array('%label' => $currency->label())), 'error');

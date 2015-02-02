@@ -63,7 +63,7 @@ class CommerceProductTypeForm extends EntityForm {
     try {
       $this->entity->save();
       drupal_set_message($this->t('The product type %product_type_label has been successfully saved.', array('%product_type_label' => $this->entity->label())));
-      $form_state->setRedirect('entity.commerce_product_type.list');
+      $form_state->setRedirect('entity.commerce_product_type.collection');
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The product type %product_type_label could not be saved.', array('%product_type_label' => $this->entity->label())), 'error');

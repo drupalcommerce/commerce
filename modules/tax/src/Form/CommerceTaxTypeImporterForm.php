@@ -113,7 +113,7 @@ class CommerceTaxTypeImporterForm extends FormBase {
         $form_state->setRebuild();
       }
       else {
-        $form_state->setRedirect('entity.commerce_tax_type.list');
+        $form_state->setRedirect('entity.commerce_tax_type.collection');
       }
     }
     catch (\Exception $e) {

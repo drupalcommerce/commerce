@@ -55,7 +55,7 @@ class CommerceOrderTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.commerce_order_type.list');
+    return new Url('entity.commerce_order_type.collection');
   }
 
   /**

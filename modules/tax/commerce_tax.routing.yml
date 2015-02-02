@@ -1,4 +1,4 @@
-entity.commerce_tax_type.list:
+entity.commerce_tax_type.collection:
   path: '/admin/commerce/config/tax/type'
   defaults:
     _entity_list: 'commerce_tax_type'
@@ -38,7 +38,7 @@ entity.commerce_tax_type.import_form:
   requirements:
     _entity_create_access: 'commerce_tax_type'
 
-entity.commerce_tax_rate.list:
+entity.commerce_tax_rate.collection:
   path: '/admin/commerce/config/tax/rate/{commerce_tax_type}'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateController::buildList'
@@ -70,7 +70,7 @@ entity.commerce_tax_rate.delete_form:
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_tax_rate_amount.list:
+entity.commerce_tax_rate_amount.collection:
   path: '/admin/commerce/config/tax/amount/{commerce_tax_rate}'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateAmountController::buildList'

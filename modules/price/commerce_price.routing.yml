@@ -1,4 +1,4 @@
-entity.commerce_currency.list:
+entity.commerce_currency.collection:
   path: '/admin/commerce/config/currency'
   defaults:
     _entity_list: 'commerce_currency'
@@ -38,7 +38,7 @@ entity.commerce_currency.delete_form:
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_number_format.list:
+entity.commerce_number_format.collection:
   path: '/admin/commerce/config/number-format'
   defaults:
     _entity_list: 'commerce_number_format'

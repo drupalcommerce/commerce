@@ -1,6 +1,6 @@
-entity.commerce_store.list:
-  route_name: entity.commerce_store.list
-  base_route: entity.commerce_store.list
+entity.commerce_store.collection:
+  route_name: entity.commerce_store.collection
+  base_route: entity.commerce_store.collection
   title: List
 
 entity.commerce_store.edit_form:
@@ -8,9 +8,9 @@ entity.commerce_store.edit_form:
   base_route: entity.commerce_store.edit_form
   title: Edit
 
-entity.commerce_store_type.list:
-  route_name: entity.commerce_store_type.list
-  base_route: entity.commerce_store.list
+entity.commerce_store_type.collection:
+  route_name: entity.commerce_store_type.collection
+  base_route: entity.commerce_store.collection
   title: Store types
 
 entity.commerce_store_type.edit_form:

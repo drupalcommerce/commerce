@@ -5,14 +5,14 @@ commerce_payment.payment_configuration:
   description: 'Configure your payment settings.'
   weight: 10
 
-entity.commerce_payment_info.list:
+entity.commerce_payment_info.collection:
   title: Payment information entities
-  route_name: entity.commerce_payment_info.list
+  route_name: entity.commerce_payment_info.collection
   parent: commerce.admin_commerce
   description: 'Manage your payment information entities.'
 
-entity.commerce_payment_info_type.list:
+entity.commerce_payment_info_type.collection:
   title: Payment information types
-  route_name: entity.commerce_payment_info_type.list
+  route_name: entity.commerce_payment_info_type.collection
   parent: commerce_payment.payment_configuration
   description: 'Manage your payment information entity types.'

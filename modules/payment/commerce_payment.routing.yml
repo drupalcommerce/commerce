@@ -46,7 +46,7 @@ entity.commerce_payment_info.edit_form:
   requirements:
     _entity_access: 'commerce_payment_info.update'
 
-entity.commerce_payment_info.list:
+entity.commerce_payment_info.collection:
   path: '/admin/commerce/payment-info'
   defaults:
     _entity_list: 'commerce_payment_info'
@@ -54,7 +54,7 @@ entity.commerce_payment_info.list:
   requirements:
     _permission: 'administer payment information'
 
-entity.commerce_payment_info_type.list:
+entity.commerce_payment_info_type.collection:
   path: '/admin/commerce/config/payment-info-types'
   defaults:
     _entity_list: 'commerce_payment_info_type'

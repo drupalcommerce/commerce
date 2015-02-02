@@ -2,22 +2,22 @@ entity.commerce_tax_type.add_form:
   route_name: entity.commerce_tax_type.add_form
   title: 'Add a new tax type'
   appears_on:
-    - entity.commerce_tax_type.list
+    - entity.commerce_tax_type.collection
 
 entity.commerce_tax_rate.add_form:
   route_name: entity.commerce_tax_rate.add_form
   title: 'Add a new tax rate'
   appears_on:
-    - entity.commerce_tax_rate.list
+    - entity.commerce_tax_rate.collection
 
 entity.commerce_tax_rate_amount.add_form:
   route_name: entity.commerce_tax_rate_amount.add_form
   title: 'Add a new tax rate amount'
   appears_on:
-    - entity.commerce_tax_rate_amount.list
+    - entity.commerce_tax_rate_amount.collection
 
 entity.commerce_tax_type.import_form:
   route_name: entity.commerce_tax_type.import_form
   title: 'Import a tax type'
   appears_on:
-    - entity.commerce_tax_type.list
+    - entity.commerce_tax_type.collection

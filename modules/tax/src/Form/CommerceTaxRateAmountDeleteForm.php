@@ -27,7 +27,7 @@ class CommerceTaxRateAmountDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return Url::fromRoute('entity.commerce_tax_rate_amount.list', array(
+    return Url::fromRoute('entity.commerce_tax_rate_amount.collection', array(
       'commerce_tax_rate' => $this->entity->getRate(),
     ));
   }

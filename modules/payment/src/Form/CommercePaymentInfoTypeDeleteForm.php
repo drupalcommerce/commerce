@@ -27,7 +27,7 @@ class CommercePaymentInfoTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('entity.commerce_payment_info_type.list');
+    return new Url('entity.commerce_payment_info_type.collection');
   }
 
   /**
