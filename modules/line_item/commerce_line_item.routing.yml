@@ -3,8 +3,6 @@ entity.commerce_line_item_type.list:
   defaults:
     _entity_list: 'commerce_line_item_type'
     _title: 'Line item types'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer line item types'
 
@@ -13,8 +11,6 @@ entity.commerce_line_item_type.edit_form:
   defaults:
     _entity_form: commerce_line_item_type.edit
     _title: 'Edit a line item type'
-  options:
-    _admin_route: TRUE
   requirements:
    _entity_access: 'commerce_line_item_type.edit'
 
@@ -23,8 +19,6 @@ entity.commerce_line_item_type.add_form:
   defaults:
     _entity_form: 'commerce_line_item_type.add'
     _title: 'Add a new line item type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_line_item_type'
 
@@ -33,7 +27,5 @@ entity.commerce_line_item_type.delete_form:
   defaults:
     _entity_form: 'commerce_line_item_type.delete'
     _title: 'Delete a line item type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_line_item_type.delete'

@@ -3,8 +3,6 @@ entity.commerce_currency.list:
   defaults:
     _entity_list: 'commerce_currency'
     _title: 'Currencies'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -13,8 +11,6 @@ entity.commerce_currency.add_form:
   defaults:
     _entity_form: 'commerce_currency.add'
     _title: 'Add a new currency'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_currency'
 
@@ -31,8 +27,6 @@ entity.commerce_currency.edit_form:
   defaults:
     _entity_form: 'commerce_currency.edit'
     _title: 'Edit an currency'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -41,8 +35,6 @@ entity.commerce_currency.delete_form:
   defaults:
     _entity_form: 'commerce_currency.delete'
     _title: 'Delete a currency'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -51,8 +43,6 @@ entity.commerce_number_format.list:
   defaults:
     _entity_list: 'commerce_number_format'
     _title: 'Number formats'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -61,8 +51,6 @@ entity.commerce_number_format.add_form:
   defaults:
     _entity_form: 'commerce_number_format.add'
     _title: 'Add a new number format'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_number_format'
 
@@ -71,8 +59,6 @@ entity.commerce_number_format.edit_form:
   defaults:
     _entity_form: 'commerce_number_format.edit'
     _title: 'Edit a number format'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -81,7 +67,5 @@ entity.commerce_number_format.delete_form:
   defaults:
     _entity_form: 'commerce_number_format.delete'
     _title: 'Delete a number format'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'

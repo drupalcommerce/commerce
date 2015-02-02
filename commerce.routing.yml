@@ -3,8 +3,6 @@ commerce.admin_commerce:
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Commerce'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'access administration pages'
 
@@ -13,8 +11,6 @@ commerce.configuration:
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Configuration'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'access administration pages'
 
@@ -23,8 +19,6 @@ entity.commerce_store.add_form:
   defaults:
     _controller: '\Drupal\commerce\Controller\CommerceStoreController::add'
     _title_callback: '\Drupal\commerce\Controller\CommerceStoreController::addPageTitle'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -33,8 +27,6 @@ entity.commerce_store.add_page:
   defaults:
     _title: 'Add a new store'
     _controller: '\Drupal\commerce\Controller\CommerceStoreController::addPage'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -43,8 +35,6 @@ entity.commerce_store.list:
   defaults:
     _entity_list: 'commerce_store'
     _title: 'Store information'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer stores'
 
@@ -53,8 +43,6 @@ entity.commerce_store.edit_form:
   defaults:
     _entity_form: commerce_store.edit
     _title: 'Edit a store'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_store.edit'
 
@@ -63,8 +51,6 @@ entity.commerce_store.delete_form:
   defaults:
     _entity_form: commerce_store.delete
     _title: 'Delete a store'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_store.delete'
 
@@ -73,8 +59,6 @@ entity.commerce_store_type.add_form:
   defaults:
     _entity_form: 'commerce_store_type.add'
     _title: 'Add a new store type'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer store types'
 
@@ -83,8 +67,6 @@ entity.commerce_store_type.list:
   defaults:
     _entity_list: 'commerce_store_type'
     _title: 'Store types'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer store types'
 
@@ -93,8 +75,6 @@ entity.commerce_store_type.edit_form:
   defaults:
     _entity_form: 'commerce_store_type.edit'
     _title: 'Edit a store type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_store_type.edit'
 
@@ -103,7 +83,5 @@ entity.commerce_store_type.delete_form:
   defaults:
     _entity_form: 'commerce_store_type.delete'
     _title: 'Delete a store type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_store_type.delete'

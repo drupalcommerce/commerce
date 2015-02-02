@@ -3,8 +3,6 @@ commerce_payment.payment_configuration:
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Payment configuration'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'access administration pages'
 
@@ -13,8 +11,6 @@ entity.commerce_payment_info.add_form:
   defaults:
     _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::add'
     _title_callback: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPageTitle'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_payment_info'
 
@@ -23,8 +19,6 @@ entity.commerce_payment_info.add_page:
   defaults:
     _title: 'Create a new payment information entity'
     _controller: '\Drupal\commerce_payment\Controller\CommercePaymentInfoController::addPage'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_payment_info'
 
@@ -33,8 +27,6 @@ entity.commerce_payment_info.admin_form:
   defaults:
     _entity_form: 'commerce_payment_info_type.edit'
     _title: 'Edit a payment information entity type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info_type.update'
 
@@ -43,8 +35,6 @@ entity.commerce_payment_info.delete_form:
   defaults:
     _entity_form: commerce_payment_info.delete
     _title: 'Delete payment information'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info.delete'
 
@@ -53,8 +43,6 @@ entity.commerce_payment_info.edit_form:
   defaults:
     _entity_form: commerce_payment_info.edit
     _title: 'Edit payment information'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info.update'
 
@@ -63,8 +51,6 @@ entity.commerce_payment_info.list:
   defaults:
     _entity_list: 'commerce_payment_info'
     _title: 'Payment information list'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer payment information'
 
@@ -73,8 +59,6 @@ entity.commerce_payment_info_type.list:
   defaults:
     _entity_list: 'commerce_payment_info_type'
     _title: 'Payment information types'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer payment information types'
 
@@ -83,8 +67,6 @@ entity.commerce_payment_info_type.add_form:
   defaults:
     _entity_form: 'commerce_payment_info_type.add'
     _title: 'Add a new payment info type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_create_access: 'commerce_payment_info_type'
 
@@ -93,8 +75,6 @@ entity.commerce_payment_info_type.delete_form:
   defaults:
     _entity_form: 'commerce_payment_info_type.delete'
     _title: 'Delete a payment info type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info_type.delete'
 
@@ -103,7 +83,5 @@ entity.commerce_payment_info_type.edit_form:
   defaults:
     _entity_form: commerce_payment_info_type.edit
     _title: 'Edit payment info type'
-  options:
-    _admin_route: TRUE
   requirements:
     _entity_access: 'commerce_payment_info_type.update'
