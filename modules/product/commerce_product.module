@@ -7,26 +7,10 @@
  * products and interact with them through forms and autocompletes.
  */
 
-use Drupal\commerce_product\CommerceProductInterface;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
-
-/**
- * Entity URI callback.
- *
- * @param \Drupal\commerce_product\CommerceProductInterface $product
- *   A product entity.
- *
- * @return \Drupal\core\Url
- *   A Url object that provides a URL to the view page for $product.
- */
-function commerce_product_uri(CommerceProductInterface $product) {
-  return new Url('entity.commerce_product.view', array(
-    'commerce_product' => $product->id(),
-  ));
-}
 
 /**
  * Implements hook_theme().

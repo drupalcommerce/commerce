@@ -24,7 +24,7 @@ entity.commerce_product.add_page:
   requirements:
     _permission: 'administer products'
 
-entity.commerce_product.view:
+entity.commerce_product.canonical:
   path: '/product/{commerce_product}'
   defaults:
     _entity_view: 'commerce_product'

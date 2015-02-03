@@ -133,7 +133,7 @@ class CommerceProductForm extends ContentEntityForm {
     try {
       $product->save();
       drupal_set_message($this->t('The product %product_label has been successfully saved.', array('%product_label' => $product->label())));
-      $form_state->setRedirect('entity.commerce_product.view', array('commerce_product' => $product->id()));
+      $form_state->setRedirect('entity.commerce_product.canonical', array('commerce_product' => $product->id()));
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The product %product_label could not be saved.', array('%product_label' => $product->label())), 'error');

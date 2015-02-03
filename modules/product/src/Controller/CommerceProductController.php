@@ -139,7 +139,7 @@ class CommerceProductController extends ControllerBase implements ContainerInjec
   }
 
   /**
-   * The _title_callback for the entity.commerce_product.view route
+   * The _title_callback for the entity.commerce_product.canonical route
    *
    * @param \Drupal\commerce_product\CommerceProductInterface $commerce_product
    *   The current product.

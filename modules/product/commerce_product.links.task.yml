@@ -1,11 +1,11 @@
-entity.commerce_product.view:
-  route_name: entity.commerce_product.view
-  base_route: entity.commerce_productview
+entity.commerce_product.canonical:
+  route_name: entity.commerce_product.canonical
+  base_route: entity.commerce_product.canonical
   title: 'View'
 
 entity.commerce_product.page_edit:
   route_name: entity.commerce_product.edit_form
-  base_route: entity.commerce_product.view
+  base_route: entity.commerce_product.canonical
   title: Edit
 
 entity.commerce_product_type.edit_form:

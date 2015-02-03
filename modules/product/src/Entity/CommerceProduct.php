@@ -40,7 +40,6 @@ use Drupal\user\UserInterface;
  *   data_table = "commerce_product_field_data",
  *   revision_table = "commerce_product_revision",
  *   revision_data_table = "commerce_product_field_revision",
- *   uri_callback = "commerce_product_uri",
  *   entity_keys = {
  *     "id" = "product_id",
  *     "label" = "title",
@@ -50,6 +49,7 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
+ *     "canonical" = "/product/{commerce_product}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
  *   },
