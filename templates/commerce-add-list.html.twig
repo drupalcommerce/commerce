@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Default theme implementation to present a list of available bundles.
+ *
+ * Available variables:
+ *   - class: The entity type specific class. E.g. 'commerce-store-add-list'
+ *            for the commerce_store entity type.
+ *   - create_bundle_url: The url to the bundle creation page.
+ *   - bundle_type_label: The lowercase label of the bundle entity type.
+ *   - bundles: A list of bundles, each with the following properties:
+ *     - add_link: link to create an entity of this bundle.
+ *     - description: Bundle description.
+ *
+ * @see template_preprocess_commerce_add_list()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if bundles is not empty %}
+  <dl class="commerce-add-list {{ bundle.class }}">
+    {% for bundle in bundles %}
+      <dt>{{ bundle.add_link }}</dt>
+      <dd>{{ bundle.description }}</dd>
+    {% endfor %}
+  </dl>
+{% else %}
+  <p>
+    {% trans %}
+      Go to the <a href="{{ create_bundle_url }}">{{ bundle_type_label }} creation page</a> to add a new {{ bundle_type_label }}.
+    {% endtrans %}
+  </p>
+{% endif %}

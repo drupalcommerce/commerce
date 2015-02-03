@@ -9,26 +9,31 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
 
 /**
- * Prepares variables for list of available store type templates.
+ * Prepares variables for the list of available bundles.
  *
- * Default template: commerce-store-add-list.html.twig.
+ * Default template: commerce-add-list.html.twig.
  *
  * @param array $variables
  *   An associative array containing:
- *   - content: An array of store types.
+ *   - bundle_type: The entity type of the bundles.
+ *   - bundles: An array of bundles.
+ *   - form_route_name: The add form route.
  */
-function template_preprocess_commerce_store_add_list(&$variables) {
-  $variables['types'] = array();
+function template_preprocess_commerce_add_list(&$variables) {
+  $bundle_type = \Drupal::entityManager()->getDefinition($variables['bundle_type']);
+  $variables += array(
+    'class' => str_replace('_', '-', $bundle_type->getBundleOf()) . '-add-list',
+    // There is no link template for the add form, guess the route name.
+    'create_bundle_url' => Url::fromRoute('entity.' . $bundle_type->id() . '.add_form'),
+    'bundle_type_label' => $bundle_type->getLowercaseLabel(),
+  );
 
-  if (!empty($variables['content'])) {
-    foreach ($variables['content'] as $commerce_store_type) {
-      $url = Url::fromRoute('entity.commerce_store.add_form', array('commerce_store_type' => $commerce_store_type->id()));
-
-      $variables['types'][$commerce_store_type->id()] = array(
-        'type' => $commerce_store_type->id(),
-        'add_link' => \Drupal::l($commerce_store_type->label(), $url),
-        'description' => Xss::filterAdmin($commerce_store_type->getDescription()),
-      );
-    }
+  foreach ($variables['bundles'] as $bundle) {
+    $url = Url::fromRoute($variables['form_route_name'], array($bundle->getEntityTypeId() => $bundle->id()));
+    $variables['bundles'][$bundle->id()] = array(
+      'bundle' => $bundle->id(),
+      'add_link' => \Drupal::l($bundle->label(), $url),
+      'description' => Xss::filterAdmin($bundle->getDescription()),
+    );
   }
 }

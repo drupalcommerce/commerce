@@ -4,16 +4,3 @@
  * @file
  * Payment information entity type permissions and operations.
  */
-
-/**
- * Implements hook_theme().
- */
-function commerce_payment_theme() {
-  return array(
-    'commerce_payment_info_add_list' => array(
-      'variables' => array('types' => NULL),
-      'file' => 'commerce_payment.pages.inc',
-      'template' => 'commerce-payment-info-add-list',
-    ),
-  );
-}

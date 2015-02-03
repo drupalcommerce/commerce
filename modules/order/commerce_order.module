@@ -5,16 +5,3 @@
  * Defines the core Commerce order entity type and API functions to manage
  * orders and interact with them.
  */
-
-/**
- * Implements hook_theme().
- */
-function commerce_order_theme() {
-  return array(
-    'commerce_order_add_list' => array(
-      'variables' => array('types' => NULL),
-      'file' => 'commerce_order.pages.inc',
-      'template' => 'commerce-order-add-list',
-    ),
-  );
-}

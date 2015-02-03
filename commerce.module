@@ -10,10 +10,14 @@
  */
 function commerce_theme() {
   return array(
-    'commerce_store_add_list' => array(
-      'variables' => array('content' => NULL),
+    'commerce_add_list' => array(
+      'variables' => array(
+        'bundles' => array(),
+        'bundle_type' => NULL,
+        'form_route_name' => NULL
+      ),
       'file' => 'commerce.pages.inc',
-      'template' => 'commerce-store-add-list',
+      'template' => 'commerce-add-list',
     ),
   );
 }
