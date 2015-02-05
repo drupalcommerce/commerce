@@ -34,7 +34,7 @@ entity.commerce_product.canonical:
   path: '/product/{commerce_product}'
   defaults:
     _entity_view: 'commerce_product'
-    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::viewProductTitle'
+    _title_callback: '\Drupal\commerce_product\Controller\ProductController::viewProductTitle'
   requirements:
     _entity_access: 'commerce_product.view'
 
@@ -50,7 +50,7 @@ entity.commerce_product.edit_form:
   path: '/product/{commerce_product}/edit'
   defaults:
     _entity_form: commerce_product.edit
-    _title_callback: '\Drupal\commerce_product\Controller\CommerceProductController::editPageTitle'
+    _title_callback: '\Drupal\commerce_product\Controller\ProductController::editPageTitle'
   options:
     _admin_route: TRUE
   requirements:
