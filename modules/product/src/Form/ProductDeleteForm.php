@@ -7,35 +7,14 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
  * Provides a form for deleting a product.
  */
-class ProductDeleteForm extends ContentEntityConfirmFormBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    return t('Are you sure you want to delete the product %title?', array('%title' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('entity.commerce_product.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return t('Delete');
-  }
+class ProductDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}

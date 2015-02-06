@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Builds the form to delete a product type.
  */
-class ProductTypeDeleteForm extends EntityConfirmFormBase {
+class ProductTypeDeleteForm extends EntityDeleteForm {
 
   /**
    * The query factory to create entity queries.
@@ -42,27 +42,6 @@ class ProductTypeDeleteForm extends EntityConfirmFormBase {
     return new static(
       $container->get('entity.query')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete %label?', array('%label' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('entity.commerce_product_type.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
   }
 
   /**

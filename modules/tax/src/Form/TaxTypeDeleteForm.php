@@ -7,35 +7,14 @@
 
 namespace Drupal\commerce_tax\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
  * Builds the form to delete a tax type.
  */
-class TaxTypeDeleteForm extends EntityConfirmFormBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete %label?', array('%label' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return Url::fromRoute('entity.commerce_tax_type.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
-  }
+class TaxTypeDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}
