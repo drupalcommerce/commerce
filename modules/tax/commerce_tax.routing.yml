@@ -33,7 +33,7 @@ entity.commerce_tax_type.delete_form:
 entity.commerce_tax_type.import_form:
   path: '/admin/commerce/config/tax/type/import'
   defaults:
-    _form: '\Drupal\commerce_tax\Form\CommerceTaxTypeImporterForm'
+    _form: '\Drupal\commerce_tax\Form\TaxTypeImporterForm'
     _title: 'Import form'
   requirements:
     _entity_create_access: 'commerce_tax_type'
@@ -41,7 +41,7 @@ entity.commerce_tax_type.import_form:
 entity.commerce_tax_rate.collection:
   path: '/admin/commerce/config/tax/rate/{commerce_tax_type}'
   defaults:
-    _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateController::buildList'
+    _controller: '\Drupal\commerce_tax\Controller\TaxRateController::buildList'
     _title: 'Tax rates'
   requirements:
     _permission: 'administer stores'
@@ -49,7 +49,7 @@ entity.commerce_tax_rate.collection:
 entity.commerce_tax_rate.add_form:
   path: '/admin/commerce/config/tax/rate/{commerce_tax_type}/add'
   defaults:
-    _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateController::addForm'
+    _controller: '\Drupal\commerce_tax\Controller\TaxRateController::addForm'
     _title: 'Add a new tax rate'
   requirements:
     _entity_create_access: 'commerce_tax_rate'
@@ -73,7 +73,7 @@ entity.commerce_tax_rate.delete_form:
 entity.commerce_tax_rate_amount.collection:
   path: '/admin/commerce/config/tax/amount/{commerce_tax_rate}'
   defaults:
-    _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateAmountController::buildList'
+    _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::buildList'
     _title: 'Tax rate amounts'
   requirements:
     _permission: 'administer stores'
@@ -81,7 +81,7 @@ entity.commerce_tax_rate_amount.collection:
 entity.commerce_tax_rate_amount.add_form:
   path: '/admin/commerce/config/tax/amount/{commerce_tax_rate}/add'
   defaults:
-    _controller: '\Drupal\commerce_tax\Controller\CommerceTaxRateAmountController::addForm'
+    _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::addForm'
     _title: 'Add a new tax rate amount'
   requirements:
     _entity_create_access: 'commerce_tax_rate_amount'

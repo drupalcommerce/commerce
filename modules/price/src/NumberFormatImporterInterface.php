@@ -17,7 +17,7 @@ interface NumberFormatImporterInterface {
    * @param \Drupal\Core\Language\LanguageInterface $language
    *   The language.
    *
-   * @return \Drupal\commerce_price\Entity\CommerceNumberFormat|bool
+   * @return \Drupal\commerce_price\Entity\NumberFormat|bool
    *    Returns the number_format entity or false if something went wrong.
    */
   public function importNumberFormat(LanguageInterface $language);

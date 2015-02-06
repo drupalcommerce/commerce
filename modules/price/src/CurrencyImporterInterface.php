@@ -34,7 +34,7 @@ interface CurrencyImporterInterface {
    * @param string $currency_code
    *   The currency code.
    *
-   * @return \Drupal\commerce_price\Entity\CommerceCurrency | bool
+   * @return \Drupal\commerce_price\Entity\Currency | bool
    *    The new currency or false if the currency is already imported.
    */
   public function importCurrency($currency_code);
@@ -42,12 +42,12 @@ interface CurrencyImporterInterface {
   /**
    * Imports translations for the currency entity.
    *
-   * @param \Drupal\commerce_price\Entity\CommerceCurrency[] $currencies
+   * @param \Drupal\commerce_price\Entity\Currency[] $currencies
    *   Array of currencies to import translations for.
    * @param \Drupal\language\ConfigurableLanguageManagerInterface[] $languages
    *   Array of languages to import.
    *
-   * @return \Drupal\commerce_price\Entity\CommerceCurrency | bool
+   * @return \Drupal\commerce_price\Entity\Currency | bool
    *   The currency entity or false if the site is not multilingual.
    */
   public function importCurrencyTranslations($currencies = array(), $languages = array());
