@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Builds the form to delete an order type.
  */
-class OrderTypeDeleteForm extends EntityConfirmFormBase {
+class OrderTypeDeleteForm extends EntityDeleteForm {
 
   /**
    * The query factory to create entity queries.

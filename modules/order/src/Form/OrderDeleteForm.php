@@ -7,35 +7,14 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
  * Provides a form for deleting an order.
  */
-class OrderDeleteForm extends ContentEntityConfirmFormBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    return t('Are you sure you want to delete the order %order_label?', array('%order_label' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('entity.commerce_order.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return t('Delete');
-  }
+class OrderDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}
