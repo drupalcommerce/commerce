@@ -38,7 +38,8 @@ use CommerceGuys\Tax\Model\TaxRateInterface;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/edit",
- *     "delete-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/delete"
+ *     "delete-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/delete",
+ *     "collection" = "/admin/commerce/config/tax/type"
  *   }
  * )
  */

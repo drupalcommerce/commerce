@@ -47,27 +47,6 @@ class OrderTypeDeleteForm extends EntityDeleteForm {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete the order type %type?', array('%type' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('entity.commerce_order_type.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $numOrders = $this->queryFactory->get('commerce_order')
       ->condition('type', $this->entity->id())
@@ -80,21 +59,6 @@ class OrderTypeDeleteForm extends EntityDeleteForm {
       return $form;
     }
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    try {
-      $this->entity->delete();
-      $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('Order type %label has been deleted.', array('%label' => $this->entity->label())));
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('Order type %label could not be deleted.', array('%label' => $this->entity->label())), 'error');
-      $this->logger('commerce_order')->error($e);
-    }
   }
 
 }

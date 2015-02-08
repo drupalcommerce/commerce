@@ -29,7 +29,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductForm",
- *       "delete" = "Drupal\commerce_product\Form\ProductDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
@@ -52,6 +52,7 @@ use Drupal\user\UserInterface;
  *     "canonical" = "/product/{commerce_product}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
+ *     "collection" = "/admin/commerce/products"
  *   },
  *   bundle_entity_type = "commerce_product_type",
  *   field_ui_base_route = "entity.commerce_product_type.edit_form",

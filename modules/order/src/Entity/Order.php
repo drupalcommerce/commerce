@@ -26,7 +26,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
- *       "delete" = "Drupal\commerce_order\Form\OrderDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     }
  *   },
  *   base_table = "commerce_order",
@@ -40,8 +40,10 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
+ *     "canonical" = "/admin/commerce/orders/{commerce_order}",
  *     "edit-form" = "/admin/commerce/orders/{commerce_order}/edit",
- *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete"
+ *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
+ *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
  *   field_ui_base_route = "entity.commerce_order.admin_form",

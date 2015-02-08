@@ -35,7 +35,8 @@ use Drupal\commerce_product\ProductTypeInterface;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/product-types/{commerce_product_type}/edit",
- *     "delete-form" = "/admin/commerce/config/product-types/{commerce_product_type}/delete"
+ *     "delete-form" = "/admin/commerce/config/product-types/{commerce_product_type}/delete",
+ *     "collection" = "/admin/commerce/config/product-types"
  *   }
  * )
  */

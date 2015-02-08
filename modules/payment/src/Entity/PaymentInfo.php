@@ -25,7 +25,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_payment\Form\PaymentInfoForm",
  *       "edit" = "Drupal\commerce_payment\Form\PaymentInfoForm",
- *       "delete" = "Drupal\commerce_payment\Form\PaymentInfoDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     }
  *   },
  *   base_table = "commerce_payment_info",
@@ -41,8 +41,10 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   permission_granularity = "bundle",
  *   admin_permission = "administer payment information",
  *   links = {
+ *     "canonical" = "/admin/commerce/payment-info/{commerce_payment_info}",
  *     "edit-form" = "/admin/commerce/payment-info/{commerce_payment_info}/edit",
- *     "delete-form" = "/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/delete"
+ *     "delete-form" = "/admin/commerce/config/payment-info-types/{commerce_payment_info_type}/delete",
+ *     "collection" = "/admin/commerce/config/payment-info-types"
  *   },
  * )
  */

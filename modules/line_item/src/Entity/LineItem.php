@@ -26,7 +26,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "edit" = "Drupal\commerce_line_item\Form\LineItemForm",
- *       "delete" = "Drupal\commerce_line_item\Form\ineItemDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     }
  *   },
  *   base_table = "commerce_line_item",
@@ -39,8 +39,10 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
+ *     "canonical" = "/admin/commerce/config/line-item/{commerce_line_item}",
  *     "edit-form" = "/admin/commerce/config/line-item/{commerce_line_item}/edit",
- *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete"
+ *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete",
+ *     "collection" = "/admin/commerce/config/line-item"
  *   },
  *   bundle_entity_type = "commerce_line_item_type",
  *   field_ui_base_route = "entity.commerce_line_item_type.edit_form",
