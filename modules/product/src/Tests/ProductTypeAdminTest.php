@@ -133,7 +133,7 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
     $product->delete();
     $this->drupalGet('admin/commerce/config/product-types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('Are you sure you want to delete %type?', array('%type' => $type->label())),
+      t('Are you sure you want to delete the product type %type?', array('%type' => $type->label())),
       'The product type is available for deletion'
     );
     $this->assertText(t('This action cannot be undone.'), 'The product type deletion confirmation form is available');

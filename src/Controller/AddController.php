@@ -69,8 +69,9 @@ class AddController extends ControllerBase {
   public function addForm(RouteMatchInterface $routeMatch) {
     $bundle = $this->getBundleFromRouteMatch($routeMatch);
     $entityType = $bundle->getEntityType()->getBundleOf();
+    $bundleKey = $this->entityManager()->getDefinition($entityType)->getKey('bundle');
     $entity = $this->entityManager()->getStorage($entityType)->create(array(
-      'type' => $bundle->id(),
+      $bundleKey => $bundle->id(),
     ));
 
     return $this->entityFormBuilder()->getForm($entity, 'add');

@@ -34,7 +34,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/order-types/{commerce_order_type}/edit",
- *     "delete-form" = "/admin/commerce/config/order-types/{commerce_order_type}/delete"
+ *     "delete-form" = "/admin/commerce/config/order-types/{commerce_order_type}/delete",
+ *     "collection" = "/admin/commerce/config/order-types"
  *   }
  * )
  */

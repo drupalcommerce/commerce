@@ -7,9 +7,10 @@
 
 namespace Drupal\commerce_payment\Form;
 
+use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the form to delete an payment information type.
@@ -17,18 +18,39 @@ use Drupal\Core\Url;
 class PaymentInfoTypeDeleteForm extends EntityDeleteForm {
 
   /**
+   * Constructs a new LineItemTypeDeleteForm object.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryFactory $queryFactory
+   *   The entity query object.
+   */
+  public function __construct(QueryFactory $queryFactory) {
+    $this->queryFactory = $queryFactory;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    try {
-      $this->entity->delete();
-      $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('Payment information type %payment_info_type_label has been deleted.', array('%payment_info_type_label' => $this->entity->label())));
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.query')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $numPaymentInfo = $this->queryFactory->get('commerce_payment_info')
+      ->condition('type', $this->entity->id())
+      ->count()
+      ->execute();
+    if ($numPaymentInfo) {
+      $caption = '<p>' . $this->formatPlural($numPaymentInfo, '%type is used by 1 payment information entity on your site. You can not remove this payment information type until you have removed all of the %type payment information entities.', '%type is used by @count payment information entities on your site. You may not remove %type until you have removed all of the %type payment information entities.', array('%type' => $this->entity->label())) . '</p>';
+      $form['#title'] = $this->getQuestion();
+      $form['description'] = array('#markup' => $caption);
+      return $form;
     }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('Payment information type %payment_info_type_label could not be deleted.', array('%payment_info_type_label' => $this->entity->label())), 'error');
-      $this->logger('commerce_payment')->error($e);
-    }
+    return parent::buildForm($form, $form_state);
   }
 
 }

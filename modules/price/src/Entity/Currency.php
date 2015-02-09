@@ -20,7 +20,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_price\Form\CurrencyForm",
  *       "edit" = "Drupal\commerce_price\Form\CurrencyForm",
- *       "delete" = "Drupal\commerce_price\Form\CurrencyDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },
@@ -34,7 +34,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
- *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete"
+ *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
+ *     "collection" = "/admin/commerce/config/currency"
  *   }
  * )
  */

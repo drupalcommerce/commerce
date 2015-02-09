@@ -28,7 +28,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce\Form\StoreForm",
  *       "edit" = "Drupal\commerce\Form\StoreForm",
- *       "delete" = "Drupal\commerce\Form\StoreDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
@@ -45,8 +45,10 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
+ *     "canonical" = "/admin/commerce/config/store/{commerce_store}",
  *     "edit-form" = "/admin/commerce/config/store/{commerce_store}/edit",
  *     "delete-form" = "/admin/commerce/config/store/{commerce_store}/delete",
+ *     "collection" = "/admin/commerce/config/store",
  *   },
  *   bundle_entity_type = "commerce_store_type",
  *   field_ui_base_route = "entity.commerce_store_type.edit_form",

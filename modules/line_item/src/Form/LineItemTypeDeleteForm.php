@@ -61,19 +61,4 @@ class LineItemTypeDeleteForm extends EntityDeleteForm {
     return parent::buildForm($form, $form_state);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    try {
-      $this->entity->delete();
-      $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('Line item type %label has been deleted.', array('%label' => $this->entity->label())));
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('Line item type %label could not be deleted.', array('%label' => $this->entity->label())), 'error');
-      $this->logger('commerce_line_item')->error($e);
-    }
-  }
-
 }

@@ -34,7 +34,8 @@ use Drupal\commerce_payment\PaymentInfoTypeInterface;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/payment-info-types/{commerce_payment_info_type}",
- *     "delete-form" = "/admin/commerce/payment-info/{commerce_payment_info}/delete"
+ *     "delete-form" = "/admin/commerce/payment-info/{commerce_payment_info}/delete",
+ *     "collection" = "/admin/commerce/payment-info"
  *   }
  * )
  */

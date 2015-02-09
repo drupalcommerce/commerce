@@ -20,7 +20,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_price\Form\NumberFormatForm",
  *       "edit" = "Drupal\commerce_price\Form\NumberFormatForm",
- *       "delete" = "Drupal\commerce_price\Form\NumberFormatDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "list_builder" = "Drupal\commerce_price\NumberFormatListBuilder",
  *   },
@@ -34,7 +34,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/number-format/{commerce_number_format}",
- *     "delete-form" = "/admin/commerce/config/number-format/{commerce_number_format}/delete"
+ *     "delete-form" = "/admin/commerce/config/number-format/{commerce_number_format}/delete",
+ *     "collection" = "/admin/commerce/config/number-format"
  *   }
  * )
  */

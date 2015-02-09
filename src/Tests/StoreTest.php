@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\commerce\Tests\StoreCRUDTest
+ * Definition of Drupal\commerce\Tests\StoreTest
  */
 
 namespace Drupal\commerce\Tests;
@@ -15,7 +15,7 @@ use Drupal\commerce\Entity\StoreType;
  *
  * @group commerce
  */
-class StoreCRUDTest extends CommerceTestBase {
+class StoreTest extends CommerceTestBase {
 
   /**
    * A store type entity to use in the tests.
