@@ -24,10 +24,16 @@ class StoreForm extends ContentEntityForm {
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
 
+    $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
+    $currency_options = array();
+    foreach ($enabledCurrencies as $currency_code => $currency) {
+      $currency_options[$currency_code] = $currency->getName();
+    }
+
     $form['default_currency'] = array(
       '#type' => 'select',
       '#title' => t('Default currency'),
-      '#options' => array('EUR' => 'EUR', 'GBP' => 'GBP', 'USD' => 'USD'),
+      '#options' => $currency_options,
     );
 
     return $form;
