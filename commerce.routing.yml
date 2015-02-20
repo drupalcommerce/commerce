@@ -44,6 +44,14 @@ entity.commerce_store.collection:
   requirements:
     _permission: 'administer stores'
 
+entity.commerce_store.canonical:
+  path: '/admin/commerce/config/store/{commerce_store}/edit'
+  defaults:
+    _entity_form: commerce_store.edit
+    _title: 'Edit a store'
+  requirements:
+    _entity_access: 'commerce_store.edit'
+
 entity.commerce_store.edit_form:
   path: '/admin/commerce/config/store/{commerce_store}/edit'
   defaults:
