@@ -9,10 +9,10 @@ commerce_product.commerce_product_type.*:
         type: label
         label: 'Label'
     revision:
-      type: integer
+      type: boolean
       label: 'Create new revision'
     digital:
-      type: integer
+      type: boolean
       label: 'Products of this type represent digital services.'
     description:
       type: text
