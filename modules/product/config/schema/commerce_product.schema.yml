@@ -18,7 +18,7 @@ commerce_product.commerce_product_type.*:
       type: text
       label: 'Description'
 
-field_config.third_party.commerce_product:
+field.field.*.*.*.third_party.commerce_product:
   type: mapping
   label: 'Product attributes'
   mapping:
