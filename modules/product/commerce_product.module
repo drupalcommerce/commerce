@@ -71,7 +71,7 @@ function commerce_product_form_field_ui_field_edit_form_alter(array &$form, Form
   // If the current field instance is attached to a product type,
   // and of a field type that defines an options list.
   $allowed_fields = array('options', 'taxonomy', 'entity_reference');
-  if ($field->entity_type == 'commerce_product' && in_array($form['#field']->module, $allowed_fields)) {
+  if ($field->entity_type == 'commerce_product' && in_array($field->get('fieldStorage')->get('module'), $allowed_fields)) {
     // Get the current instance's attribute settings for use as default values.
     $default_attribute_field = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
     $default_attribute_widget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
@@ -131,7 +131,7 @@ function commerce_product_form_field_ui_field_edit_form_submit($form, FormStateI
   $field = $form_state->get('field');
   $values = $form_state->getValues();
   $allowed_fields = array('options', 'taxonomy', 'entity_reference');
-  if ($field->entity_type == 'commerce_product' && in_array($form['#field']->module, $allowed_fields)) {
+  if ($field->entity_type == 'commerce_product' && in_array($field->get('fieldStorage')->get('module'), $allowed_fields)) {
     // If the attribute field is checked, update the attribute fields.
     if ($values['field']['commerce_product']['attribute_field']) {
       $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', $values['field']['commerce_product']['attribute_widget_title']);
