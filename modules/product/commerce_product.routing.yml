@@ -12,8 +12,6 @@ entity.commerce_product.add_page:
     _title: 'Add a new product'
     _bundle_type: commerce_product_type
     _controller: '\Drupal\commerce\Controller\AddController::addPage'
-  options:
-    _admin_route: TRUE
   requirements:
     _permission: 'administer products'
 
