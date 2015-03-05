@@ -71,13 +71,6 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $description;
 
   /**
-   * Option to specify if the product type is a digital service.
-   *
-   * @var bool
-   */
-  protected $digital;
-
-  /**
    * The default revision setting for products of this type.
    *
    * @var bool
@@ -114,21 +107,6 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    */
   public function setDescription($description) {
     $this->description = $description;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isDigital() {
-    return $this->digital ? TRUE : FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDigital($digital) {
-    $this->digital = $digital;
     return $this;
   }
 
