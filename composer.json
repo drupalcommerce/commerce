@@ -6,7 +6,6 @@
     "license": "GPL-2.0+",
     "require": {
         "commerceguys/addressing": "dev-master",
-        "commerceguys/enum": "dev-master",
         "commerceguys/intl": "dev-master",
         "commerceguys/pricing": "dev-master",
         "commerceguys/tax": "dev-master",
