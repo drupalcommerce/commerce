@@ -70,6 +70,7 @@ before_script:
   - drush en -y composer_manager simpletest
   - drush composer-manager-init
   - cd core
+  - rm -rf vendor
   - composer drupal-rebuild
   - composer update --prefer-source -n --verbose
   - cd ..
