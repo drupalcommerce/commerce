@@ -71,7 +71,7 @@ before_script:
   - drush composer-manager-init
   - cd core
   - composer drupal-rebuild
-  - composer update --prefer-source -n --verbose
+  - composer update --prefer-source
   - cd ..
   - drush en -y commerce commerce_product commerce_order
 
