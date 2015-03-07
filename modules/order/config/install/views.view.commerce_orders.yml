@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - commerce_order
 id: commerce_orders
 label: Orders
 module: views
@@ -33,7 +35,7 @@ display:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_comment: false
+          query_comment: ''
           query_tags: {  }
         provider: views
         dependencies: {  }
@@ -149,7 +151,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: null
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -200,7 +202,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: null
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -256,7 +258,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: null
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -287,9 +289,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Operations
           exclude: false
           alter:
@@ -309,7 +308,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: null
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -331,7 +330,10 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          destination: true
+          destination: false
+          dependencies:
+            module:
+              - views
           plugin_id: entity_operations
           provider: views
       filters: {  }
@@ -359,6 +361,7 @@ display:
       arguments: {  }
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
+      display_extenders: {  }
   page_1:
     display_plugin: page
     id: page_1
@@ -370,3 +373,4 @@ display:
       field_langcode_add_to_query: null
       path: admin/commerce/orders
       display_description: ''
+      display_extenders: {  }
