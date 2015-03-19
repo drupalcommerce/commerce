@@ -5,10 +5,11 @@
     "homepage": "http://drupal.org/project/commerce",
     "license": "GPL-2.0+",
     "require": {
-        "commerceguys/addressing": "dev-master",
-        "commerceguys/intl": "dev-master",
         "commerceguys/pricing": "dev-master",
-        "commerceguys/tax": "dev-master",
-        "commerceguys/zone": "dev-master"
-    }
+        "commerceguys/tax": "*",
+        "commerceguys/addressing": "*",
+        "commerceguys/intl": "*",
+        "commerceguys/zone": "*"
+    },
+    "minimum-stability": "dev"
 }
