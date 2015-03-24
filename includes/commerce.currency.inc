@@ -1147,7 +1147,7 @@ function commerce_commerce_currency_info() {
     ),
     'TRY' => array(
       'code' => 'TRY',
-      'symbol' => 'TL',
+      'symbol' => '₺',
       'name' => t('Turkish Lira'),
       'numeric_code' => '949',
       'thousands_separator' => '.',
