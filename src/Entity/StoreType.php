@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce\Entity;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\commerce\StoreTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -92,7 +92,7 @@ class StoreType extends ConfigEntityBundleBase implements StoreTypeInterface {
   public function delete() {
     if (!$this->access('delete')) {
       throw new EntityStorageException(strtr("Store Type %type may not be deleted.", array(
-        '%type' => String::checkPlain($this->entityTypeId),
+        '%type' => SafeMarkup::checkPlain($this->entityTypeId),
       )));
     }
     parent::delete();

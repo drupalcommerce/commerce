@@ -7,7 +7,7 @@
 namespace Drupal\commerce_order;
 
 use Drupal\commerce_order\Entity\OrderType;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -91,10 +91,10 @@ class OrderListBuilder extends EntityListBuilder {
     $commerceOrderType = OrderType::load($entity->bundle());
 
     if (!empty($commerceOrderType)) {
-      $type = String::checkPlain($commerceOrderType->label());
+      $type = SafeMarkup::checkPlain($commerceOrderType->label());
     }
     else {
-      $type = String::checkPlain($entity->bundle());
+      $type = SafeMarkup::checkPlain($entity->bundle());
     }
 
     $row = array(

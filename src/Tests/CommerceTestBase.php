@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce\Tests;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -63,7 +63,7 @@ abstract class CommerceTestBase extends WebTestBase {
     $this->assertEqual(
       $status,
       SAVED_NEW,
-      String::format('Created %label entity %type.',
+      SafeMarkup::format('Created %label entity %type.',
         array('%label' => $entity->getEntityType()->getLabel(), '%type' => $entity->id())
       )
     );
