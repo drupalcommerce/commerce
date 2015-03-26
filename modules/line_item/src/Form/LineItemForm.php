@@ -65,7 +65,7 @@ class LineItemForm extends ContentEntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $order->isNewRevision(),
-      '#access' => $currentUser->hasPermission('administer products'),
+      '#access' => $currentUser->hasPermission('administer line items'),
       '#group' => 'order_status',
       '#weight' => 10,
     );
