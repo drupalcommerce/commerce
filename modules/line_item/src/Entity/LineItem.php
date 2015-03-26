@@ -30,7 +30,7 @@ use Drupal\user\UserInterface;
  *     }
  *   },
  *   base_table = "commerce_line_item",
- *   admin_permission = "administer orders",
+ *   admin_permission = "administer line items",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "line_item_id",
