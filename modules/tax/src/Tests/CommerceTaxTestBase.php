@@ -8,7 +8,6 @@
 namespace Drupal\commerce_tax\Tests;
 
 use Drupal\simpletest\WebTestBase;
-use Drupal\Component\Utility\String;
 
 /**
  * Defines base class for shortcut test cases.

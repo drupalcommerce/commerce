@@ -7,8 +7,8 @@
 
 namespace Drupal\commerce_product\Tests;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\simpletest\WebTestBase;
-use Drupal\Component\Utility\String;
 
 /**
  * Defines base class for shortcut test cases.
@@ -60,7 +60,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
     $this->assertEqual(
       $status,
       SAVED_NEW,
-      String::format('Created %label entity %type.',
+      SafeMarkup::format('Created %label entity %type.',
         array(
           '%label' => $entity->getEntityType()->getLabel(),
           '%type' => $entity->id()

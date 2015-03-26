@@ -7,7 +7,7 @@
 namespace Drupal\commerce_line_item;
 
 use Drupal\commerce_line_item\Entity\LineItemType;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -91,10 +91,10 @@ class LineItemListBuilder extends EntityListBuilder {
     $commerceLineItemType = LineItemType::load($entity->bundle());
 
     if (!empty($commerceLineItemType)) {
-      $type = String::checkPlain($commerceLineItemType->label());
+      $type = SafeMarkup::checkPlain($commerceLineItemType->label());
     }
     else {
-      $type = String::checkPlain($entity->bundle());
+      $type = SafeMarkup::checkPlain($entity->bundle());
     }
 
     $row = array(
