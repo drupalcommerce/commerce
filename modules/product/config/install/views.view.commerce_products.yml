@@ -1,3 +1,4 @@
+uuid: 21999112-ce61-45c2-b306-6ee3864956df
 langcode: en
 status: true
 dependencies:
@@ -6,9 +7,9 @@ dependencies:
 id: commerce_products
 label: Products
 module: views
-description: 'Display a list of products for store admin.'
-tag: ''
-base_table: commerce_product
+description: ''
+tag: Commerce
+base_table: commerce_product_field_data
 base_field: product_id
 core: 8.x
 display:
@@ -17,28 +18,21 @@ display:
     id: default
     display_title: Master
     position: 0
-    provider: views
     display_options:
       access:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       cache:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       query:
         type: views_query
         options:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_comment: false
+          query_comment: ''
           query_tags: {  }
-        provider: views
-        dependencies: {  }
       exposed_form:
         type: basic
         options:
@@ -49,8 +43,6 @@ display:
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
-        provider: views
-        dependencies: {  }
       pager:
         type: full
         options:
@@ -58,11 +50,6 @@ display:
           offset: 0
           id: 0
           total_pages: null
-          tags:
-            previous: '‹ previous'
-            next: 'next ›'
-            first: '« first'
-            last: 'last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -71,9 +58,12 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
+          tags:
+            previous: '‹ previous'
+            next: 'next ›'
+            first: '« first'
+            last: 'last »'
           quantity: 9
-        provider: views
-        dependencies: {  }
       style:
         type: table
         options:
@@ -121,27 +111,19 @@ display:
               responsive: ''
           default: '-1'
           empty_table: true
-        provider: views
       row:
         type: fields
-        options:
-          inline: {  }
-          separator: ''
-          hide_empty: false
-          default_field_elements: true
-        provider: views
-        dependencies: {  }
       fields:
         title:
-          id: title
           table: commerce_product_field_data
           field: title
+          id: title
+          entity_type: null
+          entity_field: title
+          plugin_id: field
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - commerce_product
           label: Title
           exclude: false
           alter:
@@ -161,7 +143,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -183,9 +165,19 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          link_to_commerce_product: 1
-          plugin_id: commerce_product
-          provider: commerce_product
+          click_sort_column: value
+          type: string
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
         sku:
           id: sku
           table: commerce_product_field_data
@@ -193,9 +185,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - commerce_product
           label: SKU
           exclude: false
           alter:
@@ -215,7 +204,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -237,19 +226,30 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          link_to_commerce_product: 0
-          plugin_id: commerce_product
-          provider: commerce_product
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_product
+          entity_field: sku
+          plugin_id: field
         type:
           id: type
-          table: commerce_product_field_data
+          table: commerce_product
           field: type
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - commerce_product
           label: Type
           exclude: false
           alter:
@@ -269,7 +269,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -291,10 +291,23 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          link_to_commerce_product: 0
-          machine_name: 0
-          plugin_id: commerce_product_type
-          provider: commerce_product
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_product
+          entity_field: type
+          plugin_id: field
         operations:
           id: operations
           table: commerce_product
@@ -302,9 +315,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Operations
           exclude: false
           alter:
@@ -324,7 +334,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -347,10 +357,11 @@ display:
           empty_zero: false
           hide_alter_empty: true
           destination: true
+          entity_type: commerce_product
           plugin_id: entity_operations
-          provider: views
       filters: {  }
       sorts: {  }
+      title: Products
       header: {  }
       footer: {  }
       empty:
@@ -361,27 +372,26 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           empty: true
           tokenize: false
           content: 'No products available.'
           plugin_id: text_custom
-          provider: views
       relationships: {  }
       arguments: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
-      title: Products
-  admin_page:
+      display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false
+  page_1:
     display_plugin: page
-    id: admin_page
-    display_title: 'Admin page'
+    id: page_1
+    display_title: Page
     position: 1
-    provider: views
     display_options:
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
+      display_extenders: {  }
       path: admin/commerce/products
-      display_description: ''
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false

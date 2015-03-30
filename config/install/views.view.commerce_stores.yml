@@ -1,12 +1,15 @@
+uuid: dfb03629-b239-4867-a91a-26a5fa5e4941
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - commerce
 id: commerce_stores
 label: Stores
 module: views
-description: 'Display a list of stores for the store admin.'
-tag: ''
-base_table: commerce_store
+description: ''
+tag: Commerce
+base_table: commerce_store_field_data
 base_field: store_id
 core: 8.x
 display:
@@ -15,28 +18,21 @@ display:
     id: default
     display_title: Master
     position: 0
-    provider: views
     display_options:
       access:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       cache:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       query:
         type: views_query
         options:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_comment: false
+          query_comment: ''
           query_tags: {  }
-        provider: views
-        dependencies: {  }
       exposed_form:
         type: basic
         options:
@@ -47,8 +43,6 @@ display:
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
-        provider: views
-        dependencies: {  }
       pager:
         type: full
         options:
@@ -83,8 +77,40 @@ display:
           description: ''
           columns:
             name: name
+            type: type
+            mail: mail
+            default_currency: default_currency
+            operations: operations
           info:
             name:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            type:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            mail:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            default_currency:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            operations:
               sortable: false
               default_sort_order: asc
               align: ''
@@ -103,9 +129,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Name
           exclude: false
           alter:
@@ -125,7 +148,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -147,8 +170,23 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          plugin_id: standard
-          provider: views
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: null
+          entity_field: name
+          plugin_id: field
         type:
           id: type
           table: commerce_store_field_data
@@ -156,9 +194,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Type
           exclude: false
           alter:
@@ -178,7 +213,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -192,7 +227,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: false
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -200,8 +235,23 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          plugin_id: standard
-          provider: views
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_store
+          entity_field: type
+          plugin_id: field
         mail:
           id: mail
           table: commerce_store_field_data
@@ -209,9 +259,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: E-mail
           exclude: false
           alter:
@@ -231,7 +278,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -253,8 +300,22 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          plugin_id: standard
-          provider: views
+          click_sort_column: value
+          type: basic_string
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_store
+          entity_field: mail
+          plugin_id: field
         default_currency:
           id: default_currency
           table: commerce_store_field_data
@@ -262,9 +323,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Currency
           exclude: false
           alter:
@@ -284,7 +342,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -306,8 +364,23 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          plugin_id: standard
-          provider: views
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_store
+          entity_field: default_currency
+          plugin_id: field
         operations:
           id: operations
           table: commerce_store
@@ -315,9 +388,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Operations
           exclude: false
           alter:
@@ -337,7 +407,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -360,11 +430,11 @@ display:
           empty_zero: false
           hide_alter_empty: true
           destination: true
+          entity_type: commerce_store
           plugin_id: entity_operations
-          provider: views
       filters: {  }
       sorts: {  }
-      title: 'Store information'
+      title: Stores
       header: {  }
       footer: {  }
       empty:
@@ -375,26 +445,26 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           empty: true
           tokenize: false
           content: 'No stores available.'
           plugin_id: text_custom
-          provider: views
       relationships: {  }
       arguments: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
+      display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false
   page_1:
     display_plugin: page
     id: page_1
-    display_title: 'Admin page'
+    display_title: Page
     position: 1
-    provider: views
     display_options:
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
+      display_extenders: {  }
       path: admin/commerce/config/store
-      display_description: ''
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false

@@ -1,11 +1,14 @@
+uuid: 56a83180-1efb-480d-8000-0a3d52260f65
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - commerce_order
 id: commerce_orders
 label: Orders
 module: views
-description: 'Display a list of orders for the store admin.'
-tag: ''
+description: ''
+tag: Commerce
 base_table: commerce_order
 base_field: order_id
 core: 8.x
@@ -15,28 +18,21 @@ display:
     id: default
     display_title: Master
     position: 0
-    provider: views
     display_options:
       access:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       cache:
         type: none
         options: {  }
-        provider: views
-        dependencies: {  }
       query:
         type: views_query
         options:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_comment: false
+          query_comment: ''
           query_tags: {  }
-        provider: views
-        dependencies: {  }
       exposed_form:
         type: basic
         options:
@@ -47,8 +43,6 @@ display:
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
-        provider: views
-        dependencies: {  }
       pager:
         type: full
         options:
@@ -83,32 +77,8 @@ display:
           description: ''
           columns:
             order_number: order_number
-            changed: changed
-            status: status
-            operations: operations
           info:
             order_number:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            changed:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            status:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            operations:
               sortable: false
               default_sort_order: asc
               align: ''
@@ -121,15 +91,15 @@ display:
         type: fields
       fields:
         order_number:
-          id: order_number
           table: commerce_order
           field: order_number
+          id: order_number
+          entity_type: null
+          entity_field: order_number
+          plugin_id: field
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: 'Order number'
           exclude: false
           alter:
@@ -149,7 +119,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -171,6 +141,19 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
         changed:
           id: changed
           table: commerce_order
@@ -178,10 +161,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
-          label: Updated
+          label: Changed
           exclude: false
           alter:
             alter_text: false
@@ -200,7 +180,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -225,8 +205,9 @@ display:
           date_format: medium
           custom_date_format: ''
           timezone: ''
+          entity_type: commerce_order
+          entity_field: changed
           plugin_id: date
-          provider: views
         status:
           id: status
           table: commerce_order
@@ -234,9 +215,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: 'Order status'
           exclude: false
           alter:
@@ -256,7 +234,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -278,8 +256,23 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          plugin_id: standard
-          provider: views
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: commerce_order
+          entity_field: status
+          plugin_id: field
         operations:
           id: operations
           table: commerce_order
@@ -287,9 +280,6 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           label: Operations
           exclude: false
           alter:
@@ -309,7 +299,7 @@ display:
             suffix: ''
             target: ''
             nl2br: false
-            max_length: ''
+            max_length: 0
             word_boundary: true
             ellipsis: true
             more_link: false
@@ -332,8 +322,8 @@ display:
           empty_zero: false
           hide_alter_empty: true
           destination: true
+          entity_type: commerce_order
           plugin_id: entity_operations
-          provider: views
       filters: {  }
       sorts: {  }
       title: Orders
@@ -347,26 +337,26 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          dependencies:
-            module:
-              - views
           empty: true
           tokenize: false
           content: 'No orders available.'
           plugin_id: text_custom
-          provider: views
       relationships: {  }
       arguments: {  }
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
+      display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false
   page_1:
     display_plugin: page
     id: page_1
-    display_title: 'Admin page'
+    display_title: Page
     position: 1
-    provider: views
     display_options:
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
+      display_extenders: {  }
       path: admin/commerce/orders
-      display_description: ''
+    cache_metadata:
+      contexts:
+        - languages
+      cacheable: false

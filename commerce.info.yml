@@ -6,3 +6,4 @@ core: 8.x
 configure: commerce.admin_commerce
 dependencies:
   - composer_manager
+  - views
