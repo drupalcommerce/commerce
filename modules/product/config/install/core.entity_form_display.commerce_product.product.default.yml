@@ -9,13 +9,19 @@ dependencies:
     - commerce_product.commerce_product_type.product
     - field.field.commerce_product.product.body
     - field.field.commerce_product.product.commerce_price
+    - field.field.commerce_product.product.store_id
   module:
     - commerce_price
     - text
 content:
+  store_id:
+    type: options_select
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
   title:
     type: string_textfield
-    weight: 0
+    weight: 1
     settings:
       size: 60
       placeholder: ''

@@ -1,0 +1,18 @@
+id: commerce_product.store_id
+field_name: store_id
+entity_type: commerce_product
+type: entity_reference
+settings:
+  target_type: commerce_store
+langcode: en
+status: true
+module: entity_reference
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+dependencies:
+  module:
+    - commerce_product
+    - entity_reference

@@ -1,0 +1,27 @@
+id: commerce_product.product.store_id
+field_name: store_id
+entity_type: commerce_product
+bundle: product
+label: Store
+description: 'Store field for products'
+langcode: en
+status: true
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:commerce_store'
+  handler_settings:
+    target_bundles:
+      online: online
+    sort:
+      field: name
+      direction: ASC
+field_type: entity_reference
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.product
+    - field.storage.commerce_product.store_id
+  module:
+    - entity_reference
