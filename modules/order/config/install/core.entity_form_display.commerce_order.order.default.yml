@@ -1,0 +1,36 @@
+id: commerce_order.order.default
+targetEntityType: commerce_order
+bundle: order
+mode: default
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_type.order
+    - field.field.commerce_order.order.store_id
+content:
+  store_id:
+    type: options_select
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+  mail:
+    type: email_default
+    weight: 1
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }
