@@ -139,7 +139,7 @@ class ProductAdminTest extends CommerceProductTestBase {
     );
     $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields/add-field', $edit, t('Save and continue'));
 
-    $edit = array('field_storage[settings][allowed_values]' => '1|1\n2|2');
+    $edit = array('settings[allowed_values]' => '1|1\n2|2');
     $this->drupalPostForm(NULL, $edit, t('Save field settings'));
   }
 }
