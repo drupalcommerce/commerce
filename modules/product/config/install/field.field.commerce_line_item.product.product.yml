@@ -14,8 +14,6 @@ label: Product
 description: ''
 required: true
 translatable: false
-default_value: {  }
-default_value_callback: ''
 settings:
   handler: default
   handler_settings:
