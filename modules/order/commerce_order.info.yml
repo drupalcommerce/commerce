@@ -9,3 +9,4 @@ dependencies:
   - commerce_price
   - commerce_store
   - entity_reference
+  - inline_entity_form

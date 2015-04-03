@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_type.order
+    - field.field.commerce_order.order.line_item
+  module:
+    - commerce_price
+    - user
+id: commerce_order.order.default
+targetEntityType: commerce_order
+bundle: order
+mode: default
+content:
+  line_item:
+    type: entity_reference_entity_view
+    weight: 0
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    label: hidden
+  order_total:
+    type: price
+    weight: 1
+    settings:
+      show_currency_code: false
+    third_party_settings: {  }
+    label: above
+hidden: {  }
