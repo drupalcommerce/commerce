@@ -5,12 +5,12 @@
  * Contains \Drupal\commerce\Entity\Store.
  */
 
-namespace Drupal\commerce\Entity;
+namespace Drupal\commerce_store\Entity;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\commerce\StoreInterface;
+use Drupal\commerce_store\StoreInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
@@ -23,11 +23,11 @@ use Drupal\user\UserInterface;
  *   bundle_label = @Translation("Store type"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\commerce\StoreListBuilder",
+ *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\commerce\Form\StoreForm",
- *       "edit" = "Drupal\commerce\Form\StoreForm",
+ *       "add" = "Drupal\commerce_store\Form\StoreForm",
+ *       "edit" = "Drupal\commerce_store\Form\StoreForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -167,7 +167,7 @@ class Store extends ContentEntityBase implements StoreInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Store owner'))
       ->setDescription(t('The user that owns this store.'))
-      ->setDefaultValueCallback('Drupal\commerce\Entity\Store::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
       ->setSetting('target_type', 'user')
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',

@@ -5,7 +5,7 @@
  * Contains \Drupal\example\Form\ExampleDeleteForm.
  */
 
-namespace Drupal\commerce\Form;
+namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Entity\EntityDeleteForm;

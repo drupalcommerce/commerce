@@ -7,4 +7,5 @@ dependencies:
   - commerce
   - commerce_line_item
   - commerce_price
+  - commerce_store
   - text

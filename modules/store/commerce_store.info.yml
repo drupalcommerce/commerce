@@ -1,0 +1,8 @@
+name: Commerce Store
+type: module
+description: 'Defines the Store entities.'
+package: Commerce
+core: 8.x
+dependencies:
+- commerce
+- commerce_price

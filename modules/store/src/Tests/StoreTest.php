@@ -5,10 +5,10 @@
  * Definition of Drupal\commerce\Tests\StoreTest
  */
 
-namespace Drupal\commerce\Tests;
+namespace Drupal\commerce_store\Tests;
 
-use Drupal\commerce\Entity\Store;
-use Drupal\commerce\Entity\StoreType;
+use Drupal\commerce_store\Entity\Store;
+use Drupal\commerce_store\Entity\StoreType;
 
 /**
  * Create, view, edit, delete, and change store entities.

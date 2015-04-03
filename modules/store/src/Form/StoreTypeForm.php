@@ -5,7 +5,7 @@
  * Contains Drupal\commerce\Form\StoreTypeForm.
  */
 
-namespace Drupal\commerce\Form;
+namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -31,7 +31,7 @@ class StoreTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $storeType->id(),
       '#machine_name' => array(
-        'exists' => '\Drupal\commerce\Entity\StoreType::load',
+        'exists' => '\Drupal\commerce_store\Entity\StoreType::load',
       ),
       '#disabled' => !$storeType->isNew(),
     );

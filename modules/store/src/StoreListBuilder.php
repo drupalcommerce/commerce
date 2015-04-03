@@ -5,7 +5,7 @@
  * Contains Drupal\commerce\StoreListBuilder.
  */
 
-namespace Drupal\commerce;
+namespace Drupal\commerce_store;
 
 use Drupal\commerce\Entity\StoreType;
 use Drupal\Component\Utility\SafeMarkup;

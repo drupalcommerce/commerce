@@ -1,0 +1,6 @@
+entity.commerce_store.collection:
+  title: 'Store information'
+  route_name: 'entity.commerce_store.collection'
+  parent: 'commerce.configuration'
+  description: 'Configure your store settings.'
+

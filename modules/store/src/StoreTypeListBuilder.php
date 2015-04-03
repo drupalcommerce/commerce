@@ -5,7 +5,7 @@
  * Contains \Drupal\commerce\StoreTypeListBuilder.
  */
 
-namespace Drupal\commerce;
+namespace Drupal\commerce_store;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;

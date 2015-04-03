@@ -5,16 +5,16 @@
  * Definition of Drupal\commerce\Tests\StoreTypeTest
  */
 
-namespace Drupal\commerce\Tests;
+namespace Drupal\commerce_store\Tests;
 
-use Drupal\commerce\Entity\StoreType;
+use Drupal\commerce_store\Entity\StoreType;
 
 /**
  * Ensure the store type works correctly.
  *
  * @group commerce
  */
-class StoreTypeTest extends CommerceTestBase {
+class StoreTypeTest extends StoreTestBase {
 
   /**
    * Tests if the default Store Type was created.

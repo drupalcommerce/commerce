@@ -5,11 +5,11 @@
  * Contains Drupal\commerce\Entity\StoreType.
  */
 
-namespace Drupal\commerce\Entity;
+namespace Drupal\commerce_store\Entity;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce\StoreTypeInterface;
+use Drupal\commerce_store\StoreTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
@@ -19,11 +19,11 @@ use Drupal\Core\Entity\EntityStorageException;
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
  *   handlers = {
- *     "list_builder" = "Drupal\commerce\StoreTypeListBuilder",
+ *     "list_builder" = "Drupal\commerce_store\StoreTypeListBuilder",
  *     "form" = {
- *       "add" = "Drupal\commerce\Form\StoreTypeForm",
- *       "edit" = "Drupal\commerce\Form\StoreTypeForm",
- *       "delete" = "Drupal\commerce\Form\StoreTypeDeleteForm"
+ *       "add" = "Drupal\commerce_store\Form\StoreTypeForm",
+ *       "edit" = "Drupal\commerce_store\Form\StoreTypeForm",
+ *       "delete" = "Drupal\commerce_store\Form\StoreTypeDeleteForm"
  *     }
  *   },
  *   admin_permission = "administer store types",

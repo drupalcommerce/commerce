@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   module:
-    - commerce
+    - commerce_store
 id: commerce_stores
 label: Stores
 module: views
