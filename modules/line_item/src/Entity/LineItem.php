@@ -24,6 +24,7 @@ use Drupal\user\UserInterface;
  *     "list_builder" = "Drupal\commerce_line_item\LineItemListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "add" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "edit" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"

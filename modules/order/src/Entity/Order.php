@@ -25,6 +25,7 @@ use Drupal\user\UserInterface;
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default = "Drupal\commerce_order\Form\OrderForm",
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"

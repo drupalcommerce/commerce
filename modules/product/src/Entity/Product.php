@@ -28,6 +28,7 @@ use Drupal\user\UserInterface;
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default" = "Drupal\commerce_product\Form\ProductForm",
  *       "add" = "Drupal\commerce_product\Form\ProductForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
