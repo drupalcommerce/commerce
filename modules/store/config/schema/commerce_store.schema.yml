@@ -1,6 +1,6 @@
 # Schema for the configuration files of store types.
 
-commerce.commerce_store_type.*:
+commerce_store.commerce_store_type.*:
   type: config_entity
   label: 'Store type config'
   mapping:

@@ -11,9 +11,3 @@ commerce.configuration:
   parent: 'commerce.admin_commerce'
   description: 'Configure your store and Commerce module settings.'
   weight: 10
-
-entity.commerce_store.collection:
-  title: 'Store information'
-  route_name: 'entity.commerce_store.collection'
-  parent: 'commerce.configuration'
-  description: 'Configure your store settings.'

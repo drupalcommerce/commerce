@@ -5,7 +5,7 @@
  * Contains \Drupal\commerce\StoreInterface.
  */
 
-namespace Drupal\commerce;
+namespace Drupal\commerce_store;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;

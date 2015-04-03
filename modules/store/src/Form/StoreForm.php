@@ -5,7 +5,7 @@
  * Contains Drupal\commerce\Form\StoreForm.
  */
 
-namespace Drupal\commerce\Form;
+namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -20,7 +20,7 @@ class StoreForm extends ContentEntityForm {
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\commerce\Entity\Store */
+    /* @var $entity \Drupal\commerce_store\Entity\Store */
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
 

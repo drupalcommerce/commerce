@@ -5,7 +5,7 @@
  * Definition of Drupal\commerce\Tests\CommerceTestBase.
  */
 
-namespace Drupal\commerce\Tests;
+namespace Drupal\commerce_store\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\simpletest\WebTestBase;
@@ -13,7 +13,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines base class for commerce test cases.
  */
-abstract class CommerceTestBase extends WebTestBase {
+abstract class StoreTestBase extends WebTestBase {
 
   /**
    * Modules to enable.
