@@ -15,7 +15,7 @@ use Drupal\commerce_store\Entity\StoreType;
  *
  * @group commerce
  */
-class StoreTest extends CommerceTestBase {
+class StoreTest extends StoreTestBase {
 
   /**
    * A store type entity to use in the tests.
