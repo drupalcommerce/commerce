@@ -39,21 +39,3 @@ function commerce_toolbar() {
 
   return $items;
 }
-
-/**
- * Returns the e-mail address from which to send commerce related e-mails.
- *
- * Currently this is just using the site's e-mail address, but this may be
- * updated to use a specific e-mail address when we add a settings form for the
- * store's physical address and contact information.
- */
-function commerce_email_from() {
-  return \Drupal::config('system.site')->get('mail');
-}
-
-/**
- * Returns the currency code of the site's default currency.
- */
-function commerce_default_currency() {
-  return \Drupal::config('commerce')->get('default_currency');
-}
