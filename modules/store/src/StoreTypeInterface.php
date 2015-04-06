@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce\StoreTypeInterface.
+ * Contains Drupal\commerce_store\StoreTypeInterface.
  */
 
 namespace Drupal\commerce_store;
