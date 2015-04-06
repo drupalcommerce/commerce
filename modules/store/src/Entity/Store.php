@@ -171,7 +171,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setSetting('target_type', 'user')
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
-        'weight' => 0,
+        'weight' => 50,
       ));
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
@@ -196,7 +196,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ))
       ->setDisplayOptions('form', array(
         'type' => 'string_textfield',
-        'weight' => 0,
+        'weight' => -10,
       ));
 
     $fields['type'] = BaseFieldDefinition::create('string')
@@ -213,7 +213,7 @@ class Store extends ContentEntityBase implements StoreInterface {
         'weight' => 0,
       ));
 
-    $fields['default_currency'] = BaseFieldDefinition::create('string')
+    $fields['default_currency'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Default currency'))
       ->setDescription(t('The default currency of this store.'))
       ->setCardinality(1)
@@ -224,7 +224,22 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'options_select',
-        'weight' => 0,
+        'weight' => 10,
+        'settings' => array(),
+      ));
+
+    $fields['currencies'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Currencies'))
+      ->setDescription(t('All currencies allowed for the store.'))
+      ->setCardinality(-1)
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'commerce_currency')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'options_buttons',
+        'weight' => 20,
         'settings' => array(),
       ));
 
