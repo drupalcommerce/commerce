@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\StoreInterface.
+ * Contains \Drupal\commerce_store\StoreInterface.
  */
 
 namespace Drupal\commerce_store;
@@ -29,7 +29,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $name
    *   The new name of the store.
    *
-   * @return \Drupal\commerce\StoreInterface
+   * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
    */
   public function setName($name);
@@ -48,7 +48,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $mail
    *   The new e-mail address of the store.
    *
-   * @return \Drupal\commerce\StoreInterface
+   * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
    */
   public function setEmail($mail);
@@ -67,7 +67,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $currency_code
    *   The new default currency code of the store.
    *
-   * @return \Drupal\commerce\StoreInterface
+   * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
    */
   public function setDefaultCurrency($currency_code);

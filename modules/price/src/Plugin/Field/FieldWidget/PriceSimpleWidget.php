@@ -32,10 +32,17 @@ class PriceSimpleWidget extends WidgetBase {
     $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
     $currency_codes = array_keys($enabledCurrencies);
 
+    $default_amount = NULL;
+    if (isset($items[$delta]->amount)) {
+      // Trim all trailing 0. Since prices doesn't use significant figures they
+      // are redundant. Maybe we should keep the zeroes that normally would be
+      // displayed (fx 123.00 for EUR). For now this should be enough.
+      $default_amount = rtrim($items[$delta]->amount, 0);
+    }
     $element['amount'] = array(
       '#type' => 'textfield',
       '#title' => $element['#title'],
-      '#default_value' => isset($items[$delta]->amount) ? $items[$delta]->amount : NULL,
+      '#default_value' => $default_amount,
       '#required' => $element['#required'],
       '#size' => 10,
       '#maxlength' => 255,
