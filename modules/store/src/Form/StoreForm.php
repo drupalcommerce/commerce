@@ -24,10 +24,23 @@ class StoreForm extends ContentEntityForm {
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
 
-    $form['default_currency'] = array(
-      '#type' => 'select',
-      '#title' => t('Default currency'),
-      '#options' => array('EUR' => 'EUR', 'GBP' => 'GBP', 'USD' => 'USD'),
+    // Add default store config setting.
+    $default_store = \Drupal::config('commerce_store.settings')->get('default_store');
+    $is_default_store = FALSE;
+    $disabled = FALSE;
+    if (!empty($default_store) && $default_store == $entity->uuid()) {
+      $is_default_store = TRUE;
+    }
+    if (empty($default_store)) {
+      $is_default_store = TRUE;
+      $disabled = TRUE;
+    }
+    $form['is_default_store'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Default store'),
+      '#default_value' => $is_default_store,
+      '#disabled' => $disabled,
+      '#weight' => 0,
     );
 
     return $form;
@@ -39,6 +52,10 @@ class StoreForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->save();
+      // Save the default store config setting.
+      if (!$form_state->isValueEmpty('is_default_store') && $form_state->getValue('is_default_store') != FALSE) {
+        \Drupal::configFactory()->getEditable('commerce_store.settings')->set('default_store', $this->entity->uuid())->save();
+      }
       drupal_set_message($this->t('Saved the %label store.', array(
         '%label' => $this->entity->label(),
       )));
