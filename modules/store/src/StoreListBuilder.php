@@ -32,7 +32,7 @@ class StoreListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce\Entity\Store */
+    /* @var $entity \Drupal\commerce_store\Entity\Store */
     $storeType = StoreType::load($entity->bundle());
 
     $row['name'] = $entity->getName();

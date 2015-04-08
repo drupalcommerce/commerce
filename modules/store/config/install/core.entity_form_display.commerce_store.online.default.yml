@@ -1,0 +1,19 @@
+id: commerce_store.online.default
+targetEntityType: commerce_store
+bundle: online
+mode: default
+langcode: en
+status: true
+dependencies:
+  entity:
+    - commerce_store.commerce_store_type.online
+    - field.field.commerce_store.online.currency
+  module:
+    - commerce_price
+content:
+  currency:
+    type: options_buttons
+    weight: 20
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }
