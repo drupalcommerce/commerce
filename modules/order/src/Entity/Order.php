@@ -531,6 +531,23 @@ class Order extends ContentEntityBase implements OrderInterface {
         ),
       ));
 
+    $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Store'))
+      ->setDescription(t('Store field for orders'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'commerce_store')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'options_select',
+        'weight' => 0,
+        'settings' => array(),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     return $fields;
   }
 
