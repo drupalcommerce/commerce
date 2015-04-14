@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_product;
 
+use Drupal\commerce_store\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -14,7 +15,7 @@ use Drupal\user\EntityOwnerInterface;
 /**
  * Provides an interface defining a Commerce Product entity.
  */
-interface ProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface ProductInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
    * Get the SKU of this product.

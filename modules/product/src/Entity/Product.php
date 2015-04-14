@@ -7,10 +7,11 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce_product\ProductInterface;
+use Drupal\commerce_store\StoreInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\commerce_product\ProductInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
@@ -143,6 +144,36 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public function getStore() {
+    return $this->get('store_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStore(StoreInterface $store) {
+    $this->set('store_id', $store->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStoreId() {
+    return $this->get('store_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStoreId($storeId) {
+    $this->set('store_id', $storeId);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOwner() {
     return $this->get('uid')->entity;
   }
@@ -198,6 +229,23 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDescription(t('The product revision ID.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
+
+    $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Store'))
+      ->setDescription(t('The store to which the product belongs.'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'commerce_store')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'options_select',
+        'weight' => 0,
+        'settings' => array(),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

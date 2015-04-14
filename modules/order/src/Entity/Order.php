@@ -8,6 +8,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\OrderInterface;
+use Drupal\commerce_store\StoreInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -179,6 +180,36 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getStore() {
+    return $this->get('store_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStore(StoreInterface $store) {
+    $this->set('store_id', $store->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStoreId() {
+    return $this->get('store_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStoreId($storeId) {
+    $this->set('store_id', $storeId);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOwner() {
     return $this->get('uid')->entity;
   }
@@ -341,6 +372,23 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The order type.'))
       ->setSetting('target_type', 'commerce_order_type')
       ->setReadOnly(TRUE);
+
+    $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Store'))
+      ->setDescription(t('The store to which the order belongs.'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'commerce_store')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'options_select',
+        'weight' => 0,
+        'settings' => array(),
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))

@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_order;
 
+use Drupal\commerce_store\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -14,7 +15,7 @@ use Drupal\user\EntityOwnerInterface;
 /**
  * Provides an interface defining a Commerce Order entity.
  */
-interface OrderInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
    * Returns the order number.
