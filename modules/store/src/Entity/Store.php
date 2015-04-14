@@ -209,7 +209,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDescription(t('A valid e-mail address. Store e-mail notifications will be sent to and from this address.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', array(
-        'type' => 'email',
+        'type' => 'email_default',
         'weight' => 0,
       ));
 
@@ -225,21 +225,6 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayOptions('form', array(
         'type' => 'options_select',
         'weight' => 10,
-        'settings' => array(),
-      ));
-
-    $fields['currencies'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Currencies'))
-      ->setDescription(t('All currencies allowed for the store.'))
-      ->setCardinality(-1)
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'commerce_currency')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
-        'type' => 'options_buttons',
-        'weight' => 20,
         'settings' => array(),
       ));
 

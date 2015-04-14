@@ -426,7 +426,7 @@ class Order extends ContentEntityBase implements OrderInterface {
         'weight' => 0,
       ))
       ->setDisplayOptions('form', array(
-        'type' => 'text_textfield',
+        'type' => 'email_default',
         'weight' => 1,
       ))
       ->setDisplayConfigurable('form', TRUE);
@@ -471,12 +471,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The time that the order was last edited.'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
-
-    $fields['line_items'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Line items'))
-      ->setDescription(t('An entity reference to line items.'))
-      ->setCardinality(-1)
-      ->setSetting('target_type', 'commerce_line_item');
 
     $fields['order_total'] = BaseFieldDefinition::create('price')
       ->setLabel(t('Order Total Price'))
