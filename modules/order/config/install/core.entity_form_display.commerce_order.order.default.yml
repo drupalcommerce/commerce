@@ -1,0 +1,47 @@
+langcode: en
+status: true
+dependencies:
+  entity:
+    - commerce_order.commerce_order_type.order
+    - field.field.commerce_order.line_item.line_item
+  module:
+    - inline_entity_form
+id: commerce_order.order.default
+targetEntityType: commerce_order
+bundle: order
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+  line_item:
+    type: inline_entity_form_multiple
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      allow_existing: false
+      delete_references: false
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+    third_party_settings: {  }
+  mail:
+    type: email_default
+    weight: 1
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  hostname: true
+  order_number: true
+  status: true

@@ -3,8 +3,9 @@ status: true
 dependencies:
   module:
     - commerce_line_item
+    - commerce_order
     - entity_reference
-id: commerce_order.line_item
+id: commerce_order.field_line_item
 field_name: line_item
 entity_type: commerce_order
 type: entity_reference

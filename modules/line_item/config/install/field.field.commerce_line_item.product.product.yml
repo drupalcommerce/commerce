@@ -6,7 +6,7 @@ dependencies:
     - field.storage.commerce_line_item.product
   module:
     - entity_reference
-id: commerce_line_item.product.field_product
+id: commerce_line_item.product.product
 field_name: product
 entity_type: commerce_line_item
 bundle: product
@@ -14,10 +14,8 @@ label: Product
 description: ''
 required: true
 translatable: false
-default_value: {  }
-default_value_callback: ''
 settings:
-  handler: default
+  handler: 'default:commerce_product'
   handler_settings:
     sort:
       field: _none

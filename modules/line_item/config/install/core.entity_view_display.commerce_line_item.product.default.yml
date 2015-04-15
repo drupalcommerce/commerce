@@ -1,0 +1,47 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_line_item.commerce_line_item_type.product
+    - field.field.commerce_line_item.product.product
+  module:
+    - commerce_price
+    - user
+id: commerce_line_item.product.default
+targetEntityType: commerce_line_item
+bundle: product
+mode: default
+content:
+  line_total:
+    type: price
+    weight: 3
+    settings:
+      show_currency_code: false
+    third_party_settings: {  }
+    label: above
+  product:
+    type: entity_reference_entity_view
+    weight: 0
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    label: above
+  quantity:
+    type: number_decimal
+    weight: 1
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    label: above
+  unit_price:
+    type: price
+    weight: 2
+    settings:
+      show_currency_code: false
+    third_party_settings: {  }
+    label: above
+hidden: {  }
