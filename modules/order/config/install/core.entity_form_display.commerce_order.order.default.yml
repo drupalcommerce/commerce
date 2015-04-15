@@ -3,7 +3,7 @@ status: true
 dependencies:
   entity:
     - commerce_order.commerce_order_type.order
-    - field.field.commerce_order.order.line_item
+    - field.field.commerce_order.line_item.line_item
   module:
     - inline_entity_form
 id: commerce_order.order.default

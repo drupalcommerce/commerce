@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - commerce_order.commerce_order_type.order
-    - field.field.commerce_order.order.line_item
+    - field.field.commerce_order.line_item.line_item
   module:
     - commerce_price
     - user
