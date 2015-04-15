@@ -32,22 +32,4 @@ interface ProductTypeInterface extends ConfigEntityInterface {
    */
   public function setDescription($description);
 
-  /**
-   * Returns the digital property of the product type.
-   *
-   * @return bool
-   *   The digital property value.
-   */
-  public function isDigital();
-
-  /**
-   * Sets the digital property of the product type.
-   *
-   * @param bool
-   *   The new value for the digital property.
-   *
-   * @return $this
-   */
-  public function setDigital($digital);
-
 }

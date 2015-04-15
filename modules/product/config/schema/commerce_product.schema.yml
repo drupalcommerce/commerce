@@ -11,9 +11,6 @@ commerce_product.commerce_product_type.*:
     revision:
       type: boolean
       label: 'Create new revision'
-    digital:
-      type: boolean
-      label: 'Products of this type represent digital services.'
     description:
       type: text
       label: 'Description'
