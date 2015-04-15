@@ -15,8 +15,10 @@ description: ''
 required: true
 translatable: false
 settings:
-  handler: default
+  handler: 'default:commerce_line_item'
   handler_settings:
+    target_bundles:
+      product: product
     sort:
       field: _none
 third_party_settings: {  }
