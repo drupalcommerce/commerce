@@ -1,0 +1,5 @@
+commerce_cart.settings:
+  title: 'Cart settings'
+  description: 'Configure shopping cart settings.'
+  parent: commerce.configuration
+  route_name: commerce_cart.settings
