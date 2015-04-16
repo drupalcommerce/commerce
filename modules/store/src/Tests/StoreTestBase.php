@@ -20,7 +20,7 @@ abstract class StoreTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('commerce');
+  public static $modules = array('commerce', 'commerce_store');
 
   /**
    * User with permission to administer the commerce store.
