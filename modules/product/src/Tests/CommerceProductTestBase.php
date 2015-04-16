@@ -20,7 +20,15 @@ abstract class CommerceProductTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('commerce', 'commerce_product', 'field', 'field_ui', 'options', 'entity_reference');
+  public static $modules = array(
+    'commerce',
+    'commerce_store',
+    'commerce_product',
+    'field',
+    'field_ui',
+    'options',
+    'entity_reference'
+  );
 
   /**
    * User with permission to administer products.
@@ -32,14 +40,38 @@ abstract class CommerceProductTestBase extends WebTestBase {
    */
   protected $product;
 
+  /**
+   * The store to test against
+   */
+  protected $commerce_store;
+
   protected function setUp() {
     parent::setUp();
-    $this->adminUser = $this->drupalCreateUser(array(
-      'administer products',
-      'administer product types',
-      'administer commerce_product fields',
-      'access administration pages',
-    ));
+    // Create a commerce store.
+    $name = strtolower($this->randomMachineName(8));
+
+    $store_type = $this->createEntity('commerce_store_type', array(
+        'id' => 'foo',
+        'label' => 'Label of foo',
+      )
+    );
+
+    $this->commerce_store = $this->createEntity('commerce_store', array(
+        'type' => $store_type->id(),
+        'name' => $name,
+        'mail' => \Drupal::currentUser()->getEmail(),
+        'default_currency' => 'EUR',
+      )
+    );
+
+    $this->adminUser = $this->drupalCreateUser(
+      array(
+        'administer products',
+        'administer product types',
+        'administer commerce_product fields',
+        'access administration pages',
+      )
+    );
     $this->drupalLogin($this->adminUser);
   }
 
@@ -60,7 +92,8 @@ abstract class CommerceProductTestBase extends WebTestBase {
     $this->assertEqual(
       $status,
       SAVED_NEW,
-      SafeMarkup::format('Created %label entity %type.',
+      SafeMarkup::format(
+        'Created %label entity %type.',
         array(
           '%label' => $entity->getEntityType()->getLabel(),
           '%type' => $entity->id()
