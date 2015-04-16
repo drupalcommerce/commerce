@@ -21,22 +21,21 @@ class ProductAdminTest extends CommerceProductTestBase {
    */
   function testAddCommerceProductAdmin() {
     $title = $this->randomMachineName();
-
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
     $edit = array(
       'title[0][value]' => $title,
       'sku[0][value]' => strtolower($this->randomMachineName()),
+      'store_id' => $this->commerce_store->id()
     );
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $product = \Drupal::entityQuery('commerce_product')
       ->condition("sku", $edit['sku[0][value]'])
       ->range(0, 1)
       ->execute();
-
     $product = entity_load("commerce_product", current($product));
 
-    $this->assertTrue($product, 'The new product has been created in the database.');
+    $this->assertNotNull($product, 'The new product has been created in the database.');
     $this->assertText(t("The product @title has been successfully saved.", array('@title' => $title)), "Commerce Product success text is showing");
     $this->assertText($title, 'Created product name exists on this page.');
 
