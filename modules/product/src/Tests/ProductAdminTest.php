@@ -50,11 +50,13 @@ class ProductAdminTest extends CommerceProductTestBase {
    * Tests creating a product with an existing SKU.
    */
   function testAddCommerceProductExistingSkuAdmin() {
-    $product = $this->createEntity('commerce_product', array(
-      'sku' => $this->randomMachineName(),
-      'title' => $this->randomMachineName(),
-      'type' => 'product'
-    ));
+    $product = $this->createEntity(
+      'commerce_product', array(
+        'sku' => $this->randomMachineName(),
+        'title' => $this->randomMachineName(),
+        'type' => 'product'
+      )
+    );
 
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
@@ -77,11 +79,13 @@ class ProductAdminTest extends CommerceProductTestBase {
    * Tests deleting a product via the admin.
    */
   function testDeleteCommerceProductAdmin() {
-    $product = $this->createEntity('commerce_product', array(
-      'sku' => $this->randomMachineName(),
-      'title' => $this->randomMachineName(),
-      'type' => "product"
-    ));
+    $product = $this->createEntity(
+      'commerce_product', array(
+        'sku' => $this->randomMachineName(),
+        'title' => $this->randomMachineName(),
+        'type' => "product"
+      )
+    );
 
     $this->drupalGet('product/' . $product->id() . '/delete');
     $this->assertText(t("Are you sure you want to delete the product @product?", array('@product' => $product->getTitle())), "Commerce Product deletion confirmation text is showing");
@@ -95,15 +99,16 @@ class ProductAdminTest extends CommerceProductTestBase {
    * Tests adding product attributes to a field with just the attribute field checked.
    */
   function testProductAttributesAdmin() {
-    $this->testAddCommerceProductFieldAdmin();
+    $productFields = $this->testAddCommerceProductFieldAdmin();
     $edit = array(
-      'field[commerce_product][attribute_field]' => 1,
-      'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
+      'attribute_field' => 1,
+      'attribute_widget_title' => $this->randomMachineName()
     );
     $this->drupalPostForm(NULL, $edit, t('Save settings'));
-    $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
-    $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-select", "Product attribute widget select list field is checked");
-    $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
+    $this->drupalGet('/admin/commerce/config/product-types/product/edit/fields/commerce_product.product.field_' . $productFields["field_name"]);
+    $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
+    $this->assertFieldChecked("edit-attribute-widget-select", "Product attribute widget select list field is checked");
+    $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
   }
 
   /**
@@ -112,34 +117,39 @@ class ProductAdminTest extends CommerceProductTestBase {
   function testAddProductAttributesFieldsAdmin() {
     $attributeWidgets = array("select", "radios");
     foreach ($attributeWidgets as $attributeWidget) {
-      $this->testAddCommerceProductFieldAdmin();
+      $productFields = $this->testAddCommerceProductFieldAdmin();
       $edit = array(
-        'field[commerce_product][attribute_field]' => 1,
-        'field[commerce_product][attribute_widget]' => $attributeWidget,
-        'field[commerce_product][attribute_widget_title]' => $this->randomMachineName()
+        'attribute_field' => 1,
+        'attribute_widget' => $attributeWidget,
+        'attribute_widget_title' => $this->randomMachineName()
       );
       $this->drupalPostForm(NULL, $edit, t('Save settings'));
-      $this->assertFieldChecked("edit-field-commerce-product-attribute-field", "Product attribute field is checked");
-      $this->assertFieldChecked("edit-field-commerce-product-attribute-widget-" . $attributeWidget, "Product attribute widget select list field is checked");
-      $this->assertField('field[commerce_product][attribute_widget_title]', $edit['field[commerce_product][attribute_widget_title]']);
+      // Go back to the URL by clicking "Edit"
+      $this->drupalGet('/admin/commerce/config/product-types/product/edit/fields/commerce_product.product.field_' . $productFields["field_name"]);
+
+      $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
+      $this->assertFieldChecked("edit-attribute-widget-" . $attributeWidget, "Product attribute widget select list field is checked");
+      $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
     }
   }
 
   /**
    * Tests adding product fields.
    */
-  function testAddCommerceProductFieldAdmin() {
+  protected function testAddCommerceProductFieldAdmin() {
     $this->drupalGet('admin/commerce/config/product-types/product/edit/fields/add-field');
 
     // Create a new field.
-    $edit = array(
+    $fields = array(
       'label' => $label = $this->randomMachineName(),
       'field_name' => $name = strtolower($this->randomMachineName()),
       'new_storage_type' => 'list_string',
     );
-    $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields/add-field', $edit, t('Save and continue'));
+    $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields/add-field', $fields, t('Save and continue'));
 
     $edit = array('settings[allowed_values]' => '1|1\n2|2');
     $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+
+    return $fields;
   }
 }
