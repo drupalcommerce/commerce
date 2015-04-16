@@ -27,7 +27,8 @@ use Drupal\user\UserInterface;
  *       "add" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "edit" = "Drupal\commerce_line_item\Form\LineItemForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
- *     }
+ *     },
+ *     "inline entity form" = "Drupal\commerce_line_item\Form\LineItemInlineEntityFormHandler",
  *   },
  *   base_table = "commerce_line_item",
  *   admin_permission = "administer line items",
