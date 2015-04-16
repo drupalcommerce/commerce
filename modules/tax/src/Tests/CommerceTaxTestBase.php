@@ -19,7 +19,7 @@ abstract class CommerceTaxTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('commerce', 'commerce_tax');
+  public static $modules = array('commerce', 'commerce_tax', 'commerce_product');
 
   /**
    * User with permission to administer products.
