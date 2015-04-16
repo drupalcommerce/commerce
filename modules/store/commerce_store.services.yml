@@ -1,0 +1,4 @@
+services:
+  commerce_store.resolver:
+    class: Drupal\commerce_store\StoreResolver
+    arguments: ['@event.dispatcher']
