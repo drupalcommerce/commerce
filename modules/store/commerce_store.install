@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Implements hook_install().
+ *
+ * Create a default store.
+ */
+function commerce_store_install() {
+
+  $currency_code = "USD";
+  // If the default country has been set, detect currency_code.
+  $default_country = \Drupal::config('system.date')->get('country.default');
+  if ($default_country) {
+    $countryRepository = new \CommerceGuys\Intl\Country\CountryRepository();
+    $currency_code = $countryRepository->get($default_country)
+      ->getCurrencyCode();
+
+    /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
+    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $entity = $currency_importer->importCurrency($currency_code);
+    if ($entity) {
+      $entity->save();
+    }
+  }
+
+  $values = [
+    'name' => t('Default store'),
+    'uid' => 1,
+    'mail' => \Drupal::config('system.site')->get('mail'),
+    'type' => 'online',
+    'default_currency' => $currency_code,
+    'currency' => $currency_code,
+  ];
+  $store = entity_create("commerce_store", $values);
+  $store->save();
+
+  // Set as default store.
+  \Drupal::configFactory()->getEditable('commerce_store.settings')
+    ->set('default_store', $store->uuid())->save();
+
+}
