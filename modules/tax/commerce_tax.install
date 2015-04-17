@@ -11,14 +11,14 @@
  * Checks that the necessary libraries have been installed.
  */
 function commerce_tax_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
 
   if ($phase === 'install') {
     if (!class_exists('\CommerceGuys\Addressing\Repository\AddressFormatRepository')) {
-      $requirements['commerce_tax_library'] = array(
+      $requirements['commerce_tax_library'] = [
         'description' => t("Commerce Tax requires the commerceguys/tax library."),
         'severity' => REQUIREMENT_ERROR,
-      );
+      ];
     }
   }
 

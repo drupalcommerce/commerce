@@ -54,11 +54,12 @@ class StoreTypeDeleteForm extends EntityDeleteForm {
       ->count()
       ->execute();
     if ($numStores) {
-      $caption = '<p>' . $this->formatPlural($numStores, '%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', '%type is used by @count stores on your site. You may not remove %type until you have removed all of the %type stores.', array('%type' => $this->entity->label())) . '</p>';
+      $caption = '<p>' . $this->formatPlural($numStores, '%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', '%type is used by @count stores on your site. You may not remove %type until you have removed all of the %type stores.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
-      $form['description'] = array('#markup' => $caption);
+      $form['description'] = ['#markup' => $caption];
       return $form;
     }
+
     return parent::buildForm($form, $form_state);
   }
 

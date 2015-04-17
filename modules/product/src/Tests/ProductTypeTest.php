@@ -34,10 +34,10 @@ class ProductTypeTest extends CommerceProductTestBase {
     $title = strtolower($this->randomMachineName(8));
 
     // Create a product type programmaticaly.
-    $type = $this->createEntity('commerce_product_type', array(
+    $type = $this->createEntity('commerce_product_type', [
         'id' => $title,
         'label' => $title,
-      )
+      ]
     );
 
     $typeExists = (bool) ProductType::load($type->id());
@@ -49,18 +49,18 @@ class ProductTypeTest extends CommerceProductTestBase {
    */
   public function testDeleteProductType() {
     // Create a product type programmaticaly.
-    $type = $this->createEntity('commerce_product_type', array(
+    $type = $this->createEntity('commerce_product_type', [
         'id' => 'foo',
         'label' => 'foo'
-      )
+      ]
     );
 
     // Create a product.
-    $values = array(
+    $values = [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => "product"
-    );
+    ];
     $product = $this->createEntity('commerce_product', $values);
 
     // Try to delete the product type.

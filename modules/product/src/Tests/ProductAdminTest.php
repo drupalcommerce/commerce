@@ -23,11 +23,11 @@ class ProductAdminTest extends CommerceProductTestBase {
     $title = $this->randomMachineName();
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
-    $edit = array(
+    $edit = [
       'title[0][value]' => $title,
       'sku[0][value]' => strtolower($this->randomMachineName()),
       'store_id' => $this->commerce_store->id()
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $product = \Drupal::entityQuery('commerce_product')
       ->condition("sku", $edit['sku[0][value]'])
@@ -36,7 +36,7 @@ class ProductAdminTest extends CommerceProductTestBase {
     $product = entity_load("commerce_product", current($product));
 
     $this->assertNotNull($product, 'The new product has been created in the database.');
-    $this->assertText(t("The product @title has been successfully saved.", array('@title' => $title)), "Commerce Product success text is showing");
+    $this->assertText(t("The product @title has been successfully saved.", ['@title' => $title]), "Commerce Product success text is showing");
     $this->assertText($title, 'Created product name exists on this page.');
 
     // Assert that the frontend product page is displaying.
@@ -50,19 +50,19 @@ class ProductAdminTest extends CommerceProductTestBase {
    */
   function testAddCommerceProductExistingSkuAdmin() {
     $product = $this->createEntity(
-      'commerce_product', array(
+      'commerce_product', [
         'sku' => $this->randomMachineName(),
         'title' => $this->randomMachineName(),
         'type' => 'product'
-      )
+      ]
     );
 
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
-    $edit = array(
+    $edit = [
       'title[0][value]' => $this->randomMachineName(),
       'sku[0][value]' => $product->getSku(),
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
     // Assert that two products with the same SKU exist.
@@ -79,15 +79,15 @@ class ProductAdminTest extends CommerceProductTestBase {
    */
   function testDeleteCommerceProductAdmin() {
     $product = $this->createEntity(
-      'commerce_product', array(
+      'commerce_product', [
         'sku' => $this->randomMachineName(),
         'title' => $this->randomMachineName(),
         'type' => "product"
-      )
+      ]
     );
 
     $this->drupalGet('product/' . $product->id() . '/delete');
-    $this->assertText(t("Are you sure you want to delete the product @product?", array('@product' => $product->getTitle())), "Commerce Product deletion confirmation text is showing");
+    $this->assertText(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]), "Commerce Product deletion confirmation text is showing");
     $this->assertText(t('This action cannot be undone.'), 'The product deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $productExists = (bool) Product::load($product->id());
@@ -99,10 +99,10 @@ class ProductAdminTest extends CommerceProductTestBase {
    */
   function testProductAttributesAdmin() {
     $productFields = $this->testAddCommerceProductFieldAdmin();
-    $edit = array(
+    $edit = [
       'attribute_field' => 1,
       'attribute_widget_title' => $this->randomMachineName()
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, t('Save settings'));
     $this->drupalGet('/admin/commerce/config/product-types/product/edit/fields/commerce_product.product.field_' . $productFields["field_name"]);
     $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
@@ -114,14 +114,14 @@ class ProductAdminTest extends CommerceProductTestBase {
    * Tests adding product attributes to a field with the attribute field checked, and changing the radios.
    */
   function testAddProductAttributesFieldsAdmin() {
-    $attributeWidgets = array("select", "radios");
+    $attributeWidgets = ['select', 'radios'];
     foreach ($attributeWidgets as $attributeWidget) {
       $productFields = $this->testAddCommerceProductFieldAdmin();
-      $edit = array(
+      $edit = [
         'attribute_field' => 1,
         'attribute_widget' => $attributeWidget,
         'attribute_widget_title' => $this->randomMachineName()
-      );
+      ];
       $this->drupalPostForm(NULL, $edit, t('Save settings'));
       // Go back to the URL by clicking "Edit"
       $this->drupalGet('/admin/commerce/config/product-types/product/edit/fields/commerce_product.product.field_' . $productFields["field_name"]);
@@ -139,14 +139,14 @@ class ProductAdminTest extends CommerceProductTestBase {
     $this->drupalGet('admin/commerce/config/product-types/product/edit/fields/add-field');
 
     // Create a new field.
-    $fields = array(
+    $fields = [
       'label' => $label = $this->randomMachineName(),
       'field_name' => $name = strtolower($this->randomMachineName()),
       'new_storage_type' => 'list_string',
-    );
+    ];
     $this->drupalPostForm('admin/commerce/config/product-types/product/edit/fields/add-field', $fields, t('Save and continue'));
 
-    $edit = array('settings[allowed_values]' => '1|1\n2|2');
+    $edit = ['settings[allowed_values]' => '1|1\n2|2'];
     $this->drupalPostForm(NULL, $edit, t('Save field settings'));
 
     return $fields;

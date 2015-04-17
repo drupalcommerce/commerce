@@ -30,10 +30,10 @@ class StoreTest extends StoreTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->type = $this->createEntity('commerce_store_type', array(
+    $this->type = $this->createEntity('commerce_store_type', [
         'id' => 'foo',
         'label' => 'Label of foo',
-      )
+      ]
     );
   }
 
@@ -43,12 +43,12 @@ class StoreTest extends StoreTestBase {
   public function testCreateStore() {
     $name = strtolower($this->randomMachineName(8));
     // Create a store programmaticaly.
-    $store = $this->createEntity('commerce_store', array(
+    $store = $this->createEntity('commerce_store', [
         'type' => $this->type->id(),
         'name' => $name,
         'mail' => \Drupal::currentUser()->getEmail(),
         'default_currency' => 'EUR',
-      )
+      ]
     );
     $storeExist = (bool) Store::load($store->id());
     $this->assertTrue($storeExist, 'The new store has been created in the database.');
@@ -57,11 +57,11 @@ class StoreTest extends StoreTestBase {
     $this->drupalGet('admin/commerce/config/store');
     $this->clickLink('Add a new store');
     $this->clickLink($this->type->label());
-    $edit = array(
+    $edit = [
       'name[0][value]' => 'Foo Store',
       'mail[0][value]' => \Drupal::currentUser()->getEmail(),
       'default_currency' => 'EUR',
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
   }
 
@@ -70,19 +70,19 @@ class StoreTest extends StoreTestBase {
    */
   public function testUpdateStore() {
     // Create a new store.
-    $store = $this->createEntity('commerce_store', array(
+    $store = $this->createEntity('commerce_store', [
         'type' => $this->type->id(),
         'name' => $this->randomMachineName(8),
         'email' => \Drupal::currentUser()->getEmail(),
-      )
+      ]
     );
 
     $this->drupalGet('admin/commerce/config/store');
     $this->clickLink(t('Edit'));
     // Only change the name.
-    $edit = array(
+    $edit = [
       'name[0][value]' => $this->randomMachineName(8),
-    );
+    ];
     $this->drupalPostForm(NULL, $edit, 'Save');
     $storeChanged = Store::load($store->id());
     $this->assertEqual($store->getName(), $storeChanged->getName(), 'The name of the store has been changed.');
@@ -93,11 +93,11 @@ class StoreTest extends StoreTestBase {
    */
   public function testDeleteStore() {
     // Create a new store.
-    $store = $this->createEntity('commerce_store', array(
+    $store = $this->createEntity('commerce_store', [
         'type' => $this->type->id(),
         'name' => $this->randomMachineName(8),
         'email' => \Drupal::currentUser()->getEmail(),
-      )
+      ]
     );
     $storeExist = (bool) Store::load($store->id());
     $this->assertTrue($storeExist, 'The new store has been created in the database.');

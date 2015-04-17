@@ -43,10 +43,10 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
     $this->assertEqual(count($productTypes), 1, '1 Products types are correctly listed');
 
     // Create a new product type entity and see if the list has two product types.
-    $this->createEntity('commerce_product_type', array(
+    $this->createEntity('commerce_product_type', [
         'id' => $title,
         'label' => $title
-      )
+      ]
     );
 
     $this->drupalGet('admin/commerce/config/product-types');
@@ -61,10 +61,10 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
     $title = strtolower($this->randomMachineName(8));
 
     // Create a product type programmaticaly.
-    $type = $this->createEntity('commerce_product_type', array(
+    $type = $this->createEntity('commerce_product_type', [
         'id' => $title,
         'label' => $title,
-      )
+      ]
     );
 
     $typeExists = (bool) ProductType::load($type->id());
@@ -73,10 +73,10 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
     $this->drupalGet('admin/commerce/config/product-types/add');
 
     // Create a product type through the form.
-    $edit = array(
+    $edit = [
       'label' => 'foo',
       'id' => 'foo'
-    );
+    ];
     $this->drupalPostForm('admin/commerce/config/product-types/add', $edit, t('Save'));
     $typeExists = (bool) ProductType::load($edit['label']);
     $this->assertTrue($typeExists, 'The new product type has been created in the database.');
@@ -87,16 +87,16 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
    */
   public function testUpdateProductTypeAdmin() {
     // Create a new product type.
-    $productType = $this->createEntity('commerce_product_type', array(
+    $productType = $this->createEntity('commerce_product_type', [
         'id' => 'foo',
         'label' => 'Label for foo'
-      )
+      ]
     );
 
     // Only change the label.
-    $edit = array(
+    $edit = [
       'label' => $this->randomMachineName(8),
-    );
+    ];
     $this->drupalPostForm('admin/commerce/config/product-types/' . $productType->id() . '/edit', $edit, 'Save');
     $productTypeChanged = ProductType::load($productType->id());
     $this->assertNotEqual($productType->label(), $productTypeChanged->label(), 'The label of the product type has been changed.');
@@ -107,24 +107,24 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
    */
   public function testDeleteProductTypeAdmin() {
     // Create a product type programmaticaly.
-    $type = $this->createEntity('commerce_product_type', array(
+    $type = $this->createEntity('commerce_product_type', [
         'id' => 'foo',
         'label' => 'foo'
-      )
+      ]
     );
 
     // Create a product.
-    $values = array(
+    $values = [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => $type->id()
-    );
+    ];
     $product = $this->createEntity('commerce_product', $values);
 
     // Try to delete the product type.
     $this->drupalGet('admin/commerce/config/product-types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', array('%type' => $type->label())),
+      t('%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', ['%type' => $type->label()]),
       'The product type will not be deleted until all products of that type are deleted'
     );
     $this->assertNoText(t('This action cannot be undone.'), 'The product type deletion confirmation form is not available');
@@ -133,7 +133,7 @@ class ProductTypeAdminTest extends CommerceProductTestBase {
     $product->delete();
     $this->drupalGet('admin/commerce/config/product-types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('Are you sure you want to delete the product type %type?', array('%type' => $type->label())),
+      t('Are you sure you want to delete the product type %type?', ['%type' => $type->label()]),
       'The product type is available for deletion'
     );
     $this->assertText(t('This action cannot be undone.'), 'The product type deletion confirmation form is available');

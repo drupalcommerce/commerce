@@ -27,7 +27,7 @@ class TaxRateController extends ControllerBase {
     $rate = $this
       ->entityManager()
       ->getStorage('commerce_tax_rate')
-      ->create(array('type' => $commerce_tax_type));
+      ->create(['type' => $commerce_tax_type]);
 
     return $this->entityFormBuilder()->getForm($rate, 'add');
   }
@@ -42,7 +42,7 @@ class TaxRateController extends ControllerBase {
    *   The list of commerce_tax_rates.
    */
   public function buildList($commerce_tax_type) {
-    $build = array();
+    $build = [];
     $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate');
 
     $build['commerce_tax_rates_table'] = $listBuilder->setTaxType($commerce_tax_type)->render();

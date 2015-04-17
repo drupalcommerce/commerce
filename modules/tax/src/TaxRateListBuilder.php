@@ -60,9 +60,9 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function load() {
-    return $this->storage->loadByProperties(array(
+    return $this->storage->loadByProperties([
       'type' => $this->taxType,
-    ));
+    ]);
   }
 
   /**
@@ -72,21 +72,21 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 
-    $rateAmountsRoute = Url::fromRoute('entity.commerce_tax_rate_amount.collection', array(
+    $rateAmountsRoute = Url::fromRoute('entity.commerce_tax_rate_amount.collection', [
       'commerce_tax_rate' => $entity->getId()
-    ));
-    $addRateAmountRoute = Url::fromRoute('entity.commerce_tax_rate_amount.add_form', array(
+    ]);
+    $addRateAmountRoute = Url::fromRoute('entity.commerce_tax_rate_amount.add_form', [
       'commerce_tax_rate' => $entity->getId(),
-    ));
+    ]);
 
-    $operations['rate_amounts'] = array(
+    $operations['rate_amounts'] = [
       'title' => $this->t('View rate amounts'),
       'url' => $rateAmountsRoute,
-    );
-    $operations['add_rate_amount'] = array(
+    ];
+    $operations['add_rate_amount'] = [
       'title' => $this->t('Add rate amount'),
       'url' => $addRateAmountRoute,
-    );
+    ];
 
     return $operations;
   }

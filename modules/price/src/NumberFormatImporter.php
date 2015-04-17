@@ -48,7 +48,7 @@ class NumberFormatImporter {
     }
 
     if ($numberFormat = $this->getNumberFormat($language)) {
-      $values = array(
+      $values = [
         'locale' => $numberFormat->getLocale(),
         'name' => $language->getName(),
         'numberingSystem' => $numberFormat->getNumberingSystem(),
@@ -61,7 +61,7 @@ class NumberFormatImporter {
         'percentPattern' => $numberFormat->getPercentPattern(),
         'currencyPattern' => $numberFormat->getCurrencyPattern(),
         'accountingCurrencyPattern' => $numberFormat->getAccountingCurrencyPattern(),
-      );
+      ];
       $entity = $this->numberFormatStorage->create($values);
       return $entity;
     }

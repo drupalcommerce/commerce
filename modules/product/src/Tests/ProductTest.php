@@ -20,22 +20,22 @@ class ProductTest extends CommerceProductTestBase {
    * Tests creating a product.
    */
   function testAddCommerceProduct() {
-    $this->createEntity('commerce_product', array(
+    $this->createEntity('commerce_product', [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => 'product'
-    ));
+    ]);
   }
 
   /**
    * Tests creating a product with an existing SKU.
    */
   function testAddCommerceProductExistingSku() {
-    $values = array(
+    $values = [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => 'product'
-    );
+    ];
     $this->createEntity('commerce_product', $values);
 
     $productDuplicate = entity_create("commerce_product", $values);
@@ -49,11 +49,11 @@ class ProductTest extends CommerceProductTestBase {
    */
   function testDeleteProduct() {
     // Create a new product.
-    $values = array(
+    $values = [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => "product"
-    );
+    ];
     $product = $this->createEntity('commerce_product', $values);
     $productExists = (bool) Product::load($product->id());
     $this->assertTrue($productExists, 'The new product has been created in the database.');

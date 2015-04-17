@@ -42,10 +42,10 @@ class StoreTypeTest extends StoreTestBase {
     $this->assertEqual(count($storeTypes), 1, 'Stores types are correctly listed');
 
     // Create a new commerce store type entity and see if the list has two store types.
-    $this->createEntity('commerce_store_type', array(
+    $this->createEntity('commerce_store_type', [
         'id' => $title,
         'label' => $title,
-      )
+      ]
     );
 
     $this->drupalGet('admin/commerce/config/store/types');
@@ -60,20 +60,20 @@ class StoreTypeTest extends StoreTestBase {
     $title = strtolower($this->randomMachineName(8));
 
     // Create a store type programmaticaly.
-    $type = $this->createEntity('commerce_store_type', array(
+    $type = $this->createEntity('commerce_store_type', [
         'id' => $title,
         'label' => $title,
-      )
+      ]
     );
 
     $typeExists = (bool) StoreType::load($type->id());
     $this->assertTrue($typeExists, 'The new store type has been created in the database.');
 
     // Create a store type through the form.
-    $edit = array(
+    $edit = [
       'id' => 'foo',
       'label' => 'Label of foo',
-    );
+    ];
     $this->drupalPostForm('admin/commerce/config/store/types/add', $edit, t('Save'));
     $typeExists = (bool) StoreType::load($edit['id']);
     $this->assertTrue($typeExists, 'The new store type has been created in the database.');
@@ -84,16 +84,16 @@ class StoreTypeTest extends StoreTestBase {
    */
   public function testUpdateStoreType() {
     // Create a new store type.
-    $storeType = $this->createEntity('commerce_store_type', array(
+    $storeType = $this->createEntity('commerce_store_type', [
         'id' => 'foo',
         'label' => 'Label for foo',
-      )
+      ]
     );
 
     // Only change the label.
-    $edit = array(
+    $edit = [
       'label' => $this->randomMachineName(8),
-    );
+    ];
     $this->drupalPostForm('admin/commerce/config/store/types/online/edit', $edit, 'Save');
     $storeTypeChanged = StoreType::load($storeType->id());
     $this->assertEqual($storeType->label(), $storeTypeChanged->label(), 'The label of the store type has been changed.');
@@ -104,23 +104,23 @@ class StoreTypeTest extends StoreTestBase {
    */
   public function testDeleteStoreType() {
     // Create a store type programmaticaly.
-    $type = $this->createEntity('commerce_store_type', array(
+    $type = $this->createEntity('commerce_store_type', [
         'id' => 'foo',
         'label' => 'Label for foo',
-      )
+      ]
     );
 
     // Create a store.
-    $store = $this->createEntity('commerce_store', array(
+    $store = $this->createEntity('commerce_store', [
       'type' => $type->id(),
       'name' => $this->randomMachineName(8),
       'email' => \Drupal::currentUser()->getEmail(),
-    ));
+    ]);
 
     // Try to delete the store type.
     $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', array('%type' => $type->label())),
+      t('%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', ['%type' => $type->label()]),
       'The store type will not be deleted until all stores of that type are deleted'
     );
     $this->assertNoText(t('This action cannot be undone.'), 'The store type deletion confirmation form is not available');
@@ -129,7 +129,7 @@ class StoreTypeTest extends StoreTestBase {
     $store->delete();
     $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('Are you sure you want to delete the store type %type?', array('%type' => $type->label())),
+      t('Are you sure you want to delete the store type %type?', ['%type' => $type->label()]),
       'The store type is available for deletion'
     );
     $this->assertText(t('This action cannot be undone.'), 'The store type deletion confirmation form is available');

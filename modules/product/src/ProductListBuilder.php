@@ -30,16 +30,15 @@ class ProductListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_product\Entity\Product */
-
     $uri = $entity->urlInfo();
     $options = $uri->getOptions();
     $langcode = $entity->language()->getId();
-    $options += ($langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED && isset($languages[$langcode]) ? array('language' => $languages[$langcode]) : array());
+    $options += ($langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED && isset($languages[$langcode]) ? ['language' => $languages[$langcode]] : []);
     $uri->setOptions($options);
-    $row['title']['data'] = array(
+    $row['title']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
-    ) + $uri->toRenderArray();
+    ] + $uri->toRenderArray();
 
     $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);

@@ -83,7 +83,7 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    *
    * @var array
    */
-  protected $rates = array();
+  protected $rates = [];
 
   /**
    * {@inheritdoc}

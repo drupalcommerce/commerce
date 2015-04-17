@@ -48,56 +48,56 @@ class CurrencyForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $currency = $this->entity;
 
-    $form['name'] = array(
+    $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#default_value' => $currency->getName(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['currency_code'] = array(
+    ];
+    $form['currency_code'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
       '#default_value' => $currency->getCurrencyCode(),
-      '#element_validate' => array('::validatecurrency_code'),
+      '#element_validate' => ['::validatecurrency_code'],
       '#pattern' => '[A-Z]{3}',
       '#placeholder' => 'XXX',
       '#maxlength' => 3,
       '#size' => 3,
       '#disabled' => !$currency->isNew(),
       '#required' => TRUE,
-    );
-    $form['numericCode'] = array(
+    ];
+    $form['numericCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
       '#default_value' => $currency->getNumericCode(),
-      '#element_validate' => array('::validateNumericCode'),
+      '#element_validate' => ['::validateNumericCode'],
       '#pattern' => '[\d]{3}',
       '#placeholder' => '999',
       '#maxlength' => 3,
       '#size' => 3,
       '#required' => TRUE,
-    );
-    $form['symbol'] = array(
+    ];
+    $form['symbol'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Symbol'),
       '#default_value' => $currency->getSymbol(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['fractionDigits'] = array(
+    ];
+    $form['fractionDigits'] = [
       '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
       '#description' => $this->t('The number of digits after the decimal sign.'),
       '#default_value' => $currency->getFractionDigits() ?: 2,
       '#min' => 0,
       '#required' => TRUE,
-    );
-    $form['status'] = array(
+    ];
+    $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),
       '#default_value' => $currency->status(),
-    );
+    ];
 
     return $form;
   }
@@ -129,9 +129,9 @@ class CurrencyForm extends EntityForm {
       $form_state->setError($element, $this->t('The numeric code must consist of three digits.'));
     }
     elseif ($currency->isNew()) {
-      $loadedCurrencies = $this->currencyStorage->loadByProperties(array(
+      $loadedCurrencies = $this->currencyStorage->loadByProperties([
         'numericCode' => $numericCode,
-      ));
+      ]);
       if ($loadedCurrencies) {
         $form_state->setError($element, $this->t('The numeric code is already in use.'));
       }
@@ -146,13 +146,13 @@ class CurrencyForm extends EntityForm {
 
     try {
       $currency->save();
-      drupal_set_message($this->t('Saved the %label currency.', array(
+      drupal_set_message($this->t('Saved the %label currency.', [
         '%label' => $currency->label(),
-      )));
+      ]));
       $form_state->setRedirect('entity.commerce_currency.collection');
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label currency was not saved.', array('%label' => $currency->label())), 'error');
+      drupal_set_message($this->t('The %label currency was not saved.', ['%label' => $currency->label()]), 'error');
       $this->logger('commerce_price')->error($e);
       $form_state->setRebuild();
     }

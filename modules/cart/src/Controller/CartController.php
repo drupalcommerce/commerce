@@ -24,7 +24,7 @@ class CartController extends ControllerBase {
     // Get the Shopping Order id,
     $cart_order_id = 1;
     // To do : use the Cart settings to use a custom View for this page.
-    return views_embed_view('commerce_cart_form', 'default', array($cart_order_id));
+    return views_embed_view('commerce_cart_form', 'default', [$cart_order_id]);
   }
 
 }

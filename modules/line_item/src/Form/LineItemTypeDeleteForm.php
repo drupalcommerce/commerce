@@ -53,11 +53,12 @@ class LineItemTypeDeleteForm extends EntityDeleteForm {
       ->count()
       ->execute();
     if ($numOrders) {
-      $caption = '<p>' . $this->formatPlural($numOrders, '%type is used by 1 line item on your site. You can not remove this line item type until you have removed all of the %type line items.', '%type is used by @count line items on your site. You may not remove %type until you have removed all of the %type line items.', array('%type' => $this->entity->label())) . '</p>';
+      $caption = '<p>' . $this->formatPlural($numOrders, '%type is used by 1 line item on your site. You can not remove this line item type until you have removed all of the %type line items.', '%type is used by @count line items on your site. You may not remove %type until you have removed all of the %type line items.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
-      $form['description'] = array('#markup' => $caption);
+      $form['description'] = ['#markup' => $caption];
       return $form;
     }
+
     return parent::buildForm($form, $form_state);
   }
 

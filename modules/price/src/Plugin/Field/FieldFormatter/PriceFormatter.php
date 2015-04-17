@@ -90,20 +90,20 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'show_currency_code' => FALSE,
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $elements, FormStateInterface $form_state) {
-    $elements['show_currency_code'] = array(
+    $elements['show_currency_code'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display the currency code instead of the currency symbol.'),
       '#default_value' => $this->getSetting('show_currency_code'),
-    );
+    ];
 
     return $elements;
   }
@@ -112,7 +112,7 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items) {
-    $elements = array();
+    $elements = [];
     $format = $this->getNumberFormat();
     $displayMode = $this->getSetting('show_currency_code') ? NumberFormatter::CURRENCY_DISPLAY_CODE : NumberFormatter::CURRENCY_DISPLAY_SYMBOL;
 
@@ -121,7 +121,7 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
 
     foreach ($items as $delta => $item) {
       $currency = $this->currencyStorage->load($item->currency_code);
-      $elements[$delta] = array('#markup' => $numberFormatter->formatCurrency($item->amount, $currency));
+      $elements[$delta] = ['#markup' => $numberFormatter->formatCurrency($item->amount, $currency)];
     }
 
     return $elements;

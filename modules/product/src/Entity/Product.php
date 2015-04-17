@@ -240,11 +240,11 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 0,
-        'settings' => array(),
-      ))
+        'settings' => [],
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -256,21 +256,21 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_product\Entity\Product::getCurrentUserId')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
-        'settings' => array(
+        'settings' => [
           'match_operator' => 'CONTAINS',
           'size' => '60',
           'autocomplete_type' => 'tags',
           'placeholder' => '',
-        ),
-      ))
+        ],
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
@@ -289,37 +289,37 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setSettings(array(
+      ->setSettings([
         'default_value' => '',
         'max_length' => 255,
-      ))
-      ->setDisplayOptions('view', array(
+      ])
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => -5,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
-      ->addConstraint('ProductSku', array())
+      ->addConstraint('ProductSku', [])
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -339,16 +339,16 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDefaultValue(TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setSettings(array(
+      ->setSettings([
         'default_value' => 1,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'weight' => 10,
-        'settings' => array(
+        'settings' => [
           'display_label' => TRUE
-        )
-      ))
+        ]
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -356,15 +356,15 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDescription(t('The time that the product was created.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
@@ -378,13 +378,13 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDescription(t('The log entry explaining the changes in this revision.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'string_textarea',
         'weight' => 25,
-        'settings' => array(
+        'settings' => [
           'rows' => 4,
-        ),
-      ));
+        ],
+      ]);
 
     return $fields;
   }
@@ -413,7 +413,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    *   An array of default values.
    */
   public static function getCurrentUserId() {
-    return array(\Drupal::currentUser()->id());
+    return [\Drupal::currentUser()->id()];
   }
 
 }

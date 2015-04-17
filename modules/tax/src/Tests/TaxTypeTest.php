@@ -27,12 +27,12 @@ class TaxTypeTest extends CommerceTaxTestBase {
    * Checks the tax type add form.
    */
   protected function checkTaxTypeAddForm($name) {
-    $edit = array(
+    $edit = [
       'id' => $name,
       'name' => 'Test type',
       'roundingMode' => '1',
       'tag' => 'test',
-    );
+    ];
 
     $this->assertFalse((bool) entity_load('commerce_tax_type', $name));
     $this->drupalPostForm('admin/commerce/config/tax/type/add', $edit, t('Save'));
@@ -40,12 +40,12 @@ class TaxTypeTest extends CommerceTaxTestBase {
   }
 
   protected function checkTaxTypeEditForm($name) {
-    $edit = array(
+    $edit = [
       'id' => $name,
       'name' => 'Test type',
       'roundingMode' => '2',
       'tag' => 'test',
-    );
+    ];
 
     $this->assertFalse(entity_load('commerce_tax_type', $name)->getRoundingMode() === 2);
     $this->drupalPostForm('admin/commerce/config/tax/type/' . $name . '/edit', $edit, t('Save'));
@@ -53,9 +53,9 @@ class TaxTypeTest extends CommerceTaxTestBase {
   }
 
   protected function checkTaxTypeDeleteForm($name) {
-    $edit = array(
+    $edit = [
       'confirm' => '1',
-    );
+    ];
 
     $this->assertTrue((bool) entity_load('commerce_tax_type', $name));
     $this->drupalPostForm('admin/commerce/config/tax/type/' . $name . '/delete', $edit, t('Delete'));

@@ -37,33 +37,33 @@ class CurrencyImporterForm extends FormBase {
     $currencies = $this->currencyImporter->getImportableCurrencies();
 
     if (!$currencies) {
-      $form['message'] = array(
+      $form['message'] = [
         '#markup' => $this->t('All currencies are already imported.'),
-      );
+      ];
     }
     else {
-      $form['currency_code'] = array(
+      $form['currency_code'] = [
         '#type' => 'select',
         '#title' => $this->t('Currency code'),
         '#description' => $this->t('Please select the currency you would like to import.'),
         '#required' => TRUE,
         '#options' => $this->getCurrencyOptions($currencies),
-      );
+      ];
 
       $form['actions']['#type'] = 'actions';
-      $form['actions']['import'] = array(
+      $form['actions']['import'] = [
         '#type' => 'submit',
         '#button_type' => 'primary',
         '#name' => 'import',
         '#value' => $this->t('Import'),
-        '#submit' => array('::submitForm'),
-      );
-      $form['actions']['import_new'] = array(
+        '#submit' => ['::submitForm'],
+      ];
+      $form['actions']['import_new'] = [
         '#type' => 'submit',
         '#name' => 'import_and_new',
         '#value' => $this->t('Import and new'),
-        '#submit' => array('::submitForm'),
-      );
+        '#submit' => ['::submitForm'],
+      ];
     }
 
     return $form;
@@ -79,7 +79,7 @@ class CurrencyImporterForm extends FormBase {
    *   The list of options for a select widget.
    */
   public function getCurrencyOptions(array $currencies) {
-    $options = array();
+    $options = [];
     foreach ($currencies as $currency_code => $currency) {
       $options[$currency_code] = $currency->getName();
     }
@@ -100,7 +100,7 @@ class CurrencyImporterForm extends FormBase {
     try {
       $currency->save();
       drupal_set_message(
-        $this->t('Imported the %label currency.', array('%label' => $currency->label()))
+        $this->t('Imported the %label currency.', ['%label' => $currency->label()])
       );
       $triggeringElement = $form_state->getTriggeringElement();
       if ($triggeringElement['#name'] == 'import_and_new') {
@@ -111,7 +111,7 @@ class CurrencyImporterForm extends FormBase {
       }
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label currency was not imported.', array('%label' => $currency->label())), 'error');
+      drupal_set_message($this->t('The %label currency was not imported.', ['%label' => $currency->label()]), 'error');
       $this->logger('commerce_price')->error($e);
       $form_state->setRebuild();
     }

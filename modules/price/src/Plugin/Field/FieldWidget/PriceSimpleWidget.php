@@ -29,7 +29,7 @@ class PriceSimpleWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Get the enabled currencies.
-    $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', array('status' => 1));
+    $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', ['status' => 1]);
     $currency_codes = array_keys($enabledCurrencies);
 
     $default_amount = NULL;
@@ -39,27 +39,27 @@ class PriceSimpleWidget extends WidgetBase {
       // displayed (fx 123.00 for EUR). For now this should be enough.
       $default_amount = rtrim($items[$delta]->amount, 0);
     }
-    $element['amount'] = array(
+    $element['amount'] = [
       '#type' => 'textfield',
       '#title' => $element['#title'],
       '#default_value' => $default_amount,
       '#required' => $element['#required'],
       '#size' => 10,
       '#maxlength' => 255,
-      '#attached' => array(
-        'library' => array(
+      '#attached' => [
+        'library' => [
           'commerce_price/drupal.commerce_price.simple-widget',
-        ),
-      ),
-    );
-    $element['currency_code'] = array(
+        ],
+      ],
+    ];
+    $element['currency_code'] = [
       '#type' => 'select',
       '#title' => $this->t('Currency code'),
       '#default_value' => isset($items[$delta]->currency_code) ? $items[$delta]->currency_code : NULL,
       '#required' => $element['#required'],
       '#options' => array_combine($currency_codes, $currency_codes),
       '#title_display' => 'invisible',
-    );
+    ];
 
     return $element;
   }

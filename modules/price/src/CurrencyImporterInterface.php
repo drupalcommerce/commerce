@@ -50,6 +50,6 @@ interface CurrencyImporterInterface {
    * @return \Drupal\commerce_price\Entity\Currency | bool
    *   The currency entity or false if the site is not multilingual.
    */
-  public function importCurrencyTranslations($currencies = array(), $languages = array());
+  public function importCurrencyTranslations($currencies = [], $languages = []);
 
 }

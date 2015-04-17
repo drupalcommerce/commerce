@@ -45,34 +45,34 @@ class TaxTypeImporterForm extends FormBase {
     $taxTypes = $this->taxTypeImporter->getImportableTaxTypes();
 
     if (!$taxTypes) {
-      $form['message'] = array(
+      $form['message'] = [
         '#markup' => $this->t('All tax types are already imported'),
-      );
+      ];
       return $form;
     }
 
-    $form['tax_type'] = array(
+    $form['tax_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Tax type'),
       '#description' => $this->t('Please select the tax type you would like to import.'),
       '#required' => TRUE,
       '#options' => $this->getTaxTypeOptions($taxTypes),
-    );
+    ];
 
     $form['actions']['#type'] = 'actions';
-    $form['actions']['import'] = array(
+    $form['actions']['import'] = [
       '#type' => 'submit',
       '#button_type' => 'primary',
       '#name' => 'import',
       '#value' => $this->t('Import'),
-      '#submit' => array('::submitForm'),
-    );
-    $form['actions']['import_new'] = array(
+      '#submit' => ['::submitForm'],
+    ];
+    $form['actions']['import_new'] = [
       '#type' => 'submit',
       '#name' => 'import_and_new',
       '#value' => $this->t('Import and new'),
-      '#submit' => array('::submitForm'),
-    );
+      '#submit' => ['::submitForm'],
+    ];
 
     return $form;
   }
@@ -87,7 +87,7 @@ class TaxTypeImporterForm extends FormBase {
    *   The list of options for a select widget.
    */
   public function getTaxTypeOptions($taxTypes) {
-    $options = array();
+    $options = [];
     foreach ($taxTypes as $taxType) {
       $options[$taxType->getId()] = $taxType->getName();
     }
@@ -106,7 +106,7 @@ class TaxTypeImporterForm extends FormBase {
     try {
       $taxType->save();
       drupal_set_message(
-        $this->t('Imported the %label tax type.', array('%label' => $taxType->label()))
+        $this->t('Imported the %label tax type.', ['%label' => $taxType->label()])
       );
       $triggeringElement['#name'] = $form_state->getTriggeringElement();
       if ($triggeringElement['#name'] == 'import_and_new') {
@@ -117,7 +117,7 @@ class TaxTypeImporterForm extends FormBase {
       }
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label tax type was not imported.', array('%label' => $taxType->label())), 'error');
+      drupal_set_message($this->t('The %label tax type was not imported.', ['%label' => $taxType->label()]), 'error');
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();
     }

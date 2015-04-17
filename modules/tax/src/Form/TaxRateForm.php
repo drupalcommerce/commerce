@@ -58,38 +58,38 @@ class TaxRateForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $taxRate = $this->entity;
 
-    $form['type'] = array(
+    $form['type'] = [
       '#type' => 'hidden',
       '#value' => $taxRate->getType(),
-    );
-    $form['id'] = array(
+    ];
+    $form['id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Machine name'),
       '#default_value' => $taxRate->getId(),
-      '#element_validate' => array('::validateId'),
+      '#element_validate' => ['::validateId'],
       '#description' => $this->t('Only lowercase, underscore-separated letters allowed.'),
       '#pattern' => '[a-z_]+',
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['name'] = array(
+    ];
+    $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#default_value' => $taxRate->getName(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['displayName'] = array(
+    ];
+    $form['displayName'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Display name'),
       '#default_value' => $taxRate->getDisplayName(),
-    );
-    $form['default'] = array(
+    ];
+    $form['default'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Default'),
       '#default_value' => $taxRate->isDefault(),
-      '#element_validate' => array('::validateDefault'),
-    );
+      '#element_validate' => ['::validateDefault'],
+    ];
 
     return $form;
   }
@@ -104,9 +104,9 @@ class TaxRateForm extends EntityForm {
       $form_state->setError($element, $this->t('The machine name must be in lowercase, underscore-separated letters only.'));
     }
     elseif ($taxRate->isNew()) {
-      $loadedTaxRates = $this->taxRateStorage->loadByProperties(array(
+      $loadedTaxRates = $this->taxRateStorage->loadByProperties([
         'id' => $id,
-      ));
+      ]);
       if ($loadedTaxRates) {
         $form_state->setError($element, $this->t('The machine name is already in use.'));
       }
@@ -120,14 +120,14 @@ class TaxRateForm extends EntityForm {
     $taxRate = $this->getEntity();
     $default = $element['#value'];
     if ($default) {
-      $loadedTaxRates = $this->taxRateStorage->loadByProperties(array(
+      $loadedTaxRates = $this->taxRateStorage->loadByProperties([
         'type' => $form_state->getValue('type'),
-      ));
+      ]);
       foreach ($loadedTaxRates as $rate) {
         if ($rate->getId() !== $taxRate->getId() && $rate->isDefault()) {
-          $form_state->setError($element, $this->t('Tax rate %label is already the default.', array(
+          $form_state->setError($element, $this->t('Tax rate %label is already the default.', [
             '%label' => $rate->label(),
-          )));
+          ]));
           break;
         }
       }
@@ -142,9 +142,9 @@ class TaxRateForm extends EntityForm {
 
     try {
       $taxRate->save();
-      drupal_set_message($this->t('Saved the %label tax rate.', array(
+      drupal_set_message($this->t('Saved the %label tax rate.', [
         '%label' => $taxRate->label(),
-      )));
+      ]));
 
       $taxType = $this->taxTypeStorage->load($taxRate->getType());
       try {
@@ -153,23 +153,23 @@ class TaxRateForm extends EntityForm {
           $taxType->save();
         }
 
-        $form_state->setRedirect('entity.commerce_tax_rate.collection', array(
+        $form_state->setRedirect('entity.commerce_tax_rate.collection', [
           'commerce_tax_type' => $taxType->getId(),
-        ));
+        ]);
       }
       catch (\Exception $e) {
-        drupal_set_message($this->t('The %label tax type was not saved.', array(
+        drupal_set_message($this->t('The %label tax type was not saved.', [
           '%label' => $taxType->label(),
-        )));
+        ]));
         $this->logger('commerce_tax')->error($e);
         $form_state->setRebuild();
       }
 
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label tax rate was not saved.', array(
+      drupal_set_message($this->t('The %label tax rate was not saved.', [
         '%label' => $taxRate->label()
-      )), 'error');
+      ]), 'error');
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();
     }

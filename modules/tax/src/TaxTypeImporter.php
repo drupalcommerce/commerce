@@ -100,14 +100,14 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
       return;
     }
 
-    $values = array(
+    $values = [
       'id' => $taxType->getId(),
       'name' => $this->t($taxType->getName()),
       'compound' => $taxType->isCompound(),
       'roundingMode' => $taxType->getRoundingMode(),
       'tag' => $taxType->getTag(),
       'rates' => array_keys($taxType->getRates()),
-    );
+    ];
 
     return $this->taxTypeStorage->create($values);
   }
@@ -119,14 +119,14 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
    *   The tax rate to import.
    */
   public function importTaxRate(TaxRateInterface $taxRate) {
-    $values = array(
+    $values = [
       'type' => $taxRate->getType()->getId(),
       'id' => $taxRate->getId(),
       'name' => $this->t($taxRate->getName()),
       'displayName' => $this->t($taxRate->getDisplayName()),
       'default' => $taxRate->isDefault(),
       'amounts' => array_keys($taxRate->getAmounts()),
-    );
+    ];
 
     return $this->taxRateStorage->create($values);
   }
@@ -140,13 +140,13 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
   protected function importTaxRateAmount(TaxRateAmountInterface $taxRateAmount) {
     $startDate = $taxRateAmount->getStartDate() ? $taxRateAmount->getStartDate()->getTimestamp() : NULL;
     $endDate = $taxRateAmount->getEndDate() ? $taxRateAmount->getEndDate()->getTimestamp() : NULL;
-    $values = array(
+    $values = [
       'rate' => $taxRateAmount->getRate()->getId(),
       'id' => $taxRateAmount->getId(),
       'amount' => $taxRateAmount->getAmount(),
       'startDate' => $startDate,
       'endDate' => $endDate,
-    );
+    ];
 
     return $this->taxRateAmountStorage->create($values);
   }

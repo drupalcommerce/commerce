@@ -23,10 +23,10 @@ class TaxRateDeleteForm extends EntityDeleteForm {
     try {
       $this->entity->delete();
       $form_state->setRedirectUrl($this->getCancelUrl());
-      drupal_set_message($this->t('Tax rate %label has been deleted.', array('%label' => $this->entity->label())));
+      drupal_set_message($this->t('Tax rate %label has been deleted.', ['%label' => $this->entity->label()]));
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('Tax rate %label could not be deleted.', array('%label' => $this->entity->label())), 'error');
+      drupal_set_message($this->t('Tax rate %label could not be deleted.', ['%label' => $this->entity->label()]), 'error');
       $this->logger('commerce_tax')->error($e);
     }
   }

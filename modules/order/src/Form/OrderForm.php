@@ -19,10 +19,10 @@ class OrderForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     try {
       $this->entity->save();
-      drupal_set_message($this->t('The order %order_label has been successfully saved.', array('%order_label' => $this->entity->label())));
+      drupal_set_message($this->t('The order %order_label has been successfully saved.', ['%order_label' => $this->entity->label()]));
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The order %order_label could not be saved.', array('%order_label' => $this->entity->label())), 'error');
+      drupal_set_message($this->t('The order %order_label could not be saved.', ['%order_label' => $this->entity->label()]), 'error');
       $this->logger('commerce_order')->error($e);
     }
     $form_state->setRedirect('entity.commerce_order.collection');
@@ -36,63 +36,63 @@ class OrderForm extends ContentEntityForm {
     $order = $this->entity;
     $currentUser = $this->currentUser();
 
-    $form['advanced'] = array(
+    $form['advanced'] = [
       '#type' => 'vertical_tabs',
-      '#attributes' => array('class' => array('entity-meta')),
+      '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
-    );
+    ];
     $form = parent::form($form, $form_state);
 
-    $form['order_status'] = array(
+    $form['order_status'] = [
       '#type' => 'details',
       '#title' => t('Order status'),
       '#group' => 'advanced',
-      '#attributes' => array(
-        'class' => array('order-form-order-status'),
-      ),
-      '#attached' => array(
-        'library' => array('commerce_order/drupal.commerce_order'),
-      ),
+      '#attributes' => [
+        'class' => ['order-form-order-status'],
+      ],
+      '#attached' => [
+        'library' => ['commerce_order/drupal.commerce_order'],
+      ],
       '#weight' => 90,
       '#optional' => TRUE,
-    );
+    ];
 
     if (isset($form['status'])) {
       $form['status']['#group'] = 'order_status';
     }
 
-    $form['revision'] = array(
+    $form['revision'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $order->isNewRevision(),
       '#access' => $currentUser->hasPermission('administer products'),
       '#group' => 'order_status',
       '#weight' => 10,
-    );
+    ];
 
-    $form['revision_log'] += array(
-      '#states' => array(
-        'visible' => array(
-          ':input[name="revision"]' => array('checked' => TRUE),
-        ),
-      ),
+    $form['revision_log'] += [
+      '#states' => [
+        'visible' => [
+          ':input[name="revision"]' => ['checked' => TRUE],
+        ],
+      ],
       '#group' => 'order_status',
-    );
+    ];
 
     // Order authoring information for administrators.
-    $form['author'] = array(
+    $form['author'] = [
       '#type' => 'details',
       '#title' => t('Authoring information'),
       '#group' => 'advanced',
-      '#attributes' => array(
-        'class' => array('order-form-author'),
-      ),
-      '#attached' => array(
-        'library' => array('commerce_order/drupal.commerce_order'),
-      ),
+      '#attributes' => [
+        'class' => ['order-form-author'],
+      ],
+      '#attached' => [
+        'library' => ['commerce_order/drupal.commerce_order'],
+      ],
       '#weight' => 91,
       '#optional' => TRUE,
-    );
+    ];
 
     if (isset($form['uid'])) {
       $form['uid']['#group'] = 'author';

@@ -57,9 +57,9 @@ class TaxRateAmountListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function load() {
-    return $this->storage->loadByProperties(array(
+    return $this->storage->loadByProperties([
       'rate' => $this->taxRate,
-    ));
+    ]);
   }
 
 }

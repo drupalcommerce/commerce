@@ -35,13 +35,13 @@ class StoreForm extends ContentEntityForm {
       $is_default_store = TRUE;
       $disabled = TRUE;
     }
-    $form['is_default_store'] = array(
+    $form['is_default_store'] = [
       '#type' => 'checkbox',
       '#title' => t('Default store'),
       '#default_value' => $is_default_store,
       '#disabled' => $disabled,
       '#weight' => 0,
-    );
+    ];
 
     return $form;
   }
@@ -56,9 +56,9 @@ class StoreForm extends ContentEntityForm {
       if (!$form_state->isValueEmpty('is_default_store') && $form_state->getValue('is_default_store') != FALSE) {
         \Drupal::configFactory()->getEditable('commerce_store.settings')->set('default_store', $this->entity->uuid())->save();
       }
-      drupal_set_message($this->t('Saved the %label store.', array(
+      drupal_set_message($this->t('Saved the %label store.', [
         '%label' => $this->entity->label(),
-      )));
+      ]));
     }
     catch (\Exception $e) {
       drupal_set_message($this->t('The store could not be saved.'), 'error');

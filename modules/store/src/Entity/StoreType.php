@@ -91,9 +91,9 @@ class StoreType extends ConfigEntityBundleBase implements StoreTypeInterface {
    */
   public function delete() {
     if (!$this->access('delete')) {
-      throw new EntityStorageException(strtr("Store Type %type may not be deleted.", array(
+      throw new EntityStorageException(strtr("Store Type %type may not be deleted.", [
         '%type' => SafeMarkup::checkPlain($this->entityTypeId),
-      )));
+      ]));
     }
     parent::delete();
   }

@@ -9,7 +9,7 @@ function commerce_price_install() {
   /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
   $currency_importer = \Drupal::service('commerce_price.currency_importer');
   // A list of currencies to import and enable by default.
-  $preloaded_currencies = array('USD', 'EUR', 'GBP');
+  $preloaded_currencies = ['USD', 'EUR', 'GBP'];
 
   foreach ($preloaded_currencies as $currency_code) {
     $entity = $currency_importer->importCurrency($currency_code);
@@ -37,14 +37,14 @@ function commerce_price_install() {
  * Check that the Commerce Guys' Libraries have been installed.
  */
 function commerce_price_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
 
   if ($phase == 'install') {
     if (!class_exists('\CommerceGuys\Intl\Currency\CurrencyRepository')) {
-      $requirements['commerce_price_library'] = array(
+      $requirements['commerce_price_library'] = [
         'description' => t("Commerce Price requires the commerceguys/intl library."),
         'severity' => REQUIREMENT_ERROR,
-      );
+      ];
     }
   }
 

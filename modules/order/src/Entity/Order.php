@@ -58,9 +58,9 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public static function preCreate(EntityStorageInterface $storageController, array &$values) {
     parent::preCreate($storageController, $values);
-    $values += array(
+    $values += [
       'uid' => \Drupal::currentUser()->id(),
-    );
+    ];
   }
 
   /**
@@ -279,7 +279,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function setLineItems($lineItems) {
-    $this->set('line_items', array($lineItems));
+    $this->set('line_items', [$lineItems]);
     return $this;
   }
 
@@ -325,7 +325,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function setData($data) {
-    $this->set('data', array($data));
+    $this->set('data', [$data]);
     return $this;
   }
 
@@ -346,15 +346,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'hidden',
         'weight' => 0,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
@@ -383,11 +383,11 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 0,
-        'settings' => array(),
-      ))
+        'settings' => [],
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -399,21 +399,21 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder::getCurrentUserId')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
-        'settings' => array(
+        'settings' => [
           'match_operator' => 'CONTAINS',
           'size' => '60',
           'autocomplete_type' => 'tags',
           'placeholder' => '',
-        ),
-      ))
+        ],
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
@@ -421,15 +421,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The e-mail address associated with the order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'email_default',
         'weight' => 1,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('string')
@@ -439,15 +439,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'hidden',
         'weight' => -1,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -456,15 +456,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
@@ -485,15 +485,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The IP address that created this order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 128)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'hidden',
         'weight' => 0,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['data'] = BaseFieldDefinition::create('map')
@@ -518,13 +518,13 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The log entry explaining the changes in this revision.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'string_textarea',
         'weight' => 25,
-        'settings' => array(
+        'settings' => [
           'rows' => 4,
-        ),
-      ));
+        ],
+      ]);
 
     return $fields;
   }
@@ -538,7 +538,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    *   An array of default values.
    */
   public static function getCurrentUserId() {
-    return array(\Drupal::currentUser()->id());
+    return [\Drupal::currentUser()->id()];
   }
 
 }

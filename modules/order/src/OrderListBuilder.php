@@ -58,58 +58,53 @@ class OrderListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header = array(
-      'order_id' => array(
+    $header = [
+      'order_id' => [
         'data' => $this->t('Order ID'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-      'type' => array(
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+      'type' => [
         'data' => $this->t('Order type'),
-        'class' => array(RESPONSIVE_PRIORITY_MEDIUM),
-      ),
-      'owner' => array(
+        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      ],
+      'owner' => [
         'data' => $this->t('Owner'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
       'status' => $this->t('Status'),
-      'created' => array(
+      'created' => [
         'data' => $this->t('Created'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-      'updated' => array(
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+      'updated' => [
         'data' => $this->t('Updated'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-    );
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+    ];
+
     return $header + parent::buildHeader();
   }
+
   /**
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_order\Entity\Order */
-    $commerceOrderType = OrderType::load($entity->bundle());
-
-    if (!empty($commerceOrderType)) {
-      $type = SafeMarkup::checkPlain($commerceOrderType->label());
-    }
-    else {
-      $type = SafeMarkup::checkPlain($entity->bundle());
-    }
-
-    $row = array(
+    $orderType = OrderType::load($entity->bundle());
+    $row = [
       'order_id' => $entity->id(),
-      'type' => $type,
-      'owner' => array(
-        'data' => array(
+      'type' => SafeMarkup::checkPlain($orderType->label()),
+      'owner' => [
+        'data' => [
           '#theme' => 'username',
           '#account' => $entity->getOwner(),
-        ),
-      ),
+        ],
+      ],
       'status' => $entity->getStatus(),
       'created' => $this->dateFormatter->format($entity->getCreatedTime(), 'short'),
       'changed' => $this->dateFormatter->format($entity->getChangedTime(), 'short'),
-    );
+    ];
+
     return $row + parent::buildRow($entity);
   }
 

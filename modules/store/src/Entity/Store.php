@@ -169,35 +169,35 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDescription(t('The user that owns this store.'))
       ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
       ->setSetting('target_type', 'user')
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 50,
-      ));
+      ]);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of store.'))
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'type' => 'hidden',
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'language_select',
         'weight' => 2,
-      ));
+      ]);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Store name'))
       ->setDescription(t('The name of the store.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setSettings(array(
+      ->setSettings([
         'default_value' => '',
         'max_length' => 255,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -10,
-      ));
+      ]);
 
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
@@ -208,10 +208,10 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setLabel(t('E-mail address'))
       ->setDescription(t('A valid e-mail address. Store e-mail notifications will be sent to and from this address.'))
       ->setRequired(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'email_default',
         'weight' => 0,
-      ));
+      ]);
 
     $fields['default_currency'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Default currency'))
@@ -222,11 +222,11 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setSetting('target_type', 'commerce_currency')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 10,
-        'settings' => array(),
-      ));
+        'settings' => [],
+      ]);
 
     return $fields;
   }
@@ -240,7 +240,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    *   An array of default values.
    */
   public static function getCurrentUserId() {
-    return array(\Drupal::currentUser()->id());
+    return [\Drupal::currentUser()->id()];
   }
 
 }

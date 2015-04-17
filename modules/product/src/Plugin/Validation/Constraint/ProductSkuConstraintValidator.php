@@ -30,7 +30,7 @@ class ProductSkuConstraintValidator extends ConstraintValidator {
         ->execute();
 
       if ($skuExists) {
-        $this->context->addViolation($constraint->message, array('%sku' => $sku));
+        $this->context->addViolation($constraint->message, ['%sku' => $sku]);
       }
     }
   }

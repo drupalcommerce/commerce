@@ -20,7 +20,7 @@ abstract class StoreTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('commerce', 'commerce_store');
+  public static $modules = ['commerce', 'commerce_store'];
 
   /**
    * User with permission to administer the commerce store.
@@ -33,13 +33,12 @@ abstract class StoreTestBase extends WebTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $permissions = array(
+    $permissions = [
       'view the administration theme',
       'administer store types',
       'administer stores',
       'configure store',
-    );
-
+    ];
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
   }
@@ -59,14 +58,7 @@ abstract class StoreTestBase extends WebTestBase {
   protected function createEntity($entityType, array $values) {
     $entity = entity_create($entityType, $values);
     $status = $entity->save();
-
-    $this->assertEqual(
-      $status,
-      SAVED_NEW,
-      SafeMarkup::format('Created %label entity %type.',
-        array('%label' => $entity->getEntityType()->getLabel(), '%type' => $entity->id())
-      )
-    );
+    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', ['%label' => $entity->getEntityType()->getLabel(), '%type' => $entity->id()]));
 
     return $entity;
   }

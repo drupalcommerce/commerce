@@ -53,11 +53,12 @@ class OrderTypeDeleteForm extends EntityDeleteForm {
       ->count()
       ->execute();
     if ($numOrders) {
-      $caption = '<p>' . $this->formatPlural($numOrders, '%type is used by 1 order on your site. You can not remove this order type until you have removed all of the %type orders.', '%type is used by @count orders on your site. You may not remove %type until you have removed all of the %type orders.', array('%type' => $this->entity->label())) . '</p>';
+      $caption = '<p>' . $this->formatPlural($numOrders, '%type is used by 1 order on your site. You can not remove this order type until you have removed all of the %type orders.', '%type is used by @count orders on your site. You may not remove %type until you have removed all of the %type orders.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
-      $form['description'] = array('#markup' => $caption);
+      $form['description'] = ['#markup' => $caption];
       return $form;
     }
+
     return parent::buildForm($form, $form_state);
   }
 

@@ -25,7 +25,7 @@ class ProductController extends ControllerBase {
    *   The page title
    */
   public function editPageTitle(ProductInterface $commerce_product) {
-    return $this->t('Editing @label', array('@label' => $commerce_product->label()));
+    return $this->t('Editing @label', ['@label' => $commerce_product->label()]);
   }
 
   /**

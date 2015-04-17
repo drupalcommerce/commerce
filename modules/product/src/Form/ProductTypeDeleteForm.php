@@ -53,10 +53,9 @@ class ProductTypeDeleteForm extends EntityDeleteForm {
       ->count()
       ->execute();
     if ($numProducts) {
-      $caption = '<p>' . $this->formatPlural($numProducts, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', array('%type' => $this->entity->label())) . '</p>';
-
+      $caption = '<p>' . $this->formatPlural($numProducts, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
-      $form['description'] = array('#markup' => $caption);
+      $form['description'] = ['#markup' => $caption];
       return $form;
     }
 

@@ -58,29 +58,30 @@ class LineItemListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header = array(
-      'line_item_id' => array(
+    $header = [
+      'line_item_id' => [
         'data' => $this->t('Line Item ID'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-      'type' => array(
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+      'type' => [
         'data' => $this->t('Line item type'),
-        'class' => array(RESPONSIVE_PRIORITY_MEDIUM),
-      ),
-      'owner' => array(
+        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      ],
+      'owner' => [
         'data' => $this->t('Owner'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
       'status' => $this->t('Status'),
-      'created' => array(
+      'created' => [
         'data' => $this->t('Created'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-      'updated' => array(
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+      'updated' => [
         'data' => $this->t('Updated'),
-        'class' => array(RESPONSIVE_PRIORITY_LOW),
-      ),
-    );
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
+    ];
+
     return $header + parent::buildHeader();
   }
   /**
@@ -88,28 +89,21 @@ class LineItemListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_line_item\Entity\LineItem */
-    $commerceLineItemType = LineItemType::load($entity->bundle());
-
-    if (!empty($commerceLineItemType)) {
-      $type = SafeMarkup::checkPlain($commerceLineItemType->label());
-    }
-    else {
-      $type = SafeMarkup::checkPlain($entity->bundle());
-    }
-
-    $row = array(
+    $lineItemType = LineItemType::load($entity->bundle());
+    $row = [
       'line_item_id' => $entity->id(),
-      'type' => $type,
-      'owner' => array(
-        'data' => array(
+      'type' => SafeMarkup::checkPlain($lineItemType->label()),
+      'owner' => [
+        'data' => [
           '#theme' => 'username',
           '#account' => $entity->getOwner(),
-        ),
-      ),
+        ],
+      ],
       'status' => $entity->getStatus(),
       'created' => $this->dateFormatter->format($entity->getCreatedTime(), 'short'),
       'changed' => $this->dateFormatter->format($entity->getChangedTime(), 'short'),
-    );
+    ];
+
     return $row + parent::buildRow($entity);
   }
 

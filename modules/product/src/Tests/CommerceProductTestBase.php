@@ -20,7 +20,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  public static $modules = [
     'commerce',
     'commerce_store',
     'commerce_product',
@@ -28,7 +28,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
     'field_ui',
     'options',
     'entity_reference'
-  );
+  ];
 
   /**
    * User with permission to administer products.
@@ -50,27 +50,27 @@ abstract class CommerceProductTestBase extends WebTestBase {
     // Create a commerce store.
     $name = strtolower($this->randomMachineName(8));
 
-    $store_type = $this->createEntity('commerce_store_type', array(
+    $store_type = $this->createEntity('commerce_store_type', [
         'id' => 'foo',
         'label' => 'Label of foo',
-      )
+      ]
     );
 
-    $this->commerce_store = $this->createEntity('commerce_store', array(
+    $this->commerce_store = $this->createEntity('commerce_store', [
         'type' => $store_type->id(),
         'name' => $name,
         'mail' => \Drupal::currentUser()->getEmail(),
         'default_currency' => 'EUR',
-      )
+      ]
     );
 
     $this->adminUser = $this->drupalCreateUser(
-      array(
+      [
         'administer products',
         'administer product types',
         'administer commerce_product fields',
         'access administration pages',
-      )
+      ]
     );
     $this->drupalLogin($this->adminUser);
   }
@@ -92,12 +92,9 @@ abstract class CommerceProductTestBase extends WebTestBase {
     $this->assertEqual(
       $status,
       SAVED_NEW,
-      SafeMarkup::format(
-        'Created %label entity %type.',
-        array(
+      SafeMarkup::format('Created %label entity %type.', [
           '%label' => $entity->getEntityType()->getLabel(),
-          '%type' => $entity->id()
-        )
+          '%type' => $entity->id()]
       )
     );
 

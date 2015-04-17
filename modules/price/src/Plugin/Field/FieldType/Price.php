@@ -43,21 +43,21 @@ class Price extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $fieldDefinition) {
-    return array(
-      'columns' => array(
-        'amount' => array(
+    return [
+      'columns' => [
+        'amount' => [
           'description' => 'The price amount.',
           'type' => 'numeric',
           'precision' => 19,
           'scale' => 6,
-        ),
-        'currency_code' => array(
+        ],
+        'currency_code' => [
           'description' => 'The currency code for the price.',
           'type' => 'varchar',
           'length' => 3,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**

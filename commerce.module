@@ -9,33 +9,32 @@
  * Implements hook_theme().
  */
 function commerce_theme() {
-  return array(
-    'commerce_add_list' => array(
-      'variables' => array(
-        'bundles' => array(),
+  return [
+    'commerce_add_list' => [
+      'variables' => [
+        'bundles' => [],
         'bundle_type' => NULL,
         'form_route_name' => NULL
-      ),
+      ],
       'file' => 'commerce.pages.inc',
       'template' => 'commerce-add-list',
-    ),
-  );
+    ],
+  ];
 }
 
 /**
  * Implements hook_toolbar().
  */
 function commerce_toolbar() {
-  $items = array();
-
-  $items['commerce'] = array(
+  $items = [];
+  $items['commerce'] = [
     '#type' => 'toolbar_item',
-    '#attached' => array(
-      'library' => array(
+    '#attached' => [
+      'library' => [
         'commerce/drupal.commerce.toolbar',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $items;
 }

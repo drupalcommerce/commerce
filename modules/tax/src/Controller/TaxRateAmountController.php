@@ -42,7 +42,7 @@ class TaxRateAmountController extends ControllerBase {
    *   The list of commerce_tax_rate_amounts.
    */
   public function buildList($commerce_tax_rate) {
-    $build = array();
+    $build = [];
     $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate_amount');
 
     $build['commerce_tax_rate_amounts_table'] = $listBuilder->setTaxRate($commerce_tax_rate)->render();

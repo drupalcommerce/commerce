@@ -50,7 +50,7 @@ class NumberFormatForm extends EntityForm {
     /** @var \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $numberFormat */
     $numberFormat = $this->entity;
 
-    $form['locale'] = array(
+    $form['locale'] = [
       '#type' => 'machine_name',
       '#title' => $this->t('Locale'),
       '#description' => t('A unique machine-readable name. Can only contain letters and dashes'),
@@ -59,106 +59,106 @@ class NumberFormatForm extends EntityForm {
       '#maxlength' => 10,
       '#size' => 10,
       '#required' => TRUE,
-      '#machine_name' => array(
-        'exists' => array($this->numberFormatStorage, 'load'),
+      '#machine_name' => [
+        'exists' => [$this->numberFormatStorage, 'load'],
         'replace_pattern' => '[^A-Za-z_]+',
-      ),
+      ],
       '#disabled' => !$numberFormat->isNew(),
-    );
-    $form['name'] = array(
+    ];
+    $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#maxlength' => 30,
       '#size' => 30,
       '#default_value' => $numberFormat->getName(),
       '#required' => TRUE,
-    );
-    $form['numberingSystem'] = array(
+    ];
+    $form['numberingSystem'] = [
       '#type' => 'select',
       '#title' => $this->t('Numbering system'),
       '#maxlength' => 255,
       '#default_value' => $numberFormat->getNumberingSystem() ? $numberFormat->getNumberingSystem() : 'latn',
-      '#options' => array(
+      '#options' => [
         NumberFormatInterface::NUMBERING_SYSTEM_ARABIC => $this->t('Arabic'),
         NumberFormatInterface::NUMBERING_SYSTEM_ARABIC_EXTENDED => $this->t('Arabic Extended'),
         NumberFormatInterface::NUMBERING_SYSTEM_BENGALI => $this->t('Bengali'),
         NumberFormatInterface::NUMBERING_SYSTEM_DEVANAGARI => $this->t('Devanagari'),
         NumberFormatInterface::NUMBERING_SYSTEM_LATIN => $this->t('Latin')
-      ),
+      ],
       '#required' => TRUE,
-    );
-    $form['decimalSeparator'] = array(
+    ];
+    $form['decimalSeparator'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Decimal separator'),
       '#maxlength' => 5,
       '#size' => 5,
       '#default_value' => $numberFormat->getDecimalSeparator() ? $numberFormat->getDecimalSeparator() : '.',
       '#required' => TRUE,
-    );
-    $form['groupingSeparator'] = array(
+    ];
+    $form['groupingSeparator'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Grouping separator'),
       '#maxlength' => 5,
       '#size' => 5,
       '#default_value' => $numberFormat->getGroupingSeparator() ? $numberFormat->getGroupingSeparator() : ',',
       '#required' => TRUE,
-    );
-    $form['plusSign'] = array(
+    ];
+    $form['plusSign'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Plug sign'),
       '#maxlength' => 5,
       '#size' => 5,
       '#default_value' => $numberFormat->getPlusSign() ? $numberFormat->getPlusSign() : '=',
       '#required' => TRUE,
-    );
-    $form['minusSign'] = array(
+    ];
+    $form['minusSign'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Minus sign'),
       '#maxlength' => 5,
       '#size' => 5,
       '#default_value' => $numberFormat->getMinusSign() ? $numberFormat->getMinusSign() : '-',
       '#required' => TRUE,
-    );
-    $form['percentSign'] = array(
+    ];
+    $form['percentSign'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Percent sign'),
       '#maxlength' => 5,
       '#size' => 5,
       '#default_value' => $numberFormat->getPercentSign() ? $numberFormat->getPercentSign() : '%',
       '#required' => TRUE,
-    );
-    $form['decimalPattern'] = array(
+    ];
+    $form['decimalPattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Decimal pattern'),
       '#maxlength' => 30,
       '#size' => 30,
       '#default_value' => $numberFormat->getDecimalPattern(),
       '#required' => TRUE,
-    );
-    $form['percentPattern'] = array(
+    ];
+    $form['percentPattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Percent pattern'),
       '#maxlength' => 30,
       '#size' => 30,
       '#default_value' => $numberFormat->getPercentPattern(),
       '#required' => TRUE,
-    );
-    $form['currencyPattern'] = array(
+    ];
+    $form['currencyPattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency pattern'),
       '#maxlength' => 30,
       '#size' => 30,
       '#default_value' => $numberFormat->getCurrencyPattern(),
       '#required' => TRUE,
-    );
-    $form['accountingCurrencyPattern'] = array(
+    ];
+    $form['accountingCurrencyPattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Accounting currency pattern'),
       '#maxlength' => 30,
       '#size' => 30,
       '#default_value' => $numberFormat->getAccountingCurrencyPattern(),
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }
@@ -171,13 +171,13 @@ class NumberFormatForm extends EntityForm {
 
     try {
       $currency->save();
-      drupal_set_message($this->t('Saved the %label number format.', array(
+      drupal_set_message($this->t('Saved the %label number format.', [
         '%label' => $currency->label(),
-      )));
+      ]));
       $form_state->setRedirect('entity.commerce_number_format.collection');
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label number format was not saved.', array('%label' => $currency->label())), 'error');
+      drupal_set_message($this->t('The %label number format was not saved.', ['%label' => $currency->label()]), 'error');
       $this->logger('commerce_price')->error($e);
       $form_state->setRebuild();
     }

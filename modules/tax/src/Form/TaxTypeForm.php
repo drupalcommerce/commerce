@@ -49,50 +49,50 @@ class TaxTypeForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $taxType = $this->entity;
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Machine name'),
       '#default_value' => $taxType->getId(),
-      '#element_validate' => array('::validateId'),
+      '#element_validate' => ['::validateId'],
       '#description' => $this->t('Only lowercase, underscore-separated letters allowed.'),
       '#pattern' => '[a-z_]+',
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['name'] = array(
+    ];
+    $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#default_value' => $taxType->getName(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['compound'] = array(
+    ];
+    $form['compound'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Compound'),
       '#description' => $this->t("Compound tax is calculated on top of a primary tax. For example, Canada's Provincial Sales Tax (PST) is compound, calculated on a price that already includes the Goods and Services Tax (GST)."),
       '#default_value' => $taxType->isCompound(),
-    );
-    $form['roundingMode'] = array(
+    ];
+    $form['roundingMode'] = [
       '#type' => 'radios',
       '#title' => $this->t('Rounding mode'),
       '#default_value' => $taxType->getRoundingMode() ?: TaxType::ROUND_HALF_UP,
-      '#options' => array(
+      '#options' => [
         TaxType::ROUND_HALF_UP => $this->t('Round up'),
         TaxType::ROUND_HALF_DOWN => $this->t('Round down'),
         TaxType::ROUND_HALF_EVEN => $this->t('Round even'),
         TaxType::ROUND_HALF_ODD => $this->t('Round odd'),
-      ),
+      ],
       '#required' => TRUE,
-    );
-    $form['tag'] = array(
+    ];
+    $form['tag'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Tag'),
       '#description' => $this->t('Used by the resolvers to analyze only the tax types relevant to them. For example, the EuTaxTypeResolver would analyze only the tax types with the "EU" tag.'),
       '#default_value' => $taxType->getTag(),
-      '#element_validate' => array('::validateTag'),
+      '#element_validate' => ['::validateTag'],
       '#pattern' => '[a-zA-Z0-9]+',
       '#maxlength' => 255,
-    );
+    ];
 
     return $form;
   }
@@ -107,9 +107,9 @@ class TaxTypeForm extends EntityForm {
       $form_state->setError($element, $this->t('The machine name must be in lowercase, underscore-separated letters only.'));
     }
     elseif ($taxType->isNew()) {
-      $loadedTaxTypes = $this->taxTypeStorage->loadByProperties(array(
+      $loadedTaxTypes = $this->taxTypeStorage->loadByProperties([
         'id' => $id,
-      ));
+      ]);
       if ($loadedTaxTypes) {
         $form_state->setError($element, $this->t('The machine name is already in use.'));
       }
@@ -134,15 +134,15 @@ class TaxTypeForm extends EntityForm {
 
     try {
       $taxType->save();
-      drupal_set_message($this->t('Saved the %label tax type.', array(
+      drupal_set_message($this->t('Saved the %label tax type.', [
         '%label' => $taxType->label(),
-      )));
+      ]));
       $form_state->setRedirect('entity.commerce_tax_type.collection');
     }
     catch (\Exception $e) {
-      drupal_set_message($this->t('The %label tax type was not saved.', array(
+      drupal_set_message($this->t('The %label tax type was not saved.', [
         '%label' => $taxType->label()
-      )), 'error');
+      ]), 'error');
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();
     }

@@ -56,9 +56,9 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public static function preCreate(EntityStorageInterface $storageController, array &$values) {
     parent::preCreate($storageController, $values);
-    $values += array(
+    $values += [
       'uid' => \Drupal::currentUser()->id(),
-    );
+    ];
   }
 
   /**
@@ -209,7 +209,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public function setData($data) {
-    $this->set('data', array($data));
+    $this->set('data', [$data]);
     return $this;
   }
 
@@ -248,10 +248,10 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_line_item\Entity\CommerceLineItem::getCurrentUserId')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('string')
@@ -261,15 +261,15 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'hidden',
         'weight' => -1,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -278,15 +278,15 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
@@ -301,10 +301,10 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
       ->setRevisionable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'string',
         'weight' => 1,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -313,10 +313,10 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDescription(t('Unit Price of the Line Item'))
       ->setRequired(TRUE)
       ->setRevisionable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'price_simple',
         'weight' => 2,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -349,13 +349,13 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDescription(t('The log entry explaining the changes in this revision.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'string_textarea',
         'weight' => 25,
-        'settings' => array(
+        'settings' => [
           'rows' => 4,
-        ),
-      ));
+        ],
+      ]);
 
     return $fields;
   }
@@ -369,7 +369,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    *   An array of default values.
    */
   public static function getCurrentUserId() {
-    return array(\Drupal::currentUser()->id());
+    return [\Drupal::currentUser()->id()];
   }
 
 }

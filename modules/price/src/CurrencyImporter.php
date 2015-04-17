@@ -81,17 +81,17 @@ class CurrencyImporter implements CurrencyImporterInterface {
     $currency = $this->getCurrency($currency_code, $language, CurrencyImporterInterface::FALLBACK_LANGUAGE);
 
     if ($currency) {
-      $values = array(
+      $values = [
         'currency_code' => $currency->getCurrencyCode(),
         'name' => $currency->getName(),
         'numericCode' => $currency->getNumericCode(),
         'symbol' => $currency->getSymbol(),
         'fractionDigits' => $currency->getFractionDigits(),
-      );
+      ];
       $entity = $this->currencyStorage->create($values);
 
       // Import translations for the new currency.
-      $this->importCurrencyTranslations(array($entity), $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE));
+      $this->importCurrencyTranslations([$entity], $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE));
 
       return $entity;
     }
@@ -102,7 +102,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function importCurrencyTranslations($currencies = array(), $languages = array()) {
+  public function importCurrencyTranslations($currencies = [], $languages = []) {
     // Skip importing translations if the site it not multilingual.
     if (!$this->languageManager->isMultilingual() || !$this->languageManager instanceof ConfigurableLanguageManagerInterface) {
       return FALSE;

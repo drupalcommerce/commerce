@@ -46,15 +46,15 @@ class AddController extends ControllerBase {
     if (count($bundles) == 1) {
       $bundle = reset($bundles);
 
-      return $this->redirect($formRouteName, array($bundleType => $bundle->id()));
+      return $this->redirect($formRouteName, [$bundleType => $bundle->id()]);
     }
 
-    return array(
+    return [
       '#theme' => 'commerce_add_list',
       '#bundles' => $bundles,
       '#bundle_type' => $bundleType,
       '#form_route_name' => $formRouteName,
-    );
+    ];
   }
 
   /**
@@ -70,9 +70,9 @@ class AddController extends ControllerBase {
     $bundle = $this->getBundleFromRouteMatch($routeMatch);
     $entityType = $bundle->getEntityType()->getBundleOf();
     $bundleKey = $this->entityManager()->getDefinition($entityType)->getKey('bundle');
-    $entity = $this->entityManager()->getStorage($entityType)->create(array(
+    $entity = $this->entityManager()->getStorage($entityType)->create([
       $bundleKey => $bundle->id(),
-    ));
+    ]);
 
     return $this->entityFormBuilder()->getForm($entity, 'add');
   }
@@ -89,7 +89,7 @@ class AddController extends ControllerBase {
   public function addFormTitle(RouteMatchInterface $routeMatch) {
     $bundle = $this->getBundleFromRouteMatch($routeMatch);
 
-    return $this->t('Create @label', array('@label' => $bundle->label()));
+    return $this->t('Create @label', ['@label' => $bundle->label()]);
   }
 
   /**

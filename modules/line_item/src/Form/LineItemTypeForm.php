@@ -48,7 +48,7 @@ class LineItemTypeForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $lineItemType = $this->entity;
 
-    $form['label'] = array(
+    $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
@@ -57,17 +57,17 @@ class LineItemTypeForm extends EntityForm {
       '#required' => TRUE,
     );
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $lineItemType->id(),
-      '#machine_name' => array(
-        'exists' => array($this->lineItemTypeStorage, 'load'),
-        'source' => array('label'),
+      '#machine_name' => [
+        'exists' => [$this->lineItemTypeStorage, 'load'),
+        'source' => ['label'),
       ),
       '#disabled' => !$lineItemType->isNew(),
     );
 
-    $form['description'] = array(
+    $form['description'] = [
       '#title' => t('Description'),
       '#type' => 'textarea',
       '#default_value' => $lineItemType->getDescription(),
@@ -85,14 +85,14 @@ class LineItemTypeForm extends EntityForm {
 
     try {
       $lineItemType->save();
-      drupal_set_message($this->t('Saved the %label line item type.', array(
+      drupal_set_message($this->t('Saved the %label line item type.', [
         '%label' => $lineItemType->label(),
       )));
       $form_state->setRedirect('entity.commerce_line_item_type.collection');
     }
     catch (\Exception $e) {
       $this->logger('commerce_line_item')->error($e);
-      drupal_set_message($this->t('The %label line item type was not saved.', array(
+      drupal_set_message($this->t('The %label line item type was not saved.', [
         '%label' => $lineItemType->label(),
       )), 'error');
       $form_state->setRebuild();
