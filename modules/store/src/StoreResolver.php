@@ -32,6 +32,7 @@ class StoreResolver implements StoreEvents {
   protected function resolve(EventDispatcherInterface $eventDispatcher) {
     $event = new ResolveEvent($eventDispatcher);
     $this->eventDispatcher->dispatch(StoreEvents::RESOLVE, $event);
+    $store = $event->getStore();
   }
   
 }
