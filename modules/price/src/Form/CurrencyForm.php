@@ -59,7 +59,7 @@ class CurrencyForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
       '#default_value' => $currency->getCurrencyCode(),
-      '#element_validate' => ['::validatecurrency_code'],
+      '#element_validate' => ['::validateCurrencyCode'],
       '#pattern' => '[A-Z]{3}',
       '#placeholder' => 'XXX',
       '#maxlength' => 3,
@@ -105,7 +105,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the currency code.
    */
-  public function validatecurrency_code(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
     $currency_code = $element['#value'];
     if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
