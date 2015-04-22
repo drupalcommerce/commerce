@@ -429,7 +429,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          destination: true
+          destination: false
           entity_type: commerce_store
           plugin_id: entity_operations
       filters: {  }
@@ -454,7 +454,8 @@ display:
       display_extenders: {  }
     cache_metadata:
       contexts:
-        - languages
+        - 'languages:language_content'
+        - 'languages:language_interface'
       cacheable: false
   page_1:
     display_plugin: page
@@ -466,5 +467,6 @@ display:
       path: admin/commerce/config/store
     cache_metadata:
       contexts:
-        - languages
+        - 'languages:language_content'
+        - 'languages:language_interface'
       cacheable: false
