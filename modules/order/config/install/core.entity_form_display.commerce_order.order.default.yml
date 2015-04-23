@@ -3,9 +3,6 @@ status: true
 dependencies:
   entity:
     - commerce_order.commerce_order_type.order
-    - field.field.commerce_order.line_item.line_item
-  module:
-    - inline_entity_form
 id: commerce_order.order.default
 targetEntityType: commerce_order
 bundle: order
@@ -16,7 +13,7 @@ content:
     weight: 3
     settings: {  }
     third_party_settings: {  }
-  line_item:
+  line_items:
     type: inline_entity_form_multiple
     weight: 0
     settings:

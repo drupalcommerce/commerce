@@ -1,6 +1,8 @@
 langcode: en
 status: true
 dependencies:
+  config:
+    - commerce_line_item.commerce_line_item_type.product
   module:
     - commerce_line_item
     - commerce_order
@@ -108,7 +110,7 @@ display:
           id: unit_price__amount
           table: commerce_line_item
           field: unit_price__amount
-          relationship: line_item
+          relationship: line_items
           group_type: group
           admin_label: ''
           label: Price
@@ -155,7 +157,7 @@ display:
           click_sort_column: amount
           type: price
           settings:
-            relationship: line_item
+            relationship: line_items
             fieldsets:
               - more
               - admin_label
@@ -228,7 +230,7 @@ display:
           id: quantity
           table: commerce_line_item
           field: quantity
-          relationship: line_item
+          relationship: line_items
           group_type: group
           admin_label: ''
           label: Quantity
@@ -296,7 +298,7 @@ display:
           id: line_total__amount
           table: commerce_line_item
           field: line_total__amount
-          relationship: line_item
+          relationship: line_items
           group_type: group
           admin_label: ''
           label: Total
@@ -343,7 +345,7 @@ display:
           click_sort_column: amount
           type: price
           settings:
-            relationship: line_item
+            relationship: line_items
             fieldsets:
               - more
               - admin_label
@@ -417,12 +419,12 @@ display:
           id: type
           table: commerce_line_item
           field: type
-          relationship: line_item
+          relationship: line_items
           group_type: group
           admin_label: ''
           operator: in
           value:
-            commerce_line_item: commerce_line_item
+            product: product
           group: 1
           exposed: false
           expose:
@@ -458,7 +460,7 @@ display:
           id: line_item_id
           table: commerce_line_item
           field: line_item_id
-          relationship: line_item
+          relationship: line_items
           group_type: group
           admin_label: ''
           order: ASC
@@ -483,13 +485,13 @@ display:
           content: 'Your shopping cart is empty.'
           plugin_id: text_custom
       relationships:
-        line_item:
-          id: line_item
-          table: commerce_order__line_item
-          field: line_item
+        line_items:
+          id: line_items
+          table: commerce_order__line_items
+          field: line_items
           relationship: none
           group_type: group
-          admin_label: 'line_item: Line Item'
+          admin_label: 'line_items: Line Items'
           required: false
           plugin_id: standard
       arguments:
@@ -534,7 +536,7 @@ display:
       title: 'Shopping cart'
     cache_metadata:
       contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
+        - languages
         - url
+        - user
       cacheable: false
