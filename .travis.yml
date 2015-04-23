@@ -74,8 +74,7 @@ before_script:
   - composer drupal-rebuild
   - composer update --prefer-source -n --verbose
   - cd ..
-  # Remove this one inline_entity_form is on drupal.org
-  - git clone https://github.com/webflo/inline_entity_form.git modules/inline_entity_form
+  - drush dl inline_entity_form
   - drush en -y commerce commerce_product commerce_order
 
 script:
