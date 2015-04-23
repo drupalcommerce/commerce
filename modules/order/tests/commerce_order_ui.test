@@ -157,7 +157,7 @@ class CommerceOrderUIAdminTest extends CommerceBaseTestCase {
 
     // Check if the product has been added to the order.
     foreach (entity_metadata_wrapper('commerce_order', reset($order))->commerce_line_items as $delta => $line_item_wrapper) {
-       if ($line_item_wrapper->type->value() == 'product') {
+       if ($line_item_wrapper->getBundle() == 'product') {
          $product = $line_item_wrapper->commerce_product->value();
          $products[$product->product_id]= $product;
        }

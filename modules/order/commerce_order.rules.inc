@@ -282,7 +282,7 @@ function commerce_order_rules_contains_product($order, $sku, $operator, $value) 
 
     // Populate the array of the quantities of the products on the order.
     foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
         // Extract a product ID and quantity from the line item.
         $line_item_sku = $line_item_wrapper->commerce_product->sku->value();
         $quantity = $line_item_wrapper->quantity->value();
@@ -329,9 +329,9 @@ function commerce_order_rules_contains_product_type($order, $product_types, $ope
     // Look for product line items on the order whose products match the
     // specified product types and increment the quantity count accordingly.
     foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
         // Extract the product type from the line item.
-        $line_item_product_type = $line_item_wrapper->commerce_product->type->value();
+        $line_item_product_type = $line_item_wrapper->commerce_product->getBundle();
 
         // If the line item product type matches, update the total quantity.
         if (in_array($line_item_product_type, $product_types)) {

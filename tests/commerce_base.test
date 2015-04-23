@@ -695,7 +695,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     // Loop through the line items looking for products.
     foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
       // If this line item matches the product checked...
-      if ($line_item_wrapper->type->value() == 'product' &&
+      if ($line_item_wrapper->getBundle() == 'product' &&
           $line_item_wrapper->commerce_product->product_id->value() == $product->product_id) {
             $product_is_in_cart = TRUE;
       }

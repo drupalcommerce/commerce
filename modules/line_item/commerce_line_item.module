@@ -1431,7 +1431,7 @@ function commerce_line_items_quantity($line_items, $types = array()) {
       $line_item = entity_metadata_wrapper('commerce_line_item', $line_item);
     }
 
-    if (empty($types) || in_array($line_item->type->value(), $types)) {
+    if (empty($types) || in_array($line_item->getBundle(), $types)) {
       $quantity += $line_item->quantity->value();
     }
   }
@@ -1503,7 +1503,7 @@ function commerce_line_items_total($line_items, $types = array()) {
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_wrapper);
     }
 
-    if (empty($types) || in_array($line_item_wrapper->type->value(), $types)) {
+    if (empty($types) || in_array($line_item_wrapper->getBundle(), $types)) {
       $total += commerce_currency_convert(
         $line_item_wrapper->commerce_total->amount->value(),
         $line_item_wrapper->commerce_total->currency_code->value(),

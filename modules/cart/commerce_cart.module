@@ -334,7 +334,7 @@ function commerce_cart_line_item_delete_form_submit($form, &$form_state) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_items'][$line_item_id]);
 
   // If the deleted line item is a product...
-  if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+  if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
     $title = $line_item_wrapper->commerce_product->title->value();
   }
   else {

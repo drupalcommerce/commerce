@@ -132,7 +132,7 @@ class CommerceCartTestCaseSimpleProduct extends CommerceCartTestCase {
     $this->assertTrue(commerce_cart_order_is_cart($order), t('User has currently an order in cart status.'));
     // Get the products out of the order and store them in an array.
     foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
-       if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+       if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
          $product = $line_item_wrapper->commerce_product->value();
          $products[$product->product_id]= $product;
        }
@@ -302,7 +302,7 @@ class CommerceCartTestCaseMultiProducts extends CommerceCartTestCase {
 
     // Get the products out of the order and store them in an array.
     foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items as $delta => $line_item_wrapper) {
-       if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+       if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
          $product = $line_item_wrapper->commerce_product->value();
          $products_in_cart[$product->product_id]= $product;
        }
