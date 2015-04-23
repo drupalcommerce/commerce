@@ -4,7 +4,7 @@ dependencies:
   module:
     - commerce_line_item
     - entity_reference
-id: commerce_line_item.field_product
+id: commerce_line_item.product
 field_name: product
 entity_type: commerce_line_item
 type: entity_reference

@@ -3,25 +3,24 @@ status: true
 dependencies:
   config:
     - commerce_order.commerce_order_type.order
-    - field.storage.commerce_order.line_item
+    - field.storage.commerce_order.line_items
   module:
     - entity_reference
-id: commerce_order.order.line_item
-field_name: line_item
+id: commerce_order.order.line_items
+field_name: line_items
 entity_type: commerce_order
 bundle: order
-label: Line items
+label: 'Line items'
 description: 'An entity reference to line items.'
 required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: default
+  handler: 'default:commerce_line_item'
   handler_settings:
     target_bundles:
         product: product
     sort:
       field: _none
-third_party_settings: {  }
 field_type: entity_reference

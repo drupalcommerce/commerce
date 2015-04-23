@@ -7,11 +7,11 @@ status: true
 dependencies:
   entity:
     - commerce_store.commerce_store_type.online
-    - field.field.commerce_store.online.currency
+    - field.field.commerce_store.online.currencies
   module:
     - commerce_price
 content:
-  currency:
+  currencies:
     type: options_buttons
     weight: 20
     settings: {  }
