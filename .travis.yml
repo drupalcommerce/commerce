@@ -63,7 +63,7 @@ before_script:
   - mysql -e 'SET @@GLOBAL.wait_timeout=1200'
   # Update drupal core
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-name=admin --account-pass=admin --site-mail=admin@example.com --site-name="Commerce" --yes
-  - drush dl addressfield-7.x-1.0-rc1 rules-7.x-2.7 ctools entity views
+  - drush dl addressfield rules ctools entity views
   - drush en -y commerce_cart commerce_customer_ui commerce_product_ui commerce_line_item_ui commerce_order_ui
   - drush en -y commerce_payment commerce_payment_example commerce_tax_ui simpletest
 
