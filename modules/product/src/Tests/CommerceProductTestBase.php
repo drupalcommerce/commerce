@@ -24,6 +24,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
     'commerce',
     'commerce_store',
     'commerce_product',
+    'commerce_price',
     'field',
     'field_ui',
     'options',
@@ -47,22 +48,44 @@ abstract class CommerceProductTestBase extends WebTestBase {
 
   protected function setUp() {
     parent::setUp();
-    // Create a commerce store.
+
+    $currency_code = "USD";
+    // If the default country has been set, detect currency_code.
+    $default_country = \Drupal::config('system.date')->get('country.default');
+    if ($default_country) {
+      $countryRepository = new \CommerceGuys\Intl\Country\CountryRepository();
+      $currency_code = $countryRepository->get($default_country)
+        ->getCurrencyCode();
+
+      /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
+      $currency_importer = \Drupal::service('commerce_price.currency_importer');
+      $entity = $currency_importer->importCurrency($currency_code);
+      if ($entity) {
+        $entity->save();
+      }
+    }
+    $storeType = $this->createEntity('commerce_store_type', [
+        'id' => $this->randomMachineName(),
+        'label' => $this->randomMachineName(),
+      ]
+    );
+
     $name = strtolower($this->randomMachineName(8));
 
-    $store_type = $this->createEntity('commerce_store_type', [
-        'id' => 'foo',
-        'label' => 'Label of foo',
-      ]
-    );
+    $values = [
+      'name' => $name,
+      'uid' => 1,
+      'mail' => \Drupal::config('system.site')->get('mail'),
+      'type' => $storeType->id(),
+      'default_currency' => $currency_code,
+      'currencies' => [$currency_code],
+    ];
+    $this->commerce_store = entity_create("commerce_store", $values);
+    $this->commerce_store->save();
 
-    $this->commerce_store = $this->createEntity('commerce_store', [
-        'type' => $store_type->id(),
-        'name' => $name,
-        'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'EUR',
-      ]
-    );
+    // Set as default store.
+    \Drupal::configFactory()->getEditable('commerce_store.settings')
+      ->set('default_store', $this->commerce_store->uuid())->save();
 
     $this->adminUser = $this->drupalCreateUser(
       [
@@ -94,7 +117,8 @@ abstract class CommerceProductTestBase extends WebTestBase {
       SAVED_NEW,
       SafeMarkup::format('Created %label entity %type.', [
           '%label' => $entity->getEntityType()->getLabel(),
-          '%type' => $entity->id()]
+          '%type' => $entity->id()
+        ]
       )
     );
 

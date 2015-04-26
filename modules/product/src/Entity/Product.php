@@ -29,7 +29,7 @@ use Drupal\user\UserInterface;
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\commerce_product\Form\ProductForm",
- *       "add" = "Drupal\commerce_product\Form\ProductForm",
+ *       "add" = "Drupal\commerce_product\Form\ProductAddForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
