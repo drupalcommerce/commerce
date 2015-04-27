@@ -37,8 +37,8 @@ class LineItemTypeForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-   $entityManager = $container->get('entity.manager');
-   return new static($entityManager->getStorage('commerce_line_item_type'));
+    $entityManager = $container->get('entity.manager');
+    return new static($entityManager->getStorage('commerce_line_item_type'));
   }
 
   /**
@@ -55,24 +55,24 @@ class LineItemTypeForm extends EntityForm {
       '#default_value' => $lineItemType->label(),
       '#description' => $this->t('Label for the line item type.'),
       '#required' => TRUE,
-    );
+    ];
 
     $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $lineItemType->id(),
       '#machine_name' => [
-        'exists' => [$this->lineItemTypeStorage, 'load'),
-        'source' => ['label'),
-      ),
-      '#disabled' => !$lineItemType->isNew(),
-    );
+        'exists' => [$this->lineItemTypeStorage, 'load'],
+        'source' => ['label'],
+      ],
+      '#disabled' => !$lineItemType->isNew()
+    ];
 
     $form['description'] = [
       '#title' => t('Description'),
       '#type' => 'textarea',
       '#default_value' => $lineItemType->getDescription(),
       '#description' => $this->t('Description of this line item type'),
-    );
+    ];
 
     return $form;
   }
@@ -86,15 +86,14 @@ class LineItemTypeForm extends EntityForm {
     try {
       $lineItemType->save();
       drupal_set_message($this->t('Saved the %label line item type.', [
-        '%label' => $lineItemType->label(),
-      )));
+          '%label' => $lineItemType->label(),
+      ]));
       $form_state->setRedirect('entity.commerce_line_item_type.collection');
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $this->logger('commerce_line_item')->error($e);
       drupal_set_message($this->t('The %label line item type was not saved.', [
-        '%label' => $lineItemType->label(),
-      )), 'error');
+          '%label' => $lineItemType->label(),
+      ]), 'error');
       $form_state->setRebuild();
     }
   }
