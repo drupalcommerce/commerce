@@ -20,12 +20,27 @@ entity.commerce_product.add_page:
 entity.commerce_product.add_form:
   path: '/admin/commerce/products/add/{commerce_product_type}'
   defaults:
-    _controller: '\Drupal\commerce\Controller\AddController::addForm'
-    _title_callback: '\Drupal\commerce\Controller\AddController::addFormTitle'
+    _controller: '\Drupal\commerce_product\Controller\ProductController::addForm'
+    _title_callback: '\Drupal\commerce_product\Controller\ProductController::addFormTitle'
   options:
     parameters:
       commerce_product_type:
         type: entity:commerce_product_type
+        with_config_overrides: TRUE
+  requirements:
+    _entity_create_access: 'commerce_product'
+
+entity.commerce_product.add_form_step_2:
+  path: '/admin/commerce/products/add/{commerce_product_type}/{commerce_store}'
+  defaults:
+    _controller: '\Drupal\commerce_product\Controller\ProductController::addForm'
+  options:
+    parameters:
+      commerce_product_type:
+        type: entity:commerce_product_type
+        with_config_overrides: TRUE
+      commerce_store:
+        type: entity:commerce_store
         with_config_overrides: TRUE
   requirements:
     _entity_create_access: 'commerce_product'

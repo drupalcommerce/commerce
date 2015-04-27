@@ -28,9 +28,36 @@ class PriceSimpleWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    $product = $items->getParent();
     // Get the enabled currencies.
     $enabledCurrencies = entity_load_multiple_by_properties('commerce_currency', ['status' => 1]);
-    $currency_codes = array_keys($enabledCurrencies);
+
+    $defaultStore = \Drupal::config('commerce_store.settings')
+      ->get('default_store');
+
+    $defaultStore = \Drupal::entityManager()
+      ->loadEntityByUuid('commerce_store', $defaultStore);
+
+    if (empty($defaultStore->toArray()["currencies"])) {
+      return;
+    }
+
+    $storeCurrencies = $defaultStore->get('currencies');
+
+    if ($product->getValue()->getStore() !== NULL) {
+      $storeCurrencies = $product->getValue()
+        ->getStore()
+        ->get('currencies');
+    }
+
+    $currencyCodes = [];
+    foreach ($storeCurrencies as $code) {
+      $currencyCode = $code->get('target_id')->getValue();
+      // Check that this currency is enabled.
+      if (!empty($enabledCurrencies[$currencyCode])) {
+        $currencyCodes[$currencyCode] = $currencyCode;
+      }
+    }
 
     $default_amount = NULL;
     if (isset($items[$delta]->amount)) {
@@ -57,7 +84,7 @@ class PriceSimpleWidget extends WidgetBase {
       '#title' => $this->t('Currency code'),
       '#default_value' => isset($items[$delta]->currency_code) ? $items[$delta]->currency_code : NULL,
       '#required' => $element['#required'],
-      '#options' => array_combine($currency_codes, $currency_codes),
+      '#options' => $currencyCodes,
       '#title_display' => 'invisible',
     ];
 

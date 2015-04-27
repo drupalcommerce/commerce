@@ -24,11 +24,16 @@ class ProductAdminTest extends CommerceProductTestBase {
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
     $edit = [
-      'title[0][value]' => $title,
-      'sku[0][value]' => strtolower($this->randomMachineName()),
       'store_id' => $this->commerce_store->id()
     ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
+
+    $edit = [
+      'title[0][value]' => $title,
+      'sku[0][value]' => strtolower($this->randomMachineName()),
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+
     $product = \Drupal::entityQuery('commerce_product')
       ->condition("sku", $edit['sku[0][value]'])
       ->range(0, 1)
@@ -36,8 +41,10 @@ class ProductAdminTest extends CommerceProductTestBase {
     $product = entity_load("commerce_product", current($product));
 
     $this->assertNotNull($product, 'The new product has been created in the database.');
+    $this->assertEqual($product->getStore()->id, $this->commerce_store->id, "Store IDs match.");
     $this->assertText(t("The product @title has been successfully saved.", ['@title' => $title]), "Commerce Product success text is showing");
     $this->assertText($title, 'Created product name exists on this page.');
+
 
     // Assert that the frontend product page is displaying.
     $this->drupalGet('product/' . $product->id());
@@ -49,19 +56,28 @@ class ProductAdminTest extends CommerceProductTestBase {
    * Tests creating a product with an existing SKU.
    */
   function testAddCommerceProductExistingSkuAdmin() {
-    $product = $this->createEntity(
+    $sku = $this->randomMachineName();
+
+    $this->createEntity(
       'commerce_product', [
-        'sku' => $this->randomMachineName(),
+        'sku' => $sku,
         'title' => $this->randomMachineName(),
         'type' => 'product'
       ]
     );
-
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add a new product');
+
+    $title = $this->randomMachineName();
+
     $edit = [
-      'title[0][value]' => $this->randomMachineName(),
-      'sku[0][value]' => $product->getSku(),
+      'store_id' => $this->commerce_store->id()
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save')) ;
+
+    $edit = [
+      'title[0][value]' => $title,
+      'sku[0][value]' => $sku,
     ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
