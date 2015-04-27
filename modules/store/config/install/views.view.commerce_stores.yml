@@ -1,9 +1,9 @@
-uuid: dfb03629-b239-4867-a91a-26a5fa5e4941
 langcode: en
 status: true
 dependencies:
   module:
     - commerce_store
+    - user
 id: commerce_stores
 label: Stores
 module: views
@@ -20,8 +20,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'administer stores'
       cache:
         type: none
         options: {  }

@@ -151,4 +151,25 @@ class ProductAdminTest extends CommerceProductTestBase {
 
     return $fields;
   }
+
+  /**
+   * Tests that anonymous users cannot see the admin/commerce/products page.
+   */
+  protected function testAdminCommerceProducts() {
+    // First test that the current admin user can see the page
+    $this->drupalGet('admin/commerce/products');
+    $this->assertResponse(200);
+    $this->assertNoText("You are not authorized to access this page.");
+    $this->assertLink("Add a new product");
+
+    // Logout and check that anonymous users cannot see the products page
+    // and receieve a 403 error code.
+    $this->drupalLogout();
+
+    $this->drupalGet('admin/commerce/products');
+    $this->assertResponse(403);
+    $this->assertText("You are not authorized to access this page.");
+    $this->assertNoLink("Add a new product");
+  }
+
 }
