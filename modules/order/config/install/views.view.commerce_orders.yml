@@ -1,9 +1,9 @@
-uuid: 56a83180-1efb-480d-8000-0a3d52260f65
 langcode: en
 status: true
 dependencies:
   module:
     - commerce_order
+    - user
 id: commerce_orders
 label: Orders
 module: views
@@ -20,8 +20,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'administer orders'
       cache:
         type: none
         options: {  }
@@ -346,7 +347,8 @@ display:
       display_extenders: {  }
     cache_metadata:
       contexts:
-        - languages
+        - 'languages:language_content'
+        - 'languages:language_interface'
       cacheable: false
   page_1:
     display_plugin: page
@@ -358,5 +360,6 @@ display:
       path: admin/commerce/orders
     cache_metadata:
       contexts:
-        - languages
+        - 'languages:language_content'
+        - 'languages:language_interface'
       cacheable: false
