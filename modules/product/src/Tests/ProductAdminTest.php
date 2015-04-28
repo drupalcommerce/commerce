@@ -53,7 +53,8 @@ class ProductAdminTest extends CommerceProductTestBase {
       'commerce_product', [
         'sku' => $this->randomMachineName(),
         'title' => $this->randomMachineName(),
-        'type' => 'product'
+        'type' => 'product',
+        'store_id' => $this->commerce_store->id()
       ]
     );
 
@@ -62,6 +63,7 @@ class ProductAdminTest extends CommerceProductTestBase {
     $edit = [
       'title[0][value]' => $this->randomMachineName(),
       'sku[0][value]' => $product->getSku(),
+      'store_id' => $this->commerce_store->id()
     ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
