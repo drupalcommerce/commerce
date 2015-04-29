@@ -29,7 +29,7 @@ function commerce_store_install() {
     'mail' => \Drupal::config('system.site')->get('mail'),
     'type' => 'online',
     'default_currency' => $currency_code,
-    'currency' => $currency_code,
+    'currency' => array($currency_code),
   ];
   $store = entity_create("commerce_store", $values);
   $store->save();
