@@ -37,12 +37,12 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *     "type" = "type"
  *   },
  *   config_export = {
- *       "id",
- *       "name",
- *       "displayName",
- *       "default",
- *       "amounts",
- *       "type",
+ *     "id",
+ *     "name",
+ *     "displayName",
+ *     "default",
+ *     "amounts",
+ *     "type",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/tax/rate/{commerce_tax_rate}/edit",

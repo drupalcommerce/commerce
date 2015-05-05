@@ -35,10 +35,10 @@ use Drupal\Core\Entity\EntityStorageException;
  *     "uuid" = "uuid"
  *   },
  *   config_export = {
- *       "id",
- *       "label",
- *       "uuid",
- *       "description",
+ *     "id",
+ *     "label",
+ *     "uuid",
+ *     "description",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/store/types/{commerce_store_type}/edit",

@@ -34,11 +34,11 @@ use Drupal\commerce_product\ProductTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   config_export = {
- *       "id",
- *       "label",
- *       "revision",
- *       "digital",
- *       "description",
+ *     "id",
+ *     "label",
+ *     "revision",
+ *     "digital",
+ *     "description",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/product-types/{commerce_product_type}/edit",

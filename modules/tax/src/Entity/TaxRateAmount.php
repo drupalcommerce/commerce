@@ -35,11 +35,11 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *     "rate" = "rate"
  *   },
  *   config_export = {
- *       "id",
- *       "amount",
- *       "startDate",
- *       "endDate",
- *       "rate",
+ *     "id",
+ *     "amount",
+ *     "startDate",
+ *     "endDate",
+ *     "rate",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/tax/amount/{commerce_tax_rate_amount}/edit",
