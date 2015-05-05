@@ -32,6 +32,21 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "uuid" = "uuid",
  *     "status" = "status"
  *   },
+ *   config_export = {
+ *       "locale",
+ *       "name",
+ *       "numberingSystem",
+ *       "decimalSeparator",
+ *       "plusSign",
+ *       "minusSign",
+ *       "percentSign",
+ *       "decimalPattern",
+ *       "percentPattern",
+ *       "currencyPattern",
+ *       "accountingCurrencyPattern",
+ *       "groupingSeparator",
+ *       "status",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/number-format/{commerce_number_format}",
  *     "delete-form" = "/admin/commerce/config/number-format/{commerce_number_format}/delete",

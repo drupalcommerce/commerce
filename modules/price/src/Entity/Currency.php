@@ -32,6 +32,14 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "uuid" = "uuid",
  *     "status" = "status"
  *   },
+ *   config_export = {
+ *       "currency_code",
+ *       "name",
+ *       "numericCode",
+ *       "symbol",
+ *       "fractionDigits",
+ *       "status",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
  *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
