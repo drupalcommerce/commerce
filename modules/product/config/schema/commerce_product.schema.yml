@@ -6,8 +6,8 @@ commerce_product.commerce_product_type.*:
       type: string
       label: 'Type'
     label:
-        type: label
-        label: 'Label'
+      type: label
+      label: 'Label'
     revision:
       type: boolean
       label: 'Create new revision'

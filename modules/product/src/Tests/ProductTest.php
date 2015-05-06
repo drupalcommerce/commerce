@@ -34,7 +34,8 @@ class ProductTest extends CommerceProductTestBase {
     $values = [
       'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
-      'type' => 'product'
+      'type' => 'product',
+      'store_id' => $this->commerce_store->id()
     ];
     $this->createEntity('commerce_product', $values);
 
@@ -43,6 +44,47 @@ class ProductTest extends CommerceProductTestBase {
     $violations = $productDuplicate->sku->validate();
     $this->assertNotEqual($violations->count(), 0, 'Validation fails when creating a product with the same SKU.');
   }
+
+  /**.
+   * Ensure that changing the store ID of the product to that of another store
+   * that already contains the same SKU does not save.
+   */
+  function testAddCommerceProductExistingSkuDifferentStore() {
+    $values = [
+      'sku' => $this->randomMachineName(),
+      'title' => $this->randomMachineName(),
+      'type' => 'product',
+      'store_id' => $this->commerce_store->id()
+    ];
+
+    /* @var $product \Drupal\commerce_product\Entity\Product */
+    $product = $this->createEntity('commerce_product', $values);
+
+    $name = strtolower($this->randomMachineName(8));
+
+    $store_type = $this->createEntity('commerce_store_type', [
+        'id' => $this->randomMachineName(),
+        'label' => $this->randomMachineName(),
+      ]
+    );
+
+    /* @var $store2 \Drupal\commerce_store\Entity\Store */
+    $store2 = $this->createEntity('commerce_store', [
+        'type' => $store_type->id(),
+        'name' => $name,
+        'mail' => \Drupal::currentUser()->getEmail(),
+        'default_currency' => 'EUR',
+      ]
+    );
+
+    $values['store_id'] = $store2->id();
+    $this->createEntity('commerce_product', $values);
+
+    $valid = $product->setStore($store2)->sku->validate()->count();
+
+    $this->assertEqual($valid, 1, 'Validation fails when changing the store_id.');
+  }
+
 
   /**
    * Tests deleting a product.

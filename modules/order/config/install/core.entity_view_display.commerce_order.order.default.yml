@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - commerce_order.commerce_order_type.order
-    - field.field.commerce_order.line_item.line_item
+    - field.field.commerce_order.order.line_items
   module:
     - commerce_price
     - user
@@ -12,7 +12,7 @@ targetEntityType: commerce_order
 bundle: order
 mode: default
 content:
-  line_item:
+  line_items:
     type: entity_reference_entity_view
     weight: 0
     settings:
