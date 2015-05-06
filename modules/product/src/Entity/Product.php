@@ -308,7 +308,7 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, human-readable identifier for a product.'))
       ->setRequired(TRUE)
-      ->addConstraint('ProductSku', [])
+      ->addConstraint('ProductSku')
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setDisplayOptions('view', [

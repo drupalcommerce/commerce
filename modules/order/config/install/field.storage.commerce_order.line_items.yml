@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   module:
-    - commerce_price
+    - commerce_order
     - entity_reference
-id: commerce_store.currency
-field_name: currency
-entity_type: commerce_store
+id: commerce_order.line_items
+field_name: line_items
+entity_type: commerce_order
 type: entity_reference
 settings:
-  target_type: commerce_currency
+  target_type: commerce_line_item
 module: entity_reference
 locked: true
 cardinality: -1

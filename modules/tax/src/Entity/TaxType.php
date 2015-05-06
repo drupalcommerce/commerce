@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Zone\Model\ZoneInterface;
 use CommerceGuys\Tax\Model\TaxTypeInterface;
 use CommerceGuys\Tax\Model\TaxRateInterface;
+use CommerceGuys\Tax\Enum\GenericLabel;
 
 /**
  * Defines the Tax Type configuration entity.
@@ -86,6 +87,13 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   protected $rates = [];
 
   /**
+   * The tax type generic label.
+   *
+   * @var string
+   */
+  protected $genericLabel;
+
+  /**
    * {@inheritdoc}
    */
   public function getId() {
@@ -154,7 +162,7 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function getZone() {
     // @todo
-    return null;
+    return NULL;
   }
 
   /**
@@ -227,6 +235,23 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function hasRate(TaxRateInterface $rate) {
     return array_search($rate, $this->rates) !== FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGenericLabel() {
+    return $this->genericLabel;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGenericLabel($genericLabel) {
+    GenericLabel::assertExists($genericLabel);
+    $this->genericLabel = $genericLabel;
+
+    return $this;
   }
 
 }

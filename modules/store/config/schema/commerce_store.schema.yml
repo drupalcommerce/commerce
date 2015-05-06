@@ -15,3 +15,11 @@ commerce_store.commerce_store_type.*:
     description:
       type: text
       label: 'Description'
+
+commerce_store.settings:
+  type: config_object
+  label: 'Commerce Store settings'
+  mapping:
+    default_store:
+      type: string
+      label: 'Default store UUID'

@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.commerce_store.currency
+    - field.storage.commerce_store.currencies
   module:
     - entity_reference
-id: commerce_store.online.currency
-field_name: currency
+id: commerce_store.online.currencies
+field_name: currencies
 entity_type: commerce_store
 bundle: online
-label: Currencies
+label: 'Currencies'
 description: 'All currencies allowed for the store.'
 required: true
 translatable: false
