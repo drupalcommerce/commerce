@@ -1,19 +1,18 @@
-id: commerce_payment_info.card.card_name
-label: 'Cardholder name'
-field_name: card_name
-entity_type: commerce_payment_info
-bundle: card
-description: 'The name in the card.'
 langcode: en
 status: true
 dependencies:
   config:
     - commerce_payment.commerce_payment_info_type.card
     - field.storage.commerce_payment_info.card_name
+id: commerce_payment_info.card.card_name
+field_name: card_name
+entity_type: commerce_payment_info
+bundle: card
+label: 'Cardholder name'
+description: 'The name in the card.'
 required: true
 translatable: false
 default_value: {  }
-default_value_function: ''
+default_value_callback: ''
 settings: {  }
-third_party_settings: {  }
 field_type: string

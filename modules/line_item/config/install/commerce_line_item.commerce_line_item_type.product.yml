@@ -1,3 +1,6 @@
-id: 'product'
+langcode: en
+status: true
+dependencies: {  }
 label: 'Product Line Item'
+id: product
 description: 'A product line item type.'

@@ -27,4 +27,5 @@ content:
       show_currency_code: false
     third_party_settings: {  }
     label: above
-hidden: {  }
+hidden:
+  store_id: true

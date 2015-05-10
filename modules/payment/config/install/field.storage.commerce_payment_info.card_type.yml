@@ -1,15 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_payment
 id: commerce_payment_info.card_type
 field_name: card_type
 entity_type: commerce_payment_info
 type: string
 settings:
   max_length: 255
+  case_sensitive: false
 module: core
 locked: false
 cardinality: 1
 translatable: true
-status: true
-langcode: en
-dependencies:
-  module:
-    - commerce_payment
+indexes: {  }
+persist_with_no_fields: false

@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies:
   module:
-    - commerce_price
+    - commerce_store
     - entity_reference
 id: commerce_store.currencies
 field_name: currencies
