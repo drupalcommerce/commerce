@@ -20,7 +20,7 @@ settings:
   handler: 'default:commerce_line_item'
   handler_settings:
     target_bundles:
-        product: product
+      product: product
     sort:
       field: _none
 field_type: entity_reference

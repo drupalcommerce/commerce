@@ -1,3 +1,6 @@
-id: 'card'
+langcode: en
+status: true
+dependencies: {  }
 label: 'Card information'
+id: card
 description: 'Card payment information type.'

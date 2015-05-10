@@ -14,10 +14,13 @@ label: Product
 description: ''
 required: true
 translatable: false
+default_value: {  }
+default_value_callback: ''
 settings:
   handler: 'default:commerce_product'
   handler_settings:
+    target_bundles:
+      product: product
     sort:
       field: _none
-third_party_settings: {  }
 field_type: entity_reference

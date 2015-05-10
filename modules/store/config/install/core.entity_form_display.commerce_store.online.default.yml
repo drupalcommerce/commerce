@@ -1,15 +1,12 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_store.commerce_store_type.online
 id: commerce_store.online.default
 targetEntityType: commerce_store
 bundle: online
 mode: default
-langcode: en
-status: true
-dependencies:
-  entity:
-    - commerce_store.commerce_store_type.online
-    - field.field.commerce_store.online.currencies
-  module:
-    - commerce_price
 content:
   currencies:
     type: options_buttons
