@@ -2,8 +2,8 @@ langcode: und
 status: true
 dependencies:
   module:
-    - commerce_payment
     - commerce_price
+    - commerce_payment
 id: commerce_payment_transaction.commerce_price
 field_name: commerce_price
 entity_type: commerce_payment_transaction

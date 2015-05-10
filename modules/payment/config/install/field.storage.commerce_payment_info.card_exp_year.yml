@@ -8,7 +8,7 @@ field_name: card_exp_year
 entity_type: commerce_payment_info
 type: integer
 settings:
-  unsigned: false
+  unsigned: ''
   size: normal
 module: core
 locked: false
