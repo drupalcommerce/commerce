@@ -9,6 +9,7 @@ entity_type: commerce_payment_info
 type: string
 settings:
   max_length: 4
+  is_ascii: false
   case_sensitive: false
 module: core
 locked: false
