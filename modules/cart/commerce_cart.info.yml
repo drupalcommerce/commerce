@@ -6,3 +6,5 @@ core: 8.x
 dependencies:
   - commerce
   - commerce_order
+config_devel:
+  - views.view.commerce_cart_form

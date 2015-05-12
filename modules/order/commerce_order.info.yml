@@ -10,3 +10,10 @@ dependencies:
   - commerce_store
   - entity_reference
   - inline_entity_form
+config_devel:
+  - views.view.commerce_orders
+  - commerce_order.commerce_order_type.order
+  - field.field.commerce_order.order.line_items
+  - core.entity_form_display.commerce_order.order.default
+  - field.storage.commerce_order.line_items
+  - core.entity_view_display.commerce_order.order.default

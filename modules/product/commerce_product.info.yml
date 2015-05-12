@@ -8,3 +8,9 @@ dependencies:
   - commerce_price
   - commerce_store
   - text
+config_devel:
+  - commerce_product.commerce_product_type.product
+  - field.field.commerce_product.product.commerce_price
+  - views.view.commerce_products
+  - core.entity_form_display.commerce_product.product.default
+  - field.storage.commerce_product.commerce_price
