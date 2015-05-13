@@ -32,6 +32,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "label",
+ *     "id",
+ *     "description",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit",
  *     "delete-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit",
