@@ -32,6 +32,11 @@ use Drupal\commerce_payment\PaymentInfoTypeInterface;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "label",
+ *     "id",
+ *     "description",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/payment-info-types/{commerce_payment_info_type}",
  *     "delete-form" = "/admin/commerce/payment-info/{commerce_payment_info}/delete",
