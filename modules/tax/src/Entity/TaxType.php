@@ -37,6 +37,14 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     "roundingMode" = "roundingMode",
  *     "rates" = "rates"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "name",
+ *     "compound",
+ *     "roundingMode",
+ *     "tag",
+ *     "rates",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/edit",
  *     "delete-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/delete",
