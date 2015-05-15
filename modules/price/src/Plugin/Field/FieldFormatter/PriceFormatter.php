@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
-use CommerceGuys\Intl\Formatter\NumberFormatter;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -37,13 +36,6 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
   protected $currencyStorage;
 
   /**
-   * The number format storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $numberFormatterStorage;
-
-  /**
    * Constructs a PriceFormatter object.
    *
    * @param string $pluginId
@@ -67,7 +59,6 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
 
     $this->currencyStorage = $entityManager->getStorage('commerce_currency');
-    $this->numberFormatterStorage = $entityManager->getStorage('commerce_number_format');
   }
 
   /**
@@ -113,33 +104,12 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    */
   public function viewElements(FieldItemListInterface $items) {
     $elements = [];
-    $format = $this->getNumberFormat();
-    $displayMode = $this->getSetting('show_currency_code') ? NumberFormatter::CURRENCY_DISPLAY_CODE : NumberFormatter::CURRENCY_DISPLAY_SYMBOL;
-
-    $numberFormatter = new NumberFormatter($format, NumberFormatter::CURRENCY);
-    $numberFormatter->setCurrencyDisplay($displayMode);
 
     foreach ($items as $delta => $item) {
-      $currency = $this->currencyStorage->load($item->currency_code);
-      $elements[$delta] = ['#markup' => $numberFormatter->formatCurrency($item->amount, $currency)];
+      $elements[$delta] = ['#markup' => $item->amount];
     }
 
     return $elements;
-  }
-
-  /**
-   * Returns the number format for the current language.
-   *
-   * @return \CommerceGuys\Intl\NumberFormat\NumberFormat|\CommerceGuys\Intl\NumberFormat\NumberFormatInterface
-   *    The number format.
-   */
-  protected function getNumberFormat() {
-    $language = \Drupal::languageManager()->getCurrentLanguage();
-
-    // @TODO a fallback number format provided us or configured by the user.
-    $numberFormat = $this->numberFormatterStorage->load($language->getId());
-
-    return $numberFormat;
   }
 
 }

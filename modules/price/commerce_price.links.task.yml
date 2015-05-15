@@ -12,13 +12,3 @@ entity.commerce_currency.import:
   route_name: 'entity.commerce_currency.import'
   base_route: 'entity.commerce_currency.collection'
   title: 'Import'
-
-entity.commerce_number_format.edit_form:
-  route_name: 'entity.commerce_number_format.edit_form'
-  base_route: 'entity.commerce_number_format.edit_form'
-  title: 'Edit'
-
-entity.commerce_number_format.collection:
-  route_name: 'entity.commerce_number_format.collection'
-  base_route: 'entity.commerce_number_format.collection'
-  title: 'List'
