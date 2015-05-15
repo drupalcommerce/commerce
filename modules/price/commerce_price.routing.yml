@@ -37,35 +37,3 @@ entity.commerce_currency.delete_form:
     _title: 'Delete a currency'
   requirements:
     _permission: 'administer stores'
-
-entity.commerce_number_format.collection:
-  path: '/admin/commerce/config/number-format'
-  defaults:
-    _entity_list: 'commerce_number_format'
-    _title: 'Number formats'
-  requirements:
-    _permission: 'administer stores'
-
-entity.commerce_number_format.add_form:
-  path: '/admin/commerce/config/number-format/add'
-  defaults:
-    _entity_form: 'commerce_number_format.add'
-    _title: 'Add a new number format'
-  requirements:
-    _entity_create_access: 'commerce_number_format'
-
-entity.commerce_number_format.edit_form:
-  path: '/admin/commerce/config/number-format/{commerce_number_format}'
-  defaults:
-    _entity_form: 'commerce_number_format.edit'
-    _title: 'Edit a number format'
-  requirements:
-    _permission: 'administer stores'
-
-entity.commerce_number_format.delete_form:
-  path: '/admin/commerce/config/number-format/{commerce_number_format}/delete'
-  defaults:
-    _entity_form: 'commerce_number_format.delete'
-    _title: 'Delete a number format'
-  requirements:
-    _permission: 'administer stores'

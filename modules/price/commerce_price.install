@@ -17,18 +17,6 @@ function commerce_price_install() {
       $entity->save();
     }
   }
-
-  // Import default number formats.
-  /** @var \Drupal\commerce_price\NumberFormatImporterInterface $format_importer */
-  $format_importer = \Drupal::service('commerce_price.number_format_importer');
-  $preloaded_number_formats = \Drupal::languageManager()->getLanguages();
-
-  foreach ($preloaded_number_formats as $language) {
-    $entity = $format_importer->importNumberFormat($language);
-    if ($entity) {
-      $entity->save();
-    }
-  }
 }
 
 /**

@@ -15,12 +15,5 @@ function commerce_price_configurable_language_insert(ConfigurableLanguage $langu
 
     $currencies = \Drupal\commerce_price\Entity\Currency::loadMultiple();
     $currency_importer->importCurrencyTranslations($currencies, [$language]);
-
-    // Import number formats.
-    $format_importer = \Drupal::service('commerce_price.number_format_importer');
-    $number_format = $format_importer->importNumberFormat($language);
-    if ($number_format) {
-      $number_format->save();
-    }
   }
 }
