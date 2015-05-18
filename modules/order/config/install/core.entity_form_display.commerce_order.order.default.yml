@@ -13,12 +13,12 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: '3'
+    weight: 3
     settings: {  }
     third_party_settings: {  }
   line_items:
     type: inline_entity_form_multiple
-    weight: '0'
+    weight: 0
     settings:
       match_operator: CONTAINS
       allow_existing: false
@@ -29,18 +29,18 @@ content:
     third_party_settings: {  }
   mail:
     type: email_default
-    weight: '1'
+    weight: 1
     settings:
       placeholder: ''
     third_party_settings: {  }
   store_id:
     type: options_select
-    weight: '0'
+    weight: 0
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: '2'
+    weight: 2
     settings:
       match_operator: CONTAINS
       size: 60
