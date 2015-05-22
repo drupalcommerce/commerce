@@ -34,6 +34,12 @@ use Drupal\Core\Entity\EntityStorageException;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "uuid",
+ *     "description",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/store/types/{commerce_store_type}/edit",
  *     "delete-form" = "/admin/commerce/config/store/types/{commerce_store_type}/delete",
