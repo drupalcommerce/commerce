@@ -9,6 +9,7 @@ namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce_product\ProductInterface;
 use Drupal\commerce_store\StoreInterface;
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -61,6 +62,8 @@ use Drupal\user\UserInterface;
  * )
  */
 class Product extends ContentEntityBase implements ProductInterface {
+
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
