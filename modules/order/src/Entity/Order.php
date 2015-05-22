@@ -53,6 +53,7 @@ use Drupal\user\UserInterface;
  * )
  */
 class Order extends ContentEntityBase implements OrderInterface {
+  use EntityChangedTrait;
 
   use EntityChangedTrait;
 

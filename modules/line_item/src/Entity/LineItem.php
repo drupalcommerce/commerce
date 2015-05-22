@@ -51,6 +51,7 @@ use Drupal\user\UserInterface;
  * )
  */
 class LineItem extends ContentEntityBase implements LineItemInterface {
+  use EntityChangedTrait;
 
   use EntityChangedTrait;
 

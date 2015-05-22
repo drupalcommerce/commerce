@@ -62,6 +62,7 @@ use Drupal\user\UserInterface;
  * )
  */
 class Product extends ContentEntityBase implements ProductInterface {
+  use EntityChangedTrait;
 
   use EntityChangedTrait;
 
