@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface ProductTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the product type description.
+   * Gets the product type description.
    *
    * @return string
    *   The product type description.
@@ -33,7 +33,7 @@ interface ProductTypeInterface extends ConfigEntityInterface {
   public function setDescription($description);
 
   /**
-   * Returns the digital property of the product type.
+   * Gets the digital property of the product type.
    *
    * @return bool
    *   The digital property value.

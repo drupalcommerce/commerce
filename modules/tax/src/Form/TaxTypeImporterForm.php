@@ -78,7 +78,7 @@ class TaxTypeImporterForm extends FormBase {
   }
 
   /**
-   * Returns an options list for tax types.
+   * Gets an options list for tax types.
    *
    * @param TaxTypeInterface[] $taxTypes
    *   An array of tax types.

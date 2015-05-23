@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface PaymentInfoTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the payment information type description.
+   * Gets the payment information type description.
    *
    * @return string
    *   The payment information type description.

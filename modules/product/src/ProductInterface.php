@@ -72,7 +72,7 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
   public function setStatus($status);
 
   /**
-   * Returns the product creation timestamp.
+   * Gets the product creation timestamp.
    *
    * @return int
    *   Creation timestamp of the product.
@@ -91,7 +91,7 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
   public function setCreatedTime($timestamp);
 
   /**
-   * Returns the product type.
+   * Gets the product type.
    *
    * @return string
    *   The product type.
@@ -111,7 +111,7 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
   // you wanted to set/replace.
 
   /**
-   * Returns the product revision log message.
+   * Gets the product revision log message.
    *
    * @return string
    *   The revision log message.

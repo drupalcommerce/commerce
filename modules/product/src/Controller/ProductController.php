@@ -11,7 +11,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\commerce_product\ProductInterface;
 
 /**
- * Returns responses for Commerce Product routes.
+ * Gets responses for Commerce Product routes.
  */
 class ProductController extends ControllerBase {
 

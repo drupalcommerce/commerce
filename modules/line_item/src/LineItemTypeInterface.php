@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface LineItemTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the line item type description.
+   * Gets the line item type description.
    *
    * @return string
    *   The line item type description.

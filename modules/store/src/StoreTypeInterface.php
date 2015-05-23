@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface StoreTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the store type description.
+   * Gets the store type description.
    *
    * @return string
    *   The store type description.

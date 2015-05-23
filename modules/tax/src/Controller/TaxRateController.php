@@ -15,7 +15,7 @@ use Drupal\Core\Controller\ControllerBase;
 class TaxRateController extends ControllerBase {
 
   /**
-   * Returns a rendered add form to create a new tax rate associated to the given tax type.
+   * Gets a rendered add form to create a new tax rate associated to the given tax type.
    *
    * @param string
    *   The commerce_tax_type id.
@@ -33,7 +33,7 @@ class TaxRateController extends ControllerBase {
   }
 
   /**
-   * Returns a rendered list of tax rates entities associated to the given tax type.
+   * Gets a rendered list of tax rates entities associated to the given tax type.
    *
    * @param string
    *   The commerce_tax_type id.

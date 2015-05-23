@@ -93,7 +93,7 @@ class AddController extends ControllerBase {
   }
 
   /**
-   * Returns the bundle object from the route match.
+   * Gets the bundle object from the route match.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   The route match.

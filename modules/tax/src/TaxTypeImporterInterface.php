@@ -13,7 +13,7 @@ namespace Drupal\commerce_tax;
 interface TaxTypeImporterInterface {
 
   /**
-   * Returns all importable tax types.
+   * Gets all importable tax types.
    *
    * @return \CommerceGuys\Tax\Model\TaxTypeInterface
    *   Array of importable tax types.

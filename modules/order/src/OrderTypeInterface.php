@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface OrderTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the order type description.
+   * Gets the order type description.
    *
    * @return string
    *   The order type description.

@@ -70,7 +70,7 @@ class CurrencyImporterForm extends FormBase {
   }
 
   /**
-   * Returns an options list for currencies.
+   * Gets an options list for currencies.
    *
    * @param CurrencyInterface[] $currencies
    *   An array of currencies.

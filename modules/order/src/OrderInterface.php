@@ -18,7 +18,7 @@ use Drupal\user\EntityOwnerInterface;
 interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
-   * Returns the order number.
+   * Gets the order number.
    *
    * @return string
    *   The order number.
@@ -37,7 +37,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setOrderNumber($orderNumber);
 
   /**
-   * Returns the order type.
+   * Gets the order type.
    *
    * @return string
    *   The order type.
@@ -45,7 +45,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function getType();
 
   /**
-   * Returns the order status.
+   * Gets the order status.
    *
    * @return string
    *   The order status.
@@ -64,7 +64,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setStatus($status);
 
   /**
-   * Returns the order creation timestamp.
+   * Gets the order creation timestamp.
    *
    * @return int
    *   Creation timestamp of the order.
@@ -83,7 +83,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setCreatedTime($timestamp);
 
   /**
-   * Returns the order revision creation timestamp.
+   * Gets the order revision creation timestamp.
    *
    * @return int
    *   The UNIX timestamp of when this revision was created.
@@ -102,7 +102,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setRevisionCreationTime($timestamp);
 
   /**
-   * Returns the order revision author.
+   * Gets the order revision author.
    *
    * @return \Drupal\user\UserInterface
    *   The user entity for the revision author.
@@ -121,7 +121,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setRevisionAuthorId($uid);
 
   /**
-   * Returns the line items associated with this order.
+   * Gets the line items associated with this order.
    *
    * @return array
    *   The line items of this order.
@@ -140,7 +140,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setLineItems($lineItems);
 
   /**
-   * Returns the additional data stored in this order.
+   * Gets the additional data stored in this order.
    *
    * @return array
    *   An array of additional data.
@@ -159,7 +159,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setData($data);
 
   /**
-   * Returns the IP address that created this order.
+   * Gets the IP address that created this order.
    *
    * @return string
    *   The ip address.
@@ -178,7 +178,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setHostname($hostname);
 
   /**
-   * Returns the e-mail address associated with the order.
+   * Gets the e-mail address associated with the order.
    *
    * @return string
    *   The order mail.

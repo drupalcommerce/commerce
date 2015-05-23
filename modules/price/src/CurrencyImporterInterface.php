@@ -18,7 +18,7 @@ interface CurrencyImporterInterface {
   const FALLBACK_LANGUAGE = 'en';
 
   /**
-   * Returns all importable currencies.
+   * Gets all importable currencies.
    *
    * @param string $fallback
    *   The fallback language code.

@@ -26,7 +26,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setInstanceId($instanceId);
 
   /**
-   * Returns the instance identifier for a transaction.
+   * Gets the instance identifier for a transaction.
    *
    * @return string
    *   The instance id.
@@ -45,7 +45,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setRemoteId($remoteId);
 
   /**
-   * Returns the remote identifier for a transaction.
+   * Gets the remote identifier for a transaction.
    *
    * @return string
    *   The remote id.
@@ -65,7 +65,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setMessage($message);
 
   /**
-   * Returns human-readable message associated to this transaction.
+   * Gets human-readable message associated to this transaction.
    *
    * @return string|array
    *   A human-readable message.
@@ -84,7 +84,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setStatus($status);
 
   /**
-   * Returns the status of this transaction.
+   * Gets the status of this transaction.
    *
    * @return string
    *   The status of this transaction.
@@ -103,7 +103,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setRemoteStatus($remoteStatus);
 
   /**
-   * Returns the status of this transaction.
+   * Gets the status of this transaction.
    *
    * @return string
    *   The status of the transaction at the payment provider.
@@ -122,7 +122,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setPayload($payload);
 
   /**
-   * Returns the payment-gateway specific payload associated with this
+   * Gets the payment-gateway specific payload associated with this
    * transaction.
    *
    * @return string
@@ -131,7 +131,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function getPayload();
 
   /**
-   * Returns the Unix timestamp when this transaction was created.
+   * Gets the Unix timestamp when this transaction was created.
    *
    * @return int
    *   The Unix timestamp when this transaction was created.
@@ -150,7 +150,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setChanged($changed);
 
   /**
-   * Returns the Unix timestamp when this transaction was last changed.
+   * Gets the Unix timestamp when this transaction was last changed.
    *
    * @return int
    *   The Unix timestamp when this transaction was last changed.
@@ -169,7 +169,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
   public function setData($data);
 
   /**
-   * Returns additional data for this transaction.
+   * Gets additional data for this transaction.
    *
    * @return array
    *   An array of additional data.

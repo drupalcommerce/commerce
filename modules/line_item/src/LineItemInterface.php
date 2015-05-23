@@ -17,7 +17,7 @@ use Drupal\user\EntityOwnerInterface;
 interface LineItemInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
-   * Returns the line item type.
+   * Gets the line item type.
    *
    * @return string
    *   The line item type.
@@ -25,7 +25,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function getType();
 
   /**
-   * Returns the line item status.
+   * Gets the line item status.
    *
    * @return string
    *   The line item status.
@@ -44,7 +44,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function setStatus($status);
 
   /**
-   * Returns the line item creation timestamp.
+   * Gets the line item creation timestamp.
    *
    * @return int
    *   Creation timestamp of the line item.
@@ -63,7 +63,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function setCreatedTime($timestamp);
 
   /**
-   * Returns the line item revision creation timestamp.
+   * Gets the line item revision creation timestamp.
    *
    * @return int
    *   The UNIX timestamp of when this revision was created.
@@ -82,7 +82,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function setRevisionCreationTime($timestamp);
 
   /**
-   * Returns the line item revision author.
+   * Gets the line item revision author.
    *
    * @return \Drupal\user\UserInterface
    *   The user entity for the revision author.
@@ -101,7 +101,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function setRevisionAuthorId($uid);
 
   /**
-   * Returns the additional data stored in this line item.
+   * Gets the additional data stored in this line item.
    *
    * @return array
    *   An array of additional data.
