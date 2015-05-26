@@ -13,6 +13,9 @@ commerce_tax.commerce_tax_type.*:
     compound:
       type: boolean
       label: 'Tax type compoundness'
+    displayInclusive:
+      type: boolean
+      label: 'Tax type display inclusiveness'
     roundingMode:
       type: integer
       label: 'Tax type rounding mode'

@@ -72,6 +72,11 @@ class TaxTypeForm extends EntityForm {
       '#description' => $this->t("Compound tax is calculated on top of a primary tax. For example, Canada's Provincial Sales Tax (PST) is compound, calculated on a price that already includes the Goods and Services Tax (GST)."),
       '#default_value' => $taxType->isCompound(),
     ];
+    $form['displayInclusive'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display inclusive'),
+      '#default_value' => $taxType->isDisplayInclusive(),
+    ];
     $form['roundingMode'] = [
       '#type' => 'radios',
       '#title' => $this->t('Rounding mode'),

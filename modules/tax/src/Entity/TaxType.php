@@ -33,6 +33,7 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     "id" = "id",
  *     "label" = "name",
  *     "compound" = "compound",
+ *     "displayInclusive" = "displayInclusive",
  *     "tag" = "tag",
  *     "roundingMode" = "roundingMode",
  *     "rates" = "rates"
@@ -69,11 +70,18 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   protected $name;
 
   /**
-   * Whether the tax type is compound or not.
+   * Whether the tax type is compound.
    *
    * @var bool
    */
-  protected $compound;
+  protected $compound = false;
+
+  /**
+   * Whether the tax type is display inclusive.
+   *
+   * @var bool
+   */
+  protected $displayInclusive = false;
 
   /**
    * The tax type rounding mode.
@@ -145,6 +153,22 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function setCompound($compound) {
     $this->compound = $compound;
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDisplayInclusive() {
+    return !empty($this->displayInclusive);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisplayInclusive($displayInclusive) {
+    $this->displayInclusive = $displayInclusive;
 
     return $this;
   }

@@ -104,6 +104,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
       'id' => $taxType->getId(),
       'name' => $this->t($taxType->getName()),
       'compound' => $taxType->isCompound(),
+      'displayInclusive' => $taxType->isDisplayInclusive(),
       'roundingMode' => $taxType->getRoundingMode(),
       'tag' => $taxType->getTag(),
       'rates' => array_keys($taxType->getRates()),
