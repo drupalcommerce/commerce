@@ -15,7 +15,7 @@ class commerce_line_item_handler_filter_line_item_is_referenced extends views_ha
   }
 
   /**
-   * Don't bother showing an admin summary.
+   * Only add to the admin summary if the filter has been negated.
    */
   function admin_summary() {
     if ($this->operator == 'NOT IN') {
@@ -36,11 +36,6 @@ class commerce_line_item_handler_filter_line_item_is_referenced extends views_ha
     $options['IN'] = t('Line item is referenced');
     $options['NOT IN'] = t('Line item is NOT referenced');
     return $options;
-  }
-
-
-  function options_form(&$form, &$form_state) {
-    parent::options_form($form, $form_state);
   }
 
   /**
