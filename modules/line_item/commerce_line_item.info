@@ -15,6 +15,7 @@ files[] = includes/views/handlers/commerce_line_item_handler_area_line_item_summ
 files[] = includes/views/handlers/commerce_line_item_handler_argument_line_item_line_item_id.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_title.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_line_item_type.inc
+files[] = includes/views/handlers/commerce_line_item_handler_filter_line_item_is_referenced.inc
 files[] = includes/views/handlers/commerce_line_item_handler_filter_line_item_type.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_edit_quantity.inc
 files[] = includes/views/handlers/commerce_line_item_handler_field_edit_delete.inc

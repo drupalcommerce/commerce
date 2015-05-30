@@ -63,6 +63,15 @@ function commerce_line_item_views_data() {
 
   // TODO: Expose the display view build mode.
 
+  // Defines a filter that ensures line items are referenced by orders.
+  $data['commerce_line_item']['line_item_is_referenced'] = array(
+    'title' => t('Line item is referenced by its order'),
+    'help' => t('Ensures a line item in the result set is referenced by the order it indicates in its order_id property.'),
+    'filter' => array(
+      'handler' => 'commerce_line_item_handler_filter_line_item_is_referenced',
+    ),
+  );
+
   // Expose the type-dependent line item title.
   $data['commerce_line_item']['line_item_title'] = array(
     'field' => array(

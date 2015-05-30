@@ -105,9 +105,11 @@ function commerce_line_item_hook_info() {
  */
 function commerce_line_item_form_alter(&$form, &$form_state, $form_id) {
   $line_item_form = FALSE;
+
   // Is this a views form?
   if (strpos($form_id, 'views_form_') === 0) {
     $view = $form_state['build_info']['args'][0];
+
     // Does the view contain one of the line item edit fields?
     foreach ($view->field as $field_name => $field) {
       if ($field instanceof commerce_line_item_handler_field_edit_delete || $field instanceof commerce_line_item_handler_field_edit_quantity) {
@@ -115,10 +117,12 @@ function commerce_line_item_form_alter(&$form, &$form_state, $form_id) {
       }
     }
   }
+
   // This is not the form we are looking for.
   if (!$line_item_form) {
     return;
   }
+
   // Require the existence of an order_id argument (and its value).
   if (empty($view->argument['order_id']) || empty($view->argument['order_id']->value)) {
     return;
@@ -541,9 +545,9 @@ function commerce_line_item_type_to_arg($type) {
  *   - add_form_validate
  *   - add_form_submit
  *
- * @return
+ * @return string
  *   A string containing the name of the callback function or FALSE if it could
- *     not be found.
+ *   not be found.
  */
 function commerce_line_item_type_callback($line_item_type, $callback) {
   // If the specified callback function exists, return it.
