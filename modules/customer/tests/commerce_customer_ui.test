@@ -118,7 +118,9 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
     $this->assertTrue($this->url = url('admin/commerce/customer-profiles/add/billing', array('absolute => TRUE')));
 
     // Get the default values for the address.
-    $address = addressfield_default_values();
+    $field = field_info_field('commerce_customer_address');
+    $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', 'billing');
+    $address = addressfield_default_values($field, $instance);
 
     // Check the integrity of the add form.
     $this->pass(t('Test the integrity of the add customer profile form:'));

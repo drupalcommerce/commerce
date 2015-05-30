@@ -582,33 +582,24 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
    *  	Type of the customer profile, default billing.
    *  @param $uid
    *  	User id that will own the profile, by default anonymous.
-   *  @param $address_info
-   *  	Address information, associative array keyed by the field name.
-   *  	i.e. 'commerce_customer_address'.
    *
    *  @return
    *  	The customer profile created or FALSE if the profile wasn't created.
    */
-  public function createDummyCustomerProfile($type = 'billing', $uid = 0, $address_info = array()) {
-    variable_set('site_default_country', 'US');
+  public function createDummyCustomerProfile($type = 'billing', $uid = 0) {
     // Initialize the profile.
     $profile = commerce_customer_profile_new($type, $uid);
-
-    // Set the defaults.
+    // Initialize the address.
+    $defaults = array();
     $defaults['name_line'] = $this->randomName();
-    $defaults = array_merge($defaults, addressfield_default_values(), $this->generateAddressInformation());
-
-    // Get all the fields for the given type, by default billing.
-    $instances = field_info_instances('commerce_customer_profile', $type);
-    foreach ($instances as $name => $instance) {
-      $info_field = field_info_field($name);
-      if ($info_field['type'] == 'addressfield') {
-        $values = !empty($address_info[$name]) ? array_merge($defaults, $address_info[$name]) : $defaults;
-        $values['data'] = serialize($values['data']);
-        $profile->{$name}[LANGUAGE_NONE][] = $values;
-      }
-    }
+    $field = field_info_field('commerce_customer_address');
+    $instance = field_info_instance('commerce_customer_profile', 'commerce_customer_address', $type);
+    $values = array_merge($defaults, addressfield_default_values($field, $instance), $this->generateAddressInformation());
+    $values['data'] = serialize($values['data']);
+    $profile->commerce_customer_address[LANGUAGE_NONE][] = $values;
+    // Save the dummy profile.
     commerce_customer_profile_save($profile);
+
     return $profile;
   }
 
