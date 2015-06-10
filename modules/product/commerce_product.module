@@ -27,7 +27,7 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
   $field_storage = FieldStorageConfig::loadByName('commerce_product', 'body');
   $instance = FieldConfig::loadByName('commerce_product', $product_type_id, 'body');
   if (empty($field_storage)) {
-    $field_storage = entity_create('field_storage_config', [
+    $field_storage = FieldStorageConfig::create([
       'field_name' => 'body',
       'entity_type' => 'commerce_product',
       'type' => 'text_with_summary',
@@ -35,7 +35,7 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
     $field_storage->save();
   }
   if (empty($instance)) {
-    $instance = entity_create('field_config', [
+    $instance = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => $product_type_id,
       'label' => $label,
