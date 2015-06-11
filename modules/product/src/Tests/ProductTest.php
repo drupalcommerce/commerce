@@ -39,7 +39,7 @@ class ProductTest extends CommerceProductTestBase {
     ];
     $this->createEntity('commerce_product', $values);
 
-    $productDuplicate = entity_create("commerce_product", $values);
+    $productDuplicate = Product::create($values);
 
     $violations = $productDuplicate->sku->validate();
     $this->assertNotEqual($violations->count(), 0, 'Validation fails when creating a product with the same SKU.');

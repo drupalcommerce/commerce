@@ -86,7 +86,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    */
   protected function createEntity($entityType, $values) {
-    $entity = entity_create($entityType, $values);
+    $entity = \Drupal::entityManager()->getStorage($entityType)->create($values);
     $status = $entity->save();
 
     $this->assertEqual(

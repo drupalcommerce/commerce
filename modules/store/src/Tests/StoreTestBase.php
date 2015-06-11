@@ -56,7 +56,7 @@ abstract class StoreTestBase extends WebTestBase {
    *   A new entity.
    */
   protected function createEntity($entityType, array $values) {
-    $entity = entity_create($entityType, $values);
+    $entity = \Drupal::entityManager()->getStorage($entityType)->create($values);
     $status = $entity->save();
     $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', ['%label' => $entity->getEntityType()->getLabel(), '%type' => $entity->id()]));
 
