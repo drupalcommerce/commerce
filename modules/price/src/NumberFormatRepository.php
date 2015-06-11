@@ -37,33 +37,28 @@ class NumberFormatRepository extends ExternalNumberFormatRepository implements N
   }
 
   /**
-   * Loads the number format definitions for the provided locale.
-   *
-   * @param string $locale The desired locale.
-   *
-   * @return array
+   * {@inheritdoc}
    */
-  protected function loadDefinitions($locale) {
-    if (isset($this->definitions[$locale])) {
-      return $this->definitions[$locale];
+  public function get($locale, $fallbackLocale = null) {
+    $locale = $this->resolveLocale($locale, $fallbackLocale);
+    if (isset($this->numberFormats[$locale])) {
+      return $this->numberFormats[$locale];
     }
 
+    // Load the definition.
     $cacheKey = 'commerce_price.number_format.' . $locale;
     if ($cached = $this->cache->get($cacheKey)) {
-      $this->definitions[$locale] = $cached->data;
+      $definition = $cached->data;
     }
     else {
       $filename = $this->definitionPath . $locale . '.json';
-      $this->definitions[$locale] = json_decode(file_get_contents($filename), true);
-      // Merge-in base definitions.
-      $baseDefinitions = $this->loadBaseDefinitions();
-      foreach ($this->definitions[$locale] as $numberFormat => $definition) {
-        $this->definitions[$locale][$numberFormat] += $this->baseDefinitions[$numberFormat];
-      }
-      $this->cache->set($cacheKey, $this->definitions[$locale], CacheBackendInterface::CACHE_PERMANENT, ['number_formats']);
+      $definition = json_decode(file_get_contents($filename), true);
+      $this->cache->set($cacheKey, $definition, CacheBackendInterface::CACHE_PERMANENT, ['number_formats']);
     }
+    // Instantiate the number format and add it to the static cache.
+    $this->numberFormats[$locale] = $this->createNumberFormatFromDefinition($definition, $locale);
 
-    return $this->definitions[$locale];
+    return $this->numberFormats[$locale];
   }
 
 }
