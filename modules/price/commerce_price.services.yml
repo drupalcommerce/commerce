@@ -5,4 +5,4 @@ services:
 
   commerce_price.number_format_repository:
     class: Drupal\commerce_price\NumberFormatRepository
-    arguments: ['@cache.data']
+    arguments: ['@cache.data', '@event_dispatcher']

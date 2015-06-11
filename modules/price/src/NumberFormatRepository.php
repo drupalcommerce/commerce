@@ -9,7 +9,10 @@ namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface;
 use CommerceGuys\Intl\NumberFormat\NumberFormatRepository as ExternalNumberFormatRepository;
+use Drupal\commerce_price\Event\NumberFormatEvent;
+use Drupal\commerce_price\Event\PriceEvents;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines the number format repository.
@@ -26,13 +29,24 @@ class NumberFormatRepository extends ExternalNumberFormatRepository implements N
   protected $cache;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Creates a NumberFormatRepository instance.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher.
    */
-  public function __construct(CacheBackendInterface $cache) {
+  public function __construct(CacheBackendInterface $cache, EventDispatcherInterface $eventDispatcher) {
     $this->cache = $cache;
+    $this->eventDispatcher = $eventDispatcher;
+
     parent::__construct();
   }
 
@@ -55,8 +69,11 @@ class NumberFormatRepository extends ExternalNumberFormatRepository implements N
       $definition = json_decode(file_get_contents($filename), true);
       $this->cache->set($cacheKey, $definition, CacheBackendInterface::CACHE_PERMANENT, ['number_formats']);
     }
-    // Instantiate the number format and add it to the static cache.
-    $this->numberFormats[$locale] = $this->createNumberFormatFromDefinition($definition, $locale);
+    // Instantiate and alter the number format.
+    $numberFormat = $this->createNumberFormatFromDefinition($definition, $locale);
+    $event = new NumberFormatEvent($numberFormat);
+    $this->eventDispatcher->dispatch(PriceEvents::NUMBER_FORMAT_LOAD, $event);
+    $this->numberFormats[$locale] = $numberFormat;
 
     return $this->numberFormats[$locale];
   }
