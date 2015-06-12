@@ -1,0 +1,15 @@
+services:
+  commerce_store.store_context:
+    class: Drupal\commerce_store\StoreContext
+    arguments: ['@request_stack', '@commerce_store.chain_store_resolver']
+
+  commerce_store.chain_store_resolver:
+    class: Drupal\commerce_store\Resolver\ChainStoreResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce_store.store_resolver }
+
+  commerce_store.default_store_resolver:
+    class: Drupal\commerce_store\Resolver\DefaultStoreResolver
+    arguments: ['@config.factory', '@entity.manager']
+    tags:
+      - { name: commerce_store.store_resolver, priority: -100 }
