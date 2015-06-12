@@ -2,3 +2,11 @@ services:
   commerce_tax.tax_type_importer_factory:
     class: Drupal\commerce_tax\TaxTypeImporterFactory
     arguments: ['@entity.manager', '@string_translation']
+  commerce_tax.tax_resolver:
+    class: Drupal\commerce_tax\TaxResolver
+  plugin.manager.commerce_tax.tax_type_resolver:
+    class: Drupal\commerce_tax\TaxTypeResolverManager
+    parent: default_plugin_manager
+  plugin.manager.commerce_tax.tax_rate_resolver:
+    class: Drupal\commerce_tax\TaxRateResolverManager
+    parent: default_plugin_manager
