@@ -1,0 +1,30 @@
+services:
+  commerce.country_context:
+    class: Drupal\commerce\CountryContext
+    arguments: ['@request_stack', '@commerce.chain_country_resolver']
+
+  commerce.chain_country_resolver:
+    class: Drupal\commerce\Resolver\ChainCountryResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce.country_resolver }
+
+  commerce.default_country_resolver:
+    class: Drupal\commerce\Resolver\DefaultCountryResolver
+    arguments: ['@config.factory']
+    tags:
+      - { name: commerce.country_resolver, priority: -100 }
+
+  commerce.locale_context:
+    class: Drupal\commerce\LocaleContext
+    arguments: ['@request_stack', '@commerce.chain_locale_resolver']
+
+  commerce.chain_locale_resolver:
+    class: Drupal\commerce\Resolver\ChainLocaleResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce.locale_resolver }
+
+  commerce.default_locale_resolver:
+    class: Drupal\commerce\Resolver\DefaultLocaleResolver
+    arguments: ['@language_manager', '@commerce.country_context']
+    tags:
+      - { name: commerce.locale_resolver, priority: -100 }
