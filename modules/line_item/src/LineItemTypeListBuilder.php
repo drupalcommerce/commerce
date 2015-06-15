@@ -11,7 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides a listing of Line item types.
+ * Defines the list builder for line item types.
  */
 class LineItemTypeListBuilder extends ConfigEntityListBuilder {
 

@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * Provides a list controller for stores.
+ * Defines the list builder for products.
  */
 class ProductListBuilder extends EntityListBuilder {
 

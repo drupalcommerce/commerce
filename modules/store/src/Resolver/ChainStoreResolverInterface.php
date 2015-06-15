@@ -8,9 +8,8 @@
 namespace Drupal\commerce_store\Resolver;
 
 /**
- * Chain store resolver interface.
- *
  * Runs the added resolvers one by one until one of them returns the store.
+ *
  * Each resolver in the chain can be another chain, which is why this interface
  * extends the store resolver one.
  */

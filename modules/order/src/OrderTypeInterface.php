@@ -10,7 +10,7 @@ namespace Drupal\commerce_order;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining a commerce order type entity.
+ * Defines the interface for order types.
  */
 interface OrderTypeInterface extends ConfigEntityInterface {
 

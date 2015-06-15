@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a list controller for commerce_line_item entity.
+ * Defines the list builder for line items.
  */
 class LineItemListBuilder extends EntityListBuilder {
 

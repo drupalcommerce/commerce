@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
- * Provides an interface defining a Commerce Order entity.
+ * Defines the interface for orders.
  */
 interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 

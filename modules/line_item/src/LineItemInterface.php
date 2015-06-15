@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
- * Provides an interface defining a Commerce Line item entity.
+ * Defines the interface for line items.
  */
 interface LineItemInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 

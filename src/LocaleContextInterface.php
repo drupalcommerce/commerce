@@ -8,8 +8,6 @@
 namespace Drupal\commerce;
 
 /**
- * Locale context interface
- *
  * Holds a reference to the current locale, resolved on demand.
  *
  * @see \Drupal\commerce\LocaleContext

@@ -42,7 +42,7 @@ interface EntityStoreInterface {
    * Sets the store ID.
    *
    * @param int $store_id
-   *   The store id id.
+   *   The store id.
    *
    * @return $this
    */

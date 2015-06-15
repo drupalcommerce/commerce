@@ -10,8 +10,6 @@ namespace Drupal\commerce;
 use Drupal\commerce\Resolver\ChainLocaleResolverInterface;
 
 /**
- * Locale context.
- *
  * Holds a reference to the current locale, resolved on demand.
  *
  * The ChainLocaleResolver runs the registered locale resolvers one by one until

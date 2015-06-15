@@ -10,7 +10,7 @@ namespace Drupal\commerce_store;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining a store type entity.
+ * Defines the interface for store types.
  */
 interface StoreTypeInterface extends ConfigEntityInterface {
 

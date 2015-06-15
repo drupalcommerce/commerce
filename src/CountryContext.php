@@ -10,8 +10,6 @@ namespace Drupal\commerce;
 use Drupal\commerce\Resolver\ChainCountryResolverInterface;
 
 /**
- * Country context.
- *
  * Holds a reference to the current country, resolved on demand.
  *
  * The ChainCountryResolver runs the registered country resolvers one by one

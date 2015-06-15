@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a list controller for commerce_order entity.
+ * Defines the list builder for orders.
  */
 class OrderListBuilder extends EntityListBuilder {
 

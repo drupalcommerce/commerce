@@ -8,8 +8,6 @@
 namespace Drupal\commerce_store;
 
 /**
- * Store context interface
- *
  * Holds a reference to the active store, resolved on demand.
  *
  * @see \Drupal\commerce_store\StoreContext

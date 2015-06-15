@@ -11,7 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides a listing of Example.
+ * Defines the list builder for store types.
  */
 class StoreTypeListBuilder extends ConfigEntityListBuilder {
 

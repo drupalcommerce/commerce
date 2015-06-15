@@ -8,7 +8,7 @@
 namespace Drupal\commerce_price;
 
 /**
- * Defines a currency importer.
+ * Defines the interface for currency importers.
  */
 interface CurrencyImporterInterface {
 

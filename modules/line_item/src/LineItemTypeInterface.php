@@ -10,7 +10,7 @@ namespace Drupal\commerce_line_item;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining a commerce line item type entity.
+ * Defines the interface for line item types.
  */
 interface LineItemTypeInterface extends ConfigEntityInterface {
 

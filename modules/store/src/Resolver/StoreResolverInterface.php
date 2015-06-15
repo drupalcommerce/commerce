@@ -8,11 +8,7 @@
 namespace Drupal\commerce_store\Resolver;
 
 /**
- * Store resolver interface
- *
- * Each resolver tries to determine the active store based on its own logic,
- * and returns it if successful. Otherwise, it returns NULL to indicate that
- * the next resolver in the chain should be called.
+ * Defines the interface for store resolvers.
  */
 interface StoreResolverInterface {
 
@@ -20,6 +16,8 @@ interface StoreResolverInterface {
    * Resolves the store.
    *
    * @return \Drupal\commerce_store\StoreInterface|NULL
+   *   The store, if resolved. Otherwise NULL, indicating that the next
+   *   resolver in the chain should be called.
    */
   public function resolve();
 

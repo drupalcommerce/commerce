@@ -11,7 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides a listing of Order types.
+ * Defines the list builder for currencies.
  */
 class CurrencyListBuilder extends ConfigEntityListBuilder {
 

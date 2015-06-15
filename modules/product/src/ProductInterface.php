@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
- * Provides an interface defining a Commerce Product entity.
+ * Defines the interface for products.
  */
 interface ProductInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 

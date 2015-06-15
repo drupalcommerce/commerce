@@ -10,8 +10,6 @@ namespace Drupal\commerce_store;
 use Drupal\commerce_store\Resolver\ChainStoreResolverInterface;
 
 /**
- * Store context.
- *
  * Holds a reference to the active store, resolved on demand.
  *
  * The ChainStoreResolver runs the registered store resolvers one by one until

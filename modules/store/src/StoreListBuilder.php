@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
 /**
- * Provides a list controller for stores.
+ * Defines the list builder for stores.
  */
 class StoreListBuilder extends EntityListBuilder {
 

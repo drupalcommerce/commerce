@@ -8,9 +8,8 @@
 namespace Drupal\commerce\Resolver;
 
 /**
- * Chain locale resolver interface.
- *
  * Runs the added resolvers one by one until one of them returns the locale.
+ *
  * Each resolver in the chain can be another chain, which is why this interface
  * extends the locale resolver one.
  */

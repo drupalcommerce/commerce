@@ -8,11 +8,7 @@
 namespace Drupal\commerce\Resolver;
 
 /**
- * Country resolver interface
- *
- * Each resolver tries to determine the current country based on its own logic,
- * and returns it if successful. Otherwise, it returns NULL to indicate that
- * the next resolver in the chain should be called.
+ * Defines the interface for country resolvers.
  */
 interface CountryResolverInterface {
 
@@ -20,6 +16,8 @@ interface CountryResolverInterface {
    * Resolves the country.
    *
    * @return string|null
+   *   The country, if resolved. Otherwise NULL, indicating that the next
+   *   resolver in the chain should be called.
    */
   public function resolve();
 

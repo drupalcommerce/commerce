@@ -8,9 +8,8 @@
 namespace Drupal\commerce\Resolver;
 
 /**
- * Chain country resolver interface.
- *
  * Runs the added resolvers one by one until one of them returns the country.
+ *
  * Each resolver in the chain can be another chain, which is why this interface
  * extends the country resolver one.
  */

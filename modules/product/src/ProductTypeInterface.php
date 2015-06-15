@@ -10,7 +10,7 @@ namespace Drupal\commerce_product;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Provides an interface defining a Example entity.
+ * Defines the interface for product types.
  */
 interface ProductTypeInterface extends ConfigEntityInterface {
 

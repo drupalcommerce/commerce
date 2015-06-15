@@ -8,8 +8,6 @@
 namespace Drupal\commerce;
 
 /**
- * Country context interface
- *
  * Holds a reference to the current country, resolved on demand.
  *
  * @see \Drupal\commerce\CountryContext

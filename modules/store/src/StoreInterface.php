@@ -11,7 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
- * Provides an interface defining a Commerce Store entity.
+ * Defines the interface for stores.
  */
 interface StoreInterface extends EntityInterface, EntityOwnerInterface {
 
