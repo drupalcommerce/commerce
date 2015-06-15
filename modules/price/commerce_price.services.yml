@@ -6,3 +6,7 @@ services:
   commerce_price.number_format_repository:
     class: Drupal\commerce_price\NumberFormatRepository
     arguments: ['@cache.data', '@event_dispatcher']
+
+  commerce_price.number_formatter_factory:
+    class: Drupal\commerce_price\NumberFormatterFactory
+    arguments: ['@commerce.locale_context', '@commerce_price.number_format_repository']
