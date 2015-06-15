@@ -16,11 +16,11 @@ use Drupal\Core\Entity\EntityManagerInterface;
 class DefaultStoreResolver implements StoreResolverInterface {
 
   /**
-   * A config object for the commerce_store configuration.
+   * The configuration factory.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $config;
+  protected $configFactory;
 
   /**
    * The entity manager.
@@ -38,7 +38,7 @@ class DefaultStoreResolver implements StoreResolverInterface {
    *   The entity manager.
    */
   public function __construct(ConfigFactoryInterface $configFactory, EntityManagerInterface $entityManager) {
-    $this->config = $configFactory->get('commerce_store.settings');
+    $this->configFactory = $configFactory;
     $this->entityManager = $entityManager;
   }
 
@@ -47,7 +47,7 @@ class DefaultStoreResolver implements StoreResolverInterface {
    */
   public function resolve() {
     $store = NULL;
-    $uuid = $this->config->get('default_store');
+    $uuid = $this->configFactory->get('commerce_store.settings')->get('default_store');
     if ($uuid) {
       $store = $this->entityManager->loadEntityByUuid('commerce_store', $uuid);
     }
