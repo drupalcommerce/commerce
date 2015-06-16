@@ -10,9 +10,9 @@ namespace Drupal\commerce_product\Plugin\Validation\Constraint;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Supports validating comment author names.
+ * Supports validating product skus.
  *
- * @Plugin(
+ * @Constraint(
  *   id = "ProductSku",
  *   label = @Translation("The SKU of the product.", context = "Validation")
  * )
