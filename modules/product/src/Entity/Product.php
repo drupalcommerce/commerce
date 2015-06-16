@@ -19,8 +19,6 @@ use Drupal\user\UserInterface;
 /**
  * Defines the Commerce Product entity.
  *
- * @TODO add a data table to this definition
- *
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
@@ -137,12 +135,6 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public function getType() {
     return $this->get('type')->value;
-  }
-  /**
-   * {@inheritdoc}
-   */
-  public function getData() {
-    return $this->get('data')->value;
   }
 
   /**
@@ -330,11 +322,6 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setLabel(t('Type'))
       ->setDescription(t('The type of the product.'))
       ->setRequired(TRUE);
-
-    $fields['data'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Data'))
-      ->setDescription(t('A serialized array of additional data.'))
-      ->setRevisionable(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))

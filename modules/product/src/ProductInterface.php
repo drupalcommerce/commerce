@@ -99,18 +99,6 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
   public function getType();
 
   /**
-   * Get the product data property.
-   *
-   * @return array
-   *   Unstructured array of product data
-   */
-  public function getData();
-
-  // @TODO do we need a setter for data? I can't see how this would be useful
-  // unless it was something where you could tell it what part of the data array
-  // you wanted to set/replace.
-
-  /**
    * Gets the product revision log message.
    *
    * @return string
