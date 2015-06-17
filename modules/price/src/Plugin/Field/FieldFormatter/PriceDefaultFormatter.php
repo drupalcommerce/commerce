@@ -2,31 +2,33 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_price\Plugin\field\formatter\PriceFormatter.
+ * Contains \Drupal\commerce_price\Plugin\field\formatter\PriceDefaultFormatter.
  */
 
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
+use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the commerce price formatter.
+ * Plugin implementation of the 'price_default' formatter.
  *
  * @FieldFormatter(
- *   id = "price",
- *   label = @Translation("Price"),
+ *   id = "price_default",
+ *   label = @Translation("Default"),
  *   field_types = {
  *     "price"
  *   }
  * )
  */
-class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
    * The currency storage.
@@ -36,7 +38,14 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
   protected $currencyStorage;
 
   /**
-   * Constructs a PriceFormatter object.
+   * The number formatter.
+   *
+   * @var \CommerceGuys\Intl\Formatter\NumberFormatter
+   */
+  protected $numberFormatter;
+
+  /**
+   * Constructs a new PriceDefaultFormatter object.
    *
    * @param string $pluginId
    *   The plugin_id for the formatter.
@@ -54,11 +63,21 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    *   Any third party settings settings.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
+   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
+   *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityManagerInterface $entityManager) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityManagerInterface $entityManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
 
     $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->numberFormatter = $numberFormatterFactory->createInstance();
+    $this->numberFormatter->setMaximumFractionDigits(6);
+    if ($this->getSetting('strip_trailing_zeroes')) {
+      $this->numberFormatter->setMinimumFractionDigits(0);
+    }
+    if ($this->getSetting('display_currency_code')) {
+      $this->numberFormatter->setCurrencyDisplay(NumberFormatterInterface::CURRENCY_DISPLAY_CODE);
+    }
   }
 
   /**
@@ -73,7 +92,8 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('commerce_price.number_formatter_factory')
     );
   }
 
@@ -82,18 +102,25 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    */
   public static function defaultSettings() {
     return [
-      'show_currency_code' => FALSE,
+      'strip_trailing_zeroes' => FALSE,
+      'display_currency_code' => FALSE,
     ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $elements, FormStateInterface $form_state) {
-    $elements['show_currency_code'] = [
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $elements = [];
+    $elements['strip_trailing_zeroes'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Strip trailing zeroes after the decimal point.'),
+      '#default_value' => $this->getSetting('strip_trailing_zeroes'),
+    ];
+    $elements['display_currency_code'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display the currency code instead of the currency symbol.'),
-      '#default_value' => $this->getSetting('show_currency_code'),
+      '#default_value' => $this->getSetting('display_currency_code'),
     ];
 
     return $elements;
@@ -103,10 +130,18 @@ class PriceFormatter extends FormatterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items) {
-    $elements = [];
-
+    $currencyCodes = [];
     foreach ($items as $delta => $item) {
-      $elements[$delta] = ['#markup' => $item->amount];
+      $currencyCodes[] = $item->currency_code;
+    }
+    $currencies = $this->currencyStorage->loadMultiple($currencyCodes);
+
+    $elements = [];
+    foreach ($items as $delta => $item) {
+      $currency = $currencies[$item->currency_code];
+      $elements[$delta] = [
+        '#markup' => $this->numberFormatter->formatCurrency($item->amount, $currency),
+      ];
     }
 
     return $elements;

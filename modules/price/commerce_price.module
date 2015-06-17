@@ -1,8 +1,28 @@
 <?php
 
+/**
+ * @file
+ * Defines the Currency entity and the Price field.
+ */
+
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Language\LanguageInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_price_theme() {
+  return [
+    'commerce_price_plain' => [
+      'variables' => [
+        'amount' => 0,
+        'currency' => NULL,
+      ],
+      'template' => 'commerce-price-plain',
+    ],
+  ];
+}
 
 /**
  * Implements hook_ENTITY_TYPE_insert() for 'configurable_language'.

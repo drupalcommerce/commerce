@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Default theme implementation for displaying a price.
+ *
+ * Used by the 'price_plain' formatter.
+ * Available variables:
+ *   - amount: The decimal amount.
+ *   - currency: The currency entity.
+ *
+ * @ingroup themeable
+ */
+#}
+{{ amount|number_format(2, '.', ',') }} {{ currency.currencyCode }}
