@@ -19,9 +19,12 @@ class CurrencyListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['name'] = $this->t('Name');
-    $header['currency_code'] = $this->t('Currency code');
-    $header['status'] = $this->t('Status');
+    $header = [
+      'name' => $this->t('Name'),
+      'currencyCode' => $this->t('Currency code'),
+      'status' => $this->t('Status'),
+    ];
+
     return $header + parent::buildHeader();
   }
 
@@ -29,9 +32,12 @@ class CurrencyListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['name'] = $this->getLabel($entity);
-    $row['currency_code'] = $entity->id();
-    $row['status'] = $entity->status() ? t('Enabled') : t('Disabled');
+    $row = [
+      'name' => $this->getLabel($entity),
+      'currencyCode' => $entity->id(),
+      'status' => $entity->status() ? $this->t('Enabled') : $this->t('Disabled'),
+    ];
+
     return $row + parent::buildRow($entity);
   }
 

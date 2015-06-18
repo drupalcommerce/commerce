@@ -42,7 +42,7 @@ class CurrencyImporterForm extends FormBase {
       ];
     }
     else {
-      $form['currency_code'] = [
+      $form['currencyCode'] = [
         '#type' => 'select',
         '#title' => $this->t('Currency code'),
         '#description' => $this->t('Please select the currency you would like to import.'),
@@ -80,8 +80,8 @@ class CurrencyImporterForm extends FormBase {
    */
   public function getCurrencyOptions(array $currencies) {
     $options = [];
-    foreach ($currencies as $currency_code => $currency) {
-      $options[$currency_code] = $currency->getName();
+    foreach ($currencies as $currencyCode => $currency) {
+      $options[$currencyCode] = $currency->getName();
     }
     asort($options);
 
@@ -94,7 +94,7 @@ class CurrencyImporterForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
     $currency = $this->currencyImporter->importCurrency(
-      $values['currency_code']
+      $values['currencyCode']
     );
 
     try {

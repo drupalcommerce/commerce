@@ -5,7 +5,6 @@
  * Defines the Currency entity and the Price field.
  */
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Language\LanguageInterface;
 
@@ -31,9 +30,8 @@ function commerce_price_configurable_language_insert(ConfigurableLanguage $langu
   // Ignore 'und' and 'zxx'.
   if (!($language->getId() === LanguageInterface::LANGCODE_NOT_SPECIFIED || $language->getId() === LanguageInterface::LANGCODE_NOT_APPLICABLE)) {
     // Import currencies.
-    $currency_importer = \Drupal::service('commerce_price.currency_importer');
-
+    $importer = \Drupal::service('commerce_price.currency_importer');
     $currencies = \Drupal\commerce_price\Entity\Currency::loadMultiple();
-    $currency_importer->importCurrencyTranslations($currencies, [$language]);
+    $importer->importCurrencyTranslations($currencies, [$language]);
   }
 }

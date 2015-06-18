@@ -31,13 +31,13 @@ interface CurrencyImporterInterface {
   /**
    * Creates a new currency object for the given currency code.
    *
-   * @param string $currency_code
+   * @param string $currencyCode
    *   The currency code.
    *
    * @return \Drupal\commerce_price\Entity\Currency | bool
    *    The new currency or false if the currency is already imported.
    */
-  public function importCurrency($currency_code);
+  public function importCurrency($currencyCode);
 
   /**
    * Imports translations for the currency entity.

@@ -39,7 +39,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   protected $languageManager;
 
   /**
-   * Constructs a new CurrencyImporter.
+   * Creates a new CurrencyImporter object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
@@ -73,16 +73,16 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function importCurrency($currency_code) {
-    if ($this->currencyStorage->load($currency_code)) {
+  public function importCurrency($currencyCode) {
+    if ($this->currencyStorage->load($currencyCode)) {
       return FALSE;
     }
     $language = $this->languageManager->getDefaultLanguage();
-    $currency = $this->getCurrency($currency_code, $language, CurrencyImporterInterface::FALLBACK_LANGUAGE);
+    $currency = $this->getCurrency($currencyCode, $language, CurrencyImporterInterface::FALLBACK_LANGUAGE);
 
     if ($currency) {
       $values = [
-        'currency_code' => $currency->getCurrencyCode(),
+        'currencyCode' => $currency->getCurrencyCode(),
         'name' => $currency->getName(),
         'numericCode' => $currency->getNumericCode(),
         'symbol' => $currency->getSymbol(),
@@ -131,7 +131,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * Get a single currency.
    *
-   * @param string $currency_code
+   * @param string $currencyCode
    *   The currency code.
    * @param \Drupal\Core\Language\LanguageInterface $language
    *   The language.
@@ -142,9 +142,9 @@ class CurrencyImporter implements CurrencyImporterInterface {
    *   Returns \CommerceGuys\Intl\Currency\Currency or
    *   false when a exception has occurred.
    */
-  protected function getCurrency($currency_code, LanguageInterface $language, $fallback = NULL) {
+  protected function getCurrency($currencyCode, LanguageInterface $language, $fallback = NULL) {
     try {
-      $currency = $this->currencyRepository->get($currency_code, $language->getId(), $fallback);
+      $currency = $this->currencyRepository->get($currencyCode, $language->getId(), $fallback);
     }
     catch (UnknownLocaleException $e) {
       return FALSE;

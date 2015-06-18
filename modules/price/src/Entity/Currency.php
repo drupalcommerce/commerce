@@ -27,13 +27,13 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   admin_permission = "administer stores",
  *   config_prefix = "commerce_currency",
  *   entity_keys = {
- *     "id" = "currency_code",
+ *     "id" = "currencyCode",
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "status" = "status"
  *   },
  *   config_export = {
- *     "currency_code",
+ *     "currencyCode",
  *     "name",
  *     "numericCode",
  *     "symbol",
@@ -54,7 +54,7 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    *
    * @var string
    */
-  protected $currency_code;
+  protected $currencyCode;
 
   /**
    * The currency name.
@@ -88,22 +88,21 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    * Overrides \Drupal\Core\Entity\Entity::id().
    */
   public function id() {
-    return $this->getCurrencyCode();
+    return $this->currencyCode;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCurrencyCode() {
-    return $this->currency_code;
+    return $this->currencyCode;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCurrencyCode($currency_code) {
-    $this->currency_code = $currency_code;
-
+  public function setCurrencyCode($currencyCode) {
+    $this->currencyCode = $currencyCode;
     return $this;
   }
 
@@ -119,7 +118,6 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    */
   public function setName($name) {
     $this->name = $name;
-
     return $this;
   }
 
@@ -135,7 +133,6 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    */
   public function setNumericCode($numericCode) {
     $this->numericCode = $numericCode;
-
     return $this;
   }
 
@@ -151,7 +148,6 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    */
   public function setSymbol($symbol) {
     $this->symbol = $symbol;
-
     return $this;
   }
 
@@ -167,7 +163,6 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    */
   public function setFractionDigits($fractionDigits) {
     $this->fractionDigits = $fractionDigits;
-
     return $this;
   }
 

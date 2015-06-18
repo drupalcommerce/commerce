@@ -2,7 +2,7 @@ commerce_price.commerce_currency.*:
   type: config_entity
   label: 'Currency'
   mapping:
-    currency_code:
+    currencyCode:
       type: string
       label: 'Currency code'
     name:

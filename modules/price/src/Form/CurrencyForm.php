@@ -22,7 +22,7 @@ class CurrencyForm extends EntityForm {
   protected $currencyStorage;
 
   /**
-   * Creates a CurrencyForm instance.
+   * Creates a new CurrencyForm object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $currencyStorage
    *   The currency storage.
@@ -55,7 +55,7 @@ class CurrencyForm extends EntityForm {
       '#maxlength' => 255,
       '#required' => TRUE,
     ];
-    $form['currency_code'] = [
+    $form['currencyCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
       '#default_value' => $currency->getCurrencyCode(),
@@ -107,12 +107,12 @@ class CurrencyForm extends EntityForm {
    */
   public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
-    $currency_code = $element['#value'];
-    if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
+    $currencyCode = $element['#value'];
+    if (!preg_match('/^[A-Z]{3}$/', $currencyCode)) {
       $form_state->setError($element, $this->t('The currency code must consist of three uppercase letters.'));
     }
     elseif ($currency->isNew()) {
-      $loadedCurrency = $this->currencyStorage->load($currency_code);
+      $loadedCurrency = $this->currencyStorage->load($currencyCode);
       if ($loadedCurrency) {
         $form_state->setError($element, $this->t('The currency code is already in use.'));
       }
