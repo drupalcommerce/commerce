@@ -19,7 +19,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   label = @Translation("Price"),
  *   description = @Translation("Stores a decimal amount and a three letter currency code."),
  *   default_widget = "price_simple",
- *   default_formatter = "price",
+ *   default_formatter = "price_default",
  * )
  */
 class Price extends FieldItemBase {

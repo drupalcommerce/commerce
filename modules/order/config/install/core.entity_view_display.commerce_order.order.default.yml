@@ -21,7 +21,7 @@ content:
     third_party_settings: {  }
     label: hidden
   order_total:
-    type: price
+    type: price_default
     weight: 1
     settings:
       show_currency_code: false
