@@ -8,6 +8,7 @@
 namespace Drupal\commerce;
 
 use Drupal\commerce\Resolver\ChainLocaleResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Holds a reference to the current locale, resolved on demand.
@@ -48,7 +49,7 @@ class LocaleContext implements LocaleContextInterface {
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param\Drupal\commerce\Resolver\ChainLocaleResolverInterface $chainResolver
+   * @param \Drupal\commerce\Resolver\ChainLocaleResolverInterface $chainResolver
    *   The chain resolver.
    */
   public function __construct(RequestStack $requestStack, ChainLocaleResolverInterface $chainResolver) {

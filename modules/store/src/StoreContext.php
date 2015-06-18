@@ -8,6 +8,7 @@
 namespace Drupal\commerce_store;
 
 use Drupal\commerce_store\Resolver\ChainStoreResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Holds a reference to the active store, resolved on demand.
@@ -51,7 +52,7 @@ class StoreContext implements StoreContextInterface {
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param\Drupal\commerce_store\Resolver\ChainStoreResolverInterface $chainResolver
+   * @param \Drupal\commerce_store\Resolver\ChainStoreResolverInterface $chainResolver
    *   The chain resolver.
    */
   public function __construct(RequestStack $requestStack, ChainStoreResolverInterface $chainResolver) {

@@ -8,6 +8,7 @@
 namespace Drupal\commerce;
 
 use Drupal\commerce\Resolver\ChainCountryResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Holds a reference to the current country, resolved on demand.
@@ -48,7 +49,7 @@ class CountryContext implements CountryContextInterface {
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param\Drupal\commerce\Resolver\ChainCountryResolverInterface $chainResolver
+   * @param \Drupal\commerce\Resolver\ChainCountryResolverInterface $chainResolver
    *   The chain resolver.
    */
   public function __construct(RequestStack $requestStack, ChainCountryResolverInterface $chainResolver) {
