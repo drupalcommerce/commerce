@@ -13,7 +13,7 @@ bundle: product
 mode: default
 content:
   line_total:
-    type: price
+    type: price_default
     weight: 3
     settings:
       show_currency_code: false
@@ -38,7 +38,7 @@ content:
     third_party_settings: {  }
     label: above
   unit_price:
-    type: price
+    type: price_default
     weight: 2
     settings:
       show_currency_code: false
