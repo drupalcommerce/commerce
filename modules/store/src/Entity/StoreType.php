@@ -41,9 +41,9 @@ use Drupal\Core\Entity\EntityStorageException;
  *     "description",
  *   },
  *   links = {
- *     "edit-form" = "/admin/commerce/config/store/types/{commerce_store_type}/edit",
- *     "delete-form" = "/admin/commerce/config/store/types/{commerce_store_type}/delete",
- *     "collection" = "/admin/commerce/config/store/types",
+ *     "edit-form" = "/admin/commerce/config/store-types/{commerce_store_type}/edit",
+ *     "delete-form" = "/admin/commerce/config/store-types/{commerce_store_type}/delete",
+ *     "collection" = "/admin/commerce/config/store-types",
  *   }
  * )
  */

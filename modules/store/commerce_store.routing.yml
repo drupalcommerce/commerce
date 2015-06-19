@@ -1,5 +1,5 @@
 entity.commerce_store.add_page:
-  path: '/admin/commerce/config/store/add'
+  path: '/admin/commerce/stores/add'
   defaults:
     _title: 'Add a new store'
     _bundle_type: commerce_store_type
@@ -8,7 +8,7 @@ entity.commerce_store.add_page:
     _permission: 'administer stores'
 
 entity.commerce_store.add_form:
-  path: '/admin/commerce/config/store/add/{commerce_store_type}'
+  path: '/admin/commerce/stores/add/{commerce_store_type}'
   defaults:
     _controller: '\Drupal\commerce\Controller\AddController::addForm'
     _title_callback: '\Drupal\commerce\Controller\AddController::addFormTitle'
@@ -21,7 +21,7 @@ entity.commerce_store.add_form:
     _permission: 'administer stores'
 
 entity.commerce_store.collection:
-  path: '/admin/commerce/config/store'
+  path: '/admin/commerce/stores'
   defaults:
     _entity_list: 'commerce_store'
     _title: 'Store information'
@@ -29,7 +29,7 @@ entity.commerce_store.collection:
     _permission: 'administer stores'
 
 entity.commerce_store.edit_form:
-  path: '/admin/commerce/config/store/{commerce_store}/edit'
+  path: '/admin/commerce/stores/{commerce_store}/edit'
   defaults:
     _entity_form: commerce_store.edit
     _title: 'Edit a store'
@@ -37,7 +37,7 @@ entity.commerce_store.edit_form:
     _entity_access: 'commerce_store.edit'
 
 entity.commerce_store.delete_form:
-  path: '/admin/commerce/config/store/{commerce_store}/delete'
+  path: '/admin/commerce/stores/{commerce_store}/delete'
   defaults:
     _entity_form: commerce_store.delete
     _title: 'Delete a store'
@@ -45,7 +45,7 @@ entity.commerce_store.delete_form:
     _entity_access: 'commerce_store.delete'
 
 entity.commerce_store_type.add_form:
-  path: '/admin/commerce/config/store/types/add'
+  path: '/admin/commerce/config/store-types/add'
   defaults:
     _entity_form: 'commerce_store_type.add'
     _title: 'Add a new store type'
@@ -53,7 +53,7 @@ entity.commerce_store_type.add_form:
     _permission: 'administer store types'
 
 entity.commerce_store_type.collection:
-  path: '/admin/commerce/config/store/types'
+  path: '/admin/commerce/config/store-types'
   defaults:
     _entity_list: 'commerce_store_type'
     _title: 'Store types'
@@ -61,7 +61,7 @@ entity.commerce_store_type.collection:
     _permission: 'administer store types'
 
 entity.commerce_store_type.edit_form:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}/edit'
+  path: '/admin/commerce/config/store-types/{commerce_store_type}/edit'
   defaults:
     _entity_form: 'commerce_store_type.edit'
     _title: 'Edit a store type'
@@ -69,7 +69,7 @@ entity.commerce_store_type.edit_form:
     _entity_access: 'commerce_store_type.edit'
 
 entity.commerce_store_type.delete_form:
-  path: '/admin/commerce/config/store/types/{commerce_store_type}/delete'
+  path: '/admin/commerce/config/store-types/{commerce_store_type}/delete'
   defaults:
     _entity_form: 'commerce_store_type.delete'
     _title: 'Delete a store type'

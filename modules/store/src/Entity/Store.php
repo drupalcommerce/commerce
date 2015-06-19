@@ -45,10 +45,10 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/commerce/config/store/{commerce_store}",
- *     "edit-form" = "/admin/commerce/config/store/{commerce_store}/edit",
- *     "delete-form" = "/admin/commerce/config/store/{commerce_store}/delete",
- *     "collection" = "/admin/commerce/config/store",
+ *     "canonical" = "/admin/commerce/stores/{commerce_store}",
+ *     "edit-form" = "/admin/commerce/stores/{commerce_store}/edit",
+ *     "delete-form" = "/admin/commerce/stores/{commerce_store}/delete",
+ *     "collection" = "/admin/commerce/stores",
  *   },
  *   bundle_entity_type = "commerce_store_type",
  *   field_ui_base_route = "entity.commerce_store_type.edit_form",

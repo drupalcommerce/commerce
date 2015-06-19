@@ -54,7 +54,7 @@ class StoreTest extends StoreTestBase {
     $this->assertTrue($storeExist, 'The new store has been created in the database.');
 
     // Create a store through the form.
-    $this->drupalGet('admin/commerce/config/store');
+    $this->drupalGet('admin/commerce/stores');
     $this->clickLink('Add a new store');
     $this->clickLink($this->type->label());
     $edit = [
@@ -77,7 +77,7 @@ class StoreTest extends StoreTestBase {
       ]
     );
 
-    $this->drupalGet('admin/commerce/config/store');
+    $this->drupalGet('admin/commerce/stores');
     $this->clickLink(t('Edit'));
     // Only change the name.
     $edit = [
