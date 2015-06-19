@@ -20,7 +20,7 @@ class StoreTypeTest extends StoreTestBase {
    * Tests if the default Store Type was created.
    */
   public function testDefaultStoreType() {
-    $this->drupalGet('admin/commerce/config/store/types');
+    $this->drupalGet('admin/commerce/config/store-types');
     $storeTypes = StoreType::loadMultiple();
 
     $this->assertTrue(isset($storeTypes['online']), 'Store Type Web is available');
@@ -37,7 +37,7 @@ class StoreTypeTest extends StoreTestBase {
     $tableSelector = 'table tbody tr';
 
     // The store shows one default store type.
-    $this->drupalGet('admin/commerce/config/store/types');
+    $this->drupalGet('admin/commerce/config/store-types');
     $storeTypes = $this->cssSelect($tableSelector);
     $this->assertEqual(count($storeTypes), 1, 'Stores types are correctly listed');
 
@@ -48,7 +48,7 @@ class StoreTypeTest extends StoreTestBase {
       ]
     );
 
-    $this->drupalGet('admin/commerce/config/store/types');
+    $this->drupalGet('admin/commerce/config/store-types');
     $storeTypes = $this->cssSelect($tableSelector);
     $this->assertEqual(count($storeTypes), 2, 'Stores types are correctly listed');
   }
@@ -74,7 +74,7 @@ class StoreTypeTest extends StoreTestBase {
       'id' => 'foo',
       'label' => 'Label of foo',
     ];
-    $this->drupalPostForm('admin/commerce/config/store/types/add', $edit, t('Save'));
+    $this->drupalPostForm('admin/commerce/config/store-types/add', $edit, t('Save'));
     $typeExists = (bool) StoreType::load($edit['id']);
     $this->assertTrue($typeExists, 'The new store type has been created in the database.');
   }
@@ -94,7 +94,7 @@ class StoreTypeTest extends StoreTestBase {
     $edit = [
       'label' => $this->randomMachineName(8),
     ];
-    $this->drupalPostForm('admin/commerce/config/store/types/online/edit', $edit, 'Save');
+    $this->drupalPostForm('admin/commerce/config/store-types/online/edit', $edit, 'Save');
     $storeTypeChanged = StoreType::load($storeType->id());
     $this->assertEqual($storeType->label(), $storeTypeChanged->label(), 'The label of the store type has been changed.');
   }
@@ -118,7 +118,7 @@ class StoreTypeTest extends StoreTestBase {
     ]);
 
     // Try to delete the store type.
-    $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
+    $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
     $this->assertRaw(
       t('%type is used by 1 store on your site. You can not remove this store type until you have removed all of the %type stores.', ['%type' => $type->label()]),
       'The store type will not be deleted until all stores of that type are deleted'
@@ -127,7 +127,7 @@ class StoreTypeTest extends StoreTestBase {
 
     // Deleting the store type when its not being referenced by a store.
     $store->delete();
-    $this->drupalGet('admin/commerce/config/store/types/' . $type->id() . '/delete');
+    $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
     $this->assertRaw(
       t('Are you sure you want to delete the store type %type?', ['%type' => $type->label()]),
       'The store type is available for deletion'
