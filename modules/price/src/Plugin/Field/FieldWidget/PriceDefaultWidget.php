@@ -97,6 +97,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       '#maxlength' => 255,
     ];
     if (count($currencyCodes) == 1) {
+      $lastVisibleElement = 'amount';
       $currencyCode = reset($currencyCodes);
       $element['amount']['#field_suffix'] = $currencyCode;
       $element['currency_code'] = [
@@ -105,6 +106,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       ];
     }
     else {
+      $lastVisibleElement = 'currency_code';
       $element['currency_code'] = [
         '#type' => 'select',
         '#title' => $this->t('Currency'),
@@ -113,6 +115,10 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
         '#title_display' => 'invisible',
         '#field_suffix' => '',
       ];
+    }
+    // Add the help text if specified.
+    if (!empty($element['#description'])) {
+      $element[$lastVisibleElement]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
     }
 
     return $element;

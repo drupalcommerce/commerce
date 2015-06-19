@@ -11,7 +11,7 @@ field_name: commerce_price
 entity_type: commerce_product
 bundle: product
 label: Price
-description: 'Price field for products'
+description: ''
 required: false
 translatable: false
 default_value: {  }
