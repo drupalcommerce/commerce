@@ -37,3 +37,27 @@ entity.commerce_currency.delete_form:
     _title: 'Delete a currency'
   requirements:
     _permission: 'administer stores'
+
+entity.commerce_currency.enable:
+  path: '/admin/commerce/config/currency/{commerce_currency}/enable'
+  defaults:
+    _controller: '\Drupal\commerce_price\Controller\CurrencyController::performOperation'
+    op: 'enable'
+  options:
+    parameters:
+      commerce_currency:
+        type: entity:commerce_currency
+  requirements:
+    _permission: 'administer stores'
+
+entity.commerce_currency.disable:
+  path: '/admin/commerce/config/currency/{commerce_currency}/disable'
+  defaults:
+    _controller: '\Drupal\commerce_price\Controller\CurrencyController::performOperation'
+    op: 'disable'
+  options:
+    parameters:
+      commerce_currency:
+        type: entity:commerce_currency
+  requirements:
+    _permission: 'administer stores'

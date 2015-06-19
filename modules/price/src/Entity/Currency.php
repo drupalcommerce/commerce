@@ -43,6 +43,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   links = {
  *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
  *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
+ *     "enable" = "/admin/commerce/config/currency/{commerce_currency}/enable",
+ *     "disable" = "/admin/commerce/config/currency/{commerce_currency}/disable",
  *     "collection" = "/admin/commerce/config/currency"
  *   }
  * )
