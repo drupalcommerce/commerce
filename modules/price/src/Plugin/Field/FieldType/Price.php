@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "price",
  *   label = @Translation("Price"),
  *   description = @Translation("Stores a decimal amount and a three letter currency code."),
- *   default_widget = "price_simple",
+ *   default_widget = "price_default",
  *   default_formatter = "price_default",
  * )
  */

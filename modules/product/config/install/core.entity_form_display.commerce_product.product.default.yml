@@ -17,7 +17,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   commerce_price:
-    type: price_simple
+    type: price_default
     weight: 4
     settings: {  }
     third_party_settings: {  }

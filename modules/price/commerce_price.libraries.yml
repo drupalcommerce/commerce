@@ -1,5 +1,5 @@
-drupal.commerce_price.simple-widget:
+admin:
   version: VERSION
   css:
     theme:
-      css/commerce_price.css: {}
+      css/commerce_price.admin.css: {}
