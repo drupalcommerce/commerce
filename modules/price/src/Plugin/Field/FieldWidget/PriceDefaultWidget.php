@@ -166,7 +166,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
     $currency = $this->currencyStorage->load($value['currency_code']);
     $value['amount'] = $this->numberFormatter->parseCurrency($value['amount'], $currency);
     if ($value['amount'] === FALSE) {
-      $formState->setError($element['amount'], t('%title is not numeric.', [
+      $formState->setError($element['amount'], $this->t('%title is not numeric.', [
         '%title' => $element['#title'],
       ]));
       return;
