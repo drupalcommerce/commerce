@@ -10,7 +10,7 @@ namespace Drupal\commerce_product\Plugin\Validation\Constraint;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Supports validating product skus.
+ * Ensures product SKU uniqueness.
  *
  * @Constraint(
  *   id = "ProductSku",
@@ -19,6 +19,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class ProductSkuConstraint extends Constraint {
 
-  public $message = 'The SKU %sku is already in use and must be unique. Please supply another value.';
+  public $message = 'The SKU %sku is already in use and must be unique.';
 
 }
