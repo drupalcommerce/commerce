@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -48,29 +48,26 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    *   The widget settings.
    * @param array $thirdPartySettings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $currencyStorage
-   *   The currency storage.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   *   The entity manager.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityStorageInterface $currencyStorage) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityManagerInterface $entityManager) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
 
-    $this->currencyStorage = $currencyStorage;
+    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-    $entityManager = $container->get('entity.manager');
-
     return new static(
       $pluginId,
       $pluginDefinition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $entityManager->getStorage('commerce_currency')
+      $container->get('entity.manager')
     );
   }
 
