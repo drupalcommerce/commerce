@@ -40,7 +40,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   /**
    * The number formatter.
    *
-   * @var \CommerceGuys\Intl\Formatter\NumberFormatter
+   * @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface
    */
   protected $numberFormatter;
 

@@ -7,12 +7,14 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
+use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +38,13 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   protected $currencyStorage;
 
   /**
+   * The number formatter.
+   *
+   * @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface
+   */
+  protected $numberFormatter;
+
+  /**
    * Constructs a new PriceDefaultWidget object.
    *
    * @param string $pluginId
@@ -50,11 +59,17 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    *   Any third party settings.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
+   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
+   *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityManagerInterface $entityManager) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityManagerInterface $entityManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
 
     $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->numberFormatter = $numberFormatterFactory->createInstance(NumberFormatterInterface::DECIMAL);
+    $this->numberFormatter->setMinimumFractionDigits(0);
+    $this->numberFormatter->setMaximumFractionDigits(6);
+    $this->numberFormatter->setGroupingUsed(FALSE);
   }
 
   /**
@@ -67,14 +82,15 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('commerce_price.number_formatter_factory')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
     // Load both enabled and disabled currencies, prices with disabled
     // currencies can be skipped down the line.
     $currencies = $this->currencyStorage->loadMultiple();
@@ -84,14 +100,28 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       return $element;
     }
 
+    $amount = $items[$delta]->amount;
+    if (!empty($amount)) {
+      // Convert the stored amount to the local format. For example, "9.99"
+      // becomes "9,99" in many locales. This also strips any extra zeroes,
+      // as configured via $this->numberFormatter->setMinimumFractionDigits().
+      $amount = $this->numberFormatter->format($amount);
+    }
+
     $element['#attached']['library'][] = 'commerce_price/admin';
+    $element['#element_validate'] = [
+      [get_class($this), 'validateElement'],
+    ];
     $element['amount'] = [
       '#type' => 'textfield',
       '#title' => $element['#title'],
-      '#default_value' => $this->prepareAmount($items[$delta]->amount),
-      '#required' => $element['#required'],
+      '#default_value' => $amount,
+      '#required' => TRUE,
       '#size' => 10,
       '#maxlength' => 255,
+      // Provide an example to the end user so that they know which decimal
+      // separator to use. This is the same pattern Drupal core uses.
+      '#placeholder' => $this->numberFormatter->format('9.99'),
     ];
     if (count($currencyCodes) == 1) {
       $lastVisibleElement = 'amount';
@@ -122,27 +152,28 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   }
 
   /**
-   * Prepares the amount for display.
-   *
-   * @param int $amount
-   *   The amount
-   *
-   * @return int
-   *   The processed amount, ready for display.
+   * Converts the amount back to the standard format (e.g. "9,99" -> "9.99").
    */
-  protected function prepareAmount($amount) {
-    $amount = $amount ?: 0;
-    if (!empty($amount)) {
-      // Trim redundant zeroes.
-      $amount = rtrim($amount, 0);
-      // If we've trimmed all the way to the decimal separator, remove it.
-      $lastChar = substr($amount, -1, 1);
-      if (!is_numeric($lastChar)) {
-        $amount = substr($amount, 0, strlen($amount) - 1);
-      }
+  public static function validateElement(array $element, FormStateInterface $formState) {
+    // @todo Fix this.
+    $currencyStorage = \Drupal::service('entity.manager')->getStorage('commerce_currency');
+    $numberFormatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
+
+    $value = $formState->getValue($element['#parents']);
+    if (empty($value['amount'])) {
+      return;
     }
 
-    return $amount;
+    $currency = $currencyStorage->load($value['currency_code']);
+    $value['amount'] = $numberFormatter->parseCurrency($value['amount'], $currency);
+    if ($value['amount'] === FALSE) {
+      $formState->setError($element['amount'], t('%title is not numeric.', [
+        '%title' => $element['#title'],
+      ]));
+      return;
+    }
+
+    $formState->setValueForElement($element, $value);
   }
 
 }
