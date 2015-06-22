@@ -7,14 +7,13 @@
 
 namespace Drupal\commerce_tax;
 
-use \CommerceGuys\Tax\Repository\TaxTypeRepository;
-use \Drupal\Core\Entity\EntityManagerInterface;
-use \Drupal\Core\Entity\EntityStorageInterface;
-use \CommerceGuys\Tax\Model\TaxTypeInterface;
-use \CommerceGuys\Tax\Model\TaxRateInterface;
-use \CommerceGuys\Tax\Model\TaxRateAmountInterface;
-use \Drupal\Core\StringTranslation\StringTranslationTrait;
-use \Drupal\Core\StringTranslation\TranslationInterface;
+use CommerceGuys\Tax\Repository\TaxTypeRepository;
+use Drupal\Core\Entity\EntityManagerInterface;
+use CommerceGuys\Tax\Model\TaxTypeInterface;
+use CommerceGuys\Tax\Model\TaxRateInterface;
+use CommerceGuys\Tax\Model\TaxRateAmountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 class TaxTypeImporter implements TaxTypeImporterInterface {
 

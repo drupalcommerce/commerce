@@ -7,8 +7,8 @@
 
 namespace Drupal\commerce_tax;
 
-use \Drupal\Core\Entity\EntityManagerInterface;
-use \Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
 
 class TaxTypeImporterFactory implements TaxTypeImporterFactoryInterface {
 

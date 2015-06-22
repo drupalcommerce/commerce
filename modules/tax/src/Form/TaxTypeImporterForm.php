@@ -9,7 +9,6 @@ namespace Drupal\commerce_tax\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\UrlHelper;
 
 /**
  * Contribute form.
