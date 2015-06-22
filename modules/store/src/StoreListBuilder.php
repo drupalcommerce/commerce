@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_store;
 
-use Drupal\commerce\Entity\StoreType;
+use Drupal\commerce_store\Entity\StoreType;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;

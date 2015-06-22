@@ -9,7 +9,6 @@ namespace Drupal\commerce_tax\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Builds the form to delete a tax type.

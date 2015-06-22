@@ -7,11 +7,9 @@
 
 namespace Drupal\commerce_store\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
