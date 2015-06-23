@@ -691,7 +691,7 @@ function commerce_product_validate_sku_unique($sku, $product_id) {
  */
 function commerce_product_validate_sku($sku) {
   // Do not allow commas in a SKU.
-  if (strpos($sku, ',')) {
+  if (strpos($sku, ',') !== FALSE) {
     return FALSE;
   }
 
