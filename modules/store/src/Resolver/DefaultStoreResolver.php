@@ -11,48 +11,32 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 
 /**
- * Returns the default store, if set.
+ * Returns the default store, if known.
  */
 class DefaultStoreResolver implements StoreResolverInterface {
 
   /**
-   * The configuration factory.
+   * The store storage.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\commerce_store\StoreStorageInterface
    */
-  protected $configFactory;
-
-  /**
-   * The entity manager.
-   *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entityManager;
+  protected $storage;
 
   /**
    * Constructs a new DefaultStoreResolver object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, EntityManagerInterface $entityManager) {
-    $this->configFactory = $configFactory;
-    $this->entityManager = $entityManager;
+  public function __construct(EntityManagerInterface $entityManager) {
+    $this->storage = $entityManager->getStorage('commerce_store');
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolve() {
-    $store = NULL;
-    $uuid = $this->configFactory->get('commerce_store.settings')->get('default_store');
-    if ($uuid) {
-      $store = $this->entityManager->loadEntityByUuid('commerce_store', $uuid);
-    }
-
-    return $store;
+    return $this->storage->loadDefault();
   }
 
 }

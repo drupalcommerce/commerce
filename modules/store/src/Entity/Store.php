@@ -22,6 +22,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Store"),
  *   bundle_label = @Translation("Store type"),
  *   handlers = {
+ *     "storage" = "Drupal\commerce_store\StoreStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",

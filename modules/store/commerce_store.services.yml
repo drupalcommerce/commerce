@@ -10,6 +10,6 @@ services:
 
   commerce_store.default_store_resolver:
     class: Drupal\commerce_store\Resolver\DefaultStoreResolver
-    arguments: ['@config.factory', '@entity.manager']
+    arguments: ['@entity.manager']
     tags:
       - { name: commerce_store.store_resolver, priority: -100 }

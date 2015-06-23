@@ -27,29 +27,22 @@ class DefaultStoreResolverTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $config = $this->getMockBuilder('Drupal\Core\Config\Config')
+    $storage = $this->getMockBuilder('Drupal\commerce_store\StoreStorage')
       ->disableOriginalConstructor()
       ->getMock();
-    $config->expects($this->once())
-      ->method('get')
-      ->with('default_store')
-      ->will($this->returnValue('fakeuuid'));
-
-    $configFactory = $this->getMock('Drupal\Core\Config\ConfigFactoryInterface');
-    $configFactory->expects($this->once())
-      ->method('get')
-      ->with('commerce_store.settings')
-      ->will($this->returnValue($config));
+    $storage->expects($this->once())
+      ->method('loadDefault')
+      ->willReturn('testStore');
 
     $entityManager = $this->getMockBuilder('\Drupal\Core\Entity\EntityManager')
       ->disableOriginalConstructor()
       ->getMock();
     $entityManager->expects($this->once())
-      ->method('loadEntityByUuid')
-      ->with('commerce_store', 'fakeuuid')
-      ->will($this->returnValue('testStore'));
+      ->method('getStorage')
+      ->with('commerce_store')
+      ->willReturn($storage);
 
-    $this->resolver = new DefaultStoreResolver($configFactory, $entityManager);
+    $this->resolver = new DefaultStoreResolver($entityManager);
   }
 
   /**
