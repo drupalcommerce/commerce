@@ -8,6 +8,7 @@
 namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
