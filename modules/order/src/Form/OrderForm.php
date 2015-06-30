@@ -61,24 +61,6 @@ class OrderForm extends ContentEntityForm {
       $form['status']['#group'] = 'order_status';
     }
 
-    $form['revision'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Create new revision'),
-      '#default_value' => $order->isNewRevision(),
-      '#access' => $currentUser->hasPermission('administer products'),
-      '#group' => 'order_status',
-      '#weight' => 10,
-    ];
-
-    $form['revision_log'] += [
-      '#states' => [
-        'visible' => [
-          ':input[name="revision"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#group' => 'order_status',
-    ];
-
     // Order authoring information for administrators.
     $form['author'] = [
       '#type' => 'details',

@@ -39,7 +39,6 @@ use Drupal\user\UserInterface;
  *     "id" = "order_id",
  *     "label" = "order_number",
  *     "uuid" = "uuid",
- *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
  *   links = {
@@ -77,12 +76,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       $this->setOwnerId(\Drupal::currentUser()->id());
     }
 
-    // If no revision author has been set explicitly, make the order owner the
-    // revision author.
-    if (!$this->getRevisionAuthor()) {
-      $this->setRevisionAuthorId($this->getOwnerId());
-    }
-
     if ($this->isNew()) {
       if (!$this->getHostname()) {
         $this->setHostname(\Drupal::request()->getClientIp());
@@ -91,21 +84,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getEmail()) {
         $this->setEmail($this->getOwner()->getEmail());
       }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing order without adding a new revision, we
-      // need to make sure $entity->revision_log is reset whenever it is empty.
-      // Therefore, this code allows us to avoid clobbering an existing log
-      // entry with an empty one.
-      $record->revision_log = $this->original->revision_log->value;
     }
   }
 
@@ -244,36 +222,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRevisionCreationTime() {
-    return $this->get('revision_timestamp')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionCreationTime($timestamp) {
-    $this->set('revision_timestamp', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionAuthor() {
-    return $this->get('revision_uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionAuthorId($uid) {
-    $this->set('revision_uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getLineItems() {
     return $this->get('line_items')->first()->getValue();
   }
@@ -346,7 +294,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Order number'))
       ->setDescription(t('The order number displayed to the customer.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
@@ -365,12 +312,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The order UUID.'))
       ->setReadOnly(TRUE);
 
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The order revision ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The order type.'))
@@ -382,7 +323,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The store to which the order belongs.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
@@ -397,7 +337,6 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
       ->setDescription(t('The user that owns this order.'))
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder::getCurrentUserId')
@@ -439,7 +378,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Status'))
       ->setDescription(t('The status name of this order.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
@@ -457,7 +395,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the order was created.'))
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -473,8 +410,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the order was last edited.'))
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE);
+      ->setRequired(TRUE);
 
     $fields['order_total'] = BaseFieldDefinition::create('price')
       ->setLabel(t('Order Total Price'))
@@ -502,32 +438,6 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
-
-    $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Revision timestamp'))
-      ->setDescription(t('The time that the current revision was created.'))
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE);
-
-    $fields['revision_uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Revision user ID'))
-      ->setDescription(t('The user ID of the author of the current revision.'))
-      ->setSetting('target_type', 'user')
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE);
-
-    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('The log entry explaining the changes in this revision.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
-        'weight' => 25,
-        'settings' => [
-          'rows' => 4,
-        ],
-      ]);
 
     return $fields;
   }
