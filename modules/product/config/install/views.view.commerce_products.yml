@@ -384,6 +384,8 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - 'url.query_args.pagers:0'
+        - user.permissions
       cacheable: false
   page_1:
     display_plugin: page
@@ -397,4 +399,6 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - 'url.query_args.pagers:0'
+        - user.permissions
       cacheable: false
