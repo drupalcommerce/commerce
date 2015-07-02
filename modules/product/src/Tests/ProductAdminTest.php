@@ -26,7 +26,8 @@ class ProductAdminTest extends CommerceProductTestBase {
     $edit = [
       'title[0][value]' => $title,
       'sku[0][value]' => strtolower($this->randomMachineName()),
-      'store_id' => $this->commerce_store->id()
+      'store_id' => $this->commerce_store->id(),
+      'commerce_price[0][amount]' => "9.99"
     ];
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $product = \Drupal::entityQuery('commerce_product')
@@ -43,6 +44,7 @@ class ProductAdminTest extends CommerceProductTestBase {
     $this->drupalGet('product/' . $product->id());
     $this->assertResponse(200);
     $this->assertText($product->getTitle(), "Commerce Product title exists");
+    $this->assertText("€9.99", "Commerce Product price exists");
   }
 
   /**
