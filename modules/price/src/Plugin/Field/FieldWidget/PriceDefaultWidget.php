@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
-use Drupal\commerce\PluginCallbackTrait;
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -30,8 +29,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInterface {
-
-  use PluginCallbackTrait;
 
   /**
    * The currency storage.
@@ -113,7 +110,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
 
     $element['#attached']['library'][] = 'commerce_price/admin';
     $element['#element_validate'] = [
-      [get_class($this), 'instantiate#field.widget#' . $this->getPluginId() . '#validateElement'],
+      [get_class($this), 'validateElement'],
     ];
     $element['amount'] = [
       '#type' => 'textfield',
@@ -157,14 +154,18 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   /**
    * Converts the amount back to the standard format (e.g. "9,99" -> "9.99").
    */
-  public function validateElement(array $element, FormStateInterface $formState) {
+  public static function validateElement(array $element, FormStateInterface $formState) {
+    // @todo Fix this.
+    $currencyStorage = \Drupal::service('entity.manager')->getStorage('commerce_currency');
+    $numberFormatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
+
     $value = $formState->getValue($element['#parents']);
     if (empty($value['amount'])) {
       return;
     }
 
-    $currency = $this->currencyStorage->load($value['currency_code']);
-    $value['amount'] = $this->numberFormatter->parseCurrency($value['amount'], $currency);
+    $currency = $currencyStorage->load($value['currency_code']);
+    $value['amount'] = $numberFormatter->parseCurrency($value['amount'], $currency);
     if ($value['amount'] === FALSE) {
       $formState->setError($element['amount'], $this->t('%title is not numeric.', [
         '%title' => $element['#title'],
