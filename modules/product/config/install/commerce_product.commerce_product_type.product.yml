@@ -3,6 +3,5 @@ status: true
 dependencies: {  }
 id: product
 label: Product
-revision: null
 digital: null
 description: null

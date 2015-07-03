@@ -39,14 +39,11 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   base_table = "commerce_product",
  *   data_table = "commerce_product_field_data",
- *   revision_table = "commerce_product_revision",
- *   revision_data_table = "commerce_product_field_revision",
  *   entity_keys = {
  *     "id" = "product_id",
  *     "label" = "title",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
  *   links = {
@@ -200,38 +197,17 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing product without adding a new
-      // revision and the user did not supply a revision log, keep the existing
-      // one.
-      $record->revision_log = $this->original->getRevisionLog();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
       ->setDescription(t('The ID of the product.'))
       ->setReadOnly(TRUE);
 
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The product revision ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
     $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Store'))
       ->setDescription(t('The store to which the product belongs.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
@@ -246,7 +222,6 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The user that created this product.'))
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_product\Entity\Product::getCurrentUserId')
@@ -275,15 +250,13 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of product.'))
-      ->setRevisionable(TRUE);
+      ->setDescription(t('The language code of product.'));
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The title of this node, always treated as non-markup plain text.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)
       ->setSettings([
         'default_value' => '',
         'max_length' => 255,
@@ -305,7 +278,6 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setRequired(TRUE)
       ->addConstraint('ProductSku')
       ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
@@ -327,7 +299,6 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setLabel(t('Active'))
       ->setDescription(t('Disabled products cannot be added to shopping carts and may be hidden in administrative product lists.'))
       ->setDefaultValue(TRUE)
-      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
         'default_value' => 1,
@@ -344,7 +315,6 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the product was created.'))
-      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -360,39 +330,11 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the product was last edited.'))
-      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
-
-    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('The log entry explaining the changes in this revision.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
-        'weight' => 25,
-        'settings' => [
-          'rows' => 4,
-        ],
-      ]);
 
     return $fields;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionLog() {
-    return $this->get('revision_log')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionLog($revision_log) {
-    $this->set('revision_log', $revision_log);
-    return $this;
-  }
 
   /**
    * Default value callback for 'uid' base field definition.

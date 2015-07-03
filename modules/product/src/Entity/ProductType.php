@@ -36,7 +36,6 @@ use Drupal\commerce_product\ProductTypeInterface;
  *   config_export = {
  *     "id",
  *     "label",
- *     "revision",
  *     "digital",
  *     "description",
  *   },
@@ -83,13 +82,6 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    * @var bool
    */
   protected $digital;
-
-  /**
-   * The default revision setting for products of this type.
-   *
-   * @var bool
-   */
-  public $revision;
 
   /**
    * Indicates whether a body field should be created for this product type.

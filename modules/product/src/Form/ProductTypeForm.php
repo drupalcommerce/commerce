@@ -46,12 +46,6 @@ class ProductTypeForm extends EntityForm {
       '#default_value' => $productType->isDigital(),
       '#description' => t('Products of this type represent digital services.')
     ];
-    $form['revision'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Create new revision'),
-      '#default_value' => $productType->revision,
-      '#description' => t('Create a new revision by default for this product type.')
-    ];
 
     return $form;
   }

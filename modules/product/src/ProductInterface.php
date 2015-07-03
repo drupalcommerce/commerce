@@ -98,23 +98,4 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
    */
   public function getType();
 
-  /**
-   * Gets the product revision log message.
-   *
-   * @return string
-   *   The revision log message.
-   */
-  public function getRevisionLog();
-
-  /**
-   * Sets the product revision log message.
-   *
-   * @param string $revision_log
-   *   The revision log message.
-   *
-   * @return \Drupal\commerce_product\ProductInterface
-   *   The class instance that this method is called on.
-   */
-  public function setRevisionLog($revision_log);
-
 }
