@@ -23,4 +23,12 @@ interface ChainStoreResolverInterface extends StoreResolverInterface {
    */
   public function addResolver(StoreResolverInterface $resolver);
 
+  /**
+   * Gets all added resolvers.
+   *
+   * @return \Drupal\commerce_store\Resolver\StoreResolverInterface[]
+   *   The resolvers.
+   */
+  public function getResolvers();
+
 }

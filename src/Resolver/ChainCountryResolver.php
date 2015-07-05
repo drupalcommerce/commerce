@@ -39,6 +39,13 @@ class ChainCountryResolver implements ChainCountryResolverInterface {
   /**
    * {@inheritdoc}
    */
+  public function getResolvers() {
+    return $this->resolvers;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resolve() {
     foreach ($this->resolvers as $resolver) {
       $result = $resolver->resolve();

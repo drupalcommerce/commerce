@@ -23,4 +23,12 @@ interface ChainLocaleResolverInterface extends LocaleResolverInterface {
    */
   public function addResolver(LocaleResolverInterface $resolver);
 
+  /**
+   * Gets all added resolvers.
+   *
+   * @return \Drupal\commerce\Resolver\LocaleResolverInterface[]
+   *   The resolvers.
+   */
+  public function getResolvers();
+
 }

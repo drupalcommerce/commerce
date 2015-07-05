@@ -23,4 +23,12 @@ interface ChainCountryResolverInterface extends CountryResolverInterface {
    */
   public function addResolver(CountryResolverInterface $resolver);
 
+  /**
+   * Gets all added resolvers.
+   *
+   * @return \Drupal\commerce\Resolver\CountryResolverInterface[]
+   *   The resolvers.
+   */
+  public function getResolvers();
+
 }
