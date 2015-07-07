@@ -31,8 +31,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $name
    *   The store name.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setName($name);
 
@@ -50,8 +49,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $mail
    *   The store e-mail.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setEmail($mail);
 
@@ -69,8 +67,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param \Drupal\commerce_price\CurrencyInterface $currency
    *   The default store currency.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setDefaultCurrency(CurrencyInterface $currency);
 
@@ -88,8 +85,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param string $currencyCode
    *   The default store currency code.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setDefaultCurrencyCode($currencyCode);
 
@@ -107,8 +103,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param \Drupal\address\AddressInterface $address
    *   The store address.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setAddress(AddressInterface $address);
 
@@ -128,8 +123,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @param array $countries
    *   A list of country codes.
    *
-   * @return \Drupal\commerce_store\StoreInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setCountries(array $countries);
 

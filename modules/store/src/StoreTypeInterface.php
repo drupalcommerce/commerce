@@ -23,10 +23,10 @@ interface StoreTypeInterface extends ConfigEntityInterface {
   public function getDescription();
 
   /**
-   * Sets the description of the store type.
+   * Sets the store type description.
    *
    * @param string $description
-   *   The new description.
+   *   The store type description.
    *
    * @return $this
    */

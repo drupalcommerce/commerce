@@ -38,8 +38,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
    * @param string $status
    *   The line item status.
    *
-   * @return \Drupal\commerce_line_item\LineItemInterface
-   *   The called line item entity.
+   * @return $this
    */
   public function setStatus($status);
 
@@ -57,8 +56,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
    * @param int $timestamp
    *   The line item creation timestamp.
    *
-   * @return \Drupal\commerce_line_item\LineItemInterface
-   *   The called line item entity.
+   * @return $this
    */
   public function setCreatedTime($timestamp);
 
@@ -76,8 +74,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
    * @param int $timestamp
    *   The UNIX timestamp of when this revision was created.
    *
-   * @return \Drupal\commerce_line_item\LineItemInterface
-   *   The called line item entity.
+   * @return $this
    */
   public function setRevisionCreationTime($timestamp);
 
@@ -95,8 +92,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
    * @param int $uid
    *   The user ID of the revision author.
    *
-   * @return \Drupal\commerce_line_item\LineItemInterface
-   *   The called line item entity.
+   * @return $this
    */
   public function setRevisionAuthorId($uid);
 
@@ -114,8 +110,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
    * @param array $data
    *   An array of additional data.
    *
-   * @return \Drupal\commerce_line_item\LineItemInterface
-   *   The called line item entity.
+   * @return $this
    */
   public function setData($data);
 

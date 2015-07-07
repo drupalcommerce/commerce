@@ -31,8 +31,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param string $orderNumber
    *   The order number.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setOrderNumber($orderNumber);
 
@@ -58,8 +57,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param string $status
    *   The order status.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setStatus($status);
 
@@ -77,8 +75,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param int $timestamp
    *   The order creation timestamp.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setCreatedTime($timestamp);
 
@@ -96,8 +93,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param array $lineItems
    *   The line items associated with this order.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setLineItems($lineItems);
 
@@ -115,8 +111,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param array $data
    *   An array of additional data.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setData($data);
 
@@ -134,8 +129,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param string $hostname
    *   The IP address to associate to this order.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setHostname($hostname);
 
@@ -153,8 +147,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @param string $mail
    *   The e-mail address associated with the order.
    *
-   * @return \Drupal\commerce_order\OrderInterface
-   *   The called order entity.
+   * @return $this
    */
   public function setEmail($mail);
 
