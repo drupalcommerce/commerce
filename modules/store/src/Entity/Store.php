@@ -7,6 +7,8 @@
 
 namespace Drupal\commerce_store\Entity;
 
+use CommerceGuys\Addressing\Enum\AddressField;
+use Drupal\address\AddressInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -154,6 +156,42 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAddress() {
+    return $this->get('address')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAddress(AddressInterface $address) {
+    // $this->set('address', $address) results in the address being appended
+    // to the item list, instead of replacing the existing first item.
+    $this->address = $address;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCountries() {
+    $countries = [];
+    foreach ($this->get('countries') as $countryItem) {
+      $countries[] = $countryItem->value;
+    }
+    return $countries;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCountries(array $countries) {
+    $this->set('countries', $countries);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['store_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Store ID'))
@@ -229,6 +267,33 @@ class Store extends ContentEntityBase implements StoreInterface {
         'type' => 'options_select',
         'weight' => 2,
       ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    // Disable the recipient and organization fields on the store address.
+    $disabledFields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
+    $fields['address'] = BaseFieldDefinition::create('address')
+      ->setLabel(t('Address'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setSetting('fields', array_diff(AddressField::getAll(), $disabledFields))
+      ->setDisplayOptions('form', [
+        'type' => 'address_default',
+        'settings' => [],
+        'weight' => 3,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['countries'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Countries'))
+      ->setDescription(t('The countries this store sells to.'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setSetting('allowed_values_function', 'commerce_store_available_countries')
+      ->setDisplayOptions('form', array(
+        'type' => 'options_select',
+        'weight' => 4,
+      ))
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 

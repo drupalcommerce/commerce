@@ -4,6 +4,7 @@ description: 'Defines the Store entity and associated features.'
 package: Commerce
 core: 8.x
 dependencies:
+  - address
   - commerce
   - commerce_price
   - entity_reference
