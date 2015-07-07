@@ -8,14 +8,14 @@
 namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;
-use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\address\AddressInterface;
+use Drupal\commerce_price\CurrencyInterface;
+use Drupal\commerce_store\StoreInterface;
+use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\commerce_store\StoreInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Commerce Store entity type.

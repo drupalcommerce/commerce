@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price\Entity;
 
-use CommerceGuys\Intl\Currency\CurrencyInterface;
+use Drupal\commerce_price\CurrencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**

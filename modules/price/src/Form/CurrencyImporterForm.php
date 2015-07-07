@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_price\Form;
 
-use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -72,7 +71,7 @@ class CurrencyImporterForm extends FormBase {
   /**
    * Gets an options list for currencies.
    *
-   * @param CurrencyInterface[] $currencies
+   * @param \Drupal\commerce_price\CurrencyInterface[] $currencies
    *   An array of currencies.
    *
    * @return array

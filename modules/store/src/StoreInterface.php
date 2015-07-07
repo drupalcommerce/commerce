@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_store;
 
-use CommerceGuys\Intl\Currency\CurrencyInterface;
+use Drupal\commerce_price\CurrencyInterface;
 use Drupal\address\AddressInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -58,7 +58,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   /**
    * Gets the default store currency.
    *
-   * @return \CommerceGuys\Intl\Currency\CurrencyInterface
+   * @return \Drupal\commerce_price\CurrencyInterface
    *   The default store currency.
    */
   public function getDefaultCurrency();
@@ -66,7 +66,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   /**
    * Sets the default store currency.
    *
-   * @param \CommerceGuys\Intl\Currency\CurrencyInterface $currency
+   * @param \Drupal\commerce_price\CurrencyInterface $currency
    *   The default store currency.
    *
    * @return \Drupal\commerce_store\StoreInterface
