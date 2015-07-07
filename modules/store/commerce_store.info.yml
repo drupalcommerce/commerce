@@ -9,6 +9,6 @@ dependencies:
   - commerce_price
   - entity_reference
 config_devel:
-  - commerce_store.commerce_store_type.online
+  - commerce_store.commerce_store_type.default
   - commerce_store.settings
   - views.view.commerce_stores

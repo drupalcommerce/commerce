@@ -23,10 +23,10 @@ class StoreTypeTest extends StoreTestBase {
     $this->drupalGet('admin/commerce/config/store-types');
     $storeTypes = StoreType::loadMultiple();
 
-    $this->assertTrue(isset($storeTypes['online']), 'Store Type Web is available');
+    $this->assertTrue(isset($storeTypes['default']), 'The default store type is available');
 
-    $storeType = StoreType::load('online');
-    $this->assertEqual($storeTypes['online'], $storeType, 'The correct Store Type is loaded');
+    $storeType = StoreType::load('default');
+    $this->assertEqual($storeTypes['default'], $storeType, 'The correct store type is loaded');
   }
 
   /**
@@ -94,7 +94,7 @@ class StoreTypeTest extends StoreTestBase {
     $edit = [
       'label' => $this->randomMachineName(8),
     ];
-    $this->drupalPostForm('admin/commerce/config/store-types/online/edit', $edit, 'Save');
+    $this->drupalPostForm('admin/commerce/config/store-types/default/edit', $edit, 'Save');
     $storeTypeChanged = StoreType::load($storeType->id());
     $this->assertEqual($storeType->label(), $storeTypeChanged->label(), 'The label of the store type has been changed.');
   }
