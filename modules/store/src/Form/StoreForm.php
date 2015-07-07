@@ -53,7 +53,7 @@ class StoreForm extends ContentEntityForm {
       '#title' => $this->t('Default'),
       '#default_value' => $isDefault,
       '#disabled' => $isDefault || empty($defaultStore),
-      '#weight' => 0,
+      '#weight' => 99,
     ];
 
     return $form;

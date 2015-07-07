@@ -16,7 +16,7 @@ use Drupal\user\EntityOwnerInterface;
 interface StoreInterface extends EntityInterface, EntityOwnerInterface {
 
   /**
-   * Return the name of the store.
+   * Gets the name of the store.
    *
    * @return string
    *   The content of the field.
@@ -35,7 +35,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setName($name);
 
   /**
-   * Return the e-mail address of the store.
+   * Gets the e-mail address of the store.
    *
    * @return string
    *   The content of the field.
@@ -54,7 +54,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setEmail($mail);
 
   /**
-   * Return the default currency for the store.
+   * Gets the default currency for the store.
    *
    * @return string
    *   The content of the field.
@@ -70,6 +70,6 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
    * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
    */
-  public function setDefaultCurrency($currency_code);
+  public function setDefaultCurrency($currencyCode);
 
 }

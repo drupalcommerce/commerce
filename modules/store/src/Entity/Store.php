@@ -146,8 +146,8 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDefaultCurrency($currency_code) {
-    $this->set('default_currency', $currency_code);
+  public function setDefaultCurrency($currencyCode) {
+    $this->set('default_currency', $currencyCode);
     return $this;
   }
 
@@ -166,7 +166,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setReadOnly(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Store owner'))
+      ->setLabel(t('Owner'))
       ->setDescription(t('The user that owns this store.'))
       ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
       ->setSetting('target_type', 'user')
@@ -183,12 +183,11 @@ class Store extends ContentEntityBase implements StoreInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'language_select',
-        'weight' => 2,
+        'weight' => -1,
       ]);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Store name'))
-      ->setDescription(t('The name of the store.'))
+      ->setLabel(t('Name'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -198,7 +197,10 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -10,
-      ]);
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
@@ -207,27 +209,28 @@ class Store extends ContentEntityBase implements StoreInterface {
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('E-mail address'))
-      ->setDescription(t('A valid e-mail address. Store e-mail notifications will be sent to and from this address.'))
+      ->setDescription(t('Store e-mail notifications will be sent to and from this address.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'email_default',
-        'weight' => 0,
-      ]);
+        'weight' => 1,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['default_currency'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Default currency'))
-      ->setDescription(t('The default currency of this store.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'commerce_currency')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'options_select',
-        'weight' => 10,
-        'settings' => [],
-      ]);
+        'weight' => 2,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
