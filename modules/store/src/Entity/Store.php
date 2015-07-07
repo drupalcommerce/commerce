@@ -8,6 +8,7 @@
 namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;
+use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\address\AddressInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -103,6 +104,14 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOwnerId() {
     return $this->get('uid')->target_id;
   }
@@ -112,14 +121,6 @@ class Store extends ContentEntityBase implements StoreInterface {
    */
   public function setOwnerId($uid) {
     $this->set('uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
     return $this;
   }
 
@@ -142,13 +143,28 @@ class Store extends ContentEntityBase implements StoreInterface {
    * {@inheritdoc}
    */
   public function getDefaultCurrency() {
-    return $this->get('default_currency')->value;
+    return $this->get('default_currency')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDefaultCurrency($currencyCode) {
+  public function setDefaultCurrency(CurrencyInterface $currency) {
+    $this->set('default_currency', $currency->getCurrencyCode());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultCurrencyCode() {
+    return $this->get('default_currency')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDefaultCurrencyCode($currencyCode) {
     $this->set('default_currency', $currencyCode);
     return $this;
   }
@@ -205,7 +221,6 @@ class Store extends ContentEntityBase implements StoreInterface {
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
-      ->setDescription(t('The user that owns this store.'))
       ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
       ->setSetting('target_type', 'user')
       ->setDisplayOptions('form', [

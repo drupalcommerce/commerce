@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_store;
 
+use CommerceGuys\Intl\Currency\CurrencyInterface;
 use Drupal\address\AddressInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -17,18 +18,18 @@ use Drupal\user\EntityOwnerInterface;
 interface StoreInterface extends EntityInterface, EntityOwnerInterface {
 
   /**
-   * Gets the name of the store.
+   * Gets the store name.
    *
    * @return string
-   *   The content of the field.
+   *   The store name.
    */
   public function getName();
 
   /**
-   * Sets the name of the store.
+   * Sets the store name.
    *
    * @param string $name
-   *   The new name of the store.
+   *   The store name.
    *
    * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
@@ -36,18 +37,18 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setName($name);
 
   /**
-   * Gets the e-mail address of the store.
+   * Gets the store e-mail.
    *
    * @return string
-   *   The content of the field.
+   *   The store e-mail
    */
   public function getEmail();
 
   /**
-   * Sets the e-mail address of the store.
+   * Sets the store e-mail.
    *
    * @param string $mail
-   *   The new e-mail address of the store.
+   *   The store e-mail.
    *
    * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
@@ -55,23 +56,42 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setEmail($mail);
 
   /**
-   * Gets the default currency for the store.
+   * Gets the default store currency.
    *
-   * @return string
-   *   The content of the field.
+   * @return \CommerceGuys\Intl\Currency\CurrencyInterface
+   *   The default store currency.
    */
   public function getDefaultCurrency();
 
   /**
-   * Sets the default currency for the store.
+   * Sets the default store currency.
    *
-   * @param string $currency_code
-   *   The new default currency code of the store.
+   * @param \CommerceGuys\Intl\Currency\CurrencyInterface $currency
+   *   The default store currency.
    *
    * @return \Drupal\commerce_store\StoreInterface
    *   The class instance that this method is called on.
    */
-  public function setDefaultCurrency($currencyCode);
+  public function setDefaultCurrency(CurrencyInterface $currency);
+
+  /**
+   * Gets the default store currency code.
+   *
+   * @return string
+   *   The default store currency code.
+   */
+  public function getDefaultCurrencyCode();
+
+  /**
+   * Sets the default store currency code.
+   *
+   * @param string $currencyCode
+   *   The default store currency code.
+   *
+   * @return \Drupal\commerce_store\StoreInterface
+   *   The class instance that this method is called on.
+   */
+  public function setDefaultCurrencyCode($currencyCode);
 
   /**
    * Gets the store address.
