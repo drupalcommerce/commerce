@@ -20,8 +20,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param string $methodId
    *   The method_id of the payment method that stored the card.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setPaymentMethod($methodId);
 
@@ -39,8 +38,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param string $instanceId
    *   The instance identifier of the payment.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setInstanceId($instanceId);
 
@@ -58,8 +56,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param string $remoteId
    *   The remote transaction identifier.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setRemoteId($remoteId);
 
@@ -77,8 +74,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param integer $default
    *   The default card for this payment method instance.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setDefault($default);
 
@@ -96,8 +92,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param string $status
    *   The status of this transaction (pending, success, or failure).
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setStatus($status);
 
@@ -123,8 +118,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param array $changed
    *   An Unix timestamp.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setChanged($changed);
 
@@ -142,8 +136,7 @@ interface PaymentInfoInterface extends ContentEntityInterface {
    * @param array $data
    *   The data array.
    *
-   * @return \Drupal\commerce_payment\PaymentInfoInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setData($data);
 

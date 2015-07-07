@@ -20,8 +20,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param string $instanceId
    *   The instance identifier of the transaction.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setInstanceId($instanceId);
 
@@ -39,8 +38,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param string $remoteId
    *   The remote transaction identifier.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setRemoteId($remoteId);
 
@@ -59,8 +57,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    *   A human-readable message that is later serialized into the message
    *   column.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setMessage($message);
 
@@ -78,8 +75,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param string $status
    *   The status of this transaction (pending, success, or failure).
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setStatus($status);
 
@@ -97,8 +93,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param string $remoteStatus
    *   The status of the transaction at the payment provider.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setRemoteStatus($remoteStatus);
 
@@ -116,8 +111,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param array $payload
    *   The payment-gateway specific payload.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setPayload($payload);
 
@@ -144,8 +138,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param array $changed
    *   An Unix timestamp.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setChanged($changed);
 
@@ -163,8 +156,7 @@ interface PaymentTransactionInterface extends ContentEntityInterface {
    * @param array $data
    *   The data array.
    *
-   * @return \Drupal\commerce_payment\PaymentTransactionInterface
-   *   The class instance that this method is called on.
+   * @return $this
    */
   public function setData($data);
 
