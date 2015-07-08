@@ -2553,7 +2553,8 @@ function commerce_cart_field_formatter_settings_summary($field, $instance, $view
     );
 
     if (count(commerce_product_line_item_types()) > 1) {
-      $summary[] = t('Add to Cart line item type: @type', array('@type' => commerce_line_item_type_get_name($settings['line_item_type'])));
+      $type = !empty($settings['line_item_type']) ? $settings['line_item_type'] : 'product';
+      $summary[] = t('Add to Cart line item type: @type', array('@type' => commerce_line_item_type_get_name($type)));
     }
   }
 
