@@ -80,21 +80,11 @@ class OrderTypeForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $orderType = $this->entity;
-
-    try {
-      $orderType->save();
-      drupal_set_message($this->t('Saved the %label order type.', [
-        '%label' => $orderType->label(),
-      ]));
-      $form_state->setRedirect('entity.commerce_order_type.collection');
-    }
-    catch (\Exception $e) {
-      $this->logger('commerce_order')->error($e);
-      drupal_set_message($this->t('The %label order type was not saved.', [
-        '%label' => $orderType->label(),
-      ]), 'error');
-      $form_state->setRebuild();
-    }
+    $orderType->save();
+    drupal_set_message($this->t('Saved the %label order type.', [
+      '%label' => $orderType->label(),
+    ]));
+    $form_state->setRedirect('entity.commerce_order_type.collection');
   }
 
 }

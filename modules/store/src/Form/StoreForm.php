@@ -63,19 +63,13 @@ class StoreForm extends ContentEntityForm {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, FormStateInterface $form_state) {
-    try {
-      $this->entity->save();
-      if ($form_state->getValue('default')) {
-        $this->storage->markAsDefault($this->entity);
-      }
-      drupal_set_message($this->t('Saved the %label store.', [
-        '%label' => $this->entity->label(),
-      ]));
+    $this->entity->save();
+    if ($form_state->getValue('default')) {
+      $this->storage->markAsDefault($this->entity);
     }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('The store could not be saved.'), 'error');
-      $this->logger('commerce')->error($e);
-    }
+    drupal_set_message($this->t('Saved the %label store.', [
+      '%label' => $this->entity->label(),
+    ]));
     $form_state->setRedirect('entity.commerce_store.collection');
   }
 

@@ -54,19 +54,12 @@ class ProductTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    try {
-      $status = $this->entity->save();
-      drupal_set_message($this->t('The product type %product_type_label has been successfully saved.', ['%product_type_label' => $this->entity->label()]));
-      $form_state->setRedirect('entity.commerce_product_type.collection');
+    $status = $this->entity->save();
+    drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
+    $form_state->setRedirect('entity.commerce_product_type.collection');
 
-      if ($status == SAVED_NEW) {
-        commerce_product_add_body_field($this->id);
-      }
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('The product type %product_type_label could not be saved.', ['%product_type_label' => $this->entity->label()]), 'error');
-      $this->logger('commerce_product')->error($e);
-      $form_state->setRebuild();
+    if ($status == SAVED_NEW) {
+      commerce_product_add_body_field($this->id);
     }
   }
 

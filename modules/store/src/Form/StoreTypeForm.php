@@ -48,16 +48,10 @@ class StoreTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    try {
-      $this->entity->save();
-      drupal_set_message($this->t('Saved the %label store type.', [
-        '%label' => $this->entity->label(),
-      ]));
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('The store type could not be saved.'), 'error');
-      $this->logger('commerce')->error($e);
-    }
+    $this->entity->save();
+    drupal_set_message($this->t('Saved the %label store type.', [
+      '%label' => $this->entity->label(),
+    ]));
     $form_state->setRedirect('entity.commerce_store_type.collection');
   }
 

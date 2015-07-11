@@ -14,21 +14,6 @@ use Drupal\Core\Form\FormStateInterface;
 class OrderForm extends ContentEntityForm {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
-   */
-  public function save(array $form, FormStateInterface $form_state) {
-    try {
-      $this->entity->save();
-      drupal_set_message($this->t('The order %order_label has been successfully saved.', ['%order_label' => $this->entity->label()]));
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('The order %order_label could not be saved.', ['%order_label' => $this->entity->label()]), 'error');
-      $this->logger('commerce_order')->error($e);
-    }
-    $form_state->setRedirect('entity.commerce_order.collection');
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
@@ -89,6 +74,15 @@ class OrderForm extends ContentEntityForm {
     }
 
     return $form;
+  }
+
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    $this->entity->save();
+    drupal_set_message($this->t('The order %label has been successfully saved.', ['%label' => $this->entity->label()]));
+    $form_state->setRedirect('entity.commerce_order.collection');
   }
 
 }

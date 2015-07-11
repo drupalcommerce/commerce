@@ -82,21 +82,11 @@ class PaymentInfoTypeForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $paymentInformationType = $this->entity;
-
-    try {
-      $paymentInformationType->save();
-      drupal_set_message($this->t('Saved the %payment_info_type_label payment information type.', array(
-        '%payment_info_type_label' => $paymentInformationType->label(),
-      )));
-      $form_state->setRedirect('entity.commerce_payment_info_type.collection');
-    }
-    catch (\Exception $e) {
-      watchdog_exception('commerce_payment', $e);
-      drupal_set_message($this->t('The %payment_info_type_label payment information type was not saved.', array(
-        '%payment_info_type_label' => $paymentInformationType->label(),
-      )), 'error');
-      $form_state->setRebuild();
-    }
+    $paymentInformationType->save();
+    drupal_set_message($this->t('Saved the %payment_info_type_label payment information type.', array(
+      '%payment_info_type_label' => $paymentInformationType->label(),
+    )));
+    $form_state->setRedirect('entity.commerce_payment_info_type.collection');
   }
 
 }
