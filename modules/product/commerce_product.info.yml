@@ -8,6 +8,7 @@ dependencies:
   - commerce_price
   - commerce_store
   - inline_entity_form
+  - path
   - text
 config_devel:
   - commerce_product.commerce_product_type.default

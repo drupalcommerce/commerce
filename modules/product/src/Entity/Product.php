@@ -256,6 +256,16 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setLabel(t('Type'))
       ->setRequired(TRUE);
 
+    $fields['path'] = BaseFieldDefinition::create('path')
+      ->setLabel(t('URL alias'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', array(
+        'type' => 'path',
+        'weight' => 30,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setCustomStorage(TRUE);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
       ->setDefaultValue(TRUE)

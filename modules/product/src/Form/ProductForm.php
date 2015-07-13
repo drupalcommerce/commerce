@@ -30,7 +30,22 @@ class ProductForm extends ContentEntityForm {
     ];
     $form = parent::form($form, $form_state);
 
-    // Product author information for administrators.
+    $form['path_settings'] = array(
+      '#type' => 'details',
+      '#title' => t('URL path settings'),
+      '#open' => !empty($form['path']['widget'][0]['alias']['#value']),
+      '#group' => 'advanced',
+      '#access' => !empty($form['path']['#access']) && $product->get('path')->access('edit'),
+      '#attributes' => array(
+        'class' => array('path-form'),
+      ),
+      '#attached' => array(
+        'library' => array('path/drupal.path'),
+      ),
+      '#weight' => 30,
+    );
+    $form['path']['#group'] = 'path_settings';
+
     $form['author'] = [
       '#type' => 'details',
       '#title' => t('Authoring information'),
@@ -44,11 +59,9 @@ class ProductForm extends ContentEntityForm {
       '#weight' => 90,
       '#optional' => TRUE,
     ];
-
     if (isset($form['uid'])) {
       $form['uid']['#group'] = 'author';
     }
-
     if (isset($form['created'])) {
       $form['created']['#group'] = 'author';
     }
