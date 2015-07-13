@@ -19,6 +19,9 @@ function commerce_store_available_countries() {
   return \Drupal::service('address.country_repository')->getList();
 }
 
+/**
+ * Implements hook_field_widget_form_alter().
+ */
 function commerce_store_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
   $field_name = $field_definition->getName();
