@@ -38,6 +38,7 @@ use Drupal\commerce_product\ProductTypeInterface;
  *     "label",
  *     "digital",
  *     "description",
+ *     "variationType",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/product-types/{commerce_product_type}/edit",
@@ -77,6 +78,13 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $description;
 
   /**
+   * The matching variation type.
+   *
+   * @var string
+   */
+  protected $variationType;
+
+  /**
    * Option to specify if the product type is a digital service.
    *
    * @var bool
@@ -95,6 +103,21 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    */
   public function setDescription($description) {
     $this->description = $description;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVariationType() {
+    return $this->variationType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVariationType($variationType) {
+    $this->variationType = $variationType;
     return $this;
   }
 

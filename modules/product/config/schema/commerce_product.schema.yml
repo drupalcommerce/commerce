@@ -14,6 +14,20 @@ commerce_product.commerce_product_type.*:
     description:
       type: text
       label: 'Description'
+    variationType:
+      type: string
+      label: 'Variation type'
+
+commerce_product.commerce_product_variation_type.*:
+  type: config_entity
+  label: 'Product variation type'
+  mapping:
+    id:
+      type: string
+      label: 'Type'
+    label:
+      type: label
+      label: 'Label'
 
 field.field.*.*.*.third_party.commerce_product:
   type: mapping

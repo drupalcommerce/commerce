@@ -2,9 +2,7 @@
 
 /**
  * @file
- * Defines the core Commerce product entity, including the entity itself, the
- * bundle definitions (product types), and various API functions to manage
- * products and interact with them through forms and autocompletes.
+ * Defines the Product entity and associated features.
  */
 
 use Drupal\field\Entity\FieldConfig;
@@ -14,18 +12,14 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Adds the default body field to a product type.
  *
- * @param string $product_type_id
- *   Id of the Commerce Product type.
+ * @param \Drupal\commerce_product\ProductTypeInterface $product_type
+ *   The product type.
  * @param string $label
  *   (optional) The label for the body instance. Defaults to 'Body'.
- *
- * @return array
- *   Body field instance.
  */
-function commerce_product_add_body_field($product_type_id, $label = 'Body') {
-  // Add or remove the body field, as needed.
+function commerce_product_add_body_field($product_type, $label = 'Body') {
   $field_storage = FieldStorageConfig::loadByName('commerce_product', 'body');
-  $instance = FieldConfig::loadByName('commerce_product', $product_type_id, 'body');
+  $field = FieldConfig::loadByName('commerce_product', $product_type->id(), 'body');
   if (empty($field_storage)) {
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'body',
@@ -34,33 +28,75 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
     ]);
     $field_storage->save();
   }
-  if (empty($instance)) {
-    $instance = FieldConfig::create([
+  if (empty($field)) {
+    $field = FieldConfig::create([
       'field_storage' => $field_storage,
-      'bundle' => $product_type_id,
+      'bundle' => $product_type->id(),
       'label' => $label,
       'settings' => ['display_summary' => FALSE],
     ]);
-    $instance->save();
+    $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type_id, 'default')
+    entity_get_form_display('commerce_product', $product_type->id(), 'default')
       ->setComponent('body', [
         'type' => 'text_textarea_with_summary',
         'weight' => 1,
       ])
       ->save();
-
     // Assign display settings for 'default' view mode.
-    entity_get_display('commerce_product', $product_type_id, 'default')
+    entity_get_display('commerce_product', $product_type->id(), 'default')
       ->setComponent('body', [
         'label' => 'hidden',
         'type' => 'text_default',
       ])
       ->save();
   }
+}
 
-  return $instance;
+/**
+ * Adds the default variations field to a product type.
+ *
+ * Variations can't be a base field because the Views integraiton is broken.
+ * Instead, it is created as a configurable field for each product type.
+ *
+ * @param \Drupal\commerce_product\ProductTypeInterface $product_type
+ *   The product type.
+ */
+function commerce_product_add_variations_field($product_type) {
+  $field_storage = FieldStorageConfig::loadByName('commerce_product', 'variations');
+  $field = FieldConfig::loadByName('commerce_product', $product_type->id(), 'variations');
+  if (empty($field_storage)) {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'variations',
+      'entity_type' => 'commerce_product',
+      'type' => 'entity_reference',
+      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
+      'settings' => array(
+        'target_type' => 'commerce_product_variation',
+      ),
+      'locked' => TRUE,
+    ]);
+    $field_storage->save();
+  }
+  if (empty($field)) {
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $product_type->id(),
+      'label' => 'Variations',
+      'required' => TRUE,
+      'settings' => ['display_summary' => FALSE],
+    ]);
+    $field->save();
+
+    // Assign widget settings for the 'default' form mode.
+    entity_get_form_display('commerce_product', $product_type->id(), 'default')
+      ->setComponent('variations', [
+        'type' => 'inline_entity_form_multiple',
+        'weight' => 10,
+      ])
+      ->save();
+  }
 }
 
 /**
@@ -68,10 +104,8 @@ function commerce_product_add_body_field($product_type_id, $label = 'Body') {
  */
 function commerce_product_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
   $field = $form_state->getFormObject()->getEntity();
-  // If the current field instance is attached to a product type,
-  // and of a field type that defines an options list.
   $allowedFields = ['options', 'taxonomy', 'entity_reference'];
-  if ($field->get('entity_type') == 'commerce_product' && in_array($field->get('fieldStorage')->get('module'), $allowedFields)) {
+  if ($field->get('entity_type') == 'commerce_product_variation' && in_array($field->get('fieldStorage')->get('module'), $allowedFields)) {
     // Get the current instance's attribute settings for use as default values.
     $defaultAttributeField = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
     $defaultAttributeWidget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
@@ -131,7 +165,7 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
 function commerce_product_form_field_config_edit_form_submit($form, FormStateInterface $form_state) {
   $field = $form_state->getFormObject()->getEntity();
   $allowedFields = ['options', 'taxonomy', 'entity_reference'];
-  if ($field->get('entity_type') == 'commerce_product' && in_array($field->get('fieldStorage')->get('module'), $allowedFields)) {
+  if ($field->get('entity_type') == 'commerce_product_variation' && in_array($field->get('fieldStorage')->get('module'), $allowedFields)) {
     $formFields = &$form_state->getValues('field');
 
     // If the attribute field is checked, update the attribute fields.

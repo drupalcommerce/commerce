@@ -1,15 +1,7 @@
-entity.commerce_product.configuration:
-  path: '/admin/commerce/config/product'
-  defaults:
-    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Product configuration'
-  requirements:
-    _permission: 'access administration pages'
-
 entity.commerce_product.add_page:
   path: '/admin/commerce/products/add'
   defaults:
-    _title: 'Add a new product'
+    _title: 'Add new product'
     _bundle_type: commerce_product_type
     _controller: '\Drupal\commerce\Controller\AddController::addPage'
   options:
@@ -60,7 +52,7 @@ entity.commerce_product.delete_form:
   path: '/product/{commerce_product}/delete'
   defaults:
     _entity_form: commerce_product.delete
-    _title: 'Delete a product'
+    _title: 'Delete product'
   options:
     _admin_route: TRUE
   requirements:
@@ -70,7 +62,7 @@ entity.commerce_product_type.add_form:
   path: '/admin/commerce/config/product-types/add'
   defaults:
     _entity_form: commerce_product_type.edit
-    _title: 'Add a product type'
+    _title: 'Add product type'
   requirements:
     _entity_create_access: 'commerce_product_type'
 
@@ -86,7 +78,7 @@ entity.commerce_product_type.edit_form:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/edit'
   defaults:
     _entity_form: commerce_product_type.edit
-    _title: 'Edit a product type'
+    _title: 'Edit product type'
   requirements:
    _entity_access: 'commerce_product_type.edit'
 
@@ -94,6 +86,38 @@ entity.commerce_product_type.delete_form:
   path: '/admin/commerce/config/product-types/{commerce_product_type}/delete'
   defaults:
     _entity_form: 'commerce_product_type.delete'
-    _title: 'Delete a product type'
+    _title: 'Delete product type'
   requirements:
     _entity_access: 'commerce_product_type.delete'
+
+entity.commerce_product_variation_type.add_form:
+  path: '/admin/commerce/config/product-variation-types/add'
+  defaults:
+    _entity_form: commerce_product_variation_type.edit
+    _title: 'Add product variation type'
+  requirements:
+    _entity_create_access: 'commerce_product_variation_type'
+
+entity.commerce_product_variation_type.collection:
+  path: '/admin/commerce/config/product-variation-types'
+  defaults:
+    _entity_list: 'commerce_product_variation_type'
+    _title: 'Product variation types'
+  requirements:
+    _permission: 'administer product types'
+
+entity.commerce_product_variation_type.edit_form:
+  path: '/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/edit'
+  defaults:
+    _entity_form: commerce_product_variation_type.edit
+    _title: 'Edit product variation type'
+  requirements:
+   _entity_access: 'commerce_product_variation_type.edit'
+
+entity.commerce_product_variation_type.delete_form:
+  path: '/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/delete'
+  defaults:
+    _entity_form: 'commerce_product_variation_type.delete'
+    _title: 'Delete product variation type'
+  requirements:
+    _entity_access: 'commerce_product_variation_type.delete'

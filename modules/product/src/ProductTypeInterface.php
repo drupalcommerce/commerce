@@ -23,14 +23,32 @@ interface ProductTypeInterface extends ConfigEntityInterface {
   public function getDescription();
 
   /**
-   * Sets the description of the product type.
+   * Sets the product type description.
    *
    * @param string $description
-   *   The new description.
+   *   The product description.
    *
    * @return $this
    */
   public function setDescription($description);
+
+  /**
+   * Gets the product type's matching variation type.
+   *
+   * @return string
+   *   The variation type.
+   */
+  public function getVariationType();
+
+  /**
+   * Sets the product type's matching variation type.
+   *
+   * @param string $variationType
+   *   The variation type.
+   *
+   * @return $this
+   */
+  public function setVariationType($variationType);
 
   /**
    * Gets the digital property of the product type.

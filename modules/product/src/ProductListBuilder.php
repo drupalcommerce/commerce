@@ -21,7 +21,6 @@ class ProductListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['title'] = t('Title');
-    $header['sku'] = t('SKU');
     return $header + parent::buildHeader();
   }
 
@@ -40,7 +39,6 @@ class ProductListBuilder extends EntityListBuilder {
       '#title' => $entity->label(),
     ] + $uri->toRenderArray();
 
-    $row['sku'] = $entity->getSku();
     return $row + parent::buildRow($entity);
   }
 

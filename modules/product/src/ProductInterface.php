@@ -18,25 +18,15 @@ use Drupal\user\EntityOwnerInterface;
 interface ProductInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
-   * Get the SKU of this product.
+   * Gets the product type.
    *
    * @return string
-   *   The product SKU
+   *   The product type.
    */
-  public function getSku();
+  public function getType();
 
   /**
-   * Set the SKU of this product
-   *
-   * @param string $sku
-   *   The product SKU
-   *
-   * @return \Drupal\commerce_product\ProductInterface
-   */
-  public function setSku($sku);
-
-  /**
-   * Get the title of this product.
+   * Get the product title.
    *
    * @return string
    *   The product title
@@ -44,30 +34,30 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
   public function getTitle();
 
   /**
-   * Set the title of this product
+   * Set the product title.
    *
    * @param string $title
-   *   The product title
+   *   The product title.
    *
-   * @return \Drupal\commerce_product\ProductInterface
+   * @return $this
    */
   public function setTitle($title);
 
   /**
-   * Get the status of this product.
+   * Get the product status.
    *
-   * @return boolean
+   * @return bool
    *   The product status
    */
   public function getStatus();
 
   /**
-   * Set the status of this product
+   * Set the product status.
    *
-   * @param boolean $status
-   *   The product status
+   * @param bool $status
+   *   The product status.
    *
-   * @return \Drupal\commerce_product\ProductInterface
+   * @return $this
    */
   public function setStatus($status);
 
@@ -75,7 +65,7 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
    * Gets the product creation timestamp.
    *
    * @return int
-   *   Creation timestamp of the product.
+   *   The product creation timestamp.
    */
   public function getCreatedTime();
 
@@ -85,17 +75,8 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
    * @param int $timestamp
    *   The product creation timestamp.
    *
-   * @return \Drupal\commerce_product\ProductInterface
-   *   The called product entity.
+   * @return $this
    */
   public function setCreatedTime($timestamp);
-
-  /**
-   * Gets the product type.
-   *
-   * @return string
-   *   The product type.
-   */
-  public function getType();
 
 }

@@ -2,61 +2,49 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_product\Entity\Product.
+ * Contains \Drupal\commerce_product\Entity\ProductVariation.
  */
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\commerce_product\ProductInterface;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_product\ProductVariationInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Defines the Product entity.
+ * Defines the Product Variation entity.
  *
  * @ContentEntityType(
- *   id = "commerce_product",
- *   label = @Translation("Product"),
+ *   id = "commerce_product_variation",
+ *   label = @Translation("Product variation"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "default" = "Drupal\commerce_product\Form\ProductForm",
- *       "add" = "Drupal\commerce_product\Form\ProductForm",
- *       "edit" = "Drupal\commerce_product\Form\ProductForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "default" = "Drupal\commerce_product\Form\ProductVariationForm",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer products",
  *   fieldable = TRUE,
  *   translatable = TRUE,
- *   base_table = "commerce_product",
- *   data_table = "commerce_product_field_data",
+ *   base_table = "commerce_product_variation",
+ *   data_table = "commerce_product_variation_field_data",
  *   entity_keys = {
- *     "id" = "product_id",
- *     "label" = "title",
+ *     "id" = "variation_id",
+ *     "label" = "sku",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "bundle" = "type"
  *   },
- *   links = {
- *     "canonical" = "/product/{commerce_product}",
- *     "edit-form" = "/product/{commerce_product}/edit",
- *     "delete-form" = "/product/{commerce_product}/delete",
- *     "collection" = "/admin/commerce/products"
- *   },
- *   bundle_entity_type = "commerce_product_type",
- *   field_ui_base_route = "entity.commerce_product_type.edit_form",
+ *   bundle_entity_type = "commerce_product_variation_type",
+ *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
  * )
  */
-class Product extends ContentEntityBase implements ProductInterface {
+class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
 
@@ -70,15 +58,15 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTitle() {
-    return $this->get('title')->value;
+  public function getSku() {
+    return $this->get('sku')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setTitle($title) {
-    $this->set('title', $title);
+  public function setSku($sku) {
+    $this->set('sku', $sku);
     return $this;
   }
 
@@ -122,36 +110,6 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStore() {
-    return $this->get('store_id')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setStore(StoreInterface $store) {
-    $this->set('store_id', $store->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getStoreId() {
-    return $this->get('store_id')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setStoreId($storeId) {
-    $this->set('store_id', $storeId);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOwner() {
     return $this->get('uid')->entity;
   }
@@ -179,35 +137,20 @@ class Product extends ContentEntityBase implements ProductInterface {
     return $this->set('uid', $uid);
   }
 
+
   /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['product_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Product ID'))
+    $fields['variation_id'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Variation ID'))
       ->setReadOnly(TRUE);
-
-    $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Store'))
-      ->setDescription(t('The store to which the product belongs.'))
-      ->setCardinality(1)
-      ->setRequired(TRUE)
-      ->setSetting('target_type', 'commerce_store')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'options_select',
-        'weight' => 0,
-        'settings' => [],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_product\Entity\Product::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\commerce_product\Entity\ProductVariation::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -233,24 +176,23 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'));
 
-    $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Title'))
+    $fields['sku'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('SKU'))
+      ->setDescription(t('The unique, human-readable identifier for a product variation.'))
       ->setRequired(TRUE)
+      ->addConstraint('ProductSku')
       ->setTranslatable(TRUE)
-      ->setSettings([
-        'default_value' => '',
-        'max_length' => 255,
-      ])
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
-        'weight' => -5,
+        'weight' => -4,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -5,
+        'weight' => -4,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
@@ -258,6 +200,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
+      ->setDescription(t('Disabled product variations cannot be added to shopping carts and may be hidden in product views.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -265,7 +208,7 @@ class Product extends ContentEntityBase implements ProductInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
-        'weight' => 20,
+        'weight' => 10,
         'settings' => [
           'display_label' => TRUE
         ]
@@ -274,7 +217,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the product was created.'))
+      ->setDescription(t('The time that the product variation was created.'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -289,7 +232,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the product was last edited.'))
+      ->setDescription(t('The time that the product variation was last edited.'))
       ->setTranslatable(TRUE);
 
     return $fields;

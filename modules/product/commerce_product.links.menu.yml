@@ -9,3 +9,9 @@ entity.commerce_product_type.collection:
   route_name: 'entity.commerce_product_type.collection'
   parent: 'commerce.configuration'
   description: 'Manage your product types.'
+
+entity.commerce_product_variation_type.collection:
+  title: 'Product variation types'
+  route_name: 'entity.commerce_product_variation_type.collection'
+  parent: 'commerce.configuration'
+  description: 'Manage your product variation types.'

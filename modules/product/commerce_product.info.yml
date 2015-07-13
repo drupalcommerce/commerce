@@ -7,11 +7,13 @@ dependencies:
   - commerce
   - commerce_price
   - commerce_store
+  - inline_entity_form
   - text
 config_devel:
-  - commerce_product.commerce_product_type.product
-  - field.field.commerce_product.product.commerce_price
+  - commerce_product.commerce_product_type.default
+  - commerce_product.commerce_product_variation_type.default
+  - field.storage.commerce_product.body
+  - field.storage.commerce_product.variations
+  - field.field.commerce_product.default.body
+  - field.field.commerce_product.default.variations
   - views.view.commerce_products
-  - core.entity_form_display.commerce_product.product.default
-  - field.storage.commerce_product.commerce_price
-  - core.entity_view_display.commerce_product.product.default

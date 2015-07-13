@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: product
-label: Product
-digital: null
-description: null

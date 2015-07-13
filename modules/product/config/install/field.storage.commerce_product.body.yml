@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   module:
-    - commerce_price
     - commerce_product
-id: commerce_product.commerce_price
-field_name: commerce_price
+    - text
+id: commerce_product.body
+field_name: body
 entity_type: commerce_product
-type: price
+type: text_with_summary
 settings: {  }
-module: commerce_price
+module: text
 locked: false
 cardinality: 1
 translatable: true
