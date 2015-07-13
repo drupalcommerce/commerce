@@ -18,5 +18,7 @@ default_value: {  }
 default_value_callback: ''
 settings:
   handler: 'default:commerce_product_variation'
-  handler_settings: {  }
+  handler_settings:
+    target_bundles:
+      - default
 field_type: entity_reference

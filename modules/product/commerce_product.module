@@ -85,7 +85,14 @@ function commerce_product_add_variations_field($product_type) {
       'bundle' => $product_type->id(),
       'label' => 'Variations',
       'required' => TRUE,
-      'settings' => ['display_summary' => FALSE],
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [
+          'target_bundles' => [
+            $product_type->getVariationType(),
+          ],
+        ],
+      ],
     ]);
     $field->save();
 
