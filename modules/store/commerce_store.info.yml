@@ -8,6 +8,7 @@ dependencies:
   - commerce
   - commerce_price
   - entity_reference
+  - options
 config_devel:
   - commerce_store.commerce_store_type.default
   - commerce_store.settings
