@@ -24,8 +24,8 @@ content:
     type: price_default
     weight: 1
     settings:
-      strip_trailing_zeroes: 0
-      display_currency_code: 0
+      strip_trailing_zeroes: false
+      display_currency_code: false
     third_party_settings: {  }
     label: above
 hidden:
