@@ -197,7 +197,7 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
     $product_title = t('@sku: @title', array('@sku' => $new_product->sku, '@title' => $new_product->title));
 
     // Check at database level
-    $field_products = commerce_product_match_products($this->field_name, NULL, $new_product->sku, 'equals');
+    $field_products = commerce_product_match_products($this->field, NULL, $new_product->sku, 'equals');
     $this->assertFalse(empty($field_products), t('Product is in the available products of the field'));
 
     // Check if it is in the reference field for product displays.
