@@ -219,7 +219,7 @@ function commerce_commerce_currency_info() {
     ),
     'CAD' => array(
       'code' => 'CAD',
-      'symbol' => 'CA$',
+      'symbol' => '$',
       'name' => t('Canadian Dollar'),
       'numeric_code' => '124',
       'minor_unit' => t('Cent'),
