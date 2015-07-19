@@ -142,6 +142,8 @@ function hook_commerce_payment_totals_row_info_alter(&$rows, $totals, $order) {
  *        of the payment method.
  *      - redirect_form: the name of the CALLBACK_commerce_payment_method_redirect_form()
  *        of the payment method.
+ *      - redirect_form_back: the name of the CALLBACK_commerce_payment_method_redirect_form_back()
+ *        of the payment method.
  *      - redirect_form_validate: the name of the CALLBACK_commerce_payment_method_redirect_form_validate()
  *        of the payment method.
  *      - redirect_form_submit: the name of the CALLBACK_commerce_payment_method_redirect_form_submit()
