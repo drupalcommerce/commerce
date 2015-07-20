@@ -66,17 +66,15 @@ abstract class CommerceOrderTestBase extends WebTestBase {
       'uid' => 1,
       'mail' => \Drupal::config('system.site')->get('mail'),
       'type' => 'default',
-      'default_currency' => "USD"
+      'default_currency' => 'USD',
+      'address' => [
+        'country_code' => 'GB',
+        'locality' => 'London',
+        'postal_code' => 'NW1 6XE',
+        'address_line1' => '221B Baker Street',
+      ],
     ];
     $this->store = Store::create($values);
-
-    $address = [
-      'country_code' => 'GB',
-      'address_line1' => '221B Baker Street',
-      'locality' => 'London',
-      'postal_code' => 'NW1 6XE'
-    ];
-    $this->store->setAddress($address);
     $this->store->save();
 
     // Set as default store.
