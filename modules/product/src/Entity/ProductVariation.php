@@ -152,21 +152,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_product\Entity\ProductVariation::getCurrentUserId')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
@@ -200,7 +185,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
-      ->setDescription(t('Disabled product variations cannot be added to shopping carts and may be hidden in product views.'))
+      ->setDescription(t('Disabled product variations cannot be added to shopping carts.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -219,15 +204,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the product variation was created.'))
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'timestamp',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'datetime_timestamp',
-        'weight' => 10,
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')

@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.default
+id: commerce_product_variation.default.default
+targetEntityType: commerce_product_variation
+bundle: default
+mode: default
+content:
+  sku:
+    type: string_textfield
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 1
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  uid: true

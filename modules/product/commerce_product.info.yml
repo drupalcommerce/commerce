@@ -14,6 +14,7 @@ config_devel:
   - commerce_product.commerce_product_type.default
   - commerce_product.commerce_product_variation_type.default
   - core.entity_form_display.commerce_product.default.default
+  - core.entity_form_display.commerce_product_variation.default.default
   - field.storage.commerce_product.body
   - field.storage.commerce_product.variations
   - field.field.commerce_product.default.body
