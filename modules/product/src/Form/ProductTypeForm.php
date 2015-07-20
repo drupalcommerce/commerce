@@ -8,6 +8,7 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,7 +27,7 @@ class ProductTypeForm extends EntityForm {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    */
-  public function __construct(EntityStorageInterface $entityManager) {
+  public function __construct(EntityManagerInterface $entityManager) {
     $this->variationTypeStorage = $entityManager->getStorage('commerce_product_variation_type');
   }
 
@@ -94,8 +95,8 @@ class ProductTypeForm extends EntityForm {
     $form_state->setRedirect('entity.commerce_product_type.collection');
 
     if ($status == SAVED_NEW) {
-      commerce_product_add_body_field($this->id);
-      commerce_product_add_variations_field($this->entity->id());
+      commerce_product_add_body_field($this->entity);
+      commerce_product_add_variations_field($this->entity);
     }
   }
 
