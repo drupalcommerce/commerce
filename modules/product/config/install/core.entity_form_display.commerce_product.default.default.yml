@@ -1,0 +1,71 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.default
+    - field.field.commerce_product.default.body
+    - field.field.commerce_product.default.variations
+  module:
+    - inline_entity_form
+    - path
+    - text
+id: commerce_product.default.default
+targetEntityType: commerce_product
+bundle: default
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 1
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 20
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  store_id:
+    type: options_select
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  variations:
+    type: inline_entity_form_multiple
+    weight: 10
+    settings:
+      allow_existing: false
+      match_operator: CONTAINS
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+    third_party_settings: {  }
+hidden: {  }
