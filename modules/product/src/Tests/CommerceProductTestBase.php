@@ -70,6 +70,7 @@ abstract class CommerceProductTestBase extends WebTestBase {
         'administer product types',
         'administer commerce_product fields',
         'access administration pages',
+        'administer commerce_product_variation fields'
       ]
     );
     $this->drupalLogin($this->adminUser);

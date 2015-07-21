@@ -21,28 +21,9 @@ class ProductTest extends CommerceProductTestBase {
    */
   function testAddCommerceProduct() {
     $this->createEntity('commerce_product', [
-      'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => 'product'
     ]);
-  }
-
-  /**
-   * Tests creating a product with an existing SKU.
-   */
-  function testAddCommerceProductExistingSku() {
-    $values = [
-      'sku' => $this->randomMachineName(),
-      'title' => $this->randomMachineName(),
-      'type' => 'product',
-      'store_id' => $this->commerce_store->id()
-    ];
-    $this->createEntity('commerce_product', $values);
-
-    $productDuplicate = Product::create($values);
-
-    $violations = $productDuplicate->sku->validate();
-    $this->assertNotEqual($violations->count(), 0, 'Validation fails when creating a product with the same SKU.');
   }
 
   /**
@@ -51,7 +32,6 @@ class ProductTest extends CommerceProductTestBase {
   function testDeleteProduct() {
     // Create a new product.
     $values = [
-      'sku' => $this->randomMachineName(),
       'title' => $this->randomMachineName(),
       'type' => "product"
     ];
