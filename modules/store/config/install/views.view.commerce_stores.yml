@@ -457,7 +457,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - 'url.query_args.pagers:0'
+        - url.query_args
         - user.permissions
       cacheable: false
   page_1:
@@ -472,6 +472,6 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - 'url.query_args.pagers:0'
+        - url.query_args
         - user.permissions
       cacheable: false

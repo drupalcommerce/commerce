@@ -99,4 +99,83 @@ class ProductVariationTypeTest extends CommerceProductTestBase {
     $this->assertFalse($exists, 'The new product variation type has been deleted from the database.');
   }
 
+  /**
+   * Tests adding product fields.
+   */
+  protected function testAddCommerceProductVariationFieldAdmin() {
+    $variationType = $this->createEntity('commerce_product_variation_type', [
+      'id' => 'foo',
+      'label' => 'foo'
+    ]);
+
+    $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/add-field');
+
+    // Create a new field.
+    $fields = [
+      'label' => $label = $this->randomMachineName(),
+      'field_name' => $name = strtolower($this->randomMachineName()),
+      'new_storage_type' => 'list_string',
+    ];
+    $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/add-field', $fields, t('Save and continue'));
+
+    $edit = ['settings[allowed_values]' => '1|1\n2|2'];
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+
+    return $fields;
+  }
+
+  /**
+   * Tests adding product attributes to a field with just the attribute field checked.
+   */
+  function testProductVariationAttributesAdmin() {
+    $productFields = $this->testAddCommerceProductVariationFieldAdmin();
+    $edit = [
+      'attribute_field' => 1,
+      'attribute_widget_title' => $this->randomMachineName()
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save settings'));
+    $this->drupalGet('/admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_' . $productFields["field_name"]);
+    $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
+    $this->assertFieldChecked("edit-attribute-widget-select", "Product attribute widget select list field is checked");
+    $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
+  }
+
+  /**
+   * Tests adding product attributes to a field with the attribute field checked, and changing the radios.
+   */
+  function testAddProductVariationAttributesFieldsAdmin() {
+    $variationType = $this->createEntity('commerce_product_variation_type', [
+      'id' => 'foo',
+      'label' => 'foo'
+    ]);
+
+    $attributeWidgets = ['select', 'radios'];
+    foreach ($attributeWidgets as $attributeWidget) {
+      $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/add-field');
+
+      // Create a new field.
+      $productVariationfields = [
+        'label' => $label = $this->randomMachineName(),
+        'field_name' => $name = strtolower($this->randomMachineName()),
+        'new_storage_type' => 'list_string',
+      ];
+      $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/add-field', $productVariationfields, t('Save and continue'));
+
+      $edit = ['settings[allowed_values]' => '1|1\n2|2'];
+      $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+
+      $edit = [
+        'attribute_field' => 1,
+        'attribute_widget' => $attributeWidget,
+        'attribute_widget_title' => $this->randomMachineName()
+      ];
+      $this->drupalPostForm(NULL, $edit, t('Save settings'));
+      // Go back to the URL by clicking "Edit"
+      $this->drupalGet('/admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_' . $productVariationfields["field_name"]);
+
+      $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
+      $this->assertFieldChecked("edit-attribute-widget-" . $attributeWidget, "Product attribute widget select list field is checked");
+      $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
+    }
+  }
 }
