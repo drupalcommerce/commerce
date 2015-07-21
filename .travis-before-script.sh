@@ -17,6 +17,7 @@ cd "$DRUPAL_TI_DRUPAL_DIR"
 
 	git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git
 	git clone --branch 8.x-1.x http://git.drupal.org/project/address.git
+	git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git
 )
 
 # Enable and run composer_manager.
@@ -33,9 +34,6 @@ rm -rf vendor
 composer drupal-rebuild
 composer update --prefer-source -n --verbose
 cd ..
-
-# Download more dependencies.
-drush dl -y inline_entity_form
 
 # Enable main module and submodules.
 drush en -y commerce commerce_product commerce_order
