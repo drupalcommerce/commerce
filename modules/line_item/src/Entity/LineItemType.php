@@ -35,7 +35,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "label",
  *     "id",
- *     "description",
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit",
@@ -59,27 +58,5 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
    * @var string
    */
   protected $label;
-
-  /**
-   * A brief description of this line item type.
-   *
-   * @var string
-   */
-  protected $description;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDescription() {
-    return $this->description;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDescription($description) {
-    $this->description = $description;
-    return $this;
-  }
 
 }

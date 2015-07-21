@@ -8,6 +8,3 @@ commerce_line_item.commerce_line_item_type.*:
     id:
       type: string
       label: 'Machine-readable name'
-    description:
-      type: text
-      label: 'Description'

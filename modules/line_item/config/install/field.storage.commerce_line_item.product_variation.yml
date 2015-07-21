@@ -4,12 +4,12 @@ dependencies:
   module:
     - commerce_line_item
     - entity_reference
-id: commerce_line_item.product
-field_name: product
+id: commerce_line_item.product_variation
+field_name: product_variation
 entity_type: commerce_line_item
 type: entity_reference
 settings:
-  target_type: commerce_product
+  target_type: commerce_product_variation
 module: entity_reference
 locked: false
 cardinality: 1

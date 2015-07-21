@@ -8,9 +8,9 @@ dependencies:
   - commerce_price
   - commerce_product
 config_devel:
-  - commerce_line_item.commerce_line_item_type.product
-  - field.field.commerce_line_item.product.product
-  - core.entity_form_display.commerce_line_item.product.default
-  - field.storage.commerce_line_item.product
-  - core.entity_view_display.commerce_line_item.product.default
+  - commerce_line_item.commerce_line_item_type.product_variation
+  - field.field.commerce_line_item.product_variation.product_variation
+  - core.entity_form_display.commerce_line_item.product_variation.default
+  - field.storage.commerce_line_item.product_variation
+  - core.entity_view_display.commerce_line_item.product_variation.default
 

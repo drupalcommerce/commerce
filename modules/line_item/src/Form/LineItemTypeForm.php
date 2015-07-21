@@ -28,7 +28,6 @@ class LineItemTypeForm extends EntityForm {
    *   The line_item type storage.
    */
   public function __construct(EntityStorageInterface $lineItemTypeStorage) {
-    // Setup object members.
     $this->lineItemTypeStorage = $lineItemTypeStorage;
   }
 
@@ -56,7 +55,6 @@ class LineItemTypeForm extends EntityForm {
       '#description' => $this->t('Label for the line item type.'),
       '#required' => TRUE,
     ];
-
     $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $lineItemType->id(),
@@ -65,13 +63,6 @@ class LineItemTypeForm extends EntityForm {
         'source' => ['label'],
       ],
       '#disabled' => !$lineItemType->isNew()
-    ];
-
-    $form['description'] = [
-      '#title' => t('Description'),
-      '#type' => 'textarea',
-      '#default_value' => $lineItemType->getDescription(),
-      '#description' => $this->t('Description of this line item type'),
     ];
 
     return $form;

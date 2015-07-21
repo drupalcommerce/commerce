@@ -22,7 +22,6 @@ content:
     settings:
       match_operator: CONTAINS
       allow_existing: false
-      delete_references: false
       override_labels: false
       label_singular: ''
       label_plural: ''

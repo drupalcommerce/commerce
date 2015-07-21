@@ -21,12 +21,11 @@ class OrderAdminTest extends CommerceOrderTestBase {
    */
   public function testCreateOrder() {
     // Create a order through the add form.
-    $this->drupalGet('/admin/store/products');
     $this->drupalGet('/admin/commerce/orders');
     $this->clickLink('Create a new order');
 
     $values = array(
-      'line_items[form][inline_entity_form][product][0][target_id]' => $this->product->getTitle() . " (" . $this->product->id() . ")",
+      'line_items[form][inline_entity_form][product_variation][0][target_id]' => $this->variation->getSku(),
       'line_items[form][inline_entity_form][quantity][0][value]' => 1,
       'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99'
     );

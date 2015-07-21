@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order\Tests;
 
-use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Tests\StoreTestBase;
 use Drupal\Component\Utility\SafeMarkup;
@@ -19,11 +19,11 @@ use Drupal\simpletest\WebTestBase;
 abstract class CommerceOrderTestBase extends WebTestBase {
 
   /**
-   * The product to test against
+   * The variation to test against
    *
-   * @var \Drupal\commerce_product\Entity\Product
+   * @var \Drupal\commerce_product\Entity\ProductVariation
    */
-  protected $product;
+  protected $variation;
 
   /**
    * The store to test against
@@ -81,16 +81,13 @@ abstract class CommerceOrderTestBase extends WebTestBase {
     \Drupal::configFactory()->getEditable('commerce_store.settings')
       ->set('default_store', $this->store->uuid())->save();
 
-    // Create a product
+    // Create a product variation.
     $values = [
+      'type' => 'default',
       'sku' => $this->randomMachineName(),
-      'title' => $this->randomMachineName(),
-      'type' => 'product',
-      'store_id' => $this->store->id()
     ];
-
-    $this->product = Product::create($values);
-    $this->product->save();
+    $this->variation = ProductVariation::create($values);
+    $this->variation->save();
 
     $this->drupalLogin($this->adminUser);
   }
