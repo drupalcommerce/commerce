@@ -52,6 +52,7 @@ install:
   - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git drupal
   - git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git drupal/modules/composer_manager
   - git clone --branch 8.x-1.x http://git.drupal.org/project/address.git drupal/modules/address
+  - git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git drupal/modules/inline_entity_form
   - cd drupal
   - wget https://www.drupal.org/files/issues/2189345-61.patch
   - git apply -v -p1 < 2189345-61.patch
@@ -74,7 +75,6 @@ before_script:
   - composer drupal-rebuild
   - composer update --prefer-source -n --verbose
   - cd ..
-  - drush dl inline_entity_form
   - drush en -y commerce commerce_product commerce_order
 
 script:
