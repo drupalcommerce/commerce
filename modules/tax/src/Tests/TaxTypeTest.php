@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\commerce_tax\Tests;
+use Drupal\commerce_tax\Entity\TaxType;
 
 /**
  * Tests the commerce_tax_type entity forms.
@@ -34,9 +35,9 @@ class TaxTypeTest extends CommerceTaxTestBase {
       'tag' => 'test',
     ];
 
-    $this->assertFalse((bool) entity_load('commerce_tax_type', $name));
+    $this->assertFalse((bool) TaxType::load($name));
     $this->drupalPostForm('admin/commerce/config/tax/type/add', $edit, t('Save'));
-    $this->assertTrue((bool) entity_load('commerce_tax_type', $name));
+    $this->assertTrue((bool) TaxType::load($name));
   }
 
   protected function checkTaxTypeEditForm($name) {
@@ -47,9 +48,9 @@ class TaxTypeTest extends CommerceTaxTestBase {
       'tag' => 'test',
     ];
 
-    $this->assertFalse(entity_load('commerce_tax_type', $name)->getRoundingMode() === 2);
+    $this->assertFalse(TaxType::load($name)->getRoundingMode() === 2);
     $this->drupalPostForm('admin/commerce/config/tax/type/' . $name . '/edit', $edit, t('Save'));
-    $this->assertTrue(entity_load('commerce_tax_type', $name)->getRoundingMode() === 2);
+    $this->assertTrue(TaxType::load($name)->getRoundingMode() === 2);
   }
 
   protected function checkTaxTypeDeleteForm($name) {
@@ -57,9 +58,9 @@ class TaxTypeTest extends CommerceTaxTestBase {
       'confirm' => '1',
     ];
 
-    $this->assertTrue((bool) entity_load('commerce_tax_type', $name));
+    $this->assertTrue((bool) TaxType::load($name));
     $this->drupalPostForm('admin/commerce/config/tax/type/' . $name . '/delete', $edit, t('Delete'));
-    $this->assertFalse((bool) entity_load('commerce_tax_type', $name));
+    $this->assertFalse((bool) TaxType::load($name));
   }
 
 }
