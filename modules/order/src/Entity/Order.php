@@ -103,6 +103,21 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the line items of a deleted order.
+    $lineItems = [];
+    foreach ($entities as $entity) {
+      foreach ($entity->line_items as $item) {
+        $lineItems[$item->target_id] = $item->entity;
+      }
+    }
+    $lineItemStorage = \Drupal::service('entity.manager')->getStorage('commerce_line_item');
+    $lineItemStorage->delete($lineItems);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOrderNumber() {
     return $this->get('order_number')->value;
   }

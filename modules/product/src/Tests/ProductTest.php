@@ -8,6 +8,7 @@
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
 
 /**
  * Create, view, edit, delete, and change products and product types.
@@ -17,32 +18,25 @@ use Drupal\commerce_product\Entity\Product;
 class ProductTest extends CommerceProductTestBase {
 
   /**
-   * Tests creating a product.
-   */
-  function testAddCommerceProduct() {
-    $this->createEntity('commerce_product', [
-      'title' => $this->randomMachineName(),
-      'type' => 'product'
-    ]);
-  }
-
-  /**
    * Tests deleting a product.
    */
   function testDeleteProduct() {
-    // Create a new product.
-    $values = [
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+    ]);
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
       'title' => $this->randomMachineName(),
-      'type' => "product"
-    ];
-    $product = $this->createEntity('commerce_product', $values);
-    $productExists = (bool) Product::load($product->id());
-    $this->assertTrue($productExists, 'The new product has been created in the database.');
+      'variations' => [$variation],
+    ]);
 
     // Delete the product and verify deletion.
     $product->delete();
-
     $productExists = (bool) Product::load($product->id());
+    $variationExists = (bool) ProductVariation::load($variation->id());
     $this->assertFalse($productExists, 'The new product has been deleted from the database.');
+    $this->assertFalse($variationExists, 'The matching product variation has been deleted from the database.');
   }
+
 }

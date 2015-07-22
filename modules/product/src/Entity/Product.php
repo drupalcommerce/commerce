@@ -182,6 +182,21 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the product variations of a deleted product.
+    $variations = [];
+    foreach ($entities as $entity) {
+      foreach ($entity->variations as $item) {
+        $variations[$item->target_id] = $item->entity;
+      }
+    }
+    $variationStorage = \Drupal::service('entity.manager')->getStorage('commerce_product_variation');
+    $variationStorage->delete($variations);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
