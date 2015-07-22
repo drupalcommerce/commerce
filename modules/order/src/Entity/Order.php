@@ -107,6 +107,9 @@ class Order extends ContentEntityBase implements OrderInterface {
     // Delete the line items of a deleted order.
     $lineItems = [];
     foreach ($entities as $entity) {
+      if (empty($entity->line_items)) {
+        continue;
+      }
       foreach ($entity->line_items as $item) {
         $lineItems[$item->target_id] = $item->entity;
       }

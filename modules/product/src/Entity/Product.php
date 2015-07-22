@@ -186,6 +186,9 @@ class Product extends ContentEntityBase implements ProductInterface {
     // Delete the product variations of a deleted product.
     $variations = [];
     foreach ($entities as $entity) {
+      if (empty($entity->variations)) {
+        continue;
+      }
       foreach ($entity->variations as $item) {
         $variations[$item->target_id] = $item->entity;
       }
