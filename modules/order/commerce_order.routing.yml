@@ -1,11 +1,3 @@
-commerce_order.order_configuration:
-  path: '/admin/commerce/config/order'
-  defaults:
-    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Order configuration'
-  requirements:
-    _permission: 'access administration pages'
-
 entity.commerce_order.add_page:
   path: '/admin/commerce/orders/add'
   defaults:

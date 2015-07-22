@@ -1,10 +1,3 @@
-commerce_order.order_configuration:
-  title: Order configuration
-  route_name: commerce_order.order_configuration
-  parent: commerce.configuration
-  description: 'Configure your order settings.'
-  weight: 10
-
 entity.commerce_order.collection:
   title: Orders
   route_name: entity.commerce_order.collection
@@ -14,5 +7,5 @@ entity.commerce_order.collection:
 entity.commerce_order_type.collection:
   title: Order types
   route_name: entity.commerce_order_type.collection
-  parent: commerce_order.order_configuration
+  parent: commerce.configuration
   description: 'Manage your order types.'
