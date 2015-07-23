@@ -21,10 +21,10 @@ class OrderTypeTest extends CommerceOrderTestBase {
    */
   public function testDefaultOrderType() {
     $orderTypes = OrderType::loadMultiple();
-    $this->assertTrue(isset($orderTypes['order']), 'Order Type Order is available');
+    $this->assertTrue(isset($orderTypes['default']), 'Order Type Order is available');
 
-    $orderType = OrderType::load('order');
-    $this->assertEqual($orderTypes['order'], $orderType, 'The correct Order Type is loaded');
+    $orderType = OrderType::load('default');
+    $this->assertEqual($orderTypes['default'], $orderType, 'The correct Order Type is loaded');
   }
 
   /**

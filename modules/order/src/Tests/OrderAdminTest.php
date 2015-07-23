@@ -47,7 +47,7 @@ class OrderAdminTest extends CommerceOrderTestBase {
   public function testDeleteOrder() {
     // Create a new order.
     $order = $this->createEntity('commerce_order', array(
-        'type' => 'order',
+        'type' => 'default',
         'mail' => $this->loggedInUser->getEmail(),
       )
     );

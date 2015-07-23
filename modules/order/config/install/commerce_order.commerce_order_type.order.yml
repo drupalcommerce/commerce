@@ -1,6 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-label: Order
-id: order
-description: 'A simple default order type.'

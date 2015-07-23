@@ -25,7 +25,7 @@ class OrderTest extends CommerceOrderTestBase {
       'type' => 'product_variation',
     ]);
     $order = $this->createEntity('commerce_order', [
-      'type' => 'order',
+      'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'line_items' => [$lineItem],
     ]);
@@ -43,7 +43,7 @@ class OrderTest extends CommerceOrderTestBase {
       'type' => 'product_variation',
     ]);
     $order = $this->createEntity('commerce_order', [
-      'type' => 'order',
+      'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'line_items' => [$lineItem],
     ]);

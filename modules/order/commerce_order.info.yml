@@ -13,8 +13,8 @@ dependencies:
   - options
 config_devel:
   - views.view.commerce_orders
-  - commerce_order.commerce_order_type.order
-  - field.field.commerce_order.order.line_items
-  - core.entity_form_display.commerce_order.order.default
+  - commerce_order.commerce_order_type.default
+  - field.field.commerce_order.default.line_items
+  - core.entity_form_display.commerce_order.default.default
   - field.storage.commerce_order.line_items
-  - core.entity_view_display.commerce_order.order.default
+  - core.entity_view_display.commerce_order.default.default

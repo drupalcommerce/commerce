@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - commerce_order.commerce_order_type.order
+    - commerce_order.commerce_order_type.default
     - field.storage.commerce_order.line_items
   module:
     - entity_reference
-id: commerce_order.order.line_items
+id: commerce_order.default.line_items
 field_name: line_items
 entity_type: commerce_order
-bundle: order
+bundle: default
 label: 'Line items'
 description: 'An entity reference to line items.'
 required: true
