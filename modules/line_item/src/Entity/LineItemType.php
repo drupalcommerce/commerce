@@ -35,6 +35,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "label",
  *     "id",
+ *     "sourceEntityType",
+ *     "orderType"
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit",
@@ -58,5 +60,49 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
    * @var string
    */
   protected $label;
+
+  /**
+   * The source entity type.
+   *
+   * @var string
+   */
+  protected $sourceEntityType;
+
+  /**
+   * The order type.
+   *
+   * @var string
+   */
+  protected $orderType;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourceEntityType() {
+    return $this->sourceEntityType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSourceEntityType($sourceEntityType) {
+    $this->sourceEntityType = $sourceEntityType;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrderType() {
+    return $this->orderType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOrderType($orderType) {
+    $this->orderType = $orderType;
+    return $this;
+  }
 
 }

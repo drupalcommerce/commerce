@@ -24,8 +24,9 @@ class OrderAdminTest extends CommerceOrderTestBase {
     $this->drupalGet('/admin/commerce/orders');
     $this->clickLink('Create a new order');
 
+    $source = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $values = array(
-      'line_items[form][inline_entity_form][product_variation][0][target_id]' => $this->variation->getSku(),
+      'line_items[form][inline_entity_form][source][0][target_id]' => $source,
       'line_items[form][inline_entity_form][quantity][0][value]' => 1,
       'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99'
     );

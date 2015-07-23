@@ -298,6 +298,11 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
+    $fields['source'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Source'))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['quantity'] = BaseFieldDefinition::create('decimal')
       ->setLabel(t('Quantity'))
       ->setDescription(t('The quantity of units.'))
@@ -359,6 +364,19 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
           'rows' => 4,
         ],
       ]);
+
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entityType, $bundle, array $baseFieldDefinitions) {
+    $fields = [];
+    if ($lineItemType = LineItemType::load($bundle)) {
+      $fields['source'] = clone $baseFieldDefinitions['source'];
+      $fields['source']->setSetting('target_type', $lineItemType->getSourceEntityType());
+    }
 
     return $fields;
   }

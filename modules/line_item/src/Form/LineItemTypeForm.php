@@ -8,36 +8,34 @@
 namespace Drupal\commerce_line_item\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LineItemTypeForm extends EntityForm {
 
   /**
-   * The line_item type storage.
+   * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
-  protected $lineItemTypeStorage;
+  protected $entityManager;
 
   /**
    * Create an LineItemTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $lineItemTypeStorage
-   *   The line_item type storage.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   *   The entity manager.
    */
-  public function __construct(EntityStorageInterface $lineItemTypeStorage) {
-    $this->lineItemTypeStorage = $lineItemTypeStorage;
+  public function __construct(EntityManagerInterface $entityManager) {
+    $this->entityManager = $entityManager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-    $entityManager = $container->get('entity.manager');
-    return new static($entityManager->getStorage('commerce_line_item_type'));
+    return new static($container->get('entity.manager'));
   }
 
   /**
@@ -46,6 +44,19 @@ class LineItemTypeForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $lineItemType = $this->entity;
+    // Prepare the list of source entity types.
+    $entityTypes = $this->entityManager->getDefinitions();
+    $sourceEntityTypes = array_filter($entityTypes, function($entityType) {
+      return $entityType->isSubclassOf('\Drupal\commerce\LineItemSourceInterface');
+    });
+    $sourceEntityTypes = array_map(function($entityType) {
+      return $entityType->getLabel();
+    }, $sourceEntityTypes);
+    // Prepare the list of order types.
+    $orderTypes = $this->entityManager->getStorage('commerce_order_type')->loadMultiple();
+    $orderTypes = array_map(function($orderType) {
+      return $orderType->label();
+    }, $orderTypes);
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -64,6 +75,20 @@ class LineItemTypeForm extends EntityForm {
       ],
       '#disabled' => !$lineItemType->isNew()
     ];
+    $form['sourceEntityType'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Source entity type'),
+      '#default_value' => $lineItemType->getSourceEntityType(),
+      '#options' => $sourceEntityTypes,
+      '#required' => TRUE,
+    ];
+    $form['orderType'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Order type'),
+      '#default_value' => $lineItemType->getOrderType(),
+      '#options' => $orderTypes,
+      '#required' => TRUE,
+    ];
 
     return $form;
   }
@@ -72,21 +97,11 @@ class LineItemTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $lineItemType = $this->entity;
-
-    try {
-      $lineItemType->save();
-      drupal_set_message($this->t('Saved the %label line item type.', [
-          '%label' => $lineItemType->label(),
-      ]));
-      $form_state->setRedirect('entity.commerce_line_item_type.collection');
-    } catch (\Exception $e) {
-      $this->logger('commerce_line_item')->error($e);
-      drupal_set_message($this->t('The %label line item type was not saved.', [
-          '%label' => $lineItemType->label(),
-      ]), 'error');
-      $form_state->setRebuild();
-    }
+    $this->entity->save();
+    drupal_set_message($this->t('Saved the %label line item type.', [
+        '%label' => $this->entity->label(),
+    ]));
+    $form_state->setRedirect('entity.commerce_line_item_type.collection');
   }
 
 }

@@ -8,3 +8,9 @@ commerce_line_item.commerce_line_item_type.*:
     id:
       type: string
       label: 'Machine-readable name'
+    sourceEntityType:
+      type: string
+      label: 'Source entity type'
+    orderType:
+      type: string
+      label: 'Order type'
