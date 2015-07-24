@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_line_item\Form\LineItemTypeDeleteForm.
+ * Contains \Drupal\commerce_order\Form\LineItemTypeDeleteForm.
  */
 
-namespace Drupal\commerce_line_item\Form;
+namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\Query\QueryFactory;

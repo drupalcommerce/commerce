@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\commerce_line_item\Form\LineItemTypeForm.
+ * Contains \Drupal\commerce_order\Form\LineItemTypeForm.
  */
 
-namespace Drupal\commerce_line_item\Form;
+namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;

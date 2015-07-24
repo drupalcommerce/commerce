@@ -39,9 +39,9 @@ abstract class CommerceOrderTestBase extends WebTestBase {
    */
   public static $modules = [
     'commerce',
+    'commerce_product',
     'commerce_order',
     'commerce_price',
-    'commerce_line_item',
     'inline_entity_form'
   ];
 

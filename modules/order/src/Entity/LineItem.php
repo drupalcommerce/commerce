@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_line_item\Entity\LineItem.
+ * Contains \Drupal\commerce_order\Entity\LineItem.
  */
 
-namespace Drupal\commerce_line_item\Entity;
+namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_line_item\LineItemInterface;
+use Drupal\commerce_order\LineItemInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -24,11 +24,11 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "default" = "Drupal\commerce_line_item\Form\LineItemForm",
+ *       "default" = "Drupal\commerce_order\Form\LineItemForm",
  *     }
  *   },
  *   base_table = "commerce_line_item",
- *   admin_permission = "administer line items",
+ *   admin_permission = "administer orders",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "line_item_id",
@@ -187,7 +187,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_line_item\Entity\CommerceLineItem::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceLineItem::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',

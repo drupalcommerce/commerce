@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @file
- * Definition of Drupal\commerce_line_item\Form\LineItemForm.
+ * Contains \Drupal\commerce_order\Form\LineItemForm.
  */
-namespace Drupal\commerce_line_item\Form;
+
+namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;

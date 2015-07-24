@@ -91,3 +91,35 @@ entity.commerce_order_type.delete_form:
     _title: 'Delete an order type'
   requirements:
     _entity_access: 'commerce_order_type.delete'
+
+entity.commerce_line_item_type.collection:
+  path: '/admin/commerce/config/line-item-types'
+  defaults:
+    _entity_list: 'commerce_line_item_type'
+    _title: 'Line item types'
+  requirements:
+    _permission: 'administer line item types'
+
+entity.commerce_line_item_type.edit_form:
+  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit'
+  defaults:
+    _entity_form: commerce_line_item_type.edit
+    _title: 'Edit a line item type'
+  requirements:
+   _entity_access: 'commerce_line_item_type.edit'
+
+entity.commerce_line_item_type.add_form:
+  path: '/admin/commerce/config/line-item-types/add'
+  defaults:
+    _entity_form: 'commerce_line_item_type.add'
+    _title: 'Add a new line item type'
+  requirements:
+    _entity_create_access: 'commerce_line_item_type'
+
+entity.commerce_line_item_type.delete_form:
+  path: '/admin/commerce/config/line-item-types/{commerce_line_item_type}/delete'
+  defaults:
+    _entity_form: 'commerce_line_item_type.delete'
+    _title: 'Delete a line item type'
+  requirements:
+    _entity_access: 'commerce_line_item_type.delete'

@@ -1,9 +1,0 @@
-'administer line items':
-  title: 'Administer line items'
-  description: 'Allows users to administer line items.'
-  'restrict access': TRUE
-
-'administer line item types':
-  title: 'Administer line item types'
-  description: 'Allows users to administer line item types.'
-  'restrict access': TRUE

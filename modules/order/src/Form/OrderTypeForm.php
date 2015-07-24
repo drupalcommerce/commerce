@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce_order\Form\OrderTypeForm.
+ * Contains \Drupal\commerce_order\Form\OrderTypeForm.
  */
 
 namespace Drupal\commerce_order\Form;

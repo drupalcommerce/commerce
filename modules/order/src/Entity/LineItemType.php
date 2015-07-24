@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_line_item\Entity\LineItemType.
+ * Contains \Drupal\commerce_order\Entity\LineItemType.
  */
 
-namespace Drupal\commerce_line_item\Entity;
+namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_line_item\LineItemTypeInterface;
+use Drupal\commerce_order\LineItemTypeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
@@ -18,11 +18,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   label = @Translation("Line item type"),
  *   handlers = {
  *     "form" = {
- *       "add" = "Drupal\commerce_line_item\Form\LineItemTypeForm",
- *       "edit" = "Drupal\commerce_line_item\Form\LineItemTypeForm",
- *       "delete" = "Drupal\commerce_line_item\Form\LineItemTypeDeleteForm"
+ *       "add" = "Drupal\commerce_order\Form\LineItemTypeForm",
+ *       "edit" = "Drupal\commerce_order\Form\LineItemTypeForm",
+ *       "delete" = "Drupal\commerce_order\Form\LineItemTypeDeleteForm"
  *     },
- *     "list_builder" = "Drupal\commerce_line_item\LineItemTypeListBuilder",
+ *     "list_builder" = "Drupal\commerce_order\LineItemTypeListBuilder",
  *   },
  *   admin_permission = "administer line item types",
  *   config_prefix = "commerce_line_item_type",

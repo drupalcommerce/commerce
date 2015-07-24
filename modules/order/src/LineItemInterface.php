@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_line_item\LineItemInterface.
+ * Contains \Drupal\commerce_order\LineItemInterface.
  */
 
-namespace Drupal\commerce_line_item;
+namespace Drupal\commerce_order;
 
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;

@@ -8,7 +8,7 @@
 namespace Drupal\commerce_order\Tests;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_line_item\Entity\LineItem;
+use Drupal\commerce_order\Entity\LineItem;
 
 /**
  * Tests the commerce_order entity forms.

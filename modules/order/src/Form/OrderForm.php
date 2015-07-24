@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @file
- * Definition of Drupal\commerce_order\Form\OrderForm.
+ * Contains \Drupal\commerce_order\Form\OrderForm.
  */
+
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;

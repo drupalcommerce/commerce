@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_line_item\Entity\LineItemTypeListBuilder.
+ * Contains \Drupal\commerce_order\Entity\LineItemTypeListBuilder.
  */
 
-namespace Drupal\commerce_line_item;
+namespace Drupal\commerce_order;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
