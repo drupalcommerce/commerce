@@ -61,42 +61,6 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets the line item revision creation timestamp.
-   *
-   * @return int
-   *   The UNIX timestamp of when this revision was created.
-   */
-  public function getRevisionCreationTime();
-
-  /**
-   * Sets the line item revision creation timestamp.
-   *
-   * @param int $timestamp
-   *   The UNIX timestamp of when this revision was created.
-   *
-   * @return $this
-   */
-  public function setRevisionCreationTime($timestamp);
-
-  /**
-   * Gets the line item revision author.
-   *
-   * @return \Drupal\user\UserInterface
-   *   The user entity for the revision author.
-   */
-  public function getRevisionAuthor();
-
-  /**
-   * Sets the line item revision author.
-   *
-   * @param int $uid
-   *   The user ID of the revision author.
-   *
-   * @return $this
-   */
-  public function setRevisionAuthorId($uid);
-
-  /**
    * Gets the additional data stored in this line item.
    *
    * @return array

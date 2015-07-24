@@ -22,13 +22,9 @@ use Drupal\user\UserInterface;
  *   id = "commerce_line_item",
  *   label = @Translation("Line Item"),
  *   handlers = {
- *     "list_builder" = "Drupal\commerce_line_item\LineItemListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\commerce_line_item\Form\LineItemForm",
- *       "add" = "Drupal\commerce_line_item\Form\LineItemForm",
- *       "edit" = "Drupal\commerce_line_item\Form\LineItemForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     }
  *   },
  *   base_table = "commerce_line_item",
@@ -37,7 +33,6 @@ use Drupal\user\UserInterface;
  *   entity_keys = {
  *     "id" = "line_item_id",
  *     "uuid" = "uuid",
- *     "revision" = "revision_id",
  *     "bundle" = "type"
  *   },
  *   links = {
@@ -73,27 +68,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     // If no owner has been set explicitly, make the current user the owner.
     if (!$this->getOwner()) {
       $this->setOwnerId(\Drupal::currentUser()->id());
-    }
-
-    // If no revision author has been set explicitly, make the line item owner the
-    // revision author.
-    if (!$this->getRevisionAuthor()) {
-      $this->setRevisionAuthorId($this->getOwnerId());
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing line item without adding a new revision, we
-      // need to make sure $entity->revision_log is reset whenever it is empty.
-      // Therefore, this code allows us to avoid clobbering an existing log
-      // entry with an empty one.
-      $record->revision_log = $this->original->revision_log->value;
     }
   }
 
@@ -174,36 +148,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRevisionCreationTime() {
-    return $this->get('revision_timestamp')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionCreationTime($timestamp) {
-    $this->set('revision_timestamp', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionAuthor() {
-    return $this->get('revision_uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionAuthorId($uid) {
-    $this->set('revision_uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getData() {
     return $this->get('data')->first()->getValue();
   }
@@ -230,12 +174,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setLabel(t('UUID'))
       ->setDescription(t('The line item UUID.'))
       ->setReadOnly(TRUE);
-
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The line item revision ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
@@ -338,32 +276,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
-
-    $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Revision timestamp'))
-      ->setDescription(t('The time that the current revision was created.'))
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE);
-
-    $fields['revision_uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Revision user ID'))
-      ->setDescription(t('The user ID of the author of the current revision.'))
-      ->setSetting('target_type', 'user')
-      ->setQueryable(FALSE)
-      ->setRevisionable(TRUE);
-
-    $fields['revision_log'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('The log entry explaining the changes in this revision.'))
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
-        'weight' => 25,
-        'settings' => [
-          'rows' => 4,
-        ],
-      ]);
 
     return $fields;
   }
