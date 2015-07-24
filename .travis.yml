@@ -20,8 +20,8 @@ install:
 
   # Install latest Drush 7.
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer self-update
-  - composer global require --no-interaction --prefer-source drush/drush:dev-master
+  - travis_retry composer self-update
+  - travis_retry composer global require --no-interaction --prefer-source drush/drush:dev-master
 
   # Make sure we don't fail when checking out projects
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
@@ -73,7 +73,7 @@ before_script:
   - cd core
   - rm -rf vendor
   - composer drupal-rebuild
-  - composer update --prefer-source -n --verbose
+  - travis_retry composer update --prefer-source -n --verbose
   - cd ..
   - drush en -y commerce commerce_product commerce_order
 
