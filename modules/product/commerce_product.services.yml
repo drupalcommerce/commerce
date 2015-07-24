@@ -1,0 +1,4 @@
+services:
+  commerce_product.product_variation_manager:
+    class: Drupal\commerce_price\ProductVariationManager
+    arguments: ['@entity.manager', '@event_dispatcher']
