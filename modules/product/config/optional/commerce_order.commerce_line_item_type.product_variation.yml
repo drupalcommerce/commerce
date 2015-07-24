@@ -1,6 +1,5 @@
 langcode: en
 status: true
-dependencies: {  }
 label: 'Product variation'
 id: product_variation
 sourceEntityType: commerce_product_variation
