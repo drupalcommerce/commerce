@@ -44,8 +44,8 @@ class ProductTypeTest extends CommerceProductTestBase {
     $this->assertEqual($productType->getDescription(), $values['description'], 'The new product type has the correct label.');
     $this->assertEqual($productType->getVariationType(), $values['variationType'], 'The new product type has the correct associated variation type.');
 
-    $this->drupalGet('admin/commerce/products/add/' . $productType->id());
-    $this->assertResponse(200, 'The new product type can be accessed at admin/commerce/products/add.');
+    $this->drupalGet('product/add/' . $productType->id());
+    $this->assertResponse(200, 'The new product type can be accessed at product/add.');
 
     $user = $this->drupalCreateUser(['administer product types']);
     $this->drupalLogin($user);
