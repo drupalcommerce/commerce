@@ -49,9 +49,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/commerce/stores/{commerce_store}",
- *     "edit-form" = "/admin/commerce/stores/{commerce_store}/edit",
- *     "delete-form" = "/admin/commerce/stores/{commerce_store}/delete",
+ *     "canonical" = "/store/{commerce_store}",
+ *     "edit-form" = "/store/{commerce_store}/edit",
+ *     "delete-form" = "/store/{commerce_store}/delete",
  *     "collection" = "/admin/commerce/stores",
  *   },
  *   bundle_entity_type = "commerce_store_type",

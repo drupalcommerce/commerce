@@ -1,3 +1,8 @@
+entity.commerce_store.canonical:
+  route_name: entity.commerce_store.canonical
+  base_route: entity.commerce_store.canonical
+  title: View
+
 entity.commerce_store.collection:
   route_name: entity.commerce_store.collection
   base_route: entity.commerce_store.collection
