@@ -116,7 +116,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       '#type' => 'textfield',
       '#title' => $element['#title'],
       '#default_value' => $amount,
-      '#required' => TRUE,
+      '#required' => $element['#required'],
       '#size' => 10,
       '#maxlength' => 255,
       // Provide an example to the end user so that they know which decimal
