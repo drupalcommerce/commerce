@@ -79,12 +79,13 @@ class OrderTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $orderType = $this->entity;
-    $orderType->save();
-    drupal_set_message($this->t('Saved the %label order type.', [
-      '%label' => $orderType->label(),
-    ]));
+    $status = $this->entity->save();
+    drupal_set_message($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_order_type.collection');
+
+    if ($status == SAVED_NEW) {
+      commerce_order_add_line_items_field($this->entity);
+    }
   }
 
 }

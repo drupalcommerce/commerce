@@ -11,16 +11,12 @@ field_name: line_items
 entity_type: commerce_order
 bundle: default
 label: 'Line items'
-description: 'An entity reference to line items.'
+description: ''
 required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
   handler: 'default:commerce_line_item'
-  handler_settings:
-    target_bundles:
-      product_variation: product_variation
-    sort:
-      field: _none
+  handler_settings: {  }
 field_type: entity_reference

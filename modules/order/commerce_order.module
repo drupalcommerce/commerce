@@ -2,6 +2,58 @@
 
 /**
  * @file
- * Defines the core Commerce order entity type and API functions to manage
- * orders and interact with them.
+ * Defines the Order entity and associated features.
  */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Adds the default line_items field to an order type.
+ *
+ * Line items can't be a base field because the Views integraiton is broken.
+ * Instead, it is created as a configurable field for each order type.
+ *
+ * @param \Drupal\commerce_order\OrderTypeInterface $order_type
+ *   The order type.
+ */
+function commerce_order_add_line_items_field($order_type) {
+  $field_storage = FieldStorageConfig::loadByName('commerce_order', 'line_items');
+  $field = FieldConfig::loadByName('commerce_order', $order_type->id(), 'line_items');
+  if (empty($field_storage)) {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'line_items',
+      'entity_type' => 'commerce_order',
+      'type' => 'entity_reference',
+      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
+      'settings' => array(
+        'target_type' => 'commerce_line_item',
+      ),
+      'locked' => TRUE,
+      'translatable' => FALSE,
+    ]);
+    $field_storage->save();
+  }
+  if (empty($field)) {
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $order_type->id(),
+      'label' => 'Line items',
+      'required' => TRUE,
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
+      'translatable' => FALSE,
+    ]);
+    $field->save();
+
+    // Assign widget settings for the 'default' form mode.
+    entity_get_form_display('commerce_order', $order_type->id(), 'default')
+      ->setComponent('line_items', [
+        'type' => 'inline_entity_form_multiple',
+        'weight' => 0,
+      ])
+      ->save();
+  }
+}
