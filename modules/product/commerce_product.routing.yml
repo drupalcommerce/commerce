@@ -15,6 +15,7 @@ entity.commerce_product.add_form:
     _controller: '\Drupal\commerce\Controller\AddController::addForm'
     _title_callback: '\Drupal\commerce\Controller\AddController::addFormTitle'
   options:
+    _admin_route: TRUE
     parameters:
       commerce_product_type:
         type: entity:commerce_product_type
