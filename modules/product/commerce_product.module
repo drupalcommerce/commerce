@@ -76,6 +76,7 @@ function commerce_product_add_variations_field($product_type) {
         'target_type' => 'commerce_product_variation',
       ),
       'locked' => TRUE,
+      'translatable' => FALSE,
     ]);
     $field_storage->save();
   }
@@ -93,6 +94,7 @@ function commerce_product_add_variations_field($product_type) {
           ],
         ],
       ],
+      'translatable' => FALSE,
     ]);
     $field->save();
 

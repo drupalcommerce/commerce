@@ -13,6 +13,6 @@ settings:
 module: entity_reference
 locked: true
 cardinality: -1
-translatable: true
+translatable: false
 indexes: {  }
 persist_with_no_fields: false
