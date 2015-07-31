@@ -43,6 +43,24 @@ interface ProductVariationInterface extends LineItemSourceInterface, EntityChang
   public function setSku($sku);
 
   /**
+   * Get the variation price.
+   *
+   * @return object
+   *   The variation price.
+   */
+  public function getPrice();
+
+  /**
+   * Set the variation price.
+   *
+   * @param object $price
+   *   The variation price.
+   *
+   * @return $this
+   */
+  public function setPrice($price);
+
+  /**
    * Get the variation status.
    *
    * @return bool

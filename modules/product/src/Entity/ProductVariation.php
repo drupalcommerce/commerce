@@ -73,6 +73,21 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function getPrice() {
+    return $this->get('price')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPrice($price) {
+    $this->set('price', $price);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getStatus() {
     return $this->get('status')->value;
   }
@@ -137,7 +152,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     return $this->set('uid', $uid);
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -157,6 +171,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Type'))
+      ->setRequired(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'));
@@ -179,9 +197,21 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Type'))
-      ->setRequired(TRUE);
+    // The price is not required because it's not guaranteed to be used
+    // for storage (there might be a price per currency, role, country, etc).
+    $fields['price'] = BaseFieldDefinition::create('price')
+      ->setLabel(t('Price'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'price_default',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'price_default',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
