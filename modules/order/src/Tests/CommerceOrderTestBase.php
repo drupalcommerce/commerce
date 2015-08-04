@@ -57,6 +57,7 @@ abstract class CommerceOrderTestBase extends WebTestBase {
     $this->adminUser = $this->drupalCreateUser(array(
       'administer orders',
       'administer order types',
+      'administer line item types',
       'access administration pages',
     ));
 

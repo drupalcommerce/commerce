@@ -46,15 +46,16 @@ class LineItemTypeForm extends EntityForm {
     $lineItemType = $this->entity;
     // Prepare the list of source entity types.
     $entityTypes = $this->entityManager->getDefinitions();
-    $sourceEntityTypes = array_filter($entityTypes, function($entityType) {
+    $sourceEntityTypes = array_filter($entityTypes, function ($entityType) {
       return $entityType->isSubclassOf('\Drupal\commerce\LineItemSourceInterface');
     });
-    $sourceEntityTypes = array_map(function($entityType) {
+    $sourceEntityTypes = array_map(function ($entityType) {
       return $entityType->getLabel();
     }, $sourceEntityTypes);
     // Prepare the list of order types.
-    $orderTypes = $this->entityManager->getStorage('commerce_order_type')->loadMultiple();
-    $orderTypes = array_map(function($orderType) {
+    $orderTypes = $this->entityManager->getStorage('commerce_order_type')
+      ->loadMultiple();
+    $orderTypes = array_map(function ($orderType) {
       return $orderType->label();
     }, $orderTypes);
 
@@ -70,7 +71,7 @@ class LineItemTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $lineItemType->id(),
       '#machine_name' => [
-        'exists' => [$this->lineItemTypeStorage, 'load'],
+        'exists' => '\Drupal\commerce_order\Entity\LineItemType::load',
         'source' => ['label'],
       ],
       '#disabled' => !$lineItemType->isNew()
@@ -99,7 +100,7 @@ class LineItemTypeForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('Saved the %label line item type.', [
-        '%label' => $this->entity->label(),
+      '%label' => $this->entity->label(),
     ]));
     $form_state->setRedirect('entity.commerce_line_item_type.collection');
   }
