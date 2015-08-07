@@ -8,18 +8,6 @@
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Gets the allowed values for the 'countries' base field.
- *
- * @return array
- *   The allowed values.
- */
-function commerce_store_available_countries() {
-  // @todo Move this to a static method on the Store entity class once
-  // core fixes the invokation of available_values_function.
-  return \Drupal::service('address.country_repository')->getList();
-}
-
-/**
  * Implements hook_field_widget_form_alter().
  */
 function commerce_store_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
