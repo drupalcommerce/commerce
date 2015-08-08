@@ -2369,6 +2369,31 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
 }
 
 /**
+ * Ajax callback: returns AJAX commands when an attribute widget is changed on
+ * the Views powered shopping cart form.
+ */
+function commerce_cart_add_to_cart_views_form_refresh($form, $form_state) {
+  $commands[] = array();
+
+  // Extract the View from the form's arguments and derive its DOM ID class.
+  $view = $form_state['build_info']['args'][0];
+  $dom_id_class = drupal_html_class('view-dom-id-' . $view->dom_id);
+
+  // Unset the form related variables from the $_POST array. Otherwise, when we
+  // rebuild the View, the Views form will fetch these values to rebuild the
+  // form state and resubmit the form.
+  foreach (array('form_build_id', 'form_token', 'form_id') as $key) {
+    unset($_POST[$key]);
+  }
+
+  // Render afresh the the output of the View and return it for replacement.
+  $output = commerce_embed_view($view->name, $view->current_display, $view->args, $view->override_url);
+  $commands[] = ajax_command_replace('.' . $dom_id_class, $output);
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+/**
  * Form submit handler: add the selected product to the cart.
  */
 function commerce_cart_add_to_cart_form_submit($form, &$form_state) {

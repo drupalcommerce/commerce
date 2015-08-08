@@ -29,6 +29,15 @@ function commerce_cart_views_data_alter(&$data) {
       'handler' => 'commerce_cart_handler_area_empty_text',
     ),
   );
+
+  // Add an edit handler for cart line item attributes.
+  $data['commerce_line_item']['edit_attributes'] = array(
+    'field' => array(
+      'title' => t('Attribute field widgets'),
+      'help' => t('Renders attribute field widgets for customers to edit from the View.'),
+      'handler' => 'commerce_cart_handler_field_edit_attributes',
+    ),
+  );
 }
 
 /**
