@@ -304,7 +304,7 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setLabel(t('Countries'))
       ->setDescription(t('The countries this store sells to.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setSetting('allowed_values_function', 'commerce_store_available_countries')
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getAvailableCountries'])
       ->setDisplayOptions('form', array(
         'type' => 'options_select',
         'weight' => 4,
@@ -325,6 +325,17 @@ class Store extends ContentEntityBase implements StoreInterface {
    */
   public static function getCurrentUserId() {
     return [\Drupal::currentUser()->id()];
+  }
+
+  /**
+   * Gets the allowed values for the 'countries' base field.
+   *
+   * @return array
+   *   The allowed values.
+   */
+  public static function getAvailableCountries() {
+    // core fixes the invokation of available_values_function.
+    return \Drupal::service('address.country_repository')->getList();
   }
 
 }
