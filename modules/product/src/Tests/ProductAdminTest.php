@@ -9,6 +9,7 @@ namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Create, view, edit, delete, and change products and product types.
@@ -22,6 +23,9 @@ class ProductAdminTest extends CommerceProductTestBase {
    */
   function testAddCommerceProductAdmin() {
     $title = $this->randomMachineName();
+    $storeIds = array_map(function ($store) {
+      return $store->id();
+    }, $this->stores);
 
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add product');
@@ -31,26 +35,31 @@ class ProductAdminTest extends CommerceProductTestBase {
     ];
     $this->drupalPostForm(NULL, $productVariationValues, t('Create entity'));
 
-    $productValues = [
+    $edit = [
       'title[0][value]' => $title,
-      'store_id' => $this->commerce_store->id()
     ];
-    $this->drupalPostForm(NULL, $productValues, t('Save'));
+    foreach ($storeIds as $storeId) {
+      $edit['stores['. $storeId .']'] = $storeId;
+    }
+    $this->drupalPostForm(NULL, $edit, t('Save'));
 
-    $product = \Drupal::entityQuery('commerce_product')
-      ->condition("title", $productValues['title[0][value]'])
+    $result = \Drupal::entityQuery('commerce_product')
+      ->condition("title", $edit['title[0][value]'])
       ->range(0, 1)
       ->execute();
-    $product = Product::load(current($product));
+    $productId = reset($result);
+    $product = Product::load($productId);
 
     $this->assertNotNull($product, 'The new product has been created in the database.');
     $this->assertText(t("The product @title has been successfully saved.", ['@title' => $title]), "Commerce Product success text is showing");
     $this->assertText($title, 'Created product name exists on this page.');
+    $this->assertFieldValues($product->getStores(), $this->stores, 'Created product has the correct associated stores.');
+    $this->assertFieldValues($product->getStoreIds(), $storeIds, 'Created product has the correct associated store ids.');
 
     // Assert that the frontend product page is displaying.
     $this->drupalGet('product/' . $product->id());
     $this->assertResponse(200);
-    $this->assertText($product->getTitle(), "Commerce Product title exists");
+    $this->assertText($product->getTitle(), 'Product title exists');
 
     // Test product variations
     $productVariation = \Drupal::entityQuery('commerce_product_variation')
@@ -63,20 +72,69 @@ class ProductAdminTest extends CommerceProductTestBase {
   }
 
   /**
+   * Tests adding/removing stores to a product via the admin.
+   */
+  function testUpdateCommerceProductAdmin() {
+    $storeIds = array_map(function ($store) {
+      return $store->id();
+    }, $this->stores);
+
+    // Create a product with one (the first created) store.
+    $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomMachineName(),
+      'type' => 'default',
+      'stores' => [$this->stores[0]],
+    ]);
+    $formUrl = 'product/' . $product->id() . '/edit';
+    $this->drupalGet($formUrl);
+    $this->assertResponse(200, 'Product edit form can be accessed at ' . $formUrl);
+
+    // Add some variations.
+    $productVariationValues = [
+      'variations[form][inline_entity_form][sku][0][value]' => $this->randomMachineName(),
+      'variations[form][inline_entity_form][status][value]' => 1
+    ];
+    $this->drupalPostForm(NULL, $productVariationValues, t('Create entity'));
+
+    $edit = [];
+    // Now add the rest of the created stores, all of them.
+    foreach ($storeIds as $storeId) {
+      $edit['stores['. $storeId .']'] = $storeId;
+    }
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+    $product = Product::load($product->id());
+    $this->assertFieldValues($product->getStoreIds(), $storeIds, 'The product belongs to all created stores.');
+
+    // Try to uncheck all stores from the form.
+    // It should be denied and no stores should be deleted from the product.
+    $edit = [];
+    foreach ($storeIds as $storeId) {
+      $edit['stores['. $storeId .']'] = FALSE;
+    }
+    $this->drupalPostForm($formUrl, $edit, t('Save'));
+    $this->assertResponse(200);
+    $this->assertRaw('<strong>Stores field is required.</strong>', 'Stores field is required, cannot delete all stores from the product.');
+    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+    $product = Product::load($product->id());
+    $this->assertFieldValues($product->getStoreIds(), $storeIds, 'There are no stores deleted from the product.');
+  }
+
+  /**
    * Tests deleting a product via the admin.
    */
   function testDeleteCommerceProductAdmin() {
-    $product = $this->createEntity(
-      'commerce_product', [
-        'title' => $this->randomMachineName(),
-        'type' => "product"
-      ]
-    );
-
+    $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomMachineName(),
+      'type' => "product"
+    ]);
     $this->drupalGet('product/' . $product->id() . '/delete');
     $this->assertText(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]), "Commerce Product deletion confirmation text is showing");
     $this->assertText(t('This action cannot be undone.'), 'The product deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
+    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+
     $productExists = (bool) Product::load($product->id());
     $this->assertFalse($productExists, 'The new product has been deleted from the database.');
   }

@@ -8,7 +8,6 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce_product\ProductInterface;
-use Drupal\commerce_store\StoreInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -122,30 +121,38 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStore() {
-    return $this->get('store_id')->entity;
+  public function getStores() {
+    $stores = [];
+    foreach ($this->get('stores') as $storeItem) {
+      $stores[] = $storeItem->entity;
+    }
+    return $stores;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStore(StoreInterface $store) {
-    $this->set('store_id', $store->id());
+  public function setStores(array $stores) {
+    $this->set('stores', $stores);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getStoreId() {
-    return $this->get('store_id')->target_id;
+  public function getStoreIds() {
+    $storeIds = [];
+    foreach ($this->get('stores') as $storeItem) {
+      $storeIds[] = $storeItem->target_id;
+    }
+    return $storeIds;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStoreId($storeId) {
-    $this->set('store_id', $storeId);
+  public function setStoreIds(array $storeIds) {
+    $this->set('stores', $storeIds);
     return $this;
   }
 
@@ -204,22 +211,6 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
       ->setReadOnly(TRUE);
-
-    $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Store'))
-      ->setDescription(t('The store to which the product belongs.'))
-      ->setCardinality(1)
-      ->setRequired(TRUE)
-      ->setSetting('target_type', 'commerce_store')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'options_select',
-        'weight' => 0,
-        'settings' => [],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

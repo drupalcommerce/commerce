@@ -95,6 +95,7 @@ class ProductTypeForm extends EntityForm {
     $form_state->setRedirect('entity.commerce_product_type.collection');
 
     if ($status == SAVED_NEW) {
+      commerce_product_add_stores_field($this->entity);
       commerce_product_add_body_field($this->entity);
       commerce_product_add_variations_field($this->entity);
     }

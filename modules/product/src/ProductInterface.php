@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_product;
 
-use Drupal\commerce_store\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -15,7 +14,7 @@ use Drupal\user\EntityOwnerInterface;
 /**
  * Defines the interface for products.
  */
-interface ProductInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface ProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
    * Gets the product type.
@@ -78,5 +77,41 @@ interface ProductInterface extends EntityStoreInterface, EntityChangedInterface,
    * @return $this
    */
   public function setCreatedTime($timestamp);
+
+  /**
+   * Gets the stores through which the product is sold.
+   *
+   * @return \Drupal\commerce_store\StoreInterface[]
+   *   The stores.
+   */
+  public function getStores();
+
+  /**
+   * Sets the stores through which the product is sold.
+   *
+   * @param \Drupal\commerce_store\StoreInterface[] $stores
+   *   The stores through which the product is sold.
+   *
+   * @return $this
+   */
+  public function setStores(array $stores);
+
+  /**
+   * Gets the ids of stores through which the product is sold.
+   *
+   * @return int[]
+   *   The ids of stores through which the product is sold.
+   */
+  public function getStoreIds();
+
+  /**
+   * Sets the ids of stores through which the product is sold.
+   *
+   * @param int[] $storeIds
+   *   The ids of stores through which the product is sold.
+   *
+   * @return $this
+   */
+  public function setStoreIds(array $storeIds);
 
 }

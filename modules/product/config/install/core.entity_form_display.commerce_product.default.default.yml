@@ -4,6 +4,7 @@ dependencies:
   config:
     - commerce_product.commerce_product_type.default
     - field.field.commerce_product.default.body
+    - field.field.commerce_product.default.stores
     - field.field.commerce_product.default.variations
   module:
     - inline_entity_form
@@ -38,9 +39,9 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
-  store_id:
-    type: options_select
-    weight: 0
+  stores:
+    type: options_buttons
+    weight: -10
     settings: {  }
     third_party_settings: {  }
   title:
@@ -67,5 +68,6 @@ content:
       override_labels: false
       label_singular: ''
       label_plural: ''
+      allow_new: true
     third_party_settings: {  }
 hidden: {  }
