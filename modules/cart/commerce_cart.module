@@ -4,3 +4,30 @@
  * @file
  * Implements the shopping cart system and add to cart features.
  */
+use Drupal\Core\Entity\Entity\EntityViewMode;
+
+/**
+ * Implements hook_rebuild().
+ */
+function commerce_cart_rebuild() {
+
+  $entityTypes = \Drupal::service('entity.manager')->getDefinitions();
+  $entityTypes = array_filter($entityTypes, function ($entityType) {
+    return $entityType->isSubclassOf('\Drupal\commerce\LineItemSourceInterface');
+  });
+
+  foreach ($entityTypes as $entityType) {
+    /** @var \Drupal\commerce\LineItemSourceInterface $entityType */
+    $cartViewModeExists = EntityViewMode::load($entityType->id() . '.cart');
+
+    if (!$cartViewModeExists) {
+      EntityViewMode::create([
+        'id' => $entityType->id() . '.cart',
+        'targetEntityType' => $entityType->id(),
+        'label' => 'Cart',
+        'status' => TRUE,
+        'enabled' => TRUE,
+      ])->save();
+    }
+  }
+}
