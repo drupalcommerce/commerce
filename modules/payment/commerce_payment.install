@@ -293,3 +293,15 @@ function commerce_payment_update_7102() {
 
   return t('Schema for the commerce_payment_transaction table has been updated.');
 }
+
+/**
+ * Disable the payment checkout pane on the review form to preserve prior behavior.
+ */
+function commerce_payment_update_7103() {
+  db_update('commerce_checkout_pane')
+    ->fields(array('review' => 0))
+    ->condition('pane_id', 'commerce_payment')
+    ->execute();
+
+  return t('Payment checkout pane disabled on the review form; enable it if desired in the Payment checkout pane settings form.');
+}

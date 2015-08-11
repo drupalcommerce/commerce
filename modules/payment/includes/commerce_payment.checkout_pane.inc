@@ -290,6 +290,30 @@ function commerce_payment_pane_checkout_form_submit($form, &$form_state, $checko
 }
 
 /**
+ * Payment pane: review callback.
+ */
+function commerce_payment_pane_review($form, $form_state, &$checkout_pane, $order) {
+  // Update the checkout pane info array passed in to give it a more specific
+  // title in the review table.
+  $checkout_pane['title'] = t('Payment method');
+
+  // Load the payment method instance selected in the review pane to return the
+  // display title of a selected payment method.
+  if (!empty($order->data['payment_method'])) {
+    $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+    return $payment_method['display_title'];
+  }
+  elseif (in_array(variable_get('commerce_payment_pane_no_method_behavior', COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE), array(COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE, COMMERCE_PAYMENT_PANE_NO_METHOD_MESSAGE_EVENT))) {
+    // In the event that the order does not have a selected payment method and
+    // the checkout pane is configured to display a message that payment is not
+    // required, show a similar message here.
+    return t('Payment not required');
+  }
+
+  return NULL;
+}
+
+/**
  * Payment redirect pane: form callback.
  */
 function commerce_payment_redirect_pane_checkout_form(&$form, &$form_state, $checkout_pane, $order) {
