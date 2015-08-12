@@ -249,7 +249,6 @@ class Store extends ContentEntityBase implements StoreInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -10,
         'weight' => 0,
       ])
       ->setDisplayConfigurable('view', TRUE)

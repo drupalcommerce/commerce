@@ -8,9 +8,7 @@
 namespace Drupal\commerce_price\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Route controller for currencies.

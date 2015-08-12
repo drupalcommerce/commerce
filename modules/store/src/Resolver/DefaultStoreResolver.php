@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_store\Resolver;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 
 /**

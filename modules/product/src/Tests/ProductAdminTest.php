@@ -9,7 +9,6 @@ namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\field\Entity\FieldConfig;
 
 /**
  * Create, view, edit, delete, and change products and product types.

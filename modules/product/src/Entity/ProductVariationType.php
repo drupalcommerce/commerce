@@ -8,7 +8,6 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\commerce_product\ProductVariationTypeInterface;
 
 /**
