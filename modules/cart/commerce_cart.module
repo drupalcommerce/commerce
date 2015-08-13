@@ -4,3 +4,39 @@
  * @file
  * Implements the shopping cart system and add to cart features.
  */
+
+use Drupal\commerce_order\OrderInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_order') {
+    $fields['cart'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Cart'))
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 20,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDefaultValue(FALSE);
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Removes deleted carts from the anonymous user's session.
+ */
+function commerce_cart_commerce_order_delete(OrderInterface $order) {
+  if (!empty($order->cart)) {
+    \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
+  }
+}
