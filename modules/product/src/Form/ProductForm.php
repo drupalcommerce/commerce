@@ -30,20 +30,20 @@ class ProductForm extends ContentEntityForm {
     ];
     $form = parent::form($form, $form_state);
 
-    $form['path_settings'] = array(
+    $form['path_settings'] = [
       '#type' => 'details',
       '#title' => t('URL path settings'),
       '#open' => !empty($form['path']['widget'][0]['alias']['#value']),
       '#group' => 'advanced',
       '#access' => !empty($form['path']['#access']) && $product->get('path')->access('edit'),
-      '#attributes' => array(
-        'class' => array('path-form'),
-      ),
-      '#attached' => array(
-        'library' => array('path/drupal.path'),
-      ),
+      '#attributes' => [
+        'class' => ['path-form'],
+      ],
+      '#attached' => [
+        'library' => ['path/drupal.path'],
+      ],
       '#weight' => 30,
-    );
+    ];
     $form['path']['#group'] = 'path_settings';
 
     $form['author'] = [

@@ -26,9 +26,9 @@ function commerce_order_add_line_items_field($order_type) {
       'entity_type' => 'commerce_order',
       'type' => 'entity_reference',
       'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => array(
+      'settings' => [
         'target_type' => 'commerce_line_item',
-      ),
+      ],
       'locked' => TRUE,
       'translatable' => FALSE,
     ]);

@@ -30,10 +30,10 @@ class CurrencyController extends ControllerBase {
     $currency->$op()->save();
 
     if ($op == 'enable') {
-      drupal_set_message($this->t('The %label currency has been enabled.', array('%label' => $currency->label())));
+      drupal_set_message($this->t('The %label currency has been enabled.', ['%label' => $currency->label()]));
     }
     elseif ($op == 'disable') {
-      drupal_set_message($this->t('The %label currency has been disabled.', array('%label' => $currency->label())));
+      drupal_set_message($this->t('The %label currency has been disabled.', ['%label' => $currency->label()]));
     }
 
     $url = $currency->urlInfo('collection');

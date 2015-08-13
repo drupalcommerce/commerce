@@ -268,10 +268,10 @@ class Product extends ContentEntityBase implements ProductInterface {
     $fields['path'] = BaseFieldDefinition::create('path')
       ->setLabel(t('URL alias'))
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'path',
         'weight' => 30,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setCustomStorage(TRUE);
 

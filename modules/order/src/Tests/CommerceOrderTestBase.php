@@ -54,12 +54,12 @@ abstract class CommerceOrderTestBase extends WebTestBase {
 
   protected function setUp() {
     parent::setUp();
-    $this->adminUser = $this->drupalCreateUser(array(
+    $this->adminUser = $this->drupalCreateUser([
       'administer orders',
       'administer order types',
       'administer line item types',
       'access administration pages',
-    ));
+    ]);
 
     // Create a store
     $values = [

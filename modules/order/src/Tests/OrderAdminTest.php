@@ -25,17 +25,17 @@ class OrderAdminTest extends CommerceOrderTestBase {
     $this->clickLink('Create a new order');
 
     $source = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
-    $values = array(
+    $values = [
       'line_items[form][inline_entity_form][source][0][target_id]' => $source,
       'line_items[form][inline_entity_form][quantity][0][value]' => 1,
       'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99'
-    );
+    ];
     $this->drupalPostForm(NULL, $values, t('Create entity'));
 
-    $values = array(
+    $values = [
       'store_id' => $this->store->id(),
       'mail[0][value]' => $this->loggedInUser->getEmail()
-    );
+    ];
     $this->drupalPostForm(NULL, $values, t('Save'));
 
     $order_number = $this->cssSelect('tr td.views-field-order-number');
@@ -47,24 +47,21 @@ class OrderAdminTest extends CommerceOrderTestBase {
    */
   public function testDeleteOrder() {
     // Create a new order.
-    $order = $this->createEntity('commerce_order', array(
-        'type' => 'default',
-        'mail' => $this->loggedInUser->getEmail(),
-      )
-    );
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+    ]);
     $orderExists = (bool) Order::load($order->id());
     $this->assertTrue($orderExists, 'The order has been created in the database.');
 
     $this->drupalGet('admin/commerce/orders/' . $order->id() . '/delete');
-    $this->assertRaw(
-      t('Are you sure you want to delete the order %label?', array(
-        '%label' => $order->label(),
-      ))
-    );
+    $this->assertRaw(t('Are you sure you want to delete the order %label?', [
+      '%label' => $order->label(),
+    ]));
     $this->assertText(t('This action cannot be undone.'), 'The order deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     // Remove the entity from cache and check if the order is deleted.
-    \Drupal::entityManager()->getStorage('commerce_order')->resetCache(array($order->id()));
+    \Drupal::entityManager()->getStorage('commerce_order')->resetCache([$order->id()]);
     $orderExists = (bool) Order::load('commerce_order', $order->id());
     $this->assertFalse($orderExists, 'The order has been deleted from the database.');
   }

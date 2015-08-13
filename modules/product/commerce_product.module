@@ -28,9 +28,9 @@ function commerce_product_add_stores_field($product_type) {
       'entity_type' => 'commerce_product',
       'type' => 'entity_reference',
       'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => array(
+      'settings' => [
         'target_type' => 'commerce_store',
-      ),
+      ],
       'locked' => TRUE,
       'translatable' => FALSE,
     ]);
@@ -123,9 +123,9 @@ function commerce_product_add_variations_field($product_type) {
       'entity_type' => 'commerce_product',
       'type' => 'entity_reference',
       'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => array(
+      'settings' => [
         'target_type' => 'commerce_product_variation',
-      ),
+      ],
       'locked' => TRUE,
       'translatable' => FALSE,
     ]);

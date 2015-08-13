@@ -20,7 +20,7 @@ class LineItemForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    drupal_set_message($this->t('The line item %label has been successfully saved.', array('%label' => $this->entity->label())));
+    drupal_set_message($this->t('The line item %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_line_item.collection');
   }
 
