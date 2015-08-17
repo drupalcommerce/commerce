@@ -23,6 +23,8 @@ use Drupal\user\UserInterface;
  *   id = "commerce_order",
  *   label = @Translation("Order"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_order\Event\OrderEvent",
+ *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {

@@ -7,19 +7,20 @@
 
 namespace Drupal\commerce_store;
 
+use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines the store storage.
  */
-class StoreStorage extends SqlContentEntityStorage implements StoreStorageInterface {
+class StoreStorage extends CommerceContentEntityStorage implements StoreStorageInterface {
 
   /**
    * The config factory.
@@ -41,11 +42,13 @@ class StoreStorage extends SqlContentEntityStorage implements StoreStorageInterf
    *   The cache backend to be used.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(EntityTypeInterface $entityType, Connection $database, EntityManagerInterface $entityManager, CacheBackendInterface $cache, LanguageManagerInterface $languageManager, ConfigFactoryInterface $configFactory) {
-    parent::__construct($entityType, $database, $entityManager, $cache, $languageManager);
+  public function __construct(EntityTypeInterface $entityType, Connection $database, EntityManagerInterface $entityManager, CacheBackendInterface $cache, LanguageManagerInterface $languageManager, EventDispatcherInterface $eventDispatcher, ConfigFactoryInterface $configFactory) {
+    parent::__construct($entityType, $database, $entityManager, $cache, $languageManager, $eventDispatcher);
 
     $this->configFactory = $configFactory;
   }
@@ -60,6 +63,7 @@ class StoreStorage extends SqlContentEntityStorage implements StoreStorageInterf
       $container->get('entity.manager'),
       $container->get('cache.entity'),
       $container->get('language_manager'),
+      $container->get('event_dispatcher'),
       $container->get('config.factory')
     );
   }

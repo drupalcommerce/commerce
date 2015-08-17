@@ -22,6 +22,8 @@ use Drupal\user\UserInterface;
  *   id = "commerce_product",
  *   label = @Translation("Product"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_product\Event\ProductEvent",
+ *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",

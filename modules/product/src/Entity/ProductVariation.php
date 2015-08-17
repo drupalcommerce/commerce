@@ -21,6 +21,8 @@ use Drupal\user\UserInterface;
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
+ *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {

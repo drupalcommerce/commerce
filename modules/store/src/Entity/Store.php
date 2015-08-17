@@ -25,6 +25,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   label = @Translation("Store"),
  *   bundle_label = @Translation("Store type"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",

@@ -22,6 +22,8 @@ use Drupal\user\UserInterface;
  *   id = "commerce_line_item",
  *   label = @Translation("Line Item"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
+ *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\commerce_order\Form\LineItemForm",
