@@ -20,9 +20,8 @@ cd "$DRUPAL_TI_DRUPAL_DIR"
 	git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git
 )
 
-# Enable and run composer_manager.
-drush pm-enable composer_manager --yes
-drush composer-manager-init
+# Initialize composer_manager.
+php modules/composer_manager/scripts/init.php
 
 # Ensure the module is linked into the codebase.
 drupal_ti_ensure_module_linked
