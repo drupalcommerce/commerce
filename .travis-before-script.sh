@@ -20,19 +20,13 @@ cd "$DRUPAL_TI_DRUPAL_DIR"
 	git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git
 )
 
-# Initialize composer_manager.
-php modules/composer_manager/scripts/init.php
-
 # Ensure the module is linked into the codebase.
 drupal_ti_ensure_module_linked
 
-# Rebuild core dependencies.
-# @todo Is that really needed?
-cd core
-rm -rf vendor
+# Initialize composer_manager.
+php modules/composer_manager/scripts/init.php
 composer drupal-rebuild
-composer update --prefer-source -n --verbose
-cd ..
+composer install --prefer-source -n --verbose
 
 # Enable main module and submodules.
 drush en -y commerce commerce_product commerce_order
