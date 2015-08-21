@@ -7,14 +7,14 @@
 
 namespace Drupal\commerce_product;
 
-use Drupal\commerce\LineItemSourceInterface;
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for product variations.
  */
-interface ProductVariationInterface extends LineItemSourceInterface, EntityChangedInterface, EntityOwnerInterface {
+interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
    * Gets the variation type.

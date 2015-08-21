@@ -23,25 +23,25 @@ class LineItemTypeTest extends CommerceOrderTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
-      'sourceEntityType' => 'commerce_product_variation',
+      'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
     $this->createEntity('commerce_line_item_type', $values);
     $lineItemType = LineItemType::load($values['id']);
     $this->assertEqual($lineItemType->label(), $values['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($lineItemType->getSourceEntityType(), $values['sourceEntityType'], 'The new line item type has the correct source entity type.');
+    $this->assertEqual($lineItemType->getPurchasableEntityType(), $values['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
     $this->assertEqual($lineItemType->getOrderType(), $values['orderType'], 'The new line item type has the correct order type.');
 
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
-      'sourceEntityType' => 'commerce_product_variation',
+      'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
     $this->drupalPostForm('admin/commerce/config/line-item-types/add', $edit, t('Save'));
     $lineItemType = LineItemType::load($edit['id']);
     $this->assertEqual($lineItemType->label(), $edit['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($lineItemType->getSourceEntityType(), $edit['sourceEntityType'], 'The new line item type has the correct source entity type.');
+    $this->assertEqual($lineItemType->getPurchasableEntityType(), $edit['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
     $this->assertEqual($lineItemType->getOrderType(), $edit['orderType'], 'The new line item type has the correct order type.');
   }
 
@@ -52,7 +52,7 @@ class LineItemTypeTest extends CommerceOrderTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
-      'sourceEntityType' => 'commerce_product_variation',
+      'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
     $lineItemType = $this->createEntity('commerce_line_item_type', $values);
@@ -72,7 +72,7 @@ class LineItemTypeTest extends CommerceOrderTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
-      'sourceEntityType' => 'commerce_product_variation',
+      'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
     $lineItemType = $this->createEntity('commerce_line_item_type', $values);

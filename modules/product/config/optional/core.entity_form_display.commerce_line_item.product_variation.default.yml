@@ -15,7 +15,7 @@ content:
     weight: 3
     settings: {  }
     third_party_settings: {  }
-  source:
+  purchased_entity:
     type: entity_reference_autocomplete
     weight: 0
     settings:

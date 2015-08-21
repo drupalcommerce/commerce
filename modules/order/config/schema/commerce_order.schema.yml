@@ -22,9 +22,9 @@ commerce_order.commerce_line_item_type.*:
     id:
       type: string
       label: 'Machine-readable name'
-    sourceEntityType:
+    purchasableEntityType:
       type: string
-      label: 'Source entity type'
+      label: 'Purchasable entity type'
     orderType:
       type: string
       label: 'Order type'

@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\commerce\LineItemSourceInterface;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * Default implementation of the availability manager.
@@ -38,10 +38,10 @@ class AvailabilityManager implements AvailabilityManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function check(LineItemSourceInterface $source, $quantity) {
+  public function check(PurchasableEntityInterface $entity, $quantity = 1) {
     foreach ($this->checkers as $checker) {
-      if ($checker->applies($source)) {
-        $result = $checker->check($source, $quantity);
+      if ($checker->applies($entity)) {
+        $result = $checker->check($entity, $quantity);
         if ($result === FALSE) {
           return FALSE;
         }

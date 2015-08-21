@@ -44,14 +44,14 @@ class LineItemTypeForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $lineItemType = $this->entity;
-    // Prepare the list of source entity types.
+    // Prepare the list of purchasable entity types.
     $entityTypes = $this->entityManager->getDefinitions();
-    $sourceEntityTypes = array_filter($entityTypes, function ($entityType) {
-      return $entityType->isSubclassOf('\Drupal\commerce\LineItemSourceInterface');
+    $purchasableEntityTypes = array_filter($entityTypes, function ($entityType) {
+      return $entityType->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
     });
-    $sourceEntityTypes = array_map(function ($entityType) {
+    $purchasableEntityTypes = array_map(function ($entityType) {
       return $entityType->getLabel();
-    }, $sourceEntityTypes);
+    }, $purchasableEntityTypes);
     // Prepare the list of order types.
     $orderTypes = $this->entityManager->getStorage('commerce_order_type')
       ->loadMultiple();
@@ -76,11 +76,11 @@ class LineItemTypeForm extends EntityForm {
       ],
       '#disabled' => !$lineItemType->isNew()
     ];
-    $form['sourceEntityType'] = [
+    $form['purchasableEntityType'] = [
       '#type' => 'select',
-      '#title' => $this->t('Source entity type'),
-      '#default_value' => $lineItemType->getSourceEntityType(),
-      '#options' => $sourceEntityTypes,
+      '#title' => $this->t('Purchasable entity type'),
+      '#default_value' => $lineItemType->getPurchasableEntityType(),
+      '#options' => $purchasableEntityTypes,
       '#required' => TRUE,
     ];
     $form['orderType'] = [

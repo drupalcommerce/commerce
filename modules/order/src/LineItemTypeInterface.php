@@ -15,25 +15,25 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface LineItemTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the line item type's source entity type.
+   * Gets the line item type's purchasable entity type.
    *
-   * For example, if line items of this type are populated from product
-   * variations, the source entity type will be 'commerce_product_variation'.
+   * For example, if line items of this type are used to purchase product
+   * variations, the purchasable entity type will be 'commerce_product_variation'.
    *
    * @return string
-   *   The source entity type.
+   *   The purchasable entity type.
    */
-  public function getSourceEntityType();
+  public function getPurchasableEntityType();
 
   /**
-   * Sets the line item type's source entity type.
+   * Sets the line item type's purchasable entity type.
    *
-   * @param string $sourceEntityType
-   *   The source entity type.
+   * @param string $purchasableEntityType
+   *   The purchasable entity type.
    *
    * @return $this
    */
-  public function setSourceEntityType($sourceEntityType);
+  public function setPurchasableEntityType($purchasableEntityType);
 
   /**
    * Gets the line item type's order type.

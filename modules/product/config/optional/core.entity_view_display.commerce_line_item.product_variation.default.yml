@@ -19,7 +19,7 @@ content:
       display_currency_code: false
     third_party_settings: {  }
     label: above
-  source:
+  purchased_entity:
     type: entity_reference_entity_view
     weight: 0
     settings:

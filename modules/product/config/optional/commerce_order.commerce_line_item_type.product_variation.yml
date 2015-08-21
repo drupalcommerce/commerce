@@ -2,5 +2,5 @@ langcode: en
 status: true
 label: 'Product variation'
 id: product_variation
-sourceEntityType: commerce_product_variation
+purchasableEntityType: commerce_product_variation
 orderType: default

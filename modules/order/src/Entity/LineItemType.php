@@ -35,7 +35,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "label",
  *     "id",
- *     "sourceEntityType",
+ *     "purchasableEntityType",
  *     "orderType"
  *   },
  *   links = {
@@ -62,11 +62,11 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   protected $label;
 
   /**
-   * The source entity type.
+   * The purchasable entity type.
    *
    * @var string
    */
-  protected $sourceEntityType;
+  protected $purchasableEntityType;
 
   /**
    * The order type.
@@ -78,15 +78,15 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   /**
    * {@inheritdoc}
    */
-  public function getSourceEntityType() {
-    return $this->sourceEntityType;
+  public function getPurchasableEntityType() {
+    return $this->purchasableEntityType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSourceEntityType($sourceEntityType) {
-    $this->sourceEntityType = $sourceEntityType;
+  public function setPurchasableEntityType($purchasableEntityType) {
+    $this->purchasableEntityType = $purchasableEntityType;
     return $this;
   }
 

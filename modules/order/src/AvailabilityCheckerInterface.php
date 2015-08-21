@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order;
 
-use Drupal\commerce\LineItemSourceInterface;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * Defines the interface for availability checkers.
@@ -15,29 +15,29 @@ use Drupal\commerce\LineItemSourceInterface;
 interface AvailabilityCheckerInterface {
 
   /**
-   * Determines whether the checker applies to the given source entity.
+   * Determines whether the checker applies to the given purchasable entity.
    *
-   * @param \Drupal\commerce\LineItemSourceInterface $source
-   *   The source entity.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    *
    * @return bool
-   *   TRUE if the checker applies to the given source entity, FALSE
+   *   TRUE if the checker applies to the given purchasable entity, FALSE
    *   otherwise.
    */
-  public function applies(LineItemSourceInterface $source);
+  public function applies(PurchasableEntityInterface $entity);
 
   /**
-   * Checks the availability of the given source entity.
+   * Checks the availability of the given purchasable entity.
    *
-   * @param \Drupal\commerce\LineItemSourceInterface $source
-   *   The source entity.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    * @param int $quantity
    *   The quantity.
    *
    * @return bool|null
-   *   TRUE if the source is available, FALSE if it is not available,
+   *   TRUE if the entity is available, FALSE if it's unavailable,
    *   or NULL if it has no opinion.
    */
-  public function check(LineItemSourceInterface $source, $quantity = 1);
+  public function check(PurchasableEntityInterface $entity, $quantity = 1);
 
 }

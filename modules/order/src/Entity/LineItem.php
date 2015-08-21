@@ -238,8 +238,8 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    $fields['source'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Source'))
+    $fields['purchased_entity'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Purchased entity'))
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -288,8 +288,8 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   public static function bundleFieldDefinitions(EntityTypeInterface $entityType, $bundle, array $baseFieldDefinitions) {
     $fields = [];
     if ($lineItemType = LineItemType::load($bundle)) {
-      $fields['source'] = clone $baseFieldDefinitions['source'];
-      $fields['source']->setSetting('target_type', $lineItemType->getSourceEntityType());
+      $fields['purchased_entity'] = clone $baseFieldDefinitions['purchased_entity'];
+      $fields['purchased_entity']->setSetting('target_type', $lineItemType->getPurchasableEntityType());
     }
 
     return $fields;
