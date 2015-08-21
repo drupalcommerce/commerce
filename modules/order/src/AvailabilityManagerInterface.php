@@ -10,20 +10,43 @@ namespace Drupal\commerce_order;
 use Drupal\commerce\LineItemSourceInterface;
 
 /**
- * Defines the interface for availability managers.
+ * Runs the added checkers to determine the availability of a source entity.
+ *
+ * If any checker returns FALSE, the entity is considered to be unavailable.
+ * Example checks:
+ * - Whether the entity is in stock.
+ * - Whether the entity's "available on" date is before the current date.
+ *
+ * @see \Drupal\commerce_order\AvailabilityCheckerInterface
  */
 interface AvailabilityManagerInterface {
 
   /**
-   * Checks availability of a source with the registered availability checkers.
+   * Adds a checker.
+   *
+   * @param \Drupal\commerce_order\AvailabilityCheckerInterface $checker
+   *   The checker.
+   */
+  public function addChecker(AvailabilityCheckerInterface $checker);
+
+  /**
+   * Gets all added checkers.
+   *
+   * @return \Drupal\commerce_order\AvailabilityCheckerInterface[]
+   *   The checkers.
+   */
+  public function getCheckers();
+
+  /**
+   * Checks the availability of the given source entity.
    *
    * @param \Drupal\commerce\LineItemSourceInterface $source
-   *   The source.
+   *   The source entity.
    * @param int $quantity
    *   The quantity.
    *
    * @return bool
-   *   Returns TRUE if the source is available, FALSE if it is not available.
+   *   TRUE if the source entity is available, FALSE otherwise.
    */
   public function check(LineItemSourceInterface $source, $quantity);
 

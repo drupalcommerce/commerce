@@ -15,29 +15,29 @@ use Drupal\commerce\LineItemSourceInterface;
 interface AvailabilityCheckerInterface {
 
   /**
-   * Determines whether the checker can be used with the given source entity.
+   * Determines whether the checker applies to the given source entity.
    *
    * @param \Drupal\commerce\LineItemSourceInterface $source
-   *   The source.
+   *   The source entity.
    *
    * @return bool
-   *   Returns TRUE if the given source entity can be used with the checker,
-   *   returns FALSE if it cannot.
+   *   TRUE if the checker applies to the given source entity, FALSE
+   *   otherwise.
    */
   public function applies(LineItemSourceInterface $source);
 
   /**
-   * Checks the availability of a given source and quantity.
+   * Checks the availability of the given source entity.
    *
    * @param \Drupal\commerce\LineItemSourceInterface $source
-   *   The source.
+   *   The source entity.
    * @param int $quantity
    *   The quantity.
    *
-   * @return bool
-   *   Returns TRUE if the source is available, FALSE if it is not available,
-   *   or NULL if it has no opinion on the source.
+   * @return bool|null
+   *   TRUE if the source is available, FALSE if it is not available,
+   *   or NULL if it has no opinion.
    */
-  public function check(LineItemSourceInterface $source, $quantity);
+  public function check(LineItemSourceInterface $source, $quantity = 1);
 
 }

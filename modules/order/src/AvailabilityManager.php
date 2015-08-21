@@ -9,34 +9,40 @@ namespace Drupal\commerce_order;
 
 use Drupal\commerce\LineItemSourceInterface;
 
+/**
+ * Default implementation of the availability manager.
+ */
 class AvailabilityManager implements AvailabilityManagerInterface {
 
   /**
-   * The availability checkers.
+   * The checkers.
    *
-   * @var array
+   * @var \Drupal\commerce_order\AvailabilityCheckerInterface[]
    */
-  protected $availabilityCheckers = [];
+  protected $checkers = [];
 
   /**
-   * Adds availability checker to the registered availability checkers.
-   *
-   * @param \Drupal\commerce_order\AvailabilityCheckerInterface $availabilityChecker
-   *   The availability checker.
+   * {@inheritdoc}
    */
-  public function addAvailabilityChecker(AvailabilityCheckerInterface $availabilityChecker) {
-    $this->availabilityCheckers[] = $availabilityChecker;
+  public function addChecker(AvailabilityCheckerInterface $checker) {
+    $this->checkers[] = $checker;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCheckers() {
+    return $this->checkers;
   }
 
   /**
    * {@inheritdoc}
    */
   public function check(LineItemSourceInterface $source, $quantity) {
-    foreach ($this->availabilityCheckers as $availabilityChecker) {
-      if ($availabilityChecker->applies($source)) {
-        $check = $availabilityChecker->check($source, $quantity);
-
-        if ($check === FALSE) {
+    foreach ($this->checkers as $checker) {
+      if ($checker->applies($source)) {
+        $result = $checker->check($source, $quantity);
+        if ($result === FALSE) {
           return FALSE;
         }
       }

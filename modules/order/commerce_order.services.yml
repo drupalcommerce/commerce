@@ -2,4 +2,4 @@ services:
   commerce_order.availability_manager:
     class: Drupal\commerce_order\AvailabilityManager
     tags:
-      - { name: service_collector, tag: commerce_order.availability_checker, call: addAvailabilityChecker }
+      - { name: service_collector, tag: commerce_order.availability_checker, call: addChecker }
