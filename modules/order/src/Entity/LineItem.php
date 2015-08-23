@@ -83,21 +83,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->get('status')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setStatus($status) {
-    $this->set('status', $status);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -194,24 +179,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
-    $fields['status'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Status'))
-      ->setDescription(t('The status name of this line item.'))
-      ->setRequired(TRUE)
-      ->setRevisionable(TRUE)
-      ->setDefaultValue('')
-      ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'hidden',
-        'weight' => -1,
       ])
       ->setDisplayConfigurable('form', TRUE);
 

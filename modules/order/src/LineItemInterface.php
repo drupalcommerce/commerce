@@ -25,24 +25,6 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function getType();
 
   /**
-   * Gets the line item status.
-   *
-   * @return string
-   *   The line item status.
-   */
-  public function getStatus();
-
-  /**
-   * Sets the line item status.
-   *
-   * @param string $status
-   *   The line item status.
-   *
-   * @return $this
-   */
-  public function setStatus($status);
-
-  /**
    * Gets the line item creation timestamp.
    *
    * @return int
