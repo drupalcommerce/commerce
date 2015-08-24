@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\LineItemInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -78,6 +79,36 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public function getType() {
     return $this->bundle();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPurchasedEntity() {
+    return $this->get('purchased_entity')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPurchasedEntity(PurchasableEntityInterface $entity) {
+    $this->set('purchased_entity', $entity->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPurchasedEntityId() {
+    return $this->get('purchased_entity')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPurchasedEntityId($entityId) {
+    $this->set('purchased_entity', $entityId);
+    return $this;
   }
 
   /**
