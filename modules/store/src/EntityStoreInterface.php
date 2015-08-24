@@ -41,11 +41,11 @@ interface EntityStoreInterface {
   /**
    * Sets the store ID.
    *
-   * @param int $store_id
+   * @param int $storeId
    *   The store id.
    *
    * @return $this
    */
-  public function setStoreId($store_id);
+  public function setStoreId($storeId);
 
 }
