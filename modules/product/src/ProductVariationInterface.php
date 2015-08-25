@@ -25,6 +25,22 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function getType();
 
   /**
+   * Gets the parent product.
+   *
+   * @return \Drupal\commerce_product\ProductInterface|null
+   *   The product entity, or null.
+   */
+  public function getProduct();
+
+  /**
+   * Gets the parent product id.
+   *
+   * @return int|null
+   *   The product id, or null.
+   */
+  public function getProductId();
+
+  /**
    * Get the variation SKU.
    *
    * @return string

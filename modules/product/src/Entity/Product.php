@@ -191,6 +191,22 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a back-reference on each product variation.
+    foreach ($this->variations as $item) {
+      $variation = $item->entity;
+      if ($variation->product_id->isEmpty()) {
+        $variation->product_id = $this->id();
+        $variation->save();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     // Delete the product variations of a deleted product.
     $variations = [];

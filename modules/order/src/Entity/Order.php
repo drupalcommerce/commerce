@@ -100,6 +100,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       $this->setOrderNumber($this->id());
       $this->save();
     }
+
+    // Ensure there's a back-reference on each line item.
+    foreach ($this->line_items as $item) {
+      $lineItem = $item->entity;
+      if ($lineItem->order_id->isEmpty()) {
+        $lineItem->order_id = $this->id();
+        $lineItem->save();
+      }
+    }
   }
 
   /**

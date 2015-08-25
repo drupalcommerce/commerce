@@ -26,6 +26,22 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   public function getType();
 
   /**
+   * Gets the parent order.
+   *
+   * @return \Drupal\commerce_order\OrderInterface|null
+   *   The order entity, or null.
+   */
+  public function getOrder();
+
+  /**
+   * Gets the parent order id.
+   *
+   * @return int|null
+   *   The order id, or null.
+   */
+  public function getOrderId();
+
+  /**
    * Gets the purchased entity.
    *
    * @return \Drupal\commerce\PurchasableEntityInterface|null

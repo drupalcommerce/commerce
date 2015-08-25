@@ -97,6 +97,20 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getOrder() {
+    return $this->get('order_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrderId() {
+    return $this->get('order_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPurchasedEntity() {
     return $this->get('purchased_entity')->entity;
   }
@@ -210,6 +224,13 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setLabel(t('Type'))
       ->setDescription(t('The line item type.'))
       ->setSetting('target_type', 'commerce_line_item_type')
+      ->setReadOnly(TRUE);
+
+    // The order backreference, populated by Order::postSave().
+    $fields['order_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Order'))
+      ->setDescription(t('The parent order.'))
+      ->setSetting('target_type', 'commerce_order')
       ->setReadOnly(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')

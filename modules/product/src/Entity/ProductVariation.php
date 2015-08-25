@@ -60,6 +60,20 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function getProduct() {
+    return $this->get('product_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProductId() {
+    return $this->get('product_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSku() {
     return $this->get('sku')->value;
   }
@@ -180,6 +194,13 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'));
+
+    // The product backreference, populated by Product::postSave().
+    $fields['product_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Product'))
+      ->setDescription(t('The parent product.'))
+      ->setSetting('target_type', 'commerce_product')
+      ->setReadOnly(TRUE);
 
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
