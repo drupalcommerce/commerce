@@ -190,9 +190,9 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCountries() {
+  public function getBillingCountries() {
     $countries = [];
-    foreach ($this->get('countries') as $countryItem) {
+    foreach ($this->get('billing_countries') as $countryItem) {
       $countries[] = $countryItem->value;
     }
     return $countries;
@@ -201,8 +201,8 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function setCountries(array $countries) {
-    $this->set('countries', $countries);
+  public function setBillingCountries(array $countries) {
+    $this->set('billing_countries', $countries);
     return $this;
   }
 
@@ -300,9 +300,8 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['countries'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Countries'))
-      ->setDescription(t('The countries this store sells to.'))
+    $fields['billing_countries'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Supported billing countries'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getAvailableCountries'])
       ->setDisplayOptions('form', [
@@ -328,7 +327,7 @@ class Store extends ContentEntityBase implements StoreInterface {
   }
 
   /**
-   * Gets the allowed values for the 'countries' base field.
+   * Gets the allowed values for the 'billing_countries' base field.
    *
    * @return array
    *   The allowed values.

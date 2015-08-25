@@ -108,23 +108,23 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setAddress(AddressInterface $address);
 
   /**
-   * Gets the store countries.
+   * Gets the store billing countries.
    *
-   * If empty, it's assumed that the store sells to all countries.
+   * If empty, it's assumed that all countries are supported.
    *
    * @return array
    *   A list of country codes.
    */
-  public function getCountries();
+  public function getBillingCountries();
 
   /**
-   * Sets the store countries.
+   * Sets the store billing countries.
    *
    * @param array $countries
    *   A list of country codes.
    *
    * @return $this
    */
-  public function setCountries(array $countries);
+  public function setBillingCountries(array $countries);
 
 }

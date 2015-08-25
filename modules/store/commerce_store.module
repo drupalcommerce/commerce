@@ -15,8 +15,8 @@ function commerce_store_field_widget_form_alter(&$element, FormStateInterface $f
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();
   $widget_name = $context['widget']->getPluginId();
-  if ($field_name == 'countries' && $entity_type == 'commerce_store' && $widget_name == 'options_select') {
-    $element['#options']['_none'] = t('Sell to all countries');
+  if ($field_name == 'billing_countries' && $entity_type == 'commerce_store' && $widget_name == 'options_select') {
+    $element['#options']['_none'] = t('- All countries -');
     $element['#size'] = 5;
   }
 }
