@@ -5,8 +5,28 @@
  * Defines the Order entity and associated features.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * Changes the label of the purchased_entity field to the label of the target
+ * type (e.g. 'Product variation').
+ */
+function commerce_order_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  $field_definition = $context['items']->getFieldDefinition();
+  $field_name = $field_definition->getName();
+  $entity_type = $field_definition->getTargetEntityTypeId();
+  $widget_name = $context['widget']->getPluginId();
+  if ($field_name == 'purchased_entity' && $entity_type == 'commerce_line_item') {
+    if (!empty($element['target_id']['#target_type'])) {
+      $target_type = \Drupal::entityManager()->getDefinition($element['target_id']['#target_type']);
+      $element['target_id']['#title'] = $target_type->getLabel();
+    }
+  }
+}
 
 /**
  * Adds the default line_items field to an order type.
