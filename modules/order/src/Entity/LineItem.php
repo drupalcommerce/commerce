@@ -77,6 +77,19 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function label() {
+    $purchasedEntity = $this->get('purchased_entity')->entity;
+    if ($purchasedEntity) {
+      return $purchasedEntity->label();
+    }
+    else {
+      return $this->get('label')->value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getType() {
     return $this->bundle();
   }
@@ -236,8 +249,26 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
+    // Allows users to provide a label when no purchasable entity is referenced.
+    $fields['label'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Label'))
+      ->setSettings([
+        'default_value' => '',
+        'max_length' => 255,
+      ]);
+
     $fields['purchased_entity'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Purchased entity'))
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => -1,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'placeholder' => '',
+        ],
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -284,10 +315,34 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public static function bundleFieldDefinitions(EntityTypeInterface $entityType, $bundle, array $baseFieldDefinitions) {
+    $lineItemType = LineItemType::load($bundle);
+    $purchasableEntityType = $lineItemType->getPurchasableEntityType();
     $fields = [];
-    if ($lineItemType = LineItemType::load($bundle)) {
-      $fields['purchased_entity'] = clone $baseFieldDefinitions['purchased_entity'];
-      $fields['purchased_entity']->setSetting('target_type', $lineItemType->getPurchasableEntityType());
+    $fields['purchased_entity'] = clone $baseFieldDefinitions['purchased_entity'];
+    if ($purchasableEntityType) {
+      $fields['purchased_entity']->setSetting('target_type', $purchasableEntityType);
+    }
+    else {
+      // This line item type won't reference a purchasable entity. The field
+      // can't be removed here, or converted to a configurable one, so it's
+      // hidden instead. See https://www.drupal.org/node/2346347#comment-10254087.
+      $fields['purchased_entity']->setRequired(FALSE);
+      $fields['purchased_entity']->setDisplayOptions('form', [
+        'type' => 'hidden',
+      ]);
+      $fields['purchased_entity']->setDisplayConfigurable('form', FALSE);
+      $fields['purchased_entity']->setDisplayConfigurable('view', FALSE);
+      $fields['purchased_entity']->setReadOnly(TRUE);
+
+      // Make the label field visible and required.
+      $fields['label'] = clone $baseFieldDefinitions['label'];
+      $fields['label']->setRequired(TRUE);
+      $fields['label']->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -1,
+      ]);
+      $fields['label']->setDisplayConfigurable('form', TRUE);
+      $fields['label']->setDisplayConfigurable('view', TRUE);
     }
 
     return $fields;
