@@ -1,0 +1,10 @@
+commerce_order.commerce_order_type.*.third_party.commerce_cart:
+  type: mapping
+  label: 'Shopping cart refresh settings'
+  mapping:
+    refresh_mode:
+        type: string
+        label: 'Shopping cart refresh mode'
+    refresh_frequency:
+        type: integer
+        label: 'Shopping cart refresh frequency'
