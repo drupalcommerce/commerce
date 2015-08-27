@@ -65,6 +65,7 @@ class OrderTypeTest extends CommerceOrderTestBase {
         'label' => 'Label for foo',
       )
     );
+    commerce_order_add_line_items_field($type);
 
     // Create a order.
     $order = $this->createEntity('commerce_order', array(

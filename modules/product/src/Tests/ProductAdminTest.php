@@ -126,7 +126,7 @@ class ProductAdminTest extends CommerceProductTestBase {
   function testDeleteCommerceProductAdmin() {
     $product = $this->createEntity('commerce_product', [
       'title' => $this->randomMachineName(),
-      'type' => "product"
+      'type' => 'default',
     ]);
     $this->drupalGet('product/' . $product->id() . '/delete');
     $this->assertText(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]), "Commerce Product deletion confirmation text is showing");

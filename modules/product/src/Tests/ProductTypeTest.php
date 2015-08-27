@@ -85,6 +85,9 @@ class ProductTypeTest extends CommerceProductTestBase {
       'id' => 'foo',
       'label' => 'foo'
     ]);
+    commerce_product_add_stores_field($productType);
+    commerce_product_add_variations_field($productType);
+
     $product = $this->createEntity('commerce_product', [
       'type' => $productType->id(),
       'title' => $this->randomMachineName(),
