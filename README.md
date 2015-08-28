@@ -18,8 +18,8 @@ Installation
 
 Preparation:
 
-1.  Install the -dev versions of Drupal 8 and [composer_manager](https://drupal.org/project/composer_manager).
-2. Initialize composer_manager* (`drush composer-manager-init` or `php modules/composer_manager/scripts/init.sh`).
+1. Install the -dev versions of Drupal 8 and [composer_manager](https://drupal.org/project/composer_manager).
+2. Initialize composer_manager (`drush composer-manager-init` or `php modules/composer_manager/scripts/init.php`).
 
 With Drush:
 
