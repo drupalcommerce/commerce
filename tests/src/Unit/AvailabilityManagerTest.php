@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\Tests\AvailabilityManagerTest.
+ * Contains \Drupal\commerce\Tests\AvailabilityManagerTest.
  */
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\commerce\Tests;
 
-use Drupal\commerce_order\AvailabilityManager;
+use Drupal\commerce\AvailabilityManager;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\commerce_order\AvailabilityManager
+ * @coversDefaultClass \Drupal\commerce\AvailabilityManager
  * @group commerce
  */
 class AvailabilityManagerTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\commerce_order\AvailabilityManager
+   * @var \Drupal\commerce\AvailabilityManager
    */
   protected $availabilityManager;
 
@@ -35,7 +35,7 @@ class AvailabilityManagerTest extends UnitTestCase {
    * ::covers check
    */
   public function testCheck() {
-    $mockCheckerBuilder = $this->getMockBuilder('Drupal\commerce_order\AvailabilityCheckerInterface')
+    $mockCheckerBuilder = $this->getMockBuilder('Drupal\commerce\AvailabilityCheckerInterface')
       ->disableOriginalConstructor();
     $mockEntity = $this->getMock('Drupal\commerce_product\ProductVariationInterface');
 
