@@ -1023,7 +1023,7 @@ function commerce_product_reference_options_list($field, $instance = NULL) {
     $limit = (int) $field['settings']['options_list_limit'];
   }
   else {
-    $limit = NULL;
+    $limit = 10;
   }
 
   // Loop through all product matches.
