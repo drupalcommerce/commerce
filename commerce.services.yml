@@ -28,3 +28,8 @@ services:
     arguments: ['@language_manager', '@commerce.country_context']
     tags:
       - { name: commerce.locale_resolver, priority: -100 }
+
+  commerce.availability_manager:
+    class: Drupal\commerce\AvailabilityManager
+    tags:
+      - { name: service_collector, tag: commerce.availability_checker, call: addChecker }

@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\AvailabilityCheckerInterface.
+ * Contains \Drupal\commerce\AvailabilityCheckerInterface.
  */
 
-namespace Drupal\commerce_order;
-
-use Drupal\commerce\PurchasableEntityInterface;
+namespace Drupal\commerce;
 
 /**
  * Defines the interface for availability checkers.

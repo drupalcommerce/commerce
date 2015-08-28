@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\AvailabilityManagerInterface.
+ * Contains \Drupal\commerce\AvailabilityManagerInterface.
  */
 
-namespace Drupal\commerce_order;
-
-use Drupal\commerce\PurchasableEntityInterface;
+namespace Drupal\commerce;
 
 /**
  * Runs the added checkers to determine the availability of a purchasable entity.
@@ -17,14 +15,14 @@ use Drupal\commerce\PurchasableEntityInterface;
  * - Whether the entity is in stock.
  * - Whether the entity's "available on" date is before the current date.
  *
- * @see \Drupal\commerce_order\AvailabilityCheckerInterface
+ * @see \Drupal\commerce\AvailabilityCheckerInterface
  */
 interface AvailabilityManagerInterface {
 
   /**
    * Adds a checker.
    *
-   * @param \Drupal\commerce_order\AvailabilityCheckerInterface $checker
+   * @param \Drupal\commerce\AvailabilityCheckerInterface $checker
    *   The checker.
    */
   public function addChecker(AvailabilityCheckerInterface $checker);
@@ -32,7 +30,7 @@ interface AvailabilityManagerInterface {
   /**
    * Gets all added checkers.
    *
-   * @return \Drupal\commerce_order\AvailabilityCheckerInterface[]
+   * @return \Drupal\commerce\AvailabilityCheckerInterface[]
    *   The checkers.
    */
   public function getCheckers();

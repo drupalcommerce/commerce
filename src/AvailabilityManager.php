@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\AvailabilityManager.
+ * Contains \Drupal\commerce\AvailabilityManager.
  */
 
-namespace Drupal\commerce_order;
-
-use Drupal\commerce\PurchasableEntityInterface;
+namespace Drupal\commerce;
 
 /**
  * Default implementation of the availability manager.
@@ -17,7 +15,7 @@ class AvailabilityManager implements AvailabilityManagerInterface {
   /**
    * The checkers.
    *
-   * @var \Drupal\commerce_order\AvailabilityCheckerInterface[]
+   * @var \Drupal\commerce\AvailabilityCheckerInterface[]
    */
   protected $checkers = [];
 
