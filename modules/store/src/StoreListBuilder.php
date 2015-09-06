@@ -8,7 +8,6 @@
 namespace Drupal\commerce_store;
 
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
@@ -36,7 +35,7 @@ class StoreListBuilder extends EntityListBuilder {
     $storeType = StoreType::load($entity->bundle());
 
     $row['name'] = $entity->getName();
-    $row['type'] = SafeMarkup::checkPlain($storeType->label());
+    $row['type'] = $storeType->label();
     $row['mail'] = $entity->getEmail();
     $row['default_currency'] = $entity->getDefaultCurrency();
 

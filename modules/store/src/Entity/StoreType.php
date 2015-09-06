@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_store\Entity;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\commerce_store\StoreTypeInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -90,18 +89,6 @@ class StoreType extends ConfigEntityBundleBase implements StoreTypeInterface {
   public function setDescription($description) {
     $this->description = $description;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete() {
-    if (!$this->access('delete')) {
-      throw new EntityStorageException(strtr("Store Type %type may not be deleted.", [
-        '%type' => SafeMarkup::checkPlain($this->entityTypeId),
-      ]));
-    }
-    parent::delete();
   }
 
 }

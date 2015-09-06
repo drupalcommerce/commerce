@@ -7,7 +7,6 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce_payment\Entity\PaymentInfoType;
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -90,16 +89,9 @@ class PaymentInfoListBuilder extends EntityListBuilder {
     /* @var $entity \Drupal\commerce_payment\Entity\PaymentInfo */
     $paymentInfoType = PaymentInfoType::load($entity->bundle());
 
-    if (!empty($paymentInfoType)) {
-      $type = SafeMarkup::checkPlain($paymentInfoType->label());
-    }
-    else {
-      $type = SafeMarkup::checkPlain($entity->bundle());
-    }
-
     $row = array(
       'information_id' => $entity->id(),
-      'payment_method' => $type,
+      'payment_method' => $paymentInfoType->label(),
       'owner' => array(
         'data' => array(
           '#theme' => 'username',
