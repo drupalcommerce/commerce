@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price;
 
-use CommerceGuys\Intl\Currency\CurrencyInterface as ExternalCurrencyInterface;
+use CommerceGuys\Intl\Currency\CurrencyEntityInterface as ExternalCurrencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**

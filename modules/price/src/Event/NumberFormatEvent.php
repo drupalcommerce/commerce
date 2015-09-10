@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_price\Event;
 
-use CommerceGuys\Intl\NumberFormat\NumberFormatInterface;
+use CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
@@ -20,24 +20,24 @@ class NumberFormatEvent extends GenericEvent {
   /**
    * The number format.
    *
-   * @var \CommerceGuys\Intl\NumberFormat\NumberFormatInterface
+   * @var \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface
    */
   protected $numberFormat;
 
   /**
    * Constructs a new NumberFormatEvent.
    *
-   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatInterface $numberFormat
+   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface $numberFormat
    *   The number format.
    */
-  public function __construct(NumberFormatInterface $numberFormat) {
+  public function __construct(NumberFormatEntityInterface $numberFormat) {
     $this->numberFormat = $numberFormat;
   }
 
   /**
    * The number format the event refers to.
    *
-   * @return \CommerceGuys\Intl\NumberFormat\NumberFormatInterface
+   * @return \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface
    */
   public function getNumberFormat() {
     return $this->numberFormat;
