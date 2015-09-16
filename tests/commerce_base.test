@@ -30,7 +30,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
     $dependencies = array(
       // API
       'entity',
-    	'entity_token',
+      'entity_token',
       'rules',
       'addressfield',
       //'rules_admin',

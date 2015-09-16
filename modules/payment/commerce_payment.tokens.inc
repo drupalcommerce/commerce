@@ -38,6 +38,10 @@ function commerce_payment_token_info() {
     'name' => t('Payment method short title'),
     'description' => t('The customer oriented short title of the payment method for the payment transaction.'),
   );
+  $transaction['payment-method-display-title'] = array(
+    'name' => t('Payment method display title'),
+    'description' => t('The checkout form oriented display title of the payment method for the payment transaction.'),
+  );
   $transaction['remote-id'] = array(
     'name' => t('Remote ID'),
     'description' => t('The remote identifier for the payment transaction.'),
@@ -115,7 +119,10 @@ function commerce_payment_token_info_alter(&$data) {
       'name' => t('Payment method short title'),
       'description' => t('The customer oriented short title of the payment method selected by the customer during checkout.'),
     );
-
+    $data['tokens']['commerce-order']['payment-method-display-title'] = array(
+      'name' => t('Payment method display title'),
+      'description' => t('The checkout form oriented display title of the payment method for the payment transaction.'),
+    );
   }
 }
 
@@ -162,6 +169,11 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
         case 'payment-method-short-title':
           $title = commerce_payment_method_get_title('short_title', $transaction->payment_method);
           $replacements[$original] = $sanitize ? check_plain($title) : $title;
+          break;
+
+        case 'payment-method-display-title':
+          $title = commerce_payment_method_get_title('display_title', $transaction->payment_method);
+          $replacements[$original] = $sanitize ? filter_xss_admin($title) : $title;
           break;
 
         case 'remote-id':
@@ -266,6 +278,11 @@ function commerce_payment_tokens($type, $tokens, array $data = array(), array $o
             case 'payment-method-short-title':
               $title = commerce_payment_method_get_title('short_title', $method_id);
               $replacements[$original] = $sanitize ? check_plain($title) : $title;
+              break;
+
+            case 'payment-method-display-title':
+              $title = commerce_payment_method_get_title('display_title', $method_id);
+              $replacements[$original] = $sanitize ? filter_xss_admin($title) : $title;
               break;
           }
         }
