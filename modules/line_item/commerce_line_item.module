@@ -999,7 +999,12 @@ function commerce_line_item_field_widget_form(&$form, &$form_state, $field, $ins
     }
 
     // Load the line items for temporary storage in the form array.
-    $line_items = commerce_line_item_load_multiple($line_item_ids);
+    if(!empty($line_item_ids)) {
+      $line_items = commerce_line_item_load_multiple($line_item_ids);
+    }
+    else {
+      $line_items = array();
+    }
 
     // Update the base form element array to use the proper theme and validate
     // functions and to include header information for the line item table.
