@@ -178,3 +178,17 @@ function hook_commerce_order_uri($order) {
 function hook_commerce_order_presave($order) {
   // No example.
 }
+
+/**
+ * Respond to order deletion.
+ *
+ * The order will still exist and allows you to take an action before it is
+ * completely removed.
+ *
+ * @param $order
+ *   The order object that is being deleted.
+ */
+function hook_commerce_order_delete($order) {
+  commerce_cart_order_session_delete($order->order_id);
+  commerce_cart_order_session_delete($order->order_id, TRUE);
+}
