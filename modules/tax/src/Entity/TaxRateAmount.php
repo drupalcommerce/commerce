@@ -7,9 +7,9 @@
 
 namespace Drupal\commerce_tax\Entity;
 
+use Drupal\commerce_tax\TaxRateInterface;
+use Drupal\commerce_tax\TaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use CommerceGuys\Tax\Model\TaxRateInterface;
-use CommerceGuys\Tax\Model\TaxRateAmountInterface;
 
 /**
  * Defines the Tax Rate Amount configuration entity.
@@ -30,9 +30,6 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "amount",
- *     "startDate" = "startDate",
- *     "endDate" = "endDate",
- *     "rate" = "rate"
  *   },
  *   config_export = {
  *     "id",
@@ -53,7 +50,7 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * The tax rate.
    *
-   * @var \CommerceGuys\Tax\Model\TaxRateInterface
+   * @var \Drupal\commerce_tax\TaxRateInterface
    */
   protected $rate;
 
@@ -95,9 +92,8 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRate(TaxRateInterface $rate = null) {
+  public function setRate(TaxRateInterface $rate) {
     $this->rate = $rate->getId();
-
     return $this;
   }
 
@@ -106,15 +102,6 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function getId() {
     return $this->id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setId($id) {
-    $this->id = $id;
-
-    return $this;
   }
 
   /**
@@ -129,7 +116,6 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function setAmount($amount) {
     $this->amount = $amount;
-
     return $this;
   }
 
@@ -145,7 +131,6 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function setStartDate(\DateTime $startDate) {
     $this->startDate = $startDate;
-
     return $this;
   }
 
@@ -161,7 +146,6 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function setEndDate(\DateTime $endDate) {
     $this->endDate = $endDate;
-
     return $this;
   }
 

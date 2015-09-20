@@ -7,10 +7,10 @@
 
 namespace Drupal\commerce_tax\Entity;
 
+use Drupal\commerce_tax\TaxTypeInterface;
+use Drupal\commerce_tax\TaxRateInterface;
+use Drupal\commerce_tax\TaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use CommerceGuys\Tax\Model\TaxRateInterface;
-use CommerceGuys\Tax\Model\TaxTypeInterface;
-use CommerceGuys\Tax\Model\TaxRateAmountInterface;
 
 /**
  * Defines the Tax Rate configuration entity.
@@ -31,10 +31,6 @@ use CommerceGuys\Tax\Model\TaxRateAmountInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
- *     "displayName" = "displayName",
- *     "default" = "default",
- *     "amounts" = "amounts",
- *     "type" = "type"
  *   },
  *   config_export = {
  *     "id",
@@ -56,7 +52,7 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   /**
    * The tax rate type.
    *
-   * @var \CommerceGuys\Tax\Model\TaxTypeInterface
+   * @var \Drupal\commerce_tax\TaxTypeInterface
    */
   protected $type;
 
@@ -105,9 +101,8 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setType(TaxTypeInterface $type = null) {
+  public function setType(TaxTypeInterface $type) {
     $this->type = $type;
-
     return $this;
   }
 
@@ -116,15 +111,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function getId() {
     return $this->id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setId($id) {
-    $this->id = $id;
-
-    return $this;
   }
 
   /**
@@ -139,7 +125,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function setName($name) {
     $this->name = $name;
-
     return $this;
   }
 
@@ -169,7 +154,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function setDefault($default) {
     $this->default = $default;
-
     return $this;
   }
 
@@ -206,7 +190,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function addAmount(TaxRateAmountInterface $amount) {
     $this->amounts[] = $amount->getId();
-
     return $this;
   }
 
@@ -215,7 +198,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function removeAmount(TaxRateAmountInterface $amount) {
     unset($this->amounts[array_search($amount->getId(), $this->amounts)]);
-
     return $this;
   }
 

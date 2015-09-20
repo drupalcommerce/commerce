@@ -7,10 +7,10 @@
 
 namespace Drupal\commerce_tax\Entity;
 
+use Drupal\address\ZoneInterface;
+use Drupal\commerce_tax\TaxTypeInterface;
+use Drupal\commerce_tax\TaxRateInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use CommerceGuys\Zone\Model\ZoneInterface;
-use CommerceGuys\Tax\Model\TaxTypeInterface;
-use CommerceGuys\Tax\Model\TaxRateInterface;
 use CommerceGuys\Tax\Enum\GenericLabel;
 
 /**
@@ -32,16 +32,13 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
- *     "compound" = "compound",
- *     "displayInclusive" = "displayInclusive",
- *     "tag" = "tag",
- *     "roundingMode" = "roundingMode",
- *     "rates" = "rates"
  *   },
  *   config_export = {
  *     "id",
  *     "name",
+ *     "genericLabel",
  *     "compound",
+ *     "displayInclusive",
  *     "roundingMode",
  *     "tag",
  *     "rates",
@@ -70,23 +67,37 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   protected $name;
 
   /**
+   * The tax type generic label.
+   *
+   * @var string
+   */
+  protected $genericLabel;
+
+  /**
    * Whether the tax type is compound.
    *
    * @var bool
    */
-  protected $compound = false;
+  protected $compound = FALSE;
 
   /**
    * Whether the tax type is display inclusive.
    *
    * @var bool
    */
-  protected $displayInclusive = false;
+  protected $displayInclusive = FALSE;
 
   /**
    * The tax type rounding mode.
    */
   protected $roundingMode;
+
+  /**
+   * The tax type zone.
+   *
+   * @var \Drupal\address\ZoneInterface
+   */
+  protected $zone;
 
   /**
    * The tax type tag.
@@ -103,26 +114,10 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   protected $rates = [];
 
   /**
-   * The tax type generic label.
-   *
-   * @var string
-   */
-  protected $genericLabel;
-
-  /**
    * {@inheritdoc}
    */
   public function getId() {
     return $this->id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setId($id) {
-    $this->id = $id;
-
-    return $this;
   }
 
   /**
@@ -137,136 +132,7 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function setName($name) {
     $this->name = $name;
-
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isCompound() {
-    return $this->compound;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCompound($compound) {
-    $this->compound = $compound;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isDisplayInclusive() {
-    return !empty($this->displayInclusive);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDisplayInclusive($displayInclusive) {
-    $this->displayInclusive = $displayInclusive;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRoundingMode() {
-    return $this->roundingMode;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRoundingMode($roundingMode) {
-    $this->roundingMode = $roundingMode;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getZone() {
-    // @todo
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setZone(ZoneInterface $zone) {
-    // @todo
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTag() {
-    return $this->tag;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTag($tag) {
-    $this->tag = $tag;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRates() {
-    return $this->rates;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRates($rates) {
-    $this->rates = $rates;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasRates() {
-    return count($this->rates) > 0;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addRate(TaxRateInterface $rate) {
-    $this->rates[] = $rate->getId();
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function removeRate(TaxRateInterface $rate) {
-    unset($this->rates[array_search($rate->getId(), $this->rates)]);
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasRate(TaxRateInterface $rate) {
-    return array_search($rate, $this->rates) !== FALSE;
   }
 
   /**
@@ -282,8 +148,127 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   public function setGenericLabel($genericLabel) {
     GenericLabel::assertExists($genericLabel);
     $this->genericLabel = $genericLabel;
-
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isCompound() {
+    return !empty($this->compound);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCompound($compound) {
+    $this->compound = $compound;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDisplayInclusive() {
+    return !empty($this->displayInclusive);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisplayInclusive($displayInclusive) {
+    $this->displayInclusive = $displayInclusive;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRoundingMode() {
+    return $this->roundingMode;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRoundingMode($roundingMode) {
+    $this->roundingMode = $roundingMode;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getZone() {
+    return $this->zone;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setZone(ZoneInterface $zone) {
+    $this->zone = $zone;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTag() {
+    return $this->tag;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTag($tag) {
+    $this->tag = $tag;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRates() {
+    return $this->rates;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRates($rates) {
+    $this->rates = $rates;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasRates() {
+    return count($this->rates) > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addRate(TaxRateInterface $rate) {
+    $this->rates[] = $rate->getId();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeRate(TaxRateInterface $rate) {
+    unset($this->rates[array_search($rate->getId(), $this->rates)]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasRate(TaxRateInterface $rate) {
+    return array_search($rate, $this->rates) !== FALSE;
   }
 
 }
