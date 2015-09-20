@@ -42,7 +42,8 @@ abstract class CommerceOrderTestBase extends WebTestBase {
     'commerce_product',
     'commerce_order',
     'commerce_price',
-    'inline_entity_form'
+    'inline_entity_form',
+    'block'
   ];
 
   /**
@@ -54,6 +55,10 @@ abstract class CommerceOrderTestBase extends WebTestBase {
 
   protected function setUp() {
     parent::setUp();
+
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
+
     $this->adminUser = $this->drupalCreateUser([
       'administer orders',
       'administer order types',

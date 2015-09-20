@@ -20,7 +20,7 @@ abstract class StoreTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = ['commerce', 'commerce_store'];
+  public static $modules = ['commerce', 'commerce_store', 'block'];
 
   /**
    * User with permission to administer the commerce store.
@@ -32,6 +32,9 @@ abstract class StoreTestBase extends WebTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
 
     $permissions = [
       'view the administration theme',

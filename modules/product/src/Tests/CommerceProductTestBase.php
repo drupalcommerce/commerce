@@ -27,7 +27,8 @@ abstract class CommerceProductTestBase extends WebTestBase {
     'field',
     'field_ui',
     'options',
-    'entity_reference'
+    'entity_reference',
+    'block'
   ];
 
   /**
@@ -46,10 +47,13 @@ abstract class CommerceProductTestBase extends WebTestBase {
   protected $stores;
 
   /**
-  * {@inheritdoc}
-  */
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
+
+    $this->drupalPlaceBlock('local_tasks_block');
+    $this->drupalPlaceBlock('local_actions_block');
 
     $this->adminUser = $this->drupalCreateUser([
       'administer products',
