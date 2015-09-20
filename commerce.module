@@ -987,6 +987,7 @@ function commerce_entity_access($op, $entity, $account, $entity_type) {
         return (bool) $query
           ->addTag($entity_info['access arguments']['access tag'])
           ->addMetaData('account', $account)
+          ->addMetaData('entity', $entity)
           ->condition($entity_info['entity keys']['id'], $entity->{$entity_info['entity keys']['id']})
           ->range(0, 1)
           ->execute()
@@ -1239,6 +1240,7 @@ function commerce_entity_access_query_alter($query, $entity_type, $base_table = 
 
   $context = array(
     'account' => $account,
+    'entity' => $query->getMetaData('entity'),
     'entity_type' => $entity_type,
     'base_table' => $base_table
   );
