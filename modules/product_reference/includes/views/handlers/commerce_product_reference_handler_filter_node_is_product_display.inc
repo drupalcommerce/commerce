@@ -10,7 +10,18 @@ class commerce_product_reference_handler_filter_node_is_product_display extends 
 
   function query() {
     $this->ensure_my_table();
-    $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", array_keys(commerce_product_reference_node_types()), $this->value ? 'IN' : 'NOT IN');
+
+    $node_types = array_keys(commerce_product_reference_node_types());
+
+    if (!$node_types) {
+      // instead of:
+      // WHERE (( (node.type NOT IN  ()) ))
+      // do this:
+      // WHERE (( (node.type NOT IN  ('')) ))
+      $node_types = array('');
+    }
+
+    $this->query->add_where($this->options['group'], "$this->table_alias.$this->real_field", $node_types, $this->value ? 'IN' : 'NOT IN');
   }
 
   function ensure_table($table, $relationship) {
