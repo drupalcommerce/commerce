@@ -378,11 +378,21 @@ function commerce_line_item_field_attach_delete($entity_type, $entity) {
 
       if ($wrapper->{$field_name} instanceof EntityListWrapper) {
         foreach ($wrapper->{$field_name} as $delta => $line_item_wrapper) {
-          $referenced_line_item_ids[] = $line_item_wrapper->line_item_id->value();
+          try {
+            $referenced_line_item_ids[] = $line_item_wrapper->line_item_id->value();
+          }
+          catch (EntityMetadataWrapperException $e) {
+            // Do nothing, this was a bad reference value.
+          }
         }
       }
       elseif (!is_null($wrapper->{$field_name}->value())) {
-        $referenced_line_item_ids[] = $wrapper->{$field_name}->line_item_id->value();
+        try {
+          $referenced_line_item_ids[] = $wrapper->{$field_name}->line_item_id->value();
+        }
+        catch (EntityMetadataWrapperException $e) {
+          // Do nothing, this was a bad reference value.
+        }
       }
 
       // Loop over each line item referenced on this field...
