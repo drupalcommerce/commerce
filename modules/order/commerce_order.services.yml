@@ -1,0 +1,4 @@
+services:
+  commerce_order.line_item_matcher:
+    class: Drupal\commerce_order\LineItemMatcher
+    arguments: ['@event_dispatcher']

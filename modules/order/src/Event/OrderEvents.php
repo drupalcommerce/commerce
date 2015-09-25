@@ -139,4 +139,13 @@ final class OrderEvents {
    */
   const LINE_ITEM_DELETE = 'commerce_order.commerce_line_item.delete';
 
+  /**
+   * Name of the event fired after deleting a line item.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_order\Event\LineItemEvent
+   */
+  const LINE_ITEM_COMPARISON_FIELDS = 'commerce_order.commerce_line_item.comparison_fields';
+
 }
