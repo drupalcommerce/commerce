@@ -260,7 +260,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: E-mail
+          label: Email
           exclude: false
           alter:
             alter_text: false

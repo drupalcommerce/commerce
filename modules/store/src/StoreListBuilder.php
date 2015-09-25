@@ -22,7 +22,7 @@ class StoreListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['name'] = t('Name');
     $header['type'] = t('Type');
-    $header['mail'] = t('E-mail');
+    $header['mail'] = t('Email');
     $header['default_currency'] = t('Currency');
     return $header + parent::buildHeader();
   }
