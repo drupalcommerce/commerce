@@ -67,6 +67,9 @@ function commerce_order_account_pane_checkout_form($form, &$form_state, $checkou
       '#title' => t('E-mail address'),
       '#default_value' => $order->mail,
       '#required' => TRUE,
+      '#attributes' => array(
+        'autocomplete' => 'email',
+      ),
     );
 
     if (variable_get('commerce_order_account_pane_mail_double_entry', FALSE)) {
