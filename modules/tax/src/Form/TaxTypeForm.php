@@ -126,7 +126,7 @@ class TaxTypeForm extends EntityForm {
    */
   public function validateTag(array $element, FormStateInterface $form_state, array $form) {
     $tag = $element['#value'];
-    if (!preg_match('/[a-zA-Z0-9]+/', $tag)) {
+    if (!empty($tag) && !preg_match('/[a-zA-Z0-9]+/', $tag)) {
       $form_state->setError($element, $this->t('The tag must be a single word.'));
     }
   }
