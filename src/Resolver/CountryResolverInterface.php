@@ -15,8 +15,8 @@ interface CountryResolverInterface {
   /**
    * Resolves the country.
    *
-   * @return string|null
-   *   The country, if resolved. Otherwise NULL, indicating that the next
+   * @return \Drupal\commerce\Country|null
+   *   The country object, if resolved. Otherwise NULL, indicating that the next
    *   resolver in the chain should be called.
    */
   public function resolve();
