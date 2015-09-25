@@ -35,6 +35,32 @@ class ProductVariationTypeForm extends EntityForm {
       '#disabled' => !$variationType->isNew(),
     ];
 
+    if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
+
+      // Prepare the list of line item types.
+      $lineItemTypes = $this->entityManager->getStorage('commerce_line_item_type')
+        ->loadMultiple();
+
+      // We want to filter out all line item types that are not meant for
+      // commerce product variations entity bundles.
+      $lineItemTypes = array_filter($lineItemTypes, function($lineItemType) {
+        return $lineItemType->getPurchasableEntityType() == 'commerce_product_variation';
+      });
+
+      $lineItemTypes = array_map(function ($lineItemType) {
+        return $lineItemType->label();
+      }, $lineItemTypes);
+
+      $form['lineItemType'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Line item type'),
+        '#default_value' => $variationType->getLineItemType(),
+        '#options' => $lineItemTypes,
+        '#empty_value' => '',
+        '#required' => TRUE,
+      ];
+    }
+
     return $form;
   }
 
