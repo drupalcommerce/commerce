@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_product\ProductInterface.
+ * Contains \Drupal\commerce_product\Entity\ProductInterface.
  */
 
-namespace Drupal\commerce_product;
+namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -81,7 +81,7 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   /**
    * Gets the stores through which the product is sold.
    *
-   * @return \Drupal\commerce_store\StoreInterface[]
+   * @return \Drupal\commerce_store\Entity\StoreInterface[]
    *   The stores.
    */
   public function getStores();
@@ -89,7 +89,7 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   /**
    * Sets the stores through which the product is sold.
    *
-   * @param \Drupal\commerce_store\StoreInterface[] $stores
+   * @param \Drupal\commerce_store\Entity\StoreInterface[] $stores
    *   The stores through which the product is sold.
    *
    * @return $this

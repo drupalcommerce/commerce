@@ -8,7 +8,6 @@
 namespace Drupal\commerce_payment\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce_payment\PaymentInfoTypeInterface;
 
 /**
  * Defines the Payment information type configuration entity.

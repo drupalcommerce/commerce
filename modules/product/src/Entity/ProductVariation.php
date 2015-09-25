@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\commerce_product\ProductVariationInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;

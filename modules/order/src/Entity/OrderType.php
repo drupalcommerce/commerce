@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_order\OrderTypeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**

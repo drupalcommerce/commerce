@@ -8,7 +8,7 @@
 namespace Drupal\commerce_product\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\commerce_product\ProductInterface;
+use Drupal\commerce_product\Entity\ProductInterface;
 
 /**
  * Gets responses for Commerce Product routes.
@@ -18,7 +18,7 @@ class ProductController extends ControllerBase {
   /**
    * The _title_callback for the entity.commerce_product.edit_form route
    *
-   * @param \Drupal\commerce_product\ProductInterface $commerce_product
+   * @param \Drupal\commerce_product\Entity\ProductInterface $commerce_product
    *   The current product.
    *
    * @return string
@@ -31,7 +31,7 @@ class ProductController extends ControllerBase {
   /**
    * The _title_callback for the entity.commerce_product.canonical route
    *
-   * @param \Drupal\commerce_product\ProductInterface $commerce_product
+   * @param \Drupal\commerce_product\Entity\ProductInterface $commerce_product
    *   The current product.
    *
    * @return string

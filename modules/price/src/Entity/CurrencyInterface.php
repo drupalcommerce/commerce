@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_price\CurrencyInterface.
+ * Contains \Drupal\commerce_price\Entity\CurrencyInterface.
  */
 
-namespace Drupal\commerce_price;
+namespace Drupal\commerce_price\Entity;
 
 use CommerceGuys\Intl\Currency\CurrencyEntityInterface as ExternalCurrencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

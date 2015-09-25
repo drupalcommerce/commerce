@@ -8,7 +8,6 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce_product\ProductTypeInterface;
 
 /**
  * Defines the Commerce Product Type entity type.

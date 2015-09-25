@@ -8,7 +8,7 @@
 namespace Drupal\commerce_store\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 
 /**
  * Route controller for stores.
@@ -18,7 +18,7 @@ class StoreController extends ControllerBase {
   /**
    * The _title_callback for the entity.commerce_store.edit_form route
    *
-   * @param \Drupal\commerce_store\StoreInterface $commerce_store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $commerce_store
    *   The current store.
    *
    * @return string
@@ -31,7 +31,7 @@ class StoreController extends ControllerBase {
   /**
    * The _title_callback for the entity.commerce_store.canonical route
    *
-   * @param \Drupal\commerce_store\StoreInterface $commerce_store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $commerce_store
    *   The current store.
    *
    * @return string

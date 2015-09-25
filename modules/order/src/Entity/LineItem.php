@@ -8,7 +8,6 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_order\LineItemInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;

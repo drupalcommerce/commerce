@@ -8,7 +8,6 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce_product\ProductVariationTypeInterface;
 
 /**
  * Defines the Product Variation Type entity.

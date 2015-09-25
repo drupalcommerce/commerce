@@ -7,8 +7,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_order\OrderInterface;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;

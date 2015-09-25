@@ -8,6 +8,7 @@
 namespace Drupal\commerce_store;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;

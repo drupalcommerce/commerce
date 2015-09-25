@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\OrderInterface.
+ * Contains \Drupal\commerce_order\Entity\OrderInterface.
  */
 
-namespace Drupal\commerce_order;
+namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_store\EntityStoreInterface;
+use Drupal\commerce_store\Entity\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;

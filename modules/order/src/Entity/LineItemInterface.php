@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\LineItemInterface.
+ * Contains \Drupal\commerce_order\Entity\LineItemInterface.
  */
 
-namespace Drupal\commerce_order;
+namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -28,7 +28,7 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface, Ent
   /**
    * Gets the parent order.
    *
-   * @return \Drupal\commerce_order\OrderInterface|null
+   * @return \Drupal\commerce_order\Entity\OrderInterface|null
    *   The order entity, or null.
    */
   public function getOrder();

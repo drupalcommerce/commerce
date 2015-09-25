@@ -37,7 +37,7 @@ class AvailabilityManagerTest extends UnitTestCase {
   public function testCheck() {
     $mockCheckerBuilder = $this->getMockBuilder('Drupal\commerce\AvailabilityCheckerInterface')
       ->disableOriginalConstructor();
-    $mockEntity = $this->getMock('Drupal\commerce_product\ProductVariationInterface');
+    $mockEntity = $this->getMock('Drupal\commerce_product\Entity\ProductVariationInterface');
 
     $firstChecker = $mockCheckerBuilder->getMock();
     $firstChecker->expects($this->any())

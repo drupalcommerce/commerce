@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\PaymentTransactionInterface.
+ * Contains \Drupal\commerce_payment\Entity\PaymentTransactionInterface.
  */
 
-namespace Drupal\commerce_payment;
+namespace Drupal\commerce_payment\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 
