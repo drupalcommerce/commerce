@@ -50,7 +50,7 @@ function commerce_payment_ui_admin_page() {
         // Loop over the actions to find the first enabled payment method.
         foreach ($rule->actions() as $action) {
           // Parse the action name into a payment method ID.
-          if (strpos($action->getElementName(), 'commerce_payment_enable_') === 0) {
+          if (method_exists($action, 'getElementName') && strpos($action->getElementName(), 'commerce_payment_enable_') === 0) {
             $method_id = drupal_substr($action->getElementName(), 24);
 
             // Load the payment method instance and determine availability.
