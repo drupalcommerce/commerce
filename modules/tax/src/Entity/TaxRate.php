@@ -11,6 +11,7 @@ use Drupal\commerce_tax\TaxTypeInterface;
 use Drupal\commerce_tax\TaxRateInterface;
 use Drupal\commerce_tax\TaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the Tax Rate configuration entity.
@@ -206,6 +207,23 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    */
   public function hasAmount(TaxRateAmountInterface $amount) {
     return array_search($amount->getId(), $this->amounts) !== FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    // Delete all tax rate amounts of each tax rate.
+    foreach ($entities as $entity) {
+      if ($entity->hasAmounts()) {
+        $taxRateAmounts = \Drupal::entityManager()->getStorage('commerce_tax_rate_amount')->loadMultiple(array_values($entity->getAmounts()));
+        array_walk($taxRateAmounts, function ($taxRateAmount) {
+          $taxRateAmount->delete();
+        });
+      }
+    }
   }
 
 }
