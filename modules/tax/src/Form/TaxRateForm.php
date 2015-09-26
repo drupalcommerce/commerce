@@ -8,7 +8,6 @@
 namespace Drupal\commerce_tax\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,13 +27,6 @@ class TaxRateForm extends EntityForm {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $taxTypeStorage;
-
-  /**
-   * The original tax rate configuration entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
-   */
-  protected $originalTaxRate;
 
   /**
    * Creates a TaxRateForm instance.
@@ -65,10 +57,6 @@ class TaxRateForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $taxRate = $this->entity;
-
-    // Store tax rate while building the form, so that we may fetch original
-    // values from it while validating. @see self::validateDefault()
-    $this->setOriginalTaxRate($taxRate);
 
     $form['type'] = [
       '#type' => 'hidden',
@@ -129,15 +117,14 @@ class TaxRateForm extends EntityForm {
    * Validates that there is only one default per tax type.
    */
   public function validateDefault(array $element, FormStateInterface $form_state, array $form) {
-    $originalTaxRate = $this->getOriginalTaxRate();
+    $taxRate = $this->getEntity();
     $default = $element['#value'];
-
     if ($default) {
       $loadedTaxRates = $this->taxRateStorage->loadByProperties([
         'type' => $form_state->getValue('type'),
       ]);
       foreach ($loadedTaxRates as $rate) {
-        if ($rate->getId() !== $originalTaxRate->getId() && $rate->isDefault()) {
+        if ($rate->getId() !== $taxRate->getOriginalId() && $rate->isDefault()) {
           $form_state->setError($element, $this->t('Tax rate %label is already the default.', [
             '%label' => $rate->label(),
           ]));
@@ -186,25 +173,6 @@ class TaxRateForm extends EntityForm {
       $this->logger('commerce_tax')->error($e);
       $form_state->setRebuild();
     }
-  }
-
-  /**
-   * Sets the original tax rate configuration entity.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @return void
-   */
-  protected function setOriginalTaxRate(EntityInterface $entity) {
-    $this->originalTaxRate = $entity;
-  }
-
-  /**
-   * Fetches the original tax type.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  protected function getOriginalTaxRate() {
-    return $this->originalTaxRate;
   }
 
 }
