@@ -218,10 +218,9 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
     // Delete all tax rate amounts of each tax rate.
     foreach ($entities as $entity) {
       if ($entity->hasAmounts()) {
-        $taxRateAmounts = \Drupal::entityManager()->getStorage('commerce_tax_rate_amount')->loadMultiple(array_values($entity->getAmounts()));
-        array_walk($taxRateAmounts, function ($taxRateAmount) {
-          $taxRateAmount->delete();
-        });
+        $amountStorage = \Drupal::entityManager()->getStorage('commerce_tax_rate_amount');
+        $amounts = $amountStorage->loadMultiple($entity->getAmounts());
+        $amountStorage->delete($amounts);
       }
     }
   }
