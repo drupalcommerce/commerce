@@ -10,7 +10,7 @@ namespace Drupal\commerce\Cache\Context;
 use Drupal\commerce\CountryContext;
 
 /**
- * Defines the CountryCacheContext object, for "per country" caching.
+ * Defines the country cache context, for "per country" caching.
  *
  * Cache context ID: 'country'.
  */
@@ -18,27 +18,27 @@ class CountryCacheContext implements CacheContextInterface {
 
   /**
    * The country context.
-   * 
+   *
    * @var \Drupal\commerce\CountryContext
    */
   protected $countryContext;
-  
+
   /**
    * Constructs a new CountryCacheContext object.
-   * 
+   *
    * @param \Drupal\commerce\CountryContext $context
    *   The country context.
-   */  
+   */
   public function __construct(CountryContext $context) {
     $this->countryContext = $context;
-  } 
-  
+  }
+
   /**
    * {@inheritdoc}
    */
   public static function getLabel() {
     return t('Country');
-  } 
+  }
 
   /**
    * {@inheritdoc}
