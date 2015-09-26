@@ -101,11 +101,24 @@ function hook_commerce_tax_type_delete($tax_type, $skip_reset) {
 /**
  * Defines tax rates that may be applied to line items.
  *
+ * Modules that integrate third party tax calculation services still need to
+ * define tax rates that correspond to the price components they use to store
+ * those calculated taxes on line items. Otherwise modules that attempt to
+ * communicate the amount of tax on an order to other systems will not get
+ * accurate total tax amounts.
+ *
+ * To do this, a tax rate should be defined that may have a rate of 0 and an
+ * undefined tax type, but they should likely not specify a default Rules
+ * component, should not show in the administrative list, and should use a
+ * calculation callback that simply returns FALSE (unless the tax services
+ * supports tax calculation on a line item basis as opposed to requiring an
+ * entire order to return taxes).
+ *
  * @return
  *   An array of information about available tax rates. The returned array
  *   should be an associative array of tax rate arrays keyed by the tax rate
  *   name. Each tax rate array can include the following keys:
- *   - title: the title of the tax rate
+ *   - title: the title of the tax rate; must be defined
  *   - display_title: a display title for the tax type suitable for presenting
  *     to customers if necessary; defaults to the title
  *   - description: a short description of the tax rate
