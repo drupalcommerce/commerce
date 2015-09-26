@@ -14,15 +14,28 @@ use Drupal\Core\Form\FormStateInterface;
  */
 function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
   if ($entity_type->id() === 'commerce_store') {
+    $fields['prices_include_tax'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Prices are entered with taxes included.'))
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 3,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDefaultValue(FALSE);
+
     $fields['tax_registrations'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Tax registrations'))
       ->setDescription(t('The countries where the store is additionally registered to collect taxes.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store','getAvailableCountries'])
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 4,
-      ))
+      ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
@@ -41,5 +54,6 @@ function commerce_tax_form_commerce_store_form_alter(&$form, FormStateInterface 
     '#collapsible' => TRUE,
     '#open' => TRUE,
   ];
+  $form['prices_include_tax']['#group'] = 'tax_settings';
   $form['tax_registrations']['#group'] = 'tax_settings';
 }
