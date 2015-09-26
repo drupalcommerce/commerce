@@ -691,10 +691,10 @@ function commerce_customer_profile_can_delete($profile) {
  * @param $profile_id
  *   The ID of the customer profile to delete.
  * @param $entity_context
- *   An optional entity context array that specifies the entity throgh whose
- *   customer profile reference field the given profiles are being deleted:
- *   - entity_type: the type of entity
- *   - entity_id: the unique ID of the entity
+ *   An optional entity context array that specifies the entity through whose
+ *   customer profile reference field the given profile is being deleted:
+ *   - entity_type: The type of entity.
+ *   - entity_id: The unique ID of the entity.
  *
  * @return
  *   TRUE on success, FALSE otherwise.
@@ -709,10 +709,10 @@ function commerce_customer_profile_delete($profile_id, $entity_context = array()
  * @param $profile_ids
  *   An array of customer profile IDs to delete.
  * @param $entity_context
- *   An optional entity context array that specifies the entity throgh whose
+ *   An optional entity context array that specifies the entity through whose
  *   customer profile reference field the given profiles are being deleted:
- *   - entity_type: the type of entity
- *   - entity_id: the unique ID of the entity
+ *   - entity_type: The type of entity.
+ *   - entity_id: The unique ID of the entity.
  *
  * @return
  *   TRUE on success, FALSE otherwise.
