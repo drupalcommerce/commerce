@@ -8,7 +8,6 @@
 namespace Drupal\commerce_tax;
 
 use CommerceGuys\Tax\Model\TaxRateAmountInterface as ExternalTaxRateAmountInterface;
-use Drupal\commerce_tax\TaxRateInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**

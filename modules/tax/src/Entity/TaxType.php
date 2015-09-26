@@ -10,6 +10,7 @@ namespace Drupal\commerce_tax\Entity;
 use Drupal\address\ZoneInterface;
 use Drupal\commerce_tax\TaxTypeInterface;
 use Drupal\commerce_tax\TaxRateInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Tax\Enum\GenericLabel;
 
@@ -269,6 +270,22 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    */
   public function hasRate(TaxRateInterface $rate) {
     return array_search($rate, $this->rates) !== FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    // Delete all tax rates of each tax type.
+    foreach ($entities as $entity) {
+      if ($entity->hasRates()) {
+        $rateStorage = \Drupal::entityManager()->getStorage('commerce_tax_rate');
+        $rates = $rateStorage->loadMultiple($entity->getRates());
+        $rateStorage->delete($rates);
+      }
+    }
   }
 
 }

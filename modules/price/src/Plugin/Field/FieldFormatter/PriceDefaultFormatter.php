@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -141,6 +142,12 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
       $currency = $currencies[$item->currency_code];
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($item->amount, $currency),
+        '#cache' => [
+          'contexts' => [
+            'languages:' . LanguageInterface::TYPE_INTERFACE,
+            'country',
+          ],
+        ],
       ];
     }
 

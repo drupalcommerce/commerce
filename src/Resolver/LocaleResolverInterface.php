@@ -15,8 +15,8 @@ interface LocaleResolverInterface {
   /**
    * Resolves the locale.
    *
-   * @return string|null
-   *   The locale, if resolved. Otherwise NULL, indicating that the next
+   * @return \Drupal\commerce\Locale|null
+   *   The locale object, if resolved. Otherwise NULL, indicating that the next
    *   resolver in the chain should be called.
    */
   public function resolve();

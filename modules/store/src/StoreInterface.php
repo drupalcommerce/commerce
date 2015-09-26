@@ -36,18 +36,18 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   public function setName($name);
 
   /**
-   * Gets the store e-mail.
+   * Gets the store email.
    *
    * @return string
-   *   The store e-mail
+   *   The store email
    */
   public function getEmail();
 
   /**
-   * Sets the store e-mail.
+   * Sets the store email.
    *
    * @param string $mail
-   *   The store e-mail.
+   *   The store email.
    *
    * @return $this
    */

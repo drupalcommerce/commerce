@@ -7,8 +7,48 @@
 
 use Drupal\commerce_order\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_rebuild().
+ *
+ * Ensures the presence of a cart view mode for each purchasable entity type.
+ */
+function commerce_cart_rebuild() {
+  $entityTypes = \Drupal::service('entity.manager')->getDefinitions();
+  $entityTypes = array_filter($entityTypes, function ($entityType) {
+    return $entityType->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
+  });
+
+  foreach ($entityTypes as $entityType) {
+    if (!EntityViewMode::load($entityType->id() . '.cart')) {
+      EntityViewMode::create([
+        'id' => $entityType->id() . '.cart',
+        'targetEntityType' => $entityType->id(),
+        'label' => 'Cart',
+        'status' => TRUE,
+        'enabled' => TRUE,
+      ])->save();
+    }
+
+    $bundles = array_keys(\Drupal::service('entity.manager')->getBundleInfo($entityType->id()));
+    foreach ($bundles as $bundle) {
+      $displayId = $entityType->id() . '.' . $bundle . '.cart';
+      if (!EntityViewDisplay::load($displayId)) {
+        EntityViewDisplay::create([
+          'id' => $displayId,
+          'targetEntityType' => $entityType->id(),
+          'bundle' => $bundle,
+          'mode' => 'cart',
+          'status' => TRUE,
+        ])->save();
+      }
+    }
+  }
+}
 
 /**
  * Implements hook_entity_base_field_info().
