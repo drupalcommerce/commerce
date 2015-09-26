@@ -33,7 +33,8 @@ services:
     class: Drupal\commerce\AvailabilityManager
     tags:
       - { name: service_collector, tag: commerce.availability_checker, call: addChecker }
-  cache_context.commerce.country
+
+  cache_context.commerce.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
     arguments: ['@commerce.country_context']
     tags:
