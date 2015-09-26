@@ -92,6 +92,12 @@ class PricePlainFormatter extends FormatterBase implements ContainerFactoryPlugi
         '#theme' => 'commerce_price_plain',
         '#amount' => $item->amount,
         '#currency' => $currencies[$item->currency_code],
+        '#cache' => [
+          'contexts' => [
+            'languages:' . LanguageInterface::TYPE_INTERFACE,
+            'country',
+          ],
+        ],
       ];
     }
 
