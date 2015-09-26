@@ -8,6 +8,8 @@
 namespace Drupal\commerce\Cache\Context;
 
 use Drupal\commerce\CountryContext;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\Context\CacheContextInterface;
 
 /**
  * Defines the country cache context, for "per country" caching.
