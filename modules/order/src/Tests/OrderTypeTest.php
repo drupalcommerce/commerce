@@ -14,7 +14,7 @@ use Drupal\commerce_order\Entity\OrderType;
  *
  * @group commerce
  */
-class OrderTypeTest extends CommerceOrderTestBase {
+class OrderTypeTest extends OrderTestBase {
 
   /**
    * Tests if the default Order Type was created.
