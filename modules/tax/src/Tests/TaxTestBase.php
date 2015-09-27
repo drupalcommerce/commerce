@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of \Drupal\commerce_tax\Tests\CommerceTaxTestBase.
+ * Definition of \Drupal\commerce_tax\Tests\TaxTestBase.
  */
 
 namespace Drupal\commerce_tax\Tests;
@@ -12,7 +12,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines the base class for tax test cases.
  */
-abstract class CommerceTaxTestBase extends WebTestBase {
+abstract class TaxTestBase extends WebTestBase {
 
   /**
    * Modules to enable.
