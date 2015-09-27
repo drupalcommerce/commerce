@@ -15,7 +15,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
  *
  * @group commerce
  */
-class ProductAdminTest extends CommerceProductTestBase {
+class ProductAdminTest extends ProductTestBase {
 
   /**
    * Tests creating a product via the admin.
