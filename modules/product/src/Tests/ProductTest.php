@@ -15,7 +15,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
  *
  * @group commerce
  */
-class ProductTest extends CommerceProductTestBase {
+class ProductTest extends ProductTestBase {
 
   /**
    * Tests deleting a product.

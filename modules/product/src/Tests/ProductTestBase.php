@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of \Drupal\commerce_product\Tests\CommerceProductTestBase.
+ * Definition of \Drupal\commerce_product\Tests\ProductTestBase.
  */
 
 namespace Drupal\commerce_product\Tests;
@@ -13,7 +13,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines base class for shortcut test cases.
  */
-abstract class CommerceProductTestBase extends WebTestBase {
+abstract class ProductTestBase extends WebTestBase {
 
   /**
    * Modules to enable.

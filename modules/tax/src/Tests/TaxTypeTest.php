@@ -13,7 +13,7 @@ use Drupal\commerce_tax\Entity\TaxType;
  *
  * @group commerce
  */
-class TaxTypeTest extends CommerceTaxTestBase {
+class TaxTypeTest extends TaxTestBase {
   /**
    * Checks that the tax types forms exist.
    */

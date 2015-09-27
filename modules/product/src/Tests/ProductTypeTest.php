@@ -14,7 +14,7 @@ use Drupal\commerce_product\Entity\ProductType;
  *
  * @group commerce
  */
-class ProductTypeTest extends CommerceProductTestBase {
+class ProductTypeTest extends ProductTestBase {
 
   /**
    * Tests whether the default product type was created.
