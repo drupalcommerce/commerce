@@ -80,7 +80,7 @@ class PricePlainFormatter extends FormatterBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $currencyCodes = [];
     foreach ($items as $delta => $item) {
       $currencyCodes[] = $item->currency_code;
