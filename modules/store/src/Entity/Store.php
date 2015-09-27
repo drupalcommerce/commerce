@@ -9,8 +9,7 @@ namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\address\AddressInterface;
-use Drupal\commerce_price\CurrencyInterface;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;

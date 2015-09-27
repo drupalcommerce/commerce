@@ -8,8 +8,6 @@
 namespace Drupal\commerce_store\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\commerce_store\StoreTypeInterface;
-use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the Commerce Store Type entity type.

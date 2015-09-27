@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_store\StoreInterface.
+ * Contains \Drupal\commerce_store\Entity\StoreInterface.
  */
 
-namespace Drupal\commerce_store;
+namespace Drupal\commerce_store\Entity;
 
-use Drupal\commerce_price\CurrencyInterface;
 use Drupal\address\AddressInterface;
+use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
@@ -56,7 +56,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   /**
    * Gets the default store currency.
    *
-   * @return \Drupal\commerce_price\CurrencyInterface
+   * @return \Drupal\commerce_price\Entity\CurrencyInterface
    *   The default store currency.
    */
   public function getDefaultCurrency();
@@ -64,7 +64,7 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   /**
    * Sets the default store currency.
    *
-   * @param \Drupal\commerce_price\CurrencyInterface $currency
+   * @param \Drupal\commerce_price\Entity\CurrencyInterface $currency
    *   The default store currency.
    *
    * @return $this

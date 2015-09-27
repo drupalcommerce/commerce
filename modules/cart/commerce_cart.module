@@ -5,7 +5,7 @@
  * Implements the shopping cart system and add to cart features.
  */
 
-use Drupal\commerce_order\OrderInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;

@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_product\Event;
 
-use Drupal\commerce_product\ProductInterface;
+use Drupal\commerce_product\Entity\ProductInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,14 +20,14 @@ class ProductEvent extends Event {
   /**
    * The product.
    *
-   * @var \Drupal\commerce_product\ProductInterface
+   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
 
   /**
    * Constructs a new ProductEvent.
    *
-   * @param \Drupal\commerce_product\ProductInterface $product
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
    *   The product.
    */
   public function __construct(ProductInterface $product) {
@@ -37,7 +37,7 @@ class ProductEvent extends Event {
   /**
    * The product the event refers to.
    *
-   * @return \Drupal\commerce_product\ProductInterface
+   * @return \Drupal\commerce_product\Entity\ProductInterface
    */
   public function getProduct() {
     return $this->product;

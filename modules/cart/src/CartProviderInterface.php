@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_cart;
 
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -22,12 +22,12 @@ interface CartProviderInterface {
    *
    * @param string $orderType
    *   The order type id.
-   * @param \Drupal\commerce_store\StoreInterface $store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
-   * @return \Drupal\commerce_order\OrderInterface
+   * @return \Drupal\commerce_order\Entity\OrderInterface
    *   The created cart order.
    *
    * @throws \Drupal\commerce_cart\Exception\DuplicateCartException
@@ -40,12 +40,12 @@ interface CartProviderInterface {
    *
    * @param string $orderType
    *   The order type id.
-   * @param \Drupal\commerce_store\StoreInterface $store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
-   * @return \Drupal\commerce_order\OrderInterface|null
+   * @return \Drupal\commerce_order\Entity\OrderInterface|null
    *   The cart order, or NULL if none found.
    */
   public function getCart($orderType, StoreInterface $store, AccountInterface $account = NULL);
@@ -55,7 +55,7 @@ interface CartProviderInterface {
    *
    * @param string $orderType
    *   The order type id.
-   * @param \Drupal\commerce_store\StoreInterface $store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
@@ -71,7 +71,7 @@ interface CartProviderInterface {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
-   * @return \Drupal\commerce_order\OrderInterface[]
+   * @return \Drupal\commerce_order\Entity\OrderInterface[]
    *   A list of cart orders.
    */
   public function getCarts(AccountInterface $account = NULL);
