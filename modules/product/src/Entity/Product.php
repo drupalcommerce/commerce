@@ -115,13 +115,6 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getStores() {
     $stores = [];
     foreach ($this->get('stores') as $storeItem) {
