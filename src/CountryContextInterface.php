@@ -17,7 +17,7 @@ interface CountryContextInterface {
   /**
    * Gets the country for the current request.
    *
-   * @return \Drupal\commerce\CountryInterface
+   * @return \Drupal\commerce\Country
    */
   public function getCountry();
 

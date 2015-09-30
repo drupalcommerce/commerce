@@ -22,13 +22,13 @@ function commerce_price_field_views_data(FieldStorageConfigInterface $field_stor
       'id' => 'numeric',
       'field_name' => $table_data[$field_name]['field']['field_name'],
       'entity_type' => $table_data[$field_name]['field']['entity_type'],
-      'label' => t('amount from !field_name', ['!field_name' => $field_name]),
+      'label' => t('amount from @field_name', ['@field_name' => $field_name]),
     ];
     $data[$table_name][$field_name . '_currency_code']['field'] = [
       'id' => 'standard',
       'field_name' => $table_data[$field_name]['field']['field_name'],
       'entity_type' => $table_data[$field_name]['field']['entity_type'],
-      'label' => t('currency from !field_name', ['!field_name' => $field_name]),
+      'label' => t('currency from @field_name', ['@field_name' => $field_name]),
     ];
   }
   return $data;

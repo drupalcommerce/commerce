@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_product\Event;
 
-use Drupal\commerce_product\ProductVariationInterface;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,14 +20,14 @@ class ProductVariationEvent extends Event {
   /**
    * The product variation.
    *
-   * @var \Drupal\commerce_product\ProductVariationInterface
+   * @var \Drupal\commerce_product\Entity\ProductVariationInterface
    */
   protected $productVariation;
 
   /**
    * Constructs a new ProductVariationEvent.
    *
-   * @param \Drupal\commerce_product\ProductVariationInterface $productVariation
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $productVariation
    *   The product variation.
    */
   public function __construct(ProductVariationInterface $productVariation) {
@@ -37,7 +37,7 @@ class ProductVariationEvent extends Event {
   /**
    * The product variation the event refers to.
    *
-   * @return \Drupal\commerce_product\ProductVariationInterface
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
    */
   public function getProductVariation() {
     return $this->productVariation;

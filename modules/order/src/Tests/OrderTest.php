@@ -15,7 +15,7 @@ use Drupal\commerce_order\Entity\LineItem;
  *
  * @group commerce
  */
-class OrderTest extends CommerceOrderTestBase {
+class OrderTest extends OrderTestBase {
 
   /**
    * Tests creating an order programaticaly and through the UI.

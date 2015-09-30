@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -129,7 +130,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $currencyCodes = [];
     foreach ($items as $delta => $item) {
       $currencyCodes[] = $item->currency_code;
@@ -141,6 +142,12 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
       $currency = $currencies[$item->currency_code];
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($item->amount, $currency),
+        '#cache' => [
+          'contexts' => [
+            'languages:' . LanguageInterface::TYPE_INTERFACE,
+            'country',
+          ],
+        ],
       ];
     }
 

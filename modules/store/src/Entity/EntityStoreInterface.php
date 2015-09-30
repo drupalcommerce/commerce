@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_store\EntityStoreInterface.
+ * Contains \Drupal\commerce_store\Entity\EntityStoreInterface.
  */
 
-namespace Drupal\commerce_store;
+namespace Drupal\commerce_store\Entity;
 
 /**
  * Defines a common interface for entities that belong to a store.
@@ -15,7 +15,7 @@ interface EntityStoreInterface {
   /**
    * Gets the store.
    *
-   * @return \Drupal\commerce_store\StoreInterface|null
+   * @return \Drupal\commerce_store\Entity\StoreInterface|null
    *   The store entity, or null.
    */
   public function getStore();
@@ -23,7 +23,7 @@ interface EntityStoreInterface {
   /**
    * Sets the store.
    *
-   * @return \Drupal\commerce_store\StoreInterface $store
+   * @return \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store entity.
    *
    * @return $this

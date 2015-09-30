@@ -9,7 +9,6 @@ namespace Drupal\commerce_payment\Entity;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\commerce_payment\PaymentTransactionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**

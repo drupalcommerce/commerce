@@ -8,7 +8,6 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_order\LineItemInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -151,13 +150,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
   }
 
   /**

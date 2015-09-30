@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order\Event;
 
-use Drupal\commerce_order\OrderInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,14 +20,14 @@ class OrderEvent extends Event {
   /**
    * The order.
    *
-   * @var \Drupal\commerce_order\OrderInterface
+   * @var \Drupal\commerce_order\Entity\OrderInterface
    */
   protected $order;
 
   /**
    * Constructs a new OrderEvent.
    *
-   * @param \Drupal\commerce_order\OrderInterface $order
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
    */
   public function __construct(OrderInterface $order) {
@@ -37,7 +37,7 @@ class OrderEvent extends Event {
   /**
    * The order the event refers to.
    *
-   * @return \Drupal\commerce_order\OrderInterface
+   * @return \Drupal\commerce_order\Entity\OrderInterface
    */
   public function getOrder() {
     return $this->order;

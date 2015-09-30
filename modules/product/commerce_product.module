@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Store id can't be a base field because the Views integration is broken.
  * Instead, it is created as a configurable field for each order type.
  *
- * @param \Drupal\commerce_product\ProductTypeInterface $product_type
+ * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
 function commerce_product_add_stores_field($product_type) {
@@ -63,7 +63,7 @@ function commerce_product_add_stores_field($product_type) {
 /**
  * Adds the default body field to a product type.
  *
- * @param \Drupal\commerce_product\ProductTypeInterface $product_type
+ * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  * @param string $label
  *   (optional) The label for the body instance. Defaults to 'Body'.
@@ -111,7 +111,7 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
  * Variations can't be a base field because the Views integration is broken.
  * Instead, it is created as a configurable field for each product type.
  *
- * @param \Drupal\commerce_product\ProductTypeInterface $product_type
+ * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
 function commerce_product_add_variations_field($product_type) {

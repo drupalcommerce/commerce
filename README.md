@@ -18,20 +18,21 @@ Installation
 
 Preparation:
 
-1.  Install the -dev versions of Drupal 8 and [composer_manager](https://drupal.org/project/composer_manager).
-2. Initialize composer_manager* (`drush composer-manager-init` or `php modules/composer_manager/scripts/init.sh`).
+1. Download the -dev versions of Drupal 8 and [composer_manager](https://drupal.org/project/composer_manager) into your
+   `modules` directory.
 
-With Drush:
+2. From the Drupal root directory, initialize composer_manager,* and run it for the first time:
 
-`drush dl commerce && drush en -y commerce commerce_order commerce_product commerce_tax`
+   ```sh
+   php modules/composer_manager/scripts/init.php
+   composer drupal-install
+   ```
 
-(Drush dl runs `composer drupal-update` automatically).
+3. Enable the Commerce modules, e.g.:
 
-Without Drush:
-
-1. Download Commerce to your modules directory.
-2. Inside your core/ directory run `composer drupal-update`. This will download the Commerce libraries.
-3. Enable the Commerce modules.
+   ```sh
+   drush en -y commerce commerce_order commerce_product commerce_tax
+   ```
 
 Notes:
 - * Find out more about composer_manager usage [here](https://www.drupal.org/node/2405811).

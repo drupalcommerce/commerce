@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\OrderInterface.
+ * Contains \Drupal\commerce_order\Entity\OrderInterface.
  */
 
-namespace Drupal\commerce_order;
+namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_store\EntityStoreInterface;
+use Drupal\commerce_store\Entity\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -134,7 +134,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setHostname($hostname);
 
   /**
-   * Gets the e-mail address associated with the order.
+   * Gets the email address associated with the order.
    *
    * @return string
    *   The order mail.
@@ -145,7 +145,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * Sets the order mail.
    *
    * @param string $mail
-   *   The e-mail address associated with the order.
+   *   The email address associated with the order.
    *
    * @return $this
    */

@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_product\Event;
 
-use Drupal\commerce_product\ProductInterface;
+use Drupal\commerce_product\Entity\ProductInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class FilterVariationsEvent extends Event {
@@ -15,7 +15,7 @@ class FilterVariationsEvent extends Event {
   /**
    * The parent product.
    *
-   * @var \Drupal\commerce_product\ProductInterface
+   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
 
@@ -29,7 +29,7 @@ class FilterVariationsEvent extends Event {
   /**
    * Constructs a new FilterVariationsEvent object.
    *
-   * @param \Drupal\commerce_product\ProductInterface $product
+   * @param \Drupal\commerce_product\Entity\ProductInterface $product
    *   The product.
    * @param array $variations
    *   The enabled variations.
@@ -56,4 +56,5 @@ class FilterVariationsEvent extends Event {
   public function getVariations() {
     return $this->variations;
   }
+
 }

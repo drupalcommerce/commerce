@@ -7,8 +7,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce_order\OrderInterface;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -179,13 +178,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
   }
 
   /**
@@ -389,7 +381,7 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
-      ->setDescription(t('The e-mail address associated with the order.'))
+      ->setDescription(t('The email address associated with the order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [

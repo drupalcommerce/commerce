@@ -124,7 +124,7 @@ class TaxRateForm extends EntityForm {
         'type' => $form_state->getValue('type'),
       ]);
       foreach ($loadedTaxRates as $rate) {
-        if ($rate->getId() !== $taxRate->getId() && $rate->isDefault()) {
+        if ($rate->getId() !== $taxRate->getOriginalId() && $rate->isDefault()) {
           $form_state->setError($element, $this->t('Tax rate %label is already the default.', [
             '%label' => $rate->label(),
           ]));

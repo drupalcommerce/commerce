@@ -9,8 +9,7 @@ namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\address\AddressInterface;
-use Drupal\commerce_price\CurrencyInterface;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -261,8 +260,8 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setRequired(TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('E-mail address'))
-      ->setDescription(t('Store e-mail notifications will be sent to and from this address.'))
+      ->setLabel(t('Email address'))
+      ->setDescription(t('Store email notifications will be sent to and from this address.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'email_default',

@@ -8,6 +8,7 @@
 namespace Drupal\commerce\Resolver;
 
 use Drupal\commerce\CountryContextInterface;
+use Drupal\commerce\Locale;
 use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
@@ -64,7 +65,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface {
       $locale = $language;
     }
 
-    return $locale;
+    return new Locale($locale);
   }
 
 }
