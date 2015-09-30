@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_product\ProductVariationInterface.
+ * Contains \Drupal\commerce_product\Entity\ProductVariationInterface.
  */
 
-namespace Drupal\commerce_product;
+namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -27,7 +27,7 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   /**
    * Gets the parent product.
    *
-   * @return \Drupal\commerce_product\ProductInterface|null
+   * @return ProductInterface|null
    *   The product entity, or null.
    */
   public function getProduct();

@@ -14,7 +14,7 @@ use Drupal\commerce_order\Entity\Order;
  *
  * @group commerce
  */
-class OrderAdminTest extends CommerceOrderTestBase {
+class OrderAdminTest extends OrderTestBase {
 
   /**
    * Tests creating a Order programaticaly and through the add form.

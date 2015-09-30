@@ -14,7 +14,7 @@ use Drupal\commerce_product\Entity\ProductVariationType;
  *
  * @group commerce
  */
-class ProductVariationTypeTest extends CommerceProductTestBase {
+class ProductVariationTypeTest extends ProductTestBase {
 
   /**
    * Tests whether the default product variation type was created.

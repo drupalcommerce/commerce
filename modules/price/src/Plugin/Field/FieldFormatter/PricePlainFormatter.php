@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -79,7 +80,7 @@ class PricePlainFormatter extends FormatterBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $currencyCodes = [];
     foreach ($items as $delta => $item) {
       $currencyCodes[] = $item->currency_code;
@@ -92,6 +93,12 @@ class PricePlainFormatter extends FormatterBase implements ContainerFactoryPlugi
         '#theme' => 'commerce_price_plain',
         '#amount' => $item->amount,
         '#currency' => $currencies[$item->currency_code],
+        '#cache' => [
+          'contexts' => [
+            'languages:' . LanguageInterface::TYPE_INTERFACE,
+            'country',
+          ],
+        ],
       ];
     }
 

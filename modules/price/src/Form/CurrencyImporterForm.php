@@ -71,7 +71,7 @@ class CurrencyImporterForm extends FormBase {
   /**
    * Gets an options list for currencies.
    *
-   * @param \Drupal\commerce_price\CurrencyInterface[] $currencies
+   * @param \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies
    *   An array of currencies.
    *
    * @return array

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_order\LineItemTypeInterface.
+ * Contains \Drupal\commerce_order\Entity\LineItemTypeInterface.
  */
 
-namespace Drupal\commerce_order;
+namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 

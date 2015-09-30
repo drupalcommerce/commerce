@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_order\Event;
 
-use Drupal\commerce_order\LineItemInterface;
+use Drupal\commerce_order\Entity\LineItemInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,14 +20,14 @@ class LineItemEvent extends Event {
   /**
    * The line item.
    *
-   * @var \Drupal\commerce_order\LineItemInterface
+   * @var \Drupal\commerce_order\Entity\LineItemInterface
    */
   protected $lineItem;
 
   /**
    * Constructs a new LineItemEvent.
    *
-   * @param \Drupal\commerce_order\LineItemInterface $lineItem
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $lineItem
    *   The line item.
    */
   public function __construct(LineItemInterface $lineItem) {
@@ -37,7 +37,7 @@ class LineItemEvent extends Event {
   /**
    * The line item the event refers to.
    *
-   * @return \Drupal\commerce_order\LineItemInterface
+   * @return \Drupal\commerce_order\Entity\LineItemInterface
    */
   public function getLineItem() {
     return $this->lineItem;

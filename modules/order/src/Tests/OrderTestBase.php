@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of \Drupal\commerce_order\Tests\CommerceOrderTestBase.
+ * Definition of \Drupal\commerce_order\Tests\OrderTestBase.
  */
 
 namespace Drupal\commerce_order\Tests;
@@ -16,7 +16,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Defines base class for commerce_order test cases.
  */
-abstract class CommerceOrderTestBase extends WebTestBase {
+abstract class OrderTestBase extends WebTestBase {
 
   /**
    * The variation to test against

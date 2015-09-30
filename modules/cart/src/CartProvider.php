@@ -7,9 +7,8 @@
 
 namespace Drupal\commerce_cart;
 
-use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_cart\Exception\DuplicateCartException;
-use Drupal\commerce_store\StoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 

@@ -17,8 +17,8 @@ php:
   - hhvm
 
 branches:
-  only:
-    - "8.x-2.x"
+  except:
+    - "7.x-1.x"
 
 matrix:
   fast_finish: true

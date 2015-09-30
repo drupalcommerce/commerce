@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\commerce_product\ProductInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -111,13 +110,6 @@ class Product extends ContentEntityBase implements ProductInterface {
   public function setCreatedTime($timestamp) {
     $this->set('created', $timestamp);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
   }
 
   /**

@@ -8,6 +8,7 @@
 namespace Drupal\commerce\Resolver;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\commerce\Country;
 
 /**
  * Returns the site's default country.
@@ -35,7 +36,8 @@ class DefaultCountryResolver implements CountryResolverInterface {
    * {@inheritdoc}
    */
   public function resolve() {
-    return $this->configFactory->get('system.date')->get('country.default');
+    $countryCode = $this->configFactory->get('system.date')->get('country.default');
+    return new Country($countryCode);
   }
 
 }

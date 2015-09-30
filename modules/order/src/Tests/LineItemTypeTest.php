@@ -14,7 +14,7 @@ use Drupal\commerce_order\Entity\LineItemType;
  *
  * @group commerce
  */
-class LineItemTypeTest extends CommerceOrderTestBase {
+class LineItemTypeTest extends OrderTestBase {
 
   /**
    * Tests creating a line item type programmatically and through the add form.
