@@ -33,11 +33,6 @@ class CartProviderTest extends UnitTestCase {
   protected $entityManager;
 
   /**
-   * @var \Drupal\user\UserInterface
-   */
-  protected $mockAccountBuilder;
-
-  /**
    * @var \Drupal\commerce_cart\CartSessionInterface
    */
   protected $mockCartSessionBuilder;
@@ -48,9 +43,24 @@ class CartProviderTest extends UnitTestCase {
   protected $mockOrderBuilder;
 
   /**
+   * @var \Drupal\user\UserInterface
+   */
+  protected $registeredUser;
+
+  /**
+   * @var \Drupal\user\UserInterface
+   */
+  protected $anonymousUser;
+
+  /**
    * @var string
    */
-  protected $orderType;
+  protected $firstOrderType;
+
+  /**
+   * @var string
+   */
+  protected $secondOrderType;
 
   /**
    * {@inheritdoc}
@@ -58,7 +68,30 @@ class CartProviderTest extends UnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->mockAccountBuilder = $this->getMockBuilder('Drupal\user\UserInterface');
+    $mockAccountBuilder = $this->getMockBuilder('Drupal\user\UserInterface');
+
+    $this->anonymousUser = $mockAccountBuilder->getMock();
+    $this->anonymousUser->expects($this->any())
+      ->method('isAuthenticated')
+      ->willReturn(FALSE);
+    $this->anonymousUser->expects($this->any())
+      ->method('isAnonymous')
+      ->willReturn(TRUE);
+    $this->anonymousUser->expects($this->any())
+      ->method('id')
+      ->willReturn(1);
+
+    $this->registeredUser = $mockAccountBuilder->getMock();
+    $this->registeredUser->expects($this->any())
+      ->method('isAuthenticated')
+      ->willReturn(TRUE);
+    $this->registeredUser->expects($this->any())
+      ->method('isAnonymous')
+      ->willReturn(FALSE);
+    $this->registeredUser->expects($this->any())
+      ->method('id')
+      ->willReturn(1);
+
     $this->mockCartSessionBuilder = $this->getMockBuilder('Drupal\commerce_cart\CartSessionInterface');
 
     // Entity storage mock for mocking the api functions for getting entity mocks
@@ -93,15 +126,37 @@ class CartProviderTest extends UnitTestCase {
       ->method('id')
       ->willReturn(1);
 
-    $this->orderType = 'default';
+    $this->firstOrderType = 'default';
+    $this->secondOrderType = 'randomOrderType';
 
-    // TODO: getCartIds is used for two situations, one to validate cart
-    // does not exist and to load them. How do we differentiate between these
-    // two situations?
+    $this->firstOrder = $this->mockOrderBuilder->getMock();
+    $this->firstOrder->expects($this->any())
+      ->method('getOwnerId')
+      ->willReturn($this->anonymousUser->id());
+    $this->firstOrder->expects($this->any())
+      ->method('getType')
+      ->willReturn($this->firstOrderType);
+    $this->firstOrder->expects($this->any())
+      ->method('getStoreId')
+      ->willReturn($this->store->id());
+    $this->firstOrder->expects($this->any())
+      ->method('id')
+      ->willReturn(1);
 
-    // Split up in different tests? Create/Get
+    $this->secondOrder = $this->mockOrderBuilder->getMock();
+    $this->secondOrder->expects($this->any())
+      ->method('getOwnerId')
+      ->willReturn($this->registeredUser->id());
+    $this->secondOrder->expects($this->any())
+      ->method('getType')
+      ->willReturn($this->secondOrderType);
+    $this->secondOrder->expects($this->any())
+      ->method('getStoreId')
+      ->willReturn($this->store->id());
+    $this->secondOrder->expects($this->any())
+      ->method('id')
+      ->willReturn(2);
 
-    // TODO: Look into prophecy for phpunit
   }
 
   /**
@@ -109,35 +164,11 @@ class CartProviderTest extends UnitTestCase {
    * ::covers getCart
    */
   public function testCreateAnonymousUserCartProvider() {
-    $anonymousUser = $this->mockAccountBuilder->getMock();
-    $anonymousUser->expects($this->any())
-      ->method('isAuthenticated')
-      ->willReturn(FALSE);
-    $anonymousUser->expects($this->any())
-      ->method('isAnonymous')
-      ->willReturn(TRUE);
-    $anonymousUser->expects($this->any())
-      ->method('id')
-      ->willReturn(0);
-
-    $firstOrder = $this->mockOrderBuilder->getMock();
-    $firstOrder->expects($this->any())
-      ->method('getOwnerId')
-      ->willReturn($anonymousUser->id());
-    $firstOrder->expects($this->any())
-      ->method('getType')
-      ->willReturn($this->orderType);
-    $firstOrder->expects($this->any())
-      ->method('getStoreId')
-      ->willReturn($this->store->id());
-    $firstOrder->expects($this->any())
-      ->method('id')
-      ->willReturn(1);
 
     // Make sure the create returns an order.
     $this->orderStorage->expects($this->any())
       ->method('create')
-      ->willReturn($firstOrder);
+      ->willReturn($this->firstOrder);
 
     // Empty result query for the first query
     $this->query->expects($this->any())
@@ -151,48 +182,23 @@ class CartProviderTest extends UnitTestCase {
       ->willReturn(array());
 
     // This is what we want to test.
-    $cartProvider = new CartProvider($this->entityManager, $anonymousUser, $cartSession);
+    $cartProvider = new CartProvider($this->entityManager, $this->anonymousUser, $cartSession);
 
     // Test creating the cart for the anonymous user.
-    $cart = $cartProvider->createCart($this->orderType, $this->store, $anonymousUser);
+    $cart = $cartProvider->createCart($this->firstOrderType, $this->store, $this->anonymousUser);
     $this->assertInstanceOf('OrderInterface', $cart, 'The cart is created for an anonymous user if createCart returns an Order entity.');
 
     // Test creating the cart for the anonymous user.
-    $cart = $cartProvider->createCart($this->orderType, $this->store, $anonymousUser);
+    $cart = $cartProvider->createCart($this->firstOrderType, $this->store, $this->anonymousUser);
     $this->assertFalse($cart, 'The cart is created for an anonymous user if createCart returns an Order entity.');
-
   }
 
   public function testCreateRegisteredUserCartProvider() {
-    $registeredUser = $this->mockAccountBuilder->getMock();
-    $registeredUser->expects($this->any())
-      ->method('isAuthenticated')
-      ->willReturn(TRUE);
-    $registeredUser->expects($this->any())
-      ->method('isAnonymous')
-      ->willReturn(FALSE);
-    $registeredUser->expects($this->any())
-      ->method('id')
-      ->willReturn(1);
-
-    $firstOrder = $this->mockOrderBuilder->getMock();
-    $firstOrder->expects($this->any())
-      ->method('getOwnerId')
-      ->willReturn($registeredUser->id());
-    $firstOrder->expects($this->any())
-      ->method('getType')
-      ->willReturn($this->orderType);
-    $firstOrder->expects($this->any())
-      ->method('getStoreId')
-      ->willReturn($this->store->id());
-    $firstOrder->expects($this->any())
-      ->method('id')
-      ->willReturn(1);
 
     // Make sure the create returns an order.
     $this->orderStorage->expects($this->any())
       ->method('create')
-      ->willReturn($firstOrder);
+      ->willReturn($this->firstOrder);
 
     // Empty result query for the first query
     $this->query->expects($this->any())
@@ -203,70 +209,31 @@ class CartProviderTest extends UnitTestCase {
     $cartSession = $this->mockCartSessionBuilder->getMock();
 
     // This is what we want to test.
-    $cartProvider = new CartProvider($this->entityManager, $registeredUser, $cartSession);
+    $cartProvider = new CartProvider($this->entityManager, $this->registeredUser, $cartSession);
 
     // Test creating the cart for the anonymous user.
-    $cart = $cartProvider->createCart($this->orderType, $this->store, $registeredUser);
+    $cart = $cartProvider->createCart($this->firstOrderType, $this->store, $this->registeredUser);
     $this->assertInstanceOf('OrderInterface', $cart, 'The cart is created for an anonymous user if createCart returns an Order entity.');
 
     // Test creating the cart for the anonymous user.
-    $cart = $cartProvider->createCart($this->orderType, $this->store, $registeredUser);
+    $cart = $cartProvider->createCart($this->firstOrderType, $this->store, $this->registeredUser);
     $this->assertFalse($cart, 'The cart is created for an anonymous user if createCart returns an Order entity.');
 
   }
 
   public function testGetRegisteredUserCartProvider() {
-    $randomOrderType = 'randomOrderType';
-
-    $registeredUser = $this->mockAccountBuilder->getMock();
-    $registeredUser->expects($this->any())
-      ->method('isAuthenticated')
-      ->willReturn(TRUE);
-    $registeredUser->expects($this->any())
-      ->method('isAnonymous')
-      ->willReturn(FALSE);
-    $registeredUser->expects($this->any())
-      ->method('id')
-      ->willReturn(1);
-
-    $firstOrder = $this->mockOrderBuilder->getMock();
-    $firstOrder->expects($this->any())
-      ->method('getOwnerId')
-      ->willReturn($registeredUser->id());
-    $firstOrder->expects($this->any())
-      ->method('getType')
-      ->willReturn($this->orderType);
-    $firstOrder->expects($this->any())
-      ->method('getStoreId')
-      ->willReturn($this->store->id());
-    $firstOrder->expects($this->any())
-      ->method('id')
-      ->willReturn(1);
-
-    $secondOrder = $this->mockOrderBuilder->getMock();
-    $secondOrder->expects($this->any())
-      ->method('getOwnerId')
-      ->willReturn($registeredUser->id());
-    $secondOrder->expects($this->any())
-      ->method('getType')
-      ->willReturn($randomOrderType);
-    $secondOrder->expects($this->any())
-      ->method('getStoreId')
-      ->willReturn($this->store->id());
-    $secondOrder->expects($this->any())
-      ->method('id')
-      ->willReturn(2);
 
     $orders = [
-      $firstOrder->id() => $firstOrder,
-      $secondOrder->id()=> $secondOrder
+      $this->firstOrder->id() => $this->firstOrder,
+      $this->secondOrder->id() => $this->secondOrder
     ];
 
+    // TODO: Mock order storage to one without and one with orders
     // Make sure the load returns an order.
     $this->orderStorage->expects($this->any())
       ->method('load')
-      ->with($firstOrder->id())
-      ->willReturn($firstOrder);
+      ->with($this->firstOrder->id())
+      ->willReturn($this->firstOrder);
 
     // Make sure the create returns an order.
     $this->orderStorage->expects($this->any())
@@ -274,6 +241,7 @@ class CartProviderTest extends UnitTestCase {
       ->with(array_keys($orders))
       ->willReturn($orders);
 
+    // TODO: Mock query to one with and without orders
     // Empty result query for the first query
     $this->query->expects($this->any())
       ->method('execute')
@@ -283,14 +251,22 @@ class CartProviderTest extends UnitTestCase {
     $cartSession = $this->mockCartSessionBuilder->getMock();
 
     // This is what we want to test.
-    $cartProvider = new CartProvider($this->entityManager, $registeredUser, $cartSession);
+    $cartProvider = new CartProvider($this->entityManager, $this->registeredUser, $cartSession);
 
-    $cart = $cartProvider->getCart($this->orderType, $this->store, $registeredUser);
-    $cart_id = $cartProvider->getCartId($this->orderType, $this->store, $registeredUser);
-    // TODO: Validate the results!
+    $cart = $cartProvider->getCart($this->firstOrderType, $this->store, $this->registeredUser);
+    $this->assertInstanceOf('OrderInterface', $cart, 'The cart is created for an anonymous user if createCart returns an Order entity.');
 
-    $carts = $cartProvider->getCarts($registeredUser);
-    $cart_ids = $cartProvider->getCartIds($registeredUser);
+    $cart_id = $cartProvider->getCartId($this->firstOrderType, $this->store, $this->registeredUser);
+    $this->assertInternalType('int', $cart_id, '');
+    $this->assertEquals(1, $cart_id, '');
+
+    $carts = $cartProvider->getCarts($this->registeredUser);
+    $this->assertContainsOnlyInstancesOf('OrderInterface', $carts, '');
+
+    $cart_ids = $cartProvider->getCartIds($this->registeredUser);
+    $this->assertContainsOnly('int', $cart_ids, '');
+    $this->assertContainsOnly(1, $cart_ids, '');
+    $this->assertContainsOnly(2, $cart_ids, '');
   }
 
 }
