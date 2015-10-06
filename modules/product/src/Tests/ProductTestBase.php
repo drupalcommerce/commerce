@@ -54,6 +54,7 @@ abstract class ProductTestBase extends WebTestBase {
 
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
+    $this->drupalPlaceBlock('page_title_block');
 
     $this->adminUser = $this->drupalCreateUser([
       'administer products',
