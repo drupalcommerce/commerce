@@ -1,0 +1,2 @@
+cart_page:
+  view: commerce_cart_form

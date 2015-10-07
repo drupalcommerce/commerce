@@ -8,3 +8,15 @@ commerce_order.commerce_order_type.*.third_party.commerce_cart:
     refresh_frequency:
         type: integer
         label: 'Shopping cart refresh frequency'
+
+commerce_cart.settings:
+  type: config_object
+  label: 'Commerce Cart settings'
+  mapping:
+    cart_page:
+      type: mapping
+      label: 'Cart page settings'
+      mapping:
+        view:
+          type: string
+          label: 'Shopping cart view'

@@ -8,4 +8,5 @@ dependencies:
   - commerce_order
   - commerce_product
 config_devel:
+  - commerce_cart.settings
   - views.view.commerce_cart_form
