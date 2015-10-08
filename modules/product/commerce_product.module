@@ -141,7 +141,7 @@ function commerce_product_add_variations_field($product_type) {
         'handler' => 'default',
         'handler_settings' => [
           'target_bundles' => [
-            $product_type->getVariationType(),
+            $product_type->id() => $product_type->id(),
           ],
         ],
       ],

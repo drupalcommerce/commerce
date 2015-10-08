@@ -42,7 +42,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->will($this->returnValue('RS'));
 
     $resolver = new DefaultLocaleResolver($languageManager, $countryContext);
-    $this->assertEquals('sr-RS', $resolver->resolve());
+    $this->assertEquals('SR-RS', $resolver->resolve());
   }
 
   /**
@@ -54,7 +54,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->getMock();
     $language->expects($this->once())
       ->method('getId')
-      ->will($this->returnValue('pt-br'));
+      ->will($this->returnValue('PT-BR'));
 
     $languageManager = $this->getMockBuilder('\Drupal\Core\Language\LanguageManagerInterface')
       ->disableOriginalConstructor()
@@ -68,7 +68,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->getMock();
 
     $resolver = new DefaultLocaleResolver($languageManager, $countryContext);
-    $this->assertEquals('pt-br', $resolver->resolve());
+    $this->assertEquals('PT-BR', $resolver->resolve());
   }
 
   /**
@@ -80,7 +80,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->getMock();
     $language->expects($this->once())
       ->method('getId')
-      ->will($this->returnValue('sr'));
+      ->will($this->returnValue('SR'));
 
     $languageManager = $this->getMockBuilder('\Drupal\Core\Language\LanguageManagerInterface')
       ->disableOriginalConstructor()
@@ -97,7 +97,7 @@ class DefaultLocaleResolverTest extends UnitTestCase {
       ->will($this->returnValue(NULL));
 
     $resolver = new DefaultLocaleResolver($languageManager, $countryContext);
-    $this->assertEquals('sr', $resolver->resolve());
+    $this->assertEquals('SR', $resolver->resolve());
   }
 
 }
