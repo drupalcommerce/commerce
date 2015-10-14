@@ -538,6 +538,27 @@ class CommerceCustomerUITest extends CommerceBaseTestCase {
   }
 
   /**
+   * Delete multiple profiles with and without orders attached.
+   */
+  public function testCommerceCustomerDeleteProfilesWithOrderReference() {
+    // Create 2 new customer profiles.
+    $profile_with_order = $this->createDummyCustomerProfile('billing', $this->store_customer->uid);
+    $this->createDummyOrder($this->store_customer->uid, array(), 'pending', $profile_with_order->profile_id);
+    $profile_without_order = $this->createDummyCustomerProfile('billing', $this->store_customer->uid);
+
+    $profile_ids = array($profile_with_order->profile_id, $profile_without_order->profile_id);
+
+    // Delete the profiles we can.
+    commerce_customer_profile_delete_multiple($profile_ids);
+
+    // Check the customer profile has been deleted at database level.
+    $profiles = commerce_customer_profile_load_multiple($profile_ids, array(), TRUE);
+
+    $this->assertTrue(!empty($profiles[$profile_with_order->profile_id]), t('Profile with order has not been delete from database'));
+    $this->assertTrue(empty($profiles[$profile_without_order->profile_id]), t('Profile without order has been delete from database'));
+  }
+
+  /**
    * Create a custom profile type form an helper module and test it.
    */
   public function testCommerceCustomerUINewProfileType() {

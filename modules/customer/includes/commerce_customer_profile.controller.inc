@@ -145,6 +145,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
   public function delete($profile_ids, DatabaseTransaction $transaction = NULL, $entity_context = array()) {
     if (!empty($profile_ids)) {
       $profiles = $this->load($profile_ids, array());
+      $profile_ids_to_remove = array();
 
       // Ensure the customer profiles can actually be deleted.
       foreach ((array) $profiles as $profile_id => $profile) {
@@ -156,6 +157,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
         // If the profile cannot be deleted, remove it from the profiles array.
         if (!commerce_customer_profile_can_delete($profile)) {
           unset($profiles[$profile_id]);
+          $profile_ids_to_remove[] = $profile_id;
         }
       }
 
@@ -164,6 +166,7 @@ class CommerceCustomerProfileEntityController extends DrupalCommerceEntityContro
         return FALSE;
       }
 
+      $profile_ids = array_diff($profile_ids, $profile_ids_to_remove);
       parent::delete($profile_ids, $transaction);
       return TRUE;
     }
