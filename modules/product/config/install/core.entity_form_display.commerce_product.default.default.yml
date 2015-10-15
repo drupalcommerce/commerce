@@ -60,7 +60,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   variations:
-    type: inline_entity_form_multiple
+    type: inline_entity_form_complex
     weight: 10
     settings:
       allow_existing: false

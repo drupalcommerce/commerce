@@ -17,7 +17,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   line_items:
-    type: inline_entity_form_multiple
+    type: inline_entity_form_complex
     weight: 0
     settings:
       match_operator: CONTAINS
