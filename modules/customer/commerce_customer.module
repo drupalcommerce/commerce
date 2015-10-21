@@ -908,13 +908,6 @@ function commerce_customer_field_formatter_info() {
 function commerce_customer_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $result = array();
 
-  // Collect the list of customer profile IDs.
-  $profile_ids = array();
-
-  foreach ($items as $delta => $item) {
-    $profile_ids[] = $item['profile_id'];
-  }
-
   switch ($display['type']) {
     case 'commerce_customer_profile_reference_display':
       foreach ($items as $delta => $item) {
