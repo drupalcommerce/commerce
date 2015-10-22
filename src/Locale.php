@@ -26,7 +26,7 @@ final class Locale {
    *   The locale code.
    */
   public function __construct($localeCode) {
-    $this->localeCode = strtoupper($localeCode);
+    $this->localeCode = $localeCode;
   }
 
   /**
