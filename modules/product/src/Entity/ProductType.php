@@ -21,7 +21,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "add" = "Drupal\commerce_product\Form\ProductTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductTypeForm",
  *       "delete" = "Drupal\commerce_product\Form\ProductTypeDeleteForm"
- *     }
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   config_prefix = "commerce_product_type",
  *   admin_permission = "administer product types",

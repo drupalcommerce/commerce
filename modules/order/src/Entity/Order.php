@@ -31,7 +31,10 @@ use Drupal\user\UserInterface;
  *       "add" = "Drupal\commerce_order\Form\OrderForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
- *     }
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "commerce_order",
  *   admin_permission = "administer orders",
@@ -49,7 +52,7 @@ use Drupal\user\UserInterface;
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
- *   field_ui_base_route = "entity.commerce_order.admin_form"
+ *   field_ui_base_route = "entity.commerce_order_type.edit_form"
  * )
  */
 class Order extends ContentEntityBase implements OrderInterface {
