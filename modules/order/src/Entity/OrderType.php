@@ -21,6 +21,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "edit" = "Drupal\commerce_order\Form\OrderTypeForm",
  *       "delete" = "Drupal\commerce_order\Form\OrderTypeDeleteForm"
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *     "list_builder" = "Drupal\commerce_order\OrderTypeListBuilder",
  *   },
  *   admin_permission = "administer order types",

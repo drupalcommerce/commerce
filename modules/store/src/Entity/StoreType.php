@@ -21,7 +21,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "add" = "Drupal\commerce_store\Form\StoreTypeForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreTypeForm",
  *       "delete" = "Drupal\commerce_store\Form\StoreTypeDeleteForm"
- *     }
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer store types",
  *   config_prefix = "commerce_store_type",

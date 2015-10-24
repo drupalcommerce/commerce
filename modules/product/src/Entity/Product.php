@@ -32,6 +32,9 @@ use Drupal\user\UserInterface;
  *       "edit" = "Drupal\commerce_product\Form\ProductForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   admin_permission = "administer products",
