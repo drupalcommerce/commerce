@@ -23,13 +23,10 @@ cd "$DRUPAL_TI_DRUPAL_DIR"
 # Ensure the module is linked into the codebase.
 drupal_ti_ensure_module_linked
 
-# Add the oauth token to prevent GitHub timeouts.
-composer config github-oauth.github.com "$GITHUB_OAUTH_TOKEN"
-
 # Initialize composer_manager.
 php modules/composer_manager/scripts/init.php
 composer drupal-rebuild
-composer update --prefer-source -n --verbose
+composer update -n --verbose
 
 # Enable main module and submodules.
 drush en -y commerce commerce_product commerce_order
