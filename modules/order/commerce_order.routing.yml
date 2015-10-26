@@ -29,14 +29,6 @@ entity.commerce_order_type.collection:
   requirements:
     _permission: 'administer order types'
 
-entity.commerce_order.collection:
-  path: '/admin/commerce/orders'
-  defaults:
-    _entity_list: 'commerce_order'
-    _title: 'Orders list'
-  requirements:
-    _permission: 'administer orders'
-
 entity.commerce_order_type.add_form:
   path: '/admin/commerce/config/order-types/add'
   defaults:
@@ -45,13 +37,13 @@ entity.commerce_order_type.add_form:
   requirements:
     _entity_create_access: 'commerce_order_type'
 
-entity.commerce_line_item_type.collection:
-  path: '/admin/commerce/config/line-item-types'
+entity.commerce_order.collection:
+  path: '/admin/commerce/orders'
   defaults:
-    _entity_list: 'commerce_line_item_type'
-    _title: 'Line item types'
+    _entity_list: 'commerce_order'
+    _title: 'Orders'
   requirements:
-    _permission: 'administer line item types'
+    _permission: 'administer orders'
 
 entity.commerce_line_item_type.add_form:
   path: '/admin/commerce/config/line-item-types/add'
@@ -61,3 +53,10 @@ entity.commerce_line_item_type.add_form:
   requirements:
     _entity_create_access: 'commerce_line_item_type'
 
+entity.commerce_line_item_type.collection:
+  path: '/admin/commerce/config/line-item-types'
+  defaults:
+    _entity_list: 'commerce_line_item_type'
+    _title: 'Line item types'
+  requirements:
+    _permission: 'administer line item types'
