@@ -78,6 +78,7 @@ class ProductAdminTest extends ProductTestBase {
       return $store->id();
     }, $this->stores);
 
+
     // Create a product with one (the first created) store.
     $product = $this->createEntity('commerce_product', [
       'title' => $this->randomMachineName(),

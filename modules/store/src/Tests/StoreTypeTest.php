@@ -129,8 +129,7 @@ class StoreTypeTest extends StoreTestBase {
     $store->delete();
     $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');
     $this->assertRaw(
-      t('Are you sure you want to delete the store type %type?', ['%type' => $type->label()]),
-      'The store type is available for deletion'
+      t('This action cannot be undone')
     );
     $this->assertText(t('This action cannot be undone.'), 'The store type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
