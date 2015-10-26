@@ -114,7 +114,7 @@ class ProductAdminTest extends ProductTestBase {
     }
     $this->drupalPostForm($formUrl, $edit, t('Save'));
     $this->assertResponse(200);
-    $this->assertRaw('<strong>Stores field is required.</strong>', 'Stores field is required, cannot delete all stores from the product.');
+    $this->assertRaw('Stores field is required.', 'Stores field is required, cannot delete all stores from the product.');
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $product = Product::load($product->id());
     $this->assertFieldValues($product->getStoreIds(), $storeIds, 'There are no stores deleted from the product.');
