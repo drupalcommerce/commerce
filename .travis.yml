@@ -102,6 +102,9 @@ mysql:
 
 before_install:
   - composer self-update
+  # Add the oauth token to prevent GitHub timeouts.
+  - composer config github-oauth.github.com $GITHUB_OAUTH_TOKEN
+  - composer diagnose
   - composer global require "lionsad/drupal_ti:dev-master"
   - drupal-ti before_install
 
