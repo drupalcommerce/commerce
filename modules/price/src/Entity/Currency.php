@@ -21,6 +21,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\commerce_price\Form\CurrencyForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },
  *   admin_permission = "administer stores",
