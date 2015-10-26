@@ -81,9 +81,14 @@ class ProductTypeTest extends ProductTestBase {
    * Tests deleting a product type via a form.
    */
   public function testProductTypeDeletion() {
+    $variationType = $this->createEntity('commerce_product_variation_type', [
+      'id' => 'foo',
+      'label' => 'foo',
+    ]);
     $productType = $this->createEntity('commerce_product_type', [
       'id' => 'foo',
-      'label' => 'foo'
+      'label' => 'foo',
+      'variationType' => $variationType->id(),
     ]);
     commerce_product_add_stores_field($productType);
     commerce_product_add_variations_field($productType);
