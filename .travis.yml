@@ -28,7 +28,6 @@ matrix:
 
 env:
   global:
-    - secure: "BBSL3eNj4tEpeMYl4p7qMBE7NtEYUWqFCZFKBbq3/FUrRUP7CoAuEf2QmsDxVMLvxExGBEf1sGTvdDodEZB6d2egY/x5a9nrXPxHkqBWPDeiFJ1JFmhhdHvvp0SoJ3jFXZAiNCg3M4koxeuYwgu0WE9Vz61e5iHxCtnT70ubQJE="
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -102,6 +101,8 @@ mysql:
 
 before_install:
   - composer self-update
+  # Add the oauth token to prevent GitHub timeouts.
+  - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer global require "lionsad/drupal_ti:dev-master"
   - drupal-ti before_install
 
