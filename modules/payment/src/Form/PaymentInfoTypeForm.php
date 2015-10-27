@@ -11,7 +11,6 @@ use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PaymentInfoTypeForm extends BundleEntityFormBase {
