@@ -7,12 +7,14 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ProductTypeForm extends EntityForm {
+class ProductTypeForm extends BundleEntityFormBase {
 
   /**
    * The variation type storage.
@@ -63,6 +65,7 @@ class ProductTypeForm extends EntityForm {
         'exists' => '\Drupal\commerce_product\Entity\ProductType::load',
       ],
       '#disabled' => !$productType->isNew(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [
       '#type' => 'textfield',
@@ -83,7 +86,27 @@ class ProductTypeForm extends EntityForm {
       '#description' => t('Products of this type represent digital services.')
     ];
 
-    return $form;
+    if ($this->moduleHandler->moduleExists('language')) {
+      $form['language'] = array(
+        '#type' => 'details',
+        '#title' => t('Language settings'),
+        '#group' => 'additional_settings',
+      );
+
+      $languageConfiguration = ContentLanguageSettings::loadByEntityTypeBundle('commerce_product', $productType->id());
+      $form['language']['language_configuration'] = array(
+        '#type' => 'language_configuration',
+        '#entity_information' => array(
+          'entity_type' => 'commerce_product',
+          'bundle' => $productType->id(),
+        ),
+        '#default_value' => $languageConfiguration,
+      );
+
+      $form['#submit'][] = 'language_configuration_element_submit';
+    }
+
+  return $this->protectBundleIdElement($form);;
   }
 
   /**
