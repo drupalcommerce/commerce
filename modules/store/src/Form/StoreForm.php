@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce\Form\StoreForm.
+ * Contains \Drupal\commerce\Form\StoreForm.
  */
 
 namespace Drupal\commerce_store\Form;

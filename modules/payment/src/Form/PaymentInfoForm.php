@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Definition of Drupal\commerce_payment\Form\PaymentInfoForm.
+ * Contains Drupal\commerce_payment\Form\PaymentInfoForm.
  */
 
 namespace Drupal\commerce_payment\Form;

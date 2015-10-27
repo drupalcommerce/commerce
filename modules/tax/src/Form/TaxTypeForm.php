@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce_tax\Form\TaxTypeForm.
+ * Contains \Drupal\commerce_tax\Form\TaxTypeForm.
  */
 
 namespace Drupal\commerce_tax\Form;

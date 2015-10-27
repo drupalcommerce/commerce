@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\commerce\Tests\ProductVariationTypeTest
+ * Contains \Drupal\commerce_product\Tests\ProductVariationTypeTest.
  */
 
 namespace Drupal\commerce_product\Tests;

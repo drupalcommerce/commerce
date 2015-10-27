@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce_price\Form\CurrencyForm.
+ * Contains \Drupal\commerce_price\Form\CurrencyForm.
  */
 
 namespace Drupal\commerce_price\Form;

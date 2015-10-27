@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of \Drupal\commerce_order\Tests\OrderTestBase.
+ * Contains \Drupal\commerce_order\Tests\OrderTestBase.
  */
 
 namespace Drupal\commerce_order\Tests;

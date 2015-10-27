@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce\Locale
+ * Contains \Drupal\commerce\Locale.
  */
 
 namespace Drupal\commerce;

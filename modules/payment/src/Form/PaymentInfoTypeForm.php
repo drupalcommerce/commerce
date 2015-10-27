@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce_payment\Form\PaymentInfoTypeForm.
+ * Contains \Drupal\commerce_payment\Form\PaymentInfoTypeForm.
  */
 
 namespace Drupal\commerce_payment\Form;

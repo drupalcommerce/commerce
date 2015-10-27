@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of \Drupal\commerce_tax\Tests\TaxTestBase.
+ * Contains \Drupal\commerce_tax\Tests\TaxTestBase.
  */
 
 namespace Drupal\commerce_tax\Tests;

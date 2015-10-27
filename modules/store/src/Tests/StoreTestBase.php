@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\commerce\Tests\StoreTestBase.
+ * Contains \Drupal\commerce_store\Tests\StoreTestBase.
  */
 
 namespace Drupal\commerce_store\Tests;

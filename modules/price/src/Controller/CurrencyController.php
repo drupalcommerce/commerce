@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\commerce_price\Controller\CurrencyController
+ * Contains \Drupal\commerce_price\Controller\CurrencyController.
  */
 
 namespace Drupal\commerce_price\Controller;
