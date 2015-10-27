@@ -77,26 +77,6 @@ class PaymentInfoTypeForm extends BundleEntityFormBase {
       '#description' => $this->t('Description of this payment information type'),
     );
 
-    if ($this->moduleHandler->moduleExists('language')) {
-      $form['language'] = array(
-        '#type' => 'details',
-        '#title' => t('Language settings'),
-        '#group' => 'additional_settings',
-      );
-
-      $language_configuration = ContentLanguageSettings::loadByEntityTypeBundle('commerce_payment_info', $paymentInformationType->id());
-      $form['language']['language_configuration'] = array(
-        '#type' => 'language_configuration',
-        '#entity_information' => array(
-          'entity_type' => 'commerce_payment_info',
-          'bundle' => $paymentInformationType->id(),
-        ),
-        '#default_value' => $language_configuration,
-      );
-
-      $form['#submit'][] = 'language_configuration_element_submit';
-    }
-
     return $this->protectBundleIdElement($form);;
   }
 
