@@ -3,6 +3,6 @@
  * Admin styling.
  */
 
-.field-widget-price-default .form-type-textfield, .field-widget-price-default .form-type-select {
+.field--widget-price-default .form-type-textfield, .field--widget-price-default .form-type-select {
   display: inline;
 }
