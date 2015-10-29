@@ -28,7 +28,7 @@ class Price extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
-    $properties['amount'] = DataDefinition::create('float')
+    $properties['amount'] = DataDefinition::create('string')
       ->setLabel(t('Amount'))
       ->setRequired(FALSE);
 
@@ -58,6 +58,23 @@ class Price extends FieldItemBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints() {
+    $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
+    $constraints = parent::getConstraints();
+    $constraints[] = $manager->create('ComplexData', [
+      'amount' => [
+        'Regex' => [
+          'pattern' => '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i',
+        ],
+      ],
+    ]);
+
+    return $constraints;
   }
 
   /**
