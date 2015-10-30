@@ -7,12 +7,13 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 
-class LineItemTypeForm extends EntityForm {
+class LineItemTypeForm extends BundleEntityFormBase {
 
   /**
    * The entity manager.
@@ -74,7 +75,8 @@ class LineItemTypeForm extends EntityForm {
         'exists' => '\Drupal\commerce_order\Entity\LineItemType::load',
         'source' => ['label'],
       ],
-      '#disabled' => !$lineItemType->isNew()
+      '#disabled' => !$lineItemType->isNew(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['purchasableEntityType'] = [
       '#type' => 'select',
@@ -91,7 +93,7 @@ class LineItemTypeForm extends EntityForm {
       '#required' => TRUE,
     ];
 
-    return $form;
+    return $this->protectBundleIdElement($form);
   }
 
   /**
