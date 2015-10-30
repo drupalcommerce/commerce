@@ -7,12 +7,13 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 
-class OrderTypeForm extends EntityForm {
+class OrderTypeForm extends BundleEntityFormBase {
 
   /**
    * The order type storage.
@@ -64,6 +65,7 @@ class OrderTypeForm extends EntityForm {
         'source' => ['label'],
       ],
       '#disabled' => !$orderType->isNew(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [
       '#title' => t('Description'),
@@ -72,7 +74,7 @@ class OrderTypeForm extends EntityForm {
       '#description' => $this->t('Description of this order type'),
     ];
 
-    return $form;
+    return $this->protectBundleIdElement($form);;
   }
 
   /**

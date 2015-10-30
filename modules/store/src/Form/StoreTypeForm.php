@@ -7,10 +7,12 @@
 
 namespace Drupal\commerce_store\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\language\Entity\ContentLanguageSettings;
 
-class StoreTypeForm extends EntityForm {
+class StoreTypeForm extends BundleEntityFormBase {
 
   /**
    * {@inheritdoc}
@@ -34,6 +36,7 @@ class StoreTypeForm extends EntityForm {
         'exists' => '\Drupal\commerce_store\Entity\StoreType::load',
       ],
       '#disabled' => !$storeType->isNew(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [
       '#type' => 'textfield',
@@ -41,7 +44,27 @@ class StoreTypeForm extends EntityForm {
       '#default_value' => $storeType->getDescription(),
     ];
 
-    return $form;
+    if ($this->moduleHandler->moduleExists('language')) {
+      $form['language'] = array(
+        '#type' => 'details',
+        '#title' => t('Language settings'),
+        '#group' => 'additional_settings',
+      );
+
+      $languageConfiguration = ContentLanguageSettings::loadByEntityTypeBundle('commerce_store', $storeType->id());
+      $form['language']['language_configuration'] = array(
+        '#type' => 'language_configuration',
+        '#entity_information' => array(
+          'entity_type' => 'commerce_store',
+          'bundle' => $storeType->id(),
+        ),
+        '#default_value' => $languageConfiguration,
+      );
+
+      $form['#submit'][] = 'language_configuration_element_submit';
+    }
+
+    return $this->protectBundleIdElement($form);
   }
 
   /**
