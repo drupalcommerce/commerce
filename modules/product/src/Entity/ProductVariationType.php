@@ -37,6 +37,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "id",
  *     "label",
+ *     "lineItemType",
  *   },
  *   links = {
  *     "edit-form" =   "/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/edit",
@@ -53,5 +54,27 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
    * @var string
    */
   protected $id;
+
+  /**
+   * The line item type.
+   *
+   * @var string
+   */
+  protected $lineItemType;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLineItemType() {
+    return $this->lineItemType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setLineItemType($lineItemType) {
+    $this->lineItemType = $lineItemType;
+    return $this;
+  }
 
 }
