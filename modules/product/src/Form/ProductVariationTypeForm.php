@@ -7,10 +7,12 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\language\Entity\ContentLanguageSettings;
 
-class ProductVariationTypeForm extends EntityForm {
+class ProductVariationTypeForm extends BundleEntityFormBase {
 
   /**
    * {@inheritdoc}
@@ -33,9 +35,30 @@ class ProductVariationTypeForm extends EntityForm {
         'exists' => '\Drupal\commerce_product\Entity\ProductVariationType::load',
       ],
       '#disabled' => !$variationType->isNew(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
 
-    return $form;
+    if ($this->moduleHandler->moduleExists('language')) {
+      $form['language'] = array(
+        '#type' => 'details',
+        '#title' => t('Language settings'),
+        '#group' => 'additional_settings',
+      );
+
+      $languageConfiguration = ContentLanguageSettings::loadByEntityTypeBundle('commerce_product_variation', $variationType->id());
+      $form['language']['language_configuration'] = array(
+        '#type' => 'language_configuration',
+        '#entity_information' => array(
+          'entity_type' => 'commerce_product_variation',
+          'bundle' => $variationType->id(),
+        ),
+        '#default_value' => $languageConfiguration,
+      );
+
+      $form['#submit'][] = 'language_configuration_element_submit';
+    }
+
+    return $this->protectBundleIdElement($form);;
   }
 
   /**
