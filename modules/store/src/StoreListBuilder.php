@@ -22,8 +22,6 @@ class StoreListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['name'] = t('Name');
     $header['type'] = t('Type');
-    $header['mail'] = t('Email');
-    $header['default_currency'] = t('Currency');
     return $header + parent::buildHeader();
   }
 
@@ -36,8 +34,6 @@ class StoreListBuilder extends EntityListBuilder {
 
     $row['name'] = $entity->getName();
     $row['type'] = $storeType->label();
-    $row['mail'] = $entity->getEmail();
-    $row['default_currency'] = $entity->getDefaultCurrency();
 
     return $row + parent::buildRow($entity);
   }
