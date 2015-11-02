@@ -65,6 +65,7 @@ class ProductTypeForm extends BundleEntityFormBase {
         'exists' => '\Drupal\commerce_product\Entity\ProductType::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$productType->isNew()
     ];
     $form['description'] = [
       '#type' => 'textfield',

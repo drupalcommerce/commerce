@@ -76,6 +76,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
         'source' => ['label'],
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$lineItemType->isNew(),
     ];
     $form['purchasableEntityType'] = [
       '#type' => 'select',

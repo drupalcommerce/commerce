@@ -65,6 +65,7 @@ class OrderTypeForm extends BundleEntityFormBase {
         'source' => ['label'],
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$orderType->isNew(),
     ];
     $form['description'] = [
       '#title' => t('Description'),

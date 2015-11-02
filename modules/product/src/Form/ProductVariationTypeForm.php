@@ -35,6 +35,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
         'exists' => '\Drupal\commerce_product\Entity\ProductVariationType::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$variationType->isNew(),
     ];
 
     if ($this->moduleHandler->moduleExists('language')) {

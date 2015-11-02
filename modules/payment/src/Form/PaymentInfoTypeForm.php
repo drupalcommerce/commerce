@@ -66,6 +66,7 @@ class PaymentInfoTypeForm extends BundleEntityFormBase {
         'source' => array('label'),
       ),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#disabled' => !$paymentInformationType->isNew(),
     );
 
     $form['description'] = array(
