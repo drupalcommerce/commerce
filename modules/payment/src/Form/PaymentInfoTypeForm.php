@@ -7,12 +7,13 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PaymentInfoTypeForm extends EntityForm {
+class PaymentInfoTypeForm extends BundleEntityFormBase {
 
   /**
    * The payment info type storage.
@@ -64,7 +65,8 @@ class PaymentInfoTypeForm extends EntityForm {
         'exists' => array($this->paymentInfoTypeStorage, 'load'),
         'source' => array('label'),
       ),
-      '#disabled' => !$paymentInformationType->isNew(),
+      '#disabled' => $paymentInformationType->isLocked(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     );
 
     $form['description'] = array(
@@ -74,7 +76,7 @@ class PaymentInfoTypeForm extends EntityForm {
       '#description' => $this->t('Description of this payment information type'),
     );
 
-    return $form;
+    return $this->protectBundleIdElement($form);;
   }
 
   /**
