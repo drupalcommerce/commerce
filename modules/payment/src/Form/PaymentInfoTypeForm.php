@@ -65,7 +65,6 @@ class PaymentInfoTypeForm extends BundleEntityFormBase {
         'exists' => array($this->paymentInfoTypeStorage, 'load'),
         'source' => array('label'),
       ),
-      '#disabled' => $paymentInformationType->isLocked(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     );
 

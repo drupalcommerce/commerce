@@ -64,7 +64,6 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_product\Entity\ProductType::load',
       ],
-      '#disabled' => $productType->isLocked(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [

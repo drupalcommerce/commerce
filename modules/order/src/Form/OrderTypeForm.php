@@ -64,7 +64,6 @@ class OrderTypeForm extends BundleEntityFormBase {
         'exists' => [$this->orderTypeStorage, 'load'],
         'source' => ['label'],
       ],
-      '#disabled' => $orderType->isLocked(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [

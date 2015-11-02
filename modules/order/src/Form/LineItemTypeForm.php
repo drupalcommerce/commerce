@@ -75,7 +75,6 @@ class LineItemTypeForm extends BundleEntityFormBase {
         'exists' => '\Drupal\commerce_order\Entity\LineItemType::load',
         'source' => ['label'],
       ],
-      '#disabled' => $lineItemType->isLocked(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['purchasableEntityType'] = [

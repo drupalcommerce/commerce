@@ -35,7 +35,6 @@ class StoreTypeForm extends BundleEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_store\Entity\StoreType::load',
       ],
-      '#disabled' => $storeType->isLocked(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [
