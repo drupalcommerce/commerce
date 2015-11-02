@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class CurrencyForm extends EntityForm {
 
@@ -24,21 +25,21 @@ class CurrencyForm extends EntityForm {
   /**
    * Creates a new CurrencyForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $currencyStorage
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The currency storage.
    */
-  public function __construct(EntityStorageInterface $currencyStorage) {
-    $this->currencyStorage = $currencyStorage;
+  public function __construct(EntityTypeManager $entityTypeManager) {
+    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-    $entityManager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
+    $entityTypeManager = $container->get('entity_type.manager');
 
-    return new static($entityManager->getStorage('commerce_currency'));
+    return new static($entityTypeManager);
   }
 
   /**

@@ -82,7 +82,7 @@ class ProductAdminTest extends ProductTestBase {
     $this->assertText(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]), "Commerce Product deletion confirmation text is showing");
     $this->assertText(t('This action cannot be undone.'), 'The product deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+    \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache();
 
     $productExists = (bool) Product::load($product->id());
     $this->assertFalse($productExists, 'The new product has been deleted from the database.');

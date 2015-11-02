@@ -9,7 +9,7 @@ namespace Drupal\commerce_cart;
 
 use Drupal\commerce_cart\Exception\DuplicateCartException;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -59,15 +59,15 @@ class CartProvider implements CartProviderInterface {
   /**
    * Constructs a new CartProvider object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    * @param \Drupal\commerce_cart\CartSessionInterface $cartSession
    *   The cart session.
    */
-  public function __construct(EntityManagerInterface $entityManager, AccountInterface $currentUser, CartSessionInterface $cartSession) {
-    $this->orderStorage = $entityManager->getStorage('commerce_order');
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, AccountInterface $currentUser, CartSessionInterface $cartSession) {
+    $this->orderStorage = $entityTypeManager->getStorage('commerce_order');
     $this->currentUser = $currentUser;
     $this->cartSession = $cartSession;
   }

@@ -8,7 +8,7 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -16,27 +16,27 @@ use Drupal\Core\Entity\EntityTypeInterface;
 class LineItemTypeForm extends BundleEntityFormBase {
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * Create an LineItemTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(EntityManagerInterface $entityManager) {
-    $this->entityManager = $entityManager;
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('entity.manager'));
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
@@ -46,7 +46,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
     $form = parent::form($form, $form_state);
     $lineItemType = $this->entity;
     // Prepare the list of purchasable entity types.
-    $entityTypes = $this->entityManager->getDefinitions();
+    $entityTypes = $this->entityTypeManager->getDefinitions();
     $purchasableEntityTypes = array_filter($entityTypes, function ($entityType) {
       return $entityType->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
     });
@@ -54,7 +54,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
       return $entityType->getLabel();
     }, $purchasableEntityTypes);
     // Prepare the list of order types.
-    $orderTypes = $this->entityManager->getStorage('commerce_order_type')
+    $orderTypes = $this->entityTypeManager->getStorage('commerce_order_type')
       ->loadMultiple();
     $orderTypes = array_map(function ($orderType) {
       return $orderType->label();

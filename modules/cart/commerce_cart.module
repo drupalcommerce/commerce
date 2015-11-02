@@ -18,7 +18,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Ensures the presence of a cart view mode for each purchasable entity type.
  */
 function commerce_cart_rebuild() {
-  $entityTypes = \Drupal::service('entity.manager')->getDefinitions();
+  $entityTypes = \Drupal::service('entity_type.manager')->getDefinitions();
   $entityTypes = array_filter($entityTypes, function ($entityType) {
     return $entityType->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
   });
@@ -34,7 +34,7 @@ function commerce_cart_rebuild() {
       ])->save();
     }
 
-    $bundles = array_keys(\Drupal::service('entity.manager')->getBundleInfo($entityType->id()));
+    $bundles = array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entityType->id()));
     foreach ($bundles as $bundle) {
       $displayId = $entityType->id() . '.' . $bundle . '.cart';
       if (!EntityViewDisplay::load($displayId)) {

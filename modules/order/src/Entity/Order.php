@@ -128,7 +128,7 @@ class Order extends ContentEntityBase implements OrderInterface {
         $lineItems[$item->target_id] = $item->entity;
       }
     }
-    $lineItemStorage = \Drupal::service('entity.manager')->getStorage('commerce_line_item');
+    $lineItemStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
     $lineItemStorage->delete($lineItems);
   }
 

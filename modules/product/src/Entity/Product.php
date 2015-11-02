@@ -213,7 +213,7 @@ class Product extends ContentEntityBase implements ProductInterface {
         $variations[$item->target_id] = $item->entity;
       }
     }
-    $variationStorage = \Drupal::service('entity.manager')->getStorage('commerce_product_variation');
+    $variationStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
     $variationStorage->delete($variations);
   }
 

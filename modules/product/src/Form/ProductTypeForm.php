@@ -8,7 +8,7 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -26,18 +26,18 @@ class ProductTypeForm extends BundleEntityFormBase {
   /**
    * Creates a new ProductTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(EntityManagerInterface $entityManager) {
-    $this->variationTypeStorage = $entityManager->getStorage('commerce_product_variation_type');
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    $this->variationTypeStorage = $entityTypeManager->getStorage('commerce_product_variation_type');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('entity.manager'));
+    return new static($container->get('entity_type.manager'));
   }
 
   /**

@@ -11,7 +11,7 @@ use CommerceGuys\Intl\Country\CountryRepository;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
 use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\commerce_price\Entity\CurrencyInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
@@ -45,13 +45,13 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * Creates a new CurrencyImporter object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
-    $this->storage = $entityManager->getStorage('commerce_currency');
+  public function __construct(EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager) {
+    $this->storage = $entityTypeManager->getStorage('commerce_currency');
     $this->languageManager = $languageManager;
     $this->externalRepository = new CurrencyRepository();
   }

@@ -5,4 +5,4 @@ services:
 
   commerce_cart.cart_provider:
     class: Drupal\commerce_cart\CartProvider
-    arguments: ['@entity.manager', '@current_user', '@commerce_cart.cart_session']
+    arguments: ['@entity_type.manager', '@current_user', '@commerce_cart.cart_session']

@@ -8,7 +8,7 @@
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -57,15 +57,15 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    *   The widget settings.
    * @param array $thirdPartySettings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
    *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityManagerInterface $entityManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityTypeManagerInterface $entityTypeManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
 
-    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
     $this->numberFormatter = $numberFormatterFactory->createInstance(NumberFormatterInterface::DECIMAL);
     $this->numberFormatter->setMinimumFractionDigits(0);
     $this->numberFormatter->setMaximumFractionDigits(6);
@@ -82,7 +82,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory')
     );
   }
@@ -156,7 +156,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    */
   public static function validateElement(array $element, FormStateInterface $formState) {
     // @todo Fix this.
-    $currencyStorage = \Drupal::service('entity.manager')->getStorage('commerce_currency');
+    $currencyStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_currency');
     $numberFormatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
 
     $value = $formState->getValue($element['#parents']);

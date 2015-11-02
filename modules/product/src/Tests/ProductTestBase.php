@@ -96,7 +96,7 @@ abstract class ProductTestBase extends WebTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    */
   protected function createEntity($entityType, $values) {
-    $storage = \Drupal::entityManager()->getStorage($entityType);
+    $storage = \Drupal::service('entity_type.manager')->getStorage($entityType);
     $entity = $storage->create($values);
     $status = $entity->save();
     $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', [

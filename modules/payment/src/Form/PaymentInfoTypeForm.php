@@ -37,9 +37,9 @@ class PaymentInfoTypeForm extends BundleEntityFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-   $entityManager = $container->get('entity.manager');
-   return new static($entityManager->getStorage('commerce_payment_info_type'));
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
+   $entityTypeManager = $container->get('entity_type.manager');
+   return new static($entityTypeManager->getStorage('commerce_payment_info_type'));
   }
 
   /**

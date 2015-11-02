@@ -61,7 +61,7 @@ class OrderAdminTest extends OrderTestBase {
     $this->assertText(t('This action cannot be undone.'), 'The order deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     // Remove the entity from cache and check if the order is deleted.
-    \Drupal::entityManager()->getStorage('commerce_order')->resetCache([$order->id()]);
+    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $orderExists = (bool) Order::load('commerce_order', $order->id());
     $this->assertFalse($orderExists, 'The order has been deleted from the database.');
   }

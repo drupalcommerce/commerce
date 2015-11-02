@@ -110,7 +110,7 @@ abstract class OrderTestBase extends WebTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    */
   protected function createEntity($entityType, $values) {
-    $entity = \Drupal::entityManager()
+    $entity = \Drupal::service('entity_type.manager')
       ->getStorage($entityType)
       ->create($values);
     $status = $entity->save();

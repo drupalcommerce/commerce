@@ -8,7 +8,7 @@
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
@@ -62,15 +62,15 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    *   The view mode.
    * @param array $thirdPartySettings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
    *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityManagerInterface $entityManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityTypeManagerInterface $entityTypeManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
 
-    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
     $this->numberFormatter = $numberFormatterFactory->createInstance();
     $this->numberFormatter->setMaximumFractionDigits(6);
     if ($this->getSetting('strip_trailing_zeroes')) {
@@ -93,7 +93,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory')
     );
   }

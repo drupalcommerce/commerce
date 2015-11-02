@@ -8,7 +8,7 @@
 namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -26,13 +26,13 @@ class StoreForm extends ContentEntityForm {
   /**
    * Constructs a new StoreForm object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(EntityManagerInterface $entityManager) {
-    parent::__construct($entityManager);
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    parent::__construct($entityTypeManager);
 
-    $this->storage = $this->entityManager->getStorage('commerce_store');
+    $this->storage = $entityTypeManager->getStorage('commerce_store');
   }
 
   /**

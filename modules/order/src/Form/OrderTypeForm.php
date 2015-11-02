@@ -36,10 +36,10 @@ class OrderTypeForm extends BundleEntityFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-   $entityManager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
+   $entityTypeManager = $container->get('entity_type.manager');
 
-   return new static($entityManager->getStorage('commerce_order_type'));
+   return new static($entityTypeManager->getStorage('commerce_order_type'));
  }
 
   /**
