@@ -106,7 +106,7 @@ class ProductVariationTypeTest extends ProductTestBase {
   /**
    * Tests adding product fields.
    */
-  protected function testAddCommerceProductVariationFieldAdmin() {
+  protected function testAddProductVariationFieldAdmin() {
     $variationType = $this->createEntity('commerce_product_variation_type', [
       'id' => 'foo',
       'label' => 'foo'
@@ -132,7 +132,7 @@ class ProductVariationTypeTest extends ProductTestBase {
    * Tests adding product attributes to a field with just the attribute field checked.
    */
   function testProductVariationAttributesAdmin() {
-    $productFields = $this->testAddCommerceProductVariationFieldAdmin();
+    $productFields = $this->testAddProductVariationFieldAdmin();
     $edit = [
       'attribute_field' => 1,
       'attribute_widget_title' => $this->randomMachineName()

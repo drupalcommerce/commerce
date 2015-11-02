@@ -20,7 +20,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests creating a product via the admin.
    */
-  function testAddCommerceProductAdmin() {
+  function testAddProductAdmin() {
     $title = $this->randomMachineName();
     $storeIds = array_map(function ($store) {
       return $store->id();
@@ -73,7 +73,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests adding/removing stores to a product via the admin.
    */
-  function testUpdateCommerceProductAdmin() {
+  function testUpdateProductAdmin() {
     $storeIds = array_map(function ($store) {
       return $store->id();
     }, $this->stores);
@@ -123,7 +123,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests deleting a product via the admin.
    */
-  function testDeleteCommerceProductAdmin() {
+  function testDeleteProductAdmin() {
     $product = $this->createEntity('commerce_product', [
       'title' => $this->randomMachineName(),
       'type' => 'default',
@@ -141,7 +141,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests that anonymous users cannot see the admin/commerce/products page.
    */
-  protected function testAdminCommerceProducts() {
+  protected function testAdminProducts() {
     // First test that the current admin user can see the page
     $this->drupalGet('admin/commerce/products');
     $this->assertResponse(200);
