@@ -191,9 +191,11 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setLabel(t('UUID'))
       ->setReadOnly(TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('string')
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
-      ->setRequired(TRUE);
+      ->setDescription(t('The product variation type.'))
+      ->setSetting('target_type', 'commerce_product_variation_type')
+      ->setReadOnly(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'));

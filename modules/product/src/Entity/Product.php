@@ -274,9 +274,11 @@ class Product extends ContentEntityBase implements ProductInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('string')
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
-      ->setRequired(TRUE);
+      ->setDescription(t('The product type.'))
+      ->setSetting('target_type', 'commerce_product_type')
+      ->setReadOnly(TRUE);
 
     $fields['path'] = BaseFieldDefinition::create('path')
       ->setLabel(t('URL alias'))

@@ -257,10 +257,11 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('string')
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
-      ->setDescription(t('The type of the store.'))
-      ->setRequired(TRUE);
+      ->setDescription(t('The store type.'))
+      ->setSetting('target_type', 'commerce_store_type')
+      ->setReadOnly(TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email address'))
