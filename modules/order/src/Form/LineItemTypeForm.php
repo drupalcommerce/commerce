@@ -83,6 +83,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
       '#default_value' => $lineItemType->getPurchasableEntityType(),
       '#options' => $purchasableEntityTypes,
       '#empty_value' => '',
+      '#disabled' => !$lineItemType->isNew(),
     ];
     $form['orderType'] = [
       '#type' => 'select',

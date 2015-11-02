@@ -17,4 +17,16 @@ use Drupal\Core\Entity\ContentEntityInterface;
  * on commerce_order.
  */
 interface PurchasableEntityInterface extends ContentEntityInterface {
+
+  /**
+   * Gets the purchasable entity type's line item type.
+   *
+   * Used for finding/creating the appropriate line item when purchasing a
+   * product (adding it to an order).
+   *
+   * @return string
+   *   The line item type.
+   */
+  public function getLineItemType();
+
 }

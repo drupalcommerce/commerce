@@ -14,5 +14,4 @@ use Drupal\Core\Form\FormStateInterface;
  * Form controller for the product variation edit form.
  */
 class ProductVariationForm extends ContentEntityForm {
-
 }

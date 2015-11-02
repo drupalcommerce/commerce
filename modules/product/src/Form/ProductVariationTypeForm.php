@@ -37,6 +37,27 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
 
+    if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
+      // Prepare a list of line item types used to purchase product variations.
+      $lineItemTypeStorage = $this->entityManager->getStorage('commerce_line_item_type');
+      $lineItemTypes = $lineItemTypeStorage->loadMultiple();
+      $lineItemTypes = array_filter($lineItemTypes, function($lineItemType) {
+        return $lineItemType->getPurchasableEntityType() == 'commerce_product_variation';
+      });
+      $lineItemTypes = array_map(function ($lineItemType) {
+        return $lineItemType->label();
+      }, $lineItemTypes);
+
+      $form['lineItemType'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Line item type'),
+        '#default_value' => $variationType->getLineItemType(),
+        '#options' => $lineItemTypes,
+        '#empty_value' => '',
+        '#required' => TRUE,
+      ];
+    }
+
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
         '#type' => 'details',

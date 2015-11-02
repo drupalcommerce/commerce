@@ -35,21 +35,25 @@ class ProductVariationTypeTest extends ProductTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
+      'lineItemType' => 'product_variation',
     ];
     $variationType = $this->createEntity('commerce_product_variation_type', $values);
     $variationType = ProductVariationType::load($values['id']);
     $this->assertEqual($variationType->label(), $values['label'], 'The new product variation type has the correct label.');
+    $this->assertEqual($variationType->getLineItemType(), $values['lineItemType'], 'The new product variation type has the correct line item type.');
 
     $user = $this->drupalCreateUser(['administer product types']);
     $this->drupalLogin($user);
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
+      'lineItemType' => 'product_variation',
     ];
     $this->drupalPostForm('admin/commerce/config/product-variation-types/add', $edit, t('Save'));
     $variationType = ProductVariationType::load($edit['id']);
     $this->assertTrue($variationType, 'The new product variation type has been created.');
     $this->assertEqual($variationType->label(), $edit['label'], 'The new product variation type has the correct label.');
+    $this->assertEqual($variationType->getLineItemType(), $edit['lineItemType'], 'The new product variation type has the correct line item type.');
   }
 
   /**

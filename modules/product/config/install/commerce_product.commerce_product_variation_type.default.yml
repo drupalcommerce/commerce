@@ -3,3 +3,4 @@ status: true
 dependencies: {  }
 id: default
 label: Default
+lineItemType: product_variation

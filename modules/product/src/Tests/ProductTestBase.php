@@ -24,6 +24,7 @@ abstract class ProductTestBase extends WebTestBase {
     'commerce',
     'commerce_store',
     'commerce_product',
+    'commerce_order',
     'field',
     'field_ui',
     'options',
