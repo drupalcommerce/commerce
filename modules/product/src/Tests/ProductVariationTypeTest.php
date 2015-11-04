@@ -104,82 +104,27 @@ class ProductVariationTypeTest extends ProductTestBase {
   }
 
   /**
-   * Tests adding product fields.
+   * Tests the attribute field settings.
    */
-  protected function testAddProductVariationFieldAdmin() {
+  function testAttributeFieldSettingsAdmin() {
     $variationType = $this->createEntity('commerce_product_variation_type', [
       'id' => 'foo',
       'label' => 'foo'
     ]);
+    // The edit form fails validation if target_bundles is empty.
+    $this->createEntityReferenceField('commerce_product_variation', 'foo', 'field_attribute', 'Attribute', 'taxonomy_term', 'default', ['target_bundles' => ['taxonomy_term']]);
 
-    $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/add-field');
-
-    // Create a new field.
-    $fields = [
-      'label' => $label = $this->randomMachineName(),
-      'field_name' => $name = strtolower($this->randomMachineName()),
-      'new_storage_type' => 'list_string',
-    ];
-    $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/add-field', $fields, t('Save and continue'));
-
-    $edit = ['settings[allowed_values]' => '1|1\n2|2'];
-    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
-
-    return $fields;
-  }
-
-  /**
-   * Tests adding product attributes to a field with just the attribute field checked.
-   */
-  function testProductVariationAttributesAdmin() {
-    $productFields = $this->testAddProductVariationFieldAdmin();
     $edit = [
       'attribute_field' => 1,
+      'attribute_widget' => 'select',
       'attribute_widget_title' => $this->randomMachineName()
     ];
-    $this->drupalPostForm(NULL, $edit, t('Save settings'));
-    $this->drupalGet('/admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_' . $productFields["field_name"]);
-    $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
-    $this->assertFieldChecked("edit-attribute-widget-select", "Product attribute widget select list field is checked");
-    $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
+    $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute', $edit, t('Save settings'));
+
+    $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute');
+    $this->assertFieldChecked('edit-attribute-field', 'Attribute field setting is set.');
+    $this->assertFieldChecked('edit-attribute-widget-select', 'Attribute widget setting field is set.');
+    $this->assertField('attribute_widget_title', $edit['attribute_widget_title'], 'Attribute widget title setting is set.');
   }
 
-  /**
-   * Tests adding product attributes to a field with the attribute field checked, and changing the radios.
-   */
-  function testAddProductVariationAttributesFieldsAdmin() {
-    $variationType = $this->createEntity('commerce_product_variation_type', [
-      'id' => 'foo',
-      'label' => 'foo'
-    ]);
-
-    $attributeWidgets = ['select', 'radios'];
-    foreach ($attributeWidgets as $attributeWidget) {
-      $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/add-field');
-
-      // Create a new field.
-      $field = [
-        'label' => $label = $this->randomMachineName(),
-        'field_name' => $name = strtolower($this->randomMachineName()),
-        'new_storage_type' => 'list_string',
-      ];
-      $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/add-field', $field, t('Save and continue'));
-
-      $edit = ['settings[allowed_values]' => '1|1\n2|2'];
-      $this->drupalPostForm(NULL, $edit, t('Save field settings'));
-
-      $edit = [
-        'attribute_field' => 1,
-        'attribute_widget' => $attributeWidget,
-        'attribute_widget_title' => $this->randomMachineName()
-      ];
-      $this->drupalPostForm(NULL, $edit, t('Save settings'));
-      // Go back to the URL by clicking "Edit"
-      $this->drupalGet('/admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_' . $field['field_name']);
-
-      $this->assertFieldChecked("edit-attribute-field", "Product attribute field is checked");
-      $this->assertFieldChecked("edit-attribute-widget-" . $attributeWidget, "Product attribute widget select list field is checked");
-      $this->assertField('attribute_widget_title', $edit['attribute_widget_title']);
-    }
-  }
 }

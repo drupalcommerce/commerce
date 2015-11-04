@@ -9,11 +9,14 @@ namespace Drupal\commerce_product\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\simpletest\WebTestBase;
+use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 
 /**
  * Defines base class for shortcut test cases.
  */
 abstract class ProductTestBase extends WebTestBase {
+
+  use EntityReferenceTestTrait;
 
   /**
    * Modules to enable.
@@ -28,7 +31,7 @@ abstract class ProductTestBase extends WebTestBase {
     'field',
     'field_ui',
     'options',
-    'entity_reference',
+    'taxonomy',
     'block'
   ];
 
