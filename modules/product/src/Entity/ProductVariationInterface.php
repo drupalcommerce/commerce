@@ -112,4 +112,20 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    */
   public function setCreatedTime($timestamp);
 
+  /**
+   * Gets an array of field item lists for attribute fields.
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface[]
+   *   An array of field item lists for attribute fields, keyed by field name.
+   */
+  public function getAttributeFields();
+
+  /**
+   * Gets an array of attribute field definitions.
+   *
+   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   *   An array of attribute field definitions, keyed by field name.
+   */
+  public function getAttributeFieldDefinitions();
+
 }
