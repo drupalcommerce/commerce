@@ -10,6 +10,7 @@ dependencies:
   - entity_reference
   - inline_entity_form
   - options
+  - profile
 config_devel:
   - views.view.commerce_orders
   - commerce_order.commerce_order_type.default
