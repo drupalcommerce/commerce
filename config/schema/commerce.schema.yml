@@ -1,0 +1,13 @@
+field.widget.settings.entity_select:
+  type: mapping
+  label: 'Entity select widget settings'
+  mapping:
+    autocomplete_threshold:
+      type: integer
+      label: 'Autocomplete threshold'
+    autocomplete_size:
+      type: integer
+      label: 'Autocomplete size'
+    autocomplete_placeholder:
+      type: string
+      label: 'Autocomplete placeholder'
