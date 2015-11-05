@@ -12,7 +12,7 @@ entity_type: profile
 bundle: billing
 label: Address
 description: ''
-required: false
+required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''

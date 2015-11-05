@@ -14,6 +14,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
+use Drupal\profile\Entity\ProfileInterface;
 
 /**
  * Defines the Commerce Order entity.
@@ -210,6 +211,36 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function setStoreId($storeId) {
     $this->set('store_id', $storeId);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBillingProfile() {
+    return $this->get('billing_profile')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBillingProfile(ProfileInterface $profile) {
+    $this->set('billing_profile', $profile->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBillingProfileId() {
+    return $this->get('billing_profile')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBillingProfileId($billingProfileId) {
+    $this->set('billing_profile', $billingProfileId);
     return $this;
   }
 
@@ -462,6 +493,22 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
+
+    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Billing profile'))
+      ->setDescription(t('Billing profile'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'profile')
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', ['target_bundles' => ['profile']])
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 0,
+        'settings' => [],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }
