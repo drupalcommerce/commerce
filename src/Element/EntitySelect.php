@@ -141,11 +141,24 @@ class EntitySelect extends FormElement {
 
   /**
    * Validation callback.
+   *
+   * Transforms the subelement value into a consistent format and set it on the
+   * main element.
    */
   public static function validateEntitySelect(&$element, FormStateInterface $formState, &$completeForm) {
-    // Transfer the value from the subelement.
-    $elementValue = $formState->getValue($element['#parents']);
-    $formState->setValueForElement($element, $elementValue['value']);
+    $valueElement = $element['value'];
+    $value = $formState->getValue($valueElement['#parents']);
+    if (is_array($value)) {
+      if ($valueElement['#type'] == 'checkboxes') {
+        // Remove unselected checkboxes.
+        $value = array_filter($value);
+      }
+      elseif (!empty($valueElement['#tags'])) {
+        // Extract the entity ids from a multivalue autocomplete.
+        $value = array_column($value, 'target_id');
+      }
+    }
+    $formState->setValueForElement($element, $value);
   }
 
 }
