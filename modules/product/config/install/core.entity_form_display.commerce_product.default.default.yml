@@ -7,6 +7,7 @@ dependencies:
     - field.field.commerce_product.default.stores
     - field.field.commerce_product.default.variations
   module:
+    - commerce
     - inline_entity_form
     - path
     - text
@@ -40,9 +41,12 @@ content:
       display_label: true
     third_party_settings: {  }
   stores:
-    type: options_buttons
+    type: entity_select
     weight: -10
-    settings: {  }
+    settings:
+      autocomplete_threshold: 7
+      autocomplete_size: 60
+      autocomplete_placeholder: ''
     third_party_settings: {  }
   title:
     type: string_textfield

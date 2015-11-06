@@ -38,7 +38,7 @@ class ProductAdminTest extends ProductTestBase {
       'title[0][value]' => $title,
     ];
     foreach ($storeIds as $storeId) {
-      $edit['stores['. $storeId .']'] = $storeId;
+      $edit['stores[value]['. $storeId .']'] = $storeId;
     }
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
@@ -68,56 +68,6 @@ class ProductAdminTest extends ProductTestBase {
 
     $productVariation = ProductVariation::load(current($productVariation));
     $this->assertNotNull($productVariation, 'The new product variation has been created in the database.');
-  }
-
-  /**
-   * Tests adding/removing stores to a product via the admin.
-   */
-  function testUpdateProductAdmin() {
-    $storeIds = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
-
-    // Create a product with one (the first created) store.
-    $product = $this->createEntity('commerce_product', [
-      'title' => $this->randomMachineName(),
-      'type' => 'default',
-      'stores' => [$this->stores[0]],
-    ]);
-    $formUrl = 'product/' . $product->id() . '/edit';
-    $this->drupalGet($formUrl);
-    $this->assertResponse(200, 'Product edit form can be accessed at ' . $formUrl);
-
-    // Add some variations.
-    $productVariationValues = [
-      'variations[form][inline_entity_form][sku][0][value]' => $this->randomMachineName(),
-      'variations[form][inline_entity_form][status][value]' => 1
-    ];
-    $this->drupalPostForm(NULL, $productVariationValues, t('Create entity'));
-
-    $edit = [];
-    // Now add the rest of the created stores, all of them.
-    foreach ($storeIds as $storeId) {
-      $edit['stores['. $storeId .']'] = $storeId;
-    }
-    $this->drupalPostForm(NULL, $edit, t('Save'));
-    $this->assertResponse(200);
-    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
-    $product = Product::load($product->id());
-    $this->assertFieldValues($product->getStoreIds(), $storeIds, 'The product belongs to all created stores.');
-
-    // Try to uncheck all stores from the form.
-    // It should be denied and no stores should be deleted from the product.
-    $edit = [];
-    foreach ($storeIds as $storeId) {
-      $edit['stores['. $storeId .']'] = FALSE;
-    }
-    $this->drupalPostForm($formUrl, $edit, t('Save'));
-    $this->assertResponse(200);
-    $this->assertRaw('Stores field is required.', 'Stores field is required, cannot delete all stores from the product.');
-    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
-    $product = Product::load($product->id());
-    $this->assertFieldValues($product->getStoreIds(), $storeIds, 'There are no stores deleted from the product.');
   }
 
   /**
