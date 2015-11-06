@@ -99,14 +99,16 @@ class EntitySelect extends FormElement {
       $element['value'] = [
         '#type' => $element['#multiple'] ? 'checkboxes' : 'radios',
         '#required' => $element['#required'],
-        '#default_value' => $element['#default_value'],
         '#options' => $entityLabels,
       ];
+      if (!empty($element['#default_value'])) {
+        $element['value']['#default_value'] = $element['#default_value'];
+      }
     }
     else {
       $defaultValue = NULL;
-      // Upcast ids into entities, as expected by entity_autocomplete.
-      if ($element['#default_value']) {
+      if (!empty($element['#default_value'])) {
+        // Upcast ids into entities, as expected by entity_autocomplete.
         if ($element['#multiple']) {
           $defaultValue = $storage->loadMultiple($element['#default_value']);
         }
