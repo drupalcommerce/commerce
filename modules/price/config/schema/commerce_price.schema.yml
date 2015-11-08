@@ -10,7 +10,7 @@ commerce_price.commerce_currency.*:
       label: 'Name'
       translatable: true
     numericCode:
-      type: integer
+      type: string
       label: 'Numeric code'
     symbol:
       type: string
