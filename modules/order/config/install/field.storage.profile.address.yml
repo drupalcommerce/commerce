@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - address
+    - profile
+id: profile.address
+field_name: address
+entity_type: profile
+type: address
+settings: {  }
+module: address
+locked: true
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

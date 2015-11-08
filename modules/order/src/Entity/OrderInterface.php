@@ -11,6 +11,7 @@ use Drupal\commerce_store\Entity\EntityStoreInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\profile\Entity\ProfileInterface;
 
 /**
  * Defines the interface for orders.
@@ -150,5 +151,41 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
    * @return $this
    */
   public function setEmail($mail);
+
+  /**
+   * Gets the billing profile.
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface
+   *   The billing profile entity.
+   */
+  public function getBillingProfile();
+
+  /**
+   * Sets the billing profile.
+   *
+   * @param \Drupal\profile\Entity\ProfileInterface $profile
+   *   The billing profile entity.
+   *
+   * @return $this
+   */
+  public function setBillingProfile(ProfileInterface $profile);
+
+  /**
+   * Gets the billing profile id.
+   *
+   * @return int
+   *   The billing profile id.
+   */
+  public function getBillingProfileId();
+
+  /**
+   * Sets the billing profile id.
+   *
+   * @param int $billingProfileId
+   *   The billing profile id.
+   *
+   * @return $this
+   */
+  public function setBillingProfileId($billingProfileId);
 
 }
