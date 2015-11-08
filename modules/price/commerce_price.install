@@ -12,10 +12,7 @@ function commerce_price_install() {
   $preloaded_currencies = ['USD', 'EUR', 'GBP'];
 
   foreach ($preloaded_currencies as $currency_code) {
-    $entity = $currency_importer->importCurrency($currency_code);
-    if ($entity) {
-      $entity->save();
-    }
+    $currency_importer->import($currency_code);
   }
 }
 

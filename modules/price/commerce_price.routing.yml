@@ -18,7 +18,7 @@ entity.commerce_currency.add_form:
 entity.commerce_currency.import:
   path: '/admin/commerce/config/currency/import'
   defaults:
-    _form: '\Drupal\commerce_price\Form\CurrencyImporterForm'
+    _form: '\Drupal\commerce_price\Form\CurrencyImportForm'
     _title: 'Import a currency'
   requirements:
     _permission: 'administer stores'

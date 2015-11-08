@@ -8,35 +8,38 @@
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\Currency\CurrencyRepository;
-use CommerceGuys\Intl\Exception\UnknownCurrencyException;
 use CommerceGuys\Intl\Exception\UnknownLocaleException;
+use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 
+/**
+ * Default implementation of the currency importer.
+ */
 class CurrencyImporter implements CurrencyImporterInterface {
-
-  /**
-   * The currency manager.
-   *
-   * @var \CommerceGuys\Intl\Currency\CurrencyRepositoryInterface
-   */
-  protected $currencyRepository;
 
   /**
    * The currency storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $currencyStorage;
+  protected $storage;
 
   /**
-   * The configurable language manager.
+   * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
+
+  /**
+   * The library's currency repository.
+   *
+   * @var \CommerceGuys\Intl\Currency\CurrencyRepositoryInterface
+   */
+  protected $externalRepository;
 
   /**
    * Creates a new CurrencyImporter object.
@@ -47,25 +50,22 @@ class CurrencyImporter implements CurrencyImporterInterface {
    *   The language manager.
    */
   public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
-    $this->currencyStorage = $entityManager->getStorage('commerce_currency');
+    $this->storage = $entityManager->getStorage('commerce_currency');
     $this->languageManager = $languageManager;
-    $this->currencyRepository = new CurrencyRepository();
+    $this->externalRepository = new CurrencyRepository();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getImportableCurrencies($fallback = CurrencyImporterInterface::FALLBACK_LANGUAGE) {
-    $language = $this->languageManager->getCurrentLanguage();
-    $importableCurrencies = $this->currencyRepository->getAll($language->getId(), $fallback);
-    $importedCurrencies = $this->currencyStorage->loadMultiple();
-
-    // Remove any already imported currencies.
-    foreach ($importedCurrencies as $currency) {
-      if (isset($importableCurrencies[$currency->id()])) {
-        unset($importableCurrencies[$currency->id()]);
-      }
-    }
+  public function getImportable() {
+    $importedCurrencies = $this->storage->loadMultiple();
+    $langcode = $this->languageManager->getConfigOverrideLanguage()->getId();
+    $allCurrencies = $this->externalRepository->getAll($langcode, 'en');
+    $importableCurrencies = array_diff_key($allCurrencies, $importedCurrencies);
+    $importableCurrencies = array_map(function ($currency) {
+      return $currency->getName();
+    }, $importableCurrencies);
 
     return $importableCurrencies;
   }
@@ -73,86 +73,72 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function importCurrency($currencyCode) {
-    if ($this->currencyStorage->load($currencyCode)) {
-      return FALSE;
-    }
-    $language = $this->languageManager->getDefaultLanguage();
-    $currency = $this->getCurrency($currencyCode, $language, CurrencyImporterInterface::FALLBACK_LANGUAGE);
-
-    if ($currency) {
-      $values = [
-        'currencyCode' => $currency->getCurrencyCode(),
-        'name' => $currency->getName(),
-        'numericCode' => $currency->getNumericCode(),
-        'symbol' => $currency->getSymbol(),
-        'fractionDigits' => $currency->getFractionDigits(),
-      ];
-      $entity = $this->currencyStorage->create($values);
-
-      // Import translations for the new currency.
-      $this->importCurrencyTranslations([$entity], $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE));
-
-      return $entity;
+  public function import($currencyCode) {
+    if ($this->storage->load($currencyCode)) {
+      throw new \InvalidArgumentException(sprintf('The %s currency already exists.', $currencyCode));
     }
 
-    return FALSE;
+    $defaultLangcode = $this->languageManager->getDefaultLanguage()->getId();
+    $currency = $this->externalRepository->get($currencyCode, $defaultLangcode, 'en');
+    $values = [
+      'langcode' => $defaultLangcode,
+      'currencyCode' => $currency->getCurrencyCode(),
+      'name' => $currency->getName(),
+      'numericCode' => $currency->getNumericCode(),
+      'symbol' => $currency->getSymbol(),
+      'fractionDigits' => $currency->getFractionDigits(),
+    ];
+    $entity = $this->storage->create($values);
+    $entity->trustData()->save();
+    if ($this->languageManager->isMultilingual()) {
+      // Import translations for any additional languages the site has.
+      $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
+      $languages = array_diff_key($languages, [$defaultLangcode => $defaultLangcode]);
+      $langcodes = array_map(function ($language) {
+        return $language->getId();
+      }, $languages);
+      $this->importEntityTranslations($entity, $langcodes);
+    }
+
+    return $entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function importCurrencyTranslations($currencies = [], $languages = []) {
-    // Skip importing translations if the site it not multilingual.
-    if (!$this->languageManager->isMultilingual() || !$this->languageManager instanceof ConfigurableLanguageManagerInterface) {
-      return FALSE;
-    }
-
-    foreach ($currencies as $currency) {
-      foreach ($languages as $language) {
-        // Don't add a translation for the original language.
-        if ($currency->language()->getId() === $language->getId()) {
-          continue;
-        }
-        $configName = $currency->getConfigDependencyName();
-
-        $translatedCurrency = $this->getCurrency($currency->getCurrencyCode(), $language);
-        $translationExists = $this->languageManager->getLanguageConfigOverrideStorage($language->getId())->exists($configName);
-        if (!$translationExists && $translatedCurrency) {
-          $configTranslation = $this->languageManager->getLanguageConfigOverride($language->getId(), $configName);
-          $configTranslation->set('name', $translatedCurrency->getName());
-          $configTranslation->set('symbol', $translatedCurrency->getSymbol());
-          $configTranslation->save();
-        }
-      }
+  public function importTranslations(array $langcodes) {
+    foreach ($this->storage->loadMultiple() as $currency) {
+      $this->importEntityTranslations($currency, $langcodes);
     }
   }
 
   /**
-   * Get a single currency.
+   * Imports translations for the given currency entity.
    *
-   * @param string $currencyCode
-   *   The currency code.
-   * @param \Drupal\Core\Language\LanguageInterface $language
-   *   The language.
-   * @param string $fallback
-   *   The fallback language code.
-   *
-   * @return bool|\CommerceGuys\Intl\Currency\Currency
-   *   Returns \CommerceGuys\Intl\Currency\Currency or
-   *   false when a exception has occurred.
+   * @param \Drupal\commerce_price\Entity\CurrencyInterface $currency
+   *   The currency entity.
+   * @param array $langcodes
+   *   The langcodes.
    */
-  protected function getCurrency($currencyCode, LanguageInterface $language, $fallback = NULL) {
-    try {
-      $currency = $this->currencyRepository->get($currencyCode, $language->getId(), $fallback);
-    }
-    catch (UnknownLocaleException $e) {
-      return FALSE;
-    }
-    catch (UnknownCurrencyException $e) {
-      return FALSE;
-    }
+  protected function importEntityTranslations(CurrencyInterface $currency, array $langcodes) {
+    $currencyCode = $currency->getCurrencyCode();
+    $configName = $currency->getConfigDependencyName();
+    foreach ($langcodes as $langcode) {
+      try {
+        $translatedCurrency = $this->externalRepository->get($currencyCode, $langcode);
+      }
+      catch (UnknownLocaleException $e) {
+        // No translation found.
+        continue;
+      }
 
-    return $currency;
+      $configTranslation = $this->languageManager->getLanguageConfigOverride($langcode, $configName);
+      if ($configTranslation->isNew()) {
+        $configTranslation->set('name', $translatedCurrency->getName());
+        $configTranslation->set('symbol', $translatedCurrency->getSymbol());
+        $configTranslation->save();
+      }
+    }
   }
+
 }
