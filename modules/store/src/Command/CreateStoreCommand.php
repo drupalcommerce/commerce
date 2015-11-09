@@ -65,9 +65,13 @@ class CreateStoreCommand extends ContainerAwareCommand {
     ];
     $store = $storeStorage->create($values);
     $store->save();
+    // Make this the default store, since there's no other.
+    if (!$storeStorage->loadDefault()) {
+      $storeStorage->markAsDefault($store);
+    }
 
     $link = $container->get('url_generator')->generate('entity.commerce_store.edit_form', ['commerce_store' => $store->id()], TRUE);
-    $output->writeln(sprintf('The store %s has been created. Go to %s to complete the store address and manage other settings.', $values['name'], $link));
+    $output->writeln(sprintf('The store has been created. Go to %s to complete the store address and manage other settings.', $link));
   }
 
   /**
