@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_price;
 
+use CommerceGuys\Intl\Country\CountryRepository;
 use CommerceGuys\Intl\Currency\CurrencyRepository;
 use CommerceGuys\Intl\Exception\UnknownLocaleException;
 use Drupal\commerce_price\Entity\CurrencyInterface;
@@ -74,8 +75,9 @@ class CurrencyImporter implements CurrencyImporterInterface {
    * {@inheritdoc}
    */
   public function import($currencyCode) {
-    if ($this->storage->load($currencyCode)) {
-      throw new \InvalidArgumentException(sprintf('The %s currency already exists.', $currencyCode));
+    if ($existingEntity = $this->storage->load($currencyCode)) {
+      // Pretend the currency was just imported.
+      return $existingEntity;
     }
 
     $defaultLangcode = $this->languageManager->getDefaultLanguage()->getId();
@@ -98,6 +100,21 @@ class CurrencyImporter implements CurrencyImporterInterface {
         return $language->getId();
       }, $languages);
       $this->importEntityTranslations($entity, $langcodes);
+    }
+
+    return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function importByCountry($countryCode) {
+    $countryRepository = new CountryRepository();
+    $country = $countryRepository->get($countryCode);
+    $currencyCode = $country->getCurrencyCode();
+    $entity = NULL;
+    if ($currencyCode) {
+      $entity = $this->import($currencyCode);
     }
 
     return $entity;

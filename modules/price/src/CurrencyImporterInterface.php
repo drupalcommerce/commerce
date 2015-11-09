@@ -29,12 +29,25 @@ interface CurrencyImporterInterface {
    * @return \Drupal\commerce_price\Entity\CurrencyInterface
    *   The saved currency entity.
    *
-   * @throws \InvalidArgumentException
-   *   Thrown when the currency already exists in the system.
    * @throws \CommerceGuys\Intl\Exception\UnknownCurrencyException
    *   Thrown when the currency couldn't be found in the library definitions.
    */
   public function import($currencyCode);
+
+  /**
+   * Imports currency data for the given country code.
+   *
+   * @param string $countryCode
+   *   The country code.
+   *
+   * @return \Drupal\commerce_price\Entity\CurrencyInterface|NULL
+   *   The saved currency entity or NULL if the given country's currency
+   *   isn't known.
+   *
+   * @throws \CommerceGuys\Intl\Exception\UnknownCountryException
+   *   Thrown when the country couldn't be found in the library definitions.
+   */
+  public function importByCountry($countryCode);
 
   /**
    * Imports translations for the given language codes.
