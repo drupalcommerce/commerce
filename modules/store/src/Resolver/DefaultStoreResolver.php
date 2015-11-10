@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_store\Resolver;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Returns the default store, if known.
@@ -24,11 +24,11 @@ class DefaultStoreResolver implements StoreResolverInterface {
   /**
    * Constructs a new DefaultStoreResolver object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    */
-  public function __construct(EntityManagerInterface $entityManager) {
-    $this->storage = $entityManager->getStorage('commerce_store');
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+    $this->storage = $entityTypeManager->getStorage('commerce_store');
   }
 
   /**

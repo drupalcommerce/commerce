@@ -8,7 +8,7 @@
 namespace Drupal\commerce_tax;
 
 use CommerceGuys\Tax\Repository\TaxTypeRepository;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use CommerceGuys\Tax\Model\TaxTypeInterface;
 use CommerceGuys\Tax\Model\TaxRateInterface;
 use CommerceGuys\Tax\Model\TaxRateAmountInterface;
@@ -50,15 +50,15 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
   /**
    * Constructs a new TaxTypeImporter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param string
    *   The tax types folder of definitions.
    */
-  public function __construct(EntityManagerInterface $entityManager, TranslationInterface $stringTranslation, $taxTypesFolder = NULL) {
-    $this->taxTypeStorage = $entityManager->getStorage('commerce_tax_type');
-    $this->taxRateStorage = $entityManager->getStorage('commerce_tax_rate');
-    $this->taxRateAmountStorage = $entityManager->getStorage('commerce_tax_rate_amount');
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, TranslationInterface $stringTranslation, $taxTypesFolder = NULL) {
+    $this->taxTypeStorage = $entityTypeManager->getStorage('commerce_tax_type');
+    $this->taxRateStorage = $entityTypeManager->getStorage('commerce_tax_rate');
+    $this->taxRateAmountStorage = $entityTypeManager->getStorage('commerce_tax_rate_amount');
     $this->stringTranslation = $stringTranslation;
     $this->taxTypeRepository = new TaxTypeRepository($taxTypesFolder);
   }

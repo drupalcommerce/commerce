@@ -7,17 +7,17 @@
 
 namespace Drupal\commerce_tax;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 class TaxTypeImporterFactory implements TaxTypeImporterFactoryInterface {
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * The translation manager.
@@ -29,8 +29,8 @@ class TaxTypeImporterFactory implements TaxTypeImporterFactoryInterface {
   /**
    * Constructs the factory.
    */
-  public function __construct(EntityManagerInterface $entityManager, TranslationInterface $stringTranslation) {
-    $this->entityManager = $entityManager;
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, TranslationInterface $stringTranslation) {
+    $this->entityTypeManager = $entityTypeManager;
     $this->stringTranslation = $stringTranslation;
   }
 
@@ -38,7 +38,7 @@ class TaxTypeImporterFactory implements TaxTypeImporterFactoryInterface {
    * {@inheritdoc}
    */
   public function createInstance($taxTypesFolder = NULL) {
-    return new TaxTypeImporter($this->entityManager, $this->stringTranslation, $taxTypesFolder);
+    return new TaxTypeImporter($this->entityTypeManager, $this->stringTranslation, $taxTypesFolder);
   }
 
 }

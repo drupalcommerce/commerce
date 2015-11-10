@@ -10,8 +10,8 @@ use Drupal\commerce_order\Entity\OrderType;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,13 +31,13 @@ class OrderListBuilder extends EntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entityType, EntityStorageInterface $storage, DateFormatter $dateFormatter) {
-    parent::__construct($entityType, $storage);
+  public function __construct(EntityTypeInterface $entityType, EntityTypeManager $entityTypeManager, DateFormatter $dateFormatter) {
+    parent::__construct($entityType, $entityTypeManager->getStorage($entityType->id()));
 
     $this->dateFormatter = $dateFormatter;
   }
@@ -48,7 +48,7 @@ class OrderListBuilder extends EntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entityType) {
     return new static(
       $entityType,
-      $container->get('entity.manager')->getStorage($entityType->id()),
+      $container->get('entity_type.manager'),
       $container->get('date.formatter')
     );
   }

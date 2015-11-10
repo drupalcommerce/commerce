@@ -45,10 +45,10 @@ class TaxRateAmountForm extends EntityForm {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-    $entityManager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
+    $entityTypeManager = $container->get('entity_type.manager');
 
-    return new static($entityManager->getStorage('commerce_tax_rate_amount'), $entityManager->getStorage('commerce_tax_rate'));
+    return new static($entityTypeManager->getStorage('commerce_tax_rate_amount'), $entityTypeManager->getStorage('commerce_tax_rate'));
   }
 
   /**

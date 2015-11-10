@@ -22,7 +22,7 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
   $widget_name = $context['widget']->getPluginId();
   if ($field_name == 'purchased_entity' && $entity_type == 'commerce_line_item') {
     if (!empty($element['target_id']['#target_type'])) {
-      $target_type = \Drupal::entityManager()->getDefinition($element['target_id']['#target_type']);
+      $target_type = \Drupal::service('entity_type.manager')->getDefinition($element['target_id']['#target_type']);
       $element['target_id']['#title'] = $target_type->getLabel();
     }
   }

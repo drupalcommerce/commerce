@@ -10,7 +10,7 @@ namespace Drupal\commerce_product;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Event\FilterVariationsEvent;
 use Drupal\commerce_product\Event\ProductEvents;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ProductVariationManager implements ProductVariationManagerInterface {
@@ -32,13 +32,13 @@ class ProductVariationManager implements ProductVariationManagerInterface {
   /**
    * Constructs a ProductVariationManager object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher) {
-    $this->variationStorage = $entityManager->getStorage('commerce_product_variation');
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, EventDispatcherInterface $eventDispatcher) {
+    $this->variationStorage = $entityTypeManager->getStorage('commerce_product_variation');
     $this->eventDispatcher = $eventDispatcher;
   }
 

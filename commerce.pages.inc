@@ -20,7 +20,7 @@ use Drupal\Core\Url;
  *   - form_route_name: The add form route.
  */
 function template_preprocess_commerce_add_list(&$variables) {
-  $bundle_type = \Drupal::entityManager()->getDefinition($variables['bundle_type']);
+  $bundle_type = \Drupal::service('entity_type.manager')->getDefinition($variables['bundle_type']);
   $variables += [
     'class' => str_replace('_', '-', $bundle_type->getBundleOf()) . '-add-list',
     // There is no link template for the add form, guess the route name.
