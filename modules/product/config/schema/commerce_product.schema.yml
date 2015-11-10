@@ -43,6 +43,5 @@ field.field.*.*.*.third_party.commerce_product:
         type: string
         label: 'The widget to use for the product attribute'
     attribute_widget_title:
-        type: string
+        type: label
         label: 'The title of the product attribute for the Add to Cart form'
-        translatable: true

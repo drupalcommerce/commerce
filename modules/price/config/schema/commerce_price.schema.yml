@@ -8,14 +8,12 @@ commerce_price.commerce_currency.*:
     name:
       type: label
       label: 'Name'
-      translatable: true
     numericCode:
       type: string
       label: 'Numeric code'
     symbol:
-      type: string
+      type: label
       label: 'Symbol'
-      translatable: true
     fractionDigits:
       type: integer
       label: 'Fraction digits'
