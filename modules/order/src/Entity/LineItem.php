@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Commerce Line item entity.
@@ -50,28 +49,6 @@ use Drupal\user\UserInterface;
 class LineItem extends ContentEntityBase implements LineItemInterface {
 
   use EntityChangedTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storageController, array &$values) {
-    parent::preCreate($storageController, $values);
-    $values += [
-      'uid' => \Drupal::currentUser()->id(),
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    // If no owner has been set explicitly, make the current user the owner.
-    if (!$this->getOwner()) {
-      $this->setOwnerId(\Drupal::currentUser()->id());
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -155,36 +132,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOwner() {
-    return $this->get('uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('uid')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getData() {
     return $this->get('data')->first()->getValue();
   }
@@ -224,20 +171,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDescription(t('The parent order.'))
       ->setSetting('target_type', 'commerce_order')
       ->setReadOnly(TRUE);
-
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Owner'))
-      ->setDescription(t('The user that owns this line item.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceLineItem::getCurrentUserId')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-      ])
-      ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -359,18 +292,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     }
 
     return $fields;
-  }
-
-  /**
-   * Default value callback for 'uid' base field definition.
-   *
-   * @see ::baseFieldDefinitions()
-   *
-   * @return array
-   *   An array of default values.
-   */
-  public static function getCurrentUserId() {
-    return [\Drupal::currentUser()->id()];
   }
 
 }

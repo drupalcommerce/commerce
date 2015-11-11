@@ -10,12 +10,11 @@ namespace Drupal\commerce_order\Entity;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for line items.
  */
-interface LineItemInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface LineItemInterface extends EntityChangedInterface, EntityInterface {
 
   /**
    * Gets the line item type.
