@@ -25,10 +25,10 @@ class CurrencyForm extends EntityForm {
   /**
    * Creates a new CurrencyForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The currency storage.
    */
-  public function __construct(EntityTypeManager $entityTypeManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
   }
 

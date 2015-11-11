@@ -11,7 +11,7 @@ use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,12 +31,12 @@ class OrderListBuilder extends EntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entityType, EntityTypeManager $entityTypeManager, DateFormatter $dateFormatter) {
+  public function __construct(EntityTypeInterface $entityType, EntityTypeManagerInterface $entityTypeManager, DateFormatter $dateFormatter) {
     parent::__construct($entityType, $entityTypeManager->getStorage($entityType->id()));
 
     $this->dateFormatter = $dateFormatter;
