@@ -60,9 +60,12 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     }
 
     if ($attributes = $this->getAttributeFields()) {
-      $attributeLabels = array_map(function ($attribute) {
-        return $attribute->entity->label();
-      }, $attributes);
+      $attributeLabels = [];
+      foreach ($attributes as $attribute) {
+        if (!$attribute->isEmpty()) {
+          $attributeLabels[] = $attribute->entity->label();
+        }
+      }
 
       $label = implode(', ', $attributeLabels);
     }
