@@ -94,24 +94,8 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function setPurchasedEntity(PurchasableEntityInterface $entity) {
-    $this->set('purchased_entity', $entity->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPurchasedEntityId() {
     return $this->get('purchased_entity')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPurchasedEntityId($entityId) {
-    $this->set('purchased_entity', $entityId);
-    return $this;
   }
 
   /**

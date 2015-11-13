@@ -62,32 +62,12 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface {
   public function getPurchasedEntity();
 
   /**
-   * Sets the purchased entity.
-   *
-   * @return \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchased entity.
-   *
-   * @return $this
-   */
-  public function setPurchasedEntity(PurchasableEntityInterface $entity);
-
-  /**
    * Gets the purchased entity ID.
    *
    * @return int
    *   The purchased entity ID.
    */
   public function getPurchasedEntityId();
-
-  /**
-   * Sets the purchased entity ID.
-   *
-   * @param int $entityId
-   *   The purchased entity ID.
-   *
-   * @return $this
-   */
-  public function setPurchasedEntityId($entityId);
 
   /**
    * Gets the line item title.

@@ -12,8 +12,9 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Implements hook_field_widget_form_alter().
  *
- * Changes the label of the purchased_entity field to the label of the target
- * type (e.g. 'Product variation').
+ * - Changes the label of the purchased_entity field to the label of the
+ *   target type (e.g. 'Product variation').
+ * - Forbids editing the purchased_entity once the line item is no longer new.
  */
 function commerce_order_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
@@ -24,6 +25,9 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
     if (!empty($element['target_id']['#target_type'])) {
       $target_type = \Drupal::service('entity_type.manager')->getDefinition($element['target_id']['#target_type']);
       $element['target_id']['#title'] = $target_type->getLabel();
+      if (!$context['items']->getEntity()->isNew()) {
+        $element['#disabled'] = TRUE;
+      }
     }
   }
 }
