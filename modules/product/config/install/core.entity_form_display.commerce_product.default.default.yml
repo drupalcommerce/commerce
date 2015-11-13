@@ -67,11 +67,11 @@ content:
     type: inline_entity_form_complex
     weight: 10
     settings:
-      allow_existing: false
-      match_operator: CONTAINS
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
+      override_labels: true
+      label_singular: variation
+      label_plural: variations
       allow_new: true
+      match_operator: CONTAINS
+      allow_existing: false
     third_party_settings: {  }
 hidden: {  }

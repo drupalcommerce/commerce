@@ -30,7 +30,7 @@ class OrderAdminTest extends OrderTestBase {
       'line_items[form][inline_entity_form][quantity][0][value]' => 1,
       'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99'
     ];
-    $this->drupalPostForm(NULL, $values, t('Create entity'));
+    $this->drupalPostForm(NULL, $values, 'Create line item');
 
     $values = [
       'store_id' => $this->store->id(),

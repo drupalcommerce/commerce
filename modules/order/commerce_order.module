@@ -77,6 +77,11 @@ function commerce_order_add_line_items_field($order_type) {
       ->setComponent('line_items', [
         'type' => 'inline_entity_form_complex',
         'weight' => 0,
+        'settings' => [
+          'override_labels' => TRUE,
+          'label_singular' => 'line item',
+          'label_plural' => 'line items',
+        ],
       ])
       ->save();
   }

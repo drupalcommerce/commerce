@@ -32,7 +32,7 @@ class ProductAdminTest extends ProductTestBase {
       'variations[form][inline_entity_form][sku][0][value]' => $this->randomMachineName(),
       'variations[form][inline_entity_form][status][value]' => 1
     ];
-    $this->drupalPostForm(NULL, $productVariationValues, t('Create entity'));
+    $this->drupalPostForm(NULL, $productVariationValues, t('Create variation'));
 
     $edit = [
       'title[0][value]' => $title,

@@ -20,11 +20,12 @@ content:
     type: inline_entity_form_complex
     weight: 0
     settings:
+      override_labels: true
+      label_singular: 'line item'
+      label_plural: 'line items'
+      allow_new: true
       match_operator: CONTAINS
       allow_existing: false
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
     third_party_settings: {  }
   mail:
     type: email_default

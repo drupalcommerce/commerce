@@ -154,6 +154,11 @@ function commerce_product_add_variations_field($product_type) {
       ->setComponent('variations', [
         'type' => 'inline_entity_form_complex',
         'weight' => 10,
+        'settings' => [
+          'override_labels' => TRUE,
+          'label_singular' => 'variation',
+          'label_plural' => 'variations',
+        ],
       ])
       ->save();
   }
