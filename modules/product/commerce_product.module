@@ -510,10 +510,20 @@ function commerce_product_load($product_id) {
 
 /**
  * Loads a product by SKU.
+ *
+ * @param string $sku
+ *    The SKU to load.
+ * @param bool $reset
+ *    Boolean to reset static cache.
  */
-function commerce_product_load_by_sku($sku) {
-  $products = commerce_product_load_multiple(array(), array('sku' => $sku));
-  return $products ? reset($products) : FALSE;
+function commerce_product_load_by_sku($sku, $reset = FALSE) {
+  $cache = &drupal_static(__FUNCTION__, array());
+  if (!isset($cache[$sku]) || $reset) {
+    $products = commerce_product_load_multiple(array(), array('sku' => $sku));
+    $cache[$sku] = $products ? reset($products) : FALSE;
+  }
+
+  return $cache[$sku];
 }
 
 /**
