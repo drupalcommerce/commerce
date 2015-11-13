@@ -7,8 +7,9 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\field\FieldConfigInterface;
@@ -48,6 +49,13 @@ use Drupal\user\UserInterface;
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * Local cache for attribute field definitions.
+   *
+   * @var \Drupal\Core\Field\FieldDefinitionInterface[]
+   */
+  protected $attributeFieldDefinitions;
 
   /**
    * {@inheritdoc}
@@ -202,6 +210,23 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function getLineItemTitle() {
+    $product = $this->getProduct();
+    if (!$product) {
+      throw new EntityMalformedException(sprintf('Product variation #%d is missing the product backreference.', $this->id()));
+    }
+
+    $title = $product->getTitle();
+    if ($this->getAttributeFieldDefinitions()) {
+      $title .= ' - ' . $this->label();
+    }
+
+    return $title;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAttributeFields() {
     $fields = [];
     foreach ($this->getAttributeFieldDefinitions() as $name => $definition) {
@@ -215,14 +240,16 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getAttributeFieldDefinitions() {
-    $definitions = $this->getFieldDefinitions();
-    $definitions = array_filter($definitions, function ($definition) {
-      if ($definition instanceof FieldConfigInterface) {
-        return $definition->getThirdPartySetting('commerce_product', 'attribute_field');
-      }
-    });
+    if (!isset($this->attributeFieldDefinitions)) {
+      $definitions = $this->getFieldDefinitions();
+      $this->attributeFieldDefinitions = array_filter($definitions, function ($definition) {
+        if ($definition instanceof FieldConfigInterface) {
+          return $definition->getThirdPartySetting('commerce_product', 'attribute_field');
+        }
+      });
+    }
 
-    return $definitions;
+    return $this->attributeFieldDefinitions;
   }
 
   /**

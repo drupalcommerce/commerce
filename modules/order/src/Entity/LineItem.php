@@ -34,7 +34,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   entity_keys = {
  *     "id" = "line_item_id",
  *     "uuid" = "uuid",
- *     "bundle" = "type"
+ *     "bundle" = "type",
+ *     "label" = "title",
  *   },
  *   links = {
  *     "canonical" = "/admin/commerce/config/line-item/{commerce_line_item}",
@@ -53,14 +54,13 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function label() {
-    $purchasedEntity = $this->get('purchased_entity')->entity;
-    if ($purchasedEntity) {
-      return $purchasedEntity->label();
-    }
-    else {
-      return $this->get('label')->value;
-    }
+  public static function createFromPurchasableEntity(PurchasableEntityInterface $entity) {
+    $values = [
+      'type' => $entity->getLineItemType(),
+      'title' => $entity->getLineItemTitle(),
+      'purchased_entity' => $entity,
+    ];
+    return self::create($values);
   }
 
   /**
@@ -111,6 +111,21 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public function setPurchasedEntityId($entityId) {
     $this->set('purchased_entity', $entityId);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTitle() {
+    return $this->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTitle($title) {
+    $this->set('title', $title);
     return $this;
   }
 
@@ -195,14 +210,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setRequired(TRUE)
       ->setRevisionable(TRUE);
 
-    // Allows users to provide a label when no purchasable entity is referenced.
-    $fields['label'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Label'))
-      ->setSettings([
-        'default_value' => '',
-        'max_length' => 255,
-      ]);
-
     $fields['purchased_entity'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Purchased entity'))
       ->setRequired(TRUE)
@@ -217,6 +224,13 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Title'))
+      ->setSettings([
+        'default_value' => '',
+        'max_length' => 512,
+      ]);
 
     $fields['quantity'] = BaseFieldDefinition::create('decimal')
       ->setLabel(t('Quantity'))
@@ -280,15 +294,15 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       $fields['purchased_entity']->setDisplayConfigurable('view', FALSE);
       $fields['purchased_entity']->setReadOnly(TRUE);
 
-      // Make the label field visible and required.
-      $fields['label'] = clone $baseFieldDefinitions['label'];
-      $fields['label']->setRequired(TRUE);
-      $fields['label']->setDisplayOptions('form', [
+      // Make the title field visible and required.
+      $fields['title'] = clone $baseFieldDefinitions['title'];
+      $fields['title']->setRequired(TRUE);
+      $fields['title']->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -1,
       ]);
-      $fields['label']->setDisplayConfigurable('form', TRUE);
-      $fields['label']->setDisplayConfigurable('view', TRUE);
+      $fields['title']->setDisplayConfigurable('form', TRUE);
+      $fields['title']->setDisplayConfigurable('view', TRUE);
     }
 
     return $fields;

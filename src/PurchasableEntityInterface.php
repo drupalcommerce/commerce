@@ -19,7 +19,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface PurchasableEntityInterface extends ContentEntityInterface {
 
   /**
-   * Gets the purchasable entity type's line item type.
+   * Gets the purchasable entity's line item type.
    *
    * Used for finding/creating the appropriate line item when purchasing a
    * product (adding it to an order).
@@ -28,5 +28,16 @@ interface PurchasableEntityInterface extends ContentEntityInterface {
    *   The line item type.
    */
   public function getLineItemType();
+
+  /**
+   * Gets the purchasable entity's line item title.
+   *
+   * Saved in the $lineItem->title field to protect the line items of
+   * completed orders against changes in the referenced purchased entity.
+   *
+   * @return string
+   *   The line item title.
+   */
+  public function getLineItemTitle();
 
 }

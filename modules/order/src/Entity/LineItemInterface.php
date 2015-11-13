@@ -17,6 +17,19 @@ use Drupal\Core\Entity\EntityInterface;
 interface LineItemInterface extends EntityChangedInterface, EntityInterface {
 
   /**
+   * Constructs a new line item using the given purchasable entity.
+   *
+   * The new line item isn't saved.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
+   *
+   * @return static
+   *   The created line item.
+   */
+  public static function createFromPurchasableEntity(PurchasableEntityInterface $entity);
+
+  /**
    * Gets the line item type.
    *
    * @return string
@@ -75,6 +88,24 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface {
    * @return $this
    */
   public function setPurchasedEntityId($entityId);
+
+  /**
+   * Gets the line item title.
+   *
+   * @return string
+   *   The line item title
+   */
+  public function getTitle();
+
+  /**
+   * Sets the line item title.
+   *
+   * @param string $title
+   *   The line item title.
+   *
+   * @return $this
+   */
+  public function setTitle($title);
 
   /**
    * Gets the line item creation timestamp.

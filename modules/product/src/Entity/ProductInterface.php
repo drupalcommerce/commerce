@@ -25,7 +25,7 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function getType();
 
   /**
-   * Get the product title.
+   * Gets the product title.
    *
    * @return string
    *   The product title
@@ -33,7 +33,7 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function getTitle();
 
   /**
-   * Set the product title.
+   * Sets the product title.
    *
    * @param string $title
    *   The product title.
