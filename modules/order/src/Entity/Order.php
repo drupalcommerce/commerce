@@ -497,7 +497,6 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Billing profile'))
       ->setDescription(t('Billing profile'))
-      ->setRequired(TRUE)
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
       ->setSetting('handler_settings', ['target_bundles' => ['profile']])
