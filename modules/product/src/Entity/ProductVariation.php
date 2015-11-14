@@ -89,7 +89,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getType() {
-    return $this->get('type')->value;
+    return $this->bundle();
   }
 
   /**

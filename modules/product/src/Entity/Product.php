@@ -67,7 +67,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getType() {
-    return $this->get('type')->value;
+    return $this->bundle();
   }
 
   /**
