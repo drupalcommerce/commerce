@@ -296,7 +296,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setLabel(t('SKU'))
       ->setDescription(t('The unique, machine-readable identifier for a variation.'))
       ->setRequired(TRUE)
-      ->addConstraint('ProductSku')
+      ->addConstraint('ProductVariationSku')
       ->setTranslatable(TRUE)
       ->setSetting('display_description', TRUE)
       ->setDisplayOptions('view', [

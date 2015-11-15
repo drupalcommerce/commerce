@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_product\Plugin\Validation\Constraint\ProductSkuConstraintValidator.
+ * Contains \Drupal\commerce_product\Plugin\Validation\Constraint\ProductVariationSkuConstraintValidator.
  */
 
 namespace Drupal\commerce_product\Plugin\Validation\Constraint;
@@ -11,9 +11,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Validates the ProductSku constraint.
+ * Validates the ProductVariationSku constraint.
  */
-class ProductSkuConstraintValidator extends ConstraintValidator {
+class ProductVariationSkuConstraintValidator extends ConstraintValidator {
 
   /**
    * {@inheritdoc}
@@ -22,7 +22,7 @@ class ProductSkuConstraintValidator extends ConstraintValidator {
     $sku = $items->first()->value;
     if (isset($sku) && $sku !== '') {
       $skuExists = (bool) \Drupal::entityQuery('commerce_product_variation')
-        ->condition("sku", $sku)
+        ->condition('sku', $sku)
         ->condition('variation_id', (int) $items->getEntity()->id(), '<>')
         ->range(0, 1)
         ->count()
