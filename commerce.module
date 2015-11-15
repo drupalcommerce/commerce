@@ -2,8 +2,10 @@
 
 /**
  * @file
- * Defines the Store entity type and common functions used by Commerce modules.
+ * Defines common functionality for all Commerce modules.
  */
+
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_theme().
@@ -37,4 +39,38 @@ function commerce_toolbar() {
   ];
 
   return $items;
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * Base fields have a description that's used for two very different purposes:
+ * - To describe the field in the Views UI and other parts of the system.
+ * - As user-facing help text shown on field widgets.
+ * The text is rarely suitable for both, and in most cases feels redundant
+ * as user-facing help text. Hence we remove it from that context, but only if
+ * the definition didn't specify otherwise via our display_description setting.
+ */
+function commerce_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  $field_definition = $context['items']->getFieldDefinition();
+  if (!($field_definition instanceof \Drupal\Core\Field\BaseFieldDefinition)) {
+    // Not a base field.
+    return;
+  }
+  if (strpos($field_definition->getTargetEntityTypeId(), 'commerce_') !== 0) {
+    // Not a Commerce entity type.
+    return;
+  }
+  if ($field_definition->getSetting('display_description')) {
+    // The definition requested that the description stays untouched.
+    return;
+  }
+
+  $element['#description'] = '';
+  // Many widgets are nested one level deeper.
+  $children = \Drupal\Core\Render\Element::getVisibleChildren($element);
+  if (count($children) == 1) {
+    $child = reset($children);
+    $element[$child]['#description'] = '';
+  }
 }

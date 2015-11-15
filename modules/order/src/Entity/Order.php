@@ -8,11 +8,11 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -351,15 +351,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setRequired(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'hidden',
-        'weight' => 0,
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
@@ -391,7 +382,7 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Owner'))
-      ->setDescription(t('The user that owns this order.'))
+      ->setDescription(t('The order owner.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder::getCurrentUserId')
@@ -429,9 +420,24 @@ class Order extends ContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
+    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Billing profile'))
+      ->setDescription(t('Billing profile'))
+      ->setSetting('target_type', 'profile')
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', ['target_bundles' => ['profile']])
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 0,
+        'settings' => [],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['status'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Status'))
-      ->setDescription(t('The status name of this order.'))
+      ->setDescription(t('The order status.'))
       ->setRequired(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
@@ -446,29 +452,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the order was created.'))
-      ->setRequired(TRUE)
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'timestamp',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'datetime_timestamp',
-        'weight' => 10,
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the order was last edited.'))
-      ->setRequired(TRUE);
-
     $fields['order_total'] = BaseFieldDefinition::create('price')
-      ->setLabel(t('Order Total Price'))
+      ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', FALSE)
@@ -494,20 +479,26 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Data'))
       ->setDescription(t('A serialized array of additional data.'));
 
-    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Billing profile'))
-      ->setDescription(t('Billing profile'))
-      ->setSetting('target_type', 'profile')
-      ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['profile']])
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time when the order was created.'))
+      ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'options_select',
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'timestamp',
         'weight' => 0,
-        'settings' => [],
       ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayOptions('form', [
+        'type' => 'datetime_timestamp',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time when the order was last edited.'))
+      ->setRequired(TRUE);
 
     return $fields;
   }

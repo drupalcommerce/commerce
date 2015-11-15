@@ -11,10 +11,10 @@ use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Defines the Commerce Store entity type.
@@ -214,26 +214,17 @@ class Store extends ContentEntityBase implements StoreInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['store_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Store ID'))
-      ->setDescription(t('The ID of the store.'))
+      ->setDescription(t('The store ID.'))
       ->setReadOnly(TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the store.'))
+      ->setDescription(t('The store UUID.'))
       ->setReadOnly(TRUE);
-
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Owner'))
-      ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
-      ->setSetting('target_type', 'user')
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 50,
-      ]);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of store.'))
+      ->setDescription(t('The store language code.'))
       ->setDisplayOptions('view', [
         'type' => 'hidden',
       ])
@@ -242,8 +233,25 @@ class Store extends ContentEntityBase implements StoreInterface {
         'weight' => -1,
       ]);
 
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The store type.'))
+      ->setSetting('target_type', 'commerce_store_type')
+      ->setReadOnly(TRUE);
+
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Owner'))
+      ->setDescription(t('The store owner.'))
+      ->setDefaultValueCallback('Drupal\commerce_store\Entity\Store::getCurrentUserId')
+      ->setSetting('target_type', 'user')
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 50,
+      ]);
+
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
+      ->setDescription(t('The store name.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -257,25 +265,21 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The store type.'))
-      ->setSetting('target_type', 'commerce_store_type')
-      ->setReadOnly(TRUE);
-
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Email address'))
-      ->setDescription(t('Store email notifications will be sent to and from this address.'))
+      ->setLabel(t('Email'))
+      ->setDescription(t('Store email notifications are sent from this address.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'email_default',
         'weight' => 1,
       ])
+      ->setSetting('display_description', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['default_currency'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Default currency'))
+      ->setDescription('The default currency of the store.')
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_currency')
@@ -292,6 +296,7 @@ class Store extends ContentEntityBase implements StoreInterface {
     $disabledFields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
+      ->setDescription(t('The store address.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setSetting('fields', array_diff(AddressField::getAll(), $disabledFields))

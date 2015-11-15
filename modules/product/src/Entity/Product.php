@@ -7,12 +7,12 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Defines the Product entity.
@@ -223,10 +223,34 @@ class Product extends ContentEntityBase implements ProductInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['product_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Product ID'))
+      ->setDescription(t('The product ID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The product UUID.'))
+      ->setReadOnly(TRUE);
+
+    $fields['langcode'] = BaseFieldDefinition::create('language')
+      ->setLabel(t('Language code'))
+      ->setDescription(t('The product language code.'))
+      ->setDisplayOptions('view', [
+        'type' => 'hidden',
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'language_select',
+        'weight' => -1,
+      ]);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The product type.'))
+      ->setSetting('target_type', 'commerce_product_type')
       ->setReadOnly(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
+      ->setDescription(t('The product author.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_product\Entity\Product::getCurrentUserId')
@@ -239,24 +263,12 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setReadOnly(TRUE);
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'));
-
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
+      ->setDescription(t('The product title.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -274,14 +286,9 @@ class Product extends ContentEntityBase implements ProductInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The product type.'))
-      ->setSetting('target_type', 'commerce_product_type')
-      ->setReadOnly(TRUE);
-
     $fields['path'] = BaseFieldDefinition::create('path')
       ->setLabel(t('URL alias'))
+      ->setDescription(t('The product URL alias.'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'path',
@@ -292,6 +299,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
+      ->setDescription(t('Whether the product is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -308,7 +316,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the product was created.'))
+      ->setDescription(t('The time when the product was created.'))
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -323,7 +331,7 @@ class Product extends ContentEntityBase implements ProductInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the product was last edited.'))
+      ->setDescription(t('The time when the product was last edited.'))
       ->setTranslatable(TRUE);
 
     return $fields;

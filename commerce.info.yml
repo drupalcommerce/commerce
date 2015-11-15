@@ -1,6 +1,6 @@
 name: Commerce
 type: module
-description: 'Defines features and functions common to the Commerce modules.'
+description: 'Defines common functionality for all Commerce modules.'
 package: Commerce
 core: 8.x
 configure: commerce.admin_commerce

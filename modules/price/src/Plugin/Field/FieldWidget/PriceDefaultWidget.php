@@ -9,6 +9,7 @@ namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -144,7 +145,12 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       ];
     }
     // Add the help text if specified.
-    if (!empty($element['#description'])) {
+    // Replicates the commerce_field_widget_form_alter() logic because
+    // the copied help text can't be reached by the alter.
+    $baseField = $this->fieldDefinition instanceof BaseFieldDefinition;
+    $hasOverride = $this->fieldDefinition->getSetting('display_description');
+    $hideDescription = $baseField && !$hasOverride;
+    if (!empty($element['#description']) && !$hideDescription) {
       $element[$lastVisibleElement]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
     }
 

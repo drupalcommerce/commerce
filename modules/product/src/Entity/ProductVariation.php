@@ -258,28 +258,32 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
     $fields['variation_id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Variation ID'))
+      ->setDescription(t('The variation ID'))
       ->setReadOnly(TRUE);
+
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The variation UUID'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The variation type.'))
+      ->setSetting('target_type', 'commerce_product_variation_type')
+      ->setReadOnly(TRUE);
+
+    $fields['langcode'] = BaseFieldDefinition::create('language')
+      ->setLabel(t('Language code'))
+      ->setDescription(t('The variation language code.'));
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
+      ->setDescription(t('The variation author.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_product\Entity\ProductVariation::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setReadOnly(TRUE);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The product variation type.'))
-      ->setSetting('target_type', 'commerce_product_variation_type')
-      ->setReadOnly(TRUE);
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'));
 
     // The product backreference, populated by Product::postSave().
     $fields['product_id'] = BaseFieldDefinition::create('entity_reference')
@@ -290,10 +294,11 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
-      ->setDescription(t('The unique, human-readable identifier for a product variation.'))
+      ->setDescription(t('The unique, machine-readable identifier for a variation.'))
       ->setRequired(TRUE)
       ->addConstraint('ProductSku')
       ->setTranslatable(TRUE)
+      ->setSetting('display_description', TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',
@@ -310,6 +315,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     // for storage (there might be a price per currency, role, country, etc).
     $fields['price'] = BaseFieldDefinition::create('price')
       ->setLabel(t('Price'))
+      ->setDescription(t('The variation price'))
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'price_default',
@@ -324,7 +330,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active'))
-      ->setDescription(t('Disabled product variations cannot be added to shopping carts.'))
+      ->setDescription(t('Whether the variation is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -341,13 +347,13 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the product variation was created.'))
+      ->setDescription(t('The time when the variation was created.'))
       ->setTranslatable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the product variation was last edited.'))
+      ->setDescription(t('The time when the variation was last edited.'))
       ->setTranslatable(TRUE);
 
     return $fields;
