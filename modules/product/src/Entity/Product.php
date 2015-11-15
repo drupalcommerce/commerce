@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the Product entity.
+ * Defines the product entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_product",

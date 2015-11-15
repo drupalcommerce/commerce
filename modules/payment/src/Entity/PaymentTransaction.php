@@ -12,7 +12,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
- * Defines the Commerce Transaction entity.
+ * Defines the payment transaction entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_payment_transaction",

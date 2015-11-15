@@ -10,7 +10,7 @@ namespace Drupal\commerce_product\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Product Variation Type entity.
+ * Defines the product variation type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",

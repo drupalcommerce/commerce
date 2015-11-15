@@ -10,7 +10,7 @@ namespace Drupal\commerce_payment\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Payment information type configuration entity.
+ * Defines the payment information type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_payment_info_type",

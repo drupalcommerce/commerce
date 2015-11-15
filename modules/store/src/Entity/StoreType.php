@@ -10,7 +10,7 @@ namespace Drupal\commerce_store\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Commerce Store Type entity type.
+ * Defines the store type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_store_type",

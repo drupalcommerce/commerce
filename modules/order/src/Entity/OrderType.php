@@ -10,7 +10,7 @@ namespace Drupal\commerce_order\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Order type configuration entity.
+ * Defines the order type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_order_type",

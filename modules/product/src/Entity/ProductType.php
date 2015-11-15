@@ -10,7 +10,7 @@ namespace Drupal\commerce_product\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Commerce Product Type entity type.
+ * Defines the product type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_product_type",

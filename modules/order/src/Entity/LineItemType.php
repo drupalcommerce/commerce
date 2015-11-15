@@ -10,7 +10,7 @@ namespace Drupal\commerce_order\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the Line item type configuration entity.
+ * Defines the line item type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_line_item_type",

@@ -12,8 +12,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
- * Defines the Commerce payment information entity. It aims for storing payment
- * information and payment tokens.
+* Defines the payment information entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_payment_info",

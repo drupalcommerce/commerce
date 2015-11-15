@@ -12,7 +12,7 @@ use Drupal\commerce_tax\TaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
- * Defines the Tax Rate Amount configuration entity.
+ * Defines the tax rate amount entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_tax_rate_amount",

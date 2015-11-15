@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the Commerce Line item entity.
+ * Defines the line item entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_line_item",

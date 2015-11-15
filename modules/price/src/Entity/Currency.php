@@ -10,7 +10,7 @@ namespace Drupal\commerce_price\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
- * Defines the Currency configuration entity.
+ * Defines the currency entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_currency",

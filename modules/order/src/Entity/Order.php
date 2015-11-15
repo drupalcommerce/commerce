@@ -17,7 +17,7 @@ use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
 /**
- * Defines the Commerce Order entity.
+ * Defines the order entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_order",

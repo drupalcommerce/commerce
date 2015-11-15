@@ -15,7 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Tax\Enum\GenericLabel;
 
 /**
- * Defines the Tax Type configuration entity.
+ * Defines the tax type entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_tax_type",

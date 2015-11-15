@@ -14,7 +14,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Defines the Tax Rate configuration entity.
+ * Defines the tax rate entity class.
  *
  * @ConfigEntityType(
  *   id = "commerce_tax_rate",

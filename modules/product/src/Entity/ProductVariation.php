@@ -16,7 +16,7 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Defines the Product Variation entity.
+ * Defines the product variation entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_product_variation",

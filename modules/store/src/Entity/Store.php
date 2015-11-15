@@ -17,7 +17,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the Commerce Store entity type.
+ * Defines the store entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_store",
