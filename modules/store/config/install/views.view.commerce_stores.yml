@@ -79,33 +79,17 @@ display:
           columns:
             name: name
             type: type
-            mail: mail
-            default_currency: default_currency
             operations: operations
           info:
             name:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
               responsive: ''
             type:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            mail:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            default_currency:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
