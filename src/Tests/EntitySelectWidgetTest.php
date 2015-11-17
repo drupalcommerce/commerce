@@ -117,7 +117,7 @@ class EntitySelectWidgetTest extends WebTestBase {
     // Check store 1.
     $edit['stores[value]['. $storeIds[0] .']'] = $storeIds[0];
     $edit['stores[value]['. $storeIds[1] .']'] = FALSE;
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
@@ -145,7 +145,7 @@ class EntitySelectWidgetTest extends WebTestBase {
     // Reference both stores 1 and 2.
     $edit = [];
     $edit['stores[value]'] = $storeLabels[0] . ', ' . $storeLabels[1];
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());

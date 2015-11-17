@@ -10,6 +10,17 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_product_theme() {
+  return [
+    'product_form' => [
+      'render element' => 'form',
+    ],
+  ];
+}
+
+/**
  * Adds the default stores field to a product.
  *
  * A product can belong to multiple stores.

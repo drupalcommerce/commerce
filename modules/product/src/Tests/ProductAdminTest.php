@@ -40,7 +40,7 @@ class ProductAdminTest extends ProductTestBase {
     foreach ($storeIds as $storeId) {
       $edit['stores[value]['. $storeId .']'] = $storeId;
     }
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save and publish'));
 
     $result = \Drupal::entityQuery('commerce_product')
       ->condition("title", $edit['title[0][value]'])

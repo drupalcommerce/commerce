@@ -1,0 +1,74 @@
+/**
+ * @file
+ * Styles for the product add/edit form.
+ *
+ * Copied from node-module.css
+ */
+
+/* Narrow screens */
+.layout-region {
+  box-sizing: border-box;
+}
+
+/* Wide screens */
+@media
+  screen and (min-width: 780px),
+  (orientation: landscape) and (min-device-height: 780px) {
+
+  .layout-region-product-main,
+  .layout-region-product-footer {
+    float: left; /* LTR */
+    width: 65%;
+    padding-right: 2em; /* LTR */
+    box-sizing: border-box;
+  }
+
+  [dir="rtl"] .layout-region-product-main,
+  [dir="rtl"] .layout-region-product-footer {
+    float: right;
+    padding-left: 2em;
+    padding-right: 0;
+  }
+
+  .layout-region-product-secondary {
+    float: right; /* LTR */
+    width: 35%;
+  }
+
+  [dir="rtl"] .layout-region-product-secondary {
+    float: left;
+  }
+
+  /* @todo File an issue to add a standard class to all text-like inputs */
+  .layout-region-product-secondary .form-autocomplete,
+  .layout-region-product-secondary .form-text,
+  .layout-region-product-secondary .form-tel,
+  .layout-region-product-secondary .form-email,
+  .layout-region-product-secondary .form-url,
+  .layout-region-product-secondary .form-search,
+  .layout-region-product-secondary .form-number,
+  .layout-region-product-secondary .form-color,
+  .layout-region-product-secondary textarea {
+    box-sizing:         border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/**
+ * The vertical toolbar mode gets triggered for narrow screens, which throws off
+ * the intent of media queries written for the viewport width. When the vertical
+ * toolbar is on, we need to suppress layout for the original media width + the
+ * toolbar width (240px). In this case, 240px + 780px.
+ */
+@media
+  screen and (max-width: 1020px) {
+
+  .toolbar-vertical.toolbar-tray-open .layout-region-product-main,
+  .toolbar-vertical.toolbar-tray-open .layout-region-product-footer,
+  .toolbar-vertical.toolbar-tray-open .layout-region-product-secondary {
+    float: none;
+    width: auto;
+    padding-right: 0;
+  }
+}
