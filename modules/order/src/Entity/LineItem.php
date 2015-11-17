@@ -25,7 +25,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "default" = "Drupal\commerce_order\Form\LineItemForm",
+ *       "default" = "Drupal\Core\Entity\ContentEntityForm",
  *     }
  *   },
  *   base_table = "commerce_line_item",

@@ -27,7 +27,7 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "default" = "Drupal\commerce_product\Form\ProductVariationForm",
+ *       "default" = "Drupal\Core\Entity\ContentEntityForm",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
