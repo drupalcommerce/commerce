@@ -7,9 +7,9 @@
 
 namespace Drupal\commerce_product;
 
+use Drupal\commerce_product\Entity\ProductType;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Defines the list builder for products.
@@ -21,6 +21,8 @@ class ProductListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['title'] = t('Title');
+    $header['type'] = t('Type');
+    $header['type'] = t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -29,15 +31,14 @@ class ProductListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_product\Entity\Product */
-    $uri = $entity->urlInfo();
-    $options = $uri->getOptions();
-    $langcode = $entity->language()->getId();
-    $options += ($langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED && isset($languages[$langcode]) ? ['language' => $languages[$langcode]] : []);
-    $uri->setOptions($options);
+    $productType = ProductType::load($entity->bundle());
+
     $row['title']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
-    ] + $uri->toRenderArray();
+    ] + $entity->urlInfo()->toRenderArray();
+    $row['type'] = $productType->label();
+    $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
 
     return $row + parent::buildRow($entity);
   }

@@ -32,7 +32,10 @@ class StoreListBuilder extends EntityListBuilder {
     /* @var $entity \Drupal\commerce_store\Entity\Store */
     $storeType = StoreType::load($entity->bundle());
 
-    $row['name'] = $entity->getName();
+    $row['name']['data'] = [
+      '#type' => 'link',
+      '#title' => $entity->label(),
+    ] + $entity->urlInfo()->toRenderArray();
     $row['type'] = $storeType->label();
 
     return $row + parent::buildRow($entity);
