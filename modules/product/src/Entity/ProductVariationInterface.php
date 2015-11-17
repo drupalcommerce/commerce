@@ -77,22 +77,24 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setPrice($price);
 
   /**
-   * Get the variation status.
+   * Gets whether the variation is active.
+   *
+   * Inactive variations are not visible on add to cart forms.
    *
    * @return bool
-   *   The variation status
+   *   TRUE if the variation is active, FALSE otherwise.
    */
-  public function getStatus();
+  public function isActive();
 
   /**
-   * Set the variation status.
+   * Sets whether the variation is active.
    *
-   * @param bool $status
-   *   The variation status.
+   * @param bool $active
+   *   Whether the variation is active.
    *
    * @return $this
    */
-  public function setStatus($status);
+  public function setActive($active);
 
   /**
    * Gets the variation creation timestamp.

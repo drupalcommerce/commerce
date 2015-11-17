@@ -38,9 +38,10 @@ use Drupal\user\UserInterface;
  *   data_table = "commerce_product_variation_field_data",
  *   entity_keys = {
  *     "id" = "variation_id",
+ *     "bundle" = "type",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "bundle" = "type"
+ *     "status" = "status",
  *   },
  *   bundle_entity_type = "commerce_product_variation_type",
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
@@ -139,15 +140,15 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->get('status')->value;
+  public function isActive() {
+    return (bool) $this->getEntityKey('status');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->set('status', $status);
+  public function setActive($active) {
+    $this->set('status', (bool) $active);
     return $this;
   }
 
@@ -333,16 +334,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDescription(t('Whether the variation is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
-      ->setSettings([
-        'default_value' => 1,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => 10,
-        'settings' => [
-          'display_label' => TRUE
-        ]
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')

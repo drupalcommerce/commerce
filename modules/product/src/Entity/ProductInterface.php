@@ -43,22 +43,24 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function setTitle($title);
 
   /**
-   * Get the product status.
+   * Get whether the product is published.
+   *
+   * Unpublished products are only visible to their authors and administrators.
    *
    * @return bool
-   *   The product status
+   *   TRUE if the product is published, FALSE otherwise.
    */
-  public function getStatus();
+  public function isPublished();
 
   /**
-   * Set the product status.
+   * Sets whether the product is published.
    *
-   * @param bool $status
-   *   The product status.
+   * @param bool $published
+   *   Whether the product is published.
    *
    * @return $this
    */
-  public function setStatus($status);
+  public function setPublished($published);
 
   /**
    * Gets the product creation timestamp.

@@ -44,10 +44,11 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   data_table = "commerce_product_field_data",
  *   entity_keys = {
  *     "id" = "product_id",
+ *     "bundle" = "type",
  *     "label" = "title",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "bundle" = "type"
+ *     "status" = "status",
  *   },
  *   links = {
  *     "canonical" = "/product/{commerce_product}",
@@ -88,15 +89,15 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->get('status')->value;
+  public function isPublished() {
+    return (bool) $this->getEntityKey('status');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStatus($status) {
-    $this->set('status', $status);
+  public function setPublished($published) {
+    $this->set('status', (bool) $published);
     return $this;
   }
 
@@ -298,20 +299,10 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setCustomStorage(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Active'))
-      ->setDescription(t('Whether the product is active.'))
+      ->setLabel(t('Published'))
+      ->setDescription(t('Whether the product is published.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
-      ->setSettings([
-        'default_value' => 1,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => 20,
-        'settings' => [
-          'display_label' => TRUE
-        ]
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
