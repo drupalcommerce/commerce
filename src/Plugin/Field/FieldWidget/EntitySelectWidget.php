@@ -88,7 +88,7 @@ class EntitySelectWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
     $multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $values = $items->getValue();
@@ -110,7 +110,14 @@ class EntitySelectWidget extends WidgetBase {
       '#required' => $this->fieldDefinition->isRequired(),
     ];
 
-    return $element;
+    return ['target_id' => $element];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    return $values['target_id'];
   }
 
 }

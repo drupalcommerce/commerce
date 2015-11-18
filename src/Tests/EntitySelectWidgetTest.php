@@ -103,7 +103,7 @@ class EntitySelectWidgetTest extends WebTestBase {
     $this->createStores(1);
     $storeId = $this->stores[0]->id();
     $this->drupalGet($formUrl);
-    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[value]" and @value="'. $storeId .'"]', NULL, 'Stores field is displayed as a hidden element.');
+    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $storeId .'"]', NULL, 'Stores field is displayed as a hidden element.');
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
@@ -112,26 +112,26 @@ class EntitySelectWidgetTest extends WebTestBase {
     }, $this->stores);
     $this->drupalGet($formUrl);
     $this->assertTrue((bool) $this->xpath('//input[@type="checkbox" and starts-with(@name,"stores")]'), 'Stores field is displayed as a checkboxes element.');
-    $this->assertNoFieldChecked('edit-stores-value-1');
-    $this->assertNoFieldChecked('edit-stores-value-2');
+    $this->assertNoFieldChecked('edit-stores-target-id-value-1');
+    $this->assertNoFieldChecked('edit-stores-target-id-value-2');
     // Check store 1.
-    $edit['stores[value]['. $storeIds[0] .']'] = $storeIds[0];
-    $edit['stores[value]['. $storeIds[1] .']'] = FALSE;
+    $edit['stores[target_id][value][' . $storeIds[0] .']'] = $storeIds[0];
+    $edit['stores[target_id][value][' . $storeIds[1] .']'] = FALSE;
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
     $this->assertFieldValues($this->product->getStoreIds(), [$storeIds[0]], 'The correct store has been set on the product.');
     $this->drupalGet($formUrl);
-    $this->assertFieldChecked('edit-stores-value-'. $storeIds[0]);
-    $this->assertNoFieldChecked('edit-stores-value-'. $storeIds[1]);
+    $this->assertFieldChecked('edit-stores-target-id-value-' . $storeIds[0]);
+    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $storeIds[1]);
 
     // Reduce the cardinality to 1. Checkboxes should now be radios.
     $this->referenceField->setCardinality(1)->save();
     $this->drupalGet($formUrl);
-    $this->assertTrue((bool) $this->xpath('//input[@type="radio" and @name="stores[value]"]'), 'Stores field is displayed as a radio element.');
-    $this->assertFieldChecked('edit-stores-value-'. $storeIds[0], 'Radio field for store '. $storeIds[0] .' is checked.');
-    $this->assertNoFieldChecked('edit-stores-value-'. $storeIds[1], 'Radio field for store '. $storeIds[1] .' is unchecked.');
+    $this->assertTrue((bool) $this->xpath('//input[@type="radio" and @name="stores[target_id][value]"]'), 'Stores field is displayed as a radio element.');
+    $this->assertFieldChecked('edit-stores-target-id-value-' . $storeIds[0], 'Radio field for store ' . $storeIds[0] . ' is checked.');
+    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $storeIds[1], 'Radio field for store ' . $storeIds[1] . ' is unchecked.');
 
     // Create the final store. The widget should now be an autocomplete field.
     $this->createStores(1);
@@ -140,18 +140,18 @@ class EntitySelectWidgetTest extends WebTestBase {
     }, $this->stores);
     $this->referenceField->setCardinality(FieldStorageConfig::CARDINALITY_UNLIMITED)->save();
     $this->drupalGet($formUrl);
-    $this->assertTrue((bool) $this->xpath('//input[@id="edit-stores-value" and starts-with(@class, "form-autocomplete")]'), 'Stores field is displayed as an autocomplete element.');
-    $this->assertFieldByName('stores[value]', $storeLabels[0]);
+    $this->assertTrue((bool) $this->xpath('//input[@id="edit-stores-target-id-value" and starts-with(@class, "form-autocomplete")]'), 'Stores field is displayed as an autocomplete element.');
+    $this->assertFieldByName('stores[target_id][value]', $storeLabels[0]);
     // Reference both stores 1 and 2.
     $edit = [];
-    $edit['stores[value]'] = $storeLabels[0] . ', ' . $storeLabels[1];
+    $edit['stores[target_id][value]'] = $storeLabels[0] . ', ' . $storeLabels[1];
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
     $this->assertFieldValues($this->product->getStoreIds(), [$storeIds[0], $storeIds[1]], 'The correct stores have been set on the product.');
     $this->drupalGet($formUrl);
-    $this->assertFieldByName('stores[value]', $storeLabels[0] . ', ' . $storeLabels[1]);
+    $this->assertFieldByName('stores[target_id][value]', $storeLabels[0] . ', ' . $storeLabels[1]);
   }
 
   /**
