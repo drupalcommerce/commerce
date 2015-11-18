@@ -116,6 +116,9 @@ class CommerceProductEntityController extends DrupalCommerceEntityController {
       }
     }
 
+    // Reset load by SKU static cache.
+    drupal_static_reset('commerce_product_load_by_sku');
+
     return parent::save($product, $transaction);
   }
 
