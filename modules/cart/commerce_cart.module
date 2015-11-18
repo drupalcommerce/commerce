@@ -2336,15 +2336,12 @@ function commerce_cart_add_to_cart_form_attributes_refresh($form, $form_state) {
           $replacement_class,
         );
 
-        // Theme the product extra field to $element.
-        $variables = array(
-          $product_extra_field_name => $product->{$product_extra_field_name},
-          'label' => $product_extra_field['label'] . ':',
-          'product' => $product,
-        );
-
+        // Build the product extra field to $element.
         $element = array(
-          '#markup' => theme($product_extra_field['theme'], $variables),
+          '#theme' => $product_extra_field['theme'],
+          '#' . $product_extra_field_name => $product->{$product_extra_field_name},
+          '#label' => $product_extra_field['label'] . ':',
+          '#product' => $product,
           '#attached' => array(
             'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
           ),

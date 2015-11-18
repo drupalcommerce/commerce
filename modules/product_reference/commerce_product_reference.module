@@ -436,14 +436,11 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
             // Add the product extra field to the entity's content array.
             $content_key = 'product:' . $product_extra_field_name;
 
-            $variables = array(
-              $product_extra_field_name => $product->{$product_extra_field_name},
-              'label' => $product_extra_field['label'] . ':',
-              'product' => $product,
-            );
-
             $entity->content[$content_key] = array(
-              '#markup' => theme($product_extra_field['theme'], $variables),
+              '#theme' => $product_extra_field['theme'],
+              '#' . $product_extra_field_name => $product->{$product_extra_field_name},
+              '#label' => $product_extra_field['label'] . ':',
+              '#product' => $product,
               '#attached' => array(
                 'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
               ),
