@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_product
+id: publish_product_action
+label: 'Publish product'
+type: commerce_product
+plugin: publish_product_action
+configuration: {  }

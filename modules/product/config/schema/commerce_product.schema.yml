@@ -45,3 +45,11 @@ field.field.*.*.*.third_party.commerce_product:
     attribute_widget_title:
         type: label
         label: 'The title of the product attribute for the Add to Cart form'
+
+action.configuration.publish_product_action:
+  type: action_configuration_default
+  label: 'Configuration for the Publish product action'
+
+action.configuration.unpublish_product_action:
+  type: action_configuration_default
+  label: 'Configuration for the Unpublish product action'

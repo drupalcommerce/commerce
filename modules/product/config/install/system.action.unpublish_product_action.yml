@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_product
+id: unpublish_product_action
+label: 'Unpublish product'
+type: commerce_product
+plugin: unpublish_product_action
+configuration: {  }
