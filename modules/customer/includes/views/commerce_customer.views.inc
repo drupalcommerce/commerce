@@ -263,3 +263,36 @@ function commerce_customer_views_data() {
 
   return $data;
 }
+
+/**
+ * Implements hook_field_views_data().
+ */
+function commerce_customer_field_views_data($field) {
+  $data = field_views_field_default_views_data($field);
+
+  // Build an array of bundles the customer profile reference field appears on.
+  $bundles = array();
+
+  foreach ($field['bundles'] as $entity => $entity_bundles) {
+    $bundles[] = $entity . ' (' . implode(', ', $entity_bundles) . ')';
+  }
+
+  $replacements = array('!field_name' => $field['field_name'], '@bundles' => implode(', ', $bundles));
+
+  foreach ($data as $table_name => $table_data) {
+    foreach ($table_data as $field_name => $field_data) {
+      if (isset($field_data['filter']['field_name']) && $field_name != 'delta') {
+        $data[$table_name][$field_name]['relationship'] = array(
+          'title' => t('Referenced customer profile'),
+          'label' => t('Customer profile referenced by !field_name', $replacements),
+          'help' => t('Relate this entity to the customer profile referenced by its !field_name value.', $replacements) . '<br />' . t('Appears in: @bundles.', $replacements),
+          'base' => 'commerce_customer_profile',
+          'base field' => 'profile_id',
+          'handler' => 'views_handler_relationship',
+        );
+      }
+    }
+  }
+
+  return $data;
+}
