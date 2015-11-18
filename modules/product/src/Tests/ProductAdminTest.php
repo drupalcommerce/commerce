@@ -38,7 +38,7 @@ class ProductAdminTest extends ProductTestBase {
       'title[0][value]' => $title,
     ];
     foreach ($storeIds as $storeId) {
-      $edit['stores[value]['. $storeId .']'] = $storeId;
+      $edit['stores[target_id][value]['. $storeId .']'] = $storeId;
     }
     $this->drupalPostForm(NULL, $edit, t('Save and publish'));
 
