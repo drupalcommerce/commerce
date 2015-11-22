@@ -8,6 +8,7 @@
 namespace Drupal\commerce_order\Tests;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\profile\Entity\Profile;
 
 /**
  * Tests the commerce_order entity forms.
@@ -15,6 +16,26 @@ use Drupal\commerce_order\Entity\Order;
  * @group commerce
  */
 class OrderAdminTest extends OrderTestBase {
+
+  /**
+   * The profile to test against
+   *
+   * @var \Drupal\profile\Entity\Profile
+   */
+  protected $billingProfile;
+
+  protected function setUp() {
+    parent::setUp();
+    \Drupal::service('module_installer')->install(['profile']);
+
+    $profile_values = [
+      'type' => 'billing',
+      'uid' => 1,
+      'status' => 1,
+    ];
+    $this->billingProfile = Profile::create($profile_values);
+    $this->billingProfile->save();
+  }
 
   /**
    * Tests creating a Order programaticaly and through the add form.
@@ -34,7 +55,8 @@ class OrderAdminTest extends OrderTestBase {
 
     $values = [
       'store_id' => $this->store->id(),
-      'mail[0][value]' => $this->loggedInUser->getEmail()
+      'mail[0][value]' => $this->loggedInUser->getEmail(),
+      'billing_profile' => $this->billingProfile->id()
     ];
     $this->drupalPostForm(NULL, $values, t('Save'));
 

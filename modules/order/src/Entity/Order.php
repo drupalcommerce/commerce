@@ -425,7 +425,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['profile']])
+      ->setSetting('handler_settings', ['target_bundles' => ['billing']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'options_select',
