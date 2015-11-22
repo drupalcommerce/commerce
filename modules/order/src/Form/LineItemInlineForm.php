@@ -8,12 +8,12 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\inline_entity_form\InlineEntityForm\EntityInlineEntityFormHandler;
+use Drupal\inline_entity_form\Form\EntityInlineForm;
 
 /**
  * Defines the inline form for line items.
  */
-class LineItemInlineForm extends EntityInlineEntityFormHandler {
+class LineItemInlineForm extends EntityInlineForm {
 
   /**
    * {@inheritdoc}

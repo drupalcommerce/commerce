@@ -7,12 +7,12 @@
 
 namespace Drupal\commerce_product\Form;
 
-use Drupal\inline_entity_form\InlineEntityForm\EntityInlineEntityFormHandler;
+use Drupal\inline_entity_form\Form\EntityInlineForm;
 
 /**
  * Defines the inline form for product variations.
  */
-class ProductVariationInlineForm extends EntityInlineEntityFormHandler {
+class ProductVariationInlineForm extends EntityInlineForm {
 
   /**
    * {@inheritdoc}
