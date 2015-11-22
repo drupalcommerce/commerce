@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce_order\Entity\LineItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\inline_entity_form\Form\EntityInlineForm;
 
