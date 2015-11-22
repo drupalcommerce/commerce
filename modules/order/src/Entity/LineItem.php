@@ -26,7 +26,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
- *     }
+ *     },
+ *     "inline_form" = "Drupal\commerce_order\Form\LineItemInlineForm",
  *   },
  *   base_table = "commerce_line_item",
  *   admin_permission = "administer orders",
