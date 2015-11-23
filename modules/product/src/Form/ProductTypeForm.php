@@ -9,6 +9,7 @@ namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -24,20 +25,33 @@ class ProductTypeForm extends BundleEntityFormBase {
   protected $variationTypeStorage;
 
   /**
+   * The entity field manager.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   */
+  protected $entityFieldManager;
+
+  /**
    * Creates a new ProductTypeForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   *   The entity field manager.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityFieldManagerInterface $entityFieldManager) {
     $this->variationTypeStorage = $entityTypeManager->getStorage('commerce_product_variation_type');
+    $this->entityFieldManager = $entityFieldManager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('entity_type.manager'));
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager')
+    );
   }
 
   /**
@@ -50,6 +64,14 @@ class ProductTypeForm extends BundleEntityFormBase {
     $variationTypes = array_map(function($variationType) {
       return $variationType->label();
     }, $variationTypes);
+    // Create an empty product to get the default status value.
+    // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
+    if ($this->operation == 'add') {
+      $product = $this->entityManager->getStorage('commerce_product')->create(['type' => $productType->uuid()]);
+    }
+    else {
+      $product = $this->entityManager->getStorage('commerce_product')->create(['type' => $productType->id()]);
+    }
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -78,6 +100,11 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#options' => $variationTypes,
       '#required' => TRUE,
     ];
+    $form['product_status'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Publish new products of this type by default.'),
+      '#default_value' => $product->isPublished(),
+    ];
     $form['digital'] = [
       '#type' => 'checkbox',
       '#title' => t('Digital'),
@@ -102,7 +129,7 @@ class ProductTypeForm extends BundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
-    return $this->protectBundleIdElement($form);;
+    return $this->protectBundleIdElement($form);
   }
 
   /**
@@ -110,9 +137,17 @@ class ProductTypeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
+    // Update the default value of the status field.
+    $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $this->entity->id()]);
+    $value = (bool) $form_state->getValue('product_status');
+    if ($product->status->value != $value) {
+      $fields = $this->entityFieldManager->getFieldDefinitions('commerce_product', $this->entity->id());
+      $fields['status']->getConfig($this->entity->id())->setDefaultValue($value)->save();
+      $this->entityFieldManager->clearCachedFieldDefinitions();
+    }
+
     drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');
-
     if ($status == SAVED_NEW) {
       commerce_product_add_stores_field($this->entity);
       commerce_product_add_body_field($this->entity);
