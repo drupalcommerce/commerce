@@ -35,7 +35,7 @@ entity.commerce_product.collection:
 entity.commerce_product_type.add_form:
   path: '/admin/commerce/config/product-types/add'
   defaults:
-    _entity_form: commerce_product_type.edit
+    _entity_form: commerce_product_type.add
     _title: 'Add product type'
   requirements:
     _entity_create_access: 'commerce_product_type'
