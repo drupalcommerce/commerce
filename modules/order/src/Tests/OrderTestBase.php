@@ -96,6 +96,14 @@ abstract class OrderTestBase extends WebTestBase {
     $this->variation = ProductVariation::create($values);
     $this->variation->save();
 
+    // We need a product too otherwise tests complain about missing
+    // backreference.
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'variations' => [$this->variation],
+    ]);
+
     $this->drupalLogin($this->adminUser);
   }
 
