@@ -283,7 +283,7 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       $new_product->uid = $uid;
 
       $new_product->commerce_price[LANGUAGE_NONE][0]['amount'] = ($amount < 0) ? rand(2, 500) : $amount;
-      $new_product->commerce_price[LANGUAGE_NONE][0]['currency_code'] = 'USD';
+      $new_product->commerce_price[LANGUAGE_NONE][0]['currency_code'] = $currency_code;
 
       commerce_product_save($new_product);
 
