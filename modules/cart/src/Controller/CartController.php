@@ -21,10 +21,12 @@ class CartController extends ControllerBase {
    *   A view with cart form content.
    */
   public function cartPage() {
-    // Get the Shopping Order id,
-    $cart_order_id = 1;
-    // To do : use the Cart settings to use a custom View for this page.
-    return views_embed_view('commerce_cart_form', 'default', [$cart_order_id]);
+    // Get the cart order id using the cart provider.
+    $cart_order_ids = \Drupal::service('commerce_cart.cart_provider')->getCartIds();
+    $cart_order_id = reset($cart_order_ids);
+    // Get cart page view from cart settings config.
+    $cart_page_view = \Drupal::config('commerce_cart.settings')->get('cart_page.view');
+    return views_embed_view($cart_page_view, 'default', $cart_order_id);
   }
 
 }
