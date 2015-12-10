@@ -3,16 +3,16 @@ status: true
 dependencies:
   module:
     - commerce_product
-    - entity_reference
 id: commerce_product.variations
 field_name: variations
 entity_type: commerce_product
 type: entity_reference
 settings:
   target_type: commerce_product_variation
-module: entity_reference
+module: core
 locked: true
 cardinality: -1
 translatable: false
 indexes: {  }
 persist_with_no_fields: false
+custom_storage: false

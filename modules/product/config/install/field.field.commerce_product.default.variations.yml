@@ -4,8 +4,6 @@ dependencies:
   config:
     - commerce_product.commerce_product_type.default
     - field.storage.commerce_product.variations
-  module:
-    - entity_reference
 id: commerce_product.default.variations
 field_name: variations
 entity_type: commerce_product
