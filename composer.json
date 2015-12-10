@@ -10,7 +10,7 @@
         "commerceguys/tax": "dev-master",
         "drupal/address": "8.1.*@dev",
         "drupal/entity": "8.1.*@dev",
-        "drupal/inline_entity_form": "8.1.*@dev",
+        "drupal/inline_entity_form": "8.1.x-dev#e039a1e",
         "drupal/profile": "8.1.*@dev",
         "drupal/state_machine": "8.1.*@dev"
     },
