@@ -11,6 +11,11 @@ targetEntityType: commerce_order
 bundle: default
 mode: default
 content:
+  billing_profile:
+    type: options_select
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
   created:
     type: datetime_timestamp
     weight: 3

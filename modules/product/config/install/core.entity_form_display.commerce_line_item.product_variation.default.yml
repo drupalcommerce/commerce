@@ -1,0 +1,39 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_line_item_type.product_variation
+  module:
+    - commerce_price
+id: commerce_line_item.product_variation.default
+targetEntityType: commerce_line_item
+bundle: product_variation
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+  purchased_entity:
+    type: entity_reference_autocomplete
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  quantity:
+    type: number
+    weight: 1
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  unit_price:
+    type: price_default
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  status: true
+  uid: true

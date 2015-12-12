@@ -2,8 +2,8 @@ langcode: und
 status: true
 dependencies:
   module:
-    - commerce_price
     - commerce_payment
+    - commerce_price
 id: commerce_payment_transaction.commerce_price
 field_name: commerce_price
 entity_type: commerce_payment_transaction
@@ -15,3 +15,4 @@ cardinality: 1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false
+custom_storage: false
