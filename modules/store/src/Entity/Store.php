@@ -10,6 +10,7 @@ namespace Drupal\commerce_store\Entity;
 use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
+use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -62,6 +63,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Store extends ContentEntityBase implements StoreInterface {
+
+  use EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -212,26 +215,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['store_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Store ID'))
-      ->setDescription(t('The store ID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The store UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The store language code.'))
-      ->setDisplayOptions('view', [
-        'type' => 'hidden',
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'language_select',
-        'weight' => -1,
-      ]);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))

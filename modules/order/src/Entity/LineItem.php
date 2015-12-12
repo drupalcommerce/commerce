@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity\EntityKeysFieldsTrait;
 
 /**
  * Defines the line item entity class.
@@ -50,7 +51,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class LineItem extends ContentEntityBase implements LineItemInterface {
 
-  use EntityChangedTrait;
+  use EntityChangedTrait, EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -148,22 +149,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['line_item_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Line Item ID'))
-      ->setDescription(t('The line item ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The line item UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The line item type.'))
-      ->setSetting('target_type', 'commerce_line_item_type')
-      ->setReadOnly(TRUE);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     // The order backreference, populated by Order::postSave().
     $fields['order_id'] = BaseFieldDefinition::create('entity_reference')

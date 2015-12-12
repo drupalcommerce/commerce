@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -58,7 +59,7 @@ use Drupal\profile\Entity\ProfileInterface;
  */
 class Order extends ContentEntityBase implements OrderInterface {
 
-  use EntityChangedTrait;
+  use EntityChangedTrait, EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -339,11 +340,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['order_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Order ID'))
-      ->setDescription(t('The order ID.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))
@@ -352,17 +349,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayConfigurable('form', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The order UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The order type.'))
-      ->setSetting('target_type', 'commerce_order_type')
-      ->setReadOnly(TRUE);
 
     $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Store'))

@@ -10,6 +10,7 @@ namespace Drupal\commerce_payment\Entity;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\entity\EntityKeysFieldsTrait;
 
 /**
  * Defines the payment transaction entity class.
@@ -44,6 +45,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class PaymentTransaction extends ContentEntityBase implements PaymentTransactionInterface {
+
+  use EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -190,22 +193,13 @@ class PaymentTransaction extends ContentEntityBase implements PaymentTransaction
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['transaction_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Transaction ID'))
-      ->setDescription(t('The ID of a transaction.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
       ->setDescription(t('The user that created this transaction.'))
       ->setSetting('target_type', 'user')
       ->setTranslatable(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of a transaction.'))
-      ->setReadOnly(TRUE);
 
     // TODO: Use entity_reference instead of integer when the commerce_oder codebase will be merged.
     $fields['order_id'] = BaseFieldDefinition::create('integer')

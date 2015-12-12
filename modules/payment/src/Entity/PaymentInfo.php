@@ -10,6 +10,7 @@ namespace Drupal\commerce_payment\Entity;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\entity\EntityKeysFieldsTrait;
 
 /**
 * Defines the payment information entity class.
@@ -47,6 +48,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class PaymentInfo extends ContentEntityBase implements PaymentInfoInterface {
+
+  use EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -178,11 +181,7 @@ class PaymentInfo extends ContentEntityBase implements PaymentInfoInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['information_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Payment information ID'))
-      ->setDescription(t('Primary key: numeric payment information id.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Payment information owner'))
@@ -207,11 +206,6 @@ class PaymentInfo extends ContentEntityBase implements PaymentInfoInterface {
         ),
       ))
       ->setDisplayConfigurable('form', TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The payment information UUID.'))
-      ->setReadOnly(TRUE);
 
     // Bundle.
     $fields['payment_method'] = BaseFieldDefinition::create('string')

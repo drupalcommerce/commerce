@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -62,7 +63,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class Product extends ContentEntityBase implements ProductInterface {
 
-  use EntityChangedTrait;
+  use EntityChangedTrait, EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -222,32 +223,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['product_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Product ID'))
-      ->setDescription(t('The product ID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The product UUID.'))
-      ->setReadOnly(TRUE);
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The product language code.'))
-      ->setDisplayOptions('view', [
-        'type' => 'hidden',
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'language_select',
-        'weight' => -1,
-      ]);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The product type.'))
-      ->setSetting('target_type', 'commerce_product_type')
-      ->setReadOnly(TRUE);
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
