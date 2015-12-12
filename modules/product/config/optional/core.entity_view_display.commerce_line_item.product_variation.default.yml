@@ -5,7 +5,6 @@ dependencies:
     - commerce_order.commerce_line_item_type.product_variation
   module:
     - commerce_price
-    - user
 id: commerce_line_item.product_variation.default
 targetEntityType: commerce_line_item
 bundle: product_variation

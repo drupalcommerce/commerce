@@ -3,16 +3,16 @@ status: true
 dependencies:
   module:
     - commerce_order
-    - entity_reference
 id: commerce_order.line_items
 field_name: line_items
 entity_type: commerce_order
 type: entity_reference
 settings:
   target_type: commerce_line_item
-module: entity_reference
+module: core
 locked: true
 cardinality: -1
 translatable: false
 indexes: {  }
 persist_with_no_fields: false
+custom_storage: false

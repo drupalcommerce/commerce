@@ -1,15 +1,9 @@
 langcode: en
 status: true
 dependencies:
-  entity:
+  config:
     - commerce_payment.commerce_payment_info_type.card
-    - field.field.commerce_payment_info.card.card_exp_month
-    - field.field.commerce_payment_info.card.card_exp_year
-    - field.field.commerce_payment_info.card.card_name
-    - field.field.commerce_payment_info.card.card_number
-    - field.field.commerce_payment_info.card.card_type
   module:
-    - commerce_payment
     - text
 id: commerce_payment_info.card.default
 targetEntityType: commerce_payment_info

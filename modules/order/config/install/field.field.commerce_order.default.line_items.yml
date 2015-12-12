@@ -4,8 +4,6 @@ dependencies:
   config:
     - commerce_order.commerce_order_type.default
     - field.storage.commerce_order.line_items
-  module:
-    - entity_reference
 id: commerce_order.default.line_items
 field_name: line_items
 entity_type: commerce_order

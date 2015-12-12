@@ -29,4 +29,5 @@ content:
     third_party_settings: {  }
     label: above
 hidden:
+  billing_profile: true
   store_id: true

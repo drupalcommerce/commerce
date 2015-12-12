@@ -3,16 +3,17 @@ status: true
 dependencies:
   module:
     - commerce_product
-    - entity_reference
+    - commerce_store
 id: commerce_product.stores
 field_name: stores
 entity_type: commerce_product
 type: entity_reference
 settings:
   target_type: commerce_store
-module: entity_reference
+module: core
 locked: true
 cardinality: -1
 translatable: false
 indexes: {  }
 persist_with_no_fields: false
+custom_storage: false
