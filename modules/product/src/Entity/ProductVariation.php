@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\user\UserInterface;
 
@@ -50,7 +51,7 @@ use Drupal\user\UserInterface;
  */
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
-  use EntityChangedTrait;
+  use EntityChangedTrait, EntityKeysFieldsTrait;
 
   /**
    * Local cache for attribute field definitions.
@@ -258,25 +259,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields['variation_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Variation ID'))
-      ->setDescription(t('The variation ID'))
-      ->setReadOnly(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The variation UUID'))
-      ->setReadOnly(TRUE);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The variation type.'))
-      ->setSetting('target_type', 'commerce_product_variation_type')
-      ->setReadOnly(TRUE);
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The variation language code.'));
+    $fields = self::entityKeysBaseFieldDefinitions($entityType);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
