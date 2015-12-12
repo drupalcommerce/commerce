@@ -17,9 +17,6 @@ commerce_price.commerce_currency.*:
     fractionDigits:
       type: integer
       label: 'Fraction digits'
-    status:
-      label: Status
-      type: boolean
 
 field.formatter.settings.price_default:
   type: mapping

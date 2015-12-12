@@ -94,11 +94,6 @@ class CurrencyForm extends EntityForm {
       '#min' => 0,
       '#required' => TRUE,
     ];
-    $form['status'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enabled'),
-      '#default_value' => $currency->status(),
-    ];
 
     return $form;
   }
