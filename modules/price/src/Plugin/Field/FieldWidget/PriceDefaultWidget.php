@@ -92,8 +92,7 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
-    // Load both enabled and disabled currencies, prices with disabled
-    // currencies can be skipped down the line.
+    // Load currencies.
     $currencies = $this->currencyStorage->loadMultiple();
     $currencyCodes = array_keys($currencies);
     // Stop rendering if there are no currencies available.

@@ -8,7 +8,7 @@
 function commerce_price_install() {
   /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
   $currency_importer = \Drupal::service('commerce_price.currency_importer');
-  // A list of currencies to import and enable by default.
+  // A list of currencies to import.
   $preloaded_currencies = ['USD', 'EUR', 'GBP'];
 
   foreach ($preloaded_currencies as $currency_code) {

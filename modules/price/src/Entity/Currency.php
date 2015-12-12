@@ -31,22 +31,18 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   entity_keys = {
  *     "id" = "currencyCode",
  *     "label" = "name",
- *     "uuid" = "uuid",
- *     "status" = "status"
+ *     "uuid" = "uuid"
  *   },
  *   config_export = {
  *     "currencyCode",
  *     "name",
  *     "numericCode",
  *     "symbol",
- *     "fractionDigits",
- *     "status",
+ *     "fractionDigits"
  *   },
  *   links = {
  *     "edit-form" = "/admin/commerce/config/currency/{commerce_currency}",
  *     "delete-form" = "/admin/commerce/config/currency/{commerce_currency}/delete",
- *     "enable" = "/admin/commerce/config/currency/{commerce_currency}/enable",
- *     "disable" = "/admin/commerce/config/currency/{commerce_currency}/disable",
  *     "collection" = "/admin/commerce/config/currency"
  *   }
  * )

@@ -22,7 +22,6 @@ class CurrencyListBuilder extends ConfigEntityListBuilder {
     $header = [
       'name' => $this->t('Name'),
       'currencyCode' => $this->t('Currency code'),
-      'status' => $this->t('Status'),
     ];
 
     return $header + parent::buildHeader();
@@ -35,7 +34,6 @@ class CurrencyListBuilder extends ConfigEntityListBuilder {
     $row = [
       'name' => $this->getLabel($entity),
       'currencyCode' => $entity->id(),
-      'status' => $entity->status() ? $this->t('Enabled') : $this->t('Disabled'),
     ];
 
     return $row + parent::buildRow($entity);
