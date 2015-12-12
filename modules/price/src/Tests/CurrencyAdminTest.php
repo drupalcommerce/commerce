@@ -66,4 +66,15 @@ class CurrencyAdminTest extends WebTestBase {
     $this->assertEqual($existing_currencies, $preloaded_currencies, 'Currencies were imported at installation');
   }
 
+  function testCurrencyImportExisting() {
+    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_code = 'USD';
+
+    $count_before = \Drupal::entityQuery('commerce_currency')->count()->execute();
+    $currency_importer->import($currency_code);
+    $count_after = \Drupal::entityQuery('commerce_currency')->count()->execute();
+
+    $this->assertEqual($count_before, $count_after, 'Currency importer handles existing currencies');
+  }
+
 }
