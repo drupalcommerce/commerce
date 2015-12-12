@@ -23,6 +23,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
+ *   label_singular = @Translation("store"),
+ *   label_plural = @Translation("stores"),
  *   bundle_label = @Translation("Store type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",

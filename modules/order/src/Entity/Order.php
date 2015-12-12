@@ -23,6 +23,8 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_singular = @Translation("order"),
+ *   label_plural = @Translation("orders"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",

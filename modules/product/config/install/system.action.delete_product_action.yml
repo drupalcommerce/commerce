@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_product
+id: delete_product_action
+label: 'Delete product'
+type: commerce_product
+plugin: delete_product_action
+configuration: {  }

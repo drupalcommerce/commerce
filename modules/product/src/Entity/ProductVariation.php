@@ -22,6 +22,8 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   label_singular = @Translation("product variation"),
+ *   label_plural = @Translation("product variations"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",

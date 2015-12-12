@@ -21,6 +21,8 @@ use Drupal\entity\EntityKeysFieldsTrait;
  * @ContentEntityType(
  *   id = "commerce_line_item",
  *   label = @Translation("Line Item"),
+ *   label_singular = @Translation("line item"),
+ *   label_plural = @Translation("line items"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",

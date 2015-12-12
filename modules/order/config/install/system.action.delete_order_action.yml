@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_order
+id: delete_order_action
+label: 'Delete order'
+type: commerce_order
+plugin: delete_order_action
+configuration: {  }

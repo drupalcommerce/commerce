@@ -28,3 +28,7 @@ commerce_order.commerce_line_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
+action.configuration.delete_order_action:
+  type: action_configuration_default
+  label: 'Delete order configuration'

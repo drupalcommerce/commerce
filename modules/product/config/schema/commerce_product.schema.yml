@@ -50,3 +50,7 @@ action.configuration.publish_product_action:
 action.configuration.unpublish_product_action:
   type: action_configuration_default
   label: 'Configuration for the Unpublish product action'
+
+action.configuration.delete_product_action:
+  type: action_configuration_default
+  label: 'Delete product configuration'

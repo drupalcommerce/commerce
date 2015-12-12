@@ -45,6 +45,14 @@ entity.commerce_order.collection:
   requirements:
     _permission: 'administer orders'
 
+entity.commerce_order.multiple_delete_confirm:
+  path: '/admin/commerce/orders/delete'
+  defaults:
+    _form: '\Drupal\commerce\Form\DeleteMultiple'
+    entity_type: 'commerce_order'
+  requirements:
+    _permission: 'administer orders'
+
 entity.commerce_line_item_type.add_form:
   path: '/admin/commerce/config/line-item-types/add'
   defaults:
