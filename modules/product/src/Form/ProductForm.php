@@ -107,6 +107,17 @@ class ProductForm extends ContentEntityForm {
       '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
     ];
+    $form['visibility_settings'] = [
+      '#type' => 'details',
+      '#title' => t('Visibility settings'),
+      '#open' => TRUE,
+      '#group' => 'advanced',
+      '#access' => !empty($form['stores']['#access']),
+      '#attributes' => [
+        'class' => ['product-visibility-settings'],
+      ],
+      '#weight' => 30,
+    ];
     $form['path_settings'] = [
       '#type' => 'details',
       '#title' => t('URL path settings'),
@@ -119,7 +130,7 @@ class ProductForm extends ContentEntityForm {
       '#attached' => [
         'library' => ['path/drupal.path'],
       ],
-      '#weight' => 30,
+      '#weight' => 60,
     ];
     $form['author'] = [
       '#type' => 'details',
@@ -142,6 +153,9 @@ class ProductForm extends ContentEntityForm {
     }
     if (isset($form['path'])) {
       $form['path']['#group'] = 'path_settings';
+    }
+    if (isset($form['stores'])) {
+      $form['stores']['#group'] = 'visibility_settings';
     }
 
     return $form;
