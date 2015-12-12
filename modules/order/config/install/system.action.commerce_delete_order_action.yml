@@ -3,8 +3,8 @@ status: true
 dependencies:
   module:
     - commerce_order
-id: delete_order_action
-label: 'Delete order'
+id: commerce_delete_order_action
+label: 'Delete Commerce order'
 type: commerce_order
-plugin: delete_order_action
+plugin: 'commerce_delete_action:commerce_order'
 configuration: {  }

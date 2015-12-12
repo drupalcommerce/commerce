@@ -3,6 +3,7 @@ status: true
 dependencies:
   module:
     - commerce_order
+    - system
     - user
 id: commerce_orders
 label: Orders
