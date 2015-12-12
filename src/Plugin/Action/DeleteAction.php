@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_store\Plugin\Action\DeleteStore.
+ * Contains \Drupal\commerce\Plugin\Action\DeleteAction.
  */
 
-namespace Drupal\commerce_store\Plugin\Action;
+namespace Drupal\commerce\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -14,16 +14,15 @@ use Drupal\user\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Redirects to a store deletion form.
+ * Redirects to a order deletion form.
  *
  * @Action(
- *   id = "delete_store_action",
- *   label = @Translation("Delete store"),
- *   type = "commerce_store",
- *   confirm_form_route_name = "entity.commerce_store.multiple_delete_confirm"
+ *   id = "commerce_delete_action",
+ *   label = @Translation("Delete a commerce entity"),
+ *   deriver = "Drupal\commerce\Plugin\Action\ActionDeriver",
  * )
  */
-class DeleteStore extends ActionBase implements ContainerFactoryPluginInterface {
+class DeleteAction extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * The tempstore object.
@@ -40,7 +39,7 @@ class DeleteStore extends ActionBase implements ContainerFactoryPluginInterface 
   protected $currentUser;
 
   /**
-   * Constructs a new DeleteStore object.
+   * Constructs a new DeleteAction object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -55,7 +54,7 @@ class DeleteStore extends ActionBase implements ContainerFactoryPluginInterface 
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, PrivateTempStoreFactory $temp_store_factory, AccountInterface $current_user) {
     $this->currentUser = $current_user;
-    $this->tempStore = $temp_store_factory->get('commerce_store_multiple_delete_confirm');
+    $this->tempStore = $temp_store_factory->get('commerce_order_multiple_delete_confirm');
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -79,9 +78,9 @@ class DeleteStore extends ActionBase implements ContainerFactoryPluginInterface 
   public function executeMultiple(array $entities) {
     $info = [];
     /** @var \Drupal\node\NodeInterface $node */
-    foreach ($entities as $store) {
-      $langcode = $store->language()->getId();
-      $info[$store->id()][$langcode] = $langcode;
+    foreach ($entities as $order) {
+      $langcode = $order->language()->getId();
+      $info[$order->id()][$langcode] = $langcode;
     }
     $this->tempStore->set($this->currentUser->id(), $info);
   }
@@ -97,7 +96,7 @@ class DeleteStore extends ActionBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\node\NodeInterface $object */
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $object */
     return $object->access('delete', $account, $return_as_object);
   }
 

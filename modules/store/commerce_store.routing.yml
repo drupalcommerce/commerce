@@ -32,14 +32,6 @@ entity.commerce_store.collection:
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_store.multiple_delete_confirm:
-  path: '/admin/commerce/stores/delete'
-  defaults:
-    _form: '\Drupal\commerce\Form\DeleteMultiple'
-    entity_type: 'commerce_store'
-  requirements:
-    _permission: 'administer stores'
-
 entity.commerce_store_type.add_form:
   path: '/admin/commerce/config/store-types/add'
   defaults:

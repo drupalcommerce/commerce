@@ -45,6 +45,7 @@ use Drupal\entity\EntityKeysFieldsTrait;
  *     "canonical" = "/admin/commerce/config/line-item/{commerce_line_item}",
  *     "edit-form" = "/admin/commerce/config/line-item/{commerce_line_item}/edit",
  *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete",
+ *     "multiple-delete-form" = "/admin/commerce/config/line-item/delete",
  *     "collection" = "/admin/commerce/config/line-item"
  *   },
  *   bundle_entity_type = "commerce_line_item_type",

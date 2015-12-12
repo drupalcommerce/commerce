@@ -39,3 +39,9 @@ services:
     arguments: ['@commerce.country_context']
     tags:
       - { name: cache.context}
+
+  commerce.route_provider:
+    class: \Drupal\commerce\EventSubscriber\EntityDeleteRouteProviderSubscriber
+    arguments: ['@entity.manager']
+    tags:
+      - { name: event_subscriber }

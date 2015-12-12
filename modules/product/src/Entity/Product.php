@@ -57,6 +57,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "canonical" = "/product/{commerce_product}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
+ *     "multiple-delete-form" = "/admin/commerce/products/delete",
  *     "collection" = "/admin/commerce/products"
  *   },
  *   bundle_entity_type = "commerce_product_type",

@@ -53,6 +53,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "canonical" = "/admin/commerce/orders/{commerce_order}",
  *     "edit-form" = "/admin/commerce/orders/{commerce_order}/edit",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
+ *     "multiple-delete-form" = "/admin/commerce/orders/delete",
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
