@@ -8,9 +8,6 @@ commerce_product.commerce_product_type.*:
     label:
       type: label
       label: 'Label'
-    digital:
-      type: boolean
-      label: 'Products of this type represent digital services.'
     description:
       type: text
       label: 'Description'

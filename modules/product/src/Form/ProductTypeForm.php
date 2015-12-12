@@ -105,12 +105,6 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#title' => t('Publish new products of this type by default.'),
       '#default_value' => $product->isPublished(),
     ];
-    $form['digital'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Digital'),
-      '#default_value' => $productType->isDigital(),
-      '#description' => t('Products of this type represent digital services.')
-    ];
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [

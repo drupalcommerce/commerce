@@ -37,7 +37,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "id",
  *     "label",
- *     "digital",
  *     "description",
  *     "variationType",
  *   },
@@ -86,13 +85,6 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $variationType;
 
   /**
-   * Option to specify if the product type is a digital service.
-   *
-   * @var bool
-   */
-  protected $digital;
-
-  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -119,21 +111,6 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    */
   public function setVariationType($variationType) {
     $this->variationType = $variationType;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isDigital() {
-    return $this->digital ? TRUE : FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDigital($digital) {
-    $this->digital = $digital;
     return $this;
   }
 
