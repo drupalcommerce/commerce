@@ -7,7 +7,6 @@ dependencies:
   - address
   - commerce
   - commerce_price
-  - entity_reference
   - options
 config_devel:
   - commerce_store.commerce_store_type.default
