@@ -22,7 +22,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "delete" = "Drupal\commerce_order\Form\LineItemTypeDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_order\LineItemTypeListBuilder",
  *   },
@@ -41,6 +42,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "orderType"
  *   },
  *   links = {
+ *     "add-form" = "/admin/commerce/config/line-item-types/add",
  *     "edit-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/edit",
  *     "delete-form" = "/admin/commerce/config/line-item-types/{commerce_line_item_type}/delete",
  *     "collection" = "/admin/commerce/config/line-item-types"

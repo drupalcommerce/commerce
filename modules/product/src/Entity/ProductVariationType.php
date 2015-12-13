@@ -23,7 +23,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "delete" = "Drupal\commerce_product\Form\ProductVariationTypeDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "commerce_product_variation_type",
@@ -40,7 +41,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "lineItemType",
  *   },
  *   links = {
- *     "edit-form" =   "/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/edit",
+ *     "add-form" = "/admin/commerce/config/product-variation-types/add",
+ *     "edit-form" = "/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/edit",
  *     "delete-form" = "/admin/commerce/config/product-variation-types/{commerce_product_variation_type}/delete",
  *     "collection" =  "/admin/commerce/config/product-variation-types"
  *   }

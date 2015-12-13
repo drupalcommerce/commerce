@@ -8,23 +8,6 @@
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Implements hook_theme().
- */
-function commerce_theme() {
-  return [
-    'commerce_add_list' => [
-      'variables' => [
-        'bundles' => [],
-        'bundle_type' => NULL,
-        'form_route_name' => NULL
-      ],
-      'file' => 'commerce.pages.inc',
-      'template' => 'commerce-add-list',
-    ],
-  ];
-}
-
-/**
  * Implements hook_toolbar().
  */
 function commerce_toolbar() {

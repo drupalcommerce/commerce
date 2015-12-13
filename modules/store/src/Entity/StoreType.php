@@ -23,7 +23,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "delete" = "Drupal\commerce_store\Form\StoreTypeDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   admin_permission = "administer store types",
@@ -41,6 +42,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "description",
  *   },
  *   links = {
+ *     "add-form" = "/admin/commerce/config/store-types/add",
  *     "edit-form" = "/admin/commerce/config/store-types/{commerce_store_type}/edit",
  *     "delete-form" = "/admin/commerce/config/store-types/{commerce_store_type}/delete",
  *     "collection" = "/admin/commerce/config/store-types",

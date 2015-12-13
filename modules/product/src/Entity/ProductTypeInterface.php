@@ -8,29 +8,12 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\entity\Entity\EntityDescriptionInterface;
 
 /**
  * Defines the interface for product types.
  */
-interface ProductTypeInterface extends ConfigEntityInterface {
-
-  /**
-   * Gets the product type description.
-   *
-   * @return string
-   *   The product type description.
-   */
-  public function getDescription();
-
-  /**
-   * Sets the product type description.
-   *
-   * @param string $description
-   *   The product description.
-   *
-   * @return $this
-   */
-  public function setDescription($description);
+interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionInterface {
 
   /**
    * Gets the product type's matching variation type.

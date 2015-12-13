@@ -36,7 +36,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
@@ -54,6 +55,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   links = {
  *     "canonical" = "/store/{commerce_store}",
+ *     "add-page" = "/store/add",
+ *     "add-form" = "/store/add/{type}",
  *     "edit-form" = "/store/{commerce_store}/edit",
  *     "delete-form" = "/store/{commerce_store}/delete",
  *     "collection" = "/admin/commerce/stores",
