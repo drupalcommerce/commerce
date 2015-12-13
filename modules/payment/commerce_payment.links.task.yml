@@ -1,9 +1,0 @@
-entity.commerce_payment_info.edit_form:
-  route_name: 'entity.commerce_payment_info.edit_form'
-  base_route: 'entity.commerce_payment_info.edit_form'
-  title: 'Edit'
-
-entity.commerce_payment_info.admin_form:
-  route_name: 'entity.commerce_payment_info.admin_form'
-  base_route: 'entity.commerce_payment_info.admin_form'
-  title: 'Edit'
