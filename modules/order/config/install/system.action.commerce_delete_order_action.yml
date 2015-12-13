@@ -7,4 +7,3 @@ id: commerce_delete_order_action
 label: 'Delete Commerce order'
 type: commerce_order
 plugin: 'commerce_delete_action:commerce_order'
-configuration: {  }

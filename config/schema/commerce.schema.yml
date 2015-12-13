@@ -11,3 +11,7 @@ field.widget.settings.entity_select:
     autocomplete_placeholder:
       type: string
       label: 'Autocomplete placeholder'
+
+'action.configuration.commerce_delete_action:*':
+  type: action_configuration_default
+  label: 'Delete Commerce entity configuration'
