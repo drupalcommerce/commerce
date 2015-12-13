@@ -16,9 +16,6 @@ cd "$DRUPAL_TI_DRUPAL_DIR"
     cd "$DRUPAL_TI_MODULES_PATH"
 
     git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/address.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/profile.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git
 )
 
 # Ensure the module is linked into the codebase.
