@@ -23,8 +23,6 @@ class ActionDeriver extends DeriverBase implements DeriverInterface {
     return [
       'commerce_line_item',
       'commerce_order',
-      'commerce_payment_info',
-      'commerce_payment_transaction',
       'commerce_product',
       'commerce_product_variation',
       'commerce_store',
