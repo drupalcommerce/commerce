@@ -34,31 +34,31 @@ class CommerceContentEntityStorage extends SqlContentEntityStorage {
   /**
    * Constructs a new CommerceContentEntityStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend to be used.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeInterface $entityType, Connection $database, EntityManagerInterface $entityManager, CacheBackendInterface $cache, LanguageManagerInterface $languageManager, EventDispatcherInterface $eventDispatcher) {
-    parent::__construct($entityType, $database, $entityManager, $cache, $languageManager);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager);
 
-    $this->eventDispatcher = $eventDispatcher;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entityType) {
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
-      $entityType,
+      $entity_type,
       $container->get('database'),
       $container->get('entity.manager'),
       $container->get('cache.entity'),
@@ -73,16 +73,16 @@ class CommerceContentEntityStorage extends SqlContentEntityStorage {
   protected function postLoad(array &$entities) {
     parent::postLoad($entities);
 
-    $eventClass = $this->entityType->getHandlerClass('event');
-    if (!$eventClass) {
+    $event_class = $this->entityType->getHandlerClass('event');
+    if (!$event_class) {
       return;
     }
     // hook_entity_load() is invoked for all entities at once.
     // The event is dispatched for each entity separately, for better DX.
     // @todo Evaluate performance implications.
-    $eventName = $this->getEventName('load');
+    $event_name = $this->getEventName('load');
     foreach ($entities as $entity) {
-      $this->eventDispatcher->dispatch($eventName, new $eventClass($entity));
+      $this->eventDispatcher->dispatch($event_name, new $event_class($entity));
     }
   }
 
@@ -92,9 +92,9 @@ class CommerceContentEntityStorage extends SqlContentEntityStorage {
   protected function invokeHook($hook, EntityInterface $entity) {
     parent::invokeHook($hook, $entity);
 
-    $eventClass = $this->entityType->getHandlerClass('event');
-    if ($eventClass) {
-      $this->eventDispatcher->dispatch($this->getEventName($hook), new $eventClass($entity));
+    $event_class = $this->entityType->getHandlerClass('event');
+    if ($event_class) {
+      $this->eventDispatcher->dispatch($this->getEventName($hook), new $event_class($entity));
     }
   }
 

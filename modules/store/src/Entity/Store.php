@@ -214,8 +214,8 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields = self::entityKeysBaseFieldDefinitions($entityType);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
@@ -277,13 +277,13 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     // Disable the recipient and organization fields on the store address.
-    $disabledFields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
+    $disabled_fields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
       ->setDescription(t('The store address.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setSetting('fields', array_diff(AddressField::getAll(), $disabledFields))
+      ->setSetting('fields', array_diff(AddressField::getAll(), $disabled_fields))
       ->setDisplayOptions('form', [
         'type' => 'address_default',
         'settings' => [],

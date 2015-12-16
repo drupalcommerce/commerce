@@ -25,19 +25,19 @@ class DefaultCountryResolver implements CountryResolverInterface {
   /**
    * Constructs a new DefaultCountryResolver object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(ConfigFactoryInterface $configFactory) {
-    $this->configFactory = $configFactory;
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolve() {
-    $countryCode = $this->configFactory->get('system.date')->get('country.default');
-    return new Country($countryCode);
+    $country_code = $this->configFactory->get('system.date')->get('country.default');
+    return new Country($country_code);
   }
 
 }

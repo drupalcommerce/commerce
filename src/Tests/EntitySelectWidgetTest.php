@@ -97,71 +97,71 @@ class EntitySelectWidgetTest extends WebTestBase {
    * Tests widget's hidden input type.
    */
   function testWidget() {
-    $formUrl = 'product/' . $this->product->id() . '/edit';
+    $form_url = 'product/' . $this->product->id() . '/edit';
     // Create the first store. Since the field is required, the widget
     // should be a hidden element.
     $this->createStores(1);
-    $storeId = $this->stores[0]->id();
-    $this->drupalGet($formUrl);
-    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $storeId .'"]', NULL, 'Stores field is displayed as a hidden element.');
+    $store_id = $this->stores[0]->id();
+    $this->drupalGet($form_url);
+    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $store_id .'"]', NULL, 'Stores field is displayed as a hidden element.');
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
-    $storeIds = array_map(function ($store) {
+    $store_ids = array_map(function ($store) {
       return $store->id();
     }, $this->stores);
-    $this->drupalGet($formUrl);
+    $this->drupalGet($form_url);
     $this->assertTrue((bool) $this->xpath('//input[@type="checkbox" and starts-with(@name,"stores")]'), 'Stores field is displayed as a checkboxes element.');
     $this->assertNoFieldChecked('edit-stores-target-id-value-1');
     $this->assertNoFieldChecked('edit-stores-target-id-value-2');
     // Check store 1.
-    $edit['stores[target_id][value][' . $storeIds[0] .']'] = $storeIds[0];
-    $edit['stores[target_id][value][' . $storeIds[1] .']'] = FALSE;
+    $edit['stores[target_id][value][' . $store_ids[0] .']'] = $store_ids[0];
+    $edit['stores[target_id][value][' . $store_ids[1] .']'] = FALSE;
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
-    $this->assertFieldValues($this->product->getStoreIds(), [$storeIds[0]], 'The correct store has been set on the product.');
-    $this->drupalGet($formUrl);
-    $this->assertFieldChecked('edit-stores-target-id-value-' . $storeIds[0]);
-    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $storeIds[1]);
+    $this->assertFieldValues($this->product->getStoreIds(), [$store_ids[0]], 'The correct store has been set on the product.');
+    $this->drupalGet($form_url);
+    $this->assertFieldChecked('edit-stores-target-id-value-' . $store_ids[0]);
+    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $store_ids[1]);
 
     // Reduce the cardinality to 1. Checkboxes should now be radios.
     $this->referenceField->setCardinality(1)->save();
-    $this->drupalGet($formUrl);
+    $this->drupalGet($form_url);
     $this->assertTrue((bool) $this->xpath('//input[@type="radio" and @name="stores[target_id][value]"]'), 'Stores field is displayed as a radio element.');
-    $this->assertFieldChecked('edit-stores-target-id-value-' . $storeIds[0], 'Radio field for store ' . $storeIds[0] . ' is checked.');
-    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $storeIds[1], 'Radio field for store ' . $storeIds[1] . ' is unchecked.');
+    $this->assertFieldChecked('edit-stores-target-id-value-' . $store_ids[0], 'Radio field for store ' . $store_ids[0] . ' is checked.');
+    $this->assertNoFieldChecked('edit-stores-target-id-value-' . $store_ids[1], 'Radio field for store ' . $store_ids[1] . ' is unchecked.');
 
     // Create the final store. The widget should now be an autocomplete field.
     $this->createStores(1);
-    $storeLabels = array_map(function ($store) {
+    $store_labels = array_map(function ($store) {
       return $store->label() . ' (' . $store->id() . ')';
     }, $this->stores);
     $this->referenceField->setCardinality(FieldStorageConfig::CARDINALITY_UNLIMITED)->save();
-    $this->drupalGet($formUrl);
+    $this->drupalGet($form_url);
     $this->assertTrue((bool) $this->xpath('//input[@id="edit-stores-target-id-value" and starts-with(@class, "form-autocomplete")]'), 'Stores field is displayed as an autocomplete element.');
-    $this->assertFieldByName('stores[target_id][value]', $storeLabels[0]);
+    $this->assertFieldByName('stores[target_id][value]', $store_labels[0]);
     // Reference both stores 1 and 2.
     $edit = [];
-    $edit['stores[target_id][value]'] = $storeLabels[0] . ', ' . $storeLabels[1];
+    $edit['stores[target_id][value]'] = $store_labels[0] . ', ' . $store_labels[1];
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
-    $this->assertFieldValues($this->product->getStoreIds(), [$storeIds[0], $storeIds[1]], 'The correct stores have been set on the product.');
-    $this->drupalGet($formUrl);
-    $this->assertFieldByName('stores[target_id][value]', $storeLabels[0] . ', ' . $storeLabels[1]);
+    $this->assertFieldValues($this->product->getStoreIds(), [$store_ids[0], $store_ids[1]], 'The correct stores have been set on the product.');
+    $this->drupalGet($form_url);
+    $this->assertFieldByName('stores[target_id][value]', $store_labels[0] . ', ' . $store_labels[1]);
   }
 
   /**
    * Creates stores.
    *
-   * @param string $numStores
+   * @param string $num_stores
    *   The number of stores to create.
    */
-  protected function createStores($numStores) {
-    for ($i = 0; $i < $numStores; $i++) {
+  protected function createStores($num_stores) {
+    for ($i = 0; $i < $num_stores; $i++) {
       $this->stores[] = $this->createEntity('commerce_store', [
         'type' => 'default',
         'name' => $this->randomMachineName(8),
@@ -201,9 +201,9 @@ class EntitySelectWidgetTest extends WebTestBase {
    *
    * Ignores differences in ordering.
    *
-   * @param array $fieldValues
+   * @param array $field_values
    *   The field values.
-   * @param array $expectedValues
+   * @param array $expected_values
    *   The expected values.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
@@ -211,11 +211,11 @@ class EntitySelectWidgetTest extends WebTestBase {
    *   variables in the message text, not t(). If left blank, a default message
    *   will be displayed.
    */
-  protected function assertFieldValues(array $fieldValues, array $expectedValues, $message = '') {
+  protected function assertFieldValues(array $field_values, array $expected_values, $message = '') {
     $valid = TRUE;
-    if (count($fieldValues) == count($expectedValues)) {
-      foreach ($expectedValues as $value) {
-        if (!in_array($value, $fieldValues)) {
+    if (count($field_values) == count($expected_values)) {
+      foreach ($expected_values as $value) {
+        if (!in_array($value, $field_values)) {
           $valid = FALSE;
           break;
         }

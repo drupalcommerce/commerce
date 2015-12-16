@@ -23,7 +23,7 @@ interface EntityStoreInterface {
   /**
    * Sets the store.
    *
-   * @return \Drupal\commerce_store\Entity\StoreInterface $store
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store entity.
    *
    * @return $this

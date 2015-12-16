@@ -43,16 +43,16 @@ class StoreForm extends ContentEntityForm {
     $form = parent::form($form, $form_state);
     $entity = $this->entity;
 
-    $defaultStore = $this->storage->loadDefault();
+    $default_store = $this->storage->loadDefault();
     $isDefault = TRUE;
-    if ($defaultStore && $defaultStore->uuid() != $entity->uuid()) {
+    if ($default_store && $default_store->uuid() != $entity->uuid()) {
       $isDefault = FALSE;
     }
     $form['default'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Default'),
       '#default_value' => $isDefault,
-      '#disabled' => $isDefault || empty($defaultStore),
+      '#disabled' => $isDefault || empty($default_store),
       '#weight' => 99,
     ];
 

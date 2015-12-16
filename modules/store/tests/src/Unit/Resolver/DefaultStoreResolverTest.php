@@ -34,23 +34,22 @@ class DefaultStoreResolverTest extends UnitTestCase {
       ->method('loadDefault')
       ->willReturn('testStore');
 
-    $entityTypeManager = $this->getMockBuilder('\Drupal\Core\Entity\EntityTypeManager')
+    $entity_type_manager = $this->getMockBuilder('\Drupal\Core\Entity\EntityTypeManager')
       ->disableOriginalConstructor()
       ->getMock();
-    $entityTypeManager->expects($this->once())
+    $entity_type_manager->expects($this->once())
       ->method('getStorage')
       ->with('commerce_store')
       ->willReturn($storage);
 
-    $this->resolver = new DefaultStoreResolver($entityTypeManager);
+    $this->resolver = new DefaultStoreResolver($entity_type_manager);
   }
 
   /**
    * @covers ::resolve
    */
   public function testResolve() {
-    $defaultStore = $this->resolver->resolve();
-    $this->assertEquals('testStore', $defaultStore);
+    $this->assertEquals('testStore', $this->resolver->resolve());
   }
 
 }

@@ -66,54 +66,54 @@ class EntitySelect extends FormElement {
   /**
    * Process callback.
    */
-  public static function processEntitySelect(&$element, FormStateInterface $formState, &$completeForm) {
+  public static function processEntitySelect(&$element, FormStateInterface $form_state, &$complete_form) {
     // Nothing to do if there is no target entity type.
     if (empty($element['#target_type'])) {
       throw new \InvalidArgumentException('Missing required #target_type parameter.');
     }
 
     $storage = \Drupal::service('entity_type.manager')->getStorage($element['#target_type']);
-    $entityCount = $storage->getQuery()->count()->execute();
+    $entity_count = $storage->getQuery()->count()->execute();
     $element['#tree'] = TRUE;
     // No need to show anything, there's only one possible value.
-    if ($element['#required'] && $entityCount == 1) {
-      $entityIds = $storage->getQuery()->execute();
+    if ($element['#required'] && $entity_count == 1) {
+      $entity_ids = $storage->getQuery()->execute();
       $element['value'] = [
         '#type' => 'hidden',
-        '#value' => reset($entityIds),
+        '#value' => reset($entity_ids),
       ];
 
       return $element;
     }
 
-    if ($entityCount <= $element['#autocomplete_threshold']) {
+    if ($entity_count <= $element['#autocomplete_threshold']) {
       $entities = $storage->loadMultiple();
-      $entityLabels = array_map(function ($entity) {
+      $entity_labels = array_map(function ($entity) {
         return $entity->label();
       }, $entities);
       // Radio buttons don't have a None option by default.
       if (!$element['#multiple'] && !$element['#required']) {
-        $entityLabels = ['' => t('None')] + $entityLabels;
+        $entity_labels = ['' => t('None')] + $entity_labels;
       }
 
       $element['value'] = [
         '#type' => $element['#multiple'] ? 'checkboxes' : 'radios',
         '#required' => $element['#required'],
-        '#options' => $entityLabels,
+        '#options' => $entity_labels,
       ];
       if (!empty($element['#default_value'])) {
         $element['value']['#default_value'] = $element['#default_value'];
       }
     }
     else {
-      $defaultValue = NULL;
+      $default_value = NULL;
       if (!empty($element['#default_value'])) {
         // Upcast ids into entities, as expected by entity_autocomplete.
         if ($element['#multiple']) {
-          $defaultValue = $storage->loadMultiple($element['#default_value']);
+          $default_value = $storage->loadMultiple($element['#default_value']);
         }
         else {
-          $defaultValue = $storage->load($element['#default_value']);
+          $default_value = $storage->load($element['#default_value']);
         }
       }
 
@@ -122,7 +122,7 @@ class EntitySelect extends FormElement {
         '#target_type' => $element['#target_type'],
         '#tags' => $element['#multiple'],
         '#required' => $element['#required'],
-        '#default_value' => $defaultValue,
+        '#default_value' => $default_value,
         '#size' => $element['#autocomplete_size'],
         '#placeholder' => $element['#autocomplete_placeholder'],
       ];
@@ -145,20 +145,20 @@ class EntitySelect extends FormElement {
    * Transforms the subelement value into a consistent format and set it on the
    * main element.
    */
-  public static function validateEntitySelect(&$element, FormStateInterface $formState, &$completeForm) {
-    $valueElement = $element['value'];
-    $value = $formState->getValue($valueElement['#parents']);
+  public static function validateEntitySelect(&$element, FormStateInterface $form_state, &$complete_form) {
+    $value_element = $element['value'];
+    $value = $form_state->getValue($value_element['#parents']);
     if (is_array($value)) {
-      if ($valueElement['#type'] == 'checkboxes') {
+      if ($value_element['#type'] == 'checkboxes') {
         // Remove unselected checkboxes.
         $value = array_filter($value);
       }
-      elseif (!empty($valueElement['#tags'])) {
+      elseif (!empty($value_element['#tags'])) {
         // Extract the entity ids from a multivalue autocomplete.
         $value = array_column($value, 'target_id');
       }
     }
-    $formState->setValueForElement($element, $value);
+    $form_state->setValueForElement($element, $value);
   }
 
 }

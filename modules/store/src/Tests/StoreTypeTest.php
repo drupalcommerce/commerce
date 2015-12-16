@@ -21,12 +21,12 @@ class StoreTypeTest extends StoreTestBase {
    */
   public function testDefaultStoreType() {
     $this->drupalGet('admin/commerce/config/store-types');
-    $storeTypes = StoreType::loadMultiple();
+    $store_types = StoreType::loadMultiple();
 
-    $this->assertTrue(isset($storeTypes['default']), 'The default store type is available');
+    $this->assertTrue(isset($store_types['default']), 'The default store type is available');
 
-    $storeType = StoreType::load('default');
-    $this->assertEqual($storeTypes['default'], $storeType, 'The correct store type is loaded');
+    $store_type = StoreType::load('default');
+    $this->assertEqual($store_types['default'], $store_type, 'The correct store type is loaded');
   }
 
   /**
@@ -34,12 +34,12 @@ class StoreTypeTest extends StoreTestBase {
    */
   public function testListStoreType() {
     $title = strtolower($this->randomMachineName(8));
-    $tableSelector = 'table tbody tr';
+    $table_selector = 'table tbody tr';
 
     // The store shows one default store type.
     $this->drupalGet('admin/commerce/config/store-types');
-    $storeTypes = $this->cssSelect($tableSelector);
-    $this->assertEqual(count($storeTypes), 1, 'Stores types are correctly listed');
+    $store_types = $this->cssSelect($table_selector);
+    $this->assertEqual(count($store_types), 1, 'Stores types are correctly listed');
 
     // Create a new commerce store type entity and see if the list has two store types.
     $this->createEntity('commerce_store_type', [
@@ -49,8 +49,8 @@ class StoreTypeTest extends StoreTestBase {
     );
 
     $this->drupalGet('admin/commerce/config/store-types');
-    $storeTypes = $this->cssSelect($tableSelector);
-    $this->assertEqual(count($storeTypes), 2, 'Stores types are correctly listed');
+    $store_types = $this->cssSelect($table_selector);
+    $this->assertEqual(count($store_types), 2, 'Stores types are correctly listed');
   }
 
   /**
@@ -66,8 +66,8 @@ class StoreTypeTest extends StoreTestBase {
       ]
     );
 
-    $typeExists = (bool) StoreType::load($type->id());
-    $this->assertTrue($typeExists, 'The new store type has been created in the database.');
+    $type_exists = (bool) StoreType::load($type->id());
+    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
 
     // Create a store type through the form.
     $edit = [
@@ -75,8 +75,8 @@ class StoreTypeTest extends StoreTestBase {
       'label' => 'Label of foo',
     ];
     $this->drupalPostForm('admin/commerce/config/store-types/add', $edit, t('Save'));
-    $typeExists = (bool) StoreType::load($edit['id']);
-    $this->assertTrue($typeExists, 'The new store type has been created in the database.');
+    $type_exists = (bool) StoreType::load($edit['id']);
+    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
   }
 
   /**
@@ -84,7 +84,7 @@ class StoreTypeTest extends StoreTestBase {
    */
   public function testUpdateStoreType() {
     // Create a new store type.
-    $storeType = $this->createEntity('commerce_store_type', [
+    $store_type = $this->createEntity('commerce_store_type', [
         'id' => 'foo',
         'label' => 'Label for foo',
       ]
@@ -95,8 +95,8 @@ class StoreTypeTest extends StoreTestBase {
       'label' => $this->randomMachineName(8),
     ];
     $this->drupalPostForm('admin/commerce/config/store-types/default/edit', $edit, 'Save');
-    $storeTypeChanged = StoreType::load($storeType->id());
-    $this->assertEqual($storeType->label(), $storeTypeChanged->label(), 'The label of the store type has been changed.');
+    $changed = StoreType::load($store_type->id());
+    $this->assertEqual($store_type->label(), $changed->label(), 'The label of the store type has been changed.');
   }
 
   /**
@@ -134,8 +134,8 @@ class StoreTypeTest extends StoreTestBase {
     );
     $this->assertText(t('This action cannot be undone.'), 'The store type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $typeExists = (bool) StoreType::load($type->id());
-    $this->assertFalse($typeExists, 'The new store type has been deleted from the database.');
+    $type_exists = (bool) StoreType::load($type->id());
+    $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
 
   }
 }

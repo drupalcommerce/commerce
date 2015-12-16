@@ -19,19 +19,19 @@ class StoreTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $storeType = $this->entity;
+    $store_type = $this->entity;
 
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $storeType->label(),
+      '#default_value' => $store_type->label(),
       '#description' => $this->t('Label for the store type.'),
       '#required' => TRUE,
     ];
     $form['id'] = [
       '#type' => 'machine_name',
-      '#default_value' => $storeType->id(),
+      '#default_value' => $store_type->id(),
       '#machine_name' => [
         'exists' => '\Drupal\commerce_store\Entity\StoreType::load',
       ],
@@ -40,7 +40,7 @@ class StoreTypeForm extends BundleEntityFormBase {
     $form['description'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
-      '#default_value' => $storeType->getDescription(),
+      '#default_value' => $store_type->getDescription(),
     ];
 
     if ($this->moduleHandler->moduleExists('language')) {
@@ -53,9 +53,9 @@ class StoreTypeForm extends BundleEntityFormBase {
         '#type' => 'language_configuration',
         '#entity_information' => [
           'entity_type' => 'commerce_store',
-          'bundle' => $storeType->id(),
+          'bundle' => $store_type->id(),
         ],
-        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_store', $storeType->id()),
+        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_store', $store_type->id()),
       ];
       $form['#submit'][] = 'language_configuration_element_submit';
     }

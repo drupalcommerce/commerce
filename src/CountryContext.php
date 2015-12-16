@@ -47,14 +47,14 @@ class CountryContext implements CountryContextInterface {
   /**
    * Constructs a new CountryContext object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\commerce\Resolver\ChainCountryResolverInterface $chainResolver
+   * @param \Drupal\commerce\Resolver\ChainCountryResolverInterface $chain_resolver
    *   The chain resolver.
    */
-  public function __construct(RequestStack $requestStack, ChainCountryResolverInterface $chainResolver) {
-    $this->requestStack = $requestStack;
-    $this->chainResolver = $chainResolver;
+  public function __construct(RequestStack $request_stack, ChainCountryResolverInterface $chain_resolver) {
+    $this->requestStack = $request_stack;
+    $this->chainResolver = $chain_resolver;
     $this->countries = new \SplObjectStorage();
   }
 

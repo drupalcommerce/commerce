@@ -22,11 +22,11 @@ final class Country {
   /**
    * Constructs a new Country object.
    *
-   * @param string $countryCode
+   * @param string $country_code
    *   The country code.
    */
-  public function __construct($countryCode) {
-    $this->countryCode = strtoupper($countryCode);
+  public function __construct($country_code) {
+    $this->countryCode = strtoupper($country_code);
   }
 
   /**

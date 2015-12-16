@@ -35,28 +35,28 @@ class ChainLocaleResolverTest extends UnitTestCase {
    * ::covers resolve
    */
   public function testResolver() {
-    $mockBuilder = $this->getMockBuilder('Drupal\commerce\Resolver\LocaleResolverInterface')
+    $mock_builder = $this->getMockBuilder('Drupal\commerce\Resolver\LocaleResolverInterface')
       ->disableOriginalConstructor();
 
-    $firstResolver = $mockBuilder->getMock();
-    $firstResolver->expects($this->once())
+    $first_resolver = $mock_builder->getMock();
+    $first_resolver->expects($this->once())
       ->method('resolve');
 
-    $secondResolver = $mockBuilder->getMock();
-    $secondResolver->expects($this->once())
+    $second_resolver = $mock_builder->getMock();
+    $second_resolver->expects($this->once())
       ->method('resolve')
       ->willReturn('mk_MK');
 
-    $thirdResolver = $mockBuilder->getMock();
-    $thirdResolver->expects($this->never())
+    $third_resolver = $mock_builder->getMock();
+    $third_resolver->expects($this->never())
       ->method('resolve');
 
-    $this->chainLocaleResolver->addResolver($firstResolver);
-    $this->chainLocaleResolver->addResolver($secondResolver);
-    $this->chainLocaleResolver->addResolver($thirdResolver);
+    $this->chainLocaleResolver->addResolver($first_resolver);
+    $this->chainLocaleResolver->addResolver($second_resolver);
+    $this->chainLocaleResolver->addResolver($third_resolver);
 
     $resolvers = $this->chainLocaleResolver->getResolvers();
-    $this->assertEquals([$firstResolver, $secondResolver, $thirdResolver], $resolvers);
+    $this->assertEquals([$first_resolver, $second_resolver, $third_resolver], $resolvers);
 
     $result = $this->chainLocaleResolver->resolve();
     $this->assertEquals('mk_MK', $result);

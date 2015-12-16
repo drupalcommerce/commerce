@@ -22,11 +22,11 @@ final class Locale {
   /**
    * Constructs a new Locale object.
    *
-   * @param string $localeCode
+   * @param string $locale_code
    *   The locale code.
    */
-  public function __construct($localeCode) {
-    $this->localeCode = $localeCode;
+  public function __construct($locale_code) {
+    $this->localeCode = $locale_code;
   }
 
   /**

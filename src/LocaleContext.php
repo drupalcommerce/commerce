@@ -47,14 +47,14 @@ class LocaleContext implements LocaleContextInterface {
   /**
    * Constructs a new LocaleContext object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\commerce\Resolver\ChainLocaleResolverInterface $chainResolver
+   * @param \Drupal\commerce\Resolver\ChainLocaleResolverInterface $chain_resolver
    *   The chain resolver.
    */
-  public function __construct(RequestStack $requestStack, ChainLocaleResolverInterface $chainResolver) {
-    $this->requestStack = $requestStack;
-    $this->chainResolver = $chainResolver;
+  public function __construct(RequestStack $request_stack, ChainLocaleResolverInterface $chain_resolver) {
+    $this->requestStack = $request_stack;
+    $this->chainResolver = $chain_resolver;
     $this->locales = new \SplObjectStorage();
   }
 

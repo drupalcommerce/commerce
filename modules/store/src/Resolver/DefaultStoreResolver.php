@@ -24,11 +24,11 @@ class DefaultStoreResolver implements StoreResolverInterface {
   /**
    * Constructs a new DefaultStoreResolver object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->storage = $entityTypeManager->getStorage('commerce_store');
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->storage = $entity_type_manager->getStorage('commerce_store');
   }
 
   /**

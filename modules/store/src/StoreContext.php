@@ -50,14 +50,14 @@ class StoreContext implements StoreContextInterface {
   /**
    * Constructs a new StoreContext object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\commerce_store\Resolver\ChainStoreResolverInterface $chainResolver
+   * @param \Drupal\commerce_store\Resolver\ChainStoreResolverInterface $chain_resolver
    *   The chain resolver.
    */
-  public function __construct(RequestStack $requestStack, ChainStoreResolverInterface $chainResolver) {
-    $this->requestStack = $requestStack;
-    $this->chainResolver = $chainResolver;
+  public function __construct(RequestStack $request_stack, ChainStoreResolverInterface $chain_resolver) {
+    $this->requestStack = $request_stack;
+    $this->chainResolver = $chain_resolver;
     $this->stores = new \SplObjectStorage();
   }
 

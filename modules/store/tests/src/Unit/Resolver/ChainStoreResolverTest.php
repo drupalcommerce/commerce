@@ -37,28 +37,28 @@ class ChainStoreResolverTest extends UnitTestCase {
    * ::covers resolve
    */
   public function testResolver() {
-    $mockupBuilder = $this->getMockBuilder('Drupal\commerce_store\Resolver\StoreResolverInterface')
+    $mock_builder = $this->getMockBuilder('Drupal\commerce_store\Resolver\StoreResolverInterface')
       ->disableOriginalConstructor();
 
-    $firstResolver = $mockupBuilder->getMock();
-    $firstResolver->expects($this->once())
+    $first_resolver = $mock_builder->getMock();
+    $first_resolver->expects($this->once())
       ->method('resolve');
 
-    $secondResolver = $mockupBuilder->getMock();
-    $secondResolver->expects($this->once())
+    $second_resolver = $mock_builder->getMock();
+    $second_resolver->expects($this->once())
       ->method('resolve')
       ->willReturn('testStore');
 
-    $thirdResolver = $mockupBuilder->getMock();
-    $thirdResolver->expects($this->never())
+    $third_resolver = $mock_builder->getMock();
+    $third_resolver->expects($this->never())
       ->method('resolve');
 
-    $this->resolver->addResolver($firstResolver);
-    $this->resolver->addResolver($secondResolver);
-    $this->resolver->addResolver($thirdResolver);
+    $this->resolver->addResolver($first_resolver);
+    $this->resolver->addResolver($second_resolver);
+    $this->resolver->addResolver($third_resolver);
 
     $resolvers =  $this->resolver->getResolvers();
-    $this->assertEquals([$firstResolver, $secondResolver, $thirdResolver], $resolvers);
+    $this->assertEquals([$first_resolver, $second_resolver, $third_resolver], $resolvers);
 
     $result = $this->resolver->resolve();
     $this->assertEquals('testStore', $result);

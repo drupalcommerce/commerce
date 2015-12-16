@@ -93,17 +93,17 @@ class EntitySelectWidget extends WidgetBase {
     $multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $values = $items->getValue();
     if ($multiple) {
-      $defaultValue = array_column($values, 'target_id');
+      $default_value = array_column($values, 'target_id');
     }
     else {
-      $defaultValue = !empty($values) ? $values[0]['target_id'] : NULL;
+      $default_value = !empty($values) ? $values[0]['target_id'] : NULL;
     }
 
     $element += [
       '#type' => 'entity_select',
       '#target_type' => $this->getFieldSetting('target_type'),
       '#multiple' => $multiple,
-      '#default_value' => $defaultValue,
+      '#default_value' => $default_value,
       '#autocomplete_threshold' => $settings['autocomplete_threshold'],
       '#autocomplete_size' => $settings['autocomplete_size'],
       '#autocomplete_placeholder' => $settings['autocomplete_placeholder'],
