@@ -209,14 +209,14 @@ display:
           entity_type: commerce_order
           entity_field: changed
           plugin_id: date
-        status:
-          id: status
+        state:
+          id: state
           table: commerce_order
-          field: status
+          field: state
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Order status'
+          label: 'Order state'
           exclude: false
           alter:
             alter_text: false

@@ -32,4 +32,24 @@ interface OrderTypeInterface extends ConfigEntityInterface {
    */
   public function setDescription($description);
 
+  /**
+   * Gets the workflow of the order type.
+   *
+   * Used by the $order->state field.
+   *
+   * @return string
+   *   The order type workflow.
+   */
+  public function getWorkflow();
+
+  /**
+   * Sets the workflow of the order type.
+   *
+   * @param string $workflow
+   *   The workflow.
+   *
+   * @return $this
+   */
+  public function setWorkflow($workflow);
+
 }

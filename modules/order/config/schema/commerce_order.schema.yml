@@ -11,6 +11,9 @@ commerce_order.commerce_order_type.*:
     description:
       type: text
       label: 'Description'
+    workflow:
+      type: string
+      label: 'Workflow'
 
 commerce_order.commerce_line_item_type.*:
   type: config_entity

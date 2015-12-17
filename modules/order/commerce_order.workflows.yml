@@ -1,0 +1,32 @@
+default:
+  id: default
+  label: Default
+  group: order
+  states:
+    new:
+      label: New
+    validation:
+      label: Validation
+    fulfillment:
+      label: Fulfilment
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    create:
+      label: Create
+      from: [new]
+      to:   validation
+    validate:
+      label: Validate
+      from: [validation]
+      to:   fulfillment
+    fulfill:
+      label: Fulfill
+      from: [fulfillment]
+      to: completed
+    cancel:
+      label: Cancel
+      from: [new, validation, fulfillment]
+      to:   canceled

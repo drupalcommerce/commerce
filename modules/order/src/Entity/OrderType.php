@@ -39,6 +39,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "description",
+ *     "workflow",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -72,6 +73,13 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   protected $description;
 
   /**
+   * The order type workflow.
+   *
+   * @var string
+   */
+  protected $workflow;
+
+  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -83,6 +91,21 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setDescription($description) {
     $this->description = $description;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWorkflow() {
+    return $this->workflow;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWorkflow($workflow) {
+    $this->workflow = $workflow;
     return $this;
   }
 

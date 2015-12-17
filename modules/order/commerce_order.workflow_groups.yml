@@ -1,0 +1,3 @@
+order:
+  label: Order
+  entity_type: commerce_order

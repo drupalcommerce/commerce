@@ -161,16 +161,8 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStatus() {
-    return $this->get('status')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setStatus($status) {
-    $this->set('status', $status);
-    return $this;
+  public function getState() {
+    return $this->get('state')->first();
   }
 
   /**
@@ -424,22 +416,23 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Status'))
-      ->setDescription(t('The order status.'))
+    $fields['state'] = BaseFieldDefinition::create('state')
+      ->setLabel(t('State'))
+      ->setDescription(t('The order state.'))
       ->setRequired(TRUE)
-      ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
-        'type' => 'string',
+        'type' => 'list_default',
         'weight' => 0,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'hidden',
-        'weight' => -1,
+        'type' => 'options_select',
+        'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflow']);
 
     $fields['order_total'] = BaseFieldDefinition::create('price')
       ->setLabel(t('Total price'))
@@ -502,6 +495,20 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public static function getCurrentUserId() {
     return [\Drupal::currentUser()->id()];
+  }
+
+  /**
+   * Gets the workflow for the state field.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return string
+   *   The workflow id.
+   */
+  public static function getWorkflow(OrderInterface $order) {
+    $workflow = OrderType::load($order->getType())->getWorkflow();
+    return $workflow;
   }
 
 }

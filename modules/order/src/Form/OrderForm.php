@@ -30,12 +30,12 @@ class OrderForm extends ContentEntityForm {
     ];
     $form = parent::form($form, $form_state);
 
-    $form['order_status'] = [
+    $form['order_state'] = [
       '#type' => 'details',
-      '#title' => t('Order status'),
+      '#title' => t('Order state'),
       '#group' => 'advanced',
       '#attributes' => [
-        'class' => ['order-form-order-status'],
+        'class' => ['order-form-order-state'],
       ],
       '#attached' => [
         'library' => ['commerce_order/drupal.commerce_order'],
@@ -44,8 +44,8 @@ class OrderForm extends ContentEntityForm {
       '#optional' => TRUE,
     ];
 
-    if (isset($form['status'])) {
-      $form['status']['#group'] = 'order_status';
+    if (isset($form['state'])) {
+      $form['state']['#group'] = 'order_state';
     }
 
     // Order authoring information for administrators.

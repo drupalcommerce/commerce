@@ -48,6 +48,8 @@ class OrderTypeForm extends BundleEntityFormBase {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $orderType = $this->entity;
+    $workflow_manager = \Drupal::service('plugin.manager.workflow');
+    $workflows = $workflow_manager->getGroupedLabels('commerce_order');
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -72,8 +74,15 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#default_value' => $orderType->getDescription(),
       '#description' => $this->t('Description of this order type'),
     ];
+    $form['workflow'] = [
+      '#type' => 'select',
+      '#title' => t('Workflow'),
+      '#options' => $workflows,
+      '#default_value' => $orderType->getWorkflow(),
+      '#description' => $this->t('Used by all orders of this type.'),
+    ];
 
-    return $this->protectBundleIdElement($form);;
+    return $this->protectBundleIdElement($form);
   }
 
   /**

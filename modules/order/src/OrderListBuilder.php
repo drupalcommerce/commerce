@@ -70,7 +70,10 @@ class OrderListBuilder extends EntityListBuilder {
         'data' => $this->t('Owner'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
-      'status' => $this->t('Status'),
+      'state' => [
+        'data' => $this->t('State'),
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
       'created' => [
         'data' => $this->t('Created'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
@@ -99,7 +102,7 @@ class OrderListBuilder extends EntityListBuilder {
           '#account' => $entity->getOwner(),
         ],
       ],
-      'status' => $entity->getStatus(),
+      'state' => $entity->getState()->getLabel(),
       'created' => $this->dateFormatter->format($entity->getCreatedTime(), 'short'),
       'changed' => $this->dateFormatter->format($entity->getChangedTime(), 'short'),
     ];

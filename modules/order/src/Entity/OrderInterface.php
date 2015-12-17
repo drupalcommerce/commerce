@@ -45,22 +45,12 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function getType();
 
   /**
-   * Gets the order status.
+   * Gets the order state.
    *
-   * @return string
-   *   The order status.
+   * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface
+   *   The order state.
    */
-  public function getStatus();
-
-  /**
-   * Sets the order status.
-   *
-   * @param string $status
-   *   The order status.
-   *
-   * @return $this
-   */
-  public function setStatus($status);
+  public function getState();
 
   /**
    * Gets the order creation timestamp.
