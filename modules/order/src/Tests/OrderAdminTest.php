@@ -45,18 +45,25 @@ class OrderAdminTest extends OrderTestBase {
     $this->drupalGet('/admin/commerce/orders');
     $this->clickLink('Create a new order');
 
+    $user = $this->loggedInUser->getAccountName() . ' (' . $this->loggedInUser->id() . ')';
+    $values = [
+      'customer_user_type' => 'existing',
+      'uid' => $user,
+    ];
+    $this->drupalPostForm(NULL, $values, 'Create');
+
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $values = [
       'line_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
       'line_items[form][inline_entity_form][quantity][0][value]' => 1,
-      'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99'
+      'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99',
     ];
     $this->drupalPostForm(NULL, $values, 'Create line item');
 
     $values = [
       'store_id' => $this->store->id(),
       'mail[0][value]' => $this->loggedInUser->getEmail(),
-      'billing_profile' => $this->billingProfile->id()
+      'billing_profile' => $this->billingProfile->id(),
     ];
     $this->drupalPostForm(NULL, $values, t('Save'));
 
