@@ -262,8 +262,9 @@ class CommerceProductReferenceAdminTest extends CommerceBaseTestCase {
     $this->drupalGet('admin/structure/types/manage/' . strtr($this->display_type->type, '_', '-') . '/display');
     // Load all the fields that are pulled with the product and check if they
     // are in the display screen.
-    $extra_fields = commerce_product_reference_field_extra_fields();
-    foreach ($extra_fields['node'][$this->display_type->type]['display'] as $display) {
+    $extra_fields = field_info_extra_fields('node', $this->display_type->type, 'display');
+
+    foreach ($extra_fields as $display) {
       $this->assertText($display['label'], t('Field %field_label is present in the manage display screen', array('%field_label' => $display['label'])));
     }
   }
