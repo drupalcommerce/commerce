@@ -8,9 +8,6 @@ commerce_order.commerce_order_type.*:
     id:
       type: string
       label: 'Machine-readable name'
-    description:
-      type: text
-      label: 'Description'
     workflow:
       type: string
       label: 'Workflow'

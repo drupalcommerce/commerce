@@ -38,7 +38,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "label",
  *     "id",
- *     "description",
  *     "workflow",
  *   },
  *   links = {
@@ -66,33 +65,11 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   protected $label;
 
   /**
-   * A brief description of this order type.
-   *
-   * @var string
-   */
-  protected $description;
-
-  /**
    * The order type workflow.
    *
    * @var string
    */
   protected $workflow;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDescription() {
-    return $this->description;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDescription($description) {
-    $this->description = $description;
-    return $this;
-  }
 
   /**
    * {@inheritdoc}

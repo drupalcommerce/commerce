@@ -3,5 +3,4 @@ status: true
 dependencies: {  }
 label: Default
 id: default
-description: ''
 workflow: 'default'

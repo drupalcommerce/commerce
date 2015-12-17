@@ -68,12 +68,6 @@ class OrderTypeForm extends BundleEntityFormBase {
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
-    $form['description'] = [
-      '#title' => t('Description'),
-      '#type' => 'textarea',
-      '#default_value' => $orderType->getDescription(),
-      '#description' => $this->t('Description of this order type'),
-    ];
     $form['workflow'] = [
       '#type' => 'select',
       '#title' => t('Workflow'),

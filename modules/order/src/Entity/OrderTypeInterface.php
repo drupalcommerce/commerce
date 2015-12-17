@@ -15,24 +15,6 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface OrderTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the order type description.
-   *
-   * @return string
-   *   The order type description.
-   */
-  public function getDescription();
-
-  /**
-   * Sets the description of the order type.
-   *
-   * @param string $description
-   *   The new description.
-   *
-   * @return $this
-   */
-  public function setDescription($description);
-
-  /**
    * Gets the workflow of the order type.
    *
    * Used by the $order->state field.
