@@ -30,14 +30,6 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface {
   public static function createFromPurchasableEntity(PurchasableEntityInterface $entity);
 
   /**
-   * Gets the line item type.
-   *
-   * @return string
-   *   The line item type.
-   */
-  public function getType();
-
-  /**
    * Gets the parent order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface|null

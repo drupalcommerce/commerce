@@ -37,14 +37,6 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setOrderNumber($orderNumber);
 
   /**
-   * Gets the order type.
-   *
-   * @return string
-   *   The order type.
-   */
-  public function getType();
-
-  /**
    * Gets the order state.
    *
    * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface

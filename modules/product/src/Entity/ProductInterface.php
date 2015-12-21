@@ -17,14 +17,6 @@ use Drupal\user\EntityOwnerInterface;
 interface ProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
 
   /**
-   * Gets the product type.
-   *
-   * @return string
-   *   The product type.
-   */
-  public function getType();
-
-  /**
    * Gets the product title.
    *
    * @return string

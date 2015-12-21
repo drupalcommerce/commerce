@@ -17,14 +17,6 @@ use Drupal\user\EntityOwnerInterface;
 interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
-   * Gets the variation type.
-   *
-   * @return string
-   *   The variation type.
-   */
-  public function getType();
-
-  /**
    * Gets the parent product.
    *
    * @return ProductInterface|null

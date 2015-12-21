@@ -201,7 +201,7 @@ class CartProvider implements CartProviderInterface {
       }
 
       $this->cartData[$uid][$cart->id()] = [
-        'type' => $cart->getType(),
+        'type' => $cart->bundle(),
         'store_id' => $cart->getStoreId(),
       ];
     }

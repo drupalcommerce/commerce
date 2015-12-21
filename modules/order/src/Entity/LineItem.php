@@ -68,13 +68,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getType() {
-    return $this->bundle();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOrder() {
     return $this->get('order_id')->entity;
   }

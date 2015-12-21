@@ -154,13 +154,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getType() {
-    return $this->bundle();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getState() {
     return $this->get('state')->first();
   }
@@ -507,7 +500,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    *   The workflow id.
    */
   public static function getWorkflow(OrderInterface $order) {
-    $workflow = OrderType::load($order->getType())->getWorkflow();
+    $workflow = OrderType::load($order->bundle())->getWorkflow();
     return $workflow;
   }
 
