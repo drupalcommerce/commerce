@@ -41,26 +41,26 @@ class CartSession implements CartSessionInterface {
   /**
    * {@inheritdoc}
    */
-  public function addCartId($cartId) {
+  public function addCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
-    $ids[] = $cartId;
+    $ids[] = $cart_id;
     $this->session->set('commerce_cart_orders', array_unique($ids));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function hasCartId($cartId) {
+  public function hasCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
-    return in_array($cartId, $ids);
+    return in_array($cart_id, $ids);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function deleteCartId($cartId) {
+  public function deleteCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
-    $ids = array_diff($ids, [$cartId]);
+    $ids = array_diff($ids, [$cart_id]);
     if (!empty($ids)) {
       $this->session->set('commerce_cart_orders', $ids);
     }

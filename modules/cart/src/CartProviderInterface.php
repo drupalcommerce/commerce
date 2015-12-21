@@ -20,7 +20,7 @@ interface CartProviderInterface {
   /**
    * Creates a cart order for the given store and user.
    *
-   * @param string $orderType
+   * @param string $order_type
    *   The order type id.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
@@ -33,12 +33,12 @@ interface CartProviderInterface {
    * @throws \Drupal\commerce_cart\Exception\DuplicateCartException
    *   When a cart with the given criteria already exists.
    */
-  public function createCart($orderType, StoreInterface $store, AccountInterface $account = NULL);
+  public function createCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
 
   /**
    * Gets the cart order for the given store and user.
    *
-   * @param string $orderType
+   * @param string $order_type
    *   The order type id.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
@@ -48,12 +48,12 @@ interface CartProviderInterface {
    * @return \Drupal\commerce_order\Entity\OrderInterface|null
    *   The cart order, or NULL if none found.
    */
-  public function getCart($orderType, StoreInterface $store, AccountInterface $account = NULL);
+  public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
 
   /**
    * Gets the cart order id for the given store and user.
    *
-   * @param string $orderType
+   * @param string $order_type
    *   The order type id.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
@@ -63,7 +63,7 @@ interface CartProviderInterface {
    * @return int|null
    *   The cart order id, or NULL if none found.
    */
-  public function getCartId($orderType, StoreInterface $store, AccountInterface $account = NULL);
+  public function getCartId($order_type, StoreInterface $store, AccountInterface $account = NULL);
 
   /**
    * Gets all cart orders for the given user.

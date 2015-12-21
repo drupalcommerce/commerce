@@ -59,11 +59,11 @@ class CartRefreshTest extends WebTestBase {
     $edit['refresh_mode'] = 'always';
     $edit['refresh_frequency'] = 60;
     $this->drupalPostForm($url, $edit, t('Save'));
-    $orderType = OrderType::load('default');
-    $refreshMode = $orderType->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
-    $refreshFrequency = $orderType->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
-    $this->assertEqual($refreshMode, $edit['refresh_mode'], 'The value of the shopping cart refresh mode has been changed.');
-    $this->assertEqual($refreshFrequency, $edit['refresh_frequency'], 'The value of the shopping cart refresh frequency has been changed.');
+    $order_type = OrderType::load('default');
+    $refresh_mode = $order_type->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
+    $refresh_frequency = $order_type->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
+    $this->assertEqual($refresh_mode, $edit['refresh_mode'], 'The value of the shopping cart refresh mode has been changed.');
+    $this->assertEqual($refresh_frequency, $edit['refresh_frequency'], 'The value of the shopping cart refresh frequency has been changed.');
   }
 
 }

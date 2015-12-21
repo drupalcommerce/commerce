@@ -59,35 +59,35 @@ class CartProvider implements CartProviderInterface {
   /**
    * Constructs a new CartProvider object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\commerce_cart\CartSessionInterface $cartSession
+   * @param \Drupal\commerce_cart\CartSessionInterface $cart_session
    *   The cart session.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, AccountInterface $currentUser, CartSessionInterface $cartSession) {
-    $this->orderStorage = $entityTypeManager->getStorage('commerce_order');
-    $this->currentUser = $currentUser;
-    $this->cartSession = $cartSession;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, CartSessionInterface $cart_session) {
+    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->currentUser = $current_user;
+    $this->cartSession = $cart_session;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createCart($orderType, StoreInterface $store, AccountInterface $account = NULL) {
+  public function createCart($order_type, StoreInterface $store, AccountInterface $account = NULL) {
     $account = $account ?: $this->currentUser;
     $uid = $account->id();
-    $storeId = $store->id();
-    if ($this->getCartId($orderType, $store, $account)) {
+    $store_id = $store->id();
+    if ($this->getCartId($order_type, $store, $account)) {
       // Don't allow multiple cart orders matching the same criteria.
-      throw new DuplicateCartException("A cart order for type '$orderType', store '$storeId' and account '$uid' already exists.");
+      throw new DuplicateCartException("A cart order for type '$order_type', store '$store_id' and account '$uid' already exists.");
     }
 
     // Create the new cart order.
     $cart = $this->orderStorage->create([
-      'type' => $orderType,
-      'store_id' => $storeId,
+      'type' => $order_type,
+      'store_id' => $store_id,
       'uid' => $uid,
       'cart' => TRUE,
     ]);
@@ -100,8 +100,8 @@ class CartProvider implements CartProviderInterface {
     // Cart data has already been loaded, add the new cart order to the list.
     if (isset($this->cartData[$uid])) {
       $this->cartData[$uid][$cart->id()] = [
-        'type' => $orderType,
-        'store_id' => $storeId,
+        'type' => $order_type,
+        'store_id' => $store_id,
       ];
     }
 
@@ -111,11 +111,11 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCart($orderType, StoreInterface $store, AccountInterface $account = NULL) {
+  public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL) {
     $cart = NULL;
-    $cartId = $this->getCartId($orderType, $store, $account);
-    if ($cartId) {
-      $cart = $this->orderStorage->load($cartId);
+    $cart_id = $this->getCartId($order_type, $store, $account);
+    if ($cart_id) {
+      $cart = $this->orderStorage->load($cart_id);
     }
 
     return $cart;
@@ -124,18 +124,18 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCartId($orderType, StoreInterface $store, AccountInterface $account = NULL) {
-    $cartId = NULL;
-    $cartData = $this->loadCartData($account);
-    if ($cartData) {
+  public function getCartId($order_type, StoreInterface $store, AccountInterface $account = NULL) {
+    $cart_id = NULL;
+    $cart_data = $this->loadCartData($account);
+    if ($cart_data) {
       $search = [
-        'type' => $orderType,
+        'type' => $order_type,
         'store_id' => $store->id(),
       ];
-      $cartId = array_search($search, $cartData);
+      $cart_id = array_search($search, $cart_data);
     }
 
-    return $cartId;
+    return $cart_id;
   }
 
   /**
@@ -143,9 +143,9 @@ class CartProvider implements CartProviderInterface {
    */
   public function getCarts(AccountInterface $account = NULL) {
     $carts = [];
-    $cartIds = $this->getCartIds($account);
-    if ($cartIds) {
-      $carts = $this->orderStorage->loadMultiple($cartIds);
+    $cart_ids = $this->getCartIds($account);
+    if ($cart_ids) {
+      $carts = $this->orderStorage->loadMultiple($cart_ids);
     }
 
     return $carts;
@@ -155,8 +155,8 @@ class CartProvider implements CartProviderInterface {
    * {@inheritdoc}
    */
   public function getCartIds(AccountInterface $account = NULL) {
-    $cartData = $this->loadCartData($account);
-    return array_keys($cartData);
+    $cart_data = $this->loadCartData($account);
+    return array_keys($cart_data);
   }
 
   /**
@@ -180,20 +180,20 @@ class CartProvider implements CartProviderInterface {
         ->condition('cart', TRUE)
         ->condition('uid', $account->id())
         ->sort('order_id', 'DESC');
-      $cartIds = $query->execute();
+      $cart_ids = $query->execute();
     }
     else {
-      $cartIds = $this->cartSession->getCartIds();
+      $cart_ids = $this->cartSession->getCartIds();
     }
 
     $this->cartData[$uid] = [];
-    if (!$cartIds) {
+    if (!$cart_ids) {
       return [];
     }
     // Getting the cart data and validating the cart ids received from the
     // session requires loading the entities. This is a performance hit, but
     // it's assumed that these entities would be loaded at one point anyway.
-    $carts = $this->orderStorage->loadMultiple($cartIds);
+    $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
       if ($cart->getOwnerId() != $uid || empty($cart->cart)) {
         // Skip orders that are no longer elligible.
@@ -201,7 +201,7 @@ class CartProvider implements CartProviderInterface {
       }
 
       $this->cartData[$uid][$cart->id()] = [
-        'type' => $cart->bundle(),
+        'type' => $cart->getType(),
         'store_id' => $cart->getStoreId(),
       ];
     }
