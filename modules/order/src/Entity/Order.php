@@ -267,15 +267,43 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getLineItems() {
-    return $this->get('line_items')->first()->getValue();
+    return $this->get('line_items')->referencedEntities();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLineItems($lineItems) {
-    $this->set('line_items', [$lineItems]);
+  public function setLineItems(array $line_items) {
+    $this->set('line_items', $line_items);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addLineItem(LineItemInterface $line_item) {
+    if (!$this->hasLineItem($line_item)) {
+      $this->get('line_items')->appendItem($line_item);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeLineItem(LineItemInterface $line_item) {
+    $index = array_search($line_item, $this->getLineItems());
+    if ($index !== FALSE) {
+      $this->get('line_items')->offsetUnset($index);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasLineItem(LineItemInterface $line_item) {
+    return array_search($line_item, $this->getLineItems()) !== FALSE;
   }
 
   /**

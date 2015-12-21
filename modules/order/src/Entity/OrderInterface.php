@@ -65,7 +65,7 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   /**
    * Gets the line items associated with this order.
    *
-   * @return array
+   * @return \Drupal\commerce_order\Entity\LineItemInterface[]
    *   The line items of this order.
    */
   public function getLineItems();
@@ -73,12 +73,43 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   /**
    * Sets the line items associated with this order.
    *
-   * @param array $lineItems
+   * @param \Drupal\commerce_order\Entity\LineItemInterface[] $line_items
    *   The line items associated with this order.
    *
    * @return $this
    */
-  public function setLineItems($lineItems);
+  public function setLineItems(array $line_items);
+
+  /**
+   * Adds a line item.
+   *
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
+   *   The line item.
+   *
+   * @return $this
+   */
+  public function addLineItem(LineItemInterface $line_item);
+
+  /**
+   * Removes a line item.
+   *
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
+   *   The line item.
+   *
+   * @return $this
+   */
+  public function removeLineItem(LineItemInterface $line_item);
+
+  /**
+   * Checks whether the order has a given line item.
+   *
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
+   *   The line item.
+   *
+   * @return bool
+   *   TRUE if the line item was found, FALSE otherwise.
+   */
+  public function hasLineItem(LineItemInterface $line_item);
 
   /**
    * Gets the additional data stored in this order.
