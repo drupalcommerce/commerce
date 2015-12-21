@@ -80,6 +80,24 @@ interface LineItemInterface extends EntityChangedInterface, EntityInterface {
   public function setTitle($title);
 
   /**
+   * Gets the line item quantity.
+   *
+   * @return string
+   *   The line item quantity
+   */
+  public function getQuantity();
+
+  /**
+   * Sets the line item quantity.
+   *
+   * @param string $quantity
+   *   The line item quantity.
+   *
+   * @return $this
+   */
+  public function setQuantity($quantity);
+
+  /**
    * Gets the line item creation timestamp.
    *
    * @return int
