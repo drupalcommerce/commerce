@@ -9,6 +9,7 @@
  */
 function commerce_order_ui_menu() {
   $items = array();
+  $new_order = commerce_order_new();
 
   // Note: admin/commerce/orders is defined by a default View.
 
@@ -17,7 +18,7 @@ function commerce_order_ui_menu() {
     'title' => 'Create an order',
     'description' => 'Create a new order.',
     'page callback' => 'commerce_order_ui_order_form_wrapper',
-    'page arguments' => array(commerce_order_new()),
+    'page arguments' => array($new_order),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
     'weight' => 10,
@@ -27,7 +28,7 @@ function commerce_order_ui_menu() {
     'title' => 'Create an order',
     'description' => 'Create a new order for the specified user.',
     'page callback' => 'commerce_order_ui_order_form_wrapper',
-    'page arguments' => array(commerce_order_new(), 4),
+    'page arguments' => array($new_order, 4),
     'access callback' => 'commerce_order_access',
     'access arguments' => array('create'),
     'file' => 'includes/commerce_order_ui.orders.inc',
