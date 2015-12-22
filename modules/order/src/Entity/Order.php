@@ -109,11 +109,10 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
 
     // Ensure there's a back-reference on each line item.
-    foreach ($this->line_items as $item) {
-      $lineItem = $item->entity;
-      if ($lineItem->order_id->isEmpty()) {
-        $lineItem->order_id = $this->id();
-        $lineItem->save();
+    foreach ($this->getLineItems() as $line_item) {
+      if ($line_item->order_id->isEmpty()) {
+        $line_item->order_id = $this->id();
+        $line_item->save();
       }
     }
   }
@@ -123,17 +122,14 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     // Delete the line items of a deleted order.
-    $lineItems = [];
+    $line_items = [];
     foreach ($entities as $entity) {
-      if (empty($entity->line_items)) {
-        continue;
-      }
-      foreach ($entity->line_items as $item) {
-        $lineItems[$item->target_id] = $item->entity;
+      foreach ($entity->getLineItems() as $line_item) {
+        $line_items[$line_item->id()] = $line_item;
       }
     }
-    $lineItemStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
-    $lineItemStorage->delete($lineItems);
+    $line_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
+    $line_item_storage->delete($line_items);
   }
 
   /**
