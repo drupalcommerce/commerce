@@ -196,12 +196,12 @@ class CartProvider implements CartProviderInterface {
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
       if ($cart->getOwnerId() != $uid || empty($cart->cart)) {
-        // Skip orders that are no longer elligible.
+        // Skip orders that are no longer eligible.
         continue;
       }
 
       $this->cartData[$uid][$cart->id()] = [
-        'type' => $cart->getType(),
+        'type' => $cart->bundle(),
         'store_id' => $cart->getStoreId(),
       ];
     }

@@ -6,3 +6,7 @@ services:
   commerce_cart.cart_provider:
     class: Drupal\commerce_cart\CartProvider
     arguments: ['@entity_type.manager', '@current_user', '@commerce_cart.cart_session']
+
+  commerce_cart.cart_manager:
+    class: Drupal\commerce_cart\CartManager
+    arguments: ['@entity_type.manager', '@event_dispatcher']

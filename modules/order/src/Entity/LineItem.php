@@ -23,7 +23,7 @@ use Drupal\entity\EntityKeysFieldsTrait;
  *   label = @Translation("Line Item"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
- *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
+ *     "storage" = "Drupal\commerce_order\LineItemStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
@@ -52,18 +52,6 @@ use Drupal\entity\EntityKeysFieldsTrait;
 class LineItem extends ContentEntityBase implements LineItemInterface {
 
   use EntityChangedTrait, EntityKeysFieldsTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createFromPurchasableEntity(PurchasableEntityInterface $entity) {
-    $values = [
-      'type' => $entity->getLineItemType(),
-      'title' => $entity->getLineItemTitle(),
-      'purchased_entity' => $entity,
-    ];
-    return self::create($values);
-  }
 
   /**
    * {@inheritdoc}

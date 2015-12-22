@@ -17,19 +17,6 @@ use Drupal\Core\Entity\EntityInterface;
 interface LineItemInterface extends EntityChangedInterface, EntityInterface {
 
   /**
-   * Constructs a new line item using the given purchasable entity.
-   *
-   * The new line item isn't saved.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
-   * @return static
-   *   The created line item.
-   */
-  public static function createFromPurchasableEntity(PurchasableEntityInterface $entity);
-
-  /**
    * Gets the parent order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface|null
