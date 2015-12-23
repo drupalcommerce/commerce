@@ -20,6 +20,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Default implementation of the cart manager.
+ *
+ * Fires its own events, different from the order entity events by being a
+ * result of user interaction (add to cart form, cart view, etc).
  */
 class CartManager implements CartManagerInterface {
 
@@ -29,6 +32,13 @@ class CartManager implements CartManagerInterface {
    * @var \Drupal\commerce_order\LineItemStorageInterface
    */
   protected $lineItemStorage;
+
+  /**
+   * The line item matcher.
+   *
+   * @var \Drupal\commerce_cart\LineItemMatcherInterface
+   */
+  protected $lineItemMatcher;
 
   /**
    * The event dispatcher.
@@ -42,11 +52,14 @@ class CartManager implements CartManagerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce_cart\LineItemMatcherInterface $line_item_matcher
+   *   The line item matcher.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, EventDispatcherInterface $event_dispatcher) {
     $this->lineItemStorage = $entity_type_manager->getStorage('commerce_line_item');
+    $this->lineItemMatcher = $line_item_matcher;
     $this->eventDispatcher = $event_dispatcher;
   }
 
@@ -94,8 +107,7 @@ class CartManager implements CartManagerInterface {
     $quantity = $line_item->getQuantity();
     $matching_line_item = NULL;
     if ($combine) {
-      // @todo Implement the line item matcher.
-      //$matching_line_item = $this->lineItemMatcher->match($cart, $line_item);
+      $matching_line_item = $this->lineItemMatcher->match($line_item, $cart->getLineItems());
     }
     $needs_cart_save = FALSE;
     if ($matching_line_item) {

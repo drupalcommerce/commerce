@@ -9,4 +9,8 @@ services:
 
   commerce_cart.cart_manager:
     class: Drupal\commerce_cart\CartManager
-    arguments: ['@entity_type.manager', '@event_dispatcher']
+    arguments: ['@entity_type.manager', '@commerce_cart.line_item_matcher', '@event_dispatcher']
+
+  commerce_cart.line_item_matcher:
+      class: Drupal\commerce_cart\LineItemMatcher
+      arguments: ['@event_dispatcher']

@@ -9,9 +9,6 @@ namespace Drupal\commerce_cart\Event;
 
 /**
  * Defines events for the cart module.
- *
- * These events are fired by CartManager as a result of user interaction
- * (add to cart form, cart view, etc).
  */
 final class CartEvents {
 
@@ -58,5 +55,18 @@ final class CartEvents {
    * @see \Drupal\commerce_cart\Event\CartLineItemRemoveEvent
    */
   const CART_LINE_ITEM_REMOVE = 'commerce_cart.line_item.remove';
+
+  /**
+   * Name of the event fired when altering the list of comparison fields.
+   *
+   * Use this event to add additional field names to the list of fields used
+   * to determine whether a line item can be combined into an existing line
+   * item.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_cart\Event\LineItemComparisonFieldsEvent
+   */
+  const LINE_ITEM_COMPARISON_FIELDS = 'commerce_cart.line_item.comparison_fields';
 
 }
