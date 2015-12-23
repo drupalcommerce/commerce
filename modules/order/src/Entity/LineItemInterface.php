@@ -9,12 +9,12 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Defines the interface for line items.
  */
-interface LineItemInterface extends EntityChangedInterface, EntityInterface {
+interface LineItemInterface extends EntityChangedInterface, ContentEntityInterface {
 
   /**
    * Gets the parent order.
