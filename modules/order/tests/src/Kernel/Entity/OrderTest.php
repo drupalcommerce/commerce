@@ -61,6 +61,7 @@ class OrderTest extends KernelTestBase {
    * @covers ::setHostname
    * @covers ::getLineItems
    * @covers ::setLineItems
+   * @covers ::hasLineItems
    * @covers ::addLineItem
    * @covers ::removeLineItem
    * @covers ::hasLineItem
@@ -140,6 +141,7 @@ class OrderTest extends KernelTestBase {
     $this->assertTrue($line_items_match);
     $this->assertTrue($order->hasLineItem($line_item));
     $order->removeLineItem($line_item);
+    $this->assertFalse($order->hasLineItems());
     $this->assertFalse($order->hasLineItem($line_item));
     $order->addLineItem($line_item);
     $this->assertTrue($order->hasLineItem($line_item));
@@ -152,6 +154,7 @@ class OrderTest extends KernelTestBase {
     $order->setLineItems($new_line_items);
     $line_items_match = $new_line_items == $order->getLineItems();
     $this->assertTrue($line_items_match);
+    $this->assertTrue($order->hasLineItems());
 
     $order->setCreatedTime('635879700');
     $this->assertEquals('635879700', $order->getCreatedTime('635879700'));

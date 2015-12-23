@@ -63,22 +63,30 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets the line items associated with this order.
+   * Gets the line items.
    *
    * @return \Drupal\commerce_order\Entity\LineItemInterface[]
-   *   The line items of this order.
+   *   The line items.
    */
   public function getLineItems();
 
   /**
-   * Sets the line items associated with this order.
+   * Sets the line items.
    *
    * @param \Drupal\commerce_order\Entity\LineItemInterface[] $line_items
-   *   The line items associated with this order.
+   *   The line items.
    *
    * @return $this
    */
   public function setLineItems(array $line_items);
+
+  /**
+   * Gets whether the order has line items.
+   *
+   * @return bool
+   *   TRUE if the order has line items, FALSE otherwise.
+   */
+  public function hasLineItems();
 
   /**
    * Adds a line item.

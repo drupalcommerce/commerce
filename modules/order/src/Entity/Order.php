@@ -277,6 +277,13 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function hasLineItems() {
+    return !$this->get('line_items')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function addLineItem(LineItemInterface $line_item) {
     if (!$this->hasLineItem($line_item)) {
       $this->get('line_items')->appendItem($line_item);
@@ -288,7 +295,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function removeLineItem(LineItemInterface $line_item) {
-    $index = array_search($line_item, $this->getLineItems());
+    $index = $this->getLineItemIndex($line_item);
     if ($index !== FALSE) {
       $this->get('line_items')->offsetUnset($index);
     }
@@ -299,7 +306,25 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function hasLineItem(LineItemInterface $line_item) {
-    return array_search($line_item, $this->getLineItems()) !== FALSE;
+    return $this->getLineItemIndex($line_item) !== FALSE;
+  }
+
+  /**
+   * Gets the index of the given line item.
+   *
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
+   *   The line item.
+   *
+   * @return int|bool
+   *   The index of the given line item, or FALSE if not found.
+   */
+  protected function getLineItemIndex(LineItemInterface $line_item) {
+    $values = $this->get('line_items')->getValue();
+    $line_item_ids = array_map(function ($value) {
+      return $value['target_id'];
+    }, $values);
+
+    return array_search($line_item->id(), $line_item_ids);
   }
 
   /**
