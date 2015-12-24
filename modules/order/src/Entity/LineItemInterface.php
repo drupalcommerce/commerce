@@ -85,6 +85,22 @@ interface LineItemInterface extends EntityChangedInterface, ContentEntityInterfa
   public function setQuantity($quantity);
 
   /**
+   * Gets the unit price.
+   *
+   * @return object
+   *   The unit price.
+   */
+  public function getUnitPrice();
+
+  /**
+   * Gets the total price.
+   *
+   * @return object
+   *   The total price.
+   */
+  public function getTotalPrice();
+
+  /**
    * Gets the line item creation timestamp.
    *
    * @return int

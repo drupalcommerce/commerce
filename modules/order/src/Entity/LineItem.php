@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -114,6 +113,20 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getUnitPrice() {
+    return $this->get('unit_price')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTotalPrice() {
+    return $this->get('total_price')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -139,6 +152,16 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   public function setData($data) {
     $this->set('data', [$data]);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    $this->total_price->amount = $this->unit_price->amount * $this->quantity->value;
+    $this->total_price->currency_code = $this->unit_price->currency_code;
   }
 
   /**
@@ -201,7 +224,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['line_total'] = BaseFieldDefinition::create('price')
+    $fields['total_price'] = BaseFieldDefinition::create('price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the line item.'))
       ->setReadOnly(TRUE)

@@ -10,7 +10,7 @@ targetEntityType: commerce_line_item
 bundle: product_variation
 mode: default
 content:
-  line_total:
+  total_price:
     type: price_default
     weight: 3
     settings:
