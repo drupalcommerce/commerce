@@ -127,14 +127,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function setPrice($price) {
-    $this->set('price', $price);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isActive() {
     return (bool) $this->getEntityKey('status');
   }
