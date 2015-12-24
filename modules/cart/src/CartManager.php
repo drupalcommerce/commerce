@@ -94,6 +94,8 @@ class CartManager implements CartManagerInterface {
   public function createLineItem(PurchasableEntityInterface $entity, $quantity = 1) {
     $line_item = $this->lineItemStorage->createFromPurchasableEntity($entity, [
       'quantity' => $quantity,
+      // @todo Remove once the price calculation is in place.
+      'unit_price' => $entity->price,
     ]);
 
     return $line_item;

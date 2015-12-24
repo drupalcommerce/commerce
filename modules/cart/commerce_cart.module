@@ -86,9 +86,18 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
  * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_type_form'.
  */
 function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormStateInterface $form_state) {
-  $orderType = $form_state->getFormObject()->getEntity();
-  $refreshMode = $orderType->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
-  $refreshFrequency = $orderType->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
+  $order_type = $form_state->getFormObject()->getEntity();
+  $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form_view');
+  $refresh_mode = $order_type->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
+  $refresh_frequency = $order_type->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
+  // Prepare a list of views tagged 'commerce_cart_form'.
+  $view_storage = \Drupal::entityTypeManager()->getStorage('view');
+  $available_views = [];
+  foreach ($view_storage->loadMultiple() as $view) {
+    if (strpos($view->get('tag'), 'commerce_cart_form') !== FALSE) {
+      $available_views[$view->id()] = $view->label();
+    }
+  }
 
   $form['commerce_cart'] = [
     '#type' => 'details',
@@ -97,7 +106,13 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#open' => TRUE,
     '#collapsible' => TRUE,
   ];
-  $form['commerce_cart']['help'] = [
+  $form['commerce_cart']['cart_form_view'] = [
+    '#type' => 'select',
+    '#title' => t('Shopping cart form view'),
+    '#options' => $available_views,
+    '#default_value' => $cart_form_view,
+  ];
+  $form['commerce_cart']['refresh_intro'] = [
     '#markup' => '<p> ' . t('These settings let you control how shopping carts are refreshed, the process during which line item prices are recalculated.') . '</p>',
   ];
   $form['commerce_cart']['refresh_mode'] = [
@@ -107,13 +122,13 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
       'always' => t('Refresh a shopping cart when it is loaded regardless of who it belongs to.'),
       'owner_only' => t('Only refresh a shopping cart when it is loaded if it belongs to the current user.'),
     ],
-    '#default_value' => $refreshMode,
+    '#default_value' => $refresh_mode,
   ];
   $form['commerce_cart']['refresh_frequency'] = [
     '#type' => 'textfield',
     '#title' => t('Shopping cart refresh frequency'),
     '#description' => t('Shopping carts will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
-    '#default_value' => $refreshFrequency,
+    '#default_value' => $refresh_frequency,
     '#required' => TRUE,
     '#size' => 10,
     '#field_suffix' => t('seconds'),
@@ -126,8 +141,24 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
  */
 function commerce_cart_order_type_form_submit($form, FormStateInterface $form_state) {
   $settings = &$form_state->getValues('commerce_cart');
-  $orderType = $form_state->getFormObject()->getEntity();
-  $orderType->setThirdPartySetting('commerce_cart', 'refresh_mode', $settings['refresh_mode']);
-  $orderType->setThirdPartySetting('commerce_cart', 'refresh_frequency', $settings['refresh_frequency']);
-  $orderType->save();
+  $order_type = $form_state->getFormObject()->getEntity();
+  $order_type->setThirdPartySetting('commerce_cart', 'refresh_mode', $settings['refresh_mode']);
+  $order_type->setThirdPartySetting('commerce_cart', 'refresh_frequency', $settings['refresh_frequency']);
+  $order_type->save();
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function commerce_cart_views_data_alter(array &$data) {
+  $data['commerce_line_item']['edit_quantity']['field'] = [
+    'title' => t('Quantity text field'),
+    'help' => t('Adds a text field for editing the quantity.'),
+    'id' => 'edit_quantity',
+  ];
+  $data['commerce_line_item']['edit_remove']['field'] = [
+    'title' => t('Remove button'),
+    'help' => t('Adds a button for removing the line item.'),
+    'id' => 'edit_remove',
+  ];
 }

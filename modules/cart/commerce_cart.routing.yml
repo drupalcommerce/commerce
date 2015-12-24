@@ -1,11 +1,3 @@
-commerce_cart.settings:
-  path: '/admin/commerce/config/cart'
-  defaults:
-    _form: '\Drupal\commerce_cart\Form\CartSettingsForm'
-    _title: 'Cart settings'
-  requirements:
-    _permission: 'configure store'
-
 commerce_cart.page:
   path: '/cart'
   defaults:
