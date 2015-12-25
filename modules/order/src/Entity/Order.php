@@ -24,6 +24,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *   id = "commerce_order",
  *   label = @Translation("Order"),
  *   handlers = {
+ *     "access" = "Drupal\commerce_order\OrderAccessControlHandler",
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
