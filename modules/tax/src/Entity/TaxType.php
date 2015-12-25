@@ -8,8 +8,6 @@
 namespace Drupal\commerce_tax\Entity;
 
 use Drupal\address\ZoneInterface;
-use Drupal\commerce_tax\TaxTypeInterface;
-use Drupal\commerce_tax\TaxRateInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Tax\Enum\GenericLabel;

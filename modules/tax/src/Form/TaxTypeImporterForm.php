@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_tax\Form;
 
-use Drupal\commerce_tax\TaxTypeInterface;
+use Drupal\commerce_tax\Entity\TaxTypeInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 

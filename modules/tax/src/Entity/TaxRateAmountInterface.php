@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_tax\TaxRateAmountInterface.
+ * Contains \Drupal\commerce_tax\Entity\TaxRateAmountInterface.
  */
 
-namespace Drupal\commerce_tax;
+namespace Drupal\commerce_tax\Entity;
 
 use CommerceGuys\Tax\Model\TaxRateAmountInterface as ExternalTaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -23,7 +23,7 @@ interface TaxRateAmountInterface extends ExternalTaxRateAmountInterface, ConfigE
   /**
    * Sets the tax rate.
    *
-   * @param \Drupal\commerce_tax\TaxRateInterface $rate
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $rate
    *   The tax rate.
    */
   public function setRate(TaxRateInterface $rate);

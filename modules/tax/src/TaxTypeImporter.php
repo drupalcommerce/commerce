@@ -9,9 +9,9 @@ namespace Drupal\commerce_tax;
 
 use CommerceGuys\Tax\Repository\TaxTypeRepository;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use CommerceGuys\Tax\Model\TaxTypeInterface;
-use CommerceGuys\Tax\Model\TaxRateInterface;
-use CommerceGuys\Tax\Model\TaxRateAmountInterface;
+use CommerceGuys\Tax\Model\TaxTypeInterface as ExternalTaxTypeInterface;
+use CommerceGuys\Tax\Model\TaxRateInterface as ExternalTaxRateInterace;
+use CommerceGuys\Tax\Model\TaxRateAmountInterface as ExternalTaxRateAmountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
@@ -94,7 +94,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
    * @param \CommerceGuys\Tax\Model\TaxTypeInterface $taxType
    *   The tax type.
    */
-  protected function importTaxType(TaxTypeInterface $taxType) {
+  protected function importTaxType(ExternalTaxTypeInterface $taxType) {
     if ($this->taxTypeStorage->load($taxType->getId())) {
       return;
     }
@@ -118,7 +118,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
    * @param \CommerceGuys\Tax\Model\TaxRateInterface $taxRate
    *   The tax rate to import.
    */
-  public function importTaxRate(TaxRateInterface $taxRate) {
+  public function importTaxRate(ExternalTaxRateInterace $taxRate) {
     $values = [
       'type' => $taxRate->getType()->getId(),
       'id' => $taxRate->getId(),
@@ -137,7 +137,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
    * @param \CommerceGuys\Tax\Model\TaxRateAmountInterface $taxRateAmount
    *   The tax rate amount to import.
    */
-  protected function importTaxRateAmount(TaxRateAmountInterface $taxRateAmount) {
+  protected function importTaxRateAmount(ExternalTaxRateAmountInterface $taxRateAmount) {
     $startDate = $taxRateAmount->getStartDate() ? $taxRateAmount->getStartDate()->getTimestamp() : NULL;
     $endDate = $taxRateAmount->getEndDate() ? $taxRateAmount->getEndDate()->getTimestamp() : NULL;
     $values = [

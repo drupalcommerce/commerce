@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_tax\TaxTypeInterface.
+ * Contains \Drupal\commerce_tax\Entity\TaxTypeInterface.
  */
 
-namespace Drupal\commerce_tax;
+namespace Drupal\commerce_tax\Entity;
 
 use CommerceGuys\Tax\Model\TaxTypeInterface as ExternalTaxTypeInterface;
 use Drupal\address\ZoneInterface;
@@ -79,7 +79,7 @@ interface TaxTypeInterface extends ExternalTaxTypeInterface, ConfigEntityInterfa
   /**
    * Sets the tax rates.
    *
-   * @param \Drupal\commerce_tax\TaxRateInterface[] $rates
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface[] $rates
    *   The tax rates.
    */
   public function setRates($rates);
@@ -87,7 +87,7 @@ interface TaxTypeInterface extends ExternalTaxTypeInterface, ConfigEntityInterfa
   /**
    * Adds a tax rate.
    *
-   * @param \Drupal\commerce_tax\TaxRateInterface $rate
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $rate
    *   The tax rate.
    */
   public function addRate(TaxRateInterface $rate);
@@ -95,7 +95,7 @@ interface TaxTypeInterface extends ExternalTaxTypeInterface, ConfigEntityInterfa
   /**
    * Removes a tax rate.
    *
-   * @param \Drupal\commerce_tax\TaxRateInterface $rate
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $rate
    *   The tax rate.
    */
   public function removeRate(TaxRateInterface $rate);
@@ -103,7 +103,7 @@ interface TaxTypeInterface extends ExternalTaxTypeInterface, ConfigEntityInterfa
   /**
    * Checks whether the tax type has a tax rate.
    *
-   * @param \Drupal\commerce_tax\TaxRateInterface $rate
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $rate
    *   The tax rate.
    *
    * @return bool

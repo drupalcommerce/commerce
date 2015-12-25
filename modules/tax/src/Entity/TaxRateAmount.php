@@ -7,8 +7,6 @@
 
 namespace Drupal\commerce_tax\Entity;
 
-use Drupal\commerce_tax\TaxRateInterface;
-use Drupal\commerce_tax\TaxRateAmountInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -50,7 +48,7 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * The tax rate.
    *
-   * @var \Drupal\commerce_tax\TaxRateInterface
+   * @var \Drupal\commerce_tax\Entity\TaxRateInterface
    */
   protected $rate;
 

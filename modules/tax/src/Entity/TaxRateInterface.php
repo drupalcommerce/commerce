@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_tax\TaxRateInterface.
+ * Contains \Drupal\commerce_tax\Entity\TaxRateInterface.
  */
 
-namespace Drupal\commerce_tax;
+namespace Drupal\commerce_tax\Entity;
 
 use CommerceGuys\Tax\Model\TaxRateInterface as ExternalTaxRateInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -16,14 +16,14 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  * The external tax rate interface contains getters, while this interface adds
  * matching setters.
  *
- * @see \CommerceGuys\Tax\Model\TaxRateInterface
+ * @see \CommerceGuys\Tax\Model\Entity\TaxRateInterface
  */
 interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterface {
 
   /**
    * Sets the tax type.
    *
-   * @param \Drupal\commerce_tax\TaxTypeInterface $type
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $type
    *   The tax type.
    */
   public function setType(TaxTypeInterface $type);
@@ -47,7 +47,7 @@ interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterfa
   /**
    * Sets the tax rate amounts.
    *
-   * @param \Drupal\commerce_tax\TaxRateAmountInterface[] $amounts
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface[] $amounts
    *   The tax rate amounts.
    */
   public function setAmounts($amounts);
@@ -55,7 +55,7 @@ interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterfa
   /**
    * Adds a tax rate amount.
    *
-   * @param \Drupal\commerce_tax\TaxRateAmountInterface $amount
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $amount
    *   The tax rate amount.
    */
   public function addAmount(TaxRateAmountInterface $amount);
@@ -63,7 +63,7 @@ interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterfa
   /**
    * Removes a tax rate amount.
    *
-   * @param \Drupal\commerce_tax\TaxRateAmountInterface $amount
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $amount
    *   The tax rate amount.
    */
   public function removeAmount(TaxRateAmountInterface $amount);
@@ -71,7 +71,7 @@ interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterfa
   /**
    * Checks whether the tax rate has a tax rate amount.
    *
-   * @param \Drupal\commerce_tax\TaxRateAmountInterface $amount
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $amount
    *   The tax rate amount.
    *
    * @return bool TRUE if the tax rate amount was found, FALSE otherwise.
