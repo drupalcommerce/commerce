@@ -1,0 +1,5 @@
+form:
+  version: VERSION
+  css:
+    layout:
+      css/commerce_order.module.css: {}

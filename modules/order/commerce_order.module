@@ -10,6 +10,17 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_order_theme($existing, $type, $theme, $path) {
+  return [
+    'commerce_order_edit_form' => [
+      'render element' => 'form',
+    ],
+  ];
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  *
  * - Changes the label of the purchased_entity field to the label of the

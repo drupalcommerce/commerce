@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -23,35 +24,54 @@ class OrderForm extends ContentEntityForm {
     $order = $this->entity;
     $currentUser = $this->currentUser();
 
+    $form['#theme'] = 'commerce_order_edit_form';
+
     $form['advanced'] = [
-      '#type' => 'vertical_tabs',
+      '#type' => 'container',
       '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
     ];
     $form = parent::form($form, $form_state);
 
-    $form['order_state'] = [
+    $form['order_information'] = [
       '#type' => 'details',
-      '#title' => t('Order state'),
+      '#title' => t('Order information'),
       '#group' => 'advanced',
+      '#open' => TRUE,
       '#attributes' => [
-        'class' => ['order-form-order-state'],
-      ],
-      '#attached' => [
-        'library' => ['commerce_order/drupal.commerce_order'],
+        'class' => ['order-form-order-information'],
       ],
       '#weight' => 90,
-      '#optional' => TRUE,
     ];
 
-    if (isset($form['state'])) {
-      $form['state']['#group'] = 'order_state';
+    if (isset($form['store_id'])) {
+      $form['store_id']['#group'] = 'order_information';
+    }
+    else {
+      // @todo: This should be hidden if only one store.
+      $form['order_information']['store'] = $this->fieldAsReadOnly(t('Store'), $order->getStore()->label());
     }
 
-    // Order authoring information for administrators.
-    $form['author'] = [
+    if (isset($form['state'])) {
+      $form['state']['#group'] = 'order_information';
+    }
+    else {
+      $form['order_information']['state'] = $this->fieldAsReadOnly(t('State'), $order->getState()->getLabel());
+    }
+
+    if (isset($form['created'])) {
+      $form['created']['#group'] = 'order_information';
+    }
+    else {
+      // @todo: We need to define a "Placed" timestamp and replace this with it.
+      $created = \Drupal::service('date.formatter')->format($order->getCreatedTime(), 'short');
+      $form['order_information']['created'] = $this->fieldAsReadOnly(t('Created'), $created);
+    }
+
+    // Order customer information for administrators.
+    $form['customer'] = [
       '#type' => 'details',
-      '#title' => t('Authoring information'),
+      '#title' => t('Customer information'),
       '#group' => 'advanced',
       '#attributes' => [
         'class' => ['order-form-author'],
@@ -60,22 +80,45 @@ class OrderForm extends ContentEntityForm {
         'library' => ['commerce_order/drupal.commerce_order'],
       ],
       '#weight' => 91,
-      '#optional' => TRUE,
     ];
 
     if (isset($form['uid'])) {
-      $form['uid']['#group'] = 'author';
+      $form['uid']['#group'] = 'customer';
+    }
+    else {
+      $user_link = $order->getOwner()->toLink($order->getOwner()->getDisplayName())->toString();
+      $form['customer']['uid'] = $this->fieldAsReadOnly(t('Customer'), $user_link);
     }
 
     if (isset($form['mail'])) {
-      $form['mail']['#group'] = 'author';
+      $form['mail']['#group'] = 'customer';
+    }
+    else {
+      $form['customer']['mail'] = $this->fieldAsReadOnly(t('Email'), $order->getEmail());
     }
 
-    if (isset($form['created'])) {
-      $form['created']['#group'] = 'author';
-    }
+    $form['#attached']['library'][] = 'commerce_order/form';
 
     return $form;
+  }
+
+  /**
+   * Returns Form API array for displaying entity values in the form.
+   *
+   * @param string $label
+   *    The value label to be displayed.
+   * @param string $value
+   *    The value to be displayed.
+   *
+   * @return array
+   *   Form API element
+   */
+  protected function fieldAsReadOnly($label, $value) {
+    return [
+      '#type' => 'item',
+      '#wrapper_attributes' => array('class' => array(Html::cleanCssIdentifier($label), 'container-inline')),
+      '#markup' => '<h4 class="label inline">' . $label . '</h4> ' . $value,
+    ];
   }
 
   /**

@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Theme override for a order edit form.
+ *
+ * Two column template for the order add/edit form.
+ *
+ * This template will be used when a order edit form specifies 'order_edit_form'
+ * as its #theme callback.  Otherwise, by default, order add/edit forms will be
+ * themed by form.html.twig.
+ *
+ * Available variables:
+ * - form: The order add/edit form.
+ *
+ */
+#}
+<div class="layout-order-form clearfix">
+  <div class="layout-region layout-region-order-main">
+    {{ form|without('advanced', 'actions') }}
+  </div>
+  <div class="layout-region layout-region-order-secondary">
+    {{ form.advanced }}
+  </div>
+  <div class="layout-region layout-region-order-footer">
+    {{ form.actions }}
+  </div>
+</div>

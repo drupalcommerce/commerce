@@ -16,11 +16,6 @@ content:
     weight: 0
     settings: {  }
     third_party_settings: {  }
-  created:
-    type: datetime_timestamp
-    weight: 3
-    settings: {  }
-    third_party_settings: {  }
   line_items:
     type: inline_entity_form_complex
     weight: 0
@@ -32,26 +27,11 @@ content:
       match_operator: CONTAINS
       allow_existing: false
     third_party_settings: {  }
-  mail:
-    type: email_default
-    weight: 1
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  store_id:
-    type: options_select
-    weight: 0
-    settings: {  }
-    third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 2
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
 hidden:
+  mail: true
+  store_id: true
+  uid: true
   hostname: true
   order_number: true
-  status: true
+  state: true
+  created: true

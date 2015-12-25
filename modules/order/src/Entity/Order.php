@@ -392,11 +392,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('target_type', 'commerce_store')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'options_select',
-        'weight' => 0,
-        'settings' => [],
-      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -412,16 +407,6 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'author',
         'weight' => 0,
       ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
@@ -433,10 +418,6 @@ class Order extends ContentEntityBase implements OrderInterface {
         'label' => 'hidden',
         'type' => 'string',
         'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'email_default',
-        'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -463,10 +444,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'list_default',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'options_select',
         'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)
@@ -509,10 +486,6 @@ class Order extends ContentEntityBase implements OrderInterface {
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'datetime_timestamp',
-        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
