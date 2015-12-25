@@ -198,26 +198,24 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
   }
 
   if ($field->getType() == 'entity_reference' && $field->getFieldStorageDefinition()->getCardinality() == 1) {
-    $defaultAttributeField = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
-    $defaultAttributeWidget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
-    $defaultAttributeWidgetTitle = $field->getThirdPartySetting('commerce_product', 'attribute_widget_title', NULL);
+    $attribute_field = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
+    $attribute_widget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
+    $attribute_widget_title = $field->getThirdPartySetting('commerce_product', 'attribute_widget_title', NULL);
 
     $form['field']['commerce_product'] = [
       '#type' => 'fieldset',
-      '#title' => t('Attribute field settings'),
-      '#description' => t('Single value fields attached to products can function as attribute selection fields on Add to Cart forms. When an Add to Cart form contains multiple products, attribute field data can be used to allow customers to select a product based on the values of the field instead of just from a list of product titles.'),
+      '#title' => t('Product variation attribute settings'),
       '#weight' => 5,
       '#collapsible' => FALSE,
     ];
-
     $form['field']['commerce_product']['attribute_field'] = [
       '#type' => 'checkbox',
-      '#title' => t('Enable this field to function as a product attribute field on Add to Cart forms.'),
-      '#default_value' => $defaultAttributeField,
+      '#title' => t('Enable this field to function as an attribute field on Add to Cart forms.'),
+      '#default_value' => $attribute_field,
     ];
     $form['field']['commerce_product']['attribute_widget'] = [
       '#type' => 'radios',
-      '#title' => t('Product attribute selection widget'),
+      '#title' => t('Attribute selection widget'),
       '#description' => t('The type of element used to select an option if used on an Add to Cart form.'),
       '#options' => [
         'select' => t('Select list'),
@@ -228,7 +226,7 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
           ':input[name="attribute_field"]' => ['checked' => TRUE],
         ],
       ],
-      '#default_value' => $defaultAttributeWidget,
+      '#default_value' => $attribute_widget,
     ];
     // Determine the default attribute widget title.
     $form['field']['commerce_product']['attribute_widget_title'] = [
@@ -240,7 +238,7 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
           ':input[name="attribute_field"]' => ['checked' => TRUE],
         ],
       ],
-      '#default_value' => $defaultAttributeWidgetTitle,
+      '#default_value' => $attribute_widget_title,
     ];
     $form['actions']['submit']['#submit'][] = 'commerce_product_form_field_config_edit_form_submit';
   }
@@ -254,11 +252,11 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
  */
 function commerce_product_form_field_config_edit_form_submit($form, FormStateInterface $form_state) {
   $field = $form_state->getFormObject()->getEntity();
-  $formFields = &$form_state->getValues('field');
+  $settings = &$form_state->getValues('field');
   // If the attribute field is checked, update the attribute fields.
-  if ($formFields['attribute_field']) {
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', $formFields['attribute_widget_title']);
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget', $formFields['attribute_widget']);
+  if ($settings['attribute_field']) {
+    $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', $settings['attribute_widget_title']);
+    $field->setThirdPartySetting('commerce_product', 'attribute_widget', $settings['attribute_widget']);
     $field->setThirdPartySetting('commerce_product', 'attribute_field', TRUE);
     $field->save();
   }

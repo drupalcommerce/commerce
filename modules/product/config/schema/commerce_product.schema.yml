@@ -31,17 +31,17 @@ commerce_product.commerce_product_variation_type.*:
 
 field.field.*.*.*.third_party.commerce_product:
   type: mapping
-  label: 'Product attributes'
+  label: 'Product variation attributes'
   mapping:
     attribute_field:
         type: boolean
-        label: 'Whether or not this field should be used as a product attribute'
+        label: 'Whether or not this field should be used as an attribute'
     attribute_widget:
         type: string
-        label: 'The widget to use for the product attribute'
+        label: 'The widget to use for the attribute'
     attribute_widget_title:
         type: label
-        label: 'The title of the product attribute for the Add to Cart form'
+        label: 'The title of the attribute for the Add to Cart form'
 
 action.configuration.publish_product_action:
   type: action_configuration_default
