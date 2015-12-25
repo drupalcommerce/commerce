@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.profile.billing.address
+    - profile.type.billing
+  module:
+    - address
+id: profile.billing.default
+targetEntityType: profile
+bundle: billing
+mode: default
+content:
+  address:
+    type: address_default
+    weight: 0
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }
