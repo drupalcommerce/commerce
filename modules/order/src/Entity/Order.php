@@ -36,7 +36,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_order",
@@ -50,8 +49,6 @@ use Drupal\profile\Entity\ProfileInterface;
  *   },
  *   links = {
  *     "canonical" = "/admin/commerce/orders/{commerce_order}",
- *     "add-page" = "/admin/commerce/orders/add",
- *     "add-form" = "/admin/commerce/orders/add/{type}",
  *     "edit-form" = "/admin/commerce/orders/{commerce_order}/edit",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
  *     "collection" = "/admin/commerce/orders"

@@ -1,3 +1,11 @@
+entity.commerce_order.add_page:
+  path: '/admin/commerce/orders/add'
+  defaults:
+    _form: '\Drupal\commerce_order\Form\OrderAddForm'
+    _title: 'Create a new order'
+  requirements:
+    _entity_create_access: 'commerce_order'
+
 entity.commerce_order_type.collection:
   path: '/admin/commerce/config/order-types'
   defaults:
