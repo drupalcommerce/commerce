@@ -95,7 +95,7 @@ display:
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: false
+              empty_column: true
               responsive: ''
             status:
               sortable: true
@@ -250,9 +250,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+          hide_single_bundle: true
           entity_type: commerce_product
           entity_field: type
-          plugin_id: field
+          plugin_id: entity_bundle
         status:
           id: status
           table: commerce_product_field_data
