@@ -93,7 +93,7 @@ display:
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: false
+              empty_column: true
               responsive: ''
             operations:
               sortable: false
@@ -234,9 +234,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+          hide_single_bundle: true
           entity_type: commerce_store
           entity_field: type
-          plugin_id: field
+          plugin_id: entity_bundle
         operations:
           id: operations
           table: commerce_store
