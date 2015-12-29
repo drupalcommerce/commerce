@@ -31,7 +31,7 @@ hidden:
   mail: true
   store_id: true
   uid: true
-  hostname: true
+  ip_address: true
   order_number: true
   state: true
   created: true

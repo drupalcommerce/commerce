@@ -57,8 +57,8 @@ class OrderTest extends KernelTestBase {
    * @covers ::setOrderNumber
    * @covers ::getEmail
    * @covers ::setEmail
-   * @covers ::getHostname
-   * @covers ::setHostname
+   * @covers ::getIpAddress
+   * @covers ::setIpAddress
    * @covers ::getLineItems
    * @covers ::setLineItems
    * @covers ::hasLineItems
@@ -94,7 +94,7 @@ class OrderTest extends KernelTestBase {
       'state' => 'completed',
       'order_number' => '6',
       'mail' => 'test@example.com',
-      'hostname' => '127.0.0.1',
+      'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
       'line_items' => [$line_item],
     ]);
@@ -111,9 +111,9 @@ class OrderTest extends KernelTestBase {
     $order->setEmail('commerce@example.com');
     $this->assertEquals('commerce@example.com', $order->getEmail());
 
-    $this->assertEquals('127.0.0.1', $order->getHostname());
-    $order->setHostname('127.0.0.2');
-    $this->assertEquals('127.0.0.2', $order->getHostname());
+    $this->assertEquals('127.0.0.1', $order->getIpAddress());
+    $order->setIpAddress('127.0.0.2');
+    $this->assertEquals('127.0.0.2', $order->getIpAddress());
 
     // Avoid passing an entire entity to assertEquals(), causes a crash.
     $profiles_match = $profile === $order->getBillingProfile();

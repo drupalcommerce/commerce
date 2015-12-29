@@ -123,6 +123,8 @@ class OrderForm extends ContentEntityForm {
     else {
       $form['customer']['mail'] = $this->fieldAsReadOnly($this->t('Contact email'), $order->getEmail());
     }
+    // All additional customer information should come after uid/mail.
+    $form['customer']['ip_address'] = $this->fieldAsReadOnly($this->t('IP address'), $order->getIpAddress());
 
     return $form;
   }

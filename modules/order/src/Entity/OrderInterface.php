@@ -138,22 +138,22 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setData($data);
 
   /**
-   * Gets the IP address that created this order.
+   * Gets the order IP address.
    *
    * @return string
-   *   The ip address.
+   *   The IP address.
    */
-  public function getHostname();
+  public function getIpAddress();
 
   /**
-   * Sets the IP address associated with this order.
+   * Sets the order IP address.
    *
-   * @param string $hostname
-   *   The IP address to associate to this order.
+   * @param string $ip_address
+   *   The IP address.
    *
    * @return $this
    */
-  public function setHostname($hostname);
+  public function setIpAddress($ip_address);
 
   /**
    * Gets the email address associated with the order.

@@ -83,8 +83,8 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
 
     if ($this->isNew()) {
-      if (!$this->getHostname()) {
-        $this->setHostname(\Drupal::request()->getClientIp());
+      if (!$this->getIpAddress()) {
+        $this->setIpAddress(\Drupal::request()->getClientIp());
       }
 
       if (!$this->getEmail()) {
@@ -327,15 +327,15 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHostname() {
-    return $this->get('hostname')->value;
+  public function getIpAddress() {
+    return $this->get('ip_address')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setHostname($hostname) {
-    $this->set('hostname', $hostname);
+  public function setIpAddress($ip_address) {
+    $this->set('ip_address', $ip_address);
     return $this;
   }
 
@@ -457,9 +457,9 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['hostname'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Hostname'))
-      ->setDescription(t('The IP address that created this order.'))
+    $fields['ip_address'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('IP address'))
+      ->setDescription(t('The IP address of the order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 128)
       ->setDisplayOptions('view', [
