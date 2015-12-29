@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Two column template for the order edit form.
+ *
+ * Available variables:
+ * - form: The form.
+ */
+#}
+<div class="layout-order-form clearfix">
+  <div class="layout-region layout-region-order-main">
+    {{ form|without('advanced', 'actions') }}
+  </div>
+  <div class="layout-region layout-region-order-secondary">
+    {{ form.advanced }}
+  </div>
+  <div class="layout-region layout-region-order-footer">
+    {{ form.actions }}
+  </div>
+</div>
