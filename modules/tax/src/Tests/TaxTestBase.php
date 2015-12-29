@@ -7,12 +7,12 @@
 
 namespace Drupal\commerce_tax\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\commerce\Tests\CommerceTestBase;
 
 /**
  * Defines the base class for tax test cases.
  */
-abstract class TaxTestBase extends WebTestBase {
+abstract class TaxTestBase extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -22,20 +22,14 @@ abstract class TaxTestBase extends WebTestBase {
   public static $modules = ['commerce', 'commerce_tax', 'commerce_product'];
 
   /**
-   * User with permission to administer products.
-   */
-  protected $adminUser;
-
-  /**
    * {@inheritdoc}
    */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->adminUser = $this->drupalCreateUser([
+  protected function defaultAdminUserPermissions() {
+    return [
+      'view the administration theme',
+      'configure store',
       'administer stores',
       'access administration pages',
-    ]);
-    $this->drupalLogin($this->adminUser);
+    ];
   }
 }

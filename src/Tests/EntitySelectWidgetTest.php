@@ -9,8 +9,6 @@ namespace Drupal\commerce\Tests;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\simpletest\WebTestBase;
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
@@ -18,7 +16,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  *
  * @group commerce
  */
-class EntitySelectWidgetTest extends WebTestBase {
+class EntitySelectWidgetTest extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -83,7 +81,7 @@ class EntitySelectWidgetTest extends WebTestBase {
     ])->save();
 
     $variation = $this->createEntity('commerce_product_variation', [
-     'type' => 'default',
+      'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
     ]);
     $this->product = $this->createEntity('commerce_product', [
@@ -169,63 +167,6 @@ class EntitySelectWidgetTest extends WebTestBase {
         'default_currency' => 'EUR',
       ]);
     }
-  }
-
-  /**
-   * Creates a new entity
-   *
-   * @param string $entityType
-   *   The entity type.
-   * @param array $values
-   *   The values used to create the entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   */
-  protected function createEntity($entityType, $values) {
-    $storage = \Drupal::entityManager()->getStorage($entityType);
-    $entity = $storage->create($values);
-    $status = $entity->save();
-    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', [
-      '%label' => $entity->getEntityType()->getLabel(),
-      '%type' => $entity->id()
-    ]));
-    // The newly saved entity isn't identical to a loaded one, and would fail
-    // comparisons.
-    $entity = $storage->load($entity->id());
-
-    return $entity;
-  }
-
-  /**
-   * Asserts that the passed field values are correct.
-   *
-   * Ignores differences in ordering.
-   *
-   * @param array $field_values
-   *   The field values.
-   * @param array $expected_values
-   *   The expected values.
-   * @param $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use \Drupal\Component\Utility\SafeMarkup::format() to embed
-   *   variables in the message text, not t(). If left blank, a default message
-   *   will be displayed.
-   */
-  protected function assertFieldValues(array $field_values, array $expected_values, $message = '') {
-    $valid = TRUE;
-    if (count($field_values) == count($expected_values)) {
-      foreach ($expected_values as $value) {
-        if (!in_array($value, $field_values)) {
-          $valid = FALSE;
-          break;
-        }
-      }
-    }
-    else {
-      $valid = FALSE;
-    }
-
-    $this->assertTrue($valid, $message);
   }
 
 }
