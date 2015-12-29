@@ -91,6 +91,17 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setEmail($this->getOwner()->getEmail());
       }
     }
+
+    if ($this->getState()) {
+      $workflow = $this->getState()->getWorkflow();
+      // @todo: Check ID when bojanz/state_machine#7 lands
+      if ($workflow->getLabel() == 'Default') {
+        if ($this->getState()->getValue()['value'] == 'validation') {
+          $this->setPlacedTime(REQUEST_TIME);
+        }
+      }
+    }
+
   }
 
   /**
@@ -112,6 +123,7 @@ class Order extends ContentEntityBase implements OrderInterface {
         $line_item->save();
       }
     }
+
   }
 
   /**
@@ -354,6 +366,20 @@ class Order extends ContentEntityBase implements OrderInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getPlacedTime() {
+    return $this->get('placed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPlacedTime($timestamp) {
+    $this->set('placed', $timestamp);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -493,6 +519,21 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the order was last edited.'))
       ->setRequired(TRUE);
+
+    $fields['placed'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Placed'))
+      ->setDescription(t('The time when the order transitioned into validation.'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'datetime_timestamp',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
