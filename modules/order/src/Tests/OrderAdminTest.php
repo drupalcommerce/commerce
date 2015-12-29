@@ -61,8 +61,6 @@ class OrderAdminTest extends OrderTestBase {
     $this->drupalPostForm(NULL, $values, 'Create line item');
 
     $values = [
-      'store_id' => $this->store->id(),
-      'mail[0][value]' => $this->loggedInUser->getEmail(),
       'billing_profile' => $this->billingProfile->id(),
     ];
     $this->drupalPostForm(NULL, $values, t('Save'));
