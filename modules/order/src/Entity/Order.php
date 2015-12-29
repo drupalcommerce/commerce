@@ -410,7 +410,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Email'))
+      ->setLabel(t('Contact email'))
       ->setDescription(t('The email address associated with the order.'))
       ->setDefaultValue('')
       ->setSetting('max_length', 255)

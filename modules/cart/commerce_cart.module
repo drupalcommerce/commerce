@@ -57,6 +57,11 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
   if ($entity_type->id() === 'commerce_order') {
     $fields['cart'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Cart'))
+      ->setRequired(TRUE)
+      ->setSettings([
+        'on_label' => t('Yes'),
+        'off_label' => t('No'),
+      ])
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'settings' => [
