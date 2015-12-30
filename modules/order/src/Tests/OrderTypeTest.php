@@ -32,11 +32,11 @@ class OrderTypeTest extends OrderTestBase {
    */
   public function testCreateOrderType() {
     // Create a order type programmaticaly.
-    $type = $this->createEntity('commerce_order_type', array(
-        'id' => 'kitten',
-        'label' => 'Label of kitten',
-      )
-    );
+    $type = $this->createEntity('commerce_order_type', [
+      'id' => 'kitten',
+      'label' => 'Label of kitten',
+      'workflow' => 'default',
+    ]);
 
     $typeExists = (bool) OrderType::load($type->id());
     $this->assertTrue($typeExists, 'The new order type has been created in the database.');
@@ -60,11 +60,11 @@ class OrderTypeTest extends OrderTestBase {
    */
   public function testDeleteOrderType() {
     // Create a order type programmaticaly.
-    $type = $this->createEntity('commerce_order_type', array(
-        'id' => 'foo',
-        'label' => 'Label for foo',
-      )
-    );
+    $type = $this->createEntity('commerce_order_type', [
+      'id' => 'foo',
+      'label' => 'Label for foo',
+      'workflow' => 'default',
+    ]);
     commerce_order_add_line_items_field($type);
 
     // Create a order.

@@ -67,7 +67,6 @@ class OrderForm extends ContentEntityForm {
     ];
 
     $last_saved = $this->dateFormatter->format($order->getChangedTime(), 'short');
-    $created = $this->dateFormatter->format($order->getCreatedTime(), 'short');
     $form['advanced'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['entity-meta']],
@@ -88,7 +87,7 @@ class OrderForm extends ContentEntityForm {
         // Hide the rendered state if there's a widget for it.
         '#access' => empty($form['store_id']),
       ],
-      'created' => $this->fieldAsReadOnly($this->t('Created'), $created),
+      'date' => NULL,
       'changed' => $this->fieldAsReadOnly($this->t('Last saved'), $last_saved),
     ];
     $form['customer'] = [
@@ -102,6 +101,10 @@ class OrderForm extends ContentEntityForm {
       '#weight' => 91,
     ];
 
+    if ($placed_time = $order->getPlacedTime()) {
+      $date = $this->dateFormatter->format($placed_time, 'short');
+      $form['meta']['date'] = $this->fieldAsReadOnly($this->t('Placed'), $date);
+    }
     // Show the order's store only if there are multiple available.
     $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
     $store_count = $store_query->count()->execute();

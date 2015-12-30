@@ -174,6 +174,24 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setEmail($mail);
 
   /**
+   * Gets the timestamp of when the order was placed.
+   *
+   * @return int
+   *   The timestamp of when the order was placed.
+   */
+  public function getPlacedTime();
+
+  /**
+   * Sets the timestamp of when the order was placed.
+   *
+   * @param int $timestamp
+   *   The timestamp of when the order was placed.
+   *
+   * @return $this
+   */
+  public function setPlacedTime($timestamp);
+
+  /**
    * Gets the billing profile.
    *
    * @return \Drupal\profile\Entity\ProfileInterface

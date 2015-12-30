@@ -354,6 +354,20 @@ class Order extends ContentEntityBase implements OrderInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getPlacedTime() {
+    return $this->get('placed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPlacedTime($timestamp) {
+    $this->set('placed', $timestamp);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -479,20 +493,20 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time when the order was created.'))
-      ->setRequired(TRUE)
-      ->setTranslatable(TRUE)
+      ->setDescription(t('The time when the order was created.'));
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time when the order was last edited.'));
+
+    $fields['placed'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Placed'))
+      ->setDescription(t('The time when the order was placed.'))
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
         'weight' => 0,
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the order was last edited.'))
-      ->setRequired(TRUE);
+      ]);
 
     return $fields;
   }
