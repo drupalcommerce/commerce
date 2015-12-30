@@ -8,6 +8,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the order type entity class.
@@ -85,5 +86,16 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
     $this->workflow = $workflow;
     return $this;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preCreate(EntityStorageInterface $storage, array &$values) {
+    parent::preCreate($storage, $values);
+    $values += [
+      'type' => 'default',
+    ];
+  }
+
 
 }
