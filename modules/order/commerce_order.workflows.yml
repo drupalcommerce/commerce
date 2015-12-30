@@ -1,32 +1,107 @@
 default:
   id: default
-  label: Default
   group: order
+  label: 'Default'
   states:
-    new:
-      label: New
-    validation:
-      label: Validation
-    fulfillment:
-      label: Fulfilment
+    draft:
+      label: Draft
     completed:
       label: Completed
     canceled:
       label: Canceled
   transitions:
-    create:
-      label: Create
-      from: [new]
+    place:
+      label: 'Place order'
+      from: [draft]
+      to: completed
+    cancel:
+      label: 'Cancel order'
+      from: [draft]
+      to:   canceled
+
+default_validation:
+  id: default_validation
+  group: order
+  label: 'Default, with validation'
+  states:
+    draft:
+      label: Draft
+    validation:
+      label: Validation
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'Place order'
+      from: [draft]
       to:   validation
     validate:
-      label: Validate
+      label: 'Validate order'
       from: [validation]
+      to: completed
+    cancel:
+      label: 'Cancel order'
+      from: [draft, validation]
+      to:   canceled
+
+fulfilment:
+  id: fulfilment
+  group: order
+  label: Fulfilment
+  states:
+    draft:
+      label: Draft
+    fulfillment:
+      label: Fulfillment
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'Place order'
+      from: [draft]
       to:   fulfillment
     fulfill:
-      label: Fulfill
+      label: 'Fulfill order'
       from: [fulfillment]
       to: completed
     cancel:
-      label: Cancel
-      from: [new, validation, fulfillment]
+      label: 'Cancel order'
+      from: [draft, fulfillment]
+      to:   canceled
+
+fulfilment_validation:
+  id: fulfilment_validation
+  group: order
+  label: Fulfilment, with validation
+  states:
+    draft:
+      label: Draft
+    validation:
+      label: Validation
+    fulfillment:
+      label: Fulfillment
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'Place order'
+      from: [draft]
+      to:   validation
+    validate:
+      label: 'Validate order'
+      from: [validation]
+      to:   fulfillment
+    fulfill:
+      label: 'Fulfill order'
+      from: [fulfillment]
+      to: completed
+    cancel:
+      label: 'Cancel order'
+      from: [draft, validation, fulfillment]
       to:   canceled
