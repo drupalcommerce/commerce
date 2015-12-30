@@ -1,32 +1,108 @@
 default:
   id: default
-  label: Default
   group: order
+  label: 'Default'
+  states:
+    new:
+      label: New
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'mark as complete'
+      from: [new]
+      to: completed
+    cancel:
+      label: 'mark as canceled'
+      from: [new]
+      to:   canceled
+
+default_validation:
+  id: default_validation
+  group: order
+  label: 'Default, with validation'
+  states:
+    new:
+      label: New
+    validation:
+      label: Validation
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'send to validation'
+      from: [new]
+      to:   validation
+    validate:
+      label: 'mark as complete'
+      from: [validation]
+      to: completed
+    cancel:
+      label: 'mark as canceled'
+      from: [new, validation]
+      to:   canceled
+
+fulfilment:
+  id: fulfilment
+  group: order
+  label: Fulfilment
+  states:
+    new:
+      label: New
+    fulfillment:
+      label: Fulfillment
+    completed:
+      label: Completed
+    canceled:
+      label: Canceled
+  transitions:
+    place:
+      label: 'send to fulfillment'
+      from: [new]
+      to:   fulfillment
+    fulfill:
+      label: 'mark as complete'
+      from: [fulfillment]
+      to: completed
+    cancel:
+      label: 'mark as canceled'
+      from: [new, fulfillment]
+      to:   canceled
+
+fulfilment_validation:
+  id: fulfilment_validation
+  group: order
+  label: Fulfilment, with validation
   states:
     new:
       label: New
     validation:
       label: Validation
     fulfillment:
-      label: Fulfilment
+      label: Fulfillment
     completed:
       label: Completed
     canceled:
       label: Canceled
   transitions:
-    create:
-      label: Create
+    place:
+      label: 'send to validation'
       from: [new]
       to:   validation
     validate:
-      label: Validate
+      label: 'send to fulfillment'
       from: [validation]
       to:   fulfillment
     fulfill:
-      label: Fulfill
+      label: 'mark as complete'
       from: [fulfillment]
       to: completed
     cancel:
-      label: Cancel
+      label: 'mark as canceled'
       from: [new, validation, fulfillment]
       to:   canceled
+
