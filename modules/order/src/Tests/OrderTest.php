@@ -68,6 +68,7 @@ class OrderTest extends OrderTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'line_items' => [$line_item],
     ]);
+    $order->save();
 
     $this->assertNull($order->getPlacedTime());
 
