@@ -68,10 +68,11 @@ class OrderTest extends OrderTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'line_items' => [$line_item],
     ]);
-
+    $this->assertNull($order->getPlacedTime());
+    $order->save();
     $this->assertNull($order->getPlacedTime());
 
-    $state = $order->getState()->getWorkflow()->getState('validation');
+    $state = $order->getState()->getWorkflow()->getState('completed');
     $order->getState()->setValue($state->getId());
     $order->save();
 

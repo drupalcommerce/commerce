@@ -64,10 +64,20 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storageController, array &$values) {
-    parent::preCreate($storageController, $values);
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+
+    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+    $order_type = OrderType::load($values['type']);
+    /** @var \Drupal\state_machine\WorkflowManagerInterface $workflow_manager */
+    $workflow_manager = \Drupal::service('plugin.manager.workflow');
+    /** @var \Drupal\state_machine\Plugin\Workflow\Workflow $workflow */
+    $workflow = $workflow_manager->createInstance($order_type->getWorkflow());
+    $states = $workflow->getStates();
+
     $values += [
       'uid' => \Drupal::currentUser()->id(),
+      'state' => reset($states),
     ];
   }
 
