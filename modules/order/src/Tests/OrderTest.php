@@ -55,4 +55,27 @@ class OrderTest extends OrderTestBase {
     $this->assertFalse($lineItemExists, 'The matching line item has been deleted from the database.');
   }
 
+  /**
+   * Tests that the 'placed' timestamp is set when transitioning to validation.
+   */
+  public function testOrderPlaced() {
+    $line_item = $this->createEntity('commerce_line_item', [
+      'type' => 'product_variation',
+    ]);
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+      'line_items' => [$line_item],
+    ]);
+
+    $this->assertNull($order->getPlacedTime());
+
+    $state = $order->getState()->getWorkflow()->getState('validation');
+    $order->getState()->setValue($state->getId());
+    $order->save();
+
+    $this->assertEqual($order->getPlacedTime(), REQUEST_TIME);
+  }
+
 }

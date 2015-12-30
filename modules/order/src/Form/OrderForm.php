@@ -66,8 +66,16 @@ class OrderForm extends ContentEntityForm {
       '#default_value' => $order->getChangedTime(),
     ];
 
+    // Show the created timestamp only as a fallback, for new orders.
+    if ($placed_time = $order->getPlacedTime()) {
+      $date_label = $this->t('Placed');
+      $date = $this->dateFormatter->format($placed_time, 'short');
+    }
+    else {
+      $date_label = $this->t('Created');
+      $date = $this->dateFormatter->format($order->getCreatedTime(), 'short');
+    }
     $last_saved = $this->dateFormatter->format($order->getChangedTime(), 'short');
-    $created = $this->dateFormatter->format($order->getCreatedTime(), 'short');
     $form['advanced'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['entity-meta']],
@@ -88,7 +96,7 @@ class OrderForm extends ContentEntityForm {
         // Hide the rendered state if there's a widget for it.
         '#access' => empty($form['store_id']),
       ],
-      'created' => $this->fieldAsReadOnly($this->t('Created'), $created),
+      'date' => $this->fieldAsReadOnly($date_label, $date),
       'changed' => $this->fieldAsReadOnly($this->t('Last saved'), $last_saved),
     ];
     $form['customer'] = [
