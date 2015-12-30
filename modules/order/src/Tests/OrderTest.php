@@ -71,7 +71,7 @@ class OrderTest extends OrderTestBase {
 
     $this->assertNull($order->getPlacedTime());
 
-    $state = $order->getState()->getWorkflow()->getState('validation');
+    $state = $order->getState()->getWorkflow()->getState('completed');
     $order->getState()->setValue($state->getId());
     $order->save();
 
