@@ -173,8 +173,8 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDefaultCurrencyCode($currencyCode) {
-    $this->set('default_currency', $currencyCode);
+  public function setDefaultCurrencyCode($currency_code) {
+    $this->set('default_currency', $currency_code);
     return $this;
   }
 

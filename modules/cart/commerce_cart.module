@@ -18,29 +18,29 @@ use Drupal\Core\Form\FormStateInterface;
  * Ensures the presence of a cart view mode for each purchasable entity type.
  */
 function commerce_cart_rebuild() {
-  $entityTypes = \Drupal::service('entity_type.manager')->getDefinitions();
-  $entityTypes = array_filter($entityTypes, function ($entityType) {
-    return $entityType->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
+  $entity_types = \Drupal::service('entity_type.manager')->getDefinitions();
+  $entity_types = array_filter($entity_types, function ($entity_type) {
+    return $entity_type->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
   });
 
-  foreach ($entityTypes as $entityType) {
-    if (!EntityViewMode::load($entityType->id() . '.cart')) {
+  foreach ($entity_types as $entity_type) {
+    if (!EntityViewMode::load($entity_type->id() . '.cart')) {
       EntityViewMode::create([
-        'id' => $entityType->id() . '.cart',
-        'targetEntityType' => $entityType->id(),
+        'id' => $entity_type->id() . '.cart',
+        'targetEntityType' => $entity_type->id(),
         'label' => 'Cart',
         'status' => TRUE,
         'enabled' => TRUE,
       ])->save();
     }
 
-    $bundles = array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entityType->id()));
+    $bundles = array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type->id()));
     foreach ($bundles as $bundle) {
-      $displayId = $entityType->id() . '.' . $bundle . '.cart';
-      if (!EntityViewDisplay::load($displayId)) {
+      $display_id = $entity_type->id() . '.' . $bundle . '.cart';
+      if (!EntityViewDisplay::load($display_id)) {
         EntityViewDisplay::create([
-          'id' => $displayId,
-          'targetEntityType' => $entityType->id(),
+          'id' => $display_id,
+          'targetEntityType' => $entity_type->id(),
           'bundle' => $bundle,
           'mode' => 'cart',
           'status' => TRUE,

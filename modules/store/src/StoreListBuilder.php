@@ -30,13 +30,13 @@ class StoreListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\commerce_store\Entity\Store */
-    $storeType = StoreType::load($entity->bundle());
+    $store_type = StoreType::load($entity->bundle());
 
     $row['name']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
     ] + $entity->urlInfo()->toRenderArray();
-    $row['type'] = $storeType->label();
+    $row['type'] = $store_type->label();
 
     return $row + parent::buildRow($entity);
   }

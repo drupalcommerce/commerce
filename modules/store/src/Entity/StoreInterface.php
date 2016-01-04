@@ -82,12 +82,12 @@ interface StoreInterface extends EntityInterface, EntityOwnerInterface {
   /**
    * Sets the default store currency code.
    *
-   * @param string $currencyCode
+   * @param string $currency_code
    *   The default store currency code.
    *
    * @return $this
    */
-  public function setDefaultCurrencyCode($currencyCode);
+  public function setDefaultCurrencyCode($currency_code);
 
   /**
    * Gets the store address.

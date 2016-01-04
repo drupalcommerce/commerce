@@ -33,25 +33,25 @@ class StoreStorage extends CommerceContentEntityStorage implements StoreStorageI
   /**
    * Constructs a new StoreStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend to be used.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(EntityTypeInterface $entityType, Connection $database, EntityManagerInterface $entityManager, CacheBackendInterface $cache, LanguageManagerInterface $languageManager, EventDispatcherInterface $eventDispatcher, ConfigFactoryInterface $configFactory) {
-    parent::__construct($entityType, $database, $entityManager, $cache, $languageManager, $eventDispatcher);
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
 
-    $this->configFactory = $configFactory;
+    $this->configFactory = $config_factory;
   }
 
   /**

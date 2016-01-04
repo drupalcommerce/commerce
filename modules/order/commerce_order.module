@@ -48,7 +48,6 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
   $field_definition = $context['items']->getFieldDefinition();
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();
-  $widget_name = $context['widget']->getPluginId();
   if ($field_name == 'purchased_entity' && $entity_type == 'commerce_line_item') {
     if (!empty($element['target_id']['#target_type'])) {
       $target_type = \Drupal::service('entity_type.manager')->getDefinition($element['target_id']['#target_type']);
