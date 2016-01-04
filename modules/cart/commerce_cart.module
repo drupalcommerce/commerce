@@ -57,7 +57,6 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
   if ($entity_type->id() === 'commerce_order') {
     $fields['cart'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Cart'))
-      ->setRequired(TRUE)
       ->setSettings([
         'on_label' => t('Yes'),
         'off_label' => t('No'),
@@ -84,6 +83,26 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 function commerce_cart_commerce_order_delete(OrderInterface $order) {
   if (!empty($order->cart)) {
     \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_form'.
+ */
+function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInterface $form_state) {
+  if (isset($form['cart'])) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $form_state->getFormObject()->getEntity();
+    if ($order->getState()->value == 'draft') {
+      // Move the cart element to the bottom of the meta sidebar container.
+      $form['cart']['#group'] = 'meta';
+      $form['cart']['#weight'] = 100;
+    }
+    else {
+      // Only draft orders can be carts.
+      $form['cart']['#type'] = 'hidden';
+      $form['#default_value'] = FALSE;
+    }
   }
 }
 
