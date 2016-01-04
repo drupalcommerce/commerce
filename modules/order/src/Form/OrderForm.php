@@ -58,6 +58,7 @@ class OrderForm extends ContentEntityForm {
     $order = $this->entity;
     $form = parent::form($form, $form_state);
 
+    $form['#tree'] = TRUE;
     $form['#theme'] = 'commerce_order_edit_form';
     $form['#attached']['library'][] = 'commerce_order/form';
     // Changed must be sent to the client, for later overwrite error checking.
