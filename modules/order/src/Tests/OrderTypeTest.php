@@ -20,11 +20,11 @@ class OrderTypeTest extends OrderTestBase {
    * Tests if the default Order Type was created.
    */
   public function testDefaultOrderType() {
-    $orderTypes = OrderType::loadMultiple();
-    $this->assertTrue(isset($orderTypes['default']), 'Order Type Order is available');
+    $order_types = OrderType::loadMultiple();
+    $this->assertTrue(isset($order_types['default']), 'Order Type Order is available');
 
-    $orderType = OrderType::load('default');
-    $this->assertEqual($orderTypes['default'], $orderType, 'The correct Order Type is loaded');
+    $order_type = OrderType::load('default');
+    $this->assertEqual($order_types['default'], $order_type, 'The correct Order Type is loaded');
   }
 
   /**
@@ -38,8 +38,8 @@ class OrderTypeTest extends OrderTestBase {
       'workflow' => 'default',
     ]);
 
-    $typeExists = (bool) OrderType::load($type->id());
-    $this->assertTrue($typeExists, 'The new order type has been created in the database.');
+    $type_exists = (bool) OrderType::load($type->id());
+    $this->assertTrue($type_exists, 'The new order type has been created in the database.');
 
     // Create a order type through the add form.
     $this->drupalGet('/admin/commerce/config/order-types');
@@ -51,8 +51,8 @@ class OrderTypeTest extends OrderTestBase {
     );
     $this->drupalPostForm(NULL, $values, t('Save'));
 
-    $typeExists = (bool) OrderType::load($values['id']);
-    $this->assertTrue($typeExists, 'The new order type has been created in the database.');
+    $type_exists = (bool) OrderType::load($values['id']);
+    $this->assertTrue($type_exists, 'The new order type has been created in the database.');
   }
 
   /**
@@ -92,7 +92,7 @@ class OrderTypeTest extends OrderTestBase {
     );
     $this->assertText(t('This action cannot be undone.'), 'The order type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
-    $typeExists = (bool) OrderType::load($type->id());
-    $this->assertFalse($typeExists, 'The order type has been deleted from the database.');
+    $type_exists = (bool) OrderType::load($type->id());
+    $this->assertFalse($type_exists, 'The order type has been deleted from the database.');
   }
 }

@@ -28,12 +28,12 @@ interface LineItemTypeInterface extends ConfigEntityInterface {
   /**
    * Sets the line item type's purchasable entity type.
    *
-   * @param string $purchasableEntityType
+   * @param string $purchasable_entity_type
    *   The purchasable entity type.
    *
    * @return $this
    */
-  public function setPurchasableEntityType($purchasableEntityType);
+  public function setPurchasableEntityType($purchasable_entity_type);
 
   /**
    * Gets the line item type's order type.
@@ -46,11 +46,11 @@ interface LineItemTypeInterface extends ConfigEntityInterface {
   /**
    * Sets the line item type's order type.
    *
-   * @param string $orderType
+   * @param string $order_type
    *   The order type.
    *
    * @return $this
    */
-  public function setOrderType($orderType);
+  public function setOrderType($order_type);
 
 }

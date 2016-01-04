@@ -64,16 +64,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storageController, array &$values) {
-    parent::preCreate($storageController, $values);
-    $values += [
-      'uid' => \Drupal::currentUser()->id(),
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -139,8 +129,8 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function setOrderNumber($orderNumber) {
-    $this->set('order_number', $orderNumber);
+  public function setOrderNumber($order_number) {
+    $this->set('order_number', $order_number);
     return $this;
   }
 
@@ -387,8 +377,8 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields = self::entityKeysBaseFieldDefinitions($entityType);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
     $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))
@@ -414,7 +404,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDescription(t('The order owner.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\commerce_order\Entity\CommerceOrder::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\commerce_order\Entity\Order::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',

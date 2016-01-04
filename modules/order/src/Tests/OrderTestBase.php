@@ -96,9 +96,9 @@ abstract class OrderTestBase extends WebTestBase {
     $this->variation = ProductVariation::create($values);
     $this->variation->save();
 
-    // We need a product too otherwise tests complain about missing
+    // We need a product too otherwise tests complain about the missing
     // backreference.
-    $product = $this->createEntity('commerce_product', [
+    $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => $this->randomMachineName(),
       'variations' => [$this->variation],
@@ -110,16 +110,16 @@ abstract class OrderTestBase extends WebTestBase {
   /**
    * Creates a new entity
    *
-   * @param string $entityType
+   * @param string $entity_type
    * @param array $values
    *   An array of settings.
    *   Example: 'id' => 'foo'.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */
-  protected function createEntity($entityType, $values) {
+  protected function createEntity($entity_type, $values) {
     $entity = \Drupal::service('entity_type.manager')
-      ->getStorage($entityType)
+      ->getStorage($entity_type)
       ->create($values);
     $status = $entity->save();
 

@@ -78,8 +78,8 @@ class OrderAdminTest extends OrderTestBase {
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
     ]);
-    $orderExists = (bool) Order::load($order->id());
-    $this->assertTrue($orderExists, 'The order has been created in the database.');
+    $order_exists = (bool) Order::load($order->id());
+    $this->assertTrue($order_exists, 'The order has been created in the database.');
 
     $this->drupalGet('admin/commerce/orders/' . $order->id() . '/delete');
     $this->assertRaw(t('Are you sure you want to delete the order %label?', [
@@ -89,7 +89,7 @@ class OrderAdminTest extends OrderTestBase {
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     // Remove the entity from cache and check if the order is deleted.
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
-    $orderExists = (bool) Order::load('commerce_order', $order->id());
-    $this->assertFalse($orderExists, 'The order has been deleted from the database.');
+    $order_exists = (bool) Order::load('commerce_order', $order->id());
+    $this->assertFalse($order_exists, 'The order has been deleted from the database.');
   }
 }

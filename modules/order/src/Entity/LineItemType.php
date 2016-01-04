@@ -89,8 +89,8 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   /**
    * {@inheritdoc}
    */
-  public function setPurchasableEntityType($purchasableEntityType) {
-    $this->purchasableEntityType = $purchasableEntityType;
+  public function setPurchasableEntityType($purchasable_entity_type) {
+    $this->purchasableEntityType = $purchasable_entity_type;
     return $this;
   }
 
@@ -104,8 +104,8 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   /**
    * {@inheritdoc}
    */
-  public function setOrderType($orderType) {
-    $this->orderType = $orderType;
+  public function setOrderType($order_type) {
+    $this->orderType = $order_type;
     return $this;
   }
 

@@ -167,8 +167,8 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields = self::entityKeysBaseFieldDefinitions($entityType);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
     // The order backreference, populated by Order::postSave().
     $fields['order_id'] = BaseFieldDefinition::create('entity_reference')
@@ -261,13 +261,14 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public static function bundleFieldDefinitions(EntityTypeInterface $entityType, $bundle, array $baseFieldDefinitions) {
-    $lineItemType = LineItemType::load($bundle);
-    $purchasableEntityType = $lineItemType->getPurchasableEntityType();
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $line_item_type */
+    $line_item_type = LineItemType::load($bundle);
+    $purchasable_entity_type = $line_item_type->getPurchasableEntityType();
     $fields = [];
-    $fields['purchased_entity'] = clone $baseFieldDefinitions['purchased_entity'];
-    if ($purchasableEntityType) {
-      $fields['purchased_entity']->setSetting('target_type', $purchasableEntityType);
+    $fields['purchased_entity'] = clone $base_field_definitions['purchased_entity'];
+    if ($purchasable_entity_type) {
+      $fields['purchased_entity']->setSetting('target_type', $purchasable_entity_type);
     }
     else {
       // This line item type won't reference a purchasable entity. The field
@@ -282,7 +283,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       $fields['purchased_entity']->setReadOnly(TRUE);
 
       // Make the title field visible and required.
-      $fields['title'] = clone $baseFieldDefinitions['title'];
+      $fields['title'] = clone $base_field_definitions['title'];
       $fields['title']->setRequired(TRUE);
       $fields['title']->setDisplayOptions('form', [
         'type' => 'string_textfield',

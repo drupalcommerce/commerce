@@ -29,12 +29,12 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   /**
    * Sets the order number.
    *
-   * @param string $orderNumber
+   * @param string $order_number
    *   The order number.
    *
    * @return $this
    */
-  public function setOrderNumber($orderNumber);
+  public function setOrderNumber($order_number);
 
   /**
    * Gets the order state.

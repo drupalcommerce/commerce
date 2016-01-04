@@ -27,11 +27,11 @@ class LineItemEvent extends Event {
   /**
    * Constructs a new LineItemEvent.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $lineItem
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
    *   The line item.
    */
-  public function __construct(LineItemInterface $lineItem) {
-    $this->lineItem = $lineItem;
+  public function __construct(LineItemInterface $line_item) {
+    $this->lineItem = $line_item;
   }
 
   /**
