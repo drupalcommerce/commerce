@@ -45,14 +45,14 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * Creates a new CurrencyImporter object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, LanguageManagerInterface $languageManager) {
-    $this->storage = $entityTypeManager->getStorage('commerce_currency');
-    $this->languageManager = $languageManager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager) {
+    $this->storage = $entity_type_manager->getStorage('commerce_currency');
+    $this->languageManager = $language_manager;
     $this->externalRepository = new CurrencyRepository();
   }
 
@@ -60,30 +60,30 @@ class CurrencyImporter implements CurrencyImporterInterface {
    * {@inheritdoc}
    */
   public function getImportable() {
-    $importedCurrencies = $this->storage->loadMultiple();
+    $imported_currencies = $this->storage->loadMultiple();
     $langcode = $this->languageManager->getConfigOverrideLanguage()->getId();
-    $allCurrencies = $this->externalRepository->getAll($langcode, 'en');
-    $importableCurrencies = array_diff_key($allCurrencies, $importedCurrencies);
-    $importableCurrencies = array_map(function ($currency) {
+    $all_currencies = $this->externalRepository->getAll($langcode, 'en');
+    $importable_currencies = array_diff_key($all_currencies, $imported_currencies);
+    $importable_currencies = array_map(function ($currency) {
       return $currency->getName();
-    }, $importableCurrencies);
+    }, $importable_currencies);
 
-    return $importableCurrencies;
+    return $importable_currencies;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function import($currencyCode) {
-    if ($existingEntity = $this->storage->load($currencyCode)) {
+  public function import($currency_code) {
+    if ($existing_entity = $this->storage->load($currency_code)) {
       // Pretend the currency was just imported.
-      return $existingEntity;
+      return $existing_entity;
     }
 
-    $defaultLangcode = $this->languageManager->getDefaultLanguage()->getId();
-    $currency = $this->externalRepository->get($currencyCode, $defaultLangcode, 'en');
+    $default_langcode = $this->languageManager->getDefaultLanguage()->getId();
+    $currency = $this->externalRepository->get($currency_code, $default_langcode, 'en');
     $values = [
-      'langcode' => $defaultLangcode,
+      'langcode' => $default_langcode,
       'currencyCode' => $currency->getCurrencyCode(),
       'name' => $currency->getName(),
       'numericCode' => $currency->getNumericCode(),
@@ -95,7 +95,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
     if ($this->languageManager->isMultilingual()) {
       // Import translations for any additional languages the site has.
       $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
-      $languages = array_diff_key($languages, [$defaultLangcode => $defaultLangcode]);
+      $languages = array_diff_key($languages, [$default_langcode => $default_langcode]);
       $langcodes = array_map(function ($language) {
         return $language->getId();
       }, $languages);
@@ -108,13 +108,13 @@ class CurrencyImporter implements CurrencyImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function importByCountry($countryCode) {
-    $countryRepository = new CountryRepository();
-    $country = $countryRepository->get($countryCode);
-    $currencyCode = $country->getCurrencyCode();
+  public function importByCountry($country_code) {
+    $country_repository = new CountryRepository();
+    $country = $country_repository->get($country_code);
+    $currency_code = $country->getCurrencyCode();
     $entity = NULL;
-    if ($currencyCode) {
-      $entity = $this->import($currencyCode);
+    if ($currency_code) {
+      $entity = $this->import($currency_code);
     }
 
     return $entity;
@@ -138,22 +138,23 @@ class CurrencyImporter implements CurrencyImporterInterface {
    *   The langcodes.
    */
   protected function importEntityTranslations(CurrencyInterface $currency, array $langcodes) {
-    $currencyCode = $currency->getCurrencyCode();
-    $configName = $currency->getConfigDependencyName();
+    $currency_code = $currency->getCurrencyCode();
+    $config_name = $currency->getConfigDependencyName();
     foreach ($langcodes as $langcode) {
       try {
-        $translatedCurrency = $this->externalRepository->get($currencyCode, $langcode);
+        $translated_currency = $this->externalRepository->get($currency_code, $langcode);
       }
       catch (UnknownLocaleException $e) {
         // No translation found.
         continue;
       }
 
-      $configTranslation = $this->languageManager->getLanguageConfigOverride($langcode, $configName);
-      if ($configTranslation->isNew()) {
-        $configTranslation->set('name', $translatedCurrency->getName());
-        $configTranslation->set('symbol', $translatedCurrency->getSymbol());
-        $configTranslation->save();
+      /** @var \Drupal\language\Config\LanguageConfigOverride $config_translation */
+      $config_translation = $this->languageManager->getLanguageConfigOverride($langcode, $config_name);
+      if ($config_translation->isNew()) {
+        $config_translation->set('name', $translated_currency->getName());
+        $config_translation->set('symbol', $translated_currency->getSymbol());
+        $config_translation->save();
       }
     }
   }

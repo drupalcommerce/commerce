@@ -33,14 +33,14 @@ class NumberFormatterFactory implements NumberFormatterFactoryInterface {
   /**
    * Constructs a new NumberFormatterFactory object.
    *
-   * @param \Drupal\commerce\LocaleContextInterface $localeContext
+   * @param \Drupal\commerce\LocaleContextInterface $locale_context
    *   The locale context.
-   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface $numberFormatRepository
+   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface $number_format_repository
    *   The number format repository..
    */
-  public function __construct(LocaleContextInterface $localeContext, NumberFormatRepositoryInterface $numberFormatRepository) {
-    $this->localeContext = $localeContext;
-    $this->numberFormatRepository = $numberFormatRepository;
+  public function __construct(LocaleContextInterface $locale_context, NumberFormatRepositoryInterface $number_format_repository) {
+    $this->localeContext = $locale_context;
+    $this->numberFormatRepository = $number_format_repository;
   }
 
   /**
@@ -48,9 +48,9 @@ class NumberFormatterFactory implements NumberFormatterFactoryInterface {
    */
   public function createInstance($style = NumberFormatter::CURRENCY) {
     $locale = $this->localeContext->getLocale();
-    $numberFormat = $this->numberFormatRepository->get($locale);
+    $number_format = $this->numberFormatRepository->get($locale);
 
-    return new NumberFormatter($numberFormat, $style);
+    return new NumberFormatter($number_format, $style);
   }
 
 }

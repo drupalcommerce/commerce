@@ -21,7 +21,7 @@ interface NumberFormatterFactoryInterface {
    *   The format style, one of the NumberFormatter constants:
    *   DECIMAL, PERCENT, CURRENCY, CURRENCY_ACCOUNTING.
    *
-   * @return \CommerceGuys\Intl\Formatter\NumberFormatter
+   * @return \CommerceGuys\Intl\Formatter\NumberFormatterInterface
    *   The created number formatter.
    */
   public function createInstance($style = NumberFormatter::CURRENCY);

@@ -23,7 +23,7 @@ interface CurrencyImporterInterface {
   /**
    * Imports currency data for the given currency code.
    *
-   * @param string $currencyCode
+   * @param string $currency_code
    *   The currency code.
    *
    * @return \Drupal\commerce_price\Entity\CurrencyInterface
@@ -32,12 +32,12 @@ interface CurrencyImporterInterface {
    * @throws \CommerceGuys\Intl\Exception\UnknownCurrencyException
    *   Thrown when the currency couldn't be found in the library definitions.
    */
-  public function import($currencyCode);
+  public function import($currency_code);
 
   /**
    * Imports currency data for the given country code.
    *
-   * @param string $countryCode
+   * @param string $country_code
    *   The country code.
    *
    * @return \Drupal\commerce_price\Entity\CurrencyInterface|NULL
@@ -47,7 +47,7 @@ interface CurrencyImporterInterface {
    * @throws \CommerceGuys\Intl\Exception\UnknownCountryException
    *   Thrown when the country couldn't be found in the library definitions.
    */
-  public function importByCountry($countryCode);
+  public function importByCountry($country_code);
 
   /**
    * Imports translations for the given language codes.

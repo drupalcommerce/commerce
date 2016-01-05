@@ -27,11 +27,11 @@ class NumberFormatEvent extends GenericEvent {
   /**
    * Constructs a new NumberFormatEvent.
    *
-   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface $numberFormat
+   * @param \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface $number_format
    *   The number format.
    */
-  public function __construct(NumberFormatEntityInterface $numberFormat) {
-    $this->numberFormat = $numberFormat;
+  public function __construct(NumberFormatEntityInterface $number_format) {
+    $this->numberFormat = $number_format;
   }
 
   /**

@@ -101,8 +101,8 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function setCurrencyCode($currencyCode) {
-    $this->currencyCode = $currencyCode;
+  public function setCurrencyCode($currency_code) {
+    $this->currencyCode = $currency_code;
     return $this;
   }
 
@@ -131,8 +131,8 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function setNumericCode($numericCode) {
-    $this->numericCode = $numericCode;
+  public function setNumericCode($numeric_code) {
+    $this->numericCode = $numeric_code;
     return $this;
   }
 
@@ -161,8 +161,8 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function setFractionDigits($fractionDigits) {
-    $this->fractionDigits = $fractionDigits;
+  public function setFractionDigits($fraction_digits) {
+    $this->fractionDigits = $fraction_digits;
     return $this;
   }
 

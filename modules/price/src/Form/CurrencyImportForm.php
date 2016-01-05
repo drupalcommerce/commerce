@@ -22,16 +22,16 @@ class CurrencyImportForm extends FormBase {
    *
    * @var \Drupal\commerce_price\CurrencyImporterInterface
    */
-  protected $currencyImporter;
+  protected $importer;
 
   /**
    * Creates a new CurrencyImportForm object.
    *
-   * @param \Drupal\commerce_price\CurrencyImporterInterface $currencyImporter
+   * @param \Drupal\commerce_price\CurrencyImporterInterface $importer
    *   The currency importer.
    */
-  public function __construct(CurrencyImporterInterface $currencyImporter) {
-    $this->currencyImporter = $currencyImporter;
+  public function __construct(CurrencyImporterInterface $importer) {
+    $this->importer = $importer;
   }
 
   /**
@@ -52,7 +52,7 @@ class CurrencyImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $currencies = $this->currencyImporter->getImportable();
+    $currencies = $this->importer->getImportable();
     if (empty($currencies)) {
       $form['message'] = [
         '#markup' => $this->t('All currencies have already been imported.'),
@@ -82,8 +82,8 @@ class CurrencyImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $currencyCode = $form_state->getValue('currency_code');
-    $currency = $this->currencyImporter->import($currencyCode);
+    $currency_code = $form_state->getValue('currency_code');
+    $currency = $this->importer->import($currency_code);
     drupal_set_message($this->t('Imported the %label currency.', ['%label' => $currency->label()]));
     $form_state->setRebuild();
   }

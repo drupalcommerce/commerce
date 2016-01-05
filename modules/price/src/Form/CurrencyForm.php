@@ -20,26 +20,26 @@ class CurrencyForm extends EntityForm {
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $currencyStorage;
+  protected $storage;
 
   /**
    * Creates a new CurrencyForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The currency storage.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->storage = $entity_type_manager->getStorage('commerce_currency');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
-    $entityTypeManager = $container->get('entity_type.manager');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = $container->get('entity_type.manager');
 
-    return new static($entityTypeManager);
+    return new static($entity_type_manager);
   }
 
   /**
@@ -103,13 +103,13 @@ class CurrencyForm extends EntityForm {
    */
   public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
-    $currencyCode = $element['#value'];
-    if (!preg_match('/^[A-Z]{3}$/', $currencyCode)) {
+    $currency_code = $element['#value'];
+    if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
       $form_state->setError($element, $this->t('The currency code must consist of three uppercase letters.'));
     }
     elseif ($currency->isNew()) {
-      $loadedCurrency = $this->currencyStorage->load($currencyCode);
-      if ($loadedCurrency) {
+      $loaded_currency = $this->storage->load($currency_code);
+      if ($loaded_currency) {
         $form_state->setError($element, $this->t('The currency code is already in use.'));
       }
     }
@@ -120,15 +120,15 @@ class CurrencyForm extends EntityForm {
    */
   public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
     $currency = $this->getEntity();
-    $numericCode = $element['#value'];
-    if ($numericCode && !preg_match('/^\d{3}$/i', $numericCode)) {
+    $numeric_code = $element['#value'];
+    if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {
       $form_state->setError($element, $this->t('The numeric code must consist of three digits.'));
     }
     elseif ($currency->isNew()) {
-      $loadedCurrencies = $this->currencyStorage->loadByProperties([
-        'numericCode' => $numericCode,
+      $loaded_currencies = $this->storage->loadByProperties([
+        'numericCode' => $numeric_code,
       ]);
-      if ($loadedCurrencies) {
+      if ($loaded_currencies) {
         $form_state->setError($element, $this->t('The numeric code is already in use.'));
       }
     }

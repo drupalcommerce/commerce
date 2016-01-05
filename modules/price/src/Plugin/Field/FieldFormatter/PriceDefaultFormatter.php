@@ -48,30 +48,30 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   /**
    * Constructs a new PriceDefaultFormatter object.
    *
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The plugin_id for the formatter.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
    * @param string $label
    *   The formatter label display setting.
-   * @param string $viewMode
+   * @param string $view_mode
    *   The view mode.
-   * @param array $thirdPartySettings
+   * @param array $third_party_settings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
+   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, EntityTypeManagerInterface $entityTypeManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
-    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
-    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
-    $this->numberFormatter = $numberFormatterFactory->createInstance();
+    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
+    $this->numberFormatter = $number_formatter_factory->createInstance();
     $this->numberFormatter->setMaximumFractionDigits(6);
     if ($this->getSetting('strip_trailing_zeroes')) {
       $this->numberFormatter->setMinimumFractionDigits(0);
@@ -84,10 +84,10 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['label'],
@@ -131,11 +131,11 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $currencyCodes = [];
+    $currency_codes = [];
     foreach ($items as $delta => $item) {
-      $currencyCodes[] = $item->currency_code;
+      $currency_codes[] = $item->currency_code;
     }
-    $currencies = $this->currencyStorage->loadMultiple($currencyCodes);
+    $currencies = $this->currencyStorage->loadMultiple($currency_codes);
 
     $elements = [];
     foreach ($items as $delta => $item) {

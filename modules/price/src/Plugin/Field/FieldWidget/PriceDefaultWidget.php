@@ -48,26 +48,26 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   /**
    * Constructs a new PriceDefaultWidget object.
    *
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The plugin_id for the widget.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The definition of the field to which the widget is associated.
    * @param array $settings
    *   The widget settings.
-   * @param array $thirdPartySettings
+   * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $numberFormatterFactory
+   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, EntityTypeManagerInterface $entityTypeManager, NumberFormatterFactoryInterface $numberFormatterFactory) {
-    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
-    $this->currencyStorage = $entityTypeManager->getStorage('commerce_currency');
-    $this->numberFormatter = $numberFormatterFactory->createInstance(NumberFormatterInterface::DECIMAL);
+    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
+    $this->numberFormatter = $number_formatter_factory->createInstance(NumberFormatterInterface::DECIMAL);
     $this->numberFormatter->setMinimumFractionDigits(0);
     $this->numberFormatter->setMaximumFractionDigits(6);
     $this->numberFormatter->setGroupingUsed(FALSE);
@@ -76,10 +76,10 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
@@ -91,12 +91,12 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Load currencies.
     $currencies = $this->currencyStorage->loadMultiple();
-    $currencyCodes = array_keys($currencies);
+    $currency_codes = array_keys($currencies);
     // Stop rendering if there are no currencies available.
-    if (empty($currencyCodes)) {
+    if (empty($currency_codes)) {
       return $element;
     }
 
@@ -123,22 +123,22 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
       // separator to use. This is the same pattern Drupal core uses.
       '#placeholder' => $this->numberFormatter->format('9.99'),
     ];
-    if (count($currencyCodes) == 1) {
-      $lastVisibleElement = 'amount';
-      $currencyCode = reset($currencyCodes);
-      $element['amount']['#field_suffix'] = $currencyCode;
+    if (count($currency_codes) == 1) {
+      $last_visible_element = 'amount';
+      $currency_code = reset($currency_codes);
+      $element['amount']['#field_suffix'] = $currency_code;
       $element['currency_code'] = [
         '#type' => 'value',
-        '#value' => $currencyCode,
+        '#value' => $currency_code,
       ];
     }
     else {
-      $lastVisibleElement = 'currency_code';
+      $last_visible_element = 'currency_code';
       $element['currency_code'] = [
         '#type' => 'select',
         '#title' => $this->t('Currency'),
         '#default_value' => $items[$delta]->currency_code,
-        '#options' => array_combine($currencyCodes, $currencyCodes),
+        '#options' => array_combine($currency_codes, $currency_codes),
         '#title_display' => 'invisible',
         '#field_suffix' => '',
       ];
@@ -146,11 +146,11 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
     // Add the help text if specified.
     // Replicates the commerce_field_widget_form_alter() logic because
     // the copied help text can't be reached by the alter.
-    $baseField = $this->fieldDefinition instanceof BaseFieldDefinition;
-    $hasOverride = $this->fieldDefinition->getSetting('display_description');
-    $hideDescription = $baseField && !$hasOverride;
-    if (!empty($element['#description']) && !$hideDescription) {
-      $element[$lastVisibleElement]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
+    $base_field = $this->fieldDefinition instanceof BaseFieldDefinition;
+    $has_override = $this->fieldDefinition->getSetting('display_description');
+    $hide_description = $base_field && !$has_override;
+    if (!empty($element['#description']) && !$hide_description) {
+      $element[$last_visible_element]['#field_suffix'] .= '<div class="description">' . $element['#description'] . '</div>';
     }
 
     return $element;
@@ -159,26 +159,27 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
   /**
    * Converts the amount back to the standard format (e.g. "9,99" -> "9.99").
    */
-  public static function validateElement(array $element, FormStateInterface $formState) {
-    // @todo Fix this.
-    $currencyStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_currency');
-    $numberFormatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
+  public static function validateElement(array $element, FormStateInterface $form_state) {
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $currency_storage */
+    $currency_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_currency');
+    /** @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface $number_formatter */
+    $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
 
-    $value = $formState->getValue($element['#parents']);
+    $value = $form_state->getValue($element['#parents']);
     if (empty($value['amount'])) {
       return;
     }
 
-    $currency = $currencyStorage->load($value['currency_code']);
-    $value['amount'] = $numberFormatter->parseCurrency($value['amount'], $currency);
+    $currency = $currency_storage->load($value['currency_code']);
+    $value['amount'] = $number_formatter->parseCurrency($value['amount'], $currency);
     if ($value['amount'] === FALSE) {
-      $formState->setError($element['amount'], t('%title is not numeric.', [
+      $form_state->setError($element['amount'], t('%title is not numeric.', [
         '%title' => $element['#title'],
       ]));
       return;
     }
 
-    $formState->setValueForElement($element, $value);
+    $form_state->setValueForElement($element, $value);
   }
 
 }
