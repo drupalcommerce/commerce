@@ -25,6 +25,7 @@ class PublishProduct extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
     $entity->setPublished(TRUE);
     $entity->save();
   }
@@ -33,7 +34,7 @@ class PublishProduct extends ActionBase {
    * {@inheritdoc}
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\commerce_product\ProductInterface $object */
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $object */
     $result = $object
       ->access('update', $account, TRUE)
       ->andIf($object->status->access('edit', $account, TRUE));

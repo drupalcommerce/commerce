@@ -27,11 +27,11 @@ class ProductVariationEvent extends Event {
   /**
    * Constructs a new ProductVariationEvent.
    *
-   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $productVariation
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $product_variation
    *   The product variation.
    */
-  public function __construct(ProductVariationInterface $productVariation) {
-    $this->productVariation = $productVariation;
+  public function __construct(ProductVariationInterface $product_variation) {
+    $this->productVariation = $product_variation;
   }
 
   /**

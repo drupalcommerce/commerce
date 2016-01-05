@@ -74,8 +74,8 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   /**
    * {@inheritdoc}
    */
-  public function setLineItemType($lineItemType) {
-    $this->lineItemType = $lineItemType;
+  public function setLineItemType($line_item_type) {
+    $this->lineItemType = $line_item_type;
     return $this;
   }
 

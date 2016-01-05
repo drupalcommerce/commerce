@@ -28,11 +28,11 @@ interface ProductVariationTypeInterface extends ConfigEntityInterface {
   /**
    * Sets the product variation type's line item type.
    *
-   * @param string $lineItemType
+   * @param string $line_item_type
    *   The line item type.
    *
    * @return $this
    */
-  public function setLineItemType($lineItemType);
+  public function setLineItemType($line_item_type);
 
 }

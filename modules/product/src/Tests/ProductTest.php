@@ -33,10 +33,10 @@ class ProductTest extends ProductTestBase {
 
     // Delete the product and verify deletion.
     $product->delete();
-    $productExists = (bool) Product::load($product->id());
-    $variationExists = (bool) ProductVariation::load($variation->id());
-    $this->assertFalse($productExists, 'The new product has been deleted from the database.');
-    $this->assertFalse($variationExists, 'The matching product variation has been deleted from the database.');
+    $product_exists = (bool) Product::load($product->id());
+    $variation_exists = (bool) ProductVariation::load($variation->id());
+    $this->assertFalse($product_exists, 'The new product has been deleted from the database.');
+    $this->assertFalse($variation_exists, 'The matching product variation has been deleted from the database.');
   }
 
 }

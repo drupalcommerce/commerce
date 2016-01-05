@@ -27,11 +27,11 @@ class ProductTypeDeleteForm extends EntityDeleteForm {
   /**
    * Constructs a new ProductTypeDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $queryFactory
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
    *    The entity query object.
    */
-  public function __construct(QueryFactory $queryFactory) {
-    $this->queryFactory = $queryFactory;
+  public function __construct(QueryFactory $query_factory) {
+    $this->queryFactory = $query_factory;
   }
 
   /**
@@ -47,12 +47,12 @@ class ProductTypeDeleteForm extends EntityDeleteForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $numProducts = $this->queryFactory->get('commerce_product')
+    $product_count = $this->queryFactory->get('commerce_product')
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();
-    if ($numProducts) {
-      $caption = '<p>' . $this->formatPlural($numProducts, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', ['%type' => $this->entity->label()]) . '</p>';
+    if ($product_count) {
+      $caption = '<p>' . $this->formatPlural($product_count, '%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', '%type is used by @count products on your site. You may not remove %type until you have removed all of the %type products.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
       $form['description'] = ['#markup' => $caption];
       return $form;

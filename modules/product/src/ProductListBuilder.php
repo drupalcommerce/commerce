@@ -30,14 +30,14 @@ class ProductListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce_product\Entity\Product */
-    $productType = ProductType::load($entity->bundle());
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = ProductType::load($entity->bundle());
 
     $row['title']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
     ] + $entity->urlInfo()->toRenderArray();
-    $row['type'] = $productType->label();
+    $row['type'] = $product_type->label();
     $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
 
     return $row + parent::buildRow($entity);

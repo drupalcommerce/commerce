@@ -27,11 +27,11 @@ class ProductVariationTypeDeleteForm extends EntityDeleteForm {
   /**
    * Constructs a new ProductVariationTypeDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $queryFactory
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
    *    The entity query object.
    */
-  public function __construct(QueryFactory $queryFactory) {
-    $this->queryFactory = $queryFactory;
+  public function __construct(QueryFactory $query_factory) {
+    $this->queryFactory = $query_factory;
   }
 
   /**
@@ -47,12 +47,12 @@ class ProductVariationTypeDeleteForm extends EntityDeleteForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $numVariations = $this->queryFactory->get('commerce_product_variation')
+    $variation_count = $this->queryFactory->get('commerce_product_variation')
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();
-    if ($numVariations) {
-      $caption = '<p>' . $this->formatPlural($numVariations, '%type is used by 1 product variation on your site. You can not remove this product variation type until you have removed all of the %type product variations.', '%type is used by @count product variations on your site. You may not remove %type until you have removed all of the %type product variations.', ['%type' => $this->entity->label()]) . '</p>';
+    if ($variation_count) {
+      $caption = '<p>' . $this->formatPlural($variation_count, '%type is used by 1 product variation on your site. You can not remove this product variation type until you have removed all of the %type product variations.', '%type is used by @count product variations on your site. You may not remove %type until you have removed all of the %type product variations.', ['%type' => $this->entity->label()]) . '</p>';
       $form['#title'] = $this->getQuestion();
       $form['description'] = ['#markup' => $caption];
       return $form;

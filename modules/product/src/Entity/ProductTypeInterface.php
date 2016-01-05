@@ -26,11 +26,11 @@ interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionI
   /**
    * Sets the product type's matching variation type.
    *
-   * @param string $variationType
+   * @param string $variation_type
    *   The variation type.
    *
    * @return $this
    */
-  public function setVariationType($variationType);
+  public function setVariationType($variation_type);
 
 }

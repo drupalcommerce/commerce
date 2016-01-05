@@ -71,14 +71,14 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     }
 
     if ($attributes = $this->getAttributeFields()) {
-      $attributeLabels = [];
+      $attribute_labels = [];
       foreach ($attributes as $attribute) {
         if (!$attribute->isEmpty()) {
-          $attributeLabels[] = $attribute->entity->label();
+          $attribute_labels[] = $attribute->entity->label();
         }
       }
 
-      $label = implode(', ', $attributeLabels);
+      $label = implode(', ', $attribute_labels);
     }
     else {
       // When there are no attribute fields, there's always only one variation.
@@ -189,10 +189,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public function getLineItemType() {
     // The line item type is a bundle-level setting.
-    $typeStorage = $this->entityManager()->getStorage('commerce_product_variation_type');
-    $typeEntity = $typeStorage->load($this->bundle());
+    $type_storage = $this->entityManager()->getStorage('commerce_product_variation_type');
+    $type_entity = $type_storage->load($this->bundle());
 
-    return $typeEntity->getLineItemType();
+    return $type_entity->getLineItemType();
   }
 
   /**
@@ -243,8 +243,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields = self::entityKeysBaseFieldDefinitions($entityType);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

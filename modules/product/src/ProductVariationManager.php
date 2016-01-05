@@ -32,14 +32,14 @@ class ProductVariationManager implements ProductVariationManagerInterface {
   /**
    * Constructs a ProductVariationManager object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, EventDispatcherInterface $eventDispatcher) {
-    $this->variationStorage = $entityTypeManager->getStorage('commerce_product_variation');
-    $this->eventDispatcher = $eventDispatcher;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher) {
+    $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -56,16 +56,16 @@ class ProductVariationManager implements ProductVariationManagerInterface {
       ->condition('variation_id', $ids, "IN");
     $result = $query->execute();
 
-    if(empty($result)){
+    if (empty($result)) {
       return [];
     }
 
-    $enabledVariations = $this->variationStorage->loadMultiple($result);
-    $event = new FilterVariationsEvent($product, $enabledVariations);
+    $enabled_variations = $this->variationStorage->loadMultiple($result);
+    $event = new FilterVariationsEvent($product, $enabled_variations);
     $this->eventDispatcher->dispatch(ProductEvents::FILTER_VARIATIONS, $event);
-    $enabledVariations = $event->getVariations();
+    $enabled_variations = $event->getVariations();
 
-    return $enabledVariations;
+    return $enabled_variations;
   }
 
 }

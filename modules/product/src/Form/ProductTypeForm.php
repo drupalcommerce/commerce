@@ -34,14 +34,14 @@ class ProductTypeForm extends BundleEntityFormBase {
   /**
    * Creates a new ProductTypeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityFieldManagerInterface $entityFieldManager) {
-    $this->variationTypeStorage = $entityTypeManager->getStorage('commerce_product_variation_type');
-    $this->entityFieldManager = $entityFieldManager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+    $this->variationTypeStorage = $entity_type_manager->getStorage('commerce_product_variation_type');
+    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
@@ -59,30 +59,31 @@ class ProductTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $productType = $this->entity;
-    $variationTypes = $this->variationTypeStorage->loadMultiple();
-    $variationTypes = array_map(function($variationType) {
-      return $variationType->label();
-    }, $variationTypes);
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = $this->entity;
+    $variation_types = $this->variationTypeStorage->loadMultiple();
+    $variation_types = array_map(function($variation_type) {
+      return $variation_type->label();
+    }, $variation_types);
     // Create an empty product to get the default status value.
     // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
     if ($this->operation == 'add') {
-      $product = $this->entityManager->getStorage('commerce_product')->create(['type' => $productType->uuid()]);
+      $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->uuid()]);
     }
     else {
-      $product = $this->entityManager->getStorage('commerce_product')->create(['type' => $productType->id()]);
+      $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->id()]);
     }
 
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $productType->label(),
+      '#default_value' => $product_type->label(),
       '#required' => TRUE,
     ];
     $form['id'] = [
       '#type' => 'machine_name',
-      '#default_value' => $productType->id(),
+      '#default_value' => $product_type->id(),
       '#machine_name' => [
         'exists' => '\Drupal\commerce_product\Entity\ProductType::load',
       ],
@@ -91,13 +92,13 @@ class ProductTypeForm extends BundleEntityFormBase {
     $form['description'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
-      '#default_value' => $productType->getDescription(),
+      '#default_value' => $product_type->getDescription(),
     ];
     $form['variationType'] = [
       '#type' => 'select',
       '#title' => $this->t('Product variation type'),
-      '#default_value' => $productType->getVariationType(),
-      '#options' => $variationTypes,
+      '#default_value' => $product_type->getVariationType(),
+      '#options' => $variation_types,
       '#required' => TRUE,
     ];
     $form['product_status'] = [
@@ -116,9 +117,9 @@ class ProductTypeForm extends BundleEntityFormBase {
         '#type' => 'language_configuration',
         '#entity_information' => [
           'entity_type' => 'commerce_product',
-          'bundle' => $productType->id(),
+          'bundle' => $product_type->id(),
         ],
-        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_product', $productType->id()),
+        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_product', $product_type->id()),
       ];
       $form['#submit'][] = 'language_configuration_element_submit';
     }

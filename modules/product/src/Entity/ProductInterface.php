@@ -101,11 +101,11 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   /**
    * Sets the ids of stores through which the product is sold.
    *
-   * @param int[] $storeIds
+   * @param int[] $store_ids
    *   The ids of stores through which the product is sold.
    *
    * @return $this
    */
-  public function setStoreIds(array $storeIds);
+  public function setStoreIds(array $store_ids);
 
 }

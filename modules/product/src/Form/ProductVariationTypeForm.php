@@ -19,18 +19,19 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $variationType = $this->entity;
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = $this->entity;
 
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $variationType->label(),
+      '#default_value' => $variation_type->label(),
       '#required' => TRUE,
     ];
     $form['id'] = [
       '#type' => 'machine_name',
-      '#default_value' => $variationType->id(),
+      '#default_value' => $variation_type->id(),
       '#machine_name' => [
         'exists' => '\Drupal\commerce_product\Entity\ProductVariationType::load',
       ],
@@ -39,20 +40,20 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
 
     if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
       // Prepare a list of line item types used to purchase product variations.
-      $lineItemTypeStorage = $this->entityManager->getStorage('commerce_line_item_type');
-      $lineItemTypes = $lineItemTypeStorage->loadMultiple();
-      $lineItemTypes = array_filter($lineItemTypes, function($lineItemType) {
-        return $lineItemType->getPurchasableEntityType() == 'commerce_product_variation';
+      $line_item_type_storage = $this->entityTypeManager->getStorage('commerce_line_item_type');
+      $line_item_types = $line_item_type_storage->loadMultiple();
+      $line_item_types = array_filter($line_item_types, function($line_item_type) {
+        return $line_item_type->getPurchasableEntityType() == 'commerce_product_variation';
       });
-      $lineItemTypes = array_map(function ($lineItemType) {
-        return $lineItemType->label();
-      }, $lineItemTypes);
+      $line_item_types = array_map(function ($line_item_type) {
+        return $line_item_type->label();
+      }, $line_item_types);
 
       $form['lineItemType'] = [
         '#type' => 'select',
         '#title' => $this->t('Line item type'),
-        '#default_value' => $variationType->getLineItemType(),
-        '#options' => $lineItemTypes,
+        '#default_value' => $variation_type->getLineItemType(),
+        '#options' => $line_item_types,
         '#empty_value' => '',
         '#required' => TRUE,
       ];
@@ -68,9 +69,9 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
         '#type' => 'language_configuration',
         '#entity_information' => [
           'entity_type' => 'commerce_product_variation',
-          'bundle' => $variationType->id(),
+          'bundle' => $variation_type->id(),
         ],
-        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_product_variation', $variationType->id()),
+        '#default_value' => ContentLanguageSettings::loadByEntityTypeBundle('commerce_product_variation', $variation_type->id()),
       ];
       $form['#submit'][] = 'language_configuration_element_submit';
     }

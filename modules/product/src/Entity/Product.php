@@ -118,8 +118,8 @@ class Product extends ContentEntityBase implements ProductInterface {
    */
   public function getStores() {
     $stores = [];
-    foreach ($this->get('stores') as $storeItem) {
-      $stores[] = $storeItem->entity;
+    foreach ($this->get('stores') as $store_item) {
+      $stores[] = $store_item->entity;
     }
     return $stores;
   }
@@ -136,18 +136,18 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getStoreIds() {
-    $storeIds = [];
-    foreach ($this->get('stores') as $storeItem) {
-      $storeIds[] = $storeItem->target_id;
+    $store_ids = [];
+    foreach ($this->get('stores') as $store_item) {
+      $store_ids[] = $store_item->target_id;
     }
-    return $storeIds;
+    return $store_ids;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setStoreIds(array $storeIds) {
-    $this->set('stores', $storeIds);
+  public function setStoreIds(array $store_ids) {
+    $this->set('stores', $store_ids);
     return $this;
   }
 
@@ -211,15 +211,15 @@ class Product extends ContentEntityBase implements ProductInterface {
         $variations[$item->target_id] = $item->entity;
       }
     }
-    $variationStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
-    $variationStorage->delete($variations);
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $variation_storage->delete($variations);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions(EntityTypeInterface $entityType) {
-    $fields = self::entityKeysBaseFieldDefinitions($entityType);
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

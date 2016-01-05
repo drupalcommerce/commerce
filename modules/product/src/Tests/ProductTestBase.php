@@ -69,7 +69,7 @@ abstract class ProductTestBase extends WebTestBase {
     ]);
     $this->drupalLogin($this->adminUser);
 
-    $storeType = $this->createEntity('commerce_store_type', [
+    $store_type = $this->createEntity('commerce_store_type', [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(8),
     ]);
@@ -77,7 +77,7 @@ abstract class ProductTestBase extends WebTestBase {
     $this->stores = [];
     for ($i = 0; $i < 3; $i++) {
       $this->stores[] = $this->createEntity('commerce_store', [
-        'type' => $storeType->id(),
+        'type' => $store_type->id(),
         'name' => $this->randomMachineName(8),
         'mail' => \Drupal::currentUser()->getEmail(),
         'default_currency' => 'EUR',
@@ -88,15 +88,15 @@ abstract class ProductTestBase extends WebTestBase {
   /**
    * Creates a new entity
    *
-   * @param string $entityType
+   * @param string $entity_type
    *   The entity type.
    * @param array $values
    *   The values used to create the entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */
-  protected function createEntity($entityType, $values) {
-    $storage = \Drupal::service('entity_type.manager')->getStorage($entityType);
+  protected function createEntity($entity_type, $values) {
+    $storage = \Drupal::service('entity_type.manager')->getStorage($entity_type);
     $entity = $storage->create($values);
     $status = $entity->save();
     $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', [
@@ -115,9 +115,9 @@ abstract class ProductTestBase extends WebTestBase {
    *
    * Ignores differences in ordering.
    *
-   * @param array $fieldValues
+   * @param array $field_values
    *   The field values.
-   * @param array $expectedValues
+   * @param array $expected_values
    *   The expected values.
    * @param $message
    *   (optional) A message to display with the assertion. Do not translate
@@ -125,11 +125,11 @@ abstract class ProductTestBase extends WebTestBase {
    *   variables in the message text, not t(). If left blank, a default message
    *   will be displayed.
    */
-  protected function assertFieldValues(array $fieldValues, array $expectedValues, $message = '') {
+  protected function assertFieldValues(array $field_values, array $expected_values, $message = '') {
     $valid = TRUE;
-    if (count($fieldValues) == count($expectedValues)) {
-      foreach ($expectedValues as $value) {
-        if (!in_array($value, $fieldValues)) {
+    if (count($field_values) == count($expected_values)) {
+      foreach ($expected_values as $value) {
+        if (!in_array($value, $field_values)) {
           $valid = FALSE;
           break;
         }

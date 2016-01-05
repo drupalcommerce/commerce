@@ -111,8 +111,8 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   /**
    * {@inheritdoc}
    */
-  public function setVariationType($variationType) {
-    $this->variationType = $variationType;
+  public function setVariationType($variation_type) {
+    $this->variationType = $variation_type;
     return $this;
   }
 

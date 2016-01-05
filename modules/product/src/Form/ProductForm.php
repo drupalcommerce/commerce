@@ -174,6 +174,7 @@ class ProductForm extends ContentEntityForm {
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $element = parent::actions($form, $form_state);
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entity;
 
     $element['delete']['#access'] = $product->access('delete');
@@ -219,7 +220,7 @@ class ProductForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_product\entity\Product $product */
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->getEntity();
     $product->save();
     drupal_set_message($this->t('The product %label has been successfully saved.', ['%label' => $product->label()]));
