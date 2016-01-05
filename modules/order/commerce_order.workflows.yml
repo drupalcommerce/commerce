@@ -46,10 +46,10 @@ default_validation:
       from: [draft, validation]
       to:   canceled
 
-fulfilment:
-  id: fulfilment
+fulfillment:
+  id: fulfillment
   group: order
-  label: Fulfilment
+  label: 'Fulfillment'
   states:
     draft:
       label: Draft
@@ -73,10 +73,10 @@ fulfilment:
       from: [draft, fulfillment]
       to:   canceled
 
-fulfilment_validation:
-  id: fulfilment_validation
+fulfillment_validation:
+  id: fulfillment_validation
   group: order
-  label: Fulfilment, with validation
+  label: 'Fulfillment, with validation'
   states:
     draft:
       label: Draft
