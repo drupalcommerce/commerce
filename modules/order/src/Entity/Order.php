@@ -386,7 +386,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setRequired(TRUE)
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['store_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Store'))
@@ -407,11 +408,12 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\Order::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
+        'label' => 'above',
         'type' => 'author',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Contact email'))
@@ -419,11 +421,12 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDefaultValue('')
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
+        'label' => 'above',
         'type' => 'string',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Billing profile'))
@@ -467,7 +470,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDefaultValue('')
       ->setSetting('max_length', 128)
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
+        'label' => 'above',
         'type' => 'string',
         'weight' => 0,
       ])
@@ -475,7 +478,8 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'hidden',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))
@@ -493,10 +497,11 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Placed'))
       ->setDescription(t('The time when the order was placed.'))
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
+        'label' => 'above',
         'type' => 'timestamp',
         'weight' => 0,
-      ]);
+      ])
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }
