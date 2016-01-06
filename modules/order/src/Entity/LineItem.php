@@ -23,7 +23,7 @@ use Drupal\entity\EntityKeysFieldsTrait;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
  *     "storage" = "Drupal\commerce_order\LineItemStorage",
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "Drupal\commerce_order\LineItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
  *     },
