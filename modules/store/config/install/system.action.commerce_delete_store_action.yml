@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_store
+id: commerce_delete_store_action
+label: 'Delete Commerce store'
+type: commerce_store
+plugin: 'commerce_delete_action:commerce_store'
+configuration: {  }

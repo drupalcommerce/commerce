@@ -21,6 +21,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
+ *   label_singular = @Translation("product"),
+ *   label_plural = @Translation("products"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
@@ -58,6 +60,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "add-form" = "/product/add/{type}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
+ *     "multiple-delete-form" = "/admin/commerce/products/delete",
  *     "collection" = "/admin/commerce/products"
  *   },
  *   bundle_entity_type = "commerce_product_type",

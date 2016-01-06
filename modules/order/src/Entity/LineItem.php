@@ -20,6 +20,8 @@ use Drupal\entity\EntityKeysFieldsTrait;
  * @ContentEntityType(
  *   id = "commerce_line_item",
  *   label = @Translation("Line Item"),
+ *   label_singular = @Translation("line item"),
+ *   label_plural = @Translation("line items"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
  *     "storage" = "Drupal\commerce_order\LineItemStorage",
@@ -42,6 +44,7 @@ use Drupal\entity\EntityKeysFieldsTrait;
  *     "canonical" = "/admin/commerce/config/line-item/{commerce_line_item}",
  *     "edit-form" = "/admin/commerce/config/line-item/{commerce_line_item}/edit",
  *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete",
+ *     "multiple-delete-form" = "/admin/commerce/config/line-item/delete",
  *     "collection" = "/admin/commerce/config/line-item"
  *   },
  *   bundle_entity_type = "commerce_line_item_type",
