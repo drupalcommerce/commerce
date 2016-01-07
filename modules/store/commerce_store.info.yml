@@ -9,6 +9,7 @@ dependencies:
   - commerce_price
   - options
 config_devel:
-  - commerce_store.commerce_store_type.default
-  - commerce_store.settings
-  - views.view.commerce_stores
+  install:
+    - commerce_store.commerce_store_type.default
+    - commerce_store.settings
+    - views.view.commerce_stores
