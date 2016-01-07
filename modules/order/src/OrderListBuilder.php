@@ -63,11 +63,11 @@ class OrderListBuilder extends EntityListBuilder {
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
       'type' => [
-        'data' => $this->t('Order type'),
+        'data' => $this->t('Type'),
         'class' => [RESPONSIVE_PRIORITY_MEDIUM],
       ],
-      'owner' => [
-        'data' => $this->t('Owner'),
+      'customer' => [
+        'data' => $this->t('Customer'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
       'state' => [
@@ -76,10 +76,6 @@ class OrderListBuilder extends EntityListBuilder {
       ],
       'created' => [
         'data' => $this->t('Created'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
-      ],
-      'updated' => [
-        'data' => $this->t('Updated'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
     ];
@@ -96,7 +92,7 @@ class OrderListBuilder extends EntityListBuilder {
     $row = [
       'order_id' => $entity->id(),
       'type' => $orderType->label(),
-      'owner' => [
+      'customer' => [
         'data' => [
           '#theme' => 'username',
           '#account' => $entity->getOwner(),
@@ -104,7 +100,6 @@ class OrderListBuilder extends EntityListBuilder {
       ],
       'state' => $entity->getState()->getLabel(),
       'created' => $this->dateFormatter->format($entity->getCreatedTime(), 'short'),
-      'changed' => $this->dateFormatter->format($entity->getChangedTime(), 'short'),
     ];
 
     return $row + parent::buildRow($entity);
