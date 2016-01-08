@@ -105,4 +105,22 @@ class OrderListBuilder extends EntityListBuilder {
     return $row + parent::buildRow($entity);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+
+    if ($entity->access('update') && $entity->hasLinkTemplate('reassign-form')) {
+      $operations['reassign'] = array(
+        'title' => $this->t('Reassign'),
+        'weight' => 10,
+        'url' => $entity->toUrl('reassign-form'),
+      );
+    }
+
+    return $operations;
+  }
+
+
 }

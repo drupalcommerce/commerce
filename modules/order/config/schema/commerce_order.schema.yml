@@ -28,3 +28,4 @@ commerce_order.commerce_line_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
