@@ -6,6 +6,18 @@ entity.commerce_order.add_page:
   requirements:
     _entity_create_access: 'commerce_order'
 
+entity.commerce_order.reassign_form:
+  path: '/admin/commerce/orders/{commerce_order}/reassign'
+  defaults:
+    _form: '\Drupal\commerce_order\Form\OrderReassignForm'
+    _title: 'Reassign order'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _permission: 'administer orders'
+
 entity.commerce_order_type.collection:
   path: '/admin/commerce/config/order-types'
   defaults:

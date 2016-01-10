@@ -7,15 +7,42 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce_order\Form\CustomerFormTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_order\Entity\Order;
-use Drupal\user\Entity\User;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form controller for creating new commerce_order entities.
+ * Provides the order add form.
  */
 class OrderAddForm extends FormBase {
+
+  use CustomerFormTrait;
+
+  /**
+   * The order storage.
+   *
+   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+   */
+  protected $storage;
+
+  /**
+   * Constructs a new OrderAddForm object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->storage = $entity_type_manager->getStorage('commerce_order');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static($container->get('entity_type.manager'));
+  }
 
   /**
    * {@inheritdoc}
@@ -40,82 +67,7 @@ class OrderAddForm extends FormBase {
       '#target_type' => 'commerce_store',
       '#required' => TRUE,
     ];
-
-    $customer_user_select_default = $form_state->getValue(['customer_user_type'], 'existing');
-    $form['customer'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Customer information'),
-      '#prefix' => '<div id="customer-fieldset-wrapper">',
-      '#suffix' => '</div>',
-    ];
-    $form['customer']['customer_user_type'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Order for'),
-      '#attributes' => [
-        'class' => ['container-inline'],
-      ],
-      '#required' => TRUE,
-      '#options' => [
-        'existing' => $this->t('Existing customer'),
-        'new' => $this->t('New customer'),
-      ],
-      '#default_value' => $customer_user_select_default,
-      '#ajax' => [
-        'callback' => [$this, 'validateCustomerUserType'],
-        'wrapper' => 'customer-fieldset-wrapper',
-      ],
-    ];
-    // Existing user - User autocomplete.
-    if ($customer_user_select_default == 'existing') {
-      $form['customer']['uid'] = [
-        '#type' => 'entity_autocomplete',
-        '#title' => t('Search'),
-        '#attributes' => [
-          'class' => ['container-inline'],
-        ],
-        '#placeholder' => $this->t('Search by customer username or email address'),
-        '#target_type' => 'user',
-        '#selection_settings' => [
-          'match_operator' => 'CONTAINS',
-          'include_anonymous' => FALSE,
-        ],
-      ];
-    }
-    // Anonymous user, ask for email.
-    else {
-      $form['customer']['uid'] = [
-        '#type' => 'value',
-        '#value' => 0,
-      ];
-      $form['customer']['mail'] = [
-        '#type' => 'email',
-        '#title' => t('Email'),
-        '#required' => TRUE,
-      ];
-      $form['customer']['password'] = [
-        '#type' => 'container',
-      ];
-      $form['customer']['password']['generate'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Generate customer password'),
-        '#default_value' => 1,
-      ];
-      // We have to wrap the password_confirm element in order for #states
-      // to work properly. See https://www.drupal.org/node/1427838.
-      $form['customer']['password']['password_confirm_wrapper'] = [
-        '#type' => 'container',
-        '#states' => [
-          'visible' => [
-            ':input[name="generate"]' => ['checked' => FALSE],
-          ],
-        ],
-      ];
-      // We cannot make this required due to HTML5 validation.
-      $form['customer']['password']['password_confirm_wrapper']['pass'] = [
-        '#type' => 'password_confirm',
-        '#size' => 25,
-      ];
-    }
+    $form = $this->buildCustomerForm($form, $form_state);
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -128,32 +80,13 @@ class OrderAddForm extends FormBase {
   }
 
   /**
-   * Rebuild form for customer user type selection.
-   */
-  public function validateCustomerUserType(array $form, FormStateInterface $form_state) {
-    return $form['customer'];
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state->getValues();
-    if ($values['customer_user_type'] == 'existing') {
-      $values['mail'] = User::load($values['uid'])->getEmail();
-    }
-    else {
-      $new_user = User::create([
-        'name' => $values['mail'],
-        'mail' => $values['mail'],
-        'pass' => ($values['generate']) ? user_password() : $values['pass'],
-        'status' => TRUE,
-      ]);
-      $new_user->save();
-      $values['uid'] = $new_user->id();
-    }
+    $this->submitCustomerForm($form, $form_state);
 
-    $order = Order::create([
+    $values = $form_state->getValues();
+    $order = $this->storage->create([
       'type' => $values['type'],
       'mail' => $values['mail'],
       'uid' => [$values['uid']],
@@ -163,4 +96,5 @@ class OrderAddForm extends FormBase {
     // Redirect to the edit form to complete the order.
     $form_state->setRedirect('entity.commerce_order.edit_form', ['commerce_order' => $order->id()]);
   }
+
 }

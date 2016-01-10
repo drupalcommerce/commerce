@@ -47,7 +47,7 @@ class OrderAdminTest extends OrderTestBase {
 
     $user = $this->loggedInUser->getAccountName() . ' (' . $this->loggedInUser->id() . ')';
     $values = [
-      'customer_user_type' => 'existing',
+      'customer_type' => 'existing',
       'uid' => $user,
     ];
     $this->drupalPostForm(NULL, $values, 'Create');
