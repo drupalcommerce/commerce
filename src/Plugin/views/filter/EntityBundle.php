@@ -68,4 +68,16 @@ class EntityBundle extends Bundle {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function submitExposed(&$form, FormStateInterface $form_state) {
+    $filter_value = $form_state->getValue($this->options['id']);
+    if (empty($filter_value)) {
+      // The exposed form is submitted on first view load, even when this
+      // filter is hidden. To prevent a notice, a default value is provided.
+      $form_state->setValue($this->options['id'], 'All');
+    }
+  }
+
 }
