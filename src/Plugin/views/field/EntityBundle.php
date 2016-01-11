@@ -96,7 +96,6 @@ class EntityBundle extends Field {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
-    // Option to hide the bundle name if there's only one bundle.
     $form['hide_single_bundle'] = [
       '#type' => 'checkbox',
       '#title' => t('Hide if there\'s only one bundle.'),
