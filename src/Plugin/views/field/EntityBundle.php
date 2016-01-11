@@ -7,15 +7,10 @@
 
 namespace Drupal\commerce\Plugin\views\field;
 
+use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\Field;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Field\FieldTypePluginManagerInterface;
-use Drupal\Core\Field\FormatterPluginManager;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
  * Displays the entity bundle.
@@ -30,54 +25,20 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 class EntityBundle extends Field {
 
   /**
-   * The entity type bundle info service.
+   * The number of available bundles.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var int
    */
-  protected $entityTypeBundleInfo;
-
-  /**
-   * Constructs a \Drupal\commerce\Plugin\views\field\EntityBundle object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The field formatter plugin manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_plugin_manager
-   *   The field formatter plugin manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_plugin_manager
-   *   The field plugin type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   *  @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *    The entity type bundle info.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $formatter_plugin_manager, $field_type_plugin_manager, $language_manager, $renderer);
-    $this->entityTypeBundleInfo = $entityTypeBundleInfo;
-  }
+  protected $bundleCount;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity.manager'),
-      $container->get('plugin.manager.field.formatter'),
-      $container->get('plugin.manager.field.field_type'),
-      $container->get('language_manager'),
-      $container->get('renderer'),
-      $container->get('entity_type.bundle.info')
-    );
+  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+    parent::init($view, $display, $options);
+
+    $bundles = $this->entityManager->getBundleInfo($this->getEntityType());
+    $this->bundleCount = count($bundles);
   }
 
   /**
@@ -107,13 +68,8 @@ class EntityBundle extends Field {
    * {@inheritdoc}
    */
   public function renderItems($items) {
-    if ($this->options['hide_single_bundle']) {
-      $entity_type = $this->getEntityType();
-      $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type);
-      // Hide bundle name if there's only one bundle.
-      if (count($bundles) == 1) {
-        return '';
-      }
+    if ($this->options['hide_single_bundle'] && $this->bundleCount < 2) {
+      return '';
     }
     return parent::renderItems($items);
   }
