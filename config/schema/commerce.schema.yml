@@ -11,3 +11,25 @@ field.widget.settings.entity_select:
     autocomplete_placeholder:
       type: string
       label: 'Autocomplete placeholder'
+
+views.field.entity_bundle:
+  type: views.field.field
+  mapping:
+    hide_single_bundle:
+      type: boolean
+      label: 'Hide if there''s only one bundle.'
+
+views.filter.entity_bundle:
+  type: views.filter.in_operator
+  label: 'Bundle'
+  mapping:
+    expose:
+      type: mapping
+      label: 'Expose'
+      mapping:
+        reduce:
+          type: boolean
+          label: 'Reduce'
+        hide_single_bundle:
+          type: boolean
+          label: 'Hide if there''s only one bundle.'

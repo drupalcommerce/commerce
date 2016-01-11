@@ -518,9 +518,7 @@ display:
           click_sort_column: value
           type: timestamp_ago
           settings:
-            date_format: short
-            custom_date_format: ''
-            timezone: ''
+            granularity: 2
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -649,8 +647,8 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
-            reduce: 0
-            hide_single_bundle: 1
+            reduce: false
+            hide_single_bundle: true
           is_grouped: false
           group_info:
             label: ''

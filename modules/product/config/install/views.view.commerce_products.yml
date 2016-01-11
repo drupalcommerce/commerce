@@ -467,7 +467,7 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
-            hide_single_bundle: 1
+            hide_single_bundle: false
           is_grouped: false
           group_info:
             label: ''
