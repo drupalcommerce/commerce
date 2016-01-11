@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   module:
+    - commerce
     - commerce_product
     - user
 id: commerce_products
@@ -466,6 +467,7 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            hide_single_bundle: 1
           is_grouped: false
           group_info:
             label: ''
@@ -480,7 +482,7 @@ display:
             group_items: {  }
           entity_type: commerce_product
           entity_field: type
-          plugin_id: bundle
+          plugin_id: entity_bundle
         title:
           id: title
           table: commerce_product_field_data
