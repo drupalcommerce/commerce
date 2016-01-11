@@ -38,11 +38,12 @@ class OrderTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installConfig('commerce_order');
     $this->installEntitySchema('user');
     $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_line_item');
+    $this->installConfig('commerce_order');
     // A line item type that doesn't need a purchasable entity, for simplicity.
     LineItemType::create([
       'id' => 'test',

@@ -158,3 +158,10 @@ function commerce_order_add_line_items_field($order_type) {
       ->save();
   }
 }
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function commerce_order_views_data_alter(array &$data) {
+  $data['commerce_order']['store_id']['field']['id'] = 'store';
+}

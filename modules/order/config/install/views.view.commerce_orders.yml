@@ -5,6 +5,7 @@ dependencies:
     - commerce
     - commerce_order
     - commerce_price
+    - commerce_store
     - options
     - user
 id: commerce_orders
@@ -116,7 +117,7 @@ display:
               default_sort_order: asc
               align: ''
               separator: ''
-              empty_column: false
+              empty_column: true
               responsive: priority-medium
             uid:
               sortable: false
@@ -418,9 +419,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+          hide_single_store: true
           entity_type: commerce_order
           entity_field: store_id
-          plugin_id: field
+          plugin_id: store
         uid:
           id: uid
           table: commerce_order
@@ -798,7 +800,7 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
-            hide_single_bundle: false
+            hide_single_bundle: true
           is_grouped: false
           group_info:
             label: ''

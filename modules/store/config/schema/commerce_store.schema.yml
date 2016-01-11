@@ -1,5 +1,3 @@
-# Schema for the configuration files of store types.
-
 commerce_store.commerce_store_type.*:
   type: config_entity
   label: 'Store type config'
@@ -23,3 +21,10 @@ commerce_store.settings:
     default_store:
       type: string
       label: 'Default store UUID'
+
+views.field.store:
+  type: views.field.field
+  mapping:
+    hide_single_store:
+      type: boolean
+      label: 'Hide if there''s only one store.'
