@@ -317,7 +317,7 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
-            hide_single_bundle: false
+            hide_single_bundle: true
           is_grouped: false
           group_info:
             label: ''
