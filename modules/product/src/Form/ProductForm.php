@@ -12,6 +12,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,7 +64,7 @@ class ProductForm extends ContentEntityForm {
     $form['#tree'] = TRUE;
     $form['#theme'] = ['product_form'];
     $form['#attached']['library'][] = 'commerce_product/form';
-    $form['#entity_builders']['update_status'] = [$this, 'updateStatus'];
+    $form['#entity_builders']['update_status'] = [get_class($this), 'updateStatus'];
     // Changed must be sent to the client, for later overwrite error checking.
     $form['changed'] = [
       '#type' => 'hidden',
@@ -108,6 +109,17 @@ class ProductForm extends ContentEntityForm {
       '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
     ];
+    $form['visibility_settings'] = [
+      '#type' => 'details',
+      '#title' => t('Visibility settings'),
+      '#open' => TRUE,
+      '#group' => 'advanced',
+      '#access' => !empty($form['stores']['#access']),
+      '#attributes' => [
+        'class' => ['product-visibility-settings'],
+      ],
+      '#weight' => 30,
+    ];
     $form['path_settings'] = [
       '#type' => 'details',
       '#title' => t('URL path settings'),
@@ -120,7 +132,7 @@ class ProductForm extends ContentEntityForm {
       '#attached' => [
         'library' => ['path/drupal.path'],
       ],
-      '#weight' => 30,
+      '#weight' => 60,
     ];
     $form['author'] = [
       '#type' => 'details',
@@ -144,6 +156,33 @@ class ProductForm extends ContentEntityForm {
     if (isset($form['path'])) {
       $form['path']['#group'] = 'path_settings';
     }
+    if (isset($form['stores'])) {
+      $form['stores']['#group'] = 'visibility_settings';
+      $form['#after_build'][] = [get_class($this), 'hideEmptyVisibilitySettings'];
+    }
+
+    return $form;
+  }
+
+  /**
+   * Hides the visibility settings if the stores widget is a hidden element.
+   *
+   * @param array $form
+   *   The form.
+   *
+   * @return array
+   *   The modified visibility_settings element.
+   */
+  public static function hideEmptyVisibilitySettings($form) {
+    if (isset($form['stores']['widget']['target_id'])) {
+      $stores_element = $form['stores']['widget']['target_id'];
+      if (!Element::getVisibleChildren($stores_element)) {
+        $form['visibility_settings']['#printed'] = TRUE;
+        // Move the stores widget out of the visibility_settings group to
+        // ensure that its hidden element is still present in the HTML.
+        unset($form['stores']['#group']);
+      }
+    }
 
     return $form;
   }
@@ -162,7 +201,7 @@ class ProductForm extends ContentEntityForm {
    *
    * @see \Drupal\node\NodeForm::form()
    */
-  function updateStatus($entity_type, ProductInterface $product, array $form, FormStateInterface $form_state) {
+  public static function updateStatus($entity_type, ProductInterface $product, array $form, FormStateInterface $form_state) {
     $element = $form_state->getTriggeringElement();
     if (isset($element['#published_status'])) {
       $product->setPublished($element['#published_status']);
