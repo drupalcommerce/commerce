@@ -7,14 +7,6 @@ entity.commerce_currency.collection:
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_currency.add_form:
-  path: '/admin/commerce/config/currency/add'
-  defaults:
-    _entity_form: 'commerce_currency.add'
-    _title: 'Add a new currency'
-  requirements:
-    _entity_create_access: 'commerce_currency'
-
 entity.commerce_currency.import:
   path: '/admin/commerce/config/currency/import'
   defaults:
