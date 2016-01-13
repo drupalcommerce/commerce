@@ -55,7 +55,38 @@ class OrderReassignForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form = $this->buildCustomerForm($form, $form_state, $this->order);
+
+    if (!$this->order->getOwnerId()) {
+      $current_customer = $this->t('anonymous user with the email %email', [
+        '%email' => $this->order->getEmail(),
+      ]);
+    }
+    else {
+      $owner = $this->order->getOwner();
+
+      // If the display name has been altered to not be the email address,
+      // show the email as well.
+      if ($owner->getDisplayName() != $owner->getEmail()) {
+        $customer_link_text = $this->t('@display (@email)', [
+          '@display' => $owner->getDisplayName(),
+          '@email' => $owner->getEmail(),
+        ]);
+      }
+      else {
+        $customer_link_text = $owner->getDisplayName();
+      }
+
+      $current_customer = $this->order->getOwner()->toLink($customer_link_text)->toString();
+    }
+
+    $form['current_customer'] = [
+      '#type' => 'item',
+      '#markup' => $this->t('The order is currently assigned to @customer.', [
+        '@customer' => $current_customer,
+      ]),
+    ];
+
+    $form += $this->buildCustomerForm($form, $form_state, $this->order);
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
