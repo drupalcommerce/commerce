@@ -13,11 +13,15 @@ dependencies:
   - profile
   - state_machine
 config_devel:
-  - views.view.commerce_orders
-  - commerce_order.commerce_order_type.default
-  - field.field.commerce_order.default.line_items
-  - field.storage.commerce_order.line_items
-  - core.entity_form_display.commerce_order.default.default
-  - core.entity_view_display.commerce_order.default.default
-  - core.entity_form_display.profile.billing.default
-  - core.entity_view_display.profile.billing.default
+  install:
+    - commerce_order.commerce_order_type.default.yml
+    - core.entity_form_display.commerce_order.default.default.yml
+    - core.entity_form_display.profile.billing.default.yml
+    - core.entity_view_display.commerce_order.default.default.yml
+    - core.entity_view_display.profile.billing.default.yml
+    - field.field.commerce_order.default.line_items.yml
+    - field.field.profile.billing.address.yml
+    - field.storage.commerce_order.line_items.yml
+    - field.storage.profile.address.yml
+    - profile.type.billing.yml
+    - views.view.commerce_orders.yml

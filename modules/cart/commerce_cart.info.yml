@@ -7,3 +7,6 @@ dependencies:
   - commerce
   - commerce_order
   - commerce_product
+config_devel:
+  install:
+    - views.view.commerce_cart_form.yml
