@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\commerce_order\Tests;
+use Drupal\user\Entity\User;
 
 /**
  * Tests viewing commerce_order entities.
@@ -48,4 +49,39 @@ class OrderViewTest extends OrderTestBase {
     $this->assertText("You are not authorized to access this page.");
   }
 
+  public function testUserOrderHistory() {
+    $user1 = User::create([
+      'name' => $this->randomMachineName(),
+      'mail' => $this->randomMachineName() . '@example.com',
+    ]);
+    $user1->save();
+    $user2 = User::create([
+      'name' => $this->randomMachineName(),
+      'mail' => $this->randomMachineName() . '@example.com',
+    ]);
+    $user2->save();
+
+    $line_item = $this->createEntity('commerce_line_item', [
+      'type' => 'product_variation',
+      'unit_price' => [
+        'amount' => '999',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $user1->getEmail(),
+      'uid' => $user1->id(),
+      'line_items' => [$line_item],
+    ]);
+
+    $this->drupalLogin($user2);
+    $this->drupalGet('user/' . $user2->id());
+    $this->assertResponse(403);
+
+    $this->drupalLogin($user1);
+    $this->drupalGet('user/' . $user1->id());
+    $this->assertLinkByHref("user/{$user1->id()}/orders");
+    $this->clickLink('Orders');
+  }
 }
