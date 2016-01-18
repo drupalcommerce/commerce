@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ingroup views_field_handlers
  *
- * @ViewsField("entity_bundle")
+ * @ViewsField("commerce_entity_bundle")
  */
 class EntityBundle extends Field {
 

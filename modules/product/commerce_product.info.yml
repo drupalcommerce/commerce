@@ -25,4 +25,6 @@ config_devel:
   - field.field.commerce_product.default.body
   - field.field.commerce_product.default.stores
   - field.field.commerce_product.default.variations
+  - system.action.commerce_publish_product
+  - system.action.commerce_unpublish_product
   - views.view.commerce_products

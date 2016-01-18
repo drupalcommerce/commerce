@@ -18,7 +18,7 @@ use Drupal\views\Plugin\views\filter\Bundle;
  *
  * @ingroup views_filter_handlers
  *
- * @ViewsFilter("entity_bundle")
+ * @ViewsFilter("commerce_entity_bundle")
  */
 class EntityBundle extends Bundle {
 

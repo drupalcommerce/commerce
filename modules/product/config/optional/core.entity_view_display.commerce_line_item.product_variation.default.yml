@@ -11,7 +11,7 @@ bundle: product_variation
 mode: default
 content:
   total_price:
-    type: price_default
+    type: commerce_price_default
     weight: 3
     settings:
       strip_trailing_zeroes: false
@@ -37,7 +37,7 @@ content:
     third_party_settings: {  }
     label: above
   unit_price:
-    type: price_default
+    type: commerce_price_default
     weight: 2
     settings:
       strip_trailing_zeroes: false

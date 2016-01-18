@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ingroup views_field_handlers
  *
- * @ViewsField("store")
+ * @ViewsField("commerce_store")
  */
 class Store extends Field {
 

@@ -3,8 +3,8 @@ status: true
 dependencies:
   module:
     - commerce_product
-id: unpublish_product_action
+id: commerce_unpublish_product
 label: 'Unpublish product'
 type: commerce_product
-plugin: unpublish_product_action
+plugin: commerce_unpublish_product
 configuration: {  }

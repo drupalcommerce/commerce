@@ -35,7 +35,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   stores:
-    type: entity_select
+    type: commerce_entity_select
     weight: 0
     settings:
       autocomplete_threshold: 7

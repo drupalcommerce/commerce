@@ -43,7 +43,7 @@ field.field.*.*.*.third_party.commerce_product:
         type: label
         label: 'The title of the attribute for the Add to Cart form'
 
-field.formatter.settings.add_to_cart:
+field.formatter.settings.commerce_add_to_cart:
   type: mapping
   mapping:
     show_quantity:
@@ -56,10 +56,10 @@ field.formatter.settings.add_to_cart:
       type: boolean
       label: 'Whether to attempt to combine line items containing the same product variation'
 
-action.configuration.publish_product_action:
+action.configuration.commerce_publish_product:
   type: action_configuration_default
   label: 'Configuration for the Publish product action'
 
-action.configuration.unpublish_product_action:
+action.configuration.commerce_unpublish_product:
   type: action_configuration_default
   label: 'Configuration for the Unpublish product action'

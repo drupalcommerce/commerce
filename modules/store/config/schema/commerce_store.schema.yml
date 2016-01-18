@@ -22,7 +22,7 @@ commerce_store.settings:
       type: string
       label: 'Default store UUID'
 
-views.field.store:
+views.field.commerce_store:
   type: views.field.field
   mapping:
     hide_single_store:

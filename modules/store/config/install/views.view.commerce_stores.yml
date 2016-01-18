@@ -238,7 +238,7 @@ display:
           hide_single_bundle: true
           entity_type: commerce_store
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
         operations:
           id: operations
           table: commerce_store
@@ -332,7 +332,7 @@ display:
             group_items: {  }
           entity_type: commerce_store
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
       sorts: {  }
       title: Stores
       header: {  }

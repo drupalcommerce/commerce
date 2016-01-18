@@ -30,14 +30,14 @@ use Drupal\Core\Render\Element\FormElement;
  * Example usage:
  * @code
  * $form['entities'] = [
- *   '#type' => 'entity_select',
+ *   '#type' => 'commerce_entity_select',
  *   '#title' => t('Stores'),
  *   '#target_type' => 'commerce_store',
  *   '#multiple' => TRUE,
  * ];
  * @end
  *
- * @FormElement("entity_select")
+ * @FormElement("commerce_entity_select")
  */
 class EntitySelect extends FormElement {
 

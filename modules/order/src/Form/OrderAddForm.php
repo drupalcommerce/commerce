@@ -56,13 +56,13 @@ class OrderAddForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['type'] = [
-      '#type' => 'entity_select',
+      '#type' => 'commerce_entity_select',
       '#title' => $this->t('Order type'),
       '#target_type' => 'commerce_order_type',
       '#required' => TRUE,
     ];
     $form['store_id'] = [
-      '#type' => 'entity_select',
+      '#type' => 'commerce_entity_select',
       '#title' => $this->t('Store'),
       '#target_type' => 'commerce_store',
       '#required' => TRUE,

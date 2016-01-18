@@ -357,7 +357,7 @@ display:
           hide_single_bundle: true
           entity_type: commerce_order
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
         store_id:
           id: store_id
           table: commerce_order
@@ -423,7 +423,7 @@ display:
           hide_single_store: true
           entity_type: commerce_order
           entity_field: store_id
-          plugin_id: store
+          plugin_id: commerce_store
         uid:
           id: uid
           table: commerce_order
@@ -666,7 +666,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: amount
-          type: price_default
+          type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
             display_currency_code: false
@@ -816,7 +816,7 @@ display:
             group_items: {  }
           entity_type: commerce_order
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
         state:
           id: state
           table: commerce_order

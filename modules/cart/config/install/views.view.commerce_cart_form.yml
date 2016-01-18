@@ -193,7 +193,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: amount
-          type: price_default
+          type: commerce_price_default
           settings:
             strip_trailing_zeroes: true
             display_currency_code: false
@@ -259,11 +259,11 @@ display:
           empty_zero: false
           hide_alter_empty: true
           entity_type: commerce_line_item
-          plugin_id: edit_quantity
-        edit_remove:
-          id: edit_remove
+          plugin_id: commerce_line_item_edit_quantity
+        remove_button:
+          id: remove_button
           table: commerce_line_item
-          field: edit_remove
+          field: remove_button
           relationship: line_items
           group_type: group
           admin_label: ''
@@ -309,7 +309,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           entity_type: commerce_line_item
-          plugin_id: edit_remove
+          plugin_id: commerce_line_item_remove_button
         total_price__amount:
           id: total_price__amount
           table: commerce_line_item
@@ -359,7 +359,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: amount
-          type: price_default
+          type: commerce_price_default
           settings:
             strip_trailing_zeroes: true
             display_currency_code: false

@@ -12,14 +12,14 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Plugin implementation of the commerce price field type.
+ * Plugin implementation of the 'commerce_price' field type.
  *
  * @FieldType(
- *   id = "price",
+ *   id = "commerce_price",
  *   label = @Translation("Price"),
  *   description = @Translation("Stores a decimal amount and a three letter currency code."),
- *   default_widget = "price_default",
- *   default_formatter = "price_default",
+ *   default_widget = "commerce_price_default",
+ *   default_formatter = "commerce_price_default",
  * )
  */
 class Price extends FieldItemBase {

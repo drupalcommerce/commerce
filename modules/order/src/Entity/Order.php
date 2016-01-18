@@ -458,7 +458,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflow']);
 
-    $fields['order_total'] = BaseFieldDefinition::create('price')
+    $fields['order_total'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)

@@ -17,10 +17,10 @@ use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'add_to_cart' formatter.
+ * Plugin implementation of the 'commerce_add_to_cart' formatter.
  *
  * @FieldFormatter(
- *   id = "add_to_cart",
+ *   id = "commerce_add_to_cart",
  *   label = @Translation("Add to cart form"),
  *   field_types = {
  *     "entity_reference",

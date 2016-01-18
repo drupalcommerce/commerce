@@ -178,11 +178,11 @@ function commerce_cart_views_data_alter(array &$data) {
   $data['commerce_line_item']['edit_quantity']['field'] = [
     'title' => t('Quantity text field'),
     'help' => t('Adds a text field for editing the quantity.'),
-    'id' => 'edit_quantity',
+    'id' => 'commerce_line_item_edit_quantity',
   ];
-  $data['commerce_line_item']['edit_remove']['field'] = [
+  $data['commerce_line_item']['remove_button']['field'] = [
     'title' => t('Remove button'),
     'help' => t('Adds a button for removing the line item.'),
-    'id' => 'edit_remove',
+    'id' => 'commerce_line_item_remove_button',
   ];
 }

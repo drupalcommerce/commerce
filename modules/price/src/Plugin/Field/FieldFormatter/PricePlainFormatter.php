@@ -16,10 +16,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'price_plain' formatter.
+ * Plugin implementation of the 'commerce_price_plain' formatter.
  *
  * @FieldFormatter(
- *   id = "price_plain",
+ *   id = "commerce_price_plain",
  *   label = @Translation("Plain"),
  *   field_types = {
  *     "price"

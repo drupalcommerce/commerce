@@ -254,7 +254,7 @@ display:
           hide_single_bundle: true
           entity_type: commerce_product
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
         status:
           id: status
           table: commerce_product_field_data
@@ -482,7 +482,7 @@ display:
             group_items: {  }
           entity_type: commerce_product
           entity_field: type
-          plugin_id: entity_bundle
+          plugin_id: commerce_entity_bundle
         title:
           id: title
           table: commerce_product_field_data

@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountInterface;
  * Unpublishes a product.
  *
  * @Action(
- *   id = "unpublish_product_action",
+ *   id = "commerce_unpublish_product",
  *   label = @Translation("Unpublish selected product"),
  *   type = "commerce_product"
  * )
