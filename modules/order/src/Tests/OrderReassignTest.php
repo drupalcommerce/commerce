@@ -50,6 +50,7 @@ class OrderReassignTest extends OrderTestBase {
     $this->assertUrl($order->toUrl('collection')->toString());
 
     // Reload the order.
+    \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order = Order::load($order->id());
     $this->assertEqual($order->getOwner()->getEmail(), 'example@example.com');
     $this->assertEqual($order->getEmail(), 'example@example.com');

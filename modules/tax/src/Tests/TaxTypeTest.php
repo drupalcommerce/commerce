@@ -6,6 +6,8 @@
  */
 
 namespace Drupal\commerce_tax\Tests;
+
+use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_tax\Entity\TaxType;
 
 /**
@@ -13,7 +15,24 @@ use Drupal\commerce_tax\Entity\TaxType;
  *
  * @group commerce
  */
-class TaxTypeTest extends TaxTestBase {
+class TaxTypeTest extends CommerceTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = ['commerce_tax', 'commerce_product'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer stores',
+    ], parent::getAdministratorPermissions());
+  }
+
   /**
    * Checks that the tax types forms exist.
    */

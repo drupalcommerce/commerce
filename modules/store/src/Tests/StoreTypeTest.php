@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_store\Tests;
 
+use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\StoreType;
 
 /**
@@ -14,7 +15,24 @@ use Drupal\commerce_store\Entity\StoreType;
  *
  * @group commerce
  */
-class StoreTypeTest extends StoreTestBase {
+class StoreTypeTest extends CommerceTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = ['commerce_store'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer store types',
+      'administer stores',
+    ], parent::getAdministratorPermissions());
+  }
 
   /**
    * Tests if the default Store Type was created.
@@ -43,10 +61,9 @@ class StoreTypeTest extends StoreTestBase {
 
     // Create a new commerce store type entity and see if the list has two store types.
     $this->createEntity('commerce_store_type', [
-        'id' => $title,
-        'label' => $title,
-      ]
-    );
+      'id' => $title,
+      'label' => $title,
+    ]);
 
     $this->drupalGet('admin/commerce/config/store-types');
     $store_types = $this->cssSelect($table_selector);
@@ -61,11 +78,9 @@ class StoreTypeTest extends StoreTestBase {
 
     // Create a store type programmaticaly.
     $type = $this->createEntity('commerce_store_type', [
-        'id' => $title,
-        'label' => $title,
-      ]
-    );
-
+      'id' => $title,
+      'label' => $title,
+    ]);
     $type_exists = (bool) StoreType::load($type->id());
     $this->assertTrue($type_exists, 'The new store type has been created in the database.');
 
@@ -85,10 +100,9 @@ class StoreTypeTest extends StoreTestBase {
   public function testUpdateStoreType() {
     // Create a new store type.
     $store_type = $this->createEntity('commerce_store_type', [
-        'id' => 'foo',
-        'label' => 'Label for foo',
-      ]
-    );
+      'id' => 'foo',
+      'label' => 'Label for foo',
+    ]);
 
     // Only change the label.
     $edit = [
@@ -105,10 +119,9 @@ class StoreTypeTest extends StoreTestBase {
   public function testDeleteStoreType() {
     // Create a store type programmaticaly.
     $type = $this->createEntity('commerce_store_type', [
-        'id' => 'foo',
-        'label' => 'Label for foo',
-      ]
-    );
+      'id' => 'foo',
+      'label' => 'Label for foo',
+    ]);
 
     // Create a store.
     $store = $this->createEntity('commerce_store', [
@@ -136,6 +149,6 @@ class StoreTypeTest extends StoreTestBase {
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $type_exists = (bool) StoreType::load($type->id());
     $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
-
   }
+
 }

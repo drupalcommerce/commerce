@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_store\Tests;
 
+use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreType;
 
@@ -15,14 +16,31 @@ use Drupal\commerce_store\Entity\StoreType;
  *
  * @group commerce
  */
-class StoreTest extends StoreTestBase {
+class StoreTest extends CommerceTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = ['commerce_store'];
 
   /**
    * A store type entity to use in the tests.
    *
-   * @var StoreType
+   * @var \Drupal\commerce_store\Entity\StoreTypeInterface
    */
   protected $type;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer store types',
+      'administer stores',
+    ], parent::getAdministratorPermissions());
+  }
 
   /**
    * {@inheritdoc}
@@ -31,10 +49,9 @@ class StoreTest extends StoreTestBase {
     parent::setUp();
 
     $this->type = $this->createEntity('commerce_store_type', [
-        'id' => 'foo',
-        'label' => 'Label of foo',
-      ]
-    );
+      'id' => 'foo',
+      'label' => 'Label of foo',
+    ]);
   }
 
   /**
@@ -44,12 +61,11 @@ class StoreTest extends StoreTestBase {
     $name = strtolower($this->randomMachineName(8));
     // Create a store programmaticaly.
     $store = $this->createEntity('commerce_store', [
-        'type' => $this->type->id(),
-        'name' => $name,
-        'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'EUR',
-      ]
-    );
+      'type' => $this->type->id(),
+      'name' => $name,
+      'mail' => \Drupal::currentUser()->getEmail(),
+      'default_currency' => 'EUR',
+    ]);
     $store_exists = (bool) Store::load($store->id());
     $this->assertTrue($store_exists, 'The new store has been created in the database.');
 
@@ -71,11 +87,10 @@ class StoreTest extends StoreTestBase {
   public function testUpdateStore() {
     // Create a new store.
     $store = $this->createEntity('commerce_store', [
-        'type' => $this->type->id(),
-        'name' => $this->randomMachineName(8),
-        'email' => \Drupal::currentUser()->getEmail(),
-      ]
-    );
+      'type' => $this->type->id(),
+      'name' => $this->randomMachineName(8),
+      'email' => \Drupal::currentUser()->getEmail(),
+    ]);
 
     $this->drupalGet('admin/commerce/stores');
     $this->clickLink(t('Edit'));
@@ -94,11 +109,10 @@ class StoreTest extends StoreTestBase {
   public function testDeleteStore() {
     // Create a new store.
     $store = $this->createEntity('commerce_store', [
-        'type' => $this->type->id(),
-        'name' => $this->randomMachineName(8),
-        'email' => \Drupal::currentUser()->getEmail(),
-      ]
-    );
+      'type' => $this->type->id(),
+      'name' => $this->randomMachineName(8),
+      'email' => \Drupal::currentUser()->getEmail(),
+    ]);
     $store_exists = (bool) Store::load($store->id());
     $this->assertTrue($store_exists, 'The new store has been created in the database.');
 
@@ -107,4 +121,5 @@ class StoreTest extends StoreTestBase {
     $store_exists = (bool) Store::load($store->id());
     $this->assertFalse($store_exists, 'The new store has been deleted from the database.');
   }
+
 }

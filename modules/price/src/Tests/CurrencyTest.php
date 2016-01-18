@@ -8,15 +8,14 @@
 namespace Drupal\commerce_price\Tests;
 
 use Drupal\commerce_price\Entity\Currency;
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\simpletest\WebTestBase;
+use Drupal\commerce\Tests\CommerceTestBase;
 
 /**
  * Tests the currency UI.
  *
  * @group commerce
  */
-class CurrencyTest extends WebTestBase {
+class CurrencyTest extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -31,32 +30,6 @@ class CurrencyTest extends WebTestBase {
     'commerce_store',
     'commerce_price',
   ];
-
-  /**
-   * A test user with administrative privileges.
-   *
-   * @var \Drupal\user\UserInterface
-   */
-  protected $adminUser;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->adminUser = $this->drupalCreateUser([
-      'configure store',
-      'administer stores',
-      'access administration pages',
-      'administer site configuration',
-    ]);
-    $this->drupalLogin($this->adminUser);
-
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('page_title_block');
-  }
 
   /**
    * Tests importing a currency.
@@ -145,28 +118,12 @@ class CurrencyTest extends WebTestBase {
   }
 
   /**
-   * Creates a new entity
-   *
-   * @param string $entity_type
-   *   The entity type.
-   * @param array $values
-   *   The values used to create the entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * {@inheritdoc}
    */
-  protected function createEntity($entity_type, $values) {
-    $storage = \Drupal::service('entity_type.manager')->getStorage($entity_type);
-    $entity = $storage->create($values);
-    $status = $entity->save();
-    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', [
-      '%label' => $entity->getEntityType()->getLabel(),
-      '%type' => $entity->id()
-    ]));
-    // The newly saved entity isn't identical to a loaded one, and would fail
-    // comparisons.
-    $entity = $storage->load($entity->id());
-
-    return $entity;
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer stores',
+    ], parent::getAdministratorPermissions());
   }
 
 }

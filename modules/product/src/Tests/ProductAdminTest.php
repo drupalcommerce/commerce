@@ -50,7 +50,7 @@ class ProductAdminTest extends ProductTestBase {
     $product = Product::load($product_id);
 
     $this->assertNotNull($product, 'The new product has been created in the database.');
-    $this->assertText(t("The product @title has been successfully saved.", ['@title' => $title]), "Commerce Product success text is showing");
+    $this->assertText(t('The product @title has been successfully saved', ['@title' => $title]), 'Product success text is shown');
     $this->assertText($title, 'Created product name exists on this page.');
     $this->assertFieldValues($product->getStores(), $this->stores, 'Created product has the correct associated stores.');
     $this->assertFieldValues($product->getStoreIds(), $store_ids, 'Created product has the correct associated store ids.');
