@@ -21,7 +21,7 @@ content:
     third_party_settings: {  }
     label: hidden
   order_total:
-    type: price_default
+    type: commerce_price_default
     weight: 1
     settings:
       strip_trailing_zeroes: false

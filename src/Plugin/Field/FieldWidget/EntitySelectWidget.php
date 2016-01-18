@@ -12,10 +12,10 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'entity_select' widget.
+ * Plugin implementation of the 'commerce_entity_select' widget.
  *
  * @FieldWidget(
- *   id = "entity_select",
+ *   id = "commerce_entity_select",
  *   label = @Translation("Entity select"),
  *   field_types = {
  *     "entity_reference"
@@ -100,7 +100,7 @@ class EntitySelectWidget extends WidgetBase {
     }
 
     $element += [
-      '#type' => 'entity_select',
+      '#type' => 'commerce_entity_select',
       '#target_type' => $this->getFieldSetting('target_type'),
       '#multiple' => $multiple,
       '#default_value' => $default_value,

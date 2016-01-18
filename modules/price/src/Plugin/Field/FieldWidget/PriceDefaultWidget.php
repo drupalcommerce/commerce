@@ -19,10 +19,10 @@ use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'price_default' widget.
+ * Plugin implementation of the 'commerce_price_default' widget.
  *
  * @FieldWidget(
- *   id = "price_default",
+ *   id = "commerce_price_default",
  *   label = @Translation("Price"),
  *   field_types = {
  *     "price"

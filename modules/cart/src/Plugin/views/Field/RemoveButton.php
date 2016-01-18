@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_cart\Plugin\views\Field\EditRemove.
+ * Contains \Drupal\commerce_cart\Plugin\views\Field\RemoveButton.
  */
 
 namespace Drupal\commerce_cart\Plugin\views\Field;
@@ -15,11 +15,11 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for editing the line item quantity.
+ * Defines a form element for removing the line item.
  *
- * @ViewsField("edit_remove")
+ * @ViewsField("commerce_line_item_remove_button")
  */
-class EditRemove extends FieldPluginBase {
+class RemoveButton extends FieldPluginBase {
 
   use UncacheableFieldHandlerTrait;
 

@@ -30,7 +30,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   unit_price:
-    type: price_default
+    type: commerce_price_default
     weight: 2
     settings: {  }
     third_party_settings: {  }

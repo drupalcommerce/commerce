@@ -283,16 +283,16 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     // The price is not required because it's not guaranteed to be used
     // for storage (there might be a price per currency, role, country, etc).
-    $fields['price'] = BaseFieldDefinition::create('price')
+    $fields['price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Price'))
       ->setDescription(t('The variation price'))
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'type' => 'price_default',
+        'type' => 'commerce_price_default',
         'weight' => 0,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'price_default',
+        'type' => 'commerce_price_default',
         'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)

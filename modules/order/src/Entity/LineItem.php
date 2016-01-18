@@ -213,7 +213,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['unit_price'] = BaseFieldDefinition::create('price')
+    $fields['unit_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Unit price'))
       ->setDescription(t('The price of a single unit.'))
       ->setRequired(TRUE)
@@ -224,7 +224,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['total_price'] = BaseFieldDefinition::create('price')
+    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the line item.'))
       ->setReadOnly(TRUE)

@@ -22,7 +22,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   variations:
-    type: add_to_cart
+    type: commerce_add_to_cart
     weight: 1
     label: hidden
     settings:

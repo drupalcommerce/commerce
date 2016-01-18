@@ -76,7 +76,7 @@ class EntitySelectWidgetTest extends WebTestBase {
     $this->referenceField = FieldStorageConfig::loadByName('commerce_product', 'stores');
     $display = EntityFormDisplay::load('commerce_product.default.default');
     $display->setComponent('stores', [
-      'type' => 'entity_select',
+      'type' => 'commerce_entity_select',
       'settings' => [
         'autocomplete_threshold' => 2,
       ],

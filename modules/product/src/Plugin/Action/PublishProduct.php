@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountInterface;
  * Publishes a product.
  *
  * @Action(
- *   id = "publish_product_action",
+ *   id = "commerce_publish_product",
  *   label = @Translation("Publish selected product"),
  *   type = "commerce_product"
  * )

@@ -11,12 +11,12 @@ function commerce_views_data_alter(array &$data) {
       // Translatable entities have a data table. Non-translatable ones
       // (such as Order) have only a base table.
       if ($data_table = $entity_type->getDataTable()) {
-        $data[$data_table][$entity_type->getKey('bundle')]['field']['id'] = 'entity_bundle';
-        $data[$data_table][$entity_type->getKey('bundle')]['filter']['id'] = 'entity_bundle';
+        $data[$data_table][$entity_type->getKey('bundle')]['field']['id'] = 'commerce_entity_bundle';
+        $data[$data_table][$entity_type->getKey('bundle')]['filter']['id'] = 'commerce_entity_bundle';
       }
       else {
-        $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['field']['id'] = 'entity_bundle';
-        $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['filter']['id'] = 'entity_bundle';
+        $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['field']['id'] = 'commerce_entity_bundle';
+        $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['filter']['id'] = 'commerce_entity_bundle';
       }
     }
   }

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines a form element for editing the line item quantity.
  *
- * @ViewsField("edit_quantity")
+ * @ViewsField("commerce_line_item_edit_quantity")
  */
 class EditQuantity extends FieldPluginBase {
 

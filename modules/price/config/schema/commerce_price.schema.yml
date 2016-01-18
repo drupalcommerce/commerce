@@ -18,7 +18,7 @@ commerce_price.commerce_currency.*:
       type: integer
       label: 'Fraction digits'
 
-field.formatter.settings.price_default:
+field.formatter.settings.commerce_price_default:
   type: mapping
   label: 'Default price formatter settings'
   mapping:
