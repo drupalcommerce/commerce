@@ -7,13 +7,12 @@
 
 namespace Drupal\commerce_store\Tests;
 
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\simpletest\WebTestBase;
+use Drupal\commerce\Tests\CommerceTestBase;
 
 /**
  * Defines base class for commerce test cases.
  */
-abstract class StoreTestBase extends WebTestBase {
+abstract class StoreTestBase extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -45,26 +44,6 @@ abstract class StoreTestBase extends WebTestBase {
     ];
     $this->adminUser = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->adminUser);
-  }
-
-  /**
-   * Creates a new entity.
-   *
-   * @param string $entityType
-   *   The entity type to be created.
-   * @param array $values
-   *   An array of settings.
-   *   Example: 'id' => 'foo'.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   A new entity.
-   */
-  protected function createEntity($entityType, array $values) {
-    $entity = \Drupal::service('entity_type.manager')->getStorage($entityType)->create($values);
-    $status = $entity->save();
-    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created %label entity %type.', ['%label' => $entity->getEntityType()->getLabel(), '%type' => $entity->id()]));
-
-    return $entity;
   }
 
 }
