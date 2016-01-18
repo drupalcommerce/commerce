@@ -192,7 +192,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: amount
-          type: price_default
+          type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
             display_currency_code: false
@@ -326,7 +326,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: amount
-          type: price_default
+          type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
             display_currency_code: false
