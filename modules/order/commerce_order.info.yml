@@ -14,6 +14,7 @@ dependencies:
   - state_machine
 config_devel:
   - views.view.commerce_orders
+  - views.view.commerce_line_item_table
   - commerce_order.commerce_order_type.default
   - field.field.commerce_order.default.line_items
   - field.storage.commerce_order.line_items
