@@ -29,7 +29,7 @@ drupal_ti_ensure_module_linked
 # Initialize composer_manager.
 php modules/composer_manager/scripts/init.php
 composer drupal-rebuild
-composer update -n --verbose
+composer update -n --lock --verbose
 
 # Enable main module and submodules.
 drush en -y commerce commerce_product commerce_order
