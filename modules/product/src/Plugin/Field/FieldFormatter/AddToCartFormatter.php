@@ -140,6 +140,10 @@ class AddToCartFormatter extends FormatterBase implements ContainerFactoryPlugin
    * {@inheritdoc}
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
-    return \Drupal::moduleHandler()->moduleExists('commerce_cart');
+    $has_cart =  \Drupal::moduleHandler()->moduleExists('commerce_cart');
+    $entity_type = $field_definition->getTargetEntityTypeId();
+    $field_name = $field_definition->getName();
+    return $has_cart && $entity_type == 'commerce_product' && $field_name == 'variations';
   }
+
 }
