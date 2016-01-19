@@ -256,6 +256,11 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setLabel(t('Email'))
       ->setDescription(t('Store email notifications are sent from this address.'))
       ->setRequired(TRUE)
+      ->addConstraint('ComplexData', [
+        'value' => [
+          'Email' => [],
+        ],
+      ])
       ->setDisplayOptions('form', [
         'type' => 'email_default',
         'weight' => 1,

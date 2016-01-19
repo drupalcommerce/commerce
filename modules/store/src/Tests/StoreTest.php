@@ -81,6 +81,37 @@ class StoreTest extends CommerceTestBase {
   }
 
   /**
+   * Tests email validation - "foo.@bar.baz" currently doesn't work as a valid email pattern
+   */
+  public function testValidateEmail() {
+    $name = strtolower($this->randomMachineName(8));
+    $invalidEmail = "test@";
+    $validEmail = "test@email.address";
+
+    // Create a store programmaticaly.
+    $store = $this->createEntity('commerce_store', [
+        'type' => $this->type->id(),
+        'name' => $name,
+        'mail' => $invalidEmail,
+        'default_currency' => 'EUR',
+      ]
+    );
+
+    $violations = $store->mail->validate();
+    $this->assertNotEqual($violations->count(), 0, "Invalid email addresses fail validation.");
+
+    $store = Store::create([
+      'type' => $this->type->id(),
+      'name' => $name,
+      'mail' => $validEmail,
+      'default_currency' => 'EUR',
+    ]);
+
+    $violations = $store->mail->validate();
+    $this->assertEqual($violations->count(), 0, "Valid email addresses pass validation.");
+  }
+
+  /**
    * Tests updating a store through the edit form.
    */
   public function testUpdateStore() {
