@@ -84,6 +84,10 @@ abstract class OrderTestBase extends CommerceTestBase {
     $values = [
       'type' => 'default',
       'sku' => $this->randomMachineName(),
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'EUR',
+      ],
     ];
     $this->variation = ProductVariation::create($values);
     $this->variation->save();
