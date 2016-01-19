@@ -32,4 +32,6 @@ composer drupal-rebuild
 composer update -n --lock --verbose
 
 # Enable main module and submodules.
-drush en -y commerce commerce_product commerce_order commerce_cart
+drush en -y commerce commerce_product commerce_order
+# Drush is drunk on dependencies.
+drush en -y commerce_cart
