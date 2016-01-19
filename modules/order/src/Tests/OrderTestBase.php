@@ -10,7 +10,6 @@ namespace Drupal\commerce_order\Tests;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce\Tests\CommerceTestBase;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Defines base class for commerce_order test cases.

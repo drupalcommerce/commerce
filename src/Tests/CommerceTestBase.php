@@ -58,7 +58,6 @@ abstract class CommerceTestBase extends WebTestBase {
     return [
       'view the administration theme',
       'access administration pages',
-      'access administration pages',
       'configure store',
     ];
   }

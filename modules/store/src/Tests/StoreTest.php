@@ -9,7 +9,6 @@ namespace Drupal\commerce_store\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\Store;
-use Drupal\commerce_store\Entity\StoreType;
 
 /**
  * Create, view, edit, delete, and change store entities.
