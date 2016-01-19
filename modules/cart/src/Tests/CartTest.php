@@ -36,6 +36,7 @@ class CartTest extends OrderTestBase {
    * @var array
    */
   public static $modules = [
+    'commerce_order',
     'commerce_cart',
     'node',
   ];
