@@ -29,7 +29,7 @@ function commerce_order_theme($existing, $type, $theme, $path) {
  */
 function commerce_order_commerce_order_presave(OrderInterface $order) {
   $place_transition = $order->getState()->getWorkflow()->getTransition('place');
-  if (!$order->isNew() && $place_transition) {
+  if (!$order->isNew() && empty($order->getPlacedTime()) && $place_transition) {
     $from_states = $place_transition->getFromStates();
     $from_state = reset($from_states);
     $from_state = $from_state->getId();

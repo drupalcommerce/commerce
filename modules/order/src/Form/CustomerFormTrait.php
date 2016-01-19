@@ -94,7 +94,7 @@ trait CustomerFormTrait {
         '#title' => t('Generate password'),
         '#default_value' => 1,
       ];
-      // We have to wrap the password_confirm element in order for #states
+      // The password_confirm element needs to be wrapped in order for #states
       // to work properly. See https://www.drupal.org/node/1427838.
       $form['customer']['password']['password_confirm_wrapper'] = [
         '#type' => 'container',

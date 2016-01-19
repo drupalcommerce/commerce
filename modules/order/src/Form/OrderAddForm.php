@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use \Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\commerce_order\Form\CustomerFormTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
@@ -69,6 +70,28 @@ class OrderAddForm extends FormBase {
     ];
     $form = $this->buildCustomerForm($form, $form_state);
 
+    $form['custom_placed_date'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Place the order on a different date'),
+      '#default_value' => FALSE,
+    ];
+    // The datetime element needs to be wrapped in order for #states to work
+    // properly. See https://www.drupal.org/node/2419131
+    $form['placed_wrapper'] = [
+      '#type' => 'container',
+      '#states' => [
+        'visible' => [
+          ':input[name="custom_placed_date"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['placed_wrapper']['placed'] = [
+      '#type' => 'datetime',
+      '#title_display' => 'invisible',
+      '#title' => $this->t('Placed'),
+      '#default_value' => new DrupalDateTime(),
+    ];
+
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -86,12 +109,16 @@ class OrderAddForm extends FormBase {
     $this->submitCustomerForm($form, $form_state);
 
     $values = $form_state->getValues();
-    $order = $this->storage->create([
+    $order_data = [
       'type' => $values['type'],
       'mail' => $values['mail'],
       'uid' => [$values['uid']],
       'store_id' => [$values['store_id']],
-    ]);
+    ];
+    if (!empty($values['custom_placed_date']) && !empty($values['placed'])) {
+      $order_data['placed'] = $values['placed']->getTimestamp();
+    }
+    $order = $this->storage->create($order_data);
     $order->save();
     // Redirect to the edit form to complete the order.
     $form_state->setRedirect('entity.commerce_order.edit_form', ['commerce_order' => $order->id()]);
