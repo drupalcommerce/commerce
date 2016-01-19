@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_cart\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_order\Entity\OrderType;
 
 /**
@@ -15,7 +15,7 @@ use Drupal\commerce_order\Entity\OrderType;
  *
  * @group commerce
  */
-class CartRefreshTest extends WebTestBase {
+class CartRefreshTest extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -23,28 +23,18 @@ class CartRefreshTest extends WebTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce',
     'commerce_cart',
     'commerce_order',
   ];
 
   /**
-   * User with permission to administer products.
+   * {@inheritdoc}
    */
-  protected $adminUser;
-
-  /**
-  * {@inheritdoc}
-  */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->adminUser = $this->drupalCreateUser([
+  protected function getAdministratorPermissions() {
+    return array_merge([
       'administer orders',
       'administer order types',
-      'access administration pages',
-    ]);
-    $this->drupalLogin($this->adminUser);
+    ], parent::getAdministratorPermissions());
   }
 
   /**
