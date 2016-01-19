@@ -26,13 +26,13 @@ class StoreForm extends ContentEntityForm {
   /**
    * Constructs a new StoreForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    parent::__construct($entityTypeManager);
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($entity_type_manager);
 
-    $this->storage = $entityTypeManager->getStorage('commerce_store');
+    $this->storage = $entity_type_manager->getStorage('commerce_store');
   }
 
   /**

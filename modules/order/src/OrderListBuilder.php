@@ -29,25 +29,25 @@ class OrderListBuilder extends EntityListBuilder {
   /**
    * Constructs a new OrderListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Datetime\DateFormatter $dateFormatter
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date service.
    */
-  public function __construct(EntityTypeInterface $entityType, EntityTypeManagerInterface $entityTypeManager, DateFormatter $dateFormatter) {
-    parent::__construct($entityType, $entityTypeManager->getStorage($entityType->id()));
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, DateFormatter $date_formatter) {
+    parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
 
-    $this->dateFormatter = $dateFormatter;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entityType) {
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
-      $entityType,
+      $entity_type,
       $container->get('entity_type.manager'),
       $container->get('date.formatter')
     );
