@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_cart\Plugin\views\Field\RemoveButton.
+ * Contains \Drupal\commerce_cart\Plugin\views\Field\EditQuantity.
  */
 
-namespace Drupal\commerce_cart\Plugin\views\Field;
+namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,11 +15,11 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for removing the line item.
+ * Defines a form element for editing the line item quantity.
  *
- * @ViewsField("commerce_line_item_remove_button")
+ * @ViewsField("commerce_line_item_edit_quantity")
  */
-class RemoveButton extends FieldPluginBase {
+class EditQuantity extends FieldPluginBase {
 
   use UncacheableFieldHandlerTrait;
 
@@ -31,7 +31,7 @@ class RemoveButton extends FieldPluginBase {
   protected $cartManager;
 
   /**
-   * Constructs a new EditRemove object.
+   * Constructs a new EditQuantity object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -93,15 +93,22 @@ class RemoveButton extends FieldPluginBase {
 
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
+      $line_item = $this->getEntity($row);
+      $quantity = $line_item->getQuantity();
+
       $form[$this->options['id']][$row_index] = [
-        '#type' => 'submit',
-        '#value' => t('Remove'),
-        '#name' => 'delete-line-item-' . $row_index,
-        '#remove_line_item' => TRUE,
-        '#row_index' => $row_index,
-        '#attributes' => ['class' => ['delete-line-item']],
+        '#type' => 'number',
+        '#title' => $this->t('Quantity'),
+        '#title_display' => 'invisible',
+        '#default_value' => round($quantity),
+        '#size' => 4,
+        '#min' => 1,
+        '#max' => 9999,
+        '#step' => 1,
       ];
     }
+    // Replace the form submit button label.
+    $form['actions']['submit']['#value'] = $this->t('Update cart');
   }
 
   /**
@@ -113,11 +120,14 @@ class RemoveButton extends FieldPluginBase {
    *   The current state of the form.
    */
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
-    $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#remove_line_item'])) {
-      $row_index = $triggering_element['#row_index'];
+    $quantities = $form_state->getValue($this->options['id']);
+    foreach ($quantities as $row_index => $quantity) {
       $line_item = $this->getEntity($this->view->result[$row_index]);
-      $this->cartManager->removeLineItem($line_item->getOrder(), $line_item);
+      if ($line_item->getQuantity() != $quantity) {
+        $line_item->setQuantity($quantity);
+        $order = $line_item->getOrder();
+        $this->cartManager->updateLineItem($order, $line_item);
+      }
     }
   }
 
