@@ -18,6 +18,10 @@ function commerce_order_theme($existing, $type, $theme, $path) {
     'commerce_order' => [
       'render element' => 'elements',
     ],
+    'commerce_order__user' => [
+      'base hook' => 'commerce_order',
+      'render element' => 'elements',
+    ],
     'commerce_order_edit_form' => [
       'render element' => 'form',
     ],
