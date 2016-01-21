@@ -3,4 +3,4 @@ status: true
 dependencies: {  }
 label: Default
 id: default
-workflow: 'default'
+workflow: 'order_default'

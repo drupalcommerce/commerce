@@ -1,5 +1,5 @@
-default:
-  id: default
+order_default:
+  id: order_default
   group: order
   label: 'Default'
   states:
@@ -19,8 +19,8 @@ default:
       from: [draft]
       to:   canceled
 
-default_validation:
-  id: default_validation
+order_default_validation:
+  id: order_default_validation
   group: order
   label: 'Default, with validation'
   states:
@@ -46,8 +46,8 @@ default_validation:
       from: [draft, validation]
       to:   canceled
 
-fulfillment:
-  id: fulfillment
+order_fulfillment:
+  id: order_fulfillment
   group: order
   label: 'Fulfillment'
   states:
@@ -73,8 +73,8 @@ fulfillment:
       from: [draft, fulfillment]
       to:   canceled
 
-fulfillment_validation:
-  id: fulfillment_validation
+order_fulfillment_validation:
+  id: order_fulfillment_validation
   group: order
   label: 'Fulfillment, with validation'
   states:

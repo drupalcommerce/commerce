@@ -35,7 +35,7 @@ class OrderTypeTest extends OrderTestBase {
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'kitten',
       'label' => 'Label of kitten',
-      'workflow' => 'default',
+      'workflow' => 'order_default',
     ]);
 
     $type_exists = (bool) OrderType::load($type->id());
@@ -63,7 +63,7 @@ class OrderTypeTest extends OrderTestBase {
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'foo',
       'label' => 'Label for foo',
-      'workflow' => 'default',
+      'workflow' => 'order_default',
     ]);
     commerce_order_add_line_items_field($type);
 
@@ -95,4 +95,5 @@ class OrderTypeTest extends OrderTestBase {
     $type_exists = (bool) OrderType::load($type->id());
     $this->assertFalse($type_exists, 'The order type has been deleted from the database.');
   }
+
 }
