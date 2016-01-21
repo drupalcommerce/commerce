@@ -479,12 +479,6 @@ display:
           validate:
             type: 'entity:user'
             fail: 'not found'
-          validate_options:
-            operation: view
-            multiple: 0
-            access: false
-            restrict_roles: 0
-            roles: {  }
           break_phrase: false
           not: false
           entity_type: commerce_order
