@@ -12,6 +12,20 @@ field.widget.settings.commerce_entity_select:
       type: string
       label: 'Autocomplete placeholder'
 
+views.argument_validator.commerce_current_user:
+  type: mapping
+  label: 'Current user'
+  mapping:
+    restrict_roles:
+      type: boolean
+      label: 'Restrict user based on role, if the user doesn''t match the current user.'
+    roles:
+      type: sequence
+      label: 'Restrict to the selected roles'
+      sequence:
+        type: string
+        label: 'Role'
+
 views.field.commerce_entity_bundle:
   type: views.field.field
   mapping:

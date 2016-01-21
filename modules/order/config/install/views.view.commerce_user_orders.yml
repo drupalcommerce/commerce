@@ -1,6 +1,8 @@
 langcode: en
 status: true
 dependencies:
+  config:
+    - user.role.administrator
   module:
     - commerce_order
     - commerce_price
@@ -241,7 +243,7 @@ display:
           click_sort_column: value
           type: timestamp
           settings:
-            date_format: long
+            date_format: short
             custom_date_format: ''
             timezone: ''
           group_column: value
@@ -477,8 +479,12 @@ display:
             format: default_summary
           specify_validation: true
           validate:
-            type: 'entity:user'
+            type: commerce_current_user
             fail: 'not found'
+          validate_options:
+            restrict_roles: true
+            roles:
+              administrator: administrator
           break_phrase: false
           not: false
           entity_type: commerce_order
