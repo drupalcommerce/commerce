@@ -15,6 +15,7 @@ dependencies:
 config_devel:
   - views.view.commerce_orders
   - views.view.commerce_line_item_table
+  - views.view.commerce_user_orders
   - commerce_order.commerce_order_type.default
   - field.field.commerce_order.default.line_items
   - field.storage.commerce_order.line_items
