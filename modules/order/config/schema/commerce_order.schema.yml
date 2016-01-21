@@ -28,3 +28,7 @@ commerce_order.commerce_line_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
+views.filter.commerce_entity_select:
+  type: views.filter.many_to_one
+  label: 'Entity select'

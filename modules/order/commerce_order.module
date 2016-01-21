@@ -164,5 +164,6 @@ function commerce_order_add_line_items_field($order_type) {
  */
 function commerce_order_views_data_alter(array &$data) {
   $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
+  $data['commerce_order']['store_id']['filter']['id'] = 'commerce_entity_select';
   $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
 }
