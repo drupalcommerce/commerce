@@ -44,6 +44,7 @@ abstract class CommerceTestBase extends WebTestBase {
     $this->drupalPlaceBlock('local_actions_block');
     $this->drupalPlaceBlock('page_title_block');
 
+    $this->drupalCreateAdminRole('administrator');
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
   }

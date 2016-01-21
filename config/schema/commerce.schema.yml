@@ -12,6 +12,14 @@ field.widget.settings.commerce_entity_select:
       type: string
       label: 'Autocomplete placeholder'
 
+views.argument_validator.commerce_current_user:
+  type: mapping
+  label: 'Current user'
+  mapping:
+    admin_permission:
+      type: string
+      label: 'Admin permission'
+
 views.field.commerce_entity_bundle:
   type: views.field.field
   mapping:

@@ -241,7 +241,7 @@ display:
           click_sort_column: value
           type: timestamp
           settings:
-            date_format: long
+            date_format: short
             custom_date_format: ''
             timezone: ''
           group_column: value
@@ -477,8 +477,10 @@ display:
             format: default_summary
           specify_validation: true
           validate:
-            type: 'entity:user'
+            type: commerce_current_user
             fail: 'not found'
+          validate_options:
+            admin_permission: 'administer orders'
           break_phrase: false
           not: false
           entity_type: commerce_order
@@ -492,6 +494,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - user.permissions
       tags: {  }
   order_page:
@@ -519,5 +522,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - user.permissions
       tags: {  }
