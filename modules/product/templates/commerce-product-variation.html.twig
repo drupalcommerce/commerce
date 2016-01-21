@@ -1,0 +1,30 @@
+{#
+/**
+ * @file commerce-product-variation.html.twig
+ * Default theme implementation to present Product variation data.
+ *
+ * This template is used when viewing Product variations.
+ *
+ * Available variables:
+ * - content: Items for the content of the product variation.
+ *   Use 'content' to print them all, or print a subset such as
+ *   'content.sku'. Use the following code to exclude the
+ *   printing of a given child element:
+ *   @code
+ *   {{ content|without('sku') }}
+ *   @endcode
+ * - attributes: HTML attributes for the wrapper.
+ * - product_variation: The product variation object.
+ * - product: The product object.
+ * - product_url: The product URL.
+ * - type: The product variation type.
+ * - view_mode: The current view mode.
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes}}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

@@ -14,6 +14,9 @@ commerce_product.commerce_product_type.*:
     variationType:
       type: string
       label: 'Variation type'
+    displaySubmitted:
+      type: boolean
+      label: 'Display setting for author and date submitted by post information'
 
 commerce_product.commerce_product_variation_type.*:
   type: config_entity
