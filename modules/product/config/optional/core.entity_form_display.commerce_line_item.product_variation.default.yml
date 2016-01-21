@@ -10,11 +10,6 @@ targetEntityType: commerce_line_item
 bundle: product_variation
 mode: default
 content:
-  created:
-    type: datetime_timestamp
-    weight: 3
-    settings: {  }
-    third_party_settings: {  }
   purchased_entity:
     type: entity_reference_autocomplete
     weight: 0
@@ -35,5 +30,6 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
+  created: true
   status: true
   uid: true

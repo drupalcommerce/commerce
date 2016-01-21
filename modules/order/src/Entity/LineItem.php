@@ -244,10 +244,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
         'type' => 'timestamp',
         'weight' => 0,
       ])
-      ->setDisplayOptions('form', [
-        'type' => 'datetime_timestamp',
-        'weight' => 10,
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
