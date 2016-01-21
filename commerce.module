@@ -57,3 +57,22 @@ function commerce_field_widget_form_alter(&$element, FormStateInterface $form_st
     $element[$child]['#description'] = '';
   }
 }
+
+/**
+ * Helper for commerce entities hook_theme_suggestions_HOOK() implementations.
+ */
+function _commerce_theme_suggestions_commerce_entity($entity_type, array $variables) {
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original;
+  $commerce_entity = $variables['elements']['#' . $entity_type];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = $original . '__' . $sanitized_view_mode;
+  $suggestions[] = $original . '__' . $commerce_entity->bundle();
+  $suggestions[] = $original . '__' . $commerce_entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = $original . '__' . $commerce_entity->id();
+  $suggestions[] = $original . '__' . $commerce_entity->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}

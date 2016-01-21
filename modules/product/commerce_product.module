@@ -8,6 +8,9 @@
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Template\Attribute;
+use Drupal\commerce_product\Entity\ProductInterface;
 
 /**
  * Implements hook_theme().
@@ -16,6 +19,9 @@ function commerce_product_theme() {
   return [
     'product_form' => [
       'render element' => 'form',
+    ],
+    'commerce_product' => [
+      'render element' => 'elements',
     ],
   ];
 }
@@ -266,4 +272,90 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
     $field->unsetThirdPartySetting('commerce_product', 'attribute_field');
     $field->save();
   }
+}
+
+/**
+ * Prepares variables for Product templates.
+ *
+ * Default template: commerce-product.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_product(array &$variables) {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  // Provide a distinct $teaser boolean.
+  $variables['teaser'] = $variables['view_mode'] == 'teaser';
+  $variables['product'] = $variables['elements']['#commerce_product'];
+  /** @var Drupal\commerce_product\Entity\ProductInterface $product */
+  $product = $variables['product'];
+  $variables['date'] = drupal_render($variables['elements']['created']);
+  unset($variables['elements']['created']);
+  $variables['author_name'] = drupal_render($variables['elements']['uid']);
+  unset($variables['elements']['uid']);
+
+  $variables['url'] = $product->url('canonical', [
+    'language' => $product->language(),
+  ]);
+  $variables['label'] = $variables['elements']['title'];
+  unset($variables['elements']['title']);
+  // The 'page' variable is set to TRUE:
+  //   - The view mode is 'full' and we are on the 'product.view' route.
+  $variables['page'] = ($variables['view_mode'] == 'full' && (commerce_product_product_is_page($product)));
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  // Display post information only on certain product types.
+  /** @var Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+  $product_type = $product->type->referencedEntities();
+  $product_type = reset($product_type);
+
+  // Used by RDF to add attributes around the author and date submitted.
+  $variables['author_attributes'] = new Attribute();
+  $variables['display_submitted'] = $product_type->displaySubmitted();
+  if ($variables['display_submitted']) {
+    if (theme_get_setting('features.commerce_product_user_picture')) {
+      // To change user picture settings (e.g. image style), edit the 'compact'
+      // view mode on the User entity. Note that the 'compact' view mode might
+      // not be configured, so remember to always check the theme setting first.
+      $variables['author_picture'] = user_view($product->getOwner(), 'compact');
+    }
+  }
+
+  // Add article ARIA role.
+  $variables['attributes']['role'] = 'article';
+}
+
+/**
+ * Checks whether the current page is the full page view of the passed-in
+ * product.
+ *
+ * @param \Drupal\commerce_product\Entity\ProductInterface $product
+ *   A product entity.
+ *
+ * @return int|false
+ *   The ID of the product if this is a full page view, otherwise FALSE.
+ */
+function commerce_product_product_is_page(ProductInterface $product) {
+  $route_match = \Drupal::routeMatch();
+  if ($route_match->getRouteName() == 'entity.commerce_product.canonical') {
+    $page_product = $route_match->getParameter('commerce_product');
+  }
+  return (!empty($page_product) ? $page_product->id() == $product->id() : FALSE);
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_product().
+ */
+function commerce_product_theme_suggestions_commerce_product(array $variables) {
+  // Use commerce core helper callback to get the templates suggestions.
+  $suggestions = _commerce_theme_suggestions_commerce_entity('commerce_product', $variables);
+
+  return $suggestions;
 }
