@@ -124,6 +124,13 @@ class ProductTypeForm extends BundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
+    $form['displaySubmitted'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display author and date information'),
+      '#default_value' => $product_type->displaySubmitted(),
+      '#description' => t('Author username and publish date will be displayed.'),
+    );
+
     return $this->protectBundleIdElement($form);
   }
 

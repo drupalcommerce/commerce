@@ -5,3 +5,4 @@ id: default
 label: Default
 description: ''
 variationType: default
+displaySubmitted: false
