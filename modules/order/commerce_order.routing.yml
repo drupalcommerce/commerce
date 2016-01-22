@@ -34,6 +34,19 @@ entity.commerce_order.collection:
   requirements:
     _permission: 'administer orders'
 
+entity.commerce_order.user_view:
+  path: '/user/{user}/order/{commerce_order}'
+  defaults:
+    _entity_view: 'commerce_order.user'
+    _title: 'Order information'
+  requirements:
+    _entity_access: 'commerce_order.view'
+  options:
+    parameters:
+      entity:
+        user: 'entity:user'
+        commerce_order: 'entity:order'
+
 entity.commerce_line_item_type.collection:
   path: '/admin/commerce/config/line-item-types'
   defaults:

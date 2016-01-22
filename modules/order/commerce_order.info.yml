@@ -21,5 +21,7 @@ config_devel:
   - field.storage.commerce_order.line_items
   - core.entity_form_display.commerce_order.default.default
   - core.entity_view_display.commerce_order.default.default
+  - core.entity_view_display.commerce_order.default.user
   - core.entity_form_display.profile.billing.default
   - core.entity_view_display.profile.billing.default
+  - core.entity_view_mode.commerce_order.user
