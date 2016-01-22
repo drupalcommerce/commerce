@@ -31,4 +31,6 @@ content:
       show_quantity: false
     third_party_settings: {  }
 hidden:
+  created: true
   stores: true
+  uid: true
