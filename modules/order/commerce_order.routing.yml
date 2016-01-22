@@ -35,7 +35,7 @@ entity.commerce_order.collection:
     _permission: 'administer orders'
 
 entity.commerce_order.user_view:
-  path: '/user/{user}/order/{commerce_order}'
+  path: '/user/{user}/orders/{commerce_order}'
   defaults:
     _entity_view: 'commerce_order.user'
     _title: 'Order information'
