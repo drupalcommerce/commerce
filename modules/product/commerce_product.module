@@ -8,6 +8,8 @@
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\commerce_product\Entity\ProductVariationType;
 
 /**
  * Implements hook_theme().
@@ -16,6 +18,13 @@ function commerce_product_theme() {
   return [
     'product_form' => [
       'render element' => 'form',
+    ],
+    'commerce_product_variation' => [
+      'render element' => 'elements',
+    ],
+    'commerce_product_variation__cart' => [
+      'render element' => 'elements',
+      'base hook' => 'commerce_product_variation',
     ],
   ];
 }
@@ -176,6 +185,36 @@ function commerce_product_add_variations_field($product_type) {
 }
 
 /**
+ * Implements hook_entity_extra_field_info().
+ */
+function commerce_product_entity_extra_field_info() {
+  $extra = array();
+  $description = t('Line item label');
+  foreach (ProductVariationType::loadMultiple() as $bundle) {
+    $extra['commerce_product_variation'][$bundle->id()]['display']['line_item_label'] = array(
+      'label' => t('Line item label'),
+      'description' => $description,
+      'weight' => 100,
+      'visible' => FALSE,
+    );
+  }
+
+  return $extra;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function commerce_product_commerce_product_variation_view(array &$build, EntityInterface $commerce_product_variation, EntityViewDisplayInterface $display, $view_mode) {
+  if ($display_line_item_label = $display->getComponent('line_item_label')) {
+    $build['line_item_label'] = array(
+      '#markup' => $commerce_product_variation->getLineItemTitle(),
+      '#weight' => $display_line_item_label['weight'],
+    );
+  }
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  */
 function commerce_product_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
@@ -266,4 +305,43 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
     $field->unsetThirdPartySetting('commerce_product', 'attribute_field');
     $field->save();
   }
+}
+
+/**
+ * Prepares variables for Product variation templates.
+ *
+ * Default template: commerce-product-variation.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_product_variation(array &$variables) {
+  /** @var Drupal\commerce_product\Entity\ProductVariationInterface $product_variation */
+  $product_variation = $variables['elements']['#commerce_product_variation'];
+  // Get the Product for this ProductVariation;
+  $product = $product_variation->getProduct();
+
+  // Build some helpful variables for templates.
+  $variables['product_variation'] = $product_variation;
+  $variables['product'] = $product;
+  $variables['type'] = $product_variation->bundle();
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['product_url'] = $product->toUrl();
+
+  // Helpful $content variable for templates.
+  foreach (Element::children($variables['elements']) as $key) {
+      $variables['content'][$key] = $variables['elements'][$key];
+    }
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_product_variation().
+ */
+function commerce_product_theme_suggestions_commerce_product_variation(array $variables) {
+  // Use commerce core helper callback to get the templates suggestions.
+  $suggestions = _commerce_theme_suggestions_commerce_entity('commerce_product_variation', $variables);
+
+  return $suggestions;
 }

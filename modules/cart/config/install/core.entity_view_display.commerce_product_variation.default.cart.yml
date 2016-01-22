@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.default
+id: commerce_product_variation.default.cart
+targetEntityType: commerce_product_variation
+bundle: default
+mode: cart
+content:
+  line_item_label:
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+  sku:
+    type: string
+    weight: 1
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  price: true

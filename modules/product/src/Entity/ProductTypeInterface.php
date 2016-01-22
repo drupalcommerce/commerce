@@ -33,4 +33,20 @@ interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionI
    */
   public function setVariationType($variation_type);
 
+  /**
+   * Gets whether 'Submitted by' information should be shown.
+   *
+   * @return bool
+   *   TRUE if the submitted by information should be shown.
+   */
+  public function displaySubmitted();
+
+  /**
+   * Sets whether 'Submitted by' information should be shown.
+   *
+   * @param bool $display_submitted
+   *   TRUE if the submitted by information should be shown.
+   */
+  public function setDisplaySubmitted($display_submitted);
+
 }

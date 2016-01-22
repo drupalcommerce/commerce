@@ -7,3 +7,7 @@ dependencies:
   - commerce
   - commerce_order
   - commerce_product
+config_devel:
+  - core.entity_view_display.commerce_product_variation.default.cart
+  - views.view.commerce_cart_form
+  - views.view.commerce_carts

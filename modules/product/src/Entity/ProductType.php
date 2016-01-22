@@ -40,6 +40,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "description",
  *     "variationType",
+ *     "displaySubmitted",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",
@@ -87,6 +88,13 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $variationType;
 
   /**
+   * Display setting for author and date submitted by post information.
+   *
+   * @var bool
+   */
+  protected $displaySubmitted = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -114,6 +122,20 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   public function setVariationType($variation_type) {
     $this->variationType = $variation_type;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function displaySubmitted() {
+    return $this->displaySubmitted;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisplaySubmitted($display_submitted) {
+    $this->displaySubmitted = $display_submitted;
   }
 
 }
