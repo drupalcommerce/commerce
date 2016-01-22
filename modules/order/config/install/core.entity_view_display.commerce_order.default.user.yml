@@ -57,6 +57,6 @@ content:
     third_party_settings: {  }
 hidden:
   ip_address: true
-  order_total: true
+  total_price: true
   state: true
   uid: true

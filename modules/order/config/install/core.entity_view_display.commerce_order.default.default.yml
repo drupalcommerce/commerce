@@ -20,7 +20,7 @@ content:
       link: false
     third_party_settings: {  }
     label: hidden
-  order_total:
+  total_price:
     type: commerce_price_default
     weight: 1
     settings:

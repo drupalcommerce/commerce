@@ -82,6 +82,14 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setEmail($this->getOwner()->getEmail());
       }
     }
+
+    // Recalculate the total.
+    // @todo Rework this once pricing is finished.
+    $this->total_price->amount = 0;
+    foreach ($this->getLineItems() as $line_item) {
+      $this->total_price->amount += $line_item->total_price->amount;
+      $this->total_price->currency_code = $line_item->total_price->currency_code;
+    }
   }
 
   /**
@@ -458,7 +466,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflow']);
 
-    $fields['order_total'] = BaseFieldDefinition::create('commerce_price')
+    $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)
