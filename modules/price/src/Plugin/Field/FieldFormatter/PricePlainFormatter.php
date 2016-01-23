@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "commerce_price_plain",
  *   label = @Translation("Plain"),
  *   field_types = {
- *     "price"
+ *     "commerce_price"
  *   }
  * )
  */

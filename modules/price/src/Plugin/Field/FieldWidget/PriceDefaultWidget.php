@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "commerce_price_default",
  *   label = @Translation("Price"),
  *   field_types = {
- *     "price"
+ *     "commerce_price"
  *   }
  * )
  */
