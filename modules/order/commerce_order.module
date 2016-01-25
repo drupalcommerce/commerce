@@ -73,11 +73,7 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
  *
  * @param array $variables
  *   An associative array containing:
- *   - elements: An associative array containing the taxonomy term and any
- *     fields attached to the term. Properties used:
- *     - #commerce_order: A \Drupal\commerce_order\Entity\OrderInterface object.
- *     - #view_mode: The current view mode for this order, e.g.
- *       'full' or 'user'.
+ *   - elements: An associative array containing rendered fields.
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_commerce_order(&$variables) {
@@ -85,10 +81,6 @@ function template_preprocess_commerce_order(&$variables) {
   $order = $variables['elements']['#commerce_order'];
 
   $variables['order'] = $order;
-  $variables['order_id'] = $order->id();
-  $variables['order_number'] = $order->getOrderNumber();
-  $variables['type'] = $order->bundle();
-  $variables['view_mode'] = $variables['elements']['#view_mode'];
   // Helpful $content variable for templates.
   $variables['content'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
@@ -100,12 +92,7 @@ function template_preprocess_commerce_order(&$variables) {
  * Implements hook_theme_suggestions_commerce_order().
  */
 function commerce_order_theme_suggestions_commerce_order(array $variables) {
-  $original = $variables['theme_hook_original'];
-  $suggestions = [];
-  $suggestions[] = $original;
-  $suggestions[] = $original . '__' . $variables['elements']['#view_mode'];
-
-  return $suggestions;
+  return _commerce_entity_theme_suggestions('commerce_order', $variables);
 }
 
 /**

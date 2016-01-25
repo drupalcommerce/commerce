@@ -37,7 +37,7 @@ function commerce_product_theme_suggestions_commerce_product_variation(array $va
  *
  * @param array $variables
  *   An associative array containing:
- *   - elements: An associative array.
+ *   - elements: An associative array containing rendered fields.
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_commerce_product_variation(array &$variables) {
