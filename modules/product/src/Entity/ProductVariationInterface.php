@@ -17,6 +17,11 @@ use Drupal\user\EntityOwnerInterface;
 interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
+   * Returns a list of labels.
+   */
+  public function getLabelList();
+
+  /**
    * Gets the parent product.
    *
    * @return ProductInterface|null

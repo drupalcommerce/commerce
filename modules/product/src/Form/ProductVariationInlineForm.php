@@ -8,11 +8,21 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\inline_entity_form\Form\EntityInlineForm;
+use Drupal\core\Entity\EntityInterface;
 
 /**
  * Defines the inline form for product variations.
  */
 class ProductVariationInlineForm extends EntityInlineForm {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLabel(EntityInterface $entity) {
+    if ($entity->getEntityTypeId() == 'commerce_product_variation') {
+      return $entity->getLabelList();
+    }
+  }
 
   /**
    * {@inheritdoc}

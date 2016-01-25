@@ -70,6 +70,29 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       return call_user_func($callback, $this);
     }
 
+    $product = $this->getProduct();
+    if (!$product) {
+      throw new EntityMalformedException(sprintf('Product variation #%d is missing the product backreference.', $this->id()));
+    }
+
+    $label = $product->getTitle();
+
+    // Set the labels.
+    $label_addition = $this->getLabelList();
+
+    if (!is_null($label_addition)) {
+      // When there are no attribute fields, there's always only one variation.
+      $label .= ' - ' . $label_addition;
+    }
+
+    return $label;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLabelList() {
+    $label = NULL;
     if ($attributes = $this->getAttributeFields()) {
       $attribute_labels = [];
       foreach ($attributes as $attribute) {
@@ -80,11 +103,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
       $label = implode(', ', $attribute_labels);
     }
-    else {
-      // When there are no attribute fields, there's always only one variation.
-      $label = t('Default');
-    }
-
     return $label;
   }
 
@@ -205,8 +223,9 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     }
 
     $title = $product->getTitle();
-    if ($this->getAttributeFieldDefinitions()) {
-      $title .= ' - ' . $this->label();
+    $label_addition = $this->getLabelList();
+    if (!is_null($label_addition)) {
+      $title .= ' - ' . $label_addition;
     }
 
     return $title;
