@@ -57,3 +57,30 @@ function commerce_field_widget_form_alter(&$element, FormStateInterface $form_st
     $element[$child]['#description'] = '';
   }
 }
+
+/**
+ * Helper for providing entity theme suggestions.
+ *
+ * @param string $entity_type_id
+ *   The entity type id.
+ * @param array $variables
+ *   An array of variables passed to the theme hook.
+ *
+ * @return array
+ *   An array of theme suggestions.
+ */
+function _commerce_entity_theme_suggestions($entity_type_id, array $variables) {
+  $original = $variables['theme_hook_original'];
+  $entity = $variables['elements']['#' . $entity_type_id];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions = [];
+  $suggestions[] = $original;
+  $suggestions[] = $original . '__' . $sanitized_view_mode;
+  $suggestions[] = $original . '__' . $entity->bundle();
+  $suggestions[] = $original . '__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = $original . '__' . $entity->id();
+  $suggestions[] = $original . '__' . $entity->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}
