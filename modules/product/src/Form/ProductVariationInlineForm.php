@@ -19,9 +19,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
    * {@inheritdoc}
    */
   public function getLabel(EntityInterface $entity) {
-    if ($entity->getEntityTypeId() == 'commerce_product_variation') {
-      return $entity->getLabelList();
-    }
+    return $entity->getAttributeLabels();
   }
 
   /**

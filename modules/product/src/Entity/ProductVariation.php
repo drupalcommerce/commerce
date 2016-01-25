@@ -78,7 +78,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $label = $product->getTitle();
 
     // Set the labels.
-    $label_addition = $this->getLabelList();
+    $label_addition = $this->getAttributeLabels();
 
     if (!is_null($label_addition)) {
       // When there are no attribute fields, there's always only one variation.
@@ -91,7 +91,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getLabelList() {
+  public function getAttributeLabels() {
     $label = NULL;
     if ($attributes = $this->getAttributeFields()) {
       $attribute_labels = [];
@@ -223,7 +223,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     }
 
     $title = $product->getTitle();
-    $label_addition = $this->getLabelList();
+    $label_addition = $this->getAttributeLabels();
     if (!is_null($label_addition)) {
       $title .= ' - ' . $label_addition;
     }
