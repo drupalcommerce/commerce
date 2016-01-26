@@ -42,83 +42,115 @@ class StoreTest extends CommerceTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->type = $this->createEntity('commerce_store_type', [
-      'id' => 'foo',
-      'label' => 'Label of foo',
-    ]);
-  }
-
-  /**
-   * Tests creating a store programaticaly and through the create form.
+   * Tests creating a store.
    */
   public function testCreateStore() {
-    $name = strtolower($this->randomMachineName(8));
-    // Create a store programmaticaly.
-    $store = $this->createEntity('commerce_store', [
-      'type' => $this->type->id(),
-      'name' => $name,
-      'mail' => \Drupal::currentUser()->getEmail(),
-      'default_currency' => 'EUR',
-    ]);
-    $store_exists = (bool) Store::load($store->id());
-    $this->assertTrue($store_exists, 'The new store has been created in the database.');
-
-    // Create a store through the form.
     $this->drupalGet('admin/commerce/stores');
     $this->clickLink('Add a new store');
-    $this->clickLink($this->type->label());
+
+    // Check the integrity of the form.
+    $this->assertFieldByName('name[0][value]', NULL, 'Name field is present.');
+    $this->assertFieldByName('mail[0][value]', NULL, 'Email field is present.');
+    $this->assertFieldByName('address[0][country_code]', NULL, 'Address field is present.');
+    $this->assertFieldByName('billing_countries[]', NULL, 'Supported billing countries field is present');
+    $this->assertFieldByName('uid[0][target_id]', NULL, 'Owner field is present');
+    $this->assertFieldByName('default', NULL, 'Default field is present');
+    $this->assertFieldsByValue(t('Save'), NULL, 'Save button is present');
+
     $edit = [
-      'name[0][value]' => 'Foo Store',
+      'name[0][value]' => $this->randomMachineName(8),
       'mail[0][value]' => \Drupal::currentUser()->getEmail(),
       'default_currency' => 'EUR',
     ];
+    $address_country = [
+      'address[0][country_code]' => 'US',
+    ];
+    $this->drupalPostAjaxForm(NULL, $address_country, 'address[0][country_code]');
+    $address = [
+      'country_code' => 'US',
+      'address_line1' => '1098 Alta Ave',
+      'locality' => 'Mountain View',
+      'administrative_area' => 'US-CA',
+      'postal_code' => '94043',
+    ];
+    foreach ($address as $property => $value) {
+      $path = 'address[0][' . $property . ']';
+      $edit[$path] = $value;
+    }
     $this->drupalPostForm(NULL, $edit, t('Save'));
+
+    $store_count = $this->cssSelect('.view-commerce-stores tr td.views-field-name');
+    $this->assertEqual(count($store_count), 1, 'Stores exists in the table.');
   }
 
   /**
-   * Tests updating a store through the edit form.
+   * Tests editing a store.
    */
-  public function testUpdateStore() {
-    // Create a new store.
-    $store = $this->createEntity('commerce_store', [
-      'type' => $this->type->id(),
+  public function testEditStore() {
+    $store = $this->createStore([
+      'type' => 'default',
       'name' => $this->randomMachineName(8),
-      'email' => \Drupal::currentUser()->getEmail(),
     ]);
 
     $this->drupalGet('admin/commerce/stores');
     $this->clickLink(t('Edit'));
-    // Only change the name.
+    $new_store_name = $this->randomMachineName(8);
     $edit = [
-      'name[0][value]' => $this->randomMachineName(8),
+      'name[0][value]' => $new_store_name,
     ];
     $this->drupalPostForm(NULL, $edit, 'Save');
+
+    \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_changed = Store::load($store->id());
-    $this->assertEqual($store->getName(), $store_changed->getName(), 'The name of the store has been changed.');
+    $this->assertEqual($new_store_name, $store_changed->getName(), 'The store name successfully updated.');
   }
 
   /**
    * Tests deleting a store.
    */
   public function testDeleteStore() {
-    // Create a new store.
-    $store = $this->createEntity('commerce_store', [
-      'type' => $this->type->id(),
+    $store = $this->createStore([
+      'type' => 'default',
       'name' => $this->randomMachineName(8),
-      'email' => \Drupal::currentUser()->getEmail(),
     ]);
-    $store_exists = (bool) Store::load($store->id());
-    $this->assertTrue($store_exists, 'The new store has been created in the database.');
+    $this->drupalGet($store->toUrl('delete-form'));
+    $this->assertResponse(200, 'The store delete form can be accessed.');
+    $this->assertText(t('This action cannot be undone.'), 'The store delete confirmation form is available.');
+    $this->drupalPostForm(NULL, NULL, t('Delete'));
 
-    // Delete the Store and verify deletion.
-    $store->delete();
+    \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
-    $this->assertFalse($store_exists, 'The new store has been deleted from the database.');
+    $this->assertFalse($store_exists, 'The new store has been deleted from the database using UI.');
+  }
+
+  /**
+   * Creates a new store entity.
+   *
+   * Initializes relevant defaults (mail, currency, address).
+   *
+   * @param array $values
+   *   An array of values.
+   *   Example: 'name' => 'Foo store'.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   A new store entity.
+   */
+  protected function createStore(array $values) {
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $values += [
+      'mail' => \Drupal::currentUser()->getEmail(),
+      'default_currency' => 'USD',
+      'address' => [
+        'country_code' => 'US',
+        'address_line1' => '1098 Alta Ave',
+        'locality' => 'Mountain View',
+        'administrative_area' => 'US-CA',
+        'postal_code' => '94043',
+      ],
+    ];
+    $store = $this->createEntity('commerce_store', $values);
+
+    return $store;
   }
 
 }
