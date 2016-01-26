@@ -1,0 +1,18 @@
+<div{{ attributes}}>
+  <div class="cart-block--summary">
+    <a href="{{ url }}">
+      <span class="cart-block--summary__icon">{{ icon }}</span>
+      <span class="cart-block--summary__count">{{ count }} {{ item_text }}</span>
+    </a>
+  </div>
+  {% if content %}
+  <div class="cart-block--contents">
+    <div class="cart-block--contents__inner">
+      {{ content }}
+      <div class="cart-block--contents__links">
+        {{ links }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>

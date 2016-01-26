@@ -1,0 +1,17 @@
+/**
+ * @file
+ * Reusable layout styling for Commerce Cart components
+ */
+
+.cart-block--summary a {
+  display: block;
+}
+.cart-block--contents {
+  display: none;
+  position: absolute;
+  overflow: hidden;
+  z-index: 300;
+}
+.cart-block--contents__expanded {
+  overflow: visible;
+}

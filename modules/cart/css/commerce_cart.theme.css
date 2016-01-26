@@ -1,0 +1,35 @@
+/**
+ * @file
+ * Default theme implementation for Commerce Cart components
+ *
+ * Provides some sensible defaults when used with Bartik.
+ */
+
+.cart-block--contents {
+  width: 225px;
+  background: white;
+  color: black;
+}
+.cart-block--contents__inner {
+  padding: 10px;
+}
+.cart--cart-block .cart-block--contents a {
+  color: inherit;
+}
+.cart-block--summary,
+.cart-block--summary__icon img,
+.cart-block--summary__count {
+  vertical-align: middle;
+}
+
+.cart--cart-block li.cart-block--contents__item {
+  clear: both;
+  margin-bottom: 10px;
+  border-bottom: 1px #eaeaea solid;
+}
+.cart-block--contents__quantity {
+  float: left;
+}
+.cart-block--contents__price {
+  float: right;
+}
