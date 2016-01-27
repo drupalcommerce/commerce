@@ -9,6 +9,7 @@ namespace Drupal\commerce_order\Form;
 
 use \Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\commerce_order\Form\CustomerFormTrait;
+use Drupal\commerce_store\Form\StoreWarningTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OrderAddForm extends FormBase {
 
   use CustomerFormTrait;
+  use StoreWarningTrait;
 
   /**
    * The order storage.
@@ -56,6 +58,15 @@ class OrderAddForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+
+    if ($message = $this->buildStoreWarning()) {
+      return [
+        'store_error' => [
+          '#markup' => $message,
+        ],
+      ];
+    }
+
     $form['type'] = [
       '#type' => 'commerce_entity_select',
       '#title' => $this->t('Order type'),
