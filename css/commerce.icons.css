@@ -3,7 +3,10 @@
  * Styling for Commerce toolbar icons.
  */
 
-/* Bar formatting */
+/**
+ * Bar formatting
+ * Commerce includes a non-drupal cart icon called "cart.svg" that you could use instead of "drupal-cart.svg"
+ */
 .toolbar-bar .toolbar-icon-commerce-admin-commerce:before {
   background-image: url("../icons/bebebe/drupal-cart.svg");
 }
