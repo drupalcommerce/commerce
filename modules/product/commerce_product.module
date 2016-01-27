@@ -17,7 +17,42 @@ function commerce_product_theme() {
     'product_form' => [
       'render element' => 'form',
     ],
+    'commerce_product_variation' => [
+      'render element' => 'elements',
+    ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_product_variation().
+ */
+function commerce_product_theme_suggestions_commerce_product_variation(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_product_variation', $variables);
+}
+
+/**
+ * Prepares variables for product variation templates.
+ *
+ * Default template: commerce-product-variation.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_product_variation(array &$variables) {
+  /** @var Drupal\commerce_product\Entity\ProductVariationInterface $product_variation */
+  $product_variation = $variables['elements']['#commerce_product_variation'];
+  $product = $product_variation->getProduct();
+
+  $variables['product'] = $product;
+  $variables['product_variation'] = $product_variation;
+  $variables['product_url'] = $product->toUrl();
+  // Helpful $content variable for templates.
+  $variables['content'] = [];
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
 }
 
 /**

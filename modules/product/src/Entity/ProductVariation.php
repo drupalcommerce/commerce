@@ -279,7 +279,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setLabel(t('Product'))
       ->setDescription(t('The parent product.'))
       ->setSetting('target_type', 'commerce_product')
-      ->setReadOnly(TRUE);
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))

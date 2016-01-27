@@ -19,6 +19,8 @@ config_devel:
   - core.entity_form_display.commerce_product_variation.default.default
   - core.entity_form_display.commerce_line_item.product_variation.default
   - core.entity_view_display.commerce_line_item.product_variation.default
+  - core.entity_view_display.commerce_product_variation.default.cart
+  - core.entity_view_mode.commerce_product_variation.cart.yml
   - field.storage.commerce_product.body
   - field.storage.commerce_product.stores
   - field.storage.commerce_product.variations

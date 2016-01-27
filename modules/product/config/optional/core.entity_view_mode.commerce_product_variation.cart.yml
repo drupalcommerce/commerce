@@ -1,0 +1,6 @@
+langcode: en
+status: true
+id: commerce_product_variation.cart
+label: Cart
+targetEntityType: commerce_product_variation
+cache: true
