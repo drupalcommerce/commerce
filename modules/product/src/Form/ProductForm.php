@@ -14,6 +14,8 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\commerce_store\Form\StoreWarningTrait;
+
 
 /**
  * Defines the product add/edit form.
@@ -21,6 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Uses a two-column layout, optimized for an admin theme.
  */
 class ProductForm extends ContentEntityForm {
+
+  use StoreWarningTrait;
 
   /**
    * The date formatter.
@@ -57,6 +61,15 @@ class ProductForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
+    // Check to make sure a store is already available.
+    if ($message = $this->buildStoreWarning()) {
+      return [
+        'store_error' => [
+          '#markup' => $message,
+        ],
+      ];
+    }
+
     /* @var \Drupal\commerce_product\Entity\Product $product */
     $product = $this->entity;
     $form = parent::form($form, $form_state);
