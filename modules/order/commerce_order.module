@@ -29,6 +29,18 @@ function commerce_order_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_entity_type_alter().
+ *
+ * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+ */
+function commerce_order_entity_type_alter(array &$entity_types) {
+  // Unset EntityChanged constraint for Commerce order entities.
+  $order_constraints = $entity_types['commerce_order']->getConstraints();
+  unset($order_constraints['EntityChanged']);
+  $entity_types['commerce_order']->setConstraints($order_constraints);
+}
+
+/**
  * Implements hook_ENTITY_TYPE_presave().
  */
 function commerce_order_commerce_order_presave(OrderInterface $order) {
