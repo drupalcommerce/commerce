@@ -12,6 +12,8 @@ use Drupal\commerce_order\Form\CustomerFormTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,7 +28,14 @@ class OrderAddForm extends FormBase {
    *
    * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage
    */
-  protected $storage;
+  protected $orderStorage;
+
+  /**
+   * The store storage.
+   *
+   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+   */
+  protected $storeStorage;
 
   /**
    * Constructs a new OrderAddForm object.
@@ -35,7 +44,8 @@ class OrderAddForm extends FormBase {
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->storage = $entity_type_manager->getStorage('commerce_order');
+    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->storeStorage = $entity_type_manager->getStorage('commerce_store');
   }
 
   /**
@@ -56,6 +66,21 @@ class OrderAddForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    // Skip building the form if there are no available stores.
+    $store_query = $this->storeStorage->getQuery();
+    if ($store_query->count()->execute() === 0) {
+      $options = [
+        'query' => [
+          'destination' => Url::fromRoute('<current>')->toString(),
+        ],
+      ];
+      $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page', [], $options);
+      $form['warning'] = [
+        '#markup' => t("Orders can't be created until a store has been added. @link", ['@link' => $link->toString()]),
+      ];
+      return $form;
+    }
+
     $form['type'] = [
       '#type' => 'commerce_entity_select',
       '#title' => $this->t('Order type'),
@@ -118,7 +143,7 @@ class OrderAddForm extends FormBase {
     if (!empty($values['custom_placed_date']) && !empty($values['placed'])) {
       $order_data['placed'] = $values['placed']->getTimestamp();
     }
-    $order = $this->storage->create($order_data);
+    $order = $this->orderStorage->create($order_data);
     $order->save();
     // Redirect to the edit form to complete the order.
     $form_state->setRedirect('entity.commerce_order.edit_form', ['commerce_order' => $order->id()]);

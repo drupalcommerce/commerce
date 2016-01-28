@@ -12,7 +12,9 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -51,6 +53,28 @@ class ProductForm extends ContentEntityForm {
       $container->get('entity.manager'),
       $container->get('date.formatter')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    // Skip building the form if there are no available stores.
+    $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
+    if ($store_query->count()->execute() === 0) {
+      $options = [
+        'query' => [
+          'destination' => Url::fromRoute('<current>')->toString(),
+        ],
+      ];
+      $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page', [], $options);
+      $form['warning'] = [
+        '#markup' => t("Products can't be created until a store has been added. @link", ['@link' => $link->toString()]),
+      ];
+      return $form;
+    }
+
+    return parent::buildForm($form, $form_state);
   }
 
   /**
