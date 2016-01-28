@@ -89,7 +89,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $label_addition = $this->getAttributeLabels();
 
     if (!is_null($label_addition)) {
-      // When there are no attribute fields, there's always only one variation.
       $label .= ' - ' . $label_addition;
     }
 
