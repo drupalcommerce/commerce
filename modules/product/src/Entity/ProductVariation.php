@@ -72,9 +72,17 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $product = $this->getProduct();
     if (!$product) {
-      throw new EntityMalformedException(sprintf('Product variation #%d is missing the product backreference.', $this->id()));
+      // In this case the product is not yet present, and we return the labels
+      // only.
+      if ($label_addition = $this->getAttributeLabels()) {
+        return $label_addition;
+      }
+      else {
+        return t('Default');
+      }
     }
 
+    // If we were able to get the product, resume other label building.
     $label = $product->getTitle();
 
     // Set the labels.
