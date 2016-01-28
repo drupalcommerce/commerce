@@ -62,7 +62,7 @@ class ProductForm extends ContentEntityForm {
     $form = parent::form($form, $form_state);
 
     $form['#tree'] = TRUE;
-    $form['#theme'] = ['product_form'];
+    $form['#theme'] = ['commerce_product_form'];
     $form['#attached']['library'][] = 'commerce_product/form';
     $form['#entity_builders']['update_status'] = [get_class($this), 'updateStatus'];
     // Changed must be sent to the client, for later overwrite error checking.

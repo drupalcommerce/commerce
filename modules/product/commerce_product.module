@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
  */
 function commerce_product_theme() {
   return [
-    'product_form' => [
+    'commerce_product_form' => [
       'render element' => 'form',
     ],
     'commerce_product_variation' => [
