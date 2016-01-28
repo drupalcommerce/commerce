@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ *
+ * Default theme implementation for products.
+ *
+ * Available variables:
+ * - content: Items for the content of the product variation.
+ *   Use 'content' to print them all, or print a subset such as
+ *   'content.title'. Use the following code to exclude the
+ *   printing of a given child element:
+ *   @code
+ *   {{ content|without('title') }}
+ *   @endcode
+ * - attributes: HTML attributes for the wrapper.
+ * - product: The product object.
+ * - url: The product URL.
+ *
+ * @ingroup themeable
+ */
+#}
+<article{{ attributes }}>
+  {{ content }}
+</article>

@@ -17,6 +17,9 @@ function commerce_product_theme() {
     'commerce_product_form' => [
       'render element' => 'form',
     ],
+    'commerce_product' => [
+      'render element' => 'elements',
+    ],
     'commerce_product_variation' => [
       'render element' => 'elements',
     ],
@@ -24,10 +27,40 @@ function commerce_product_theme() {
 }
 
 /**
+ * Implements hook_theme_suggestions_commerce_product().
+ */
+function commerce_product_theme_suggestions_commerce_product(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_product', $variables);
+}
+
+/**
  * Implements hook_theme_suggestions_commerce_product_variation().
  */
 function commerce_product_theme_suggestions_commerce_product_variation(array $variables) {
   return _commerce_entity_theme_suggestions('commerce_product_variation', $variables);
+}
+
+/**
+ * Prepares variables for product templates.
+ *
+ * Default template: commerce-product.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_product(array &$variables) {
+  /** @var Drupal\commerce_product\Entity\ProductInterface $product */
+  $product = $variables['elements']['#commerce_product'];
+
+  $variables['product'] = $product;
+  $variables['url'] = $product->toUrl();
+  // Helpful $content variable for templates.
+  $variables['content'] = [];
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
 }
 
 /**
