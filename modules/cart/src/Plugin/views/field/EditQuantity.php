@@ -107,8 +107,6 @@ class EditQuantity extends FieldPluginBase {
         '#step' => 1,
       ];
     }
-    // Replace the form submit button label.
-    $form['actions']['submit']['#value'] = $this->t('Update cart');
   }
 
   /**

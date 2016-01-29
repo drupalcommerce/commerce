@@ -66,6 +66,11 @@ class OrderForm extends ContentEntityForm {
       '#type' => 'hidden',
       '#default_value' => $order->getChangedTime(),
     ];
+    // Version must be sent to the client, for later overwrite error checking.
+    $form['version'] = [
+      '#type' => 'hidden',
+      '#default_value' => $order->getVersion(),
+    ];
 
     $last_saved = $this->dateFormatter->format($order->getChangedTime(), 'short');
     $form['advanced'] = [
@@ -158,7 +163,8 @@ class OrderForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    $order = $this->getEntity();
+    $order->save();
     drupal_set_message($this->t('The order %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_order.collection');
   }

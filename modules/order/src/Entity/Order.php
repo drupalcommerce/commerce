@@ -45,7 +45,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "id" = "order_id",
  *     "label" = "order_number",
  *     "uuid" = "uuid",
- *     "bundle" = "type"
+ *     "bundle" = "type",
  *   },
  *   links = {
  *     "canonical" = "/admin/commerce/orders/{commerce_order}",
@@ -55,7 +55,10 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
- *   field_ui_base_route = "entity.commerce_order_type.edit_form"
+ *   field_ui_base_route = "entity.commerce_order_type.edit_form",
+ *   constraints = {
+ *     "OrderVersion" = {}
+ *   }
  * )
  */
 class Order extends ContentEntityBase implements OrderInterface {
@@ -81,6 +84,16 @@ class Order extends ContentEntityBase implements OrderInterface {
       if (!$this->getEmail()) {
         $this->setEmail($this->getOwner()->getEmail());
       }
+    }
+    else {
+      // Increment order version on each save.
+      $saved_entity = $storage->loadUnchanged($this->id());
+      // A change to the order version must add an exception.
+      if ($saved_entity && $saved_entity->getVersion() > $this->getVersion()) {
+        throw new OrderVersionMismatchException('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+      }
+      $version = $this->getVersion() + 1;
+      $this->setVersion($version);
     }
 
     // Recalculate the total.
@@ -126,6 +139,21 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
     $line_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
     $line_item_storage->delete($line_items);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVersion() {
+    return $this->get('version')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVersion($version) {
+    $this->set('version', $version);
+    return $this;
   }
 
   /**
@@ -388,6 +416,13 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+
+    $fields['version'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Version'))
+      ->setDescription(t('The order version number, it gets incremented on each save.'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setDefaultValue(1);
 
     $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))
