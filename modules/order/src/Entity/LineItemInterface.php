@@ -7,7 +7,6 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 

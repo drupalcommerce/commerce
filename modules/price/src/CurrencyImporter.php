@@ -14,7 +14,6 @@ use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\language\ConfigurableLanguageManagerInterface;
 
 /**
  * Default implementation of the currency importer.
