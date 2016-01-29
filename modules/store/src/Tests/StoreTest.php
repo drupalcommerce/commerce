@@ -60,7 +60,7 @@ class StoreTest extends CommerceTestBase {
     $edit = [
       'name[0][value]' => $this->randomMachineName(8),
       'mail[0][value]' => \Drupal::currentUser()->getEmail(),
-      'default_currency' => 'EUR',
+      'default_currency' => 'USD',
     ];
     $address_country = [
       'address[0][country_code]' => 'US',

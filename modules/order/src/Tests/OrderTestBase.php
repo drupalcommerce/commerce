@@ -38,7 +38,6 @@ abstract class OrderTestBase extends CommerceTestBase {
   public static $modules = [
     'commerce_product',
     'commerce_order',
-    'commerce_price',
     'inline_entity_form',
   ];
 
@@ -86,7 +85,7 @@ abstract class OrderTestBase extends CommerceTestBase {
       'sku' => $this->randomMachineName(),
       'price' => [
         'amount' => 999,
-        'currency_code' => 'EUR',
+        'currency_code' => 'USD',
       ],
     ];
     $this->variation = ProductVariation::create($values);

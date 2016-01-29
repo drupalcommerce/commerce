@@ -158,7 +158,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
         'type' => 'default',
         'name' => $this->randomMachineName(8),
         'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'EUR',
+        'default_currency' => 'USD',
       ]);
     }
   }

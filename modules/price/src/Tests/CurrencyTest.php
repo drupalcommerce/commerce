@@ -23,12 +23,8 @@ class CurrencyTest extends CommerceTestBase {
    * @var array
    */
   public static $modules = [
-    'block',
-    'system',
     'user',
-    'commerce',
     'commerce_store',
-    'commerce_price',
   ];
 
   /**

@@ -74,7 +74,7 @@ abstract class ProductTestBase extends CommerceTestBase {
         'type' => $store_type->id(),
         'name' => $this->randomMachineName(8),
         'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'EUR',
+        'default_currency' => 'USD',
       ]);
     }
   }

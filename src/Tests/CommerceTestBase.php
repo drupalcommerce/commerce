@@ -25,7 +25,7 @@ abstract class CommerceTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = ['block', 'commerce', 'field'];
+  public static $modules = ['block', 'commerce', 'commerce_price', 'field'];
 
   /**
    * A test user with administrative privileges.
@@ -47,6 +47,9 @@ abstract class CommerceTestBase extends WebTestBase {
     $this->drupalCreateAdminRole('administrator');
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);
+
+    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_importer->import('USD');
   }
 
   /**

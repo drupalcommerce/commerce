@@ -1,22 +1,6 @@
 <?php
 
 /**
- * Implements hook_install().
- *
- * Import the default currencies from the library.
- */
-function commerce_price_install() {
-  /** @var \Drupal\commerce_price\CurrencyImporterInterface $currency_importer */
-  $currency_importer = \Drupal::service('commerce_price.currency_importer');
-  // A list of currencies to import.
-  $preloaded_currencies = ['USD', 'EUR', 'GBP'];
-
-  foreach ($preloaded_currencies as $currency_code) {
-    $currency_importer->import($currency_code);
-  }
-}
-
-/**
  * Implements hook_requirements().
  *
  * Check that the Commerce Guys' Libraries have been installed.
