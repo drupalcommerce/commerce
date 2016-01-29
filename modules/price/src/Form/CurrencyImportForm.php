@@ -59,11 +59,13 @@ class CurrencyImportForm extends FormBase {
       ];
     }
     else {
-      $form['currency_code'] = [
+      $form['currency_codes'] = [
         '#type' => 'select',
-        '#title' => $this->t('Currency'),
+        '#title' => $this->t('Currencies'),
         '#required' => TRUE,
         '#options' => $currencies,
+        '#multiple' => TRUE,
+        '#size' => 10,
       ];
       $form['actions']['#type'] = 'actions';
       $form['actions']['import'] = [
@@ -82,9 +84,11 @@ class CurrencyImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $currency_code = $form_state->getValue('currency_code');
-    $currency = $this->importer->import($currency_code);
-    drupal_set_message($this->t('Imported the %label currency.', ['%label' => $currency->label()]));
+    $currency_codes = $form_state->getValue('currency_codes');
+    foreach ($currency_codes as $currency_code) {
+      $this->importer->import($currency_code);
+    }
+    drupal_set_message($this->t('Imported the selected currencies.'));
     $form_state->setRebuild();
   }
 

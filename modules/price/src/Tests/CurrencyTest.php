@@ -37,7 +37,7 @@ class CurrencyTest extends CommerceTestBase {
   function testCurrencyImport() {
     $this->drupalGet('admin/commerce/config/currency/import');
     $edit = [
-      'currency_code' => 'CHF',
+      'currency_codes[]' => ['CHF'],
     ];
     $this->drupalPostForm(NULL, $edit, t('Import'));
     $currency = Currency::load('CHF');
@@ -46,9 +46,7 @@ class CurrencyTest extends CommerceTestBase {
     $this->assertEqual($currency->getNumericCode(), '756');
     $this->assertEqual($currency->getSymbol(), 'CHF');
     $this->assertEqual($currency->getFractionDigits(), '2');
-    $this->assertText(t('Imported the @name currency.', ['@name' => $currency->getName()]), 'Currency import success message is visible.');
   }
-
 
   /**
    * Tests creating a currency.
