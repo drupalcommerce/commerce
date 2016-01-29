@@ -8,6 +8,17 @@
 use Drupal\Core\Form\FormStateInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_store_theme() {
+  return [
+    'commerce_store' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  */
 function commerce_store_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
@@ -18,5 +29,35 @@ function commerce_store_field_widget_form_alter(&$element, FormStateInterface $f
   if ($field_name == 'billing_countries' && $entity_type == 'commerce_store' && $widget_name == 'options_select') {
     $element['#options']['_none'] = t('- All countries -');
     $element['#size'] = 5;
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_store().
+ */
+function commerce_store_theme_suggestions_commerce_store(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_store', $variables);
+}
+
+/**
+ * Prepares variables for store templates.
+ *
+ * Default template: commerce-store.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_store(array &$variables) {
+  /** @var Drupal\commerce_store\Entity\StoreInterface $store */
+  $store = $variables['elements']['#commerce_store'];
+
+  $variables['store'] = $store;
+  $variables['url'] = $store->toUrl();
+  // Helpful $content variable for templates.
+  $variables['content'] = [];
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
   }
 }

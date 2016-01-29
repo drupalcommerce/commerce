@@ -11,4 +11,5 @@ dependencies:
 config_devel:
   - commerce_store.commerce_store_type.default
   - commerce_store.settings
+  - core.entity_view_display.commerce_store.default.default
   - views.view.commerce_stores
