@@ -470,7 +470,9 @@ function commerce_i18n_string($name, $default, $options = array()) {
  * Returns the currency code of the site's default currency.
  */
 function commerce_default_currency() {
-  return variable_get('commerce_default_currency', 'USD');
+  $currency_code = variable_get('commerce_default_currency', 'USD');
+  drupal_alter('commerce_default_currency', $currency_code);
+  return $currency_code;
 }
 
 /**
