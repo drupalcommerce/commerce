@@ -97,11 +97,23 @@ class AddToCartForm extends FormBase {
     }
 
     $form['#settings'] = $settings;
-    $form['variation'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Select variation:'),
-      '#options' => $variations,
-    ];
+
+    // If there are multiple variations, display ability to select a variation.
+    if (count($variations) > 1) {
+      $form['variation'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Select variation:'),
+        '#options' => $variations,
+      ];
+    }
+    // Otherwise set the variation and only display "add to cart".
+    else {
+      $form['variation'] = [
+        '#type' => 'value',
+        '#value' => key($variations),
+      ];
+    }
+
     if (!empty($settings['show_quantity'])) {
       $form['quantity'] = [
         '#type' => 'number',
