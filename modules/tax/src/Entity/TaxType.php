@@ -7,7 +7,7 @@
 
 namespace Drupal\commerce_tax\Entity;
 
-use Drupal\address\ZoneInterface;
+use Drupal\address\Entity\ZoneInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Tax\Enum\GenericLabel;
@@ -22,7 +22,11 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     "form" = {
  *       "add" = "Drupal\commerce_tax\Form\TaxTypeForm",
  *       "edit" = "Drupal\commerce_tax\Form\TaxTypeForm",
- *       "delete" = "Drupal\commerce_tax\Form\TaxTypeDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxTypeListBuilder"
  *   },
@@ -43,16 +47,17 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     "rates",
  *   },
  *   links = {
- *     "edit-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/edit",
- *     "delete-form" = "/admin/commerce/config/tax/type/{commerce_tax_type}/delete",
- *     "collection" = "/admin/commerce/config/tax/type"
+ *     "add-form" = "/admin/commerce/config/tax-types/add",
+ *     "edit-form" = "/admin/commerce/config/tax-types/{commerce_tax_type}/edit",
+ *     "delete-form" = "/admin/commerce/config/tax-types/{commerce_tax_type}/delete",
+ *     "collection" = "/admin/commerce/config/tax-types"
  *   }
  * )
  */
 class TaxType extends ConfigEntityBase implements TaxTypeInterface {
 
   /**
-   * The tax type id.
+   * The tax type ID.
    *
    * @var string
    */
@@ -88,15 +93,24 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
 
   /**
    * The tax type rounding mode.
+   *
+   * @var int
    */
   protected $roundingMode;
 
   /**
-   * The tax type zone.
+   * The zone ID.
    *
-   * @var \Drupal\address\ZoneInterface
+   * @var string
    */
   protected $zone;
+
+  /**
+   * The loaded zone.
+   *
+   * @var \Drupal\address\Entity\ZoneInterface
+   */
+  protected $loadedZone;
 
   /**
    * The tax type tag.
@@ -106,11 +120,18 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   protected $tag;
 
   /**
-   * The tax type rates.
+   * The tax rate IDs.
    *
-   * @var array
+   * @var string[]
    */
   protected $rates = [];
+
+  /**
+   * The loaded tax rates.
+   *
+   * @var \Drupal\commerce_tax\Entity\TaxRateInterface[]
+   */
+  protected $loadedRates;
 
   /**
    * {@inheritdoc}
@@ -144,9 +165,9 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function setGenericLabel($genericLabel) {
-    GenericLabel::assertExists($genericLabel);
-    $this->genericLabel = $genericLabel;
+  public function setGenericLabel($generic_label) {
+    GenericLabel::assertExists($generic_label);
+    $this->genericLabel = $generic_label;
     return $this;
   }
 
@@ -175,8 +196,8 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDisplayInclusive($displayInclusive) {
-    $this->displayInclusive = $displayInclusive;
+  public function setDisplayInclusive($display_inclusive) {
+    $this->displayInclusive = $display_inclusive;
     return $this;
   }
 
@@ -190,23 +211,34 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRoundingMode($roundingMode) {
-    $this->roundingMode = $roundingMode;
+  public function setRoundingMode($rounding_mode) {
+    $this->roundingMode = $rounding_mode;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getZone() {
+  public function getZoneId() {
     return $this->zone;
   }
 
   /**
    * {@inheritdoc}
    */
+  public function getZone() {
+    if (!$this->loadedZone) {
+      $this->loadedZone = $this->entityTypeManager()->getStorage('zone')->load($this->zone);
+    }
+    return $this->loadedZone;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setZone(ZoneInterface $zone) {
-    $this->zone = $zone;
+    $this->zone = $zone->id();
+    $this->loadedZone = $zone;
     return $this;
   }
 
@@ -229,14 +261,22 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function getRates() {
-    return $this->rates;
+    if (!$this->loadedRates) {
+      $storage = $this->entityTypeManager()->getStorage('commerce_tax_rate');
+      $this->loadedRates = $storage->loadMultiple($this->rates);
+    }
+    return $this->loadedRates;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRates($rates) {
-    $this->rates = $rates;
+  public function setRates(array $rates) {
+    $this->rates = array_map(function ($rate) {
+      return $rate->id();
+    }, $rates);
+    $this->loadedRates = $rates;
+
     return $this;
   }
 
@@ -251,7 +291,10 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function addRate(TaxRateInterface $rate) {
-    $this->rates[] = $rate->getId();
+    if (!$this->hasRate($rate)) {
+      $this->rates[] = $rate->getId();
+      $this->loadedRates = [];
+    }
     return $this;
   }
 
@@ -259,7 +302,11 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function removeRate(TaxRateInterface $rate) {
-    unset($this->rates[array_search($rate->getId(), $this->rates)]);
+    $index = array_search($rate->getId(), $this->rates);
+    if ($index !== FALSE) {
+      unset($this->rates[$index]);
+      $this->loadedRates = [];
+    }
     return $this;
   }
 
@@ -267,23 +314,26 @@ class TaxType extends ConfigEntityBase implements TaxTypeInterface {
    * {@inheritdoc}
    */
   public function hasRate(TaxRateInterface $rate) {
-    return array_search($rate, $this->rates) !== FALSE;
+    return array_search($rate->id(), $this->rates) !== FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface[] $entities */
     parent::postDelete($storage, $entities);
 
-    // Delete all tax rates of each tax type.
+    // Delete the tax rates of each tax type.
+    $rates = [];
     foreach ($entities as $entity) {
-      if ($entity->hasRates()) {
-        $rateStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_tax_rate');
-        $rates = $rateStorage->loadMultiple($entity->getRates());
-        $rateStorage->delete($rates);
+      foreach ($entity->getRates() as $rate) {
+        $rates[$rate->id()] = $rate;
       }
     }
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $rate_storage */
+    $rate_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_tax_rate');
+    $rate_storage->delete($rates);
   }
 
 }

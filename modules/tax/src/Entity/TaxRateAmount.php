@@ -8,6 +8,7 @@
 namespace Drupal\commerce_tax\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the tax rate amount entity class.
@@ -19,7 +20,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_tax\Form\TaxRateAmountForm",
  *       "edit" = "Drupal\commerce_tax\Form\TaxRateAmountForm",
- *       "delete" = "Drupal\commerce_tax\Form\TaxRateAmountDeleteForm",
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxRateAmountListBuilder"
  *   },
@@ -31,33 +35,40 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   },
  *   config_export = {
  *     "id",
+ *     "rate",
  *     "amount",
  *     "startDate",
  *     "endDate",
- *     "rate",
  *   },
  *   links = {
- *     "edit-form" = "/admin/commerce/config/tax/amount/{commerce_tax_rate_amount}/edit",
- *     "delete-form" = "/admin/commerce/config/tax/amount/{commerce_tax_rate_amount}/delete",
- *     "collection" = "/admin/commerce/config/tax/amount"
+ *     "edit-form" = "/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate_amount}/edit",
+ *     "delete-form" = "/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate_amount}/delete",
+ *     "collection" = "/admin/commerce/config/tax-rate-amounts"
  *   }
  * )
  */
 class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
 
   /**
-   * The tax rate.
-   *
-   * @var \Drupal\commerce_tax\Entity\TaxRateInterface
-   */
-  protected $rate;
-
-  /**
-   * The tax rate amount id.
+   * The tax rate amount ID.
    *
    * @var string
    */
   protected $id;
+
+  /**
+   * The tax rate ID.
+   *
+   * @var string
+   */
+  protected $rate;
+
+  /**
+   * The loaded tax rate.
+   *
+   * @var \Drupal\commerce_tax\Entity\TaxRateInterface
+   */
+  protected $loadedRate;
 
   /**
    * The tax rate amount amount.
@@ -83,23 +94,34 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRate() {
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRateId() {
     return $this->rate;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setRate(TaxRateInterface $rate) {
-    $this->rate = $rate->getId();
-    return $this;
+  public function getRate() {
+    if (!$this->loadedRate) {
+      $this->loadedRate = $this->entityTypeManager()->getStorage('tax_rate')->load($this->rate);
+    }
+    return $this->loadedRate;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getId() {
-    return $this->id;
+  public function setRate(TaxRateInterface $rate) {
+    $this->rate = $rate->id();
+    $this->loadedRate = $rate;
+    return $this;
   }
 
   /**
@@ -127,8 +149,8 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * {@inheritdoc}
    */
-  public function setStartDate(\DateTime $startDate) {
-    $this->startDate = $startDate;
+  public function setStartDate(\DateTime $start_date) {
+    $this->startDate = $start_date;
     return $this;
   }
 
@@ -142,9 +164,36 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
   /**
    * {@inheritdoc}
    */
-  public function setEndDate(\DateTime $endDate) {
-    $this->endDate = $endDate;
+  public function setEndDate(\DateTime $end_date) {
+    $this->endDate = $end_date;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $parameters = [];
+    if ($rel == 'collection') {
+      $parameters['commerce_tax_rate'] = $this->rate;
+    }
+    else {
+      $parameters['commerce_tax_rate_amount'] = $this->id;
+    }
+
+    return $parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    if (!$update) {
+      // Add a reference to the parent tax rate.
+      $tax_rate = $this->getRate();
+      $tax_rate->addAmount($this);
+      $tax_rate->save();
+    }
   }
 
 }

@@ -8,47 +8,34 @@
 namespace Drupal\commerce_tax\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TaxRateAmountForm extends EntityForm {
 
   /**
-   * The tax rate amount storage.
+   * The entity query factory.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\Query\QueryFactory
    */
-  protected $taxRateAmountStorage;
+  protected $queryFactory;
 
   /**
-   * The tax rate storage.
+   * Constructs a new TaxRateAmountForm object.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   *   The entity query factory.
    */
-  protected $taxRateStorage;
-
-  /**
-   * Creates a TaxRateAmountForm instance.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $taxRateAmountStorage
-   *   The tax rate amount storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $taxRateStorage
-   *   The tax rate storage.
-   */
-  public function __construct(EntityStorageInterface $taxRateAmountStorage, EntityStorageInterface $taxRateStorage) {
-    $this->taxRateAmountStorage = $taxRateAmountStorage;
-    $this->taxRateStorage = $taxRateStorage;
+  public function __construct(QueryFactory $query_factory) {
+    $this->queryFactory = $query_factory;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager */
-    $entityTypeManager = $container->get('entity_type.manager');
-
-    return new static($entityTypeManager->getStorage('commerce_tax_rate_amount'), $entityTypeManager->getStorage('commerce_tax_rate'));
+    return new static($container->get('entity.query'));
   }
 
   /**
@@ -56,111 +43,81 @@ class TaxRateAmountForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $taxRateAmount = $this->entity;
+    /** @var \Drupal\commerce_tax\Entity\TaxRateAmountInterface $tax_rate_amount */
+    $tax_rate_amount = $this->entity;
 
-    $form['rate'] = array(
+    $form['rate'] = [
       '#type' => 'hidden',
-      '#value' => $taxRateAmount->getRate(),
-    );
-    $form['id'] = array(
-      '#type' => 'textfield',
+      '#value' => $tax_rate_amount->getRateId(),
+    ];
+    $form['id'] = [
+      '#type' => 'machine_name',
       '#title' => $this->t('Machine name'),
-      '#default_value' => $taxRateAmount->getId(),
-      '#element_validate' => array('::validateId'),
-      '#description' => $this->t('Only lowercase, underscore-separated letters allowed.'),
-      '#pattern' => '[a-z_]+',
-      '#maxlength' => 255,
+      '#default_value' => $tax_rate_amount->getId(),
+      '#machine_name' => [
+        'exists' => [$this, 'exists'],
+      ],
+      '#field_prefix' => $tax_rate_amount->getRateId() . '_',
       '#required' => TRUE,
-    );
-    $form['amount'] = array(
-      '#type' => 'textfield',
+      '#disabled' => !$tax_rate_amount->isNew(),
+    ];
+    $form['amount'] = [
+      '#type' => 'number',
       '#title' => $this->t('Amount'),
-      '#default_value' => $taxRateAmount->getAmount(),
-      '#element_validate' => array('::validateAmount'),
+      '#default_value' => $tax_rate_amount->getAmount(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
-    $form['startDate'] = array(
+    ];
+    $form['startDate'] = [
       '#type' => 'date',
       '#title' => $this->t('Start date'),
-      '#default_value' => $taxRateAmount->getStartDate(),
-    );
-    $form['endDate'] = array(
+      '#default_value' => $tax_rate_amount->getStartDate(),
+    ];
+    $form['endDate'] = [
       '#type' => 'date',
       '#title' => $this->t('End date'),
-      '#default_value' => $taxRateAmount->getEndDate(),
-    );
+      '#default_value' => $tax_rate_amount->getEndDate(),
+    ];
 
     return $form;
   }
 
   /**
-   * Validates the id field.
+   * Determines if the tax rate amount already exists.
+   *
+   * @param string $id
+   *   The tax rate amount ID.
+   * @param array $element
+   *   The form element.
+   *
+   * @return bool
+   *   TRUE if the tax rate amount exists, FALSE otherwise.
    */
-  public function validateId(array $element, FormStateInterface $form_state, array $form) {
-    $taxRateAmount = $this->getEntity();
-    $id = $element['#value'];
-    if (!preg_match('/[a-z_]+/', $id)) {
-      $form_state->setError($element, $this->t('The machine name must be in lowercase, underscore-separated letters only.'));
-    }
-    elseif ($taxRateAmount->isNew()) {
-      $loadedTaxRateAmounts = $this->taxRateAmountStorage->loadByProperties(array(
-        'id' => $id,
-      ));
-      if ($loadedTaxRateAmounts) {
-        $form_state->setError($element, $this->t('The machine name is already in use.'));
-      }
-    }
+  public function exists($id, array $element) {
+    return (bool) $this->queryFactory
+      ->get('commerce_tax_rate_amount')
+      ->condition('id', $element['#field_prefix'] . $id)
+      ->execute();
   }
 
   /**
-   * Validates the amount field.
+   * {@inheritdoc}
    */
-  public function validateAmount(array $element, FormStateInterface $form_state, array $form) {
-    if (!is_numeric($element['#value'])) {
-      $form_state->setError($element, $this->t('The amount must be numeric.'));
-    }
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    $form_state->setValueForElement($form['id'], $form['id']['#field_prefix'] . $form_state->getValue('id'));
   }
 
   /**
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $taxRateAmount = $this->entity;
-
-    try {
-      $taxRateAmount->save();
-      drupal_set_message($this->t('Saved the %label tax rate.', array(
-        '%label' => $taxRateAmount->label(),
-      )));
-
-      $taxRate = $this->taxRateStorage->load($taxRateAmount->getRate());
-      try {
-        if (!$taxRate->hasAmount($taxRateAmount)) {
-          $taxRate->addAmount($taxRateAmount);
-          $taxRate->save();
-        }
-
-        $form_state->setRedirect('entity.commerce_tax_rate_amount.collection', array(
-          'commerce_tax_rate' => $taxRate->getId(),
-        ));
-      }
-      catch (\Exception $e) {
-        drupal_set_message($this->t('The %label tax rate was not saved.', array(
-          '%label' => $taxRate->label(),
-        )));
-        $this->logger('commerce_tax')->error($e);
-        $form_state->setRebuild();
-      }
-
-    }
-    catch (\Exception $e) {
-      drupal_set_message($this->t('The %label tax rate amount was not saved.', array(
-        '%label' => $taxRate->label()
-      )), 'error');
-      $this->logger('commerce_tax')->error($e);
-      $form_state->setRebuild();
-    }
+    $this->entity->save();
+    drupal_set_message($this->t('Saved the %label tax rate.', [
+      '%label' => $this->entity->label(),
+    ]));
+    $form_state->setRedirectUrl($this->entity->toUrl('canonical'));
   }
 
 }

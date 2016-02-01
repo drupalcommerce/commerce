@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_tax\Controller;
 
+use Drupal\commerce_tax\Entity\TaxTypeInterface;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -15,38 +16,36 @@ use Drupal\Core\Controller\ControllerBase;
 class TaxRateController extends ControllerBase {
 
   /**
-   * Gets a rendered add form to create a new tax rate associated to the given tax type.
+   * Provides the commerce_tax_rate add form.
    *
-   * @param string
-   *   The commerce_tax_type id.
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $commerce_tax_type
+   *   The tax type.
    *
    * @return array
-   *   The commerce_tax_rate add form.
+   *   The add form.
    */
-  public function addForm($commerce_tax_type) {
+  public function addForm(TaxTypeInterface $commerce_tax_type) {
     $rate = $this
-      ->entityManager()
+      ->entityTypeManager()
       ->getStorage('commerce_tax_rate')
-      ->create(['type' => $commerce_tax_type]);
+      ->create(['type' => $commerce_tax_type->id()]);
 
     return $this->entityFormBuilder()->getForm($rate, 'add');
   }
 
   /**
-   * Gets a rendered list of tax rates entities associated to the given tax type.
+   * Provides the commerce_tax_rate listing.
    *
-   * @param string
-   *   The commerce_tax_type id.
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $commerce_tax_type
+   *   The tax type.
    *
    * @return array
-   *   The list of commerce_tax_rates.
+   *   The listing render array.
    */
-  public function buildList($commerce_tax_type) {
-    $build = [];
-    $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate');
-
-    $build['commerce_tax_rates_table'] = $listBuilder->setTaxType($commerce_tax_type)->render();
-    return $build;
+  public function buildList(TaxTypeInterface $commerce_tax_type) {
+    $list_builder = $this->entityTypeManager()->getListBuilder('commerce_tax_rate');
+    $list_builder->setTaxType($commerce_tax_type);
+    return $list_builder->render();
   }
 
 }

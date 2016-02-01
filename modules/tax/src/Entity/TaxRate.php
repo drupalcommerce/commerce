@@ -20,7 +20,10 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "form" = {
  *       "add" = "Drupal\commerce_tax\Form\TaxRateForm",
  *       "edit" = "Drupal\commerce_tax\Form\TaxRateForm",
- *       "delete" = "Drupal\commerce_tax\Form\TaxRateDeleteForm",
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxRateListBuilder"
  *   },
@@ -32,34 +35,40 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   },
  *   config_export = {
  *     "id",
+ *     "type",
  *     "name",
- *     "displayName",
  *     "default",
  *     "amounts",
- *     "type",
  *   },
  *   links = {
- *     "edit-form" = "/admin/commerce/config/tax/rate/{commerce_tax_rate}/edit",
- *     "delete-form" = "/admin/commerce/config/tax/rate/{commerce_tax_rate}/delete",
- *     "collection" = "/admin/commerce/config/tax/rate"
+ *     "edit-form" = "/admin/commerce/config/tax-rates/{commerce_tax_rate}/edit",
+ *     "delete-form" = "/admin/commerce/config/tax-rates/{commerce_tax_rate}/delete",
+ *     "collection" = "/admin/commerce/config/tax-rates"
  *   }
  * )
  */
 class TaxRate extends ConfigEntityBase implements TaxRateInterface {
 
   /**
-   * The tax rate type.
-   *
-   * @var \Drupal\commerce_tax\Entity\TaxTypeInterface
-   */
-  protected $type;
-
-  /**
-   * The tax rate id.
+   * The tax rate ID.
    *
    * @var string
    */
   protected $id;
+
+  /**
+   * The tax type ID.
+   *
+   * @var string
+   */
+  protected $type;
+
+  /**
+   * The loaded tax type.
+   *
+   * @var \Drupal\commerce_tax\Entity\TaxTypeInterface
+   */
+  protected $loadedType;
 
   /**
    * The tax rate name.
@@ -69,46 +78,57 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   protected $name;
 
   /**
-   * The tax rate display name.
-   *
-   * @var string
-   */
-  protected $displayName;
-
-  /**
-   * The tax rate defaultness.
+   * Whether the tax rate is the default for its tax type.
    *
    * @var boolean
    */
   protected $default;
 
   /**
-   * The tax rate amounts.
+   * The tax rate amount IDs.
    *
-   * @var array
+   * @var string[]
    */
   protected $amounts = [];
 
   /**
-   * {@inheritdoc}
+   * The loaded tax rate amounts.
+   *
+   * @var \Drupal\commerce_tax\Entity\TaxRateAmountInterface[]
    */
-  public function getType() {
-    return $this->type;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setType(TaxTypeInterface $type) {
-    $this->type = $type;
-    return $this;
-  }
+  protected $loadedAmounts = [];
 
   /**
    * {@inheritdoc}
    */
   public function getId() {
     return $this->id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTypeId() {
+    return $this->type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getType() {
+    if (!$this->loadedType) {
+      $this->loadedType = $this->entityTypeManager()->getStorage('commerce_tax_type')->load($this->type);
+    }
+    return $this->loadedType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setType(TaxTypeInterface $type) {
+    $this->type = $type->id();
+    $this->loadedType = $type;
+    return $this;
   }
 
   /**
@@ -124,20 +144,6 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   public function setName($name) {
     $this->name = $name;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDisplayName() {
-    return $this->displayName;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDisplayName($displayName) {
-    $this->displayName = $displayName;
   }
 
   /**
@@ -159,14 +165,23 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function getAmounts() {
-    return $this->amounts;
+    if (!$this->loadedAmounts) {
+      $storage = $this->entityTypeManager()->getStorage('commerce_tax_rate_amount');
+      $this->loadedAmounts = $storage->loadMultiple($this->amounts);
+    }
+    return $this->loadedAmounts;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setAmounts($amounts) {
-    $this->amounts = $amounts;
+  public function setAmounts(array $amounts) {
+    $this->amounts = array_map(function ($amount) {
+      return $amount->id();
+    }, $amounts);
+    $this->loadedAmounts = $amounts;
+
+    return $this;
   }
 
   /**
@@ -187,7 +202,10 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function addAmount(TaxRateAmountInterface $amount) {
-    $this->amounts[] = $amount->getId();
+    if (!$this->hasAmount($amount)) {
+      $this->amounts[] = $amount->getId();
+      $this->loadedAmounts = [];
+    }
     return $this;
   }
 
@@ -195,7 +213,11 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function removeAmount(TaxRateAmountInterface $amount) {
-    unset($this->amounts[array_search($amount->getId(), $this->amounts)]);
+    $index = array_search($amount->getId(), $this->amounts);
+    if ($index !== FALSE) {
+      unset($this->amounts[$index]);
+      $this->loadedAmounts = [];
+    }
     return $this;
   }
 
@@ -209,17 +231,59 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    parent::postDelete($storage, $entities);
+  protected function urlRouteParameters($rel) {
+    $parameters = [];
+    if ($rel == 'collection') {
+      $parameters['commerce_tax_type'] = $this->type;
+    }
+    else {
+      $parameters['commerce_tax_rate'] = $this->id;
+    }
 
-    // Delete all tax rate amounts of each tax rate.
-    foreach ($entities as $entity) {
-      if ($entity->hasAmounts()) {
-        $amountStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_tax_rate_amount');
-        $amounts = $amountStorage->loadMultiple($entity->getAmounts());
-        $amountStorage->delete($amounts);
+    return $parameters;
+   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    // Ensure there's only one default rate.
+    if ($this->isDefault()) {
+      /** @var \Drupal\commerce_tax\Entity\TaxRateInterface[] $other_rates */
+      $other_rates = $this->getType()->getRates();
+      foreach ($other_rates as $other_rate) {
+        if ($other_rate->isDefault() && $other_rate->id() != $this->id()) {
+          $other_rate->setDefault(FALSE);
+          $other_rate->save();
+        }
       }
     }
+
+    // Add a reference to the parent tax type.
+    if (!$update) {
+      $tax_type = $this->getType();
+      $tax_type->addRate($this);
+      $tax_type->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    /** @var \Drupal\commerce_tax\Entity\TaxRateInterface $entity */
+    parent::postDelete($storage, $entities);
+
+    // Delete the tax rates amounts of each tax rate.
+    $amounts = [];
+    foreach ($entities as $entity) {
+      foreach ($entity->getAmounts() as $amount) {
+        $amounts[$amount->id()] = $amount;
+      }
+    }
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $rate_storage */
+    $amount_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_tax_rate_amount');
+    $amount_storage->delete($amounts);
   }
 
 }

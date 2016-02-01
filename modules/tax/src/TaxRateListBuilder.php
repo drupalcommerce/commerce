@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_tax;
 
+use Drupal\commerce_tax\Entity\TaxTypeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
@@ -19,7 +20,7 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
   /**
    * The tax type.
    *
-   * @var string
+   * @var \Drupal\commerce_tax\Entity\TaxTypeInterface
    */
   protected $taxType;
 
@@ -29,7 +30,6 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
   public function buildHeader() {
     $header['id'] = $this->t('Machine name');
     $header['name'] = $this->t('Name');
-    $header['display_name'] = $this->t('Display name');
     return $header + parent::buildHeader();
   }
 
@@ -37,58 +37,45 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['id'] = $entity->getId();
-    $row['name'] = $this->getLabel($entity);
-    $row['display_name'] = $entity->getDisplayName();
+    $row['id'] = $entity->id();
+    $row['name'] = $entity->label();
     return $row + parent::buildRow($entity);
   }
 
   /**
    * Sets the tax type.
    *
-   * @param string $taxType
+   * @param \Drupal\commerce_tax\Entity\TaxTypeInterface $tax_type
+   *   The tax type.
    *
-   * @return \Drupal\commerce_tax\TaxRateListBuilder
+   * @return $this
    */
-  public function setTaxType($taxType) {
-    $this->taxType = $taxType;
-
+  public function setTaxType(TaxTypeInterface $tax_type) {
+    $this->taxType = $tax_type;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function load() {
-    return $this->storage->loadByProperties([
-      'type' => $this->taxType,
-    ]);
+  public function getDefaultOperations(EntityInterface $entity) {
+    /** @var \Drupal\commerce_tax\Entity\TaxRateInterface $entity */
+    $operations = parent::getDefaultOperations($entity);
+    $operations['rate_amounts'] = [
+      'title' => $this->t('View rate amounts'),
+      'url' => Url::fromRoute('entity.commerce_tax_rate_amount.collection', [
+        'commerce_tax_rate' => $entity->id()
+      ]),
+    ];
+
+    return $operations;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $operations = parent::getDefaultOperations($entity);
-
-    $rateAmountsRoute = Url::fromRoute('entity.commerce_tax_rate_amount.collection', [
-      'commerce_tax_rate' => $entity->getId()
-    ]);
-    $addRateAmountRoute = Url::fromRoute('entity.commerce_tax_rate_amount.add_form', [
-      'commerce_tax_rate' => $entity->getId(),
-    ]);
-
-    $operations['rate_amounts'] = [
-      'title' => $this->t('View rate amounts'),
-      'url' => $rateAmountsRoute,
-    ];
-    $operations['add_rate_amount'] = [
-      'title' => $this->t('Add rate amount'),
-      'url' => $addRateAmountRoute,
-    ];
-
-    return $operations;
+  protected function getEntityIds() {
+    return array_keys($this->taxType->getRates());
   }
 
 }

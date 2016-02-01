@@ -1,7 +1,7 @@
 name: Commerce Tax
 type: module
-description: 'Defines the Tax entities.'
+description: 'Provides tax functionality.'
 package: Commerce
 core: 8.x
 dependencies:
-- commerce
+  - commerce

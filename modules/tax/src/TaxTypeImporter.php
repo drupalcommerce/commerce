@@ -123,7 +123,6 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
       'type' => $taxRate->getType()->getId(),
       'id' => $taxRate->getId(),
       'name' => $this->t($taxRate->getName()),
-      'displayName' => $this->t($taxRate->getDisplayName()),
       'default' => $taxRate->isDefault(),
       'amounts' => array_keys($taxRate->getAmounts()),
     ];

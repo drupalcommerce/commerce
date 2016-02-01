@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_tax;
 
+use Drupal\commerce_tax\Entity\TaxRateInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -18,7 +19,7 @@ class TaxRateAmountListBuilder extends ConfigEntityListBuilder {
   /**
    * The tax rate.
    *
-   * @var string
+   * @var \Drupal\commerce_tax\Entity\TaxRateInterface
    */
   protected $taxRate;
 
@@ -35,31 +36,29 @@ class TaxRateAmountListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['id'] = $entity->getId();
-    $row['amount'] = $this->getLabel($entity);
+    $row['id'] = $entity->id();
+    $row['amount'] = $entity->label();
     return $row + parent::buildRow($entity);
   }
 
   /**
    * Sets the tax rate.
    *
-   * @param string $taxRate
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $tax_rate
+   *   The tax rate.
    *
-   * @return \Drupal\commerce_tax\TaxRateAmountListBuilder
+   * @return $this
    */
-  public function setTaxRate($taxRate) {
-    $this->taxRate = $taxRate;
-
+  public function setTaxRate(TaxRateInterface $tax_rate) {
+    $this->taxRate = $tax_rate;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function load() {
-    return $this->storage->loadByProperties([
-      'rate' => $this->taxRate,
-    ]);
+  protected function getEntityIds() {
+    return array_keys($this->taxRate->getAmounts());
   }
 
 }

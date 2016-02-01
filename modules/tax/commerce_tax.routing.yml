@@ -1,37 +1,13 @@
 entity.commerce_tax_type.collection:
-  path: '/admin/commerce/config/tax/type'
+  path: '/admin/commerce/config/tax-types'
   defaults:
     _entity_list: 'commerce_tax_type'
     _title: 'Tax types'
   requirements:
     _permission: 'administer stores'
 
-entity.commerce_tax_type.add_form:
-  path: '/admin/commerce/config/tax/type/add'
-  defaults:
-    _entity_form: 'commerce_tax_type.add'
-    _title: 'Add a new tax type'
-  requirements:
-    _entity_create_access: 'commerce_tax_type'
-
-entity.commerce_tax_type.edit_form:
-  path: '/admin/commerce/config/tax/type/{commerce_tax_type}/edit'
-  defaults:
-    _entity_form: 'commerce_tax_type.edit'
-    _title: 'Edit a tax type'
-  requirements:
-    _permission: 'administer stores'
-
-entity.commerce_tax_type.delete_form:
-  path: '/admin/commerce/config/tax/type/{commerce_tax_type}/delete'
-  defaults:
-    _entity_form: 'commerce_tax_type.delete'
-    _title: 'Delete a tax type'
-  requirements:
-    _permission: 'administer stores'
-
 entity.commerce_tax_type.import_form:
-  path: '/admin/commerce/config/tax/type/import'
+  path: '/admin/commerce/config/tax-types/import'
   defaults:
     _form: '\Drupal\commerce_tax\Form\TaxTypeImporterForm'
     _title: 'Import form'
@@ -39,7 +15,7 @@ entity.commerce_tax_type.import_form:
     _entity_create_access: 'commerce_tax_type'
 
 entity.commerce_tax_rate.collection:
-  path: '/admin/commerce/config/tax/rate/{commerce_tax_type}'
+  path: '/admin/commerce/config/tax-rates/{commerce_tax_type}'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateController::buildList'
     _title: 'Tax rates'
@@ -47,31 +23,15 @@ entity.commerce_tax_rate.collection:
     _permission: 'administer stores'
 
 entity.commerce_tax_rate.add_form:
-  path: '/admin/commerce/config/tax/rate/{commerce_tax_type}/add'
+  path: '/admin/commerce/config/tax-rates/{commerce_tax_type}/add'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateController::addForm'
     _title: 'Add a new tax rate'
   requirements:
     _entity_create_access: 'commerce_tax_rate'
 
-entity.commerce_tax_rate.edit_form:
-  path: '/admin/commerce/config/tax/rate/{commerce_tax_rate}/edit'
-  defaults:
-    _entity_form: 'commerce_tax_rate.edit'
-    _title: 'Edit a tax rate'
-  requirements:
-    _permission: 'administer stores'
-
-entity.commerce_tax_rate.delete_form:
-  path: '/admin/commerce/config/tax/rate/{commerce_tax_rate}/delete'
-  defaults:
-    _entity_form: 'commerce_tax_rate.delete'
-    _title: 'Delete a tax rate'
-  requirements:
-    _permission: 'administer stores'
-
 entity.commerce_tax_rate_amount.collection:
-  path: '/admin/commerce/config/tax/amount/{commerce_tax_rate}'
+  path: '/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate}'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::buildList'
     _title: 'Tax rate amounts'
@@ -79,25 +39,9 @@ entity.commerce_tax_rate_amount.collection:
     _permission: 'administer stores'
 
 entity.commerce_tax_rate_amount.add_form:
-  path: '/admin/commerce/config/tax/amount/{commerce_tax_rate}/add'
+  path: '/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate}/add'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::addForm'
     _title: 'Add a new tax rate amount'
   requirements:
     _entity_create_access: 'commerce_tax_rate_amount'
-
-entity.commerce_tax_rate_amount.edit_form:
-  path: '/admin/commerce/config/tax/amount/{commerce_tax_rate_amount}/edit'
-  defaults:
-    _entity_form: 'commerce_tax_rate_amount.edit'
-    _title: 'Edit a tax rate amount'
-  requirements:
-    _permission: 'administer stores'
-
-entity.commerce_tax_rate_amount.delete_form:
-  path: '/admin/commerce/config/tax/amount/{commerce_tax_rate_amount}/delete'
-  defaults:
-    _entity_form: 'commerce_tax_rate_amount.delete'
-    _title: 'Delete a tax rate amount'
-  requirements:
-    _permission: 'administer stores'

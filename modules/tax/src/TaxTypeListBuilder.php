@@ -20,7 +20,6 @@ class TaxTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['id'] = $this->t('Machine name');
     $header['name'] = $this->t('Name');
     $header['tag'] = $this->t('Tag');
     return $header + parent::buildHeader();
@@ -30,8 +29,8 @@ class TaxTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['id'] = $entity->getId();
-    $row['name'] = $this->getLabel($entity);
+    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $entity */
+    $row['name'] = $entity->label();
     $row['tag'] = $entity->getTag();
     return $row + parent::buildRow($entity);
   }
@@ -40,23 +39,11 @@ class TaxTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function getDefaultOperations(EntityInterface $entity) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $entity */
     $operations = parent::getDefaultOperations($entity);
-
-    $ratesRoute = Url::fromRoute('entity.commerce_tax_rate.collection', [
-      'commerce_tax_type' => $entity->getId()
-    ]);
-    $addRateRoute = Url::fromRoute('entity.commerce_tax_rate.add_form', [
-      'commerce_tax_type' => $entity->getId(),
-    ]);
-
     $operations['rates'] = [
       'title' => $this->t('View rates'),
-      'url' => $ratesRoute,
-    ];
-    $operations['add_rate'] = [
-      'title' => $this->t('Add rate'),
-      'url' => $addRateRoute,
+      'url' => Url::fromRoute('entity.commerce_tax_rate.collection', ['commerce_tax_type' => $entity->id()]),
     ];
 
     return $operations;

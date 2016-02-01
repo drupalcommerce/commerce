@@ -7,6 +7,7 @@
 
 namespace Drupal\commerce_tax\Controller;
 
+use Drupal\commerce_tax\Entity\TaxRateInterface;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -15,38 +16,36 @@ use Drupal\Core\Controller\ControllerBase;
 class TaxRateAmountController extends ControllerBase {
 
   /**
-   * Gets a rendered add form to create a new tax rate amount associated to the given tax rate.
+   * Provides the commerce_tax_rate_amount add form.
    *
-   * @param string
-   *   The commerce_tax_rate id.
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $commerce_tax_rate
+   *   The tax rate.
    *
    * @return array
-   *   The commerce_tax_rate_amount add form.
+   *   The add form.
    */
-  public function addForm($commerce_tax_rate) {
-    $rateAmount = $this
-      ->entityManager()
-      ->getStorage('commerce_tax_rate_amount')
-      ->create(array('rate' => $commerce_tax_rate));
+  public function addForm(TaxRateInterface $commerce_tax_rate) {
+    $rate = $this
+      ->entityTypeManager()
+      ->getStorage('commerce_tax_rate')
+      ->create(['rate' => $commerce_tax_rate->id()]);
 
-    return $this->entityFormBuilder()->getForm($rateAmount, 'add');
+    return $this->entityFormBuilder()->getForm($rate, 'add');
   }
 
   /**
-   * Gets a rendered list of tax rate amounts entities associated to the given tax rate.
+   * Provides the commerce_tax_rate_amount listing.
    *
-   * @param string
-   *   The commerce_tax_rate id.
+   * @param \Drupal\commerce_tax\Entity\TaxRateInterface $commerce_tax_rate
+   *   The tax rate.
    *
    * @return array
-   *   The list of commerce_tax_rate_amounts.
+   *   The listing render array.
    */
-  public function buildList($commerce_tax_rate) {
-    $build = [];
-    $listBuilder = $this->entityManager()->getListBuilder('commerce_tax_rate_amount');
-
-    $build['commerce_tax_rate_amounts_table'] = $listBuilder->setTaxRate($commerce_tax_rate)->render();
-    return $build;
+  public function buildList(TaxRateInterface $commerce_tax_rate) {
+    $list_builder = $this->entityTypeManager()->getListBuilder('commerce_tax_rate_amount');
+    $list_builder->setTaxRate($commerce_tax_rate);
+    return $list_builder->render();
   }
 
 }
