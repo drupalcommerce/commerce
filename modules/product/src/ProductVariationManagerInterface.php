@@ -5,7 +5,8 @@
  * Contains \Drupal\commerce_product\Entity\ProductVariationManagerInterface.
  */
 
-namespace Drupal\commerce_product\Entity;
+namespace Drupal\commerce_product;
+use Drupal\commerce_product\Entity\ProductInterface;
 
 /**
  * Defines the interface for product variation managers.
