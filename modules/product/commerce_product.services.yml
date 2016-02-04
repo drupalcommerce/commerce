@@ -1,4 +1,4 @@
 services:
   commerce_product.product_variation_manager:
     class: Drupal\commerce_product\ProductVariationManager
-    arguments: ['@entity_type.manager', '@event_dispatcher']
+    arguments: ['@entity_type.manager', '@event_dispatcher', '@entity.query']

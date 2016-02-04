@@ -11,6 +11,7 @@ use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Event\FilterVariationsEvent;
 use Drupal\commerce_product\Event\ProductEvents;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ProductVariationManager implements ProductVariationManagerInterface {
@@ -21,6 +22,14 @@ class ProductVariationManager implements ProductVariationManagerInterface {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $variationStorage;
+
+  /**
+   * The entity query for product variation.
+   *
+   * @var \Drupal\Core\Entity\Query\QueryInterface
+   */
+  protected $entityQuery;
+
 
   /**
    * The event dispatcher.
@@ -34,11 +43,14 @@ class ProductVariationManager implements ProductVariationManagerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   *   The entity query factory.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, QueryFactory $query_factory, EventDispatcherInterface $event_dispatcher) {
     $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
+    $this->entityQuery = $query_factory->get('commerce_product_variation');
     $this->eventDispatcher = $event_dispatcher;
   }
 
@@ -51,7 +63,7 @@ class ProductVariationManager implements ProductVariationManagerInterface {
       $ids[] = $variation->target_id;
     }
 
-    $query = \Drupal::entityQuery('commerce_product_variation')
+    $query = $this->entityQuery
       ->condition('status', TRUE)
       ->condition('variation_id', $ids, "IN");
     $result = $query->execute();
