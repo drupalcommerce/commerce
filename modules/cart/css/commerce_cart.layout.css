@@ -14,7 +14,6 @@
 }
 .cart-block--contents.is-scrollable {
   overflow-y: scroll;
-  max-height: 200px;
 }
 .cart-block--contents.is-outside {
   right: 0;
