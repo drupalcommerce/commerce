@@ -9,13 +9,12 @@
 .cart-block--contents {
   display: none;
   position: absolute;
-  overflow: hidden;
   z-index: 300;
-}
-.cart-block--contents.is-scrollable {
+  overflow-x: hidden;
   overflow-y: scroll;
+  max-height: 300px;
 }
-.cart-block--contents.is-outside {
+.cart-block--contents.is-outside-horizontal {
   right: 0;
 }
 .cart-block--contents__expanded {

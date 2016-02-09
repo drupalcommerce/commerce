@@ -9,71 +9,29 @@
   Drupal.behaviors.commerceCartBlock = {
     attach: function (context) {
       var $context = $(context),
-          $cartClass = '.cart--cart-block',
-          $cartContentClass = '.cart-block--contents',
-          $cart = $context.find($cartClass),
+          $cart = $context.find('.cart--cart-block'),
           $cartButton = $context.find('.cart-block--link__expand'),
-          $cartContents = $cart.find($cartContentClass);
+          $cartContents = $cart.find('.cart-block--contents');
 
       if ($cartContents.length > 0) {
         // Expand the block when the link is clicked.
         $cartButton.on('click', function (e) {
+          // Prevent it from going to the cart.
           e.preventDefault();
-
-
           // Get the shopping cart width + the offset to the left.
           var $windowWidth = $(window).width(),
-              $cartOffsetLeft = $cart.offset().left,
-              $cartWidth = $cartContents.width() + $cartOffsetLeft,
-              $window = $(window);
+            $cartOffsetLeft = $cart.offset().left,
+            $cartWidth = $cartContents.width() + $cartOffsetLeft;
           // If the cart goes out of the viewport we should align it right.
           if ($cartWidth > $windowWidth) {
-            $cartContents.addClass('is-outside');
+            $cartContents.addClass('is-outside-horizontal');
           }
-
           // Toggle the expanded class.
           $cartContents
             .toggleClass('cart-block--contents__expanded')
-            .slideToggle('normal', function() {
-              if ($cartContents.hasClass('cart-block--contents__expanded')) {
-                // Get the shopping cart height + the offset to the top.
-                resizecart($cartClass, $cartContentClass, $window);
-                // When the window get's resized, we should recalculate.
-                $(window).on('resize', function() {
-                  resizecart($cartClass, $cartContentClass, $window);
-                });
-              }
-              else {
-                resetcart($cartClass, $cartContentClass);
-              }
-            });
+            .slideToggle();
         });
       }
     }
   };
-
-  function resizecart(cartClass, contentClass, window) {
-    var $cart= $(cartClass),
-      $cartContent = $cart.find(contentClass),
-      $cartOffsetTop = $cartContent.offset().top,
-      $cartHeight = $cartContent.height() + $cartOffsetTop,
-      $maxHeight = window.height() - $cartOffsetTop,
-      $windowHeight = window.height();
-    // If the cart size is bigger then the viewport, we should make it scrollable.
-    if ($cartHeight > $windowHeight) {
-      $cartContent.addClass('is-scrollable');
-      $cartContent.css('max-height', $maxHeight + 'px');
-    }
-    else if ($cartHeight < $windowHeight && $cartContent.hasClass('is-scrollable')) {
-      $cartContent.css('max-height', $maxHeight + 'px');
-    }
-  }
-
-  function resetcart(cartClass, contentClass) {
-    var $cart= $(cartClass),
-      $cartContent = $cart.find(contentClass);
-
-    $cartContent.removeAttr('style');
-    $cartContent.removeClass('is-scrollable');
-  }
 })(jQuery, Drupal, drupalSettings);
