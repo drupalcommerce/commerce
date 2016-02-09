@@ -10,6 +10,9 @@
   display: none;
   position: absolute;
   z-index: 300;
+  overflow: hidden;
+}
+.cart-block--contents__items {
   overflow-x: hidden;
   overflow-y: scroll;
   max-height: 300px;
