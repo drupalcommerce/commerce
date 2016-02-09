@@ -29,7 +29,7 @@ class ProductVariationTypeListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row = [];
-    $row['name'] = $this->getLabel($entity);
+    $row['name'] = $entity->label();
     $row['type'] = $entity->id();
 
    return $row + parent::buildRow($entity);

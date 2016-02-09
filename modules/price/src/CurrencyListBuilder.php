@@ -32,7 +32,7 @@ class CurrencyListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row = [
-      'name' => $this->getLabel($entity),
+      'name' => $entity->label(),
       'currencyCode' => $entity->id(),
     ];
 
