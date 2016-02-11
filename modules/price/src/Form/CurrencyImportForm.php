@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Form\CurrencyImportForm.
- */
-
 namespace Drupal\commerce_price\Form;
 
 use Drupal\commerce_price\CurrencyImporterInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\LineItemStorage.
- */
-
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\CommerceContentEntityStorage;

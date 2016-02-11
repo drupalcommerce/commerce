@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Entity\ProductType.
- */
-
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;

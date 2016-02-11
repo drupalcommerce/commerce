@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Form\AddToCartForm.
- */
-
 namespace Drupal\commerce_product\Form;
 
 use Drupal\commerce_cart\CartManagerInterface;

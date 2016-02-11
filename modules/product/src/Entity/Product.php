@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Entity\Product.
- */
-
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\entity\EntityKeysFieldsTrait;

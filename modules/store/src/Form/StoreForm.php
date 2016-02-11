@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Form\StoreForm.
- */
-
 namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;

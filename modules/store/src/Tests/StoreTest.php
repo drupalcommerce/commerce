@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\Tests\StoreTest.
- */
-
 namespace Drupal\commerce_store\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;

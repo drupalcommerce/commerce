@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Plugin\field\formatter\PriceDefaultFormatter.
- */
-
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;

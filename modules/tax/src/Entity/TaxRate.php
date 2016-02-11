@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\Entity\TaxRate.
- */
-
 namespace Drupal\commerce_tax\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartManagerInterface.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_order\Entity\LineItemInterface;

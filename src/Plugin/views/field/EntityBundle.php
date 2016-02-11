@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Plugin\views\field\EntityBundle.
- */
-
 namespace Drupal\commerce\Plugin\views\field;
 
 use Drupal\views\ViewExecutable;

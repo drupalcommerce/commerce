@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Event\OrderEvent.
- */
-
 namespace Drupal\commerce_order\Event;
 
 use Drupal\commerce_order\Entity\OrderInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Event\CartLineItemRemoveEvent.
- */
-
 namespace Drupal\commerce_cart\Event;
 
 use Drupal\commerce_order\Entity\OrderInterface;

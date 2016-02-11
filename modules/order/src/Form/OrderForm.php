@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\OrderForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Component\Utility\Html;

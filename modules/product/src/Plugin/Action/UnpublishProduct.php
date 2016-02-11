@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Plugin\Action\UnpublishProduct.
- */
-
 namespace Drupal\commerce_product\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;

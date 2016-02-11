@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\LineItemTypeForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;

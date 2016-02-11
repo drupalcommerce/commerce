@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\LineItemInlineForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use Drupal\commerce_order\Entity\LineItemInterface;

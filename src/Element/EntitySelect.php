@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Element\EntitySelect.
- */
-
 namespace Drupal\commerce\Element;
 
 use Drupal\Core\Form\FormStateInterface;

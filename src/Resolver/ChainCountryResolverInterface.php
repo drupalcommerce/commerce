@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Resolver\ChainCountryResolverInterface.
- */
-
 namespace Drupal\commerce\Resolver;
 
 /**

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Entity\OrderTypeInterface.
- */
-
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\Resolver\DefaultStoreResolver.
- */
-
 namespace Drupal\commerce_store\Resolver;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

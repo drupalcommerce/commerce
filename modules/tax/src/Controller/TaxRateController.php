@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\Controller\TaxRateController.
- */
-
 namespace Drupal\commerce_tax\Controller;
 
 use Drupal\commerce_tax\Entity\TaxTypeInterface;

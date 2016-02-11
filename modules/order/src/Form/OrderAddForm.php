@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\OrderAddForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use \Drupal\Core\Datetime\DrupalDateTime;

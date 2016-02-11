@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\CountryContextInterface.
- */
-
 namespace Drupal\commerce;
 
 /**

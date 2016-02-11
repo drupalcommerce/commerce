@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\StoreStorageInterface.
- */
-
 namespace Drupal\commerce_store;
 
 use Drupal\commerce_store\Entity\StoreInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Event\LineItemEvent.
- */
-
 namespace Drupal\commerce_order\Event;
 
 use Drupal\commerce_order\Entity\LineItemInterface;

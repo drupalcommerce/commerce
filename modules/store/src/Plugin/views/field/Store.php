@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\Plugin\views\field\Store.
- */
-
 namespace Drupal\commerce_store\Plugin\views\field;
 
 use Drupal\views\ViewExecutable;

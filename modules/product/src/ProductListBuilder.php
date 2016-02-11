@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\ProductListBuilder.
- */
-
 namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductType;

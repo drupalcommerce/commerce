@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Tests\OrderTest.
- */
-
 namespace Drupal\commerce_order\Tests;
 
 use Drupal\commerce_order\Entity\Order;

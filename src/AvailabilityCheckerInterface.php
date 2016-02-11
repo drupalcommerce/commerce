@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\AvailabilityCheckerInterface.
- */
-
 namespace Drupal\commerce;
 
 /**

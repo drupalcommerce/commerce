@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartManager.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce\PurchasableEntityInterface;

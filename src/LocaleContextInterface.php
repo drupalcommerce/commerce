@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\LocaleContextInterface.
- */
-
 namespace Drupal\commerce;
 
 /**

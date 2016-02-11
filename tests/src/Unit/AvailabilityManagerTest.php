@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Tests\AvailabilityManagerTest.
- */
-
 namespace Drupal\commerce\Tests;
 
 use Drupal\commerce\AvailabilityManager;

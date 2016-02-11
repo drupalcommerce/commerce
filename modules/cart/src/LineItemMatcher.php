@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\LineItemMatcher.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_cart\Event\CartEvents;

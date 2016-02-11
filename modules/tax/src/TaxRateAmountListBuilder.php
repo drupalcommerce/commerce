@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxRateAmountListBuilder.
- */
-
 namespace Drupal\commerce_tax;
 
 use Drupal\commerce_tax\Entity\TaxRateInterface;

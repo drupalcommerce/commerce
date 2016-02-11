@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\commerce_cart\Exception\DuplicateCartException.
- */
 
 namespace Drupal\commerce_cart\Exception;
 

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxTypeImporterFactory.
- */
-
 namespace Drupal\commerce_tax;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

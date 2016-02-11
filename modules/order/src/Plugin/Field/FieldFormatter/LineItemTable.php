@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Plugin\Field\FieldFormatter\LineItemTable.
- */
-
 namespace Drupal\commerce_order\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Event\FilterVariationsEvent.
- */
-
 namespace Drupal\commerce_product\Event;
 
 use Drupal\commerce_product\Entity\ProductInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Entity\LineItemInterface.
- */
-
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Entity\EntityChangedInterface;

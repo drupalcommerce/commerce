@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\PurchasableEntityInterface.
- */
-
 namespace Drupal\commerce;
 
 use Drupal\Core\Entity\ContentEntityInterface;

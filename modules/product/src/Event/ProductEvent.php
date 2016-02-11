@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Event\ProductEvent.
- */
-
 namespace Drupal\commerce_product\Event;
 
 use Drupal\commerce_product\Entity\ProductInterface;

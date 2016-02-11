@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Plugin\Block\CartBlock.
- */
-
 namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;

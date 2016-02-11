@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\commerce_order\OrderListBuilder.
- */
 
 namespace Drupal\commerce_order;
 

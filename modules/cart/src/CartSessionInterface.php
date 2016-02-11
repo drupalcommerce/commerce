@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartSessionInterface.
- */
-
 namespace Drupal\commerce_cart;
 
 /**

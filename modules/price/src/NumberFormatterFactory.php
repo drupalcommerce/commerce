@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\NumberFormatterFactory.
- */
-
 namespace Drupal\commerce_price;
 
 use Drupal\commerce\LocaleContextInterface;

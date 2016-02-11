@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Event\CartEvents.
- */
-
 namespace Drupal\commerce_cart\Event;
 
 /**

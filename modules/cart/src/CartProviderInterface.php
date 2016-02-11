@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartProviderInterface.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_store\Entity\StoreInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\StoreStorage.
- */
-
 namespace Drupal\commerce_store;
 
 use Drupal\commerce\CommerceContentEntityStorage;

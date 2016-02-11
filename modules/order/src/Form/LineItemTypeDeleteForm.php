@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\LineItemTypeDeleteForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;

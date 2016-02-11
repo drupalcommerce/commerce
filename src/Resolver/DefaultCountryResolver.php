@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce\Resolver\DefaultCountryResolver.
- */
-
 namespace Drupal\commerce\Resolver;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

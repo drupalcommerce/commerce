@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Form\CurrencyForm.
- */
-
 namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;

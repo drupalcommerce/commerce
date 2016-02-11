@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Entity\CurrencyInterface.
- */
-
 namespace Drupal\commerce_price\Entity;
 
 use CommerceGuys\Intl\Currency\CurrencyInterface as ExternalCurrencyInterface;

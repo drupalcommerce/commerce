@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxTypeListBuilder.
- */
-
 namespace Drupal\commerce_tax;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

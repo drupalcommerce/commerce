@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\LineItemViewsData.
- */
-
 namespace Drupal\commerce_order;
 
 use Drupal\views\EntityViewsData;

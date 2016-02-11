@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Event\PriceEvents.
- */
-
 namespace Drupal\commerce_price\Event;
 
 /**

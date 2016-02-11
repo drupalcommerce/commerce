@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\CurrencyImporter.
- */
-
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\Country\CountryRepository;

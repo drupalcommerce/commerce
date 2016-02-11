@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Tests\ProductTest.
- */
-
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\Product;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_store\Form\StoreTypeDeleteForm.
- */
-
 namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;

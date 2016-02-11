@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Plugin\Field\FieldFormatter\AddToCartFormatter.
- */
-
 namespace Drupal\commerce_product\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;

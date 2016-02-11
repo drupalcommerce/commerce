@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\ProductVariationTypeListBuilder.
- */
-
 namespace Drupal\commerce_product;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

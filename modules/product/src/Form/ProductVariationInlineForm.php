@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Form\ProductVariationInlineForm.
- */
-
 namespace Drupal\commerce_product\Form;
 
 use Drupal\inline_entity_form\Form\EntityInlineForm;

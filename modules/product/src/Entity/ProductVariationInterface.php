@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_product\Entity\ProductVariationInterface.
- */
-
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;

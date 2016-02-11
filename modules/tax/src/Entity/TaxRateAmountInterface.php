@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_tax\Entity\TaxRateAmountInterface.
- */
-
 namespace Drupal\commerce_tax\Entity;
 
 use CommerceGuys\Tax\Model\TaxRateAmountInterface as ExternalTaxRateAmountInterface;

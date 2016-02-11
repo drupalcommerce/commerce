@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_price\Event\NumberFormatEvent.
- */
-
 namespace Drupal\commerce_price\Event;
 
 use CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface;

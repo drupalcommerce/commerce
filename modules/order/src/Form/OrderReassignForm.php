@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_order\Form\OrderReassignForm.
- */
-
 namespace Drupal\commerce_order\Form;
 
 use Drupal\commerce_order\Form\CustomerFormTrait;
