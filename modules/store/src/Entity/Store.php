@@ -266,7 +266,7 @@ class Store extends ContentEntityBase implements StoreInterface {
 
     $fields['default_currency'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Default currency'))
-      ->setDescription('The default currency of the store.')
+      ->setDescription(t('The default currency of the store.'))
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_currency')
