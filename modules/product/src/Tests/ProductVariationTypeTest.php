@@ -116,11 +116,11 @@ class ProductVariationTypeTest extends ProductTestBase {
     $this->createEntityReferenceField('commerce_product_variation', 'foo', 'field_attribute', 'Attribute', 'taxonomy_term', 'default', ['target_bundles' => ['taxonomy_term']]);
 
     // Create a vocabulary otherwise we can't submit the field settings form.
-    $vocabulary = entity_create('taxonomy_vocabulary', array(
+    $vocabulary = $this->createEntity('taxonomy_vocabulary', [
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
       'vid' => Unicode::strtolower($this->randomMachineName()),
-    ));
+    ]);
     $vocabulary->save();
 
     $edit = [
