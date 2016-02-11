@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductVariationType;

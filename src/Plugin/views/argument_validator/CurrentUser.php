@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Plugin\views\argument_validator;
 
 use Drupal\Component\Utility\Html;

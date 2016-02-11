@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

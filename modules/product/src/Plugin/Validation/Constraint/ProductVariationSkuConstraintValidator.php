@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;

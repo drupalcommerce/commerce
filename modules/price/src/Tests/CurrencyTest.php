@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Tests;
 
 use Drupal\commerce_price\Entity\Currency;

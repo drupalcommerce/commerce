@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_order\Tests;
 
 use Drupal\commerce_order\Entity\LineItemType;

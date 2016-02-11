@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_cart;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

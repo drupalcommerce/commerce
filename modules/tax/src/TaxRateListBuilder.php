@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_tax;
 
 use Drupal\commerce_tax\Entity\TaxTypeInterface;

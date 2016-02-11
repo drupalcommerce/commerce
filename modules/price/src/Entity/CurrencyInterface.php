@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Entity;
 
 use CommerceGuys\Intl\Currency\CurrencyInterface as ExternalCurrencyInterface;

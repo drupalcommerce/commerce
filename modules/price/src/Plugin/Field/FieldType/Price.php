@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;

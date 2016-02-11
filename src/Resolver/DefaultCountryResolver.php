@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Resolver;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

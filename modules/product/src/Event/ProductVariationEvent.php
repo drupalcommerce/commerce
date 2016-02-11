@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Event;
 
 use Drupal\commerce_product\Entity\ProductVariationInterface;

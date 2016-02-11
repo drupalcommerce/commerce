@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_store\Resolver;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

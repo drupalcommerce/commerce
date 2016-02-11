@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce;
 
 use Drupal\Core\Cache\CacheBackendInterface;

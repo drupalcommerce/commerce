@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;

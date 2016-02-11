@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;

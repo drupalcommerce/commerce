@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;

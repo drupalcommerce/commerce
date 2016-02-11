@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_order\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_tax\Entity;
 
 use Drupal\address\Entity\ZoneInterface;

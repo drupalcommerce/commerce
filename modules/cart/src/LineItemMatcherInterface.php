@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_order\Entity\LineItemInterface;

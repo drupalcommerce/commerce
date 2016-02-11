@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\Tests\commerce_store\Unit\Resolver;
 
 use Drupal\commerce_store\Resolver\DefaultStoreResolver;

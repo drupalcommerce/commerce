@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

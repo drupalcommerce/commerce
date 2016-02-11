@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Element;
 
 use Drupal\Core\Form\FormStateInterface;

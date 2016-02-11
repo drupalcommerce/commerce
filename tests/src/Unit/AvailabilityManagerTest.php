@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Tests;
 
 use Drupal\commerce\AvailabilityManager;

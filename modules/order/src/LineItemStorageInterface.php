@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\PurchasableEntityInterface;

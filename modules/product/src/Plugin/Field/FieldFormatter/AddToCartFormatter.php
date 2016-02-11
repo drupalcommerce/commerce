@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;

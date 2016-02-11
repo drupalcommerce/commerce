@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Form;
 
 use Drupal\inline_entity_form\Form\EntityInlineForm;

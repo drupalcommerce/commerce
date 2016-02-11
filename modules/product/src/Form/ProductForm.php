@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_product\Form;
 
 use Drupal\commerce_product\Entity\ProductInterface;

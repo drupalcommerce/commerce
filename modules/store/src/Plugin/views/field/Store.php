@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_store\Plugin\views\field;
 
 use Drupal\views\ViewExecutable;

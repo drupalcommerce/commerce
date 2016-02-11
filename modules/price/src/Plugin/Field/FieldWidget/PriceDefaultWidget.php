@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;

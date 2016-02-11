@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;

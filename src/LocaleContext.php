@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce;
 
 use Drupal\commerce\Resolver\ChainLocaleResolverInterface;

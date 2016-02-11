@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;

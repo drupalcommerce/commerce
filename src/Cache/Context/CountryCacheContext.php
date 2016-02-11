@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce\Cache\Context;
 
 use Drupal\commerce\CountryContext;

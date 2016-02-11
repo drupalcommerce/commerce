@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;

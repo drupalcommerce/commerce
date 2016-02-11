@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_cart\Controller;
 
 use Drupal\commerce_cart\CartProviderInterface;
