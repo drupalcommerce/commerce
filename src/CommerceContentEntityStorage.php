@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\CommerceEntityStorage.
- */
-
 namespace Drupal\commerce;
 
 use Drupal\Core\Cache\CacheBackendInterface;

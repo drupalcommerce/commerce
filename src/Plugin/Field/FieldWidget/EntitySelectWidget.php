@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Plugin\Field\FieldWidget\EntitySelectWidget.
- */
-
 namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;

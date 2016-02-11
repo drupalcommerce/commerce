@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Tests\CommerceTestBase.
- */
-
 namespace Drupal\commerce\Tests;
 
 use Drupal\Component\Render\FormattableMarkup;

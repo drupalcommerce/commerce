@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Tests\EntitySelectWidgetTest.
- */
-
 namespace Drupal\commerce\Tests;
 
 use Drupal\commerce_product\Entity\Product;

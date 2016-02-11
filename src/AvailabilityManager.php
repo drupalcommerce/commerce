@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\AvailabilityManager.
- */
-
 namespace Drupal\commerce;
 
 /**

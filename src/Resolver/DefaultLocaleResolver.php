@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Resolver\DefaultLocaleResolver.
- */
-
 namespace Drupal\commerce\Resolver;
 
 use Drupal\commerce\CountryContextInterface;

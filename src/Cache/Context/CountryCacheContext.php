@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Cache\Context\CountryCacheContext
- */
-
 namespace Drupal\commerce\Cache\Context;
 
 use Drupal\commerce\CountryContext;

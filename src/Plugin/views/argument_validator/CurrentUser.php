@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Plugin\views\argument_validator\CurrentUser.
- */
-
 namespace Drupal\commerce\Plugin\views\argument_validator;
 
 use Drupal\Component\Utility\Html;

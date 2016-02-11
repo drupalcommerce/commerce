@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\LocaleContext.
- */
-
 namespace Drupal\commerce;
 
 use Drupal\commerce\Resolver\ChainLocaleResolverInterface;

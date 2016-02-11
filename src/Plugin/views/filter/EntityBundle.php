@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Plugin\views\filter\EntityBundle.
- */
-
 namespace Drupal\commerce\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
