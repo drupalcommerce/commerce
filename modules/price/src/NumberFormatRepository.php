@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\NumberFormatRepository.
- */
-
 namespace Drupal\commerce_price;
 
 use CommerceGuys\Intl\NumberFormat\NumberFormatRepositoryInterface;

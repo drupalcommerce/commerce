@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\Entity\Currency.
- */
-
 namespace Drupal\commerce_price\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;

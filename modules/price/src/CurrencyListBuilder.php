@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\CurrencyListBuilder.
- */
-
 namespace Drupal\commerce_price;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

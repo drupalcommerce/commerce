@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\Plugin\Field\FieldType\Price.
- */
-
 namespace Drupal\commerce_price\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;

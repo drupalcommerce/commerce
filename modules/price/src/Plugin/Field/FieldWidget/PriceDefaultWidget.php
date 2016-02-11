@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\Plugin\Field\FieldWidget\PriceDefaultWidget.
- */
-
 namespace Drupal\commerce_price\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_price\NumberFormatterFactoryInterface;

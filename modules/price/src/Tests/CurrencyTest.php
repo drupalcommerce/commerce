@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_price\Tests\CurrencyTest.
- */
-
 namespace Drupal\commerce_price\Tests;
 
 use Drupal\commerce_price\Entity\Currency;
