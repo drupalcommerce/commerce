@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxTypeImporterInterface.
- */
-
 namespace Drupal\commerce_tax;
 
 /**

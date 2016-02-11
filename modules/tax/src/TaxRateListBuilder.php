@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxRateListBuilder.
- */
-
 namespace Drupal\commerce_tax;
 
 use Drupal\commerce_tax\Entity\TaxTypeInterface;

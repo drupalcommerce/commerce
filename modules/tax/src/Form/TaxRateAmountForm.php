@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\Form\TaxRateAmountForm.
- */
-
 namespace Drupal\commerce_tax\Form;
 
 use Drupal\Core\Entity\EntityForm;

@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\Entity\TaxTypeInterface.
- */
-
 namespace Drupal\commerce_tax\Entity;
 
 use CommerceGuys\Tax\Model\TaxTypeInterface as ExternalTaxTypeInterface;

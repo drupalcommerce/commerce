@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\Entity\TaxType.
- */
-
 namespace Drupal\commerce_tax\Entity;
 
 use Drupal\address\Entity\ZoneInterface;

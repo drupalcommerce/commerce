@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_tax\TaxTypeImporter.
- */
-
 namespace Drupal\commerce_tax;
 
 use CommerceGuys\Tax\Repository\TaxTypeRepository;
