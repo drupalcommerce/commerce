@@ -319,6 +319,7 @@ class AddToCartForm extends FormBase {
       // the values from variations matching the previous attribute value.
       // For 'Color' and 'Size' attributes that means getting the colors of all
       // variations, but only the sizes of variations with the selected color.
+      $callback = NULL;
       if ($index > 0) {
         $previous_field_name = $field_names[$index - 1];
         $previous_field_value = $selected_variation->get($previous_field_name)->target_id;
