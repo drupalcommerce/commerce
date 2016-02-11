@@ -22,7 +22,7 @@ class CreateStoreCommand extends ContainerAwareCommand {
   protected function configure() {
     $this
       ->setName('commerce:create:store')
-      ->setDescription(t('Create a new store'))
+      ->setDescription('Create a new store')
       ->addOption('name', '', InputOption::VALUE_REQUIRED, 'The store name')
       ->addOption('mail', '', InputOption::VALUE_REQUIRED, 'The store email')
       ->addOption('country', '', InputOption::VALUE_REQUIRED, 'The store country')
