@@ -1,9 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\commerce_cart\Exception\ExceptionInterface.
- */
-
 namespace Drupal\commerce_cart\Exception;
 
 /**
