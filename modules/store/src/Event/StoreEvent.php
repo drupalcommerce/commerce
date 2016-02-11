@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_store\Event\StoreEvent.
- */
-
 namespace Drupal\commerce_store\Event;
 
 use Drupal\commerce_store\Entity\StoreInterface;

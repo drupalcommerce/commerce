@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce\Entity\Store.
- */
-
 namespace Drupal\commerce_store\Entity;
 
 use CommerceGuys\Addressing\Enum\AddressField;

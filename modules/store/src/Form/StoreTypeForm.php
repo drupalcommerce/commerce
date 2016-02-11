@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains Drupal\commerce\Form\StoreTypeForm.
- */
-
 namespace Drupal\commerce_store\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;

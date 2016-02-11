@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_store\StoreListBuilder.
- */
-
 namespace Drupal\commerce_store;
 
 use Drupal\commerce_store\Entity\StoreType;

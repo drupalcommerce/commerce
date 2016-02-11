@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_store\Entity\StoreInterface.
- */
-
 namespace Drupal\commerce_store\Entity;
 
 use Drupal\address\AddressInterface;

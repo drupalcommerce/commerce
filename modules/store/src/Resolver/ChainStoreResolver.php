@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_store\Resolver\ChainStoreResolver.
- */
-
 namespace Drupal\commerce_store\Resolver;
 
 /**

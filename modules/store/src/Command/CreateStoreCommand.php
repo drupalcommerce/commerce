@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains Drupal\commerce_store\Command\CreateStoreCommand.
- */
-
 namespace Drupal\commerce_store\Command;
 
 use CommerceGuys\Intl\Currency\CurrencyRepository;
