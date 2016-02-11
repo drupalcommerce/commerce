@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_order\Entity\Order.
- */
-
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_store\Entity\StoreInterface;

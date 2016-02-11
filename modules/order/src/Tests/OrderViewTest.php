@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_order\Tests\OrderViewTest.
- */
-
 namespace Drupal\commerce_order\Tests;
 
 /**

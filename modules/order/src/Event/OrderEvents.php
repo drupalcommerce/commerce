@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_order\Event\OrderEvents.
- */
-
 namespace Drupal\commerce_order\Event;
 
 final class OrderEvents {

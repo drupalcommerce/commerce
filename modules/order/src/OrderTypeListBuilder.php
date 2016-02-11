@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_order\Entity\OrderTypeListBuilder.
- */
-
 namespace Drupal\commerce_order;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;

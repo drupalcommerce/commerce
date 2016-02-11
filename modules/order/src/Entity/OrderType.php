@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_order\Entity\OrderType.
- */
-
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
