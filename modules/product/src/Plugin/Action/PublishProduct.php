@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Plugin\Action\PublishProduct.
- */
-
 namespace Drupal\commerce_product\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;

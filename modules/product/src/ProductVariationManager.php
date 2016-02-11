@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\ProductVariationManager.
- */
-
 namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductInterface;

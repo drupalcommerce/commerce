@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Form\ProductForm.
- */
-
 namespace Drupal\commerce_product\Form;
 
 use Drupal\commerce_product\Entity\ProductInterface;

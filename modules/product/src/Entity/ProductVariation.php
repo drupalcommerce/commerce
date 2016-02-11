@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Entity\ProductVariation.
- */
-
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;

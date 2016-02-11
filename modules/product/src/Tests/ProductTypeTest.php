@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Tests\ProductTypeTest.
- */
-
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductType;

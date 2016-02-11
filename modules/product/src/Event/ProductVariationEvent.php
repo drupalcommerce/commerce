@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Event\ProductVariationEvent.
- */
-
 namespace Drupal\commerce_product\Event;
 
 use Drupal\commerce_product\Entity\ProductVariationInterface;

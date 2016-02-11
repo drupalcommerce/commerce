@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Plugin\Validation\Constraint\ProductVariationSkuConstraintValidator.
- */
-
 namespace Drupal\commerce_product\Plugin\Validation\Constraint;
 
 use Symfony\Component\Validator\Constraint;

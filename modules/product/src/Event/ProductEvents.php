@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_product\Event\ProductEvents.
- */
-
 namespace Drupal\commerce_product\Event;
 
 final class ProductEvents {
