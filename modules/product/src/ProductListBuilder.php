@@ -36,7 +36,7 @@ class ProductListBuilder extends EntityListBuilder {
     $row['title']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
-    ] + $entity->urlInfo()->toRenderArray();
+    ] + $entity->toUrl()->toRenderArray();
     $row['type'] = $product_type->label();
     $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
 
