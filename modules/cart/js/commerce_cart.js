@@ -21,9 +21,9 @@
           // Get the shopping cart width + the offset to the left.
           var $windowWidth = $(window).width(),
             $cartOffsetLeft = $cart.offset().left,
-            $cartWidth = $cartContents.width() + $cartOffsetLeft;
+            cartWidth = $cartContents.width() + $cartOffsetLeft;
           // If the cart goes out of the viewport we should align it right.
-          if ($cartWidth > $windowWidth) {
+          if (cartWidth > $windowWidth) {
             $cartContents.addClass('is-outside-horizontal');
           }
           // Toggle the expanded class.
