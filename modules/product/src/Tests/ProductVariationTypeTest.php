@@ -9,7 +9,6 @@ namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Component\Utility\Unicode;
-use Drupal\taxonomy\Entity\Term;
 
 /**
  * Ensure the product variation type works correctly.
@@ -117,7 +116,7 @@ class ProductVariationTypeTest extends ProductTestBase {
     $this->createEntityReferenceField('commerce_product_variation', 'foo', 'field_attribute', 'Attribute', 'taxonomy_term', 'default', ['target_bundles' => ['taxonomy_term']]);
 
     // Create a vocabulary otherwise we can't submit the field settings form.
-    $vocabulary = Term::create([
+    $vocabulary = $this->createEntity('taxonomy_vocabulary', [
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
       'vid' => Unicode::strtolower($this->randomMachineName()),
