@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_cart\Event\CartEntityAddEvent.
- */
-
 namespace Drupal\commerce_cart\Event;
 
 use Drupal\commerce\PurchasableEntityInterface;

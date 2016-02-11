@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartSession.
- */
-
 namespace Drupal\commerce_cart;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \gDrupal\commerce_cart\Tests\CartRefreshTest.
- */
-
 namespace Drupal\commerce_cart\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;

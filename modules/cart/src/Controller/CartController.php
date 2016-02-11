@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_cart\Controller\CartController.
- */
-
 namespace Drupal\commerce_cart\Controller;
 
 use Drupal\commerce_cart\CartProviderInterface;

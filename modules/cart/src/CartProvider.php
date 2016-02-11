@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartProvider.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_cart\Exception\DuplicateCartException;
