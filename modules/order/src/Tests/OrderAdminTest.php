@@ -102,7 +102,7 @@ class OrderAdminTest extends OrderTestBase {
     $this->drupalPostForm(NULL, NULL, t('Delete'));
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
-    $order_exists = (bool) Order::load('commerce_order', $order->id());
+    $order_exists = (bool) Order::load($order->id());
     $this->assertFalse($order_exists, 'The order has been deleted from the database.');
   }
 
