@@ -5,11 +5,20 @@ namespace Drupal\commerce_product\Entity;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\views\Plugin\views\argument\StringArgument;
 
 /**
  * Defines the interface for product variations.
  */
 interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+
+  /**
+   * Get a list of Attribute Labels.
+   *
+   * @return string
+   *   String of all the product attribute labels.
+   */
+  public function getAttributeLabels();
 
   /**
    * Gets the parent product.
