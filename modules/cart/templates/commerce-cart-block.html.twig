@@ -1,6 +1,6 @@
 <div{{ attributes}}>
   <div class="cart-block--summary">
-    <a href="{{ url }}">
+    <a class="cart-block--link__expand" href="{{ url }}">
       <span class="cart-block--summary__icon">{{ icon }}</span>
       <span class="cart-block--summary__count">{{ count }} {{ item_text }}</span>
     </a>
@@ -8,7 +8,9 @@
   {% if content %}
   <div class="cart-block--contents">
     <div class="cart-block--contents__inner">
-      {{ content }}
+      <div class="cart-block--contents__items">
+        {{ content }}
+      </div>
       <div class="cart-block--contents__links">
         {{ links }}
       </div>

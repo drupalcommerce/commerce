@@ -12,6 +12,14 @@
   overflow: hidden;
   z-index: 300;
 }
+.cart-block--contents__items {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 300px;
+}
+.cart-block--contents.is-outside-horizontal {
+  right: 0;
+}
 .cart-block--contents__expanded {
   overflow: visible;
 }
