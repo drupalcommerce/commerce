@@ -8,19 +8,30 @@
 
   Drupal.behaviors.commerceCartBlock = {
     attach: function (context) {
-      var $context = $(context);
-      var $cart = $context.find('.cart--cart-block');
-      var $cartContents = $cart.find('.cart-block--contents');
+      var $context = $(context),
+          $cart = $context.find('.cart--cart-block'),
+          $cartButton = $context.find('.cart-block--link__expand'),
+          $cartContents = $cart.find('.cart-block--contents');
 
       if ($cartContents.length > 0) {
-        $cart.click(function (e) {
+        // Expand the block when the link is clicked.
+        $cartButton.on('click', function (e) {
+          // Prevent it from going to the cart.
           e.preventDefault();
+          // Get the shopping cart width + the offset to the left.
+          var $windowWidth = $(window).width(),
+            $cartOffsetLeft = $cart.offset().left,
+            cartWidth = $cartContents.width() + $cartOffsetLeft;
+          // If the cart goes out of the viewport we should align it right.
+          if (cartWidth > $windowWidth) {
+            $cartContents.addClass('is-outside-horizontal');
+          }
+          // Toggle the expanded class.
           $cartContents
             .toggleClass('cart-block--contents__expanded')
             .slideToggle();
         });
       }
-
     }
   };
 })(jQuery, Drupal, drupalSettings);
