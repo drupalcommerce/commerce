@@ -2,39 +2,20 @@
 
 namespace Drupal\commerce_store\Plugin\views\field;
 
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\Field;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Displays the store.
  *
- * Can be configured to show nothing when there's only one possible store,
- * allowing the 'Hide empty column' table setting to hide the column.
+ * Can be configured to show nothing when there's only one possible store.
  *
  * @ingroup views_field_handlers
  *
  * @ViewsField("commerce_store")
  */
 class Store extends Field {
-
-  /**
-   * The number of available stores.
-   *
-   * @var int
-   */
-  protected $storeCount;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
-    parent::init($view, $display, $options);
-
-    $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
-    $this->storeCount = $store_query->count()->execute();
-  }
 
   /**
    * {@inheritdoc}
@@ -62,11 +43,14 @@ class Store extends Field {
   /**
    * {@inheritdoc}
    */
-  public function renderItems($items) {
-    if ($this->options['hide_single_store'] && $this->storeCount < 2) {
-      return '';
+  public function access(AccountInterface $account) {
+    $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
+    $store_count = $store_query->count()->execute();
+    if ($this->options['hide_single_store'] && $store_count <= 1) {
+      return FALSE;
     }
-    return parent::renderItems($items);
+
+    return parent::access($account);
   }
 
 }

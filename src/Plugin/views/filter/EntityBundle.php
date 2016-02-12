@@ -4,6 +4,7 @@ namespace Drupal\commerce\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\filter\Bundle;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Filters by entity bundle.
@@ -51,28 +52,13 @@ class EntityBundle extends Bundle {
   /**
    * {@inheritdoc}
    */
-  public function isExposed() {
-    if (!empty($this->options['exposed'])) {
-      $entity_type = $this->getEntityType();
-      $bundles = $this->entityManager->getBundleInfo($entity_type);
-      if (count($bundles) > 1 || empty($this->options['expose']['hide_single_bundle'])) {
-        return TRUE;
-      }
+  public function access(AccountInterface $account) {
+    $bundles = $this->entityManager->getBundleInfo($this->getEntityType());
+    if ($this->options['expose']['hide_single_bundle'] && count($bundles) <= 1) {
+      return FALSE;
     }
 
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitExposed(&$form, FormStateInterface $form_state) {
-    $filter_value = $form_state->getValue($this->options['id']);
-    if (empty($filter_value)) {
-      // The exposed form is submitted on first view load, even when this
-      // filter is hidden. To prevent a notice, a default value is provided.
-      $form_state->setValue($this->options['id'], 'All');
-    }
+    return parent::access($account);
   }
 
 }

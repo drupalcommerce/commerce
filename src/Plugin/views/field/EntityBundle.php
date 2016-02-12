@@ -6,35 +6,18 @@ use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\Field;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Displays the entity bundle.
  *
- * Can be configured to show nothing when there's only one possible bundle,
- * allowing the 'Hide empty column' table setting to hide the column.
+ * Can be configured to show nothing when there's only one possible bundle.
  *
  * @ingroup views_field_handlers
  *
  * @ViewsField("commerce_entity_bundle")
  */
 class EntityBundle extends Field {
-
-  /**
-   * The number of available bundles.
-   *
-   * @var int
-   */
-  protected $bundleCount;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
-    parent::init($view, $display, $options);
-
-    $bundles = $this->entityManager->getBundleInfo($this->getEntityType());
-    $this->bundleCount = count($bundles);
-  }
 
   /**
    * {@inheritdoc}
@@ -62,11 +45,13 @@ class EntityBundle extends Field {
   /**
    * {@inheritdoc}
    */
-  public function renderItems($items) {
-    if ($this->options['hide_single_bundle'] && $this->bundleCount < 2) {
-      return '';
+  public function access(AccountInterface $account) {
+    $bundles = $this->entityManager->getBundleInfo($this->getEntityType());
+    if ($this->options['hide_single_bundle'] && count($bundles) <= 1) {
+      return FALSE;
     }
-    return parent::renderItems($items);
+
+    return parent::access($account);
   }
 
 }
