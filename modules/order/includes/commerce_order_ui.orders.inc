@@ -38,7 +38,11 @@ function commerce_order_settings_form($form, &$form_state) {
  *
  * @see commerce_order_order_form()
  */
-function commerce_order_ui_order_form_wrapper($order, $account = NULL) {
+function commerce_order_ui_order_form_wrapper($order = NULL, $account = NULL) {
+  if (empty($order)) {
+    $order = commerce_order_new();
+  }
+
   // Set the page title and a default customer if necessary.
   if (empty($order->order_id)) {
     drupal_set_title(t('Create an order'));
