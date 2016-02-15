@@ -358,14 +358,15 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
  * @return \Drupal\Core\Entity\EntityInterface
  *   The entity view object.
  */
-function _commerce_product_get_type_storage($product_type, $storage) {
-  if (is_null(\Drupal::entityTypeManager()->getStorage($storage)->load('commerce_product.' . $product_type->id() . '.default'))) {
-    return \Drupal::entityTypeManager()->getStorage($storage)->create([
+function _commerce_product_get_type_storage($product_type, $storage_type) {
+  $storage = \Drupal::entityTypeManager()->getStorage($storage_type)->load('commerce_product.' . $product_type->id() . '.default')
+  if (is_null($storage)) {
+    $storage = \Drupal::entityTypeManager()->getStorage($storage_type)->create([
       'targetEntityType' => 'commerce_product',
       'bundle' => $product_type->id(),
       'mode' => 'default',
       'status' => TRUE,
     ]);
   }
-  return \Drupal::entityTypeManager()->getStorage($storage)->load('commerce_product.' . $product_type->id() . '.default');
+  return $storage;
 }
