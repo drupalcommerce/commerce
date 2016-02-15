@@ -130,7 +130,7 @@ function commerce_product_add_stores_field($product_type) {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    $form = _commerce_product_get_form_storage($product_type);
+    $form = _commerce_product_get_type_storage($product_type, 'entity_form_display');
 
     $form->setComponent('stores', [
         'type' => 'commerce_entity_select',
@@ -169,7 +169,7 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    $form = _commerce_product_get_form_storage($product_type);
+    $form = _commerce_product_get_type_storage($product_type, 'entity_form_display');
 
     $form->setComponent('body', [
         'type' => 'text_textarea_with_summary',
@@ -178,7 +178,7 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
       ->save();
 
     // Assign widget settings for the 'default' view mode.
-    $display = _commerce_product_get_view_storage($product_type);
+    $display = _commerce_product_get_type_storage($product_type, 'entity_view_display');
 
     $display->setComponent('body', [
         'label' => 'hidden',
@@ -233,7 +233,7 @@ function commerce_product_add_variations_field($product_type) {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    $form = _commerce_product_get_form_storage($product_type);
+    $form = _commerce_product_get_type_storage($product_type, 'entity_form_display');
 
     $form->setComponent('variations', [
       'type' => 'inline_entity_form_complex',
@@ -246,7 +246,7 @@ function commerce_product_add_variations_field($product_type) {
     ])->save();
 
     // Assign widget settings for the 'default' view mode.
-    $display = _commerce_product_get_view_storage($product_type);
+    $display = _commerce_product_get_type_storage($product_type, 'entity_view_display');
 
     $display->setComponent('variations', [
        'type' => 'commerce_add_to_cart',
@@ -350,28 +350,7 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
 }
 
 /**
- * Helper function to create the form storage.
- *
- * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
- *   The product type.
- *
- * @return \Drupal\Core\Entity\EntityInterface
- *   The entity form object.
- */
-function _commerce_product_get_form_storage($product_type) {
-  if (is_null(\Drupal::entityTypeManager()->getStorage('entity_form_display')->load('commerce_product.' . $product_type->id() . '.default'))) {
-    return \Drupal::entityTypeManager()->getStorage('entity_form_display')->create([
-      'targetEntityType' => 'commerce_product',
-      'bundle' => $product_type->id(),
-      'mode' => 'default',
-      'status' => TRUE,
-    ]);
-  }
-  return \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('commerce_product.' . $product_type->id() . '.default');
-}
-
-/**
- * Helper function to create the view storage.
+ * Helper function to create the view/form storage.
  *
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
@@ -379,14 +358,14 @@ function _commerce_product_get_form_storage($product_type) {
  * @return \Drupal\Core\Entity\EntityInterface
  *   The entity view object.
  */
-function _commerce_product_get_view_storage($product_type) {
-  if (is_null(\Drupal::entityTypeManager()->getStorage('entity_view_display')->load('commerce_product.' . $product_type->id() . '.default'))) {
-    return \Drupal::entityTypeManager()->getStorage('entity_view_display')->create([
+function _commerce_product_get_type_storage($product_type, $storage) {
+  if (is_null(\Drupal::entityTypeManager()->getStorage($storage)->load('commerce_product.' . $product_type->id() . '.default'))) {
+    return \Drupal::entityTypeManager()->getStorage($storage)->create([
       'targetEntityType' => 'commerce_product',
       'bundle' => $product_type->id(),
       'mode' => 'default',
       'status' => TRUE,
     ]);
   }
-  return \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('commerce_product.' . $product_type->id() . '.default');
+  return \Drupal::entityTypeManager()->getStorage($storage)->load('commerce_product.' . $product_type->id() . '.default');
 }
