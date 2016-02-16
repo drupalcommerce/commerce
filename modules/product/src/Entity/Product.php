@@ -169,8 +169,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    $this->get('uid')->target_id;
-    return $this;
+    return $this->get('uid')->target_id;
   }
 
   /**
