@@ -21,8 +21,8 @@ class OrderTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'views',
-                            'address',  'profile', 'state_machine',
+  public static $modules = ['system', 'entity', 'field', 'options', 'user',
+                            'views', 'address',  'profile', 'state_machine',
                             'inline_entity_form',  'commerce', 'commerce_price',
                             'commerce_store', 'commerce_product',
                             'commerce_order'];

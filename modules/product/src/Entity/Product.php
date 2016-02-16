@@ -31,6 +31,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
+ *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
@@ -53,6 +54,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "add-form" = "/product/add/{type}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
+ *     "delete-multiple-form" = "/admin/commerce/products/delete",
  *     "collection" = "/admin/commerce/products"
  *   },
  *   bundle_entity_type = "commerce_product_type",
