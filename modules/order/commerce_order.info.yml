@@ -25,3 +25,4 @@ config_devel:
   - core.entity_form_display.profile.billing.default
   - core.entity_view_display.profile.billing.default
   - core.entity_view_mode.commerce_order.user
+  - system.action.commerce_delete_order_action

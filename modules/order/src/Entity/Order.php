@@ -31,6 +31,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
  *   base_table = "commerce_order",
@@ -46,6 +47,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "canonical" = "/admin/commerce/orders/{commerce_order}",
  *     "edit-form" = "/admin/commerce/orders/{commerce_order}/edit",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/delete",
+ *     "delete-multiple-form" = "/admin/commerce/orders/delete",
  *     "reassign-form" = "/admin/commerce/orders/{commerce_order}/reassign",
  *     "collection" = "/admin/commerce/orders"
  *   },
