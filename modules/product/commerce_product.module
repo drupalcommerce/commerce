@@ -335,3 +335,24 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
     $field->save();
   }
 }
+
+/**
+ * Implements hook_entity_bundle_create().
+ */
+function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
+  if (\Drupal::moduleHandler()->moduleExists('commerce_cart')) {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+
+    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $form_display */
+    $form_display = $storage->load('commerce_line_item.' . $bundle . '.' . \Drupal\commerce_product\Form\AddToCartForm::LINE_ITEM_FORM_DISPLAY);
+    if (!$form_display) {
+      $form_display = $storage->create([
+        'targetEntityType' => 'commerce_line_item',
+        'bundle' => $bundle,
+        'mode' => \Drupal\commerce_product\Form\AddToCartForm::LINE_ITEM_FORM_DISPLAY,
+        'status' => TRUE,
+      ]);
+      $form_display->save();
+    }
+  }
+}

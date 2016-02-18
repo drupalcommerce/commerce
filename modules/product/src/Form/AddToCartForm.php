@@ -7,6 +7,7 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the add to cart form for product variations.
  */
 class AddToCartForm extends FormBase {
+
+  const LINE_ITEM_FORM_DISPLAY = 'add_to_cart';
 
   /**
    * The cart manager.
@@ -45,13 +48,6 @@ class AddToCartForm extends FormBase {
    * @var \Drupal\commerce_store\StoreContextInterface
    */
   protected $storeContext;
-
-  /**
-   * The current variation.
-   *
-   * @var \Drupal\commerce_product\Entity\ProductVariationInterface
-   */
-  protected $currentVariation;
 
   /**
    * Constructs a new AddToCartForm object.
@@ -95,6 +91,8 @@ class AddToCartForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $product = NULL, array $settings = NULL) {
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+
     $wrapper_id = Html::getUniqueId('commerce-product-add-to-cart-form');
     $form += [
       '#tree' => TRUE,
@@ -104,17 +102,26 @@ class AddToCartForm extends FormBase {
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
     ];
-    $form = $this->variationElement($form, $form_state);
-    $form['quantity'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Quantity'),
-      '#default_value' => $settings['default_quantity'],
-      '#min' => 1,
-      '#max' => 9999,
-      '#step' => 1,
-      '#access' => !empty($settings['show_quantity']),
-      '#weight' => 99,
-    ];
+
+    /** @var \Drupal\commerce_product\Entity\ProductType $product_type */
+    $product_type = $this->entityTypeManager
+      ->getStorage('commerce_product_type')
+      ->load($product->bundle());
+    /** @var \Drupal\commerce_product\Entity\ProductVariationType $variation_type */
+    $variation_type = $this->entityTypeManager
+      ->getStorage('commerce_product_variation_type')
+      ->load($product_type->getVariationType());
+
+    $line_item = $this->entityTypeManager->getStorage('commerce_line_item')
+      ->create([
+        'type' => $variation_type->getLineItemType(),
+      ]);
+
+    $this->variationElement($form, $form_state);
+
+    $form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+    $form_display->buildForm($line_item, $form, $form_state);
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add to cart'),
@@ -126,6 +133,21 @@ class AddToCartForm extends FormBase {
     }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    $variation_storage = $this->entityTypeManager->getStorage('commerce_product_variation');
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = $variation_storage->load($form_state->getValue('variation'));
+
+    $line_item = $this->cartManager->createLineItem($variation);
+    $line_item_form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+    $line_item_form_display->validateFormValues($line_item, $form, $form_state);
   }
 
   /**
@@ -150,9 +172,16 @@ class AddToCartForm extends FormBase {
     if (!$cart) {
       $cart = $this->cartProvider->createCart('default', $store);
     }
-    $quantity = $form_state->getValue('quantity');
+
     $combine = $form['#settings']['combine'];
-    $this->cartManager->addEntity($cart, $variation, $quantity, $combine);
+
+    $line_item = $this->cartManager->createLineItem($variation);
+    $line_item_form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+
+    $line_item_form_display->extractFormValues($line_item, $form, $form_state);
+
+    $this->cartManager->addLineItem($cart, $line_item, $combine);
+
     drupal_set_message(t('@variation added to @cart-link.', [
       '@variation' => $variation->label(),
       '@cart-link' => Link::createFromRoute('your cart', 'commerce_cart.page')->toString(),
@@ -160,17 +189,14 @@ class AddToCartForm extends FormBase {
   }
 
   /**
-   * Builds the form elements for selecting a variation.
+   * Create variation selection widget.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return array
-   *   The modified form.
+   *   The current state of the form.
    */
-  protected function variationElement(array $form, FormStateInterface $form_state) {
+  protected function variationElement(&$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\Product $product */
     $product = $form['#product'];
     $variations = $product->variations->referencedEntities();
@@ -180,7 +206,6 @@ class AddToCartForm extends FormBase {
         '#type' => 'value',
         '#value' => 0,
       ];
-      return $form;
     }
     elseif (count($variations) === 1) {
       // Preselect the only possible variation.
@@ -190,54 +215,45 @@ class AddToCartForm extends FormBase {
         '#type' => 'value',
         '#value' => $selected_variation->id(),
       ];
-      return $form;
     }
-
-    // Build the full attribute form.
-    $selected_variation = $this->selectVariationFromUserInput($variations, $form_state);
-    $form['variation'] = [
-      '#type' => 'value',
-      '#value' => $selected_variation->id(),
-    ];
-    $form['attributes'] = [
-      '#type' => 'container',
-      '#attributes' => [
-        'class' => ['attribute-widgets'],
-      ],
-    ];
-    foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
-      $form['attributes'][$field_name] = [
-        '#type' => $attribute['type'],
-        '#title' => $attribute['title'],
-        '#options' => $attribute['values'],
-        '#required' => $attribute['required'],
-        '#default_value' => $selected_variation->get($field_name)->target_id,
-        '#ajax' => [
-          'callback' => '::ajaxRefresh',
-          'wrapper' => $form['#wrapper_id'],
+    else {
+      // Build the full attribute form.
+      $selected_variation = $this->selectVariationFromUserInput($variations, $form_state);
+      $form['variation'] = [
+        '#type' => 'value',
+        '#value' => $selected_variation->id(),
+      ];
+      $form['attributes'] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['attribute-widgets'],
         ],
       ];
-      // Convert the _none option into #empty_value.
-      if (isset($form['attributes'][$field_name]['options']['_none'])) {
-        if (!$form['attributes'][$field_name]['#required']) {
-          $form['attributes'][$field_name]['#empty_value'] = '';
+      foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
+        $form['attributes'][$field_name] = [
+          '#type' => $attribute['type'],
+          '#title' => $attribute['title'],
+          '#options' => $attribute['values'],
+          '#required' => $attribute['required'],
+          '#default_value' => $selected_variation->get($field_name)->target_id,
+          '#ajax' => [
+            'callback' => '::ajaxRefresh',
+            'wrapper' => $form['#wrapper_id'],
+          ],
+        ];
+        // Convert the _none option into #empty_value.
+        if (isset($form['attributes'][$field_name]['options']['_none'])) {
+          if (!$form['attributes'][$field_name]['#required']) {
+            $form['attributes'][$field_name]['#empty_value'] = '';
+          }
+          unset($form['attributes'][$field_name]['options']['_none']);
         }
-        unset($form['attributes'][$field_name]['options']['_none']);
-      }
-      // 1 required value -> Disable the element to skip unneeded ajax calls.
-      if ($attribute['required'] && count($attribute['values']) === 1) {
-        $form['attributes'][$field_name]['#disabled'] = TRUE;
+        // 1 required value -> Disable the element to skip unneeded ajax calls.
+        if ($attribute['required'] && count($attribute['values']) === 1) {
+          $form['attributes'][$field_name]['#disabled'] = TRUE;
+        }
       }
     }
-
-    return $form;
-  }
-
-  /**
-   * Ajax callback.
-   */
-  public function ajaxRefresh(array $form, FormStateInterface $form_state) {
-    return $form;
   }
 
   /**
@@ -333,11 +349,10 @@ class AddToCartForm extends FormBase {
 
     return $attributes;
   }
-
   /**
    * Gets the attribute values of a given set of variations.
    *
-   * @param array $variations
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
    *   The variations.
    * @param string $field_name
    *   The field name of the attribute.
@@ -363,6 +378,13 @@ class AddToCartForm extends FormBase {
     }
 
     return $values;
+  }
+
+  /**
+   * Ajax callback.
+   */
+  public function ajaxRefresh(array $form, FormStateInterface $form_state) {
+    return $form;
   }
 
 }

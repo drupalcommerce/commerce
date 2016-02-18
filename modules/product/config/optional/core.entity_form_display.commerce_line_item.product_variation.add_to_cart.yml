@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_line_item_type.product_variation
+    - core.entity_form_mode.commerce_line_item.add_to_cart
+  module:
+    - commerce_product
+id: commerce_line_item.product_variation.add_to_cart
+targetEntityType: commerce_line_item
+bundle: product_variation
+mode: add_to_cart
+content:
+hidden:
+  created: true
+  purchased_entity: true
+  quantity: true
+  status: true
+  uid: true
+  unit_price: true
