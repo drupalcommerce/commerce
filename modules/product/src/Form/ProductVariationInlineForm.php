@@ -24,7 +24,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
    * {@inheritdoc}
    */
   public function getTableFields($bundles) {
-    $fields = parent::tableFields($bundles);
+    $fields = parent::getTableFields($bundles);
     $fields['label']['label'] = t('Title');
     $fields['status'] = [
       'type' => 'field',
