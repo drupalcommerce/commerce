@@ -14,7 +14,7 @@ class LineItemInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function labels() {
+  public function getEntityTypeLabels() {
     $labels = [
       'singular' => t('line item'),
       'plural' => t('line items'),
@@ -25,7 +25,7 @@ class LineItemInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function tableFields($bundles) {
+  public function getTableFields($bundles) {
     $fields = parent::tableFields($bundles);
     $fields['unit_price'] = [
       'type' => 'field',

@@ -12,7 +12,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function labels() {
+  public function getEntityTypeLabels() {
     $labels = [
       'singular' => t('variation'),
       'plural' => t('variations'),
@@ -23,7 +23,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function tableFields($bundles) {
+  public function getTableFields($bundles) {
     $fields = parent::tableFields($bundles);
     $fields['label']['label'] = t('Title');
     $fields['status'] = [
