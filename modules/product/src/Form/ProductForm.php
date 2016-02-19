@@ -56,7 +56,7 @@ class ProductForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Skip building the form if there are no available stores.
     $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
-    if ($store_query->count()->execute() === 0) {
+    if ($store_query->count()->execute() == 0) {
       $options = [
         'query' => [
           'destination' => Url::fromRoute('<current>')->toString(),
