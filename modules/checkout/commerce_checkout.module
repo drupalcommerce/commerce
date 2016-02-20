@@ -478,7 +478,9 @@ function commerce_checkout_pages() {
  * Returns the page ID of the first checkout page sorted by weight.
  */
 function commerce_checkout_first_checkout_page() {
-  return key(commerce_checkout_pages());
+  $keys = commerce_checkout_pages();
+  reset($keys);
+  return key($keys);
 }
 
 /**
