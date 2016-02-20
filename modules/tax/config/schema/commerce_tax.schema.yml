@@ -8,6 +8,9 @@ commerce_tax.commerce_tax_type.*:
     name:
       type: string
       label: 'Tax type name'
+    zone:
+      type: string
+      label: 'Tax type zone'
     compound:
       type: boolean
       label: 'Whether the tax type is compound'

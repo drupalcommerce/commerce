@@ -22,7 +22,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxRateAmountListBuilder"
  *   },
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer tax",
  *   config_prefix = "commerce_tax_rate_amount",
  *   entity_keys = {
  *     "id" = "id",
@@ -105,7 +105,7 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function getRate() {
     if (!$this->loadedRate) {
-      $this->loadedRate = $this->entityTypeManager()->getStorage('tax_rate')->load($this->rate);
+      $this->loadedRate = $this->entityTypeManager()->getStorage('commerce_tax_rate')->load($this->rate);
     }
     return $this->loadedRate;
   }

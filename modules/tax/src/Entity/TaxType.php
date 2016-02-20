@@ -25,7 +25,7 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxTypeListBuilder"
  *   },
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer tax",
  *   config_prefix = "commerce_tax_type",
  *   entity_keys = {
  *     "id" = "id",
@@ -34,7 +34,7 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *   config_export = {
  *     "id",
  *     "name",
- *     "genericLabel",
+ *     "zone",
  *     "compound",
  *     "displayInclusive",
  *     "roundingMode",
