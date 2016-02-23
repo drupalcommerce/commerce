@@ -273,20 +273,35 @@ class AddToCartForm extends FormBase {
   protected function selectVariationFromUserInput(array $variations, FormStateInterface $form_state) {
     $user_input = $form_state->getUserInput();
     $current_variation = reset($variations);
+
     if (!empty($user_input)) {
+      $matches = [];
+      $invalid_matches = [];
       $attributes = $user_input['attributes'];
-      foreach ($variations as $variation) {
-        $match = TRUE;
-        foreach ($attributes as $field_name => $value) {
+
+      // Remove the last attribute. We don't filter based on it.
+      array_pop($attributes);
+
+      foreach ($attributes as $field_name => $value) {
+        foreach ($variations as $variation) {
+          // Check if this variation has been considered and invalid match.
+          if (array_key_exists($variation->id(), $invalid_matches)) {
+            continue;
+          }
+
           if ($variation->get($field_name)->target_id != $value) {
-            $match = FALSE;
+            $invalid_matches[$variation->id()] = $variation;
+          }
+          else {
+            $matches[$variation->id()] = $variation;
           }
         }
+      }
 
-        if ($match) {
-          $current_variation = $variation;
-          break;
-        }
+      $matches = array_diff_key($matches, $invalid_matches);
+
+      if (!empty($matches)) {
+        $current_variation = reset($matches);
       }
     }
 
