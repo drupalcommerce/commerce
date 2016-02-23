@@ -1,0 +1,4 @@
+'administer tax':
+  title: 'Administer tax'
+  description: 'Allows users configure tax.'
+  'restrict access': TRUE
