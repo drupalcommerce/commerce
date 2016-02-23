@@ -77,7 +77,8 @@ interface TaxTypeInterface extends ExternalTaxTypeInterface, ConfigEntityInterfa
   /**
    * Sets the tax type tag.
    *
-   * @param string $tag The tax type tag.
+   * @param string $tag
+   *   The tax type tag.
    */
   public function setTag($tag);
 

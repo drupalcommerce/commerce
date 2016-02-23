@@ -38,6 +38,7 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     "compound",
  *     "displayInclusive",
  *     "roundingMode",
+ *     "zone",
  *     "tag",
  *     "rates",
  *   },
