@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce\Tests;
+namespace Drupal\Tests\commerce\Unit;
 
 use Drupal\commerce\AvailabilityManager;
 use Drupal\Tests\UnitTestCase;
