@@ -240,6 +240,8 @@ class AddToCartForm extends FormBase {
             'callback' => '::ajaxRefresh',
             'wrapper' => $form['#wrapper_id'],
           ],
+          // Options may change and not contain the current #value when processed.
+          '#validated' => TRUE,
         ];
         // Convert the _none option into #empty_value.
         if (isset($form['attributes'][$field_name]['options']['_none'])) {
@@ -298,11 +300,9 @@ class AddToCartForm extends FormBase {
         }
       }
 
+      // Check if we have valid matches, and change the current variation.
       $matches = array_diff_key($matches, $invalid_matches);
-
-      if (!empty($matches)) {
-        $current_variation = reset($matches);
-      }
+      $current_variation = reset($matches);
     }
 
     return $current_variation;
