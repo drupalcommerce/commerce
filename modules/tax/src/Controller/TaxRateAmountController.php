@@ -22,7 +22,7 @@ class TaxRateAmountController extends ControllerBase {
   public function addForm(TaxRateInterface $commerce_tax_rate) {
     $rate = $this
       ->entityTypeManager()
-      ->getStorage('commerce_tax_rate')
+      ->getStorage('commerce_tax_rate_amount')
       ->create(['rate' => $commerce_tax_rate->id()]);
 
     return $this->entityFormBuilder()->getForm($rate, 'add');

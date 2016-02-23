@@ -112,7 +112,7 @@ class TaxRateAmountForm extends EntityForm {
     drupal_set_message($this->t('Saved the %label tax rate.', [
       '%label' => $this->entity->label(),
     ]));
-    $form_state->setRedirectUrl($this->entity->toUrl('canonical'));
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
 
 }

@@ -105,7 +105,7 @@ class TaxRateAmount extends ConfigEntityBase implements TaxRateAmountInterface {
    */
   public function getRate() {
     if (!$this->loadedRate) {
-      $this->loadedRate = $this->entityTypeManager()->getStorage('tax_rate')->load($this->rate);
+      $this->loadedRate = $this->entityTypeManager()->getStorage('commerce_tax_rate')->load($this->rate);
     }
     return $this->loadedRate;
   }
