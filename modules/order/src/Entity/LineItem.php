@@ -202,7 +202,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'string',
+        'type' => 'number',
         'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE)
@@ -213,7 +213,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDescription(t('The price of a single unit.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'price_simple',
+        'type' => 'commerce_price_default',
         'weight' => 2,
       ])
       ->setDisplayConfigurable('form', TRUE)
