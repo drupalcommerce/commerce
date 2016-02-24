@@ -13,6 +13,8 @@ use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
+use Drupal\commerce_product\Form\AddToCartForm;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -268,6 +270,31 @@ class AddToCartFormTest extends OrderTestBase {
     $line_item = $line_items[1];
     $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
     $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+  }
+
+  /**
+   * Tests ability to expose line item fields on the add to cart form.
+   */
+  public function testExposedLineItemFields() {
+    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $line_item_form_display */
+    $line_item_form_display = EntityFormDisplay::load('commerce_line_item.product_variation.' . AddToCartForm::LINE_ITEM_FORM_DISPLAY);
+    $line_item_form_display->setComponent('quantity', [
+      'type' => 'number',
+    ]);
+    $line_item_form_display->save();
+
+    // Get the existing product page and submit Add to cart form.
+    $this->postAddToCart($this->variation->getProduct(), [
+      'quantity' => 3,
+    ]);
+
+    // Check if the quantity was increased for the existing line item.
+    $this->cart = Order::load($this->cart->id());
+    $line_items = $this->cart->getLineItems();
+    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
+    $line_item = $line_items[0];
+    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 3), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
   }
 
   /**

@@ -4,7 +4,7 @@ dependencies:
   config:
     - commerce_order.commerce_line_item_type.product_variation
   module:
-    - commerce_price
+    - commerce_product
 id: commerce_line_item.product_variation.default
 targetEntityType: commerce_line_item
 bundle: product_variation
@@ -22,14 +22,10 @@ content:
     type: number
     weight: 1
     settings:
-      placeholder: ''
-    third_party_settings: {  }
-  unit_price:
-    type: commerce_price_default
-    weight: 2
-    settings: {  }
+      placeholder: '1'
     third_party_settings: {  }
 hidden:
   created: true
   status: true
   uid: true
+  unit_price: true
