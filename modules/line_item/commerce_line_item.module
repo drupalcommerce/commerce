@@ -1263,7 +1263,7 @@ function commerce_line_item_manager_validate($element, &$form_state, $form) {
   // If the "Add line item" button was clicked, store the line item type in the
   // $form_state for the rebuild of the $form array.
   if (!empty($form_state['triggering_element'])) {
-    if ($form_state['triggering_element']['#value'] == t('Add line item')) {
+    if ($form_state['triggering_element']['#value'] === t('Add line item')) {
       $form_state['line_item_add'] = $element['actions']['line_item_type']['#value'];
       $form_state['rebuild'] = TRUE;
     }
