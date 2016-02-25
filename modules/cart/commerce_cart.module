@@ -54,6 +54,30 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 }
 
 /**
+ * Implements hook_entity_bundle_create().
+ *
+ * Creates an 'add_to_cart' form display for each new line item type.
+ */
+function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
+  if ($entity_type_id == 'commerce_line_item' && !\Drupal::isConfigSyncing()) {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+    $form_display = $storage->load('commerce_line_item.' . $bundle . '.add_to_cart');
+    if (!$form_display) {
+      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+      $form_display = $storage->create([
+        'targetEntityType' => 'commerce_line_item',
+        'bundle' => $bundle,
+        'mode' => 'add_to_cart',
+        'status' => TRUE,
+      ]);
+      // Hide the unit price by default.
+      $form_display->removeComponent('unit_price');
+      $form_display->save();
+    }
+  }
+}
+
+/**
  * Implements hook_ENTITY_TYPE_delete().
  *
  * Removes deleted carts from the anonymous user's session.

@@ -9,5 +9,7 @@ dependencies:
   - commerce_product
   - views
 config_devel:
-  - views.view.commerce_cart_form
-  - views.view.commerce_carts
+  install:
+    - core.entity_form_mode.commerce_line_item.add_to_cart
+    - views.view.commerce_cart_form
+    - views.view.commerce_carts

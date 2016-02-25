@@ -4,6 +4,10 @@ dependencies:
   config:
     - commerce_product.commerce_product_variation_type.default
     - core.entity_view_mode.commerce_product_variation.cart
+  enforced:
+    module:
+      - commerce_cart
+      - commerce_product
 id: commerce_product_variation.default.cart
 targetEntityType: commerce_product_variation
 bundle: default
