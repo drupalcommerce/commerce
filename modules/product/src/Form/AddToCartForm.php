@@ -7,6 +7,7 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the add to cart form for product variations.
  */
 class AddToCartForm extends FormBase {
+
+  const LINE_ITEM_FORM_DISPLAY = 'add_to_cart';
 
   /**
    * The cart manager.
@@ -45,13 +48,6 @@ class AddToCartForm extends FormBase {
    * @var \Drupal\commerce_store\StoreContextInterface
    */
   protected $storeContext;
-
-  /**
-   * The current variation.
-   *
-   * @var \Drupal\commerce_product\Entity\ProductVariationInterface
-   */
-  protected $currentVariation;
 
   /**
    * Constructs a new AddToCartForm object.
@@ -95,6 +91,8 @@ class AddToCartForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $product = NULL, array $settings = NULL) {
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+
     $wrapper_id = Html::getUniqueId('commerce-product-add-to-cart-form');
     $form += [
       '#tree' => TRUE,
@@ -104,17 +102,26 @@ class AddToCartForm extends FormBase {
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
     ];
-    $form = $this->variationElement($form, $form_state);
-    $form['quantity'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Quantity'),
-      '#default_value' => $settings['default_quantity'],
-      '#min' => 1,
-      '#max' => 9999,
-      '#step' => 1,
-      '#access' => !empty($settings['show_quantity']),
-      '#weight' => 99,
-    ];
+
+    /** @var \Drupal\commerce_product\Entity\ProductType $product_type */
+    $product_type = $this->entityTypeManager
+      ->getStorage('commerce_product_type')
+      ->load($product->bundle());
+    /** @var \Drupal\commerce_product\Entity\ProductVariationType $variation_type */
+    $variation_type = $this->entityTypeManager
+      ->getStorage('commerce_product_variation_type')
+      ->load($product_type->getVariationType());
+
+    $line_item = $this->entityTypeManager->getStorage('commerce_line_item')
+      ->create([
+        'type' => $variation_type->getLineItemType(),
+      ]);
+
+    $this->variationElement($form, $form_state);
+
+    $form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+    $form_display->buildForm($line_item, $form, $form_state);
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add to cart'),
@@ -126,6 +133,21 @@ class AddToCartForm extends FormBase {
     }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    $variation_storage = $this->entityTypeManager->getStorage('commerce_product_variation');
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+    $variation = $variation_storage->load($form_state->getValue('variation'));
+
+    $line_item = $this->cartManager->createLineItem($variation);
+    $line_item_form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+    $line_item_form_display->validateFormValues($line_item, $form, $form_state);
   }
 
   /**
@@ -150,9 +172,16 @@ class AddToCartForm extends FormBase {
     if (!$cart) {
       $cart = $this->cartProvider->createCart('default', $store);
     }
-    $quantity = $form_state->getValue('quantity');
+
     $combine = $form['#settings']['combine'];
-    $this->cartManager->addEntity($cart, $variation, $quantity, $combine);
+
+    $line_item = $this->cartManager->createLineItem($variation);
+    $line_item_form_display = EntityFormDisplay::collectRenderDisplay($line_item, self::LINE_ITEM_FORM_DISPLAY);
+
+    $line_item_form_display->extractFormValues($line_item, $form, $form_state);
+
+    $this->cartManager->addLineItem($cart, $line_item, $combine);
+
     drupal_set_message(t('@variation added to @cart-link.', [
       '@variation' => $variation->label(),
       '@cart-link' => Link::createFromRoute('your cart', 'commerce_cart.page')->toString(),

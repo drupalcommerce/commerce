@@ -201,6 +201,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
+      ->setDefaultValue(1)
       ->setDisplayOptions('form', [
         'type' => 'number',
         'weight' => 1,
