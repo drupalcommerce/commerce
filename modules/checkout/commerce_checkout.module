@@ -995,7 +995,7 @@ function commerce_checkout_completion_message_default() {
     $format = 'filtered_html';
   }
   else {
-    // Otherwise select a fallback format and use a plaint text default value.
+    // Otherwise select a fallback format and use a plain text default value.
     $value = 'Your order number is [commerce-order:order-number]. You can view your order on your account page when logged in.';
     $format = filter_fallback_format();
   }
