@@ -9,6 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views\Entity\View;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Provides a cart block.
@@ -200,11 +202,61 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Find proper cache tags to make this cacheable
    */
   public function getCacheMaxAge() {
-    return 0;
+    $cache_max_age = 0;
+
+    // Use the cart provider to get the carts.
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
+    $carts = $this->cartProvider->getCarts();
+    $carts = array_filter($carts, function ($cart) {
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
+      return $cart->hasLineItems();
+    });
+
+    $cart_views = [];
+    if (!empty($carts)) {
+      $cart_views = $this->getCartViews($carts);
+    }
+    foreach ($cart_views as $cart_view) {
+      $view = View::load($cart_view['#name']);
+
+      if ($view->getCacheMaxAge() == Cache::PERMANENT) {
+        $cache_max_age = Cache::PERMANENT;
+        break;
+      }
+      else if ($cache_max_age < $view->getCacheMaxAge()) {
+        $cache_max_age = $view->getCacheMaxAge();
+      }
+    }
+
+    return $cache_max_age;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $cache_contexts = [];
+
+    // Use the cart provider to get the carts.
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
+    $carts = $this->cartProvider->getCarts();
+    $carts = array_filter($carts, function ($cart) {
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
+      return $cart->hasLineItems();
+    });
+
+    $cart_views = [];
+    if (!empty($carts)) {
+      $cart_views = $this->getCartViews($carts);
+    }
+    foreach ($cart_views as $cart_view) {
+      $view = View::load($cart_view['#name']);
+      $cache_contexts = Cache::mergeContexts($view->getCacheContexts(), $cache_contexts);
+    }
+
+    return $cache_contexts;
   }
 
 }
