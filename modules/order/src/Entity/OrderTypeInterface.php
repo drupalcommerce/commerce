@@ -10,23 +10,23 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface OrderTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the workflow of the order type.
+   * Gets the order type's workflow ID.
    *
    * Used by the $order->state field.
    *
    * @return string
-   *   The order type workflow.
+   *   The order type workflow ID.
    */
-  public function getWorkflow();
+  public function getWorkflowId();
 
   /**
-   * Sets the workflow of the order type.
+   * Sets the workflow ID of the order type.
    *
-   * @param string $workflow
-   *   The workflow.
+   * @param string $workflow_id
+   *   The workflow ID.
    *
    * @return $this
    */
-  public function setWorkflow($workflow);
+  public function setWorkflowId($workflow_id);
 
 }

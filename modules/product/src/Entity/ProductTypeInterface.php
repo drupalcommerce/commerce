@@ -11,21 +11,21 @@ use Drupal\entity\Entity\EntityDescriptionInterface;
 interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionInterface {
 
   /**
-   * Gets the product type's matching variation type.
+   * Gets the product type's matching variation type ID.
    *
    * @return string
-   *   The variation type.
+   *   The variation type ID.
    */
-  public function getVariationType();
+  public function getVariationTypeId();
 
   /**
-   * Sets the product type's matching variation type.
+   * Sets the product type's matching variation type ID.
    *
-   * @param string $variation_type
-   *   The variation type.
+   * @param string $variation_type_id
+   *   The variation type ID.
    *
    * @return $this
    */
-  public function setVariationType($variation_type);
+  public function setVariationTypeId($variation_type_id);
 
 }

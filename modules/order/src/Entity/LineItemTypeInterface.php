@@ -10,42 +10,42 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface LineItemTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the line item type's purchasable entity type.
+   * Gets the line item type's purchasable entity type ID.
    *
-   * For example, if line items of this type are used to purchase product
-   * variations, the purchasable entity type will be 'commerce_product_variation'.
+   * E.g, if line items of this type are used to purchase product variations,
+   * the purchasable entity type ID will be 'commerce_product_variation'.
    *
    * @return string
-   *   The purchasable entity type.
+   *   The purchasable entity type ID.
    */
-  public function getPurchasableEntityType();
+  public function getPurchasableEntityTypeId();
 
   /**
-   * Sets the line item type's purchasable entity type.
+   * Sets the line item type's purchasable entity type ID.
    *
-   * @param string $purchasable_entity_type
+   * @param string $purchasable_entity_type_id
    *   The purchasable entity type.
    *
    * @return $this
    */
-  public function setPurchasableEntityType($purchasable_entity_type);
+  public function setPurchasableEntityTypeId($purchasable_entity_type_id);
 
   /**
-   * Gets the line item type's order type.
+   * Gets the line item type's order type ID.
    *
    * @return string
    *   The order type.
    */
-  public function getOrderType();
+  public function getOrderTypeId();
 
   /**
-   * Sets the line item type's order type.
+   * Sets the line item type's order type ID.
    *
-   * @param string $order_type
-   *   The order type.
+   * @param string $order_type_id
+   *   The order type ID.
    *
    * @return $this
    */
-  public function setOrderType($order_type);
+  public function setOrderTypeId($order_type_id);
 
 }

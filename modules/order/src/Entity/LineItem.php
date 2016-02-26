@@ -255,7 +255,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
     /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $line_item_type */
     $line_item_type = LineItemType::load($bundle);
-    $purchasable_entity_type = $line_item_type->getPurchasableEntityType();
+    $purchasable_entity_type = $line_item_type->getPurchasableEntityTypeId();
     $fields = [];
     $fields['purchased_entity'] = clone $base_field_definitions['purchased_entity'];
     if ($purchasable_entity_type) {

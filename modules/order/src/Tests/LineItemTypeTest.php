@@ -24,8 +24,8 @@ class LineItemTypeTest extends OrderTestBase {
     $this->createEntity('commerce_line_item_type', $values);
     $line_item_type = LineItemType::load($values['id']);
     $this->assertEqual($line_item_type->label(), $values['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($line_item_type->getPurchasableEntityType(), $values['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
-    $this->assertEqual($line_item_type->getOrderType(), $values['orderType'], 'The new line item type has the correct order type.');
+    $this->assertEqual($line_item_type->getPurchasableEntityTypeId(), $values['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
+    $this->assertEqual($line_item_type->getOrderTypeId(), $values['orderType'], 'The new line item type has the correct order type.');
 
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
@@ -36,8 +36,8 @@ class LineItemTypeTest extends OrderTestBase {
     $this->drupalPostForm('admin/commerce/config/line-item-types/add', $edit, t('Save'));
     $line_item_type = LineItemType::load($edit['id']);
     $this->assertEqual($line_item_type->label(), $edit['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($line_item_type->getPurchasableEntityType(), $edit['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
-    $this->assertEqual($line_item_type->getOrderType(), $edit['orderType'], 'The new line item type has the correct order type.');
+    $this->assertEqual($line_item_type->getPurchasableEntityTypeId(), $edit['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
+    $this->assertEqual($line_item_type->getOrderTypeId(), $edit['orderType'], 'The new line item type has the correct order type.');
   }
 
   /**

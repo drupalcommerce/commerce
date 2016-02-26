@@ -92,7 +92,7 @@ class ProductTypeForm extends BundleEntityFormBase {
     $form['variationType'] = [
       '#type' => 'select',
       '#title' => $this->t('Product variation type'),
-      '#default_value' => $product_type->getVariationType(),
+      '#default_value' => $product_type->getVariationTypeId(),
       '#options' => $variation_types,
       '#required' => TRUE,
       '#access' => $product_type->isNew(),

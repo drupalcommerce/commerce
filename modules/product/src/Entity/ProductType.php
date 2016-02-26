@@ -75,7 +75,7 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $description;
 
   /**
-   * The matching variation type.
+   * The variation type ID.
    *
    * @var string
    */
@@ -99,15 +99,15 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   /**
    * {@inheritdoc}
    */
-  public function getVariationType() {
+  public function getVariationTypeId() {
     return $this->variationType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setVariationType($variation_type) {
-    $this->variationType = $variation_type;
+  public function setVariationTypeId($variation_type_id) {
+    $this->variationType = $variation_type_id;
     return $this;
   }
 

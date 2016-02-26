@@ -461,7 +461,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
-      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflow']);
+      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
@@ -525,7 +525,7 @@ class Order extends ContentEntityBase implements OrderInterface {
   }
 
   /**
-   * Gets the workflow for the state field.
+   * Gets the workflow ID for the state field.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
@@ -533,8 +533,8 @@ class Order extends ContentEntityBase implements OrderInterface {
    * @return string
    *   The workflow id.
    */
-  public static function getWorkflow(OrderInterface $order) {
-    $workflow = OrderType::load($order->bundle())->getWorkflow();
+  public static function getWorkflowId(OrderInterface $order) {
+    $workflow = OrderType::load($order->bundle())->getWorkflowId();
     return $workflow;
   }
 

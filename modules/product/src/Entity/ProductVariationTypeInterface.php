@@ -10,24 +10,24 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface ProductVariationTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the product variation type's line item type.
+   * Gets the product variation type's line item type ID.
    *
    * Used for finding/creating the appropriate line item when purchasing a
    * product (adding it to an order).
    *
    * @return string
-   *   The line item type.
+   *   The line item type ID.
    */
-  public function getLineItemType();
+  public function getLineItemTypeId();
 
   /**
-   * Sets the product variation type's line item type.
+   * Sets the product variation type's line item type ID.
    *
-   * @param string $line_item_type
-   *   The line item type.
+   * @param string $line_item_type_id
+   *   The line item type ID.
    *
    * @return $this
    */
-  public function setLineItemType($line_item_type);
+  public function setLineItemTypeId($line_item_type_id);
 
 }

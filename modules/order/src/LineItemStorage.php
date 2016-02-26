@@ -15,7 +15,7 @@ class LineItemStorage extends CommerceContentEntityStorage implements LineItemSt
    */
   public function createFromPurchasableEntity(PurchasableEntityInterface $entity, array $values = []) {
     $values += [
-      'type' => $entity->getLineItemType(),
+      'type' => $entity->getLineItemTypeId(),
       'title' => $entity->getLineItemTitle(),
       'purchased_entity' => $entity,
     ];
