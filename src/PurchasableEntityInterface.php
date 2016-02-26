@@ -14,15 +14,15 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface PurchasableEntityInterface extends ContentEntityInterface {
 
   /**
-   * Gets the purchasable entity's line item type.
+   * Gets the purchasable entity's line item type ID.
    *
    * Used for finding/creating the appropriate line item when purchasing a
    * product (adding it to an order).
    *
    * @return string
-   *   The line item type.
+   *   The line item type ID.
    */
-  public function getLineItemType();
+  public function getLineItemTypeId();
 
   /**
    * Gets the purchasable entity's line item title.

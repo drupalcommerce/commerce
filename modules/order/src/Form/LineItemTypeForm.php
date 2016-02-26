@@ -49,7 +49,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
     $form['purchasableEntityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Purchasable entity type'),
-      '#default_value' => $line_item_type->getPurchasableEntityType(),
+      '#default_value' => $line_item_type->getPurchasableEntityTypeId(),
       '#options' => $purchasable_entity_types,
       '#empty_value' => '',
       '#disabled' => !$line_item_type->isNew(),
@@ -57,7 +57,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
     $form['orderType'] = [
       '#type' => 'select',
       '#title' => $this->t('Order type'),
-      '#default_value' => $line_item_type->getOrderType(),
+      '#default_value' => $line_item_type->getOrderTypeId(),
       '#options' => $order_types,
       '#required' => TRUE,
     ];

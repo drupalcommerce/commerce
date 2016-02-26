@@ -60,7 +60,7 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   protected $label;
 
   /**
-   * The order type workflow.
+   * The order type workflow ID.
    *
    * @var string
    */
@@ -69,15 +69,15 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getWorkflow() {
+  public function getWorkflowId() {
     return $this->workflow;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setWorkflow($workflow) {
-    $this->workflow = $workflow;
+  public function setWorkflowId($workflow_id) {
+    $this->workflow = $workflow_id;
     return $this;
   }
 

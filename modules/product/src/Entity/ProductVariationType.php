@@ -46,14 +46,14 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 class ProductVariationType extends ConfigEntityBundleBase implements ProductVariationTypeInterface {
 
   /**
-   * The product variation type id.
+   * The product variation type ID.
    *
    * @var string
    */
   protected $id;
 
   /**
-   * The line item type.
+   * The line item type ID.
    *
    * @var string
    */
@@ -62,15 +62,15 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   /**
    * {@inheritdoc}
    */
-  public function getLineItemType() {
+  public function getLineItemTypeId() {
     return $this->lineItemType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLineItemType($line_item_type) {
-    $this->lineItemType = $line_item_type;
+  public function setLineItemTypeId($line_item_type_id) {
+    $this->lineItemType = $line_item_type_id;
     return $this;
   }
 

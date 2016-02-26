@@ -61,14 +61,14 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   protected $label;
 
   /**
-   * The purchasable entity type.
+   * The purchasable entity type ID.
    *
    * @var string
    */
   protected $purchasableEntityType;
 
   /**
-   * The order type.
+   * The order type ID.
    *
    * @var string
    */
@@ -77,30 +77,30 @@ class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterfa
   /**
    * {@inheritdoc}
    */
-  public function getPurchasableEntityType() {
+  public function getPurchasableEntityTypeId() {
     return $this->purchasableEntityType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setPurchasableEntityType($purchasable_entity_type) {
-    $this->purchasableEntityType = $purchasable_entity_type;
+  public function setPurchasableEntityTypeId($purchasable_entity_type_id) {
+    $this->purchasableEntityType = $purchasable_entity_type_id;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOrderType() {
+  public function getOrderTypeId() {
     return $this->orderType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setOrderType($order_type) {
-    $this->orderType = $order_type;
+  public function setOrderTypeId($order_type_id) {
+    $this->orderType = $order_type_id;
     return $this;
   }
 

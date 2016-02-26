@@ -24,7 +24,7 @@ class LineItemViewsData extends EntityViewsData {
     $entity_type_ids = [];
     /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $line_item_type */
     foreach ($line_item_types as $line_item_type) {
-      if ($entity_type_id = $line_item_type->getPurchasableEntityType()) {
+      if ($entity_type_id = $line_item_type->getPurchasableEntityTypeId()) {
         $entity_type_ids[] = $entity_type_id;
       }
     }

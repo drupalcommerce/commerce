@@ -37,7 +37,7 @@ class ProductTypeTest extends ProductTestBase {
     $product_type = ProductType::load($values['id']);
     $this->assertEqual($product_type->label(), $values['label'], 'The new product type has the correct label.');
     $this->assertEqual($product_type->getDescription(), $values['description'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getVariationType(), $values['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertEqual($product_type->getVariationTypeId(), $values['variationType'], 'The new product type has the correct associated variation type.');
 
     $this->drupalGet('product/add/' . $product_type->id());
     $this->assertResponse(200, 'The new product type can be accessed at product/add.');
@@ -55,7 +55,7 @@ class ProductTypeTest extends ProductTestBase {
     $this->assertTrue($product_type, 'The new product type has been created.');
     $this->assertEqual($product_type->label(), $edit['label'], 'The new product type has the correct label.');
     $this->assertEqual($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getVariationType(), $edit['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertEqual($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
   }
 
   /**

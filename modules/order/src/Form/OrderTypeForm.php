@@ -38,7 +38,7 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#type' => 'select',
       '#title' => t('Workflow'),
       '#options' => $workflows,
-      '#default_value' => $order_type->getWorkflow(),
+      '#default_value' => $order_type->getWorkflowId(),
       '#description' => $this->t('Used by all orders of this type.'),
     ];
 

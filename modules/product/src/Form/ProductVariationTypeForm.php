@@ -38,7 +38,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       $line_item_type_storage = $this->entityTypeManager->getStorage('commerce_line_item_type');
       $line_item_types = $line_item_type_storage->loadMultiple();
       $line_item_types = array_filter($line_item_types, function($line_item_type) {
-        return $line_item_type->getPurchasableEntityType() == 'commerce_product_variation';
+        return $line_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
       });
       $line_item_types = array_map(function ($line_item_type) {
         return $line_item_type->label();
@@ -47,7 +47,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       $form['lineItemType'] = [
         '#type' => 'select',
         '#title' => $this->t('Line item type'),
-        '#default_value' => $variation_type->getLineItemType(),
+        '#default_value' => $variation_type->getLineItemTypeId(),
         '#options' => $line_item_types,
         '#empty_value' => '',
         '#required' => TRUE,

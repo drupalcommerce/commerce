@@ -10,6 +10,16 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
+ * Implements hook_entity_create().
+ */
+function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
+  if ($entity_type_id == 'commerce_product' && !\Drupal::isConfigSyncing()) {
+    // Clear the line item type map after a new product type has been created.
+    \Drupal::service('commerce_product.line_item_type_map')->clearCache();
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function commerce_product_theme() {
@@ -220,7 +230,7 @@ function commerce_product_add_variations_field($product_type) {
         'handler' => 'default',
         'handler_settings' => [
           'target_bundles' => [
-            $product_type->getVariationType(),
+            $product_type->getVariationTypeId(),
           ],
         ],
       ],
