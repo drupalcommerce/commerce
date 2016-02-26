@@ -78,6 +78,13 @@ function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
 }
 
 /**
+ * Implements hook_entity_type_build().
+ */
+function commerce_cart_entity_type_build(array &$entity_types) {
+  $entity_types['commerce_line_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
+}
+
+/**
  * Implements hook_ENTITY_TYPE_delete().
  *
  * Removes deleted carts from the anonymous user's session.

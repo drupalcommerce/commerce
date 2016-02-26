@@ -2,10 +2,12 @@
 
 namespace Drupal\commerce_product\Plugin\Field\FieldFormatter;
 
+use Drupal\commerce_product\LineItemTypeMapInterface;
+use Drupal\Core\Entity\EntityFormBuilderInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
@@ -25,11 +27,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AddToCartFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The form builder.
+   * The entity form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var \Drupal\Core\Entity\EntityFormBuilderInterface
    */
-  protected $formBuilder;
+  protected $entityFormBuilder;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The line item type map.
+   *
+   * @var \Drupal\commerce_product\LineItemTypeMapInterface
+   */
+  protected $lineItemTypeMap;
 
   /**
    * Constructs an AddToCartFormatter object.
@@ -48,60 +64,19 @@ class AddToCartFormatter extends FormatterBase implements ContainerFactoryPlugin
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
+   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
+   *   The entity form builder.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\commerce_product\LineItemTypeMapInterface $line_item_type_map
+   *   The line item type map.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, FormBuilderInterface $form_builder) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityFormBuilderInterface $entity_form_builder, EntityTypeManagerInterface $entity_type_manager, LineItemTypeMapInterface $line_item_type_map) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
-    $this->formBuilder = $form_builder;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings() {
-    return array(
-      'show_quantity' => FALSE,
-      'default_quantity' => 1,
-      'combine' => TRUE,
-    ) + parent::defaultSettings();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    $form = parent::settingsForm($form, $form_state);
-
-    $form['show_quantity'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Display a quantity input field on the add to cart form.'),
-      '#default_value' => $this->getSetting('show_quantity'),
-    ];
-    $form['default_quantity'] = [
-      '#type' => 'number',
-      '#title' => t('Default quantity'),
-      '#default_value' => $this->getSetting('default_quantity'),
-      '#min' => 1,
-      '#max' => 9999,
-    ];
-    $form['combine'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Attempt to combine line items containing the same product variation.'),
-      '#description' => t('The line item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
-      '#default_value' => $this->getSetting('combine'),
-    ];
-
-    return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    // @todo.
-    return [];
+    $this->entityFormBuilder = $entity_form_builder;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->lineItemTypeMap = $line_item_type_map;
   }
 
   /**
@@ -117,8 +92,49 @@ class AddToCartFormatter extends FormatterBase implements ContainerFactoryPlugin
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('form_builder')
+      $container->get('entity.form_builder'),
+      $container->get('entity_type.manager'),
+      $container->get('commerce_product.line_item_type_map')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'combine' => TRUE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $form = parent::settingsForm($form, $form_state);
+    $form['combine'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Combine line items containing the same product variation.'),
+      '#description' => t('The line item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
+      '#default_value' => $this->getSetting('combine'),
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+    if ($this->getSetting('combine')) {
+      $summary[] = $this->t('Combine line items containing the same product variation.');
+    }
+    else {
+      $summary[] = $this->t('Do not combine line items containing the same product variation.');
+    }
+
+    return $summary;
   }
 
   /**
@@ -127,8 +143,17 @@ class AddToCartFormatter extends FormatterBase implements ContainerFactoryPlugin
   public function viewElements(FieldItemListInterface $items, $langcode) {
     // @todo Use a lazy_builder.
     $product = $items->getEntity();
-    $settings = $this->getSettings();
-    return $this->formBuilder->getForm('\Drupal\commerce_product\Form\AddToCartForm', $product, $settings);
+    $line_item_type = $this->lineItemTypeMap->getLineItemTypeId($product->bundle());
+    $line_item_storage = $this->entityTypeManager->getStorage('commerce_line_item');
+    $line_item = $line_item_storage->create([
+      'type' => $line_item_type,
+    ]);
+    $form_state_additions = [
+      'product' => $product,
+      'settings' => $this->getSettings(),
+    ];
+
+    return $this->entityFormBuilder->getForm($line_item, 'add_to_cart', $form_state_additions);
   }
 
   /**

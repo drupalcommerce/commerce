@@ -8,14 +8,20 @@ dependencies:
     module:
       - commerce_cart
       - commerce_product
+  module:
+    - commerce_product
 id: commerce_line_item.product_variation.add_to_cart
 targetEntityType: commerce_line_item
 bundle: product_variation
 mode: add_to_cart
-content: {  }
+content:
+  purchased_entity:
+    type: commerce_product_variation_attributes
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   created: true
-  purchased_entity: true
   quantity: true
   status: true
   uid: true

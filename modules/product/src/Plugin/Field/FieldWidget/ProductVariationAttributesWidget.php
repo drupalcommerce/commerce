@@ -3,16 +3,21 @@
 namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
-
 /**
- * Plugin implementation of the 'commerce_product_variation_attributes ' widget.
+ * Plugin implementation of the 'commerce_product_variation_attributes' widget.
+ *
+ * The widget form depends on the 'product' being present in $form_state.
+ * @see \Drupal\commerce_product\Plugin\Field\FieldFormatter::viewElements().
  *
  * @FieldWidget(
- *   id = "commerce_product_variation_attributes ",
+ *   id = "commerce_product_variation_attributes",
  *   label = @Translation("Product variation attributes"),
  *   field_types = {
  *     "entity_reference"
@@ -24,12 +29,22 @@ class ProductVariationAttributesWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
+  public static function isApplicable(FieldDefinitionInterface $field_definition) {
+    $entity_type = $field_definition->getTargetEntityTypeId();
+    $field_name = $field_definition->getName();
+    return $entity_type == 'commerce_line_item' && $field_name == 'purchased_entity';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_product\Entity\Product $product */
-    $product = $form['#product'];
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $form_state->get('product');
     $variations = $product->variations->referencedEntities();
     if (count($variations) === 0) {
-      // Signal to the parent form that there are no variations to select.
+      // Nothing to purchase, tell the parent form to hide itself.
+      $form_state->set('hide_form', TRUE);
       $element['variation'] = [
         '#type' => 'value',
         '#value' => 0,
@@ -48,7 +63,16 @@ class ProductVariationAttributesWidget extends WidgetBase {
     }
 
     // Build the full attribute form.
-    $selected_variation = $this->selectVariationFromUserInput($variations, $form_state);
+    $wrapper_id = Html::getUniqueId('commerce-product-add-to-cart-form');
+    $form += [
+      '#wrapper_id' => $wrapper_id,
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
+    ];
+    $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
+    $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
+    $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+
     $element['variation'] = [
       '#type' => 'value',
       '#value' => $selected_variation->id(),
@@ -67,7 +91,7 @@ class ProductVariationAttributesWidget extends WidgetBase {
         '#required' => $attribute['required'],
         '#default_value' => $selected_variation->get($field_name)->target_id,
         '#ajax' => [
-          'callback' => '::ajaxRefresh',
+          'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $form['#wrapper_id'],
         ],
       ];
@@ -87,6 +111,19 @@ class ProductVariationAttributesWidget extends WidgetBase {
     return $element;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    // Map the variation form value to the expected field structure.
+    foreach ($values as $key => $value) {
+      $values[$key] = [
+        'target_id' => $value['variation'],
+      ];
+    }
+
+    return $values;
+  }
 
   /**
    * Selects a product variation based on user input containing attribute values.
@@ -96,14 +133,13 @@ class ProductVariationAttributesWidget extends WidgetBase {
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
    *   An array of product variations.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
+   * @param array $user_input
+   *   The user input.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface
    *   The selected variation.
    */
-  protected function selectVariationFromUserInput(array $variations, FormStateInterface $form_state) {
-    $user_input = $form_state->getUserInput();
+  protected function selectVariationFromUserInput(array $variations, array $user_input) {
     $current_variation = reset($variations);
     if (!empty($user_input)) {
       $attributes = $user_input['attributes'];
@@ -181,6 +217,7 @@ class ProductVariationAttributesWidget extends WidgetBase {
 
     return $attributes;
   }
+
   /**
    * Gets the attribute values of a given set of variations.
    *
@@ -215,9 +252,8 @@ class ProductVariationAttributesWidget extends WidgetBase {
   /**
    * Ajax callback.
    */
-  public function ajaxRefresh(array $form, FormStateInterface $form_state) {
+  public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
     return $form;
   }
-
 
 }
