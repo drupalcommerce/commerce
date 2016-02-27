@@ -7,12 +7,10 @@
 
 namespace Drupal\commerce_product\Tests;
 
-use Drupal\commerce_order\Entity\LineItemInterface;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Tests\OrderTestBase;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -137,10 +135,9 @@ class AddToCartFormTest extends OrderTestBase {
     // Get the existing product page and submit Add to cart form.
     $this->postAddToCart($product);
     $this->assertEqual($variation3->{$attribute_name}->target_id, $attribute->id());
-    $this->drupalPostAjaxForm(NULL, [
+    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
       'attributes[test_variation]' => $variation3->{$attribute_name}->target_id,
     ], 'attributes[test_variation]');
-    $this->assertAttributeExists('edit-attributes-test-variation', $variation3->{$attribute_name}->target_id);
     $this->postAddToCart($product, [
       'attributes[test_variation]' => $variation3->{$attribute_name}->target_id,
     ]);
@@ -150,9 +147,11 @@ class AddToCartFormTest extends OrderTestBase {
     $line_items = $this->cart->getLineItems();
     /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
     $line_item = $line_items[0];
-    $this->assertLineItemInOrder($this->variation, $line_item);
+    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
     $line_item = $line_items[1];
-    $this->assertLineItemInOrder($variation3, $line_item);
+    $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
   }
 
   /**
@@ -179,7 +178,7 @@ class AddToCartFormTest extends OrderTestBase {
     // Reload the variation since we have a new fields.
     $this->variation = ProductVariation::load($this->variation->id());
 
-    // Get the product so we can append new variations.
+    // Get the product so we can append new variations
     $product = $this->variation->getProduct();
 
     /**
@@ -227,20 +226,26 @@ class AddToCartFormTest extends OrderTestBase {
 
 
     $this->postAddToCart($this->variation->getProduct());
-
-    // Drill down to "medium" and "blue" variation.
-    $this->drupalPostAjaxForm(NULL, [
+    // Trigger AJAX by changing size attribute
+    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
       'attributes[test_size_attribute]' => $size_attributes['medium']->id(),
     ], 'attributes[test_size_attribute]');
-    $this->assertAttributeExists('edit-attributes-test-color-attribute', $color_attributes['red']->id());
-    $this->assertAttributeExists('edit-attributes-test-color-attribute', $color_attributes['blue']->id());
-
-    $this->drupalPostAjaxForm(NULL, [
+    // Trigger AJAX by changing color attribute
+    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
       'attributes[test_color_attribute]' => $color_attributes['blue']->id(),
     ], 'attributes[test_color_attribute]');
-    $this->assertAttributeExists('edit-attributes-test-color-attribute', $color_attributes['red']->id());
-    $this->assertAttributeExists('edit-attributes-test-color-attribute', $color_attributes['blue']->id());
-    $this->assertAttributeDoesNotExist('edit-attributes-test-size-attribute', $size_attributes['small']->id());
+
+    // We can't assert an option doesn't exist using AssertContentTrait, since
+    // our ID is dynamic. Version of assertNoOption using data-drupal-selector.
+    // @see \Drupal\simpletest\AssertContentTrait::assertNoOption
+    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]', [
+      ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
+    ]);
+    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
+      ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
+      ':option' => $size_attributes['small']->id(),
+    ]);
+    $this->assertTrue(isset($selects[0]) && !isset($options[0]), NULL, 'Browser');
 
     $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled]', [
       ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
@@ -258,9 +263,11 @@ class AddToCartFormTest extends OrderTestBase {
     $line_items = $this->cart->getLineItems();
     /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
     $line_item = $line_items[0];
-    $this->assertLineItemInOrder($this->variation, $line_item);
+    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
     $line_item = $line_items[1];
-    $this->assertLineItemInOrder($variation3, $line_item);
+    $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
   }
 
   /**
@@ -310,21 +317,17 @@ class AddToCartFormTest extends OrderTestBase {
   /**
    * Creates an attribute.
    *
-   * @param string $vocabulary
-   *   The vocabulary ID.
+   * @param string $bundle
    * @param string $name
-   *   The attribute name.
    *
    * @return \Drupal\taxonomy\Entity\Term
-   *   The created attribute.
    */
-  protected function createAttributeOption($vocabulary, $name) {
+  protected function createAttributeOption($bundle, $name) {
     $attribute = $this->createEntity('taxonomy_term', [
-      'vid' => $vocabulary,
+      'vid' => $bundle,
       'name' => $name,
     ]);
     $attribute->save();
-
     return $attribute;
   }
 
@@ -332,64 +335,14 @@ class AddToCartFormTest extends OrderTestBase {
    * Posts the add to cart form for a product.
    *
    * @param \Drupal\commerce_product\Entity\ProductInterface $product
-   *   The product.
    * @param array $edit
-   *   The values to post.
+   *
+   * @throws \Exception
    */
   protected function postAddToCart(ProductInterface $product, array $edit = []) {
     $this->drupalGet('product/' . $product->id());
     $this->assertField('edit-submit', t('Add to cart button exists.'));
     $this->drupalPostForm(NULL, $edit, t('Add to cart'));
-  }
-
-  /**
-   * Asserts that an attribute option does exist.
-   *
-   * @param string $selector
-   *   The element selector.
-   * @param string $option
-   *   The option.
-   */
-  protected function assertAttributeExists($selector, $option) {
-    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
-      ':data_drupal_selector' => $selector,
-      ':option' => $option,
-    ]);
-    $this->assertFalse(empty($options), 'The attribute is not available');
-  }
-
-  /**
-   * Asserts that an attribute option does not exist.
-   *
-   * @param string $selector
-   *   The element selector.
-   * @param string $option
-   *   The option.
-   */
-  protected function assertAttributeDoesNotExist($selector, $option) {
-    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
-      ':data_drupal_selector' => $selector,
-      ':option' => $option,
-    ]);
-    $this->assertTrue(empty($options), 'The attribute is not available');
-  }
-
-  /**
-   * Assert the line item in the order is correct.
-   *
-   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
-   *   The purchased product variation.
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
-   * @param int $quantity
-   *   The quantity.
-   */
-  protected function assertLineItemInOrder(ProductVariationInterface $variation, LineItemInterface $line_item, $quantity = 1) {
-    $this->assertEqual($line_item->getTitle(), $variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
-      '@product' => $line_item->getTitle(),
-      '@quantity' => $line_item->getQuantity(),
-    ]));
   }
 
 }

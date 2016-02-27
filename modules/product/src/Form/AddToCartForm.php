@@ -241,7 +241,7 @@ class AddToCartForm extends FormBase {
   }
 
   /**
-   * Selects a product variation based on user input and attribute values.
+   * Selects a product variation based on user input containing attribute values.
    *
    * If there's no user input (form viewed for the first time), the default
    * variation is returned.
@@ -258,24 +258,20 @@ class AddToCartForm extends FormBase {
     $user_input = $form_state->getUserInput();
     $current_variation = reset($variations);
     if (!empty($user_input)) {
-      // Cascade through the dependent attributes, narrowing down the variation
-      // list. The last attribute defines the final available variations,
-      // so it's not used as a qualifying attribute.
       $attributes = $user_input['attributes'];
-      if (count($attributes) > 1) {
-        array_pop($attributes);
-      }
-
-      foreach ($attributes as $field_name => $value) {
-        foreach ($variations as $key => $variation) {
+      foreach ($variations as $variation) {
+        $match = TRUE;
+        foreach ($attributes as $field_name => $value) {
           if ($variation->get($field_name)->target_id != $value) {
-            unset($variations[$key]);
+            $match = FALSE;
           }
         }
-      }
 
-      // Select the first remaining variation.
-      $current_variation = reset($variations);
+        if ($match) {
+          $current_variation = $variation;
+          break;
+        }
+      }
     }
 
     return $current_variation;
