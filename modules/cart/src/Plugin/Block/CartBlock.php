@@ -176,7 +176,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $order_type_ids = array_map(function($cart) {
         return $cart->bundle();
       }, $carts);
-      $order_type_storage = \Drupal::entityManager()->getStorage('commerce_order_type');
+      $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
       $order_types = $order_type_storage->loadMultiple(array_unique($order_type_ids));
 
       $available_views = [];

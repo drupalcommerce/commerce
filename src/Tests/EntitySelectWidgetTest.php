@@ -106,7 +106,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
     $edit['stores[target_id][value][' . $store_ids[1] .']'] = FALSE;
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
-    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+    \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
     $this->assertFieldValues($this->product->getStoreIds(), [$store_ids[0]], 'The correct store has been set on the product.');
     $this->drupalGet($form_url);
@@ -134,7 +134,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
     $edit['stores[target_id][value]'] = $store_labels[0] . ', ' . $store_labels[1];
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
-    \Drupal::entityManager()->getStorage('commerce_product')->resetCache();
+    \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();
     $this->product = Product::load($this->product->id());
     $this->assertFieldValues($this->product->getStoreIds(), [$store_ids[0], $store_ids[1]], 'The correct stores have been set on the product.');
     $this->drupalGet($form_url);
