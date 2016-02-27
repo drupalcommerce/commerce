@@ -71,7 +71,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       $form['#submit'][] = 'language_configuration_element_submit';
     }
 
-    return $this->protectBundleIdElement($form);;
+    return $this->protectBundleIdElement($form);
   }
 
   /**

@@ -2,9 +2,7 @@
 
 namespace Drupal\commerce\Plugin\views\field;
 
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\Field;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
