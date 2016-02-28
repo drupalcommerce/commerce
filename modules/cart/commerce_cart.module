@@ -96,6 +96,23 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ *
+ * Hides irrelevant purchased_entity widgets on the add_to_cart line item
+ * form display.
+ */
+function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
+  $entity = $form_state->getFormObject()->getEntity();
+  if ($form['#entity_type'] == 'commerce_line_item' && $entity->getMode() == 'add_to_cart') {
+    $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
+    unset($options['entity_reference_autocomplete_tags']);
+    unset($options['entity_reference_autocomplete']);
+    unset($options['inline_entity_form_complex']);
+  }
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_form'.
  */
 function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInterface $form_state) {
