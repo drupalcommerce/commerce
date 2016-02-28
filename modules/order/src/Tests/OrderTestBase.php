@@ -91,6 +91,7 @@ abstract class OrderTestBase extends CommerceTestBase {
     $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
       'variations' => [$this->variation],
     ]);
   }

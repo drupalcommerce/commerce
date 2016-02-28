@@ -54,6 +54,37 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 }
 
 /**
+ * Implements hook_entity_bundle_create().
+ *
+ * Creates an 'add_to_cart' form display for each new line item type.
+ */
+function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
+  if ($entity_type_id == 'commerce_line_item' && !\Drupal::isConfigSyncing()) {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+    $form_display = $storage->load('commerce_line_item.' . $bundle . '.add_to_cart');
+    if (!$form_display) {
+      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+      $form_display = $storage->create([
+        'targetEntityType' => 'commerce_line_item',
+        'bundle' => $bundle,
+        'mode' => 'add_to_cart',
+        'status' => TRUE,
+      ]);
+      // Hide the unit price by default.
+      $form_display->removeComponent('unit_price');
+      $form_display->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function commerce_cart_entity_type_build(array &$entity_types) {
+  $entity_types['commerce_line_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
+}
+
+/**
  * Implements hook_ENTITY_TYPE_delete().
  *
  * Removes deleted carts from the anonymous user's session.
@@ -61,6 +92,23 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 function commerce_cart_commerce_order_delete(OrderInterface $order) {
   if (!empty($order->cart)) {
     \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
+ *
+ * Hides irrelevant purchased_entity widgets on the add_to_cart line item
+ * form display.
+ */
+function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
+  $entity = $form_state->getFormObject()->getEntity();
+  if ($form['#entity_type'] == 'commerce_line_item' && $entity->getMode() == 'add_to_cart') {
+    $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
+    unset($options['entity_reference_autocomplete_tags']);
+    unset($options['entity_reference_autocomplete']);
+    unset($options['inline_entity_form_complex']);
   }
 }
 

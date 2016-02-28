@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_product\Tests\AddToCartFormTest.
+ * Contains \Drupal\commerce_cart\Tests\AddToCartFormTest.
  */
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\commerce_cart\Tests;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Tests\OrderTestBase;
@@ -13,6 +13,7 @@ use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -135,11 +136,11 @@ class AddToCartFormTest extends OrderTestBase {
     // Get the existing product page and submit Add to cart form.
     $this->postAddToCart($product);
     $this->assertEqual($variation3->{$attribute_name}->target_id, $attribute->id());
-    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
-      'attributes[test_variation]' => $variation3->{$attribute_name}->target_id,
-    ], 'attributes[test_variation]');
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_variation]' => $variation3->{$attribute_name}->target_id,
+    ], 'purchased_entity[0][attributes][test_variation]');
     $this->postAddToCart($product, [
-      'attributes[test_variation]' => $variation3->{$attribute_name}->target_id,
+      'purchased_entity[0][attributes][test_variation]' => $variation3->{$attribute_name}->target_id,
     ]);
 
     // Check if the quantity was increased for the existing line item.
@@ -227,35 +228,35 @@ class AddToCartFormTest extends OrderTestBase {
 
     $this->postAddToCart($this->variation->getProduct());
     // Trigger AJAX by changing size attribute
-    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
-      'attributes[test_size_attribute]' => $size_attributes['medium']->id(),
-    ], 'attributes[test_size_attribute]');
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['medium']->id(),
+    ], 'purchased_entity[0][attributes][test_size_attribute]');
     // Trigger AJAX by changing color attribute
-    $ajax_commands = $this->drupalPostAjaxForm(NULL, [
-      'attributes[test_color_attribute]' => $color_attributes['blue']->id(),
-    ], 'attributes[test_color_attribute]');
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['blue']->id(),
+    ], 'purchased_entity[0][attributes][test_color_attribute]');
 
     // We can't assert an option doesn't exist using AssertContentTrait, since
     // our ID is dynamic. Version of assertNoOption using data-drupal-selector.
     // @see \Drupal\simpletest\AssertContentTrait::assertNoOption
     $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]', [
-      ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
+      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
     ]);
     $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
-      ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
+      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
       ':option' => $size_attributes['small']->id(),
     ]);
     $this->assertTrue(isset($selects[0]) && !isset($options[0]), NULL, 'Browser');
 
     $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled]', [
-      ':data_drupal_selector' => 'edit-attributes-test-size-attribute',
+      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
     ]);
     $this->assertTrue(isset($selects[0]));
 
     // Since we do not have a Small, Blue. Should only see variation 3.
     $this->postAddToCart($product, [
-      'attributes[test_color_attribute]' => $color_attributes['blue']->id(),
-      'attributes[test_size_attribute]' => $size_attributes['medium']->id(),
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['blue']->id(),
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['medium']->id(),
     ]);
 
     // Check if the quantity was increased for the existing line item.
@@ -268,6 +269,30 @@ class AddToCartFormTest extends OrderTestBase {
     $line_item = $line_items[1];
     $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
     $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+  }
+
+  /**
+   * Tests ability to expose line item fields on the add to cart form.
+   */
+  public function testExposedLineItemFields() {
+    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $line_item_form_display */
+    $line_item_form_display = EntityFormDisplay::load('commerce_line_item.product_variation.add_to_cart');
+    $line_item_form_display->setComponent('quantity', [
+      'type' => 'number',
+    ]);
+    $line_item_form_display->save();
+
+    // Get the existing product page and submit Add to cart form.
+    $this->postAddToCart($this->variation->getProduct(), [
+      'quantity[0][value]' => 3,
+    ]);
+    // Check if the quantity was increased for the existing line item.
+    $this->cart = Order::load($this->cart->id());
+    $line_items = $this->cart->getLineItems();
+    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
+    $line_item = $line_items[0];
+    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == 3), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
   }
 
   /**
