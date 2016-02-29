@@ -2,7 +2,3 @@ services:
   commerce_product.line_item_type_map:
     class: Drupal\commerce_product\LineItemTypeMap
     arguments: ['@cache.data', '@entity_type.manager']
-
-  commerce_product.product_variation_manager:
-    class: Drupal\commerce_product\ProductVariationManager
-    arguments: ['@entity_type.manager', '@event_dispatcher', '@entity.query']

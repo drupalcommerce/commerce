@@ -19,7 +19,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Product variation"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
- *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
+ *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {

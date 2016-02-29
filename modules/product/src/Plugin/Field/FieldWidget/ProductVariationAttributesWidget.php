@@ -5,10 +5,13 @@ namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'commerce_product_variation_attributes' widget.
@@ -24,7 +27,50 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class ProductVariationAttributesWidget extends WidgetBase {
+class ProductVariationAttributesWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The product variation storage.
+   *
+   * @var \Drupal\commerce_product\ProductVariationStorageInterface
+   */
+  protected $variationStorage;
+
+  /**
+   * Constructs a new ProductVariationAttributesWidget object.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the widget.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+
+    $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -41,7 +87,7 @@ class ProductVariationAttributesWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
-    $variations = $product->variations->referencedEntities();
+    $variations = $this->variationStorage->loadEnabled($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
       $form_state->set('hide_form', TRUE);
