@@ -1,6 +1,9 @@
 langcode: en
 status: true
 dependencies:
+  enforced:
+    module:
+      - commerce_order
   module:
     - entity
 id: commerce_order_delete_action

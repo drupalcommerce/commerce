@@ -4,6 +4,9 @@ dependencies:
   config:
     - field.field.profile.billing.address
     - profile.type.billing
+  enforced:
+    module:
+      - commerce_order
   module:
     - address
 id: profile.billing.default
