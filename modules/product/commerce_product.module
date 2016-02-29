@@ -7,6 +7,7 @@
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -140,7 +141,7 @@ function commerce_product_add_stores_field($product_type) {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
+    EntityFormDisplay::load('commerce_product.' . $product_type->id() . '.default')
       ->setComponent('stores', [
         'type' => 'commerce_entity_select',
         'weight' => -10,
@@ -178,7 +179,7 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
+    EntityFormDisplay::load('commerce_product.' . $product_type->id() . '.default')
       ->setComponent('body', [
         'type' => 'text_textarea_with_summary',
         'weight' => 1,
@@ -239,7 +240,7 @@ function commerce_product_add_variations_field($product_type) {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
+    EntityFormDisplay::load('commerce_product.' . $product_type->id() . '.default')
       ->setComponent('variations', [
         'type' => 'inline_entity_form_complex',
         'weight' => 10,

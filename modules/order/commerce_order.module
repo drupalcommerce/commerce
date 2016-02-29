@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -136,7 +137,7 @@ function commerce_order_add_line_items_field($order_type) {
     $field->save();
 
     // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_order', $order_type->id(), 'default')
+    EntityFormDisplay::load('commerce_order.' . $order_type->id() . '.default')
       ->setComponent('line_items', [
         'type' => 'inline_entity_form_complex',
         'weight' => 0,
