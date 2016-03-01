@@ -183,17 +183,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getLineItemTitle() {
-    $product = $this->getProduct();
-    if (!$product) {
-      throw new EntityMalformedException(sprintf('Product variation #%d is missing the product backreference.', $this->id()));
-    }
-
-    $title = $product->getTitle();
-    if ($this->getAttributeFieldDefinitions()) {
-      $title .= ' - ' . $this->label();
-    }
-
-    return $title;
+    return $this->label();
   }
 
   /**
@@ -300,16 +290,22 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    *   The generated value.
    */
   protected function generateTitle() {
+    if (!$this->getProductId()) {
+      // Title generation is not possible before the parent product is known.
+      return '';
+    }
+
+    $product_title = $this->getProduct()->getTitle();
     if ($attribute_values = $this->getAttributeValues()) {
       $attribute_labels = array_map(function ($attribute_value) {
         return $attribute_value->label();
       }, $attribute_values);
 
-      $title = implode(', ', $attribute_labels);
+      $title = $product_title . ' - ' . implode(', ', $attribute_labels);
     }
     else {
       // When there are no attribute fields, there's only one variation.
-      $title = t('Default');
+      $title = $product_title;
     }
 
     return $title;

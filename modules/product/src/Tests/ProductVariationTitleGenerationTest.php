@@ -64,6 +64,7 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
+      'title' => 'My product',
       'variations' => [$variation],
     ]);
     $this->assertFalse($variation->getTitle());
@@ -79,9 +80,12 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
+      'title' => 'My second product',
       'variations' => [$variation],
     ]);
-    $this->assertEqual($variation->getTitle(), 'Default');
+    $this->assertEqual($variation->getTitle(), $product->getTitle());
+
+    // @todo Create attributes, then retest title generation.
   }
 
 }

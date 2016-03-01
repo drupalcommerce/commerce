@@ -110,10 +110,10 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets the attribute ids.
+   * Gets the attribute IDs.
    *
    * @return int[]
-   *   The attribute ids, keyed by field name.
+   *   The attribute IDs, keyed by field name.
    */
   public function getAttributeIds();
 
@@ -124,7 +124,7 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    *   The field name.
    *
    * @return int|null
-   *   The attribute id, or NULL.
+   *   The attribute ID, or NULL.
    */
   public function getAttributeId($field_name);
 
