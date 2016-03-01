@@ -30,4 +30,22 @@ interface ProductVariationTypeInterface extends ConfigEntityInterface {
    */
   public function setLineItemTypeId($line_item_type_id);
 
+  /**
+   * Gets whether the product variation title should be automatically generated.
+   *
+   * @return bool
+   *   Whether the product variation title should be automatically generated.
+   */
+  public function shouldGenerateTitle();
+
+  /**
+   * Sets whether the product variation title should be automatically generated.
+   *
+   * @param bool $generate_title
+   *   Whether the product variation title should be automatically generated.
+   *
+   * @return $this
+   */
+  public function setGenerateTitle($generate_title);
+
 }

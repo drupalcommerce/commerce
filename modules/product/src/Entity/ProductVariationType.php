@@ -34,6 +34,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "id",
  *     "label",
  *     "lineItemType",
+ *     "generateTitle",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-variation-types/add",
@@ -60,6 +61,13 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   protected $lineItemType;
 
   /**
+   * Whether the product variation title should be automatically generated.
+   *
+   * @var bool
+   */
+  protected $generateTitle;
+
+  /**
    * {@inheritdoc}
    */
   public function getLineItemTypeId() {
@@ -72,6 +80,20 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   public function setLineItemTypeId($line_item_type_id) {
     $this->lineItemType = $line_item_type_id;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldGenerateTitle() {
+    return (bool) $this->generateTitle;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setGenerateTitle($generate_title) {
+    $this->generateTitle = $generate_title;
   }
 
 }

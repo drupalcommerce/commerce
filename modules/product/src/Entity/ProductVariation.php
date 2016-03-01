@@ -5,6 +5,7 @@ namespace Drupal\commerce_product\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity\EntityKeysFieldsTrait;
@@ -38,6 +39,7 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
+ *     "label" = "title",
  *     "status" = "status",
  *   },
  *   bundle_entity_type = "commerce_product_variation_type",
@@ -54,34 +56,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * @var \Drupal\Core\Field\FieldDefinitionInterface[]
    */
   protected $attributeFieldDefinitions;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function label() {
-    // A label callback was registered to override the default logic.
-    $callback = $this->getEntityType()->getLabelCallback();
-    if ($callback && is_callable($callback)) {
-      return call_user_func($callback, $this);
-    }
-
-    if ($attributes = $this->getAttributeFields()) {
-      $attribute_labels = [];
-      foreach ($attributes as $attribute) {
-        if (!$attribute->isEmpty()) {
-          $attribute_labels[] = $attribute->entity->label();
-        }
-      }
-
-      $label = implode(', ', $attribute_labels);
-    }
-    else {
-      // When there are no attribute fields, there's always only one variation.
-      $label = t('Default');
-    }
-
-    return $label;
-  }
 
   /**
    * {@inheritdoc}
@@ -109,6 +83,21 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public function setSku($sku) {
     $this->set('sku', $sku);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTitle() {
+    return $this->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTitle($title) {
+    $this->set('title', $title);
     return $this;
   }
 
@@ -238,6 +227,48 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = $this->entityTypeManager()
+      ->getStorage('commerce_product_variation_type')
+      ->load($this->bundle());
+
+    if ($variation_type->shouldGenerateTitle()) {
+      $title = $this->generateTitle();
+      $this->setTitle($title);
+    }
+  }
+
+  /**
+   * Generates the variation title based on attribute values.
+   *
+   * @return string
+   *   The generated value.
+   */
+  protected function generateTitle() {
+    if ($attributes = $this->getAttributeFields()) {
+      $attribute_labels = [];
+      foreach ($attributes as $attribute) {
+        if (!$attribute->isEmpty()) {
+          $attribute_labels[] = $attribute->entity->label();
+        }
+      }
+
+      $title = implode(', ', $attribute_labels);
+    }
+    else {
+      // When there are no attribute fields, there's only one variation.
+      $title = t('Default');
+    }
+
+    return $title;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = self::entityKeysBaseFieldDefinitions($entity_type);
 
@@ -277,6 +308,27 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Title'))
+      ->setDescription(t('The variation title.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
+      ->setSettings([
+        'default_value' => '',
+        'max_length' => 255,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'string',
+        'weight' => -5,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     // The price is not required because it's not guaranteed to be used
     // for storage (there might be a price per currency, role, country, etc).
     $fields['price'] = BaseFieldDefinition::create('commerce_price')
@@ -311,6 +363,27 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the variation was last edited.'))
       ->setTranslatable(TRUE);
+
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($bundle);
+    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    $fields = [];
+    $fields['title'] = clone $base_field_definitions['title'];
+    if ($variation_type->shouldGenerateTitle()) {
+      // Permanently hide the title widget, the value is always generated.
+      $fields['title']->setRequired(FALSE);
+      $fields['title']->setDisplayOptions('form', [
+        'type' => 'hidden',
+      ]);
+      $fields['title']->setDisplayConfigurable('form', FALSE);
+    }
 
     return $fields;
   }

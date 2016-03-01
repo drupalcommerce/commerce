@@ -32,6 +32,11 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
+    $form['generateTitle'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Generate variation titles based on attribute values.'),
+      '#default_value' => $variation_type->shouldGenerateTitle(),
+    ];
 
     if (\Drupal::moduleHandler()->moduleExists('commerce_order')) {
       // Prepare a list of line item types used to purchase product variations.

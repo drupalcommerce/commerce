@@ -28,6 +28,9 @@ commerce_product.commerce_product_variation_type.*:
     lineItemType:
       type: string
       label: 'Line item type'
+    generateTitle:
+      type: boolean
+      label: 'Generate variation titles based on attribute values'
 
 field.field.*.*.*.third_party.commerce_product:
   type: mapping

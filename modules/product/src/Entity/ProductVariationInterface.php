@@ -46,6 +46,24 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setSku($sku);
 
   /**
+   * Gets the variation title.
+   *
+   * @return string
+   *   The variation title
+   */
+  public function getTitle();
+
+  /**
+   * Sets the variation title.
+   *
+   * @param string $title
+   *   The variation title.
+   *
+   * @return $this
+   */
+  public function setTitle($title);
+
+  /**
    * Gets the variation price.
    *
    * @return object
