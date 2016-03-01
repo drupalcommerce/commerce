@@ -34,6 +34,10 @@ services:
     tags:
       - { name: service_collector, tag: commerce.availability_checker, call: addChecker }
 
+  commerce.config_updater:
+    class: Drupal\commerce\Config\ConfigUpdater
+    arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
+
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
     arguments: ['@commerce.country_context']
