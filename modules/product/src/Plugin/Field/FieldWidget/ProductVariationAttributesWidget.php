@@ -135,7 +135,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
         '#title' => $attribute['title'],
         '#options' => $attribute['values'],
         '#required' => $attribute['required'],
-        '#default_value' => $selected_variation->get($field_name)->target_id,
+        '#default_value' => $selected_variation->getAttributeId($field_name),
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $form['#wrapper_id'],
@@ -192,7 +192,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       foreach ($variations as $variation) {
         $match = TRUE;
         foreach ($attributes as $field_name => $value) {
-          if ($variation->get($field_name)->target_id != $value) {
+          if ($variation->getAttributeId($field_name) != $value) {
             $match = FALSE;
           }
         }
@@ -247,9 +247,10 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       $callback = NULL;
       if ($index > 0) {
         $previous_field_name = $field_names[$index - 1];
-        $previous_field_value = $selected_variation->get($previous_field_name)->target_id;
+        $previous_field_value = $selected_variation->getAttributeId($previous_field_name);
         $callback = function ($variation) use ($previous_field_name, $previous_field_value) {
-          return $variation->get($previous_field_name)->target_id == $previous_field_value;
+          /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+          return $variation->getAttributeId($previous_field_name) == $previous_field_value;
         };
       }
 
@@ -281,9 +282,8 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $values = [];
     foreach ($variations as $variation) {
       if (is_null($callback) || call_user_func($callback, $variation)) {
-        if (!$variation->get($field_name)->isEmpty()) {
-          /** @var \Drupal\Core\Entity\ContentEntityInterface $attribute_value */
-          $attribute_value = $variation->get($field_name)->entity;
+        $attribute_value = $variation->getAttributeValue($field_name);
+        if ($attribute_value) {
           $values[$attribute_value->id()] = $attribute_value->label();
         }
         else {

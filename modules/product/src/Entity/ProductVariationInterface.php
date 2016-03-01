@@ -110,12 +110,42 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets an array of field item lists for attribute fields.
+   * Gets the attribute ids.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface[]
-   *   An array of field item lists for attribute fields, keyed by field name.
+   * @return int[]
+   *   The attribute ids, keyed by field name.
    */
-  public function getAttributeFields();
+  public function getAttributeIds();
+
+  /**
+   * Gets the attribute id for the given field name.
+   *
+   * @param string $field_name
+   *   The field name.
+   *
+   * @return int|null
+   *   The attribute id, or NULL.
+   */
+  public function getAttributeId($field_name);
+
+  /**
+   * Gets the attribute values.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   The attribute values, keyed by field name.
+   */
+  public function getAttributeValues();
+
+  /**
+   * Gets the attribute value for the given field name.
+   *
+   * @param string $field_name
+   *   The field name.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   *   The attribute value, or NULL.
+   */
+  public function getAttributeValue($field_name);
 
   /**
    * Gets an array of attribute field definitions.

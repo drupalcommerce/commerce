@@ -199,13 +199,65 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getAttributeFields() {
-    $fields = [];
+  public function getAttributeIds() {
+    $attribute_ids = [];
     foreach ($this->getAttributeFieldDefinitions() as $name => $definition) {
-      $fields[$name] = $this->get($name);
+      $field = $this->get($name);
+      if (!$field->isEmpty()) {
+        $attribute_ids[$name] = $field->target_id;
+      }
     }
 
-    return $fields;
+    return $attribute_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAttributeId($field_name) {
+    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
+    if (!isset($attribute_field_definitions[$field_name])) {
+      throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
+    }
+    $attribute_id = NULL;
+    $field = $this->get($field_name);
+    if (!$field->isEmpty()) {
+      $attribute_id = $field->target_id;
+    }
+
+    return $attribute_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAttributeValues() {
+    $attribute_values = [];
+    foreach ($this->getAttributeFieldDefinitions() as $field_name => $definition) {
+      $field = $this->get($field_name);
+      if (!$field->isEmpty()) {
+        $attribute_values[$field_name] = $field->entity;
+      }
+    }
+
+    return $attribute_values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAttributeValue($field_name) {
+    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
+    if (!isset($attribute_field_definitions[$field_name])) {
+      throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
+    }
+    $attribute_value = NULL;
+    $field = $this->get($field_name);
+    if (!$field->isEmpty()) {
+      $attribute_value = $field->entity;
+    }
+
+    return $attribute_value;
   }
 
   /**
@@ -248,13 +300,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    *   The generated value.
    */
   protected function generateTitle() {
-    if ($attributes = $this->getAttributeFields()) {
-      $attribute_labels = [];
-      foreach ($attributes as $attribute) {
-        if (!$attribute->isEmpty()) {
-          $attribute_labels[] = $attribute->entity->label();
-        }
-      }
+    if ($attribute_values = $this->getAttributeValues()) {
+      $attribute_labels = array_map(function ($attribute_value) {
+        return $attribute_value->label();
+      }, $attribute_values);
 
       $title = implode(', ', $attribute_labels);
     }
