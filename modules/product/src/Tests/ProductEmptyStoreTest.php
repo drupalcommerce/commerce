@@ -1,21 +1,16 @@
 <?php
-/**
- * @file
- * Contains \Drupal\commerce_product\Tests\ProductEmptyStoreTestBase,
- * Contains \Drupal\commerce_product\Tests\ProductEmptyStoreTest.
- */
+
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\Core\Url;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\Core\Entity\EntityInterface;
-/**
- * Defines base class for Empty store test cases.
- */
-abstract class ProductEmptyStoreTestBase extends CommerceTestBase {
 
-  use EntityReferenceTestTrait;
+/**
+ * Empty Store product page test.
+ *
+ * @group commerce
+ */
+class ProductEmptyStoreTest extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -32,20 +27,6 @@ abstract class ProductEmptyStoreTestBase extends CommerceTestBase {
   ];
 
   /**
-   * The product to test against.
-   *
-   * @var \Drupal\commerce_product\Entity\ProductInterface[]
-   */
-  protected $product;
-
-  /**
-   * The stores to test against.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface[]
-   */
-  protected $stores;
-
-  /**
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions() {
@@ -56,15 +37,7 @@ abstract class ProductEmptyStoreTestBase extends CommerceTestBase {
       'administer commerce_product_variation fields',
     ], parent::getAdministratorPermissions());
   }
-}
 
-
-/**
- * Empty Store product page test.
- *
- * @group commerce
- */
-class ProductEmptyStoreTest extends ProductEmptyStoreTestBase {
   /**
    * Tests creating a product.
    */

@@ -1,21 +1,16 @@
 <?php
-/**
- * @file
- * Contains \Drupal\commerce_order\Tests\OrderEmptyStoreTestBase,
- * Contains \Drupal\commerce_order\Tests\OrderEmptyStoreTest.
- */
+
 namespace Drupal\commerce_order\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\Core\Url;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\Core\Entity\EntityInterface;
-/**
- * Defines base class for Empty store test cases.
- */
-abstract class OrderEmptyStoreTestBase extends CommerceTestBase {
 
-  use EntityReferenceTestTrait;
+/**
+ * Empty Store order page test.
+ *
+ * @group commerce
+ */
+class OrderEmptyStoreTest extends CommerceTestBase {
 
   /**
    * Modules to enable.
@@ -23,27 +18,10 @@ abstract class OrderEmptyStoreTestBase extends CommerceTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce_store',
     'commerce_product',
     'commerce_order',
-    'field_ui',
-    'options',
-    'taxonomy',
+    'inline_entity_form',
   ];
-
-  /**
-   * The product to test against.
-   *
-   * @var \Drupal\commerce_product\Entity\ProductInterface[]
-   */
-  protected $product;
-
-  /**
-   * The stores to test against.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface[]
-   */
-  protected $stores;
 
   /**
    * {@inheritdoc}
@@ -55,19 +33,11 @@ abstract class OrderEmptyStoreTestBase extends CommerceTestBase {
       'administer line item types',
     ], parent::getAdministratorPermissions());
   }
-}
 
-
-/**
- * Empty Store order page test.
- *
- * @group commerce
- */
-class OrderEmptyStoreTest extends OrderEmptyStoreTestBase {
   /**
-   * Tests creating a product.
+   * Tests order create page.
    */
-  function testCreateOrder() {
+  function testCreateOrderPage() {
     $this->drupalGet('admin/commerce/orders');
     $this->clickLink('Create a new order');
 
