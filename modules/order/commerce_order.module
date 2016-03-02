@@ -135,18 +135,24 @@ function commerce_order_add_line_items_field($order_type) {
     ]);
     $field->save();
 
-    // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_order', $order_type->id(), 'default')
-      ->setComponent('line_items', [
-        'type' => 'inline_entity_form_complex',
-        'weight' => 0,
-        'settings' => [
-          'override_labels' => TRUE,
-          'label_singular' => 'line item',
-          'label_plural' => 'line items',
-        ],
-      ])
-      ->save();
+    $view_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'view');
+    $view_display->setComponent('line_items', [
+      'type' => 'commerce_line_item_table',
+      'weight' => 0,
+    ]);
+    $view_display->save();
+
+    $form_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'form');
+    $form_display->setComponent('line_items', [
+      'type' => 'inline_entity_form_complex',
+      'weight' => 0,
+      'settings' => [
+        'override_labels' => TRUE,
+        'label_singular' => 'line item',
+        'label_plural' => 'line items',
+      ],
+    ]);
+    $form_display->save();
   }
 }
 
