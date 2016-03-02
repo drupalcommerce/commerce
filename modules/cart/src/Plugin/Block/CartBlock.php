@@ -11,11 +11,11 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a Shopping cart block.
+ * Provides a cart block.
  *
  * @Block(
  *   id = "commerce_cart",
- *   admin_label = @Translation("Shopping Cart"),
+ *   admin_label = @Translation("Cart"),
  *   category = @Translation("Commerce")
  * )
  */
@@ -51,6 +51,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, CartProviderInterface $cart_provider, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
     $this->cartProvider = $cart_provider;
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -72,10 +73,10 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
+    return [
       'item_text' => $this->t('items'),
       'dropdown' => TRUE,
-    );
+    ];
   }
 
   /**
@@ -86,7 +87,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#type' => 'textfield',
       '#title' => $this->t('Items text'),
       '#default_value' => $this->configuration['item_text'],
-      '#description' => $this->t('This text displays after the product count. Defaults to "items"'),
+      '#description' => $this->t('Shown after the number. Defaults to "items"'),
     ];
     $form['commerce_cart_dropdown'] = [
       '#type' => 'radios',
@@ -110,13 +111,12 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   }
 
   /**
-   * Builds cart block.
+   * Builds the cart block.
    *
    * @return array
    *   A render array.
    */
   public function build() {
-    // Use the cart provider to get the carts.
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
@@ -128,7 +128,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $cart_views = [];
     if (!empty($carts)) {
       $cart_views = $this->getCartViews($carts);
-
       foreach ($carts as $cart_id => $cart) {
         foreach ($cart->getLineItems() as $line_item) {
           $count += (int) $line_item->getQuantity();
@@ -207,4 +206,5 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   public function getCacheMaxAge() {
     return 0;
   }
+
 }
