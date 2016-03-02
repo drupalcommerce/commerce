@@ -262,8 +262,14 @@ function commerce_product_field_widget_form_alter(&$element, FormStateInterface 
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();
   $widget_name = $context['widget']->getPluginId();
+  $required = $field_definition->isRequired();
   if ($field_name == 'path' && $entity_type == 'commerce_product' && $widget_name == 'path') {
     $element['alias']['#description'] = t('The alternative URL for this product. Use a relative path. For example, "/my-product".');
+  }
+  elseif ($field_name == 'title' && $entity_type == 'commerce_product_variation' && !$required) {
+    // The title field is optional only when its value is automatically
+    // generated, in which case the widget needs to be hidden.
+    $element['#access'] = FALSE;
   }
 }
 

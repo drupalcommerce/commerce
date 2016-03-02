@@ -38,7 +38,7 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $field_definitions */
     $this->assertFalse($this->variationType->shouldGenerateTitle());
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('commerce_product_variation', $this->variationType->id());
-    $this->assertEqual($field_definitions['title']->getDisplayOptions('form')['type'], 'string_textfield');
+    $this->assertTrue($field_definitions['title']->isRequired());
 
     // Enable generation.
     $this->variationType->setGenerateTitle(TRUE);
@@ -49,7 +49,7 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
 
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $field_definitions */
     $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('commerce_product_variation', $this->variationType->id());
-    $this->assertEqual($field_definitions['title']->getDisplayOptions('form')['type'], 'hidden');
+    $this->assertFalse($field_definitions['title']->isRequired());
   }
 
   /**

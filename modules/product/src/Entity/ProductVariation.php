@@ -422,11 +422,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $fields = [];
     $fields['title'] = clone $base_field_definitions['title'];
     if ($variation_type->shouldGenerateTitle()) {
-      // Permanently hide the title widget, the value is always generated.
+      // The title is always generated, the field needs to be hidden.
+      // The widget is hidden in commerce_product_field_widget_form_alter()
+      // since setDisplayOptions() can't affect existing form displays.
       $fields['title']->setRequired(FALSE);
-      $fields['title']->setDisplayOptions('form', [
-        'type' => 'hidden',
-      ]);
       $fields['title']->setDisplayConfigurable('form', FALSE);
     }
 
