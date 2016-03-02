@@ -8,7 +8,7 @@ dependencies:
     - commerce_order
     - commerce_price
 id: commerce_cart_block
-label: 'Shopping cart block'
+label: 'Cart block'
 module: views
 description: ''
 tag: commerce_cart_block
@@ -92,7 +92,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: '{{ quantity }} x'
+            text: '{{ quantity }}&nbsp;x'
             make_link: false
             path: ''
             absolute: false

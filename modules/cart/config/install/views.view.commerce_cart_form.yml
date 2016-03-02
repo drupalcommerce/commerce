@@ -9,7 +9,7 @@ dependencies:
     - commerce_order
     - commerce_price
 id: commerce_cart_form
-label: 'Shopping cart form'
+label: 'Cart form'
 module: views
 description: ''
 tag: commerce_cart_form
