@@ -139,13 +139,12 @@ function commerce_product_add_stores_field($product_type) {
     ]);
     $field->save();
 
-    // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
-      ->setComponent('stores', [
-        'type' => 'commerce_entity_select',
-        'weight' => -10,
-      ])
-      ->save();
+    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
+    $form_display->setComponent('stores', [
+      'type' => 'commerce_entity_select',
+      'weight' => -10,
+    ]);
+    $form_display->save();
   }
 }
 
@@ -177,20 +176,19 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
     ]);
     $field->save();
 
-    // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
-      ->setComponent('body', [
-        'type' => 'text_textarea_with_summary',
-        'weight' => 1,
-      ])
-      ->save();
-    // Assign display settings for 'default' view mode.
-    entity_get_display('commerce_product', $product_type->id(), 'default')
-      ->setComponent('body', [
-        'label' => 'hidden',
-        'type' => 'text_default',
-      ])
-      ->save();
+    $view_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'view');
+    $view_display->setComponent('body', [
+      'label' => 'hidden',
+      'type' => 'text_default',
+    ]);
+    $view_display->save();
+
+    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
+    $form_display->setComponent('body', [
+      'type' => 'text_textarea_with_summary',
+      'weight' => 1,
+    ]);
+    $form_display->save();
   }
 }
 
@@ -238,18 +236,24 @@ function commerce_product_add_variations_field($product_type) {
     ]);
     $field->save();
 
-    // Assign widget settings for the 'default' form mode.
-    entity_get_form_display('commerce_product', $product_type->id(), 'default')
-      ->setComponent('variations', [
-        'type' => 'inline_entity_form_complex',
-        'weight' => 10,
-        'settings' => [
-          'override_labels' => TRUE,
-          'label_singular' => 'variation',
-          'label_plural' => 'variations',
-        ],
-      ])
-      ->save();
+    $view_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'view');
+    $view_display->setComponent('variations', [
+      'type' => 'commerce_add_to_cart',
+      'weight' => 10,
+    ]);
+    $view_display->save();
+
+    $form_display = commerce_get_entity_display('commerce_product', $product_type->id(), 'form');
+    $form_display->setComponent('variations', [
+      'type' => 'inline_entity_form_complex',
+      'weight' => 10,
+      'settings' => [
+        'override_labels' => TRUE,
+        'label_singular' => 'variation',
+        'label_plural' => 'variations',
+      ],
+    ]);
+    $form_display->save();
   }
 }
 
