@@ -16,6 +16,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Plugin implementation of the 'commerce_product_variation_attributes' widget.
@@ -56,6 +57,13 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   protected $attributeStorage;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * Constructs a new ProductVariationAttributesWidget object.
    *
    * @param string $plugin_id
@@ -72,11 +80,14 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    *   The attribute field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ProductAttributeFieldManagerInterface $attribute_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ProductAttributeFieldManagerInterface $attribute_field_manager, EntityTypeManagerInterface $entity_type_manager, RequestStack $request_stack) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
     $this->attributeFieldManager = $attribute_field_manager;
+    $this->requestStack = $request_stack;
     $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
     $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
   }
@@ -92,7 +103,8 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('commerce_product.attribute_field_manager'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('request_stack')
     );
   }
 
@@ -145,7 +157,14 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     ];
     $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
     $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
-    $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+
+    if (!empty($user_input)) {
+      $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+    }
+    else {
+      $selected_variation = $this->selectVariationFromQueryString($variations);
+    }
+
     $element['variation'] = [
       '#type' => 'value',
       '#value' => $selected_variation->id(),
@@ -211,7 +230,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   }
 
   /**
-   * Selects a product variation based on user input containing attribute values.
+   * Selects a product variation based on user input having attribute values.
    *
    * If there's no user input (form viewed for the first time), the default
    * variation is returned.
@@ -235,7 +254,6 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
             $match = FALSE;
           }
         }
-
         if ($match) {
           $current_variation = $variation;
           break;
@@ -243,6 +261,30 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       }
     }
 
+    return $current_variation;
+  }
+
+  /**
+   * Selects a product variation based on a query string.
+   *
+   * If there's no query string, the default variation is returned.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
+   *   An array of product variations.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The selected variation.
+   */
+  protected function selectVariationFromQueryString(array $variations) {
+    // Always set the default variation.
+    $current_variation = reset($variations);
+    // If our query string is present and it is one of the available variations
+    // we modify the current variation.
+    if ($query_string_id = $this->requestStack->getCurrentRequest()->query->get('v')) {
+      if (array_key_exists($query_string_id, $variations)) {
+        $current_variation = $variations[$query_string_id];
+      }
+    }
     return $current_variation;
   }
 

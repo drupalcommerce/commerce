@@ -12,6 +12,11 @@ use Drupal\user\EntityOwnerInterface;
 interface ProductVariationInterface extends PurchasableEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
+   * Query string parameter for defining a canonical URL to a product variation.
+   */
+  const CANONICAL_QUERY_PARAM = 'v';
+
+  /**
    * Gets the parent product.
    *
    * @return ProductInterface|null
