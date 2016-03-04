@@ -297,9 +297,8 @@ function commerce_customer_profile_pane_checkout_form_submit($form, &$form_state
   commerce_customer_profile_save($profile);
 
   // Store the profile ID for the related field as specified on the settings form.
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-  if ($field_name = variable_get('commerce_' . $checkout_pane['pane_id'] . '_field', '')) {
+  if (!empty($field_name)) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
     $wrapper->{$field_name} = $profile;
   }
   else {
