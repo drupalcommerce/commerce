@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
 use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\user\UserInterface;
@@ -56,6 +57,38 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * @var \Drupal\Core\Field\FieldDefinitionInterface[]
    */
   protected $attributeFieldDefinitions;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if (in_array($rel, ['canonical', 'revision'])) {
+      // Set our variation id as query string.
+      $options = [
+        'query' => [
+          'dv' => $this->id(),
+        ],
+      ];
+
+      // Build our url.
+      $route_parameters = $this->getProduct()->urlRouteParameters('canonical');
+      $route_name = "entity.commerce_product.canonical";
+      $uri = new Url($route_name, $route_parameters, $options);
+
+      // Pass the entity data through as options, so that alter functions do not
+      // need to look up this entity again.
+      $uri
+        ->setOption('entity_type', $this->getProduct()->getEntityType())
+        ->setOption('entity', $this->getProduct());
+
+
+      // Set uri options.
+      $uri_options = $uri->getOptions();
+      $uri_options += $options;
+
+      return $uri->setOptions($uri_options);
+    }
+  }
 
   /**
    * {@inheritdoc}

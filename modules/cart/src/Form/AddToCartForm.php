@@ -81,6 +81,13 @@ class AddToCartForm extends ContentEntityForm {
       $form['#access'] = FALSE;
     }
 
+    // If our default variation is set, we alter the add to cart form.
+    if ($default_variation = \Drupal::request()->query->get('dv')) {
+      if (is_numeric($default_variation)) {
+        $form['purchased_entity']['widget'][0]['attributes']['field_variation']['#default_value'] = $default_variation;
+      }
+    }
+
     return $form;
   }
 
