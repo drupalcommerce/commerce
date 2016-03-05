@@ -62,7 +62,7 @@ class ProductForm extends ContentEntityForm {
           'destination' => Url::fromRoute('<current>')->toString(),
         ],
       ];
-      $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page', [], $options);
+      $link = _commerce_store_get_add_link($options);
       $form['warning'] = [
         '#markup' => t("Products can't be created until a store has been added. @link", ['@link' => $link->toString()]),
       ];
