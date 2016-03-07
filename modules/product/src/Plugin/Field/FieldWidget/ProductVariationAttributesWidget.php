@@ -117,11 +117,26 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     ];
     $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
     $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
+
     $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+
+    // Set our default active one.
+    $active_variation = $selected_variation->id();
+
+    // If we have a url parsed, we change. Also, if there is user input, we can
+    // ignore the url.
+    if (!empty($user_input) && $default_variation = \Drupal::request()->query->get('dv')) {
+      if (
+        array_key_exists($default_variation, $variations)
+        && $default_variation <> $selected_variation->id()
+      ) {
+        $active_variation = $default_variation;
+      }
+    }
 
     $element['variation'] = [
       '#type' => 'value',
-      '#value' => $selected_variation->id(),
+      '#value' => $active_variation,
     ];
     $element['attributes'] = [
       '#type' => 'container',
