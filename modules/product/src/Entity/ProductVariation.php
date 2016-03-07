@@ -416,15 +416,16 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = ProductVariationType::load($bundle);
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = [];
-    $fields['title'] = clone $base_field_definitions['title'];
-    if ($variation_type->shouldGenerateTitle()) {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($bundle);
+    // $variation_type could be NULL if the method is invoked during uninstall.
+    if ($variation_type && $variation_type->shouldGenerateTitle()) {
       // The title is always generated, the field needs to be hidden.
       // The widget is hidden in commerce_product_field_widget_form_alter()
       // since setDisplayOptions() can't affect existing form displays.
+      $fields['title'] = clone $base_field_definitions['title'];
       $fields['title']->setRequired(FALSE);
       $fields['title']->setDisplayConfigurable('form', FALSE);
     }
