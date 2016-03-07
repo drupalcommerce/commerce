@@ -416,19 +416,21 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = ProductVariationType::load($bundle);
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = [];
-    $fields['title'] = clone $base_field_definitions['title'];
-    if ($variation_type->shouldGenerateTitle()) {
-      // The title is always generated, the field needs to be hidden.
-      // The widget is hidden in commerce_product_field_widget_form_alter()
-      // since setDisplayOptions() can't affect existing form displays.
-      $fields['title']->setRequired(FALSE);
-      $fields['title']->setDisplayConfigurable('form', FALSE);
+    // We check here if we were able to load. As during uninstall processes,
+    // this might already be gone at the time it gets here.
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    if ($variation_type = ProductVariationType::load($bundle)) {
+      /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+      $fields['title'] = clone $base_field_definitions['title'];
+      if ($variation_type->shouldGenerateTitle()) {
+        // The title is always generated, the field needs to be hidden.
+        // The widget is hidden in commerce_product_field_widget_form_alter()
+        // since setDisplayOptions() can't affect existing form displays.
+        $fields['title']->setRequired(FALSE);
+        $fields['title']->setDisplayConfigurable('form', FALSE);
+      }
     }
-
     return $fields;
   }
 
