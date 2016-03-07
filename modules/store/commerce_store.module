@@ -61,32 +61,3 @@ function template_preprocess_commerce_store(array &$variables) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 }
-
-/**
- * Helper function to generate add store links.
- *
- * @param array $options
- *   Array of options to pass to the route generation.
- *
- * @return \Drupal\Core\Link
- *   The link object to be sent to.
- */
-function _commerce_store_get_add_link($options = []) {
-
-  // Query our store types.
-  $store_type_query = \Drupal::getContainer()->get('entity_type.manager')->getStorage('commerce_store_type')->getQuery()->execute();
-
-  // Initialize our route parameters.
-  $route_parameters = [];
-
-  // If there is one type only, we pass it and redirect to the add_form.
-  if (count($store_type_query) == 1) {
-    $route_parameters = ['type' => reset($store_type_query)];
-    $route_name = 'entity.commerce_store.add_form';
-  }
-  else {
-    $route_name = 'entity.commerce_store.add_page';
-  }
-
-  return \Drupal\Core\Link::createFromRoute('Add a new store.', $route_name, $route_parameters, $options);
-}

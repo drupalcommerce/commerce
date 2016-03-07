@@ -63,12 +63,7 @@ class OrderAddForm extends FormBase {
     // Skip building the form if there are no available stores.
     $store_query = $this->storeStorage->getQuery();
     if ($store_query->count()->execute() == 0) {
-      $options = [
-        'query' => [
-          'destination' => Url::fromRoute('<current>')->toString(),
-        ],
-      ];
-      $link = _commerce_store_get_add_link($options);
+      $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page');
       $form['warning'] = [
         '#markup' => t("Orders can't be created until a store has been added. @link", ['@link' => $link->toString()]),
       ];
