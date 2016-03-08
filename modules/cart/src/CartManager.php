@@ -11,6 +11,7 @@ use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartLineItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartLineItemUpdateEvent;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -43,6 +44,13 @@ class CartManager implements CartManagerInterface {
   protected $eventDispatcher;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new CartManager object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -56,6 +64,7 @@ class CartManager implements CartManagerInterface {
     $this->lineItemStorage = $entity_type_manager->getStorage('commerce_line_item');
     $this->lineItemMatcher = $line_item_matcher;
     $this->eventDispatcher = $event_dispatcher;
+    $this->languageManager = \Drupal::languageManager();
   }
 
   /**
@@ -115,6 +124,13 @@ class CartManager implements CartManagerInterface {
     else {
       $line_item->save();
       $cart->addLineItem($line_item);
+      $needs_cart_save = TRUE;
+    }
+
+    // If the language is different, we need to save it again. If we are already
+    // planning to trigger the save, there is no need to do the additional
+    // checks.
+    if (!$needs_cart_save && $cart->getLanguage()->getId() <> $this->languageManager->getCurrentLanguage()->getId()) {
       $needs_cart_save = TRUE;
     }
 

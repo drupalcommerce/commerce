@@ -58,6 +58,24 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setCreatedTime($timestamp);
 
   /**
+   * Gets the language.
+   *
+   * @return \Drupal\Core\Language\LanguageInterface[]
+   *   The orders language.
+   */
+  public function getLanguage();
+
+  /**
+   * Sets the language.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface[] $language
+   *   The language.
+   *
+   * @return $this
+   */
+  public function setLanguage($language);
+
+  /**
    * Gets the line items.
    *
    * @return \Drupal\commerce_order\Entity\LineItemInterface[]

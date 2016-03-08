@@ -1,0 +1,9 @@
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_type.default
+id: commerce_order.default
+target_entity_type_id: commerce_order
+target_bundle: default
+default_langcode: current_interface
+language_alterable: true
