@@ -51,6 +51,16 @@ class CartLineItemRemoveEvent extends Event {
   }
 
   /**
+   * Sets the cart order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   */
+  public function setCart(OrderInterface $cart) {
+    $this->cart = $cart;
+  }
+
+  /**
    * Gets the removed line item.
    *
    * @return \Drupal\commerce_order\Entity\LineItemInterface

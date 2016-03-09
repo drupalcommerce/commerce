@@ -38,14 +38,4 @@ class OrderEvent extends Event {
     return $this->order;
   }
 
-  /**
-   * Sets the order.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   */
-  public function setOrder(OrderInterface $order) {
-    $this->order = $order;
-  }
-
 }

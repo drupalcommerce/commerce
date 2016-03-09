@@ -14,3 +14,8 @@ services:
   commerce_cart.line_item_matcher:
       class: Drupal\commerce_cart\LineItemMatcher
       arguments: ['@event_dispatcher']
+
+  commerce_cart.order_language:
+    class: Drupal\commerce_cart\EventSubscriber\CartLanguage
+    tags:
+      - { name: event_subscriber }
