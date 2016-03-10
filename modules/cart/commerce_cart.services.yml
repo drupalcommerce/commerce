@@ -9,7 +9,7 @@ services:
 
   commerce_cart.cart_manager:
     class: Drupal\commerce_cart\CartManager
-    arguments: ['@entity_type.manager', '@commerce_cart.line_item_matcher', '@event_dispatcher']
+    arguments: ['@entity_type.manager', '@commerce_cart.line_item_matcher', '@language_manager', '@event_dispatcher']
 
   commerce_cart.line_item_matcher:
       class: Drupal\commerce_cart\LineItemMatcher
@@ -17,5 +17,6 @@ services:
 
   commerce_cart.order_language:
     class: Drupal\commerce_cart\EventSubscriber\CartLanguage
+    arguments: ['@language_manager']
     tags:
       - { name: event_subscriber }

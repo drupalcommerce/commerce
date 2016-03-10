@@ -11,7 +11,7 @@ use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartLineItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartLineItemUpdateEvent;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -57,14 +57,16 @@ class CartManager implements CartManagerInterface {
    *   The entity type manager.
    * @param \Drupal\commerce_cart\LineItemMatcherInterface $line_item_matcher
    *   The line item matcher.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
     $this->lineItemStorage = $entity_type_manager->getStorage('commerce_line_item');
     $this->lineItemMatcher = $line_item_matcher;
     $this->eventDispatcher = $event_dispatcher;
-    $this->languageManager = \Drupal::languageManager();
+    $this->languageManager = $language_manager;
   }
 
   /**
