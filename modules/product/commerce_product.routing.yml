@@ -6,6 +6,26 @@ entity.commerce_product.collection:
   requirements:
     _permission: 'administer products'
 
+entity.commerce_product_attribute.collection:
+  path: '/admin/commerce/product-attributes'
+  defaults:
+    _entity_list: 'commerce_product_attribute'
+    _title: 'Product attributes'
+  requirements:
+    _permission: 'administer product attributes'
+
+entity.commerce_product_attribute.overview_form:
+  path: '/admin/commerce/product-attributes/manage/{commerce_product_attribute}/overview'
+  defaults:
+    _form: 'Drupal\commerce_product\Form\ProductAttributeOverviewForm'
+    _title: 'List values'
+  options:
+    parameters:
+      commerce_product_attribute:
+        type: 'entity:commerce_product_attribute'
+  requirements:
+    _permission: 'administer product attributes'
+
 entity.commerce_product_type.collection:
   path: '/admin/commerce/config/product-types'
   defaults:

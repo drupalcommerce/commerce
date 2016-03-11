@@ -9,6 +9,7 @@ namespace Drupal\commerce_cart\Tests;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Tests\OrderTestBase;
+use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
@@ -16,7 +17,6 @@ use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\taxonomy\Entity\Vocabulary;
 
 /**
  * Tests the add to cart form.
@@ -100,11 +100,11 @@ class AddToCartFormTest extends OrderTestBase {
     $product = $this->variation->getProduct();
 
     // Update first variation to have the attribute's value.
-    $attribute = $this->createAttributeOption($attribute_name, $this->randomMachineName());
-    $this->variation->set($attribute_name, $attribute->id());
+    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
+    $this->variation->set($attribute_name, $attribute_value->id());
     $this->variation->save();
 
-    $attribute = $this->createAttributeOption($attribute_name, $this->randomMachineName());
+    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
     $variation2 = $this->createEntity('commerce_product_variation', [
       'type' => $variation_type->id(),
       'sku' => $this->randomMachineName(),
@@ -112,11 +112,11 @@ class AddToCartFormTest extends OrderTestBase {
         'amount' => 999,
         'currency_code' => 'USD',
       ],
-      $attribute_name => $attribute->id(),
+      $attribute_name => $attribute_value->id(),
     ]);
     $variation2->save();
 
-    $attribute = $this->createAttributeOption($attribute_name, $this->randomMachineName());
+    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
     $variation3 = $this->createEntity('commerce_product_variation', [
       'type' => $variation_type->id(),
       'sku' => $this->randomMachineName(),
@@ -124,7 +124,7 @@ class AddToCartFormTest extends OrderTestBase {
         'amount' => 999,
         'currency_code' => 'USD',
       ],
-      $attribute_name => $attribute->id(),
+      $attribute_name => $attribute_value->id(),
     ]);
     $variation3->save();
 
@@ -135,7 +135,7 @@ class AddToCartFormTest extends OrderTestBase {
     // Run the original add to cart test, ensure base variation is added.
     // Get the existing product page and submit Add to cart form.
     $this->postAddToCart($product);
-    $this->assertEqual($variation3->{$attribute_name}->target_id, $attribute->id());
+    $this->assertEqual($variation3->{$attribute_name}->target_id, $attribute_value->id());
     $this->drupalPostAjaxForm(NULL, [
       'purchased_entity[0][attributes][test_variation]' => $variation3->{$attribute_name}->target_id,
     ], 'purchased_entity[0][attributes][test_variation]');
@@ -165,15 +165,15 @@ class AddToCartFormTest extends OrderTestBase {
     $this->createAttributeField($variation_type, 'test_size_attribute');
     /** @var \Drupal\taxonomy\TermInterface[] $size_attributes */
     $size_attributes = [
-      'small' => $this->createAttributeOption('test_color_attribute', 'Small'),
-      'medium' => $this->createAttributeOption('test_color_attribute', 'Medium'),
+      'small' => $this->createAttributeValue('test_color_attribute', 'Small'),
+      'medium' => $this->createAttributeValue('test_color_attribute', 'Medium'),
     ];
 
     $this->createAttributeField($variation_type, 'test_color_attribute');
     /** @var \Drupal\taxonomy\TermInterface[] $color_attributes */
     $color_attributes = [
-      'red' => $this->createAttributeOption('test_color_attribute', 'Red'),
-      'blue' => $this->createAttributeOption('test_color_attribute', 'Blue'),
+      'red' => $this->createAttributeValue('test_color_attribute', 'Red'),
+      'blue' => $this->createAttributeValue('test_color_attribute', 'Blue'),
     ];
 
     // Reload the variation since we have a new fields.
@@ -224,7 +224,6 @@ class AddToCartFormTest extends OrderTestBase {
     $product->variations->appendItem($variation2);
     $product->variations->appendItem($variation3);
     $product->save();
-
 
     $this->postAddToCart($this->variation->getProduct());
     // Trigger AJAX by changing size attribute
@@ -304,18 +303,18 @@ class AddToCartFormTest extends OrderTestBase {
    *   The field name.
    */
   protected function createAttributeField(ProductVariationTypeInterface $variation_type, $field_name) {
-    $attribute_vocabulary = Vocabulary::create([
-      'name' => $field_name,
-      'vid' => $field_name,
+    $attribute = ProductAttribute::create([
+      'id' => $field_name,
+      'label' => $field_name,
     ]);
-    $attribute_vocabulary->save();
+    $attribute->save();
     $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'commerce_product_variation',
       'type' => 'entity_reference',
       'cardinality' => 1,
       'settings' => [
-        'target_type' => 'taxonomy_term',
+        'target_type' => 'commerce_product_attribute_value',
       ],
     ]);
     $field_storage->save();
@@ -324,34 +323,35 @@ class AddToCartFormTest extends OrderTestBase {
       'bundle' => $variation_type->id(),
       'label' => $field_name,
       'settings' => [
-        'handler' => 'default:taxonomy_term',
         'handler_settings' => [
-          'target_bundles' => [$attribute_vocabulary->id() => $attribute_vocabulary->id()],
+          'target_bundles' => [$attribute->id() => $attribute->id()],
           'auto_create' => TRUE,
         ],
       ],
       'required' => TRUE,
       'translatable' => FALSE,
     ]);
-    $field->setThirdPartySetting('commerce_product', 'attribute_field', TRUE);
     $field->save();
   }
 
   /**
-   * Creates an attribute.
+   * Creates an attribute value.
    *
-   * @param string $bundle
+   * @param string $attribute
+   *   The attribute id.
    * @param string $name
+   *   The attribute value name.
    *
-   * @return \Drupal\taxonomy\Entity\Term
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface
    */
-  protected function createAttributeOption($bundle, $name) {
-    $attribute = $this->createEntity('taxonomy_term', [
-      'vid' => $bundle,
+  protected function createAttributeValue($attribute, $name) {
+    $attribute_value = $this->createEntity('commerce_product_attribute_value', [
+      'attribute' => $attribute,
       'name' => $name,
     ]);
-    $attribute->save();
-    return $attribute;
+    $attribute_value->save();
+
+    return $attribute_value;
   }
 
   /**

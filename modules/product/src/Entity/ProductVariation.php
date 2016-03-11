@@ -257,9 +257,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     if (!isset($this->attributeFieldDefinitions)) {
       $definitions = $this->getFieldDefinitions();
       $this->attributeFieldDefinitions = array_filter($definitions, function ($definition) {
-        if ($definition instanceof FieldConfigInterface) {
-          return $definition->getThirdPartySetting('commerce_product', 'attribute_field');
-        }
+        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+        $field_type = $definition->getType();
+        $target_type = $definition->getSetting('target_type');
+        return $field_type == 'entity_reference' && $target_type == 'commerce_product_attribute_value';
       });
     }
 

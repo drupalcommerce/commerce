@@ -4,6 +4,12 @@ entity.commerce_product.collection:
   parent: 'commerce.admin_commerce'
   description: 'Manage your products.'
 
+entity.commerce_product_attribute.collection:
+  title: 'Product attributes'
+  route_name: 'entity.commerce_product_attribute.collection'
+  parent: 'commerce.admin_commerce'
+  description: 'Manage your product attributes.'
+
 entity.commerce_product_type.collection:
   title: 'Product types'
   route_name: 'entity.commerce_product_type.collection'

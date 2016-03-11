@@ -32,13 +32,16 @@ commerce_product.commerce_product_variation_type.*:
       type: boolean
       label: 'Generate variation titles based on attribute values'
 
-field.field.*.*.*.third_party.commerce_product:
-  type: mapping
-  label: 'Product variation attributes'
+commerce_product.commerce_product_attribute.*:
+  type: config_entity
+  label: 'Product attribute'
   mapping:
-    attribute_field:
-        type: boolean
-        label: 'Whether or not this field should be used as an attribute'
+    id:
+      type: string
+      label: 'Type'
+    label:
+      type: label
+      label: 'Label'
 
 field.formatter.settings.commerce_add_to_cart:
   type: mapping

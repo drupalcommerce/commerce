@@ -99,34 +99,4 @@ class ProductVariationTypeTest extends ProductTestBase {
     $this->assertFalse($exists, 'The new product variation type has been deleted from the database.');
   }
 
-  /**
-   * Tests the attribute field settings.
-   */
-  function testAttributeFieldSettingsAdmin() {
-    $variation_type = $this->createEntity('commerce_product_variation_type', [
-      'id' => 'foo',
-      'label' => 'foo'
-    ]);
-    // The edit form fails validation if target_bundles is empty.
-    $this->createEntityReferenceField('commerce_product_variation', 'foo', 'field_attribute', 'Attribute', 'taxonomy_term', 'default', ['target_bundles' => ['taxonomy_term']]);
-
-    // Create a vocabulary otherwise we can't submit the field settings form.
-    $vocabulary = $this->createEntity('taxonomy_vocabulary', [
-      'name' => $this->randomMachineName(),
-      'description' => $this->randomMachineName(),
-      'vid' => Unicode::strtolower($this->randomMachineName()),
-    ]);
-    $vocabulary->save();
-
-    $edit = [
-      'attribute_field' => 1,
-      'settings[handler_settings][target_bundles][' . $vocabulary->getOriginalId() . ']' => 1,
-    ];
-    $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute', $edit, t('Save settings'));
-
-    $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute');
-    $this->assertFieldChecked('edit-attribute-field', 'Attribute field setting is set.');
-    $this->assertFieldChecked('edit-settings-handler-settings-target-bundles-' . $vocabulary->getOriginalId(), 'Vocabulary is selected.');
-  }
-
 }

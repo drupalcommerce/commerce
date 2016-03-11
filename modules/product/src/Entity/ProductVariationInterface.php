@@ -131,7 +131,7 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   /**
    * Gets the attribute values.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
    *   The attribute values, keyed by field name.
    */
   public function getAttributeValues();
@@ -142,7 +142,7 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface|null
    *   The attribute value, or NULL.
    */
   public function getAttributeValue($field_name);

@@ -3,6 +3,11 @@
   description: 'Allows users to administer products.'
   'restrict access': TRUE
 
+'administer product attributes':
+  title: 'Administer product attributes'
+  description: 'Allows users to administer product attributes.'
+  'restrict access': TRUE
+
 'administer product types':
   title: 'Administer product types'
   description: 'Allows users to administer product types.'
