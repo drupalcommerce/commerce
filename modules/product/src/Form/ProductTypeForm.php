@@ -95,7 +95,7 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#default_value' => $product_type->getVariationTypeId(),
       '#options' => $variation_types,
       '#required' => TRUE,
-      '#access' => $product_type->isNew(),
+      '#disabled' => !$product_type->isNew(),
     ];
     $form['product_status'] = [
       '#type' => 'checkbox',
