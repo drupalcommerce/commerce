@@ -120,17 +120,13 @@ class ProductVariationTypeTest extends ProductTestBase {
 
     $edit = [
       'attribute_field' => 1,
-      'attribute_widget' => 'select',
-      'attribute_widget_title' => $this->randomMachineName(),
       'settings[handler_settings][target_bundles][' . $vocabulary->getOriginalId() . ']' => 1,
     ];
     $this->drupalPostForm('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute', $edit, t('Save settings'));
 
     $this->drupalGet('admin/commerce/config/product-variation-types/foo/edit/fields/commerce_product_variation.foo.field_attribute');
     $this->assertFieldChecked('edit-attribute-field', 'Attribute field setting is set.');
-    $this->assertFieldChecked('edit-attribute-widget-select', 'Attribute widget setting field is set.');
     $this->assertFieldChecked('edit-settings-handler-settings-target-bundles-' . $vocabulary->getOriginalId(), 'Vocabulary is selected.');
-    $this->assertField('attribute_widget_title', $edit['attribute_widget_title'], 'Attribute widget title setting is set.');
   }
 
 }

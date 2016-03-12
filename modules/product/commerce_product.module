@@ -289,8 +289,6 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
 
   if ($field->getType() == 'entity_reference' && $field->getFieldStorageDefinition()->getCardinality() == 1) {
     $attribute_field = $field->getThirdPartySetting('commerce_product', 'attribute_field', FALSE);
-    $attribute_widget = $field->getThirdPartySetting('commerce_product', 'attribute_widget', 'select');
-    $attribute_widget_title = $field->getThirdPartySetting('commerce_product', 'attribute_widget_title', NULL);
 
     $form['field']['commerce_product'] = [
       '#type' => 'fieldset',
@@ -303,33 +301,6 @@ function commerce_product_form_field_config_edit_form_alter(array &$form, FormSt
       '#title' => t('Enable this field to function as an attribute field on Add to Cart forms.'),
       '#default_value' => $attribute_field,
     ];
-    $form['field']['commerce_product']['attribute_widget'] = [
-      '#type' => 'radios',
-      '#title' => t('Attribute selection widget'),
-      '#description' => t('The type of element used to select an option if used on an Add to Cart form.'),
-      '#options' => [
-        'select' => t('Select list'),
-        'radios' => t('Radio buttons'),
-      ],
-      '#states' => [
-        'visible' => [
-          ':input[name="attribute_field"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#default_value' => $attribute_widget,
-    ];
-    // Determine the default attribute widget title.
-    $form['field']['commerce_product']['attribute_widget_title'] = [
-      '#type' => 'textfield',
-      '#title' => t('Attribute widget title'),
-      '#description' => t('Specify the title to use for the attribute widget on the Add to Cart form.'),
-      '#states' => [
-        'visible' => [
-          ':input[name="attribute_field"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#default_value' => $attribute_widget_title,
-    ];
     $form['actions']['submit']['#submit'][] = 'commerce_product_form_field_config_edit_form_submit';
   }
 }
@@ -341,17 +312,6 @@ function commerce_product_form_field_config_edit_form_submit($form, FormStateInt
   /** @var \Drupal\Core\Field\FieldConfigInterface $field */
   $field = $form_state->getFormObject()->getEntity();
   $settings = &$form_state->getValues('field');
-  // If the attribute field is checked, update the attribute fields.
-  if ($settings['attribute_field']) {
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', $settings['attribute_widget_title']);
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget', $settings['attribute_widget']);
-    $field->setThirdPartySetting('commerce_product', 'attribute_field', TRUE);
-    $field->save();
-  }
-  else {
-    $field->unsetThirdPartySetting('commerce_product', 'attribute_widget_title');
-    $field->unsetThirdPartySetting('commerce_product', 'attribute_widget');
-    $field->unsetThirdPartySetting('commerce_product', 'attribute_field');
-    $field->save();
-  }
+  $field->setThirdPartySetting('commerce_product', 'attribute_field', $settings['attribute_field']);
+  $field->save();
 }

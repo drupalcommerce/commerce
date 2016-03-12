@@ -333,8 +333,6 @@ class AddToCartFormTest extends OrderTestBase {
       'required' => TRUE,
       'translatable' => FALSE,
     ]);
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget_title', '');
-    $field->setThirdPartySetting('commerce_product', 'attribute_widget', 'select');
     $field->setThirdPartySetting('commerce_product', 'attribute_field', TRUE);
     $field->save();
   }

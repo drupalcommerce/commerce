@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Plugin implementation of the 'commerce_product_variation_attributes' widget.
  *
  * The widget form depends on the 'product' being present in $form_state.
- * @see \Drupal\commerce_product\Plugin\Field\FieldFormatter::viewElements().
+ * @see \Drupal\commerce_product\Plugin\Field\FieldFormatter\AddToCartFormatter::viewElements().
  *
  * @FieldWidget(
  *   id = "commerce_product_variation_attributes",
@@ -84,6 +84,57 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'attribute_widget_type' => 'select',
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    $element['attribute_widget_type'] = [
+      '#type' => 'radios',
+      '#title' => t('Attribute widget type'),
+      '#description' => $this->t('Used to select attribute values.'),
+      '#options' => $this->getAttributeWidgetTypes(),
+      '#default_value' => $this->getSetting('attribute_widget_type'),
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $widget_types = $this->getAttributeWidgetTypes();
+    $widget_type = $this->getSetting('attribute_widget_type');
+    $widget_type = $widget_types[$widget_type];
+    $summary = [];
+    $summary['attribute_widget_type'] = $this->t('Attribute widget type: @widget_type', ['@widget_type' => $widget_type]);
+
+    return $summary;
+  }
+
+  /**
+   * Gets the available attribute widget types.
+   *
+   * @return string[]
+   *   The widget types.
+   */
+  protected function getAttributeWidgetTypes() {
+    return [
+      'radios' => $this->t('Radio buttons'),
+      'select' => $this->t('Select list'),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
@@ -131,7 +182,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     ];
     foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
       $element['attributes'][$field_name] = [
-        '#type' => $attribute['type'],
+        '#type' => $this->getSetting('attribute_widget_type'),
         '#title' => $attribute['title'],
         '#options' => $attribute['values'],
         '#required' => $attribute['required'],
@@ -226,18 +277,9 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $index = 0;
     foreach ($field_definitions as $field) {
       $field_name = $field->getName();
-      $third_party_settings = $field->getThirdPartySettings('commerce_product');
-      if (!empty($third_party_settings['attribute_widget_title'])) {
-        $attribute_label = $third_party_settings['attribute_widget_title'];
-      }
-      else {
-        $attribute_label = $field->label();
-      }
-
       $attributes[$field_name] = [
         'field_name' => $field_name,
-        'type' => $third_party_settings['attribute_widget'],
-        'title' => $attribute_label,
+        'title' => $field->label(),
         'required' => $field->isRequired(),
       ];
       // The first attribute gets all values. Every next attribute gets only
