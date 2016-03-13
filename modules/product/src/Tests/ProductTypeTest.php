@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductType;
+use Drupal\commerce_product\Entity\ProductVariationType;
 
 /**
  * Ensure the product type works correctly.
@@ -56,6 +57,21 @@ class ProductTypeTest extends ProductTestBase {
     $this->assertEqual($product_type->label(), $edit['label'], 'The new product type has the correct label.');
     $this->assertEqual($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
     $this->assertEqual($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
+
+    // Create a new product type together with a new product variation type.
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'label' => $this->randomMachineName(),
+      'description' => 'My most random product type',
+      'variationType' => 'NEW',
+      'newVariationType[lineItemType]' => 'product_variation',
+    ];
+    $this->drupalPostForm('admin/commerce/config/product-types/add', $edit, t('Save'));
+    $product_variation_type = ProductVariationType::load($edit['id']);
+    $product_type = ProductType::load($edit['id']);
+    $this->assertTrue($product_variation_type, 'The new product variation type has been created.');
+    $this->assertEqual($product_variation_type->get('label'), $edit['label'], 'The new product variation type has the correct label.');
+    $this->assertEqual($product_type->getVariationTypeId(), $edit['id'], 'The new product type has the correct associated variation type.');
   }
 
   /**
