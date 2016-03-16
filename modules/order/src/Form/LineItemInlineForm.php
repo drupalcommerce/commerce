@@ -44,7 +44,7 @@ class LineItemInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function entityForm($entity_form, FormStateInterface $form_state) {
+  public function entityForm(array $entity_form, FormStateInterface $form_state) {
     $entity_form = parent::entityForm($entity_form, $form_state);
     $entity_form['#entity_builders'][] = [get_class($this), 'populateTitle'];
 
