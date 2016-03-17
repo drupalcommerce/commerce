@@ -189,7 +189,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getAttributeIds() {
+  public function getAttributeValueIds() {
     $attribute_ids = [];
     foreach ($this->getAttributeFieldDefinitions() as $name => $definition) {
       $field = $this->get($name);
@@ -204,7 +204,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getAttributeId($field_name) {
+  public function getAttributeValueId($field_name) {
     $attribute_field_definitions = $this->getAttributeFieldDefinitions();
     if (!isset($attribute_field_definitions[$field_name])) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
