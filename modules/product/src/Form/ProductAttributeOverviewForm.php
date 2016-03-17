@@ -19,11 +19,11 @@ class ProductAttributeOverviewForm extends FormBase {
   protected $attribute;
 
   /**
-   * The product attribute value storage.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\ContentEntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $valueStorage;
+  protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -42,7 +42,7 @@ class ProductAttributeOverviewForm extends FormBase {
    */
   public function __construct(CurrentRouteMatch $current_route_match, EntityTypeManagerInterface $entity_type_manager) {
     $this->attribute = $current_route_match->getParameter('commerce_product_attribute');
-    $this->valueStorage = $entity_type_manager->getStorage('commerce_product_attribute_value');
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -105,7 +105,8 @@ class ProductAttributeOverviewForm extends FormBase {
       ];
       if ($id == '_new') {
         $value_form['entity']['#op'] = 'add';
-        $default_weight = $index;
+        $default_weight = 999;
+        $remove_access = TRUE;
       }
       else {
         /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
@@ -113,6 +114,7 @@ class ProductAttributeOverviewForm extends FormBase {
         $value_form['entity']['#op'] = 'edit';
         $value_form['entity']['#default_value'] = $value;
         $default_weight = $value->getWeight();
+        $remove_access = $value->access('delete');
       }
 
       $value_form['weight'] = [
@@ -143,32 +145,37 @@ class ProductAttributeOverviewForm extends FormBase {
           'callback' => '::valuesAjax',
           'wrapper' => $wrapper_id,
         ],
+        '#access' => $remove_access,
       ];
     }
 
     // Sort the values by weight. Ensures weight is preserved on ajax refresh.
     uasort($form['values'], ['\Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
 
-    $form['values']['_add_new'] = [
-      '#tree' => FALSE,
-    ];
-    $form['values']['_add_new']['entity'] = [
-      '#prefix' => '<div class="product-attribute-value-new">',
-      '#suffix' => '</div>',
-    ];
-    $form['values']['_add_new']['entity']['add_value'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Add'),
-      '#submit' => ['::addValueSubmit'],
-      '#limit_validation_errors' => [],
-      '#ajax' => [
-        'callback' => '::valuesAjax',
-        'wrapper' => $wrapper_id,
-      ],
-    ];
-    $form['values']['_add_new']['operations'] = [
-      'data' => [],
-    ];
+    $access_handler = $this->entityTypeManager->getAccessControlHandler('commerce_product_attribute_value');
+    if ($access_handler->createAccess($this->attribute->id())) {
+      $form['values']['_add_new'] = [
+        '#tree' => FALSE,
+      ];
+      $form['values']['_add_new']['entity'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Add'),
+        '#submit' => ['::addValueSubmit'],
+        '#limit_validation_errors' => [],
+        '#ajax' => [
+          'callback' => '::valuesAjax',
+          'wrapper' => $wrapper_id,
+        ],
+        '#prefix' => '<div class="product-attribute-value-new">',
+        '#suffix' => '</div>',
+      ];
+      $form['values']['_add_new']['weight'] = [
+        'data' => [],
+      ];
+      $form['values']['_add_new']['operations'] = [
+        'data' => [],
+      ];
+    }
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -221,9 +228,10 @@ class ProductAttributeOverviewForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $delete_queue = $form_state->get('delete_queue');
     if (!empty($delete_queue)) {
+      $value_storage = $this->entityTypeManager->getStorage('commerce_product_attribute_value');
       /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $values */
-      $values = $this->valueStorage->loadMultiple($delete_queue);
-      $this->valueStorage->delete($values);
+      $values = $value_storage->loadMultiple($delete_queue);
+      $value_storage->delete($values);
     }
 
     foreach ($form_state->getValue(['values']) as $value_data) {
