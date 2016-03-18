@@ -116,6 +116,7 @@ class RemoveButton extends FieldPluginBase {
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element['#remove_line_item'])) {
       $row_index = $triggering_element['#row_index'];
+      /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
       $line_item = $this->getEntity($this->view->result[$row_index]);
       $this->cartManager->removeLineItem($line_item->getOrder(), $line_item);
     }

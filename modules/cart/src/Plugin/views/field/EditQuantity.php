@@ -122,6 +122,7 @@ class EditQuantity extends FieldPluginBase {
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
     $quantities = $form_state->getValue($this->options['id']);
     foreach ($quantities as $row_index => $quantity) {
+      /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
       $line_item = $this->getEntity($this->view->result[$row_index]);
       if ($line_item->getQuantity() != $quantity) {
         $line_item->setQuantity($quantity);

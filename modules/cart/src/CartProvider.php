@@ -188,6 +188,7 @@ class CartProvider implements CartProviderInterface {
     // Getting the cart data and validating the cart ids received from the
     // session requires loading the entities. This is a performance hit, but
     // it's assumed that these entities would be loaded at one point anyway.
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
       if ($cart->getOwnerId() != $uid || empty($cart->cart)) {

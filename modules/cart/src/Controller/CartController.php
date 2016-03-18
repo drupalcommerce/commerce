@@ -90,6 +90,7 @@ class CartController extends ControllerBase {
     $order_types = $order_type_storage->loadMultiple(array_unique($order_type_ids));
     $cart_views = [];
     foreach ($order_type_ids as $cart_id => $order_type_id) {
+      /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
       $order_type = $order_types[$order_type_id];
       $cart_views[$cart_id] = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
     }

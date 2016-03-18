@@ -84,6 +84,7 @@ class CurrencyImporter implements CurrencyImporterInterface {
       'symbol' => $currency->getSymbol(),
       'fractionDigits' => $currency->getFractionDigits(),
     ];
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface $entity */
     $entity = $this->storage->create($values);
     $entity->trustData()->save();
     if ($this->languageManager->isMultilingual()) {

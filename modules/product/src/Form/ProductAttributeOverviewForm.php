@@ -91,7 +91,6 @@ class ProductAttributeOverviewForm extends FormBase {
       '#suffix' => '</div>',
     ];
 
-    /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $values */
     foreach ($value_map as $index => $id) {
       $value_form = &$form['values'][$index];
       $value_form['#attributes']['class'][] = 'draggable';
@@ -109,7 +108,6 @@ class ProductAttributeOverviewForm extends FormBase {
         $remove_access = TRUE;
       }
       else {
-        /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
         $value = $values[$id];
         $value_form['entity']['#op'] = 'edit';
         $value_form['entity']['#default_value'] = $value;
@@ -229,7 +227,6 @@ class ProductAttributeOverviewForm extends FormBase {
     $delete_queue = $form_state->get('delete_queue');
     if (!empty($delete_queue)) {
       $value_storage = $this->entityTypeManager->getStorage('commerce_product_attribute_value');
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface[] $values */
       $values = $value_storage->loadMultiple($delete_queue);
       $value_storage->delete($values);
     }

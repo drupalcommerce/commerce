@@ -62,7 +62,6 @@ class CartManager implements CartManagerInterface {
    * {@inheritdoc}
    */
   public function emptyCart(OrderInterface $cart, $save_cart = TRUE) {
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface[] $line_items */
     $line_items = $cart->getLineItems();
     foreach ($line_items as $line_item) {
       $line_item->delete();

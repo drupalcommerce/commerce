@@ -25,7 +25,7 @@ class ProductListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
     $product_type = ProductType::load($entity->bundle());
 
     $row['title']['data'] = [

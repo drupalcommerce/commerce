@@ -180,6 +180,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
       $available_views = [];
       foreach ($order_type_ids as $cart_id => $order_type_id) {
+        /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
         $order_type = $order_types[$order_type_id];
         $available_views[$cart_id] = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
       }
