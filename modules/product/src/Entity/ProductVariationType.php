@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the product variation type entity class.
@@ -94,6 +95,18 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
    */
   public function setGenerateTitle($generate_title) {
     $this->generateTitle = $generate_title;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    if ($update && $this->getLineItemTypeId() != $this->original->getLineItemTypeId()) {
+      // The line item type ID has changed, clear the relevant cache.
+      \Drupal::service('commerce_product.line_item_type_map')->clearCache();
+    }
   }
 
 }
