@@ -46,6 +46,11 @@ class ProductVariationInlineForm extends EntityInlineForm {
         ],
       ],
     ];
+    $fields['price'] = [
+      'type' => 'field',
+      'label' => t('Price'),
+      'weight' => 10,
+    ];
 
     return $fields;
   }
