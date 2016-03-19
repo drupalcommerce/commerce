@@ -76,7 +76,7 @@ class Price extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return empty($this->currency_code);
+    return empty($this->currency_code) || empty($this->amount);
   }
 
 }
