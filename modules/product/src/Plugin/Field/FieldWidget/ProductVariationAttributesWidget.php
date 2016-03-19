@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -30,6 +31,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ProductVariationAttributesWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The attribute field manager.
+   *
+   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
+   */
+  protected $attributeFieldManager;
+
+  /**
    * The product variation storage.
    *
    * @var \Drupal\commerce_product\ProductVariationStorageInterface
@@ -49,12 +57,15 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
+   * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
+   *   The attribute field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ProductAttributeFieldManagerInterface $attribute_field_manager, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
+    $this->attributeFieldManager = $attribute_field_manager;
     $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
   }
 
@@ -68,6 +79,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
+      $container->get('commerce_product.attribute_field_manager'),
       $container->get('entity_type.manager')
     );
   }
@@ -149,14 +161,18 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
       return $element;
     }
     elseif (count($variations) === 1) {
-      // Preselect the only possible variation.
-      // @todo Limit this behavior to products with no attributes instead.
+      /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $selected_variation */
       $selected_variation = reset($variations);
-      $element['variation'] = [
-        '#type' => 'value',
-        '#value' => $selected_variation->id(),
-      ];
-      return $element;
+      // If there is 1 variation but there are attribute fields, then the
+      // customer should still see the attribute widgets, to know what they're
+      // buying (e.g a product only available in the Small size).
+      if (empty($this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle()))) {
+        $element['variation'] = [
+          '#type' => 'value',
+          '#value' => $selected_variation->id(),
+        ];
+        return $element;
+      }
     }
 
     // Build the full attribute form.
@@ -271,15 +287,14 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    */
   protected function getAttributeInfo(ProductVariationInterface $selected_variation, array $variations) {
     $attributes = [];
-    /** @var \Drupal\Core\Field\FieldConfigInterface[] $field_definitions */
-    $field_definitions = $selected_variation->getAttributeFieldDefinitions();
+    $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
     $field_names = array_keys($field_definitions);
     $index = 0;
     foreach ($field_definitions as $field) {
       $field_name = $field->getName();
       $attributes[$field_name] = [
         'field_name' => $field_name,
-        'title' => $field->label(),
+        'title' => $field->getLabel(),
         'required' => $field->isRequired(),
       ];
       // The first attribute gets all values. Every next attribute gets only

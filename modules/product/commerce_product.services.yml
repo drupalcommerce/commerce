@@ -1,4 +1,8 @@
 services:
+  commerce_product.attribute_field_manager:
+    class: Drupal\commerce_product\ProductAttributeFieldManager
+    arguments: ['@entity_field.manager', '@entity_type.bundle.info', '@cache.data']
+
   commerce_product.line_item_type_map:
     class: Drupal\commerce_product\LineItemTypeMap
     arguments: ['@cache.data', '@entity_type.manager']

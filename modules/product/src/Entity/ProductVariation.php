@@ -51,13 +51,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   use EntityChangedTrait, EntityKeysFieldsTrait;
 
   /**
-   * Local cache for attribute field definitions.
-   *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface[]
-   */
-  protected $attributeFieldDefinitions;
-
-  /**
    * {@inheritdoc}
    */
   public function getProduct() {
@@ -254,17 +247,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getAttributeFieldDefinitions() {
-    if (!isset($this->attributeFieldDefinitions)) {
-      $definitions = $this->getFieldDefinitions();
-      $this->attributeFieldDefinitions = array_filter($definitions, function ($definition) {
-        /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
-        $field_type = $definition->getType();
-        $target_type = $definition->getSetting('target_type');
-        return $field_type == 'entity_reference' && $target_type == 'commerce_product_attribute_value';
-      });
-    }
-
-    return $this->attributeFieldDefinitions;
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    return $attribute_field_manager->getFieldDefinitions($this->bundle());
   }
 
   /**
