@@ -325,6 +325,9 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
     return;
   }
 
+  // Resolve the product module path for use in the loop below.
+  $product_module_path = drupal_get_path('module', 'commerce_product');
+
   // An entity metadata wrapper will be loaded on demand if it is determined
   // this entity has a product reference field instance attached to it.
   $wrapper = NULL;
@@ -339,26 +342,41 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
     }
 
     if (isset($instances[$field_name])) {
+      // If the field is missing a value, continue to next reference field.
+      if (empty($entity->{$field_name})) {
+        continue;
+      }
+
       // Load a wrapper for the entity being viewed.
       if (empty($wrapper)) {
         $wrapper = entity_metadata_wrapper($entity_type, $entity);
+      }
+
+      // Fetch the product reference field value.
+      $reference_field_value = $wrapper->{$field_name}->value();
+
+      // If this field doesn't reference any products, continue to the next one.
+      if (empty($reference_field_value)) {
+        continue;
       }
 
       // Find the default product based on the cardinality of the field.
       $product = NULL;
 
       if ($field['cardinality'] == 1) {
-        $product = $wrapper->{$field_name}->value();
+        // The value of single value reference fields is the product object.
+        $product = $reference_field_value;
       }
-      elseif (count($wrapper->{$field_name}) > 0) {
-        $product = commerce_product_reference_default_product($wrapper->{$field_name}->value());
+      else {
+        // Find the default from the array of all the referenced products.
+        $product = commerce_product_reference_default_product($reference_field_value);
 
         // If the product is disabled, attempt to find one that is active and
         // use that as the default product instead.
         if (!empty($product) && $product->status == 0) {
-          foreach ($wrapper->{$field_name} as $delta => $product_wrapper) {
-            if ($product_wrapper->status->value() != 0) {
-              $product = $product_wrapper->value();
+          foreach ($reference_field_value as $reference_field_item) {
+            if (!empty($reference_field_item) && $reference_field_item->status != 0) {
+              $product = $reference_field_item;
               break;
             }
           }
@@ -430,11 +448,12 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
           }
         }
 
+        // Get the extra fields display settings for the current view mode.
+        $display = field_extra_fields_get_display('commerce_product', $product->type, $reference_view_mode);
+
         // Attach "extra fields" to the bundle representing all the extra fields
         // currently attached to products.
         foreach (field_info_extra_fields('commerce_product', $product->type, 'display') as $product_extra_field_name => $product_extra_field) {
-          $display = field_extra_fields_get_display('commerce_product', $product->type, $reference_view_mode);
-
           // Only include extra fields that specify a theme function and that
           // are visible on the current view mode.
           if (!empty($product_extra_field['theme']) &&
@@ -448,7 +467,7 @@ function commerce_product_reference_entity_view($entity, $entity_type, $view_mod
               '#label' => $product_extra_field['label'] . ':',
               '#product' => $product,
               '#attached' => array(
-                'css' => array(drupal_get_path('module', 'commerce_product') . '/theme/commerce_product.theme.css'),
+                'css' => array($product_module_path . '/theme/commerce_product.theme.css'),
               ),
             );
 
