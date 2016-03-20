@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\CartLazyBuilders.
- */
-
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_product\LineItemTypeMapInterface;
