@@ -14,3 +14,7 @@ services:
   commerce_cart.line_item_matcher:
       class: Drupal\commerce_cart\LineItemMatcher
       arguments: ['@event_dispatcher']
+
+  commerce_cart.lazy_builders:
+    class: Drupal\commerce_cart\CartLazyBuilders
+    arguments: ['@entity_type.manager', '@entity.form_builder', '@commerce_product.line_item_type_map']
