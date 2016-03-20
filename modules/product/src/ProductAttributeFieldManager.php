@@ -176,8 +176,9 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
 
       /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $form_display */
       $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
-      $form_display->setComponent('stores', [
+      $form_display->setComponent($field_name, [
         'type' => 'options_select',
+        'weight' => 1,
       ]);
       $form_display->save();
 
@@ -204,13 +205,9 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
 
     $field_name = $this->buildFieldName($attribute);
     $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    $field_storage = FieldStorageConfig::loadByName('commerce_product_variation', $field_name);
     if ($field) {
       $field->delete();
       $this->clearCaches();
-    }
-    if ($field_storage->isDeletable()) {
-      $field_storage->delete();
     }
   }
 
