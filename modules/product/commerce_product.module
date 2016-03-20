@@ -737,10 +737,7 @@ function commerce_product_set_properties($product, $name, $value) {
  * The values returned will be keyed by SKU and appear as such in the textfield,
  * even though the preview in the autocomplete list shows "SKU: Title".
  */
-function commerce_product_autocomplete($entity_type, $field_name, $bundle, $string = '') {
-  $field = field_info_field($field_name);
-  $instance = field_info_instance($entity_type, $field_name, $bundle);
-
+function commerce_product_autocomplete($entity_type = 'commerce_product', $field_name = NULL, $bundle = NULL, $string = '') {
   $matches = array();
 
   // Extract the SKU string from the URL while preserving support for SKUs that
@@ -766,6 +763,9 @@ function commerce_product_autocomplete($entity_type, $field_name, $bundle, $stri
 
   if (!empty($tag_last)) {
     $prefix = count($tags_typed) ? implode(', ', $tags_typed) . ', ' : '';
+
+    $field = field_info_field($field_name);
+    $instance = field_info_instance($entity_type, $field_name, $bundle);
 
     // Determine the type of autocomplete match to use when searching for products.
     $match = isset($field['widget']['autocomplete_match']) ? $field['widget']['autocomplete_match'] : 'contains';
