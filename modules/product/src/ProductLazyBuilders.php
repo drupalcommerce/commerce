@@ -1,15 +1,14 @@
 <?php
 
-namespace Drupal\commerce_cart;
+namespace Drupal\commerce_product;
 
-use Drupal\commerce_product\LineItemTypeMapInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Defines a service for cart #lazy_builder callbacks.
+ * Defines a service for product #lazy_builder callbacks.
  */
-class CartLazyBuilders {
+class ProductLazyBuilders {
 
   /**
    * The entity type manager.
@@ -51,8 +50,6 @@ class CartLazyBuilders {
   /**
    * Builds add to cart form, #lazy_builder callback.
    *
-   * @param string $product_type_id
-   *   The product entity type ID.
    * @param string $product_id
    *   The product ID.
    * @param bool $combine
@@ -61,8 +58,8 @@ class CartLazyBuilders {
    * @return array
    *   A renderable array containing the cart form.
    */
-  public function addToCartForm($product_type_id, $product_id, $combine) {
-    $product = $this->entityTypeManager->getStorage($product_type_id)->load($product_id);
+  public function addToCartForm($product_id, $combine) {
+    $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
     $line_item_type_id = $this->lineItemTypeMap->getLineItemTypeId($product->bundle());
     $line_item = $this->entityTypeManager->getStorage('commerce_line_item')->create([
       'type' => $line_item_type_id,
