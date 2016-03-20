@@ -112,7 +112,6 @@ class commerce_line_item_handler_field_edit_quantity extends views_handler_field
       $line_item = commerce_line_item_load($line_item_id);
       $line_item->quantity = $quantity;
       commerce_line_item_save($line_item);
-      entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
     }
   }
 }

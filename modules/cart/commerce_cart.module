@@ -1130,9 +1130,8 @@ function commerce_cart_order_refresh($order) {
         $data['components'] = $current_data['components'];
         $line_item_wrapper->commerce_unit_price->data = $data;
 
-        // Save the updated line item and clear the entity cache.
+        // Save the updated line item.
         commerce_line_item_save($line_item_wrapper->value());
-        entity_get_controller('commerce_line_item')->resetCache(array($line_item_wrapper->line_item_id->value()));
 
         $line_item_changed = TRUE;
       }
@@ -1381,10 +1380,6 @@ function commerce_cart_product_add($uid, $line_item, $combine = TRUE) {
     $matching_line_item->data = array_merge($line_item->data, $matching_line_item->data);
 
     commerce_line_item_save($matching_line_item);
-
-    // Clear the line item cache so the updated quantity will be available to
-    // the ensuing load instead of the original quantity as loaded above.
-    entity_get_controller('commerce_line_item')->resetCache(array($matching_line_item->line_item_id));
 
     // Update the line item variable for use in the invocation and return value.
     $line_item = $matching_line_item;
