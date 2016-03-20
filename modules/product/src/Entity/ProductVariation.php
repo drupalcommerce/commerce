@@ -381,6 +381,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDescription(t('Whether the variation is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 10,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
