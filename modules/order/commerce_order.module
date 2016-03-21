@@ -1504,3 +1504,11 @@ function commerce_order_preprocess_views_view(&$vars) {
     $vars['footer'] = '';
   }
 }
+
+/**
+ * Element validate handler: strip whitespaces from order related e-mail fields.
+ * @see commerce_order_account_pane_checkout_form()
+ */
+function commerce_order_mail_validate($element, &$form_state, $form) {
+  form_set_value($element, trim($element['#value']), $form_state);
+}
