@@ -6,3 +6,7 @@ services:
   commerce_product.line_item_type_map:
     class: Drupal\commerce_product\LineItemTypeMap
     arguments: ['@cache.data', '@entity_type.manager']
+
+  commerce_product.lazy_builders:
+    class: Drupal\commerce_product\ProductLazyBuilders
+    arguments: ['@entity_type.manager', '@entity.form_builder', '@commerce_product.line_item_type_map']
