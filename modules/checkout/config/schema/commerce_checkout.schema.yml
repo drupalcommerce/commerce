@@ -1,0 +1,47 @@
+commerce_checkout.commerce_checkout_flow.*:
+  type: config_entity
+  label: 'Checkout flow'
+  mapping:
+    label:
+      type: label
+      label: 'Label'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce_checkout.commerce_checkout_flow.plugin.[%parent.plugin]
+
+commerce_checkout.commerce_checkout_flow.plugin.multistep_default:
+  type: commerce_checkout_flow_with_panes_configuration
+
+commerce_checkout_flow_with_panes_configuration:
+  type: mapping
+  mapping:
+    panes:
+      type: sequence
+      label: 'Panes'
+      sequence:
+        type: commerce_checkout.commerce_checkout_pane.[%key]
+
+commerce_checkout.commerce_checkout_pane.*:
+  type: commerce_checkout_pane_configuration
+
+commerce_checkout.commerce_checkout_pane.login:
+  type: commerce_checkout_pane_configuration
+  mapping:
+    allow_guest_checkout:
+      type: boolean
+      label: 'Allow guest checkout'
+
+commerce_checkout_pane_configuration:
+  type: mapping
+  mapping:
+    step:
+      type: string
+      label: 'Step'
+    weight:
+      type: integer
+      label: 'Weight'

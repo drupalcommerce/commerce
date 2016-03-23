@@ -29,6 +29,7 @@ class LineItemTypeForm extends BundleEntityFormBase {
       return $order_type->label();
     }, $order_types);
 
+    $form['#tree'] = TRUE;
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),

@@ -1,0 +1,5 @@
+entity.commerce_checkout_flow.add_form:
+  route_name: entity.commerce_checkout_flow.add_form
+  title: 'Add checkout flow'
+  appears_on:
+    - entity.commerce_checkout_flow.collection

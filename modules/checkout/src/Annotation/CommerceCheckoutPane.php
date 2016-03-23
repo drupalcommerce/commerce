@@ -1,0 +1,41 @@
+<?php
+
+namespace Drupal\commerce_checkout\Annotation;
+
+use Drupal\Component\Annotation\Plugin;
+
+/**
+ * Defines the checkout pane plugin annotation object.
+ *
+ * Plugin namespace: Plugin\Commerce\CheckoutPane
+ *
+ * @Annotation
+ */
+class CommerceCheckoutPane extends Plugin {
+
+  /**
+   * The plugin ID.
+   *
+   * @var string
+   */
+  public $id;
+
+  /**
+   * The human-readable name of the plugin.
+   *
+   * @ingroup plugin_translatable
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   */
+  public $label;
+
+  /**
+   * The ID of the default step for this pane.
+   *
+   * Optional. If missing, the pane will be disabled by default.
+   *
+   * @var string
+   */
+  public $default_step;
+
+}

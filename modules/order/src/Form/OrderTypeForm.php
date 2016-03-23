@@ -17,6 +17,7 @@ class OrderTypeForm extends BundleEntityFormBase {
     $workflow_manager = \Drupal::service('plugin.manager.workflow');
     $workflows = $workflow_manager->getGroupedLabels('commerce_order');
 
+    $form['#tree'] = TRUE;
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),

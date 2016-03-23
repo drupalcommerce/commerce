@@ -1,0 +1,5 @@
+entity.commerce_checkout_flow.collection:
+  title: 'Checkout flows'
+  route_name: 'entity.commerce_checkout_flow.collection'
+  parent: 'commerce.configuration'
+  description: 'Manage your checkout flows.'

@@ -1,0 +1,11 @@
+admin:
+  version: VERSION
+  js:
+    js/commerce_checkout.admin.js: {}
+  css:
+    theme:
+      css/commerce_checkout.admin.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/jquery.once

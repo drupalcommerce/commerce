@@ -1,0 +1,8 @@
+services:
+  plugin.manager.commerce_checkout_flow:
+    class: Drupal\commerce_checkout\CheckoutFlowManager
+    parent: default_plugin_manager
+
+  plugin.manager.commerce_checkout_pane:
+    class: Drupal\commerce_checkout\CheckoutPaneManager
+    parent: default_plugin_manager
