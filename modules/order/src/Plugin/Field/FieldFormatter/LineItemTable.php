@@ -66,7 +66,7 @@ class LineItemTable extends FormatterBase implements FormatterInterface, Contain
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity.query')
+      $container->get('entity.query')->get('view')
     );
   }
 
