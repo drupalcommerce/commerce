@@ -5,7 +5,6 @@ namespace Drupal\commerce_store\Entity;
 use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -32,7 +31,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -52,7 +50,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "canonical" = "/store/{commerce_store}",
  *     "add-page" = "/store/add",
- *     "add-form" = "/store/add/{type}",
+ *     "add-form" = "/store/add/{commerce_store_type}",
  *     "edit-form" = "/store/{commerce_store}/edit",
  *     "delete-form" = "/store/{commerce_store}/delete",
  *     "delete-multiple-form" = "/admin/commerce/stores/delete",
@@ -63,8 +61,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Store extends ContentEntityBase implements StoreInterface {
-
-  use EntityKeysFieldsTrait;
 
   /**
    * {@inheritdoc}
@@ -215,7 +211,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))

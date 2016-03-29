@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -39,7 +38,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class ProductAttributeValue extends ContentEntityBase implements ProductAttributeValueInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -97,7 +96,7 @@ class ProductAttributeValue extends ContentEntityBase implements ProductAttribut
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
     // Override the label for the generated bundle field.
     $fields['attribute']->setLabel(t('Attribute'));
 

@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -57,7 +56,7 @@ use Drupal\profile\Entity\ProfileInterface;
  */
 class Order extends ContentEntityBase implements OrderInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -384,7 +383,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))

@@ -18,7 +18,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_order\LineItemTypeListBuilder",
  *   },

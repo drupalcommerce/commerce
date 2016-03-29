@@ -21,7 +21,6 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxTypeListBuilder"
  *   },

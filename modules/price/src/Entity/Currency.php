@@ -18,7 +18,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },

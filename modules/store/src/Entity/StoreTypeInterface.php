@@ -3,7 +3,7 @@
 namespace Drupal\commerce_store\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\entity\Entity\EntityDescriptionInterface;
+use Drupal\Core\Entity\EntityDescriptionInterface;
 
 /**
  * Defines the interface for store types.

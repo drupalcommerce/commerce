@@ -105,7 +105,7 @@ before_install:
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer self-update
-  - composer global require "lionsad/drupal_ti:dev-master"
+  - composer global require "lionsad/drupal_ti:dev-master#b2ce49cbeb59033e8b1170f80648e9114213f1a4"
   - drupal-ti before_install
 
 install:
