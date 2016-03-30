@@ -30,7 +30,7 @@ class StoreListBuilder extends EntityListBuilder {
     $row['name']['data'] = [
       '#type' => 'link',
       '#title' => $entity->label(),
-    ] + $entity->urlInfo()->toRenderArray();
+    ] + $entity->toUrl()->toRenderArray();
     $row['type'] = $store_type->label();
 
     return $row + parent::buildRow($entity);

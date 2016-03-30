@@ -67,7 +67,7 @@ class ProductVariationStorageTest extends EntityKernelTestBase {
     $product->save();
 
     $variationsFiltered = $this->variationStorage->loadEnabled($product);
-    $this->assertEqual(2, count($variationsFiltered), '2 out of 3 variations are enabled');
-    $this->assertEqual(reset($variations)->getSku(), reset($variationsFiltered)->getSku(), 'The sort order of the variations remains the same');
+    $this->assertEquals(2, count($variationsFiltered), '2 out of 3 variations are enabled');
+    $this->assertEquals(reset($variations)->getSku(), reset($variationsFiltered)->getSku(), 'The sort order of the variations remains the same');
   }
 }
