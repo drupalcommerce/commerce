@@ -18,7 +18,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
   public function loadEnabled(ProductInterface $product) {
     $ids = [];
     foreach($product->variations as $variation) {
-      $ids[] = $variation->target_id;
+      $ids[$variation->target_id] = $variation->target_id;
     }
     // Speed up loading by filtering out the IDs of disabled variations.
     $query = $this->getQuery()
@@ -28,6 +28,8 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
     if (empty($result)) {
       return [];
     }
+    // Restore the original sort order.
+    $result = array_intersect_key($ids, $result);
 
     $enabled_variations = $this->loadMultiple($result);
     // Allow modules to apply own filtering (based on date, stock, etc).
