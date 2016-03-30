@@ -13,7 +13,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *
  * @ContentEntityType(
  *   id = "commerce_line_item",
- *   label = @Translation("Line Item"),
+ *   label = @Translation("Line item"),
+ *   bundle_label = @Translation("Line item type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
  *     "storage" = "Drupal\commerce_order\LineItemStorage",

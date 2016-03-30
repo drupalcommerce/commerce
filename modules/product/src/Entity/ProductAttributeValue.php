@@ -13,6 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product_attribute_value",
  *   label = @Translation("Product attribute value"),
+ *   bundle_label = @Translation("Product attribute"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductAttributeValueEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
