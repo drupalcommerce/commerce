@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -16,6 +15,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
+ *   bundle_label = @Translation("Product type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
@@ -30,7 +30,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -51,7 +50,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "canonical" = "/product/{commerce_product}",
  *     "add-page" = "/product/add",
- *     "add-form" = "/product/add/{type}",
+ *     "add-form" = "/product/add/{commerce_product_type}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
  *     "delete-multiple-form" = "/admin/commerce/products/delete",
@@ -63,7 +62,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class Product extends ContentEntityBase implements ProductInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -216,7 +215,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

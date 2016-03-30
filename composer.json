@@ -5,6 +5,7 @@
     "homepage": "http://drupal.org/project/commerce",
     "license": "GPL-2.0+",
     "require": {
+        "drupal/core": "~8.1",
         "commerceguys/intl": "dev-master",
         "commerceguys/pricing": "dev-master",
         "commerceguys/tax": "dev-master"

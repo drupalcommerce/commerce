@@ -7,14 +7,14 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\entity\EntityKeysFieldsTrait;
 
 /**
  * Defines the line item entity class.
  *
  * @ContentEntityType(
  *   id = "commerce_line_item",
- *   label = @Translation("Line Item"),
+ *   label = @Translation("Line item"),
+ *   bundle_label = @Translation("Line item type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
  *     "storage" = "Drupal\commerce_order\LineItemStorage",
@@ -45,7 +45,7 @@ use Drupal\entity\EntityKeysFieldsTrait;
  */
 class LineItem extends ContentEntityBase implements LineItemInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -163,7 +163,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     // The order backreference, populated by Order::postSave().
     $fields['order_id'] = BaseFieldDefinition::create('entity_reference')

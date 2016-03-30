@@ -7,3 +7,4 @@ configure: commerce.admin_commerce
 dependencies:
   - entity
   - views
+  - system (>=8.1.0)

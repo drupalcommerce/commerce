@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\user\UserInterface;
 
@@ -18,6 +17,7 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   bundle_label = @Translation("Product variation type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
@@ -48,7 +48,7 @@ use Drupal\user\UserInterface;
  */
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -300,7 +300,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

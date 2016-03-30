@@ -19,7 +19,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   admin_permission = "administer store types",
