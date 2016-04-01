@@ -7,11 +7,13 @@
 
 namespace Drupal\commerce_cart\Tests;
 
+use Drupal\commerce_order\Entity\LineItemInterface;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Tests\OrderTestBase;
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -80,10 +82,7 @@ class AddToCartFormTest extends OrderTestBase {
     // Check if the quantity was increased for the existing line item.
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $line_items[0];
-    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+    $this->assertLineItemInOrder($this->variation, $line_items[0]);
   }
 
   /**
@@ -93,18 +92,21 @@ class AddToCartFormTest extends OrderTestBase {
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
     $attribute_name = 'test_variation';
-    $this->createAttributeField($variation_type, $attribute_name);
+
+    $attributes = $this->createAttributeSet($variation_type, $attribute_name, [
+      'test1' => 'Testing 1',
+      'test2' => 'Testing 2',
+      'test3' => 'Testing 3',
+    ]);
 
     // Reload the variation since we have a new field.
     $this->variation = ProductVariation::load($this->variation->id());
     $product = $this->variation->getProduct();
 
     // Update first variation to have the attribute's value.
-    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
-    $this->variation->set($attribute_name, $attribute_value->id());
+    $this->variation->set($attribute_name, $attributes['test1']->id());
     $this->variation->save();
 
-    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
     $variation2 = $this->createEntity('commerce_product_variation', [
       'type' => $variation_type->id(),
       'sku' => $this->randomMachineName(),
@@ -112,11 +114,10 @@ class AddToCartFormTest extends OrderTestBase {
         'amount' => 999,
         'currency_code' => 'USD',
       ],
-      $attribute_name => $attribute_value->id(),
+      $attribute_name => $attributes['test2']->id(),
     ]);
     $variation2->save();
 
-    $attribute_value = $this->createAttributeValue($attribute_name, $this->randomMachineName());
     $variation3 = $this->createEntity('commerce_product_variation', [
       'type' => $variation_type->id(),
       'sku' => $this->randomMachineName(),
@@ -124,7 +125,7 @@ class AddToCartFormTest extends OrderTestBase {
         'amount' => 999,
         'currency_code' => 'USD',
       ],
-      $attribute_name => $attribute_value->id(),
+      $attribute_name => $attributes['test3']->id(),
     ]);
     $variation3->save();
 
@@ -135,7 +136,7 @@ class AddToCartFormTest extends OrderTestBase {
     // Run the original add to cart test, ensure base variation is added.
     // Get the existing product page and submit Add to cart form.
     $this->postAddToCart($product);
-    $this->assertEqual($variation3->{$attribute_name}->target_id, $attribute_value->id());
+    $this->assertEqual($variation3->{$attribute_name}->target_id, $attributes['test3']->id());
     $this->drupalPostAjaxForm(NULL, [
       'purchased_entity[0][attributes][test_variation]' => $variation3->{$attribute_name}->target_id,
     ], 'purchased_entity[0][attributes][test_variation]');
@@ -146,13 +147,69 @@ class AddToCartFormTest extends OrderTestBase {
     // Check if the quantity was increased for the existing line item.
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $line_items[0];
-    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
-    $line_item = $line_items[1];
-    $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+
+    $this->assertLineItemInOrder($this->variation, $line_items[0]);
+    $this->assertLineItemInOrder($variation3, $line_items[1]);
+  }
+
+  /**
+   * Tests that attribute field is disabled if only one value.
+   */
+  public function testProductAttributeDisabledIfOne() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $size_attributes = $this->createAttributeSet($variation_type, 'test_size_attribute', [
+      'small' => 'Small',
+      'medium' => 'Medium',
+      'large' => 'Large',
+    ]);
+    $color_attributes = $this->createAttributeSet($variation_type, 'test_color_attribute', [
+      'red' => 'Red',
+    ]);
+
+    // Reload the variation since we have new fields.
+    $this->variation = ProductVariation::load($this->variation->id());
+
+    // Get the product so we can append new variations.
+    $product = $this->variation->getProduct();
+
+    // Update first variation to have the attribute's value.
+    $this->variation->set('test_size_attribute', $size_attributes['small']->id());
+    $this->variation->set('test_color_attribute', $color_attributes['red']->id());
+    $this->variation->save();
+
+    $attribute_values_matrix = [
+      ['medium', 'red'],
+      ['large', 'red'],
+    ];
+
+    $variations = [
+      $this->variation,
+    ];
+    // Generate variations off of the attributes values matrix.
+    foreach ($attribute_values_matrix as $key => $value) {
+      $variation = $this->createEntity('commerce_product_variation', [
+        'type' => $variation_type->id(),
+        'sku' => $this->randomMachineName(),
+        'price' => [
+          'amount' => 999,
+          'currency_code' => 'USD',
+        ],
+        'test_size_attribute' => $size_attributes[$value[0]]->id(),
+        'test_color_attribute' => $color_attributes[$value[1]]->id(),
+      ]);
+      $variations[] = $variation;
+      $product->variations->appendItem($variation);
+    }
+
+    $product->save();
+
+    $this->drupalGet($product->toUrl());
+    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled]', [
+      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-color-attribute',
+    ]);
+    $this->assertTrue(isset($selects[0]));
   }
 
   /**
@@ -162,112 +219,172 @@ class AddToCartFormTest extends OrderTestBase {
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
 
-    $this->createAttributeField($variation_type, 'test_size_attribute');
-    /** @var \Drupal\taxonomy\TermInterface[] $size_attributes */
-    $size_attributes = [
-      'small' => $this->createAttributeValue('test_color_attribute', 'Small'),
-      'medium' => $this->createAttributeValue('test_color_attribute', 'Medium'),
-    ];
+    $size_attributes = $this->createAttributeSet($variation_type, 'test_size_attribute', [
+      'small' => 'Small',
+      'medium' => 'Medium',
+      'large' => 'Large',
+    ]);
+    $color_attributes = $this->createAttributeSet($variation_type, 'test_color_attribute', [
+      'red' => 'Red',
+      'blue' => 'Blue',
+    ]);
 
-    $this->createAttributeField($variation_type, 'test_color_attribute');
-    /** @var \Drupal\taxonomy\TermInterface[] $color_attributes */
-    $color_attributes = [
-      'red' => $this->createAttributeValue('test_color_attribute', 'Red'),
-      'blue' => $this->createAttributeValue('test_color_attribute', 'Blue'),
-    ];
-
-    // Reload the variation since we have a new fields.
+    // Reload the variation since we have new fields.
     $this->variation = ProductVariation::load($this->variation->id());
 
-    // Get the product so we can append new variations
+    // Get the product so we can append new variations.
     $product = $this->variation->getProduct();
-
-    /**
-     * +--------------------+------------------+
-     * | Variation          | Attributes       |
-     * +--------------------+------------------+
-     * | 1                  | Small, Red       |
-     * | 2                  | Medium, Red      |
-     * | 3                  | Medium, Blue     |
-     * +--------------------+------------------+
-     */
 
     // Update first variation to have the attribute's value.
     $this->variation->set('test_size_attribute', $size_attributes['small']->id());
     $this->variation->set('test_color_attribute', $color_attributes['red']->id());
     $this->variation->save();
 
-    $variation2 = $this->createEntity('commerce_product_variation', [
-      'type' => $variation_type->id(),
-      'sku' => $this->randomMachineName(),
-      'price' => [
-        'amount' => 999,
-        'currency_code' => 'USD',
-      ],
-      'test_size_attribute' => $size_attributes['medium']->id(),
-      'test_color_attribute' => $color_attributes['red']->id(),
-    ]);
-    $variation2->save();
+    $attribute_values_matrix = [
+      ['small', 'blue'],
+      ['medium', 'red'],
+      ['medium', 'blue'],
+      ['large', 'red'],
+      ['large', 'blue'],
+    ];
 
-    $variation3 = $this->createEntity('commerce_product_variation', [
-      'type' => $variation_type->id(),
-      'sku' => $this->randomMachineName(),
-      'price' => [
-        'amount' => 999,
-        'currency_code' => 'USD',
-      ],
-      'test_size_attribute' => $size_attributes['medium']->id(),
-      'test_color_attribute' => $color_attributes['blue']->id(),
-    ]);
-    $variation3->save();
+    $variations = [
+      $this->variation,
+    ];
+    // Generate variations off of the attributes values matrix.
+    foreach ($attribute_values_matrix as $key => $value) {
+      $variation = $this->createEntity('commerce_product_variation', [
+        'type' => $variation_type->id(),
+        'sku' => $this->randomMachineName(),
+        'price' => [
+          'amount' => 999,
+          'currency_code' => 'USD',
+        ],
+        'test_size_attribute' => $size_attributes[$value[0]]->id(),
+        'test_color_attribute' => $color_attributes[$value[1]]->id(),
+      ]);
+      $variations[] = $variation;
+      $product->variations->appendItem($variation);
+    }
 
-    $product->variations->appendItem($variation2);
-    $product->variations->appendItem($variation3);
     $product->save();
 
+    // There is no Medium, Red.
+    $this->assertAttributeDoesNotExist('edit-purchased-entity-0-attributes-test-size-attribute', $size_attributes['medium']->id());
     $this->postAddToCart($this->variation->getProduct());
-    // Trigger AJAX by changing size attribute
+
+    // Trigger AJAX by changing color attribute.
     $this->drupalPostAjaxForm(NULL, [
-      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['medium']->id(),
-    ], 'purchased_entity[0][attributes][test_size_attribute]');
-    // Trigger AJAX by changing color attribute
-    $this->drupalPostAjaxForm(NULL, [
-      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['blue']->id(),
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['red']->id(),
     ], 'purchased_entity[0][attributes][test_color_attribute]');
+    // Trigger AJAX by changing size attribute.
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['large']->id(),
+    ], 'purchased_entity[0][attributes][test_size_attribute]');
 
-    // We can't assert an option doesn't exist using AssertContentTrait, since
-    // our ID is dynamic. Version of assertNoOption using data-drupal-selector.
-    // @see \Drupal\simpletest\AssertContentTrait::assertNoOption
-    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]', [
-      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
-    ]);
-    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
-      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
-      ':option' => $size_attributes['small']->id(),
-    ]);
-    $this->assertTrue(isset($selects[0]) && !isset($options[0]), NULL, 'Browser');
+    $this->assertAttributeExists('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['red']->id());
+    $this->assertAttributeExists('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['blue']->id());
 
-    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled]', [
-      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-test-size-attribute',
-    ]);
-    $this->assertTrue(isset($selects[0]));
-
-    // Since we do not have a Small, Blue. Should only see variation 3.
     $this->postAddToCart($product, [
-      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['blue']->id(),
-      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['medium']->id(),
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['red']->id(),
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['large']->id(),
     ]);
 
     // Check if the quantity was increased for the existing line item.
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $line_items[0];
-    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
-    $line_item = $line_items[1];
-    $this->assertEqual($line_item->getTitle(), $variation3->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 1), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+
+    $this->assertLineItemInOrder($variations[0], $line_items[0]);
+    $this->assertLineItemInOrder($variations[3], $line_items[1]);
+  }
+
+  /**
+   * Tests an uneven attribute matrix.
+   *
+   * 6in-10in are in color "Red", however Green is only 8in-10in.
+   */
+  public function testAttributeDependencies() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $size_attributes = $this->createAttributeSet($variation_type, 'test_size_attribute', [
+      '6' => '6in',
+      '7' => '7in',
+      '8' => '8in',
+      '9' => '9in',
+      '10' => '10in',
+    ]);
+    $color_attributes = $this->createAttributeSet($variation_type, 'test_color_attribute', [
+      'red' => 'Red',
+      'green' => 'Green',
+    ]);
+
+    // Reload the variation since we have new fields.
+    $this->variation = ProductVariation::load($this->variation->id());
+
+    // Get the product so we can append new variations.
+    $product = $this->variation->getProduct();
+
+    // Update first variation to have the attribute's value.
+    $this->variation->set('test_size_attribute', $size_attributes['6']->id());
+    $this->variation->set('test_color_attribute', $color_attributes['red']->id());
+    $this->variation->save();
+
+    $attribute_values_matrix = [
+      ['7', 'red'],
+      ['8', 'red'],
+      ['9', 'red'],
+      ['10', 'red'],
+      ['8', 'green'],
+      ['9', 'green'],
+      ['10', 'green'],
+    ];
+
+    $variations = [
+      $this->variation,
+    ];
+    // Generate variations off of the attributes values matrix.
+    foreach ($attribute_values_matrix as $key => $value) {
+      $variation = $this->createEntity('commerce_product_variation', [
+        'type' => $variation_type->id(),
+        'sku' => $this->randomMachineName(),
+        'price' => [
+          'amount' => 999,
+          'currency_code' => 'USD',
+        ],
+        'test_size_attribute' => $size_attributes[$value[0]]->id(),
+        'test_color_attribute' => $color_attributes[$value[1]]->id(),
+      ]);
+      $variations[] = $variation;
+      $product->variations->appendItem($variation);
+    }
+
+    $product->save();
+
+    $this->drupalGet($product->toUrl());
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['red']->id(),
+    ], 'purchased_entity[0][attributes][test_color_attribute]');
+
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['9']->id(),
+    ], 'purchased_entity[0][attributes][test_size_attribute]');
+    // Assert that our color attribute persisted when changing the size.
+    $this->assertAttributeSelected('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['red']->id());
+    $this->assertAttributeExists('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['green']->id());
+
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_size_attribute]' => $size_attributes['7']->id(),
+    ], 'purchased_entity[0][attributes][test_size_attribute]');
+    // Assert that our color attribute persisted when changing the size.
+    $this->assertAttributeSelected('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['red']->id());
+    $this->assertAttributeExists('edit-purchased-entity-0-attributes-test-color-attribute', $color_attributes['green']->id());
+
+    $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][test_color_attribute]' => $color_attributes['green']->id(),
+    ], 'purchased_entity[0][attributes][test_color_attribute]');
+    // Assert that our size attribute persisted when changing the color.
+    $this->assertAttributeSelected('edit-purchased-entity-0-attributes-test-size-attribute', $size_attributes['7']->id());
   }
 
   /**
@@ -288,10 +405,32 @@ class AddToCartFormTest extends OrderTestBase {
     // Check if the quantity was increased for the existing line item.
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $line_items[0];
-    $this->assertEqual($line_item->getTitle(), $this->variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == 3), t('The product @product has been added to cart.', ['@product' => $line_item->getTitle()]));
+
+    $this->assertLineItemInOrder($this->variation, $line_items[0], 3);
+  }
+
+  /**
+   * Creates an attribute field and set of attribute values.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type
+   *   The variation type.
+   * @param string $name
+   *   The attribute field name.
+   * @param array $options
+   *   Associative array of key name values. [red => Red].
+   *
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Array of attribute entities.
+   */
+  protected function createAttributeSet(ProductVariationTypeInterface $variation_type, $name, array $options) {
+    $this->createAttributeField($variation_type, $name);
+
+    $attribute_set = [];
+    foreach ($options as $key => $value) {
+      $attribute_set[$key] = $this->createAttributeValue($name, $value);
+    }
+
+    return $attribute_set;
   }
 
   /**
@@ -343,6 +482,7 @@ class AddToCartFormTest extends OrderTestBase {
    *   The attribute value name.
    *
    * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface
+   *   The attribute value entity.
    */
   protected function createAttributeValue($attribute, $name) {
     $attribute_value = $this->createEntity('commerce_product_attribute_value', [
@@ -358,7 +498,9 @@ class AddToCartFormTest extends OrderTestBase {
    * Posts the add to cart form for a product.
    *
    * @param \Drupal\commerce_product\Entity\ProductInterface $product
+   *   The product.
    * @param array $edit
+   *   The form array.
    *
    * @throws \Exception
    */
@@ -366,6 +508,72 @@ class AddToCartFormTest extends OrderTestBase {
     $this->drupalGet('product/' . $product->id());
     $this->assertField('edit-submit', t('Add to cart button exists.'));
     $this->drupalPostForm(NULL, $edit, t('Add to cart'));
+  }
+
+  /**
+   * Asserts that an attribute option is selected.
+   *
+   * @param string $selector
+   *   The element selector.
+   * @param string $option
+   *   The option.
+   */
+  protected function assertAttributeSelected($selector, $option) {
+    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@selected="selected" and @value=:option]', [
+      ':data_drupal_selector' => $selector,
+      ':option' => $option,
+    ]);
+    $this->assertFalse(empty($options), 'The attribute is selected');
+  }
+
+  /**
+   * Asserts that an attribute option does exist.
+   *
+   * @param string $selector
+   *   The element selector.
+   * @param string $option
+   *   The option.
+   */
+  protected function assertAttributeExists($selector, $option) {
+    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
+      ':data_drupal_selector' => $selector,
+      ':option' => $option,
+    ]);
+    $this->assertFalse(empty($options), 'The attribute is not available');
+  }
+
+  /**
+   * Asserts that an attribute option does not exist.
+   *
+   * @param string $selector
+   *   The element selector.
+   * @param string $option
+   *   The option.
+   */
+  protected function assertAttributeDoesNotExist($selector, $option) {
+    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [
+      ':data_drupal_selector' => $selector,
+      ':option' => $option,
+    ]);
+    $this->assertTrue(empty($options), 'The attribute is not available');
+  }
+
+  /**
+   * Assert the line item in the order is correct.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The purchased product variation.
+   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
+   *   The line item.
+   * @param int $quantity
+   *   The quantity.
+   */
+  protected function assertLineItemInOrder(ProductVariationInterface $variation, LineItemInterface $line_item, $quantity = 1) {
+    $this->assertEqual($line_item->getTitle(), $variation->getLineItemTitle());
+    $this->assertTrue(($line_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
+      '@product' => $line_item->getTitle(),
+      '@quantity' => $line_item->getQuantity(),
+    ]));
   }
 
 }
