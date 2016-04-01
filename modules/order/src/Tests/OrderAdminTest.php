@@ -25,7 +25,7 @@ class OrderAdminTest extends OrderTestBase {
 
     $profile_values = [
       'type' => 'billing',
-      'uid' => 1,
+      'uid' => $this->loggedInUser->id(),
       'status' => 1,
     ];
     $this->billingProfile = Profile::create($profile_values);

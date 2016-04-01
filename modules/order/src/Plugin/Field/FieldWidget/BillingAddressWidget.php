@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\commerce_order\Plugin\Field\FieldWidget;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -13,6 +14,7 @@ use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\profile\ProfileStorage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -31,11 +33,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BillingAddressWidget extends OptionsWidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The address entity storage.
+   * The entity type manager.
    *
-   * @var Drupal\profile\ProfileStorage
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $addressStorage;
+  protected $entityTypeManager;
+  /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
 
   /**
    * The entity query factory service.
@@ -57,15 +66,15 @@ class BillingAddressWidget extends OptionsWidgetBase implements ContainerFactory
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param Drupal\profile\ProfileStorage $address_storage
-   *   The profile address storage.
-   * @param \Drupal\Core\Entity\Query\QueryFactory $entityQuery
-   *   The entity query factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ProfileStorage $address_storage, QueryFactory $entity_query) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $this->addressStorage = $address_storage;
-    $this->entityQuery = $entity_query;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -78,56 +87,9 @@ class BillingAddressWidget extends OptionsWidgetBase implements ContainerFactory
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager')->getStorage('profile'),
-      $container->get('entity.query')
+      $container->get('entity_type.manager'),
+      $container->get('renderer')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings() {
-    return array(
-      'size' => 60,
-      'placeholder' => '',
-    ) + parent::defaultSettings();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    $elements = [];
-
-    $elements['size'] = array(
-      '#type' => 'number',
-      '#title' => t('Size of textfield'),
-      '#default_value' => $this->getSetting('size'),
-      '#required' => TRUE,
-      '#min' => 1,
-    );
-    $elements['placeholder'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Placeholder'),
-      '#default_value' => $this->getSetting('placeholder'),
-      '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
-    );
-
-    return $elements;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    $summary = [];
-
-    $summary[] = t('Textfield size: !size', array('!size' => $this->getSetting('size')));
-    if (!empty($this->getSetting('placeholder'))) {
-      $summary[] = t('Placeholder: @placeholder', array('@placeholder' => $this->getSetting('placeholder')));
-    }
-
-    return $summary;
   }
 
   /**
@@ -137,60 +99,46 @@ class BillingAddressWidget extends OptionsWidgetBase implements ContainerFactory
 
     $element = parent::formElement($items, $delta, $element, $form, $form_state);;
 
-    $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
     $addresses = $this->getBillingAddresses($items);
 
     // If required and there is one single option, preselect it.
     if ($this->required && count($addresses) == 1) {
       reset($addresses);
-      $selected = array(key($addresses));
+      $selected = [key($addresses)];
     }
 
-    if (count($addresses) > 1) {
-      $element += array(
-        '#type' => 'radios',
-        '#default_value' => $selected ? reset($selected) : NULL,
-        '#options' => $addresses,
-      );
-    } else {
-      $element += array(
-        '#type' => 'checkboxes',
-        '#default_value' => $selected,
-        '#options' => $addresses,
-      );
-    }
+    $element += [
+      '#type' => ($this->multiple) ? 'checkboxes' : 'radios',
+      '#default_value' => $selected ? reset($selected) : NULL,
+      '#options' => $addresses,
+    ];
 
     return $element;
   }
 
-  private function getBillingAddresses($items) {
+  /**
+   * Returns billing address items.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   Array of default values for this field.
+   *
+   * @return array
+   *   An array of markup for the radio buttons.
+   */
+  protected function getBillingAddresses(FieldItemListInterface $items) {
+    $profiles = $this->entityTypeManager->getStorage('profile')
+      ->loadMultipleByUser($items->getEntity()->getOwner(), 'billing');
 
-    $addressIds = $this->entityQuery->get('profile')
-      ->condition('type', 'billing')
-      ->condition('uid', $items->getEntity()->getOwnerId())
-      ->execute();
-    $addresses = $this->addressStorage->loadMultiple($addressIds);
+    $options = [];
 
-    $arrAddresses = array();
-
-    foreach ($addresses as $address) {
-
-      $arrAddress = $address->toArray();
-
-      $details = $arrAddress['is_default'][0]['value'] ? '(default address)<br/>' : NULL;
-      $details .= $arrAddress['address'][0]['recipient'];
-      $details .= !empty($arrAddress['address'][0]['organization']) ? '<br/>' . $arrAddress['address'][0]['organization'] : NULL;
-      $details .= '<br/>' . $arrAddress['address'][0]['address_line1'];
-      $details .= !empty($arrAddress['address'][0]['address_line2']) ? '<br/>' . $arrAddress['address'][0]['address_line2'] : NULL;
-      $details .= '<br/>' . $arrAddress['address'][0]['locality'] . ', ' 
-        . substr($arrAddress['address'][0]['administrative_area'], 3) . ' '
-        . $arrAddress['address'][0]['postal_code'];
-
-      $arrAddresses[$address->id()] = $details;
+    $view_builder = $this->entityTypeManager->getViewBuilder('profile');
+    foreach ($profiles as $profile) {
+      $renderable = $view_builder->view($profile);
+      $options[$profile->id()] = $this->renderer->render($renderable);
     }
 
-    return $arrAddresses;
+    return $options;
   }
 
   /**
