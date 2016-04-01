@@ -13,6 +13,18 @@ use Drupal\Component\Utility\Unicode;
 class ProductVariationTypeTest extends ProductTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    $this->createEntity('commerce_product_attribute', [
+      'id' => 'color',
+      'label' => 'Color',
+    ]);
+  }
+
+  /**
    * Tests whether the default product variation type was created.
    */
   public function testDefaultProductVariationType() {
@@ -38,8 +50,6 @@ class ProductVariationTypeTest extends ProductTestBase {
     $this->assertEqual($variation_type->label(), $values['label'], 'The new product variation type has the correct label.');
     $this->assertEqual($variation_type->getLineItemTypeId(), $values['lineItemType'], 'The new product variation type has the correct line item type.');
 
-    $user = $this->drupalCreateUser(['administer product types']);
-    $this->drupalLogin($user);
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
@@ -97,6 +107,29 @@ class ProductVariationTypeTest extends ProductTestBase {
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $exists = (bool) ProductVariationType::load($variation_type->id());
     $this->assertFalse($exists, 'The new product variation type has been deleted from the database.');
+  }
+
+  /**
+   * Tests the attributes element on the product variation type form.
+   */
+  function testProductVariationTypeAttributes() {
+    $edit = [
+      'label' => 'Default',
+      'lineItemType' => 'product_variation',
+      'attributes' => ['color' => 'color'],
+    ];
+    $this->drupalPostForm('admin/commerce/config/product-variation-types/default/edit', $edit, t('Save'));
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
+    $this->assertText('attribute_color', 'The color attribute field has been created');
+
+    $edit = [
+      'label' => 'Default',
+      'lineItemType' => 'product_variation',
+      'attributes' => ['color' => FALSE],
+    ];
+    $this->drupalPostForm('admin/commerce/config/product-variation-types/default/edit', $edit, t('Save'));
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
+    $this->assertNoText('attribute_color', 'The color attribute field has been deleted');
   }
 
 }
