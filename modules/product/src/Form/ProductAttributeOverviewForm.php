@@ -59,6 +59,8 @@ class ProductAttributeOverviewForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['#attached']['library'][] = 'commerce_product/attributes-form';
+
     $user_input = $form_state->getUserInput();
     $values = $this->attribute->getValues();
     // The value map allows new values to be added and removed before saving.
