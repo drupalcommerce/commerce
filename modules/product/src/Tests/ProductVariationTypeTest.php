@@ -116,7 +116,7 @@ class ProductVariationTypeTest extends ProductTestBase {
     $edit = [
       'label' => 'Default',
       'lineItemType' => 'product_variation',
-      'attributes' => ['color' => 'color'],
+      'attributes[color]' => 'color',
     ];
     $this->drupalPostForm('admin/commerce/config/product-variation-types/default/edit', $edit, t('Save'));
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
@@ -125,7 +125,7 @@ class ProductVariationTypeTest extends ProductTestBase {
     $edit = [
       'label' => 'Default',
       'lineItemType' => 'product_variation',
-      'attributes' => ['color' => FALSE],
+      'attributes[color]' => FALSE,
     ];
     $this->drupalPostForm('admin/commerce/config/product-variation-types/default/edit', $edit, t('Save'));
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
