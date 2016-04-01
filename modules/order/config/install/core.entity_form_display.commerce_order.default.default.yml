@@ -12,7 +12,7 @@ bundle: default
 mode: default
 content:
   billing_profile:
-    type: options_select
+    type: billing_address_options
     weight: 0
     settings: {  }
     third_party_settings: {  }

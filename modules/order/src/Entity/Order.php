@@ -442,11 +442,11 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('handler_settings', ['target_bundles' => ['billing']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'options_select',
+        'type' => 'billing_address_options',
         'weight' => 0,
         'settings' => [],
       ])
-      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['state'] = BaseFieldDefinition::create('state')
