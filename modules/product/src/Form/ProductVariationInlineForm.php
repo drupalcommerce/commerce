@@ -34,6 +34,11 @@ class ProductVariationInlineForm extends EntityInlineForm {
   public function getTableFields($bundles) {
     $fields = parent::getTableFields($bundles);
     $fields['label']['label'] = t('Title');
+    $fields['price'] = [
+      'type' => 'field',
+      'label' => t('Price'),
+      'weight' => 10,
+    ];
     $fields['status'] = [
       'type' => 'field',
       'label' => t('Status'),
