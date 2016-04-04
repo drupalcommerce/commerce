@@ -231,7 +231,7 @@ function commerce_payment_credit_card_validate($details, $settings) {
   }
 
   // Validate the start date if present.
-  if (isset($details['start_date']) && ($invalid = commerce_payment_validate_credit_card_start_date($details['exp_month'], $details['exp_year'])) !== TRUE) {
+  if (isset($details['start_month']) && ($invalid = commerce_payment_validate_credit_card_start_date($details['start_month'], $details['start_year'])) !== TRUE) {
     form_set_error($prefix . 'start_' . $invalid, t('Your have entered an invalid start date.'));
     $valid = FALSE;
   }
