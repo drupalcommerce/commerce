@@ -10,10 +10,23 @@
  *   incorporate into their submission form callbacks.
  *
  * @param $fields
- *   An array specifying the CC fields that should be included on the form; the
- *     card number and expiration date fields are always present.
+ *   An associative array specifying the fields that should be included on the
+ *   credit card form. The card number and expiration fields are always present,
+ *   and fields whose array keys listed below aren't set will be left out of the
+ *   credit card form:
+ *   - type: an array identifying supported card types using the keys of the
+ *     return array from commerce_payment_credit_card_types().
+ *   - owner: TRUE to include an owner name textfield.
+ *   - start_date: TRUE to include start date select lists.
+ *   - issue: boolean that when present enables an issue number field; if TRUE,
+ *     makes the field required; if FALSE, makes the field optional.
+ *   - code: text label to use for a security code / CVV textfield.
+ *   - bank: TRUE to include a bank name textfield.
  * @param $default
  *   An array of default values for the available CC fields.
+ *
+ * @return
+ *   A credit card form array for use in another form.
  */
 function commerce_payment_credit_card_form($fields = array(), $default = array()) {
   // Merge default values into the default array.
