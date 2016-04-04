@@ -1065,6 +1065,9 @@ function commerce_cart_order_convert($order, $account) {
 function commerce_cart_order_refresh($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
+  // Allow other modules to act on the order prior to the refresh logic.
+  module_invoke_all('commerce_cart_order_pre_refresh', $order);
+
   // Loop over every line item on the order...
   $line_item_changed = FALSE;
 
