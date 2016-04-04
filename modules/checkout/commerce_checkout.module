@@ -475,9 +475,19 @@ function commerce_checkout_pages() {
 }
 
 /**
- * Returns the page ID of the first checkout page sorted by weight.
+ * Returns the page ID of the first checkout page to be used.
  */
 function commerce_checkout_first_checkout_page() {
+  // See if any modules return a page ID first.
+  $page_id = module_invoke_all('commerce_checkout_first_checkout_page');
+
+  // If we received a return value from the hook, use the first item in the
+  // return array as the page ID.
+  if (!empty($page_id)) {
+    return reset($page_id);
+  }
+
+  // Otherwise fallback to the first page defined in checkout form.
   $keys = commerce_checkout_pages();
   reset($keys);
   return key($keys);

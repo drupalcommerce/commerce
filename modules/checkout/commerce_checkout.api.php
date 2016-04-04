@@ -292,3 +292,21 @@ function hook_commerce_checkout_pane_info() {
 function hook_commerce_checkout_pane_info_alter(&$checkout_panes) {
   $checkout_panes['billing']['weight'] = -6;
 }
+
+/**
+ * Allows modules to define the first page for a new order entering checkout.
+ *
+ * The default first checkout page is whatever the first page is after the
+ * checkout pages array is sorted by weight. This hook allows modules to provide
+ * an alternate page ID or default page ID without having to build the checkout
+ * page and pane info arrays, providing a noticeable performance improvement.
+ *
+ * If more than one module implements this hook, the first returned value will
+ * be used.
+ *
+ * @return string
+ *   The new first checkout page ID.
+ */
+function hook_commerce_checkout_first_checkout_page() {
+  return 'checkout';
+}
