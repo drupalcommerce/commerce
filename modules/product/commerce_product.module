@@ -771,7 +771,7 @@ function commerce_product_autocomplete($entity_type = 'commerce_product', $field
     $match = isset($field['widget']['autocomplete_match']) ? $field['widget']['autocomplete_match'] : 'contains';
 
     // Get an array of matching products.
-    $products = commerce_product_match_products($field, $instance, $tag_last, $match, array(), 10);
+    $products = commerce_product_match_products($field, $instance, $tag_last, $match, array(), 10, TRUE);
 
     // Loop through the products and convert them into autocomplete output.
     foreach ($products as $product_id => $data) {
