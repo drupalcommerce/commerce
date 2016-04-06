@@ -103,13 +103,11 @@ class ProductAttributeOverviewForm extends FormBase {
         '#save_entity' => FALSE,
       ];
       if ($id == '_new') {
-        $value_form['entity']['#op'] = 'add';
         $default_weight = 999;
         $remove_access = TRUE;
       }
       else {
         $value = $values[$id];
-        $value_form['entity']['#op'] = 'edit';
         $value_form['entity']['#default_value'] = $value;
         $default_weight = $value->getWeight();
         $remove_access = $value->access('delete');
@@ -231,9 +229,9 @@ class ProductAttributeOverviewForm extends FormBase {
       $value_storage->delete($values);
     }
 
-    foreach ($form_state->getValue(['values']) as $value_data) {
+    foreach ($form_state->getValue(['values']) as $index => $value_data) {
       /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
-      $value = $value_data['entity'];
+      $value = $form['values'][$index]['entity']['#entity'];
       $value->setWeight($value_data['weight']);
       $value->save();
     }
