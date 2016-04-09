@@ -90,6 +90,9 @@ class ProductAttributeOverviewForm extends FormBase {
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
     ];
+    // Make the weight list always reflect the current number of values.
+    // Taken from WidgetBase::formMultipleElements().
+    $max_weight = count($value_map);
 
     foreach ($value_map as $index => $id) {
       $value_form = &$form['values'][$index];
@@ -107,7 +110,7 @@ class ProductAttributeOverviewForm extends FormBase {
         '#save_entity' => FALSE,
       ];
       if ($id == '_new') {
-        $default_weight = 999;
+        $default_weight = $max_weight;
         $remove_access = TRUE;
       }
       else {
@@ -121,6 +124,7 @@ class ProductAttributeOverviewForm extends FormBase {
         '#type' => 'weight',
         '#title' => $this->t('Weight'),
         '#title_display' => 'invisible',
+        '#delta' => $max_weight,
         '#default_value' => $default_weight,
         '#attributes' => [
           'class' => ['product-attribute-value-order-weight'],
