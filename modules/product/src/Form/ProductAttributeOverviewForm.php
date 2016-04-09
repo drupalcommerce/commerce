@@ -75,7 +75,7 @@ class ProductAttributeOverviewForm extends FormBase {
     $form['values'] = [
       '#type' => 'table',
       '#header' => [
-        $this->t('Value'),
+        ['data' => $this->t('Value'), 'colspan' => 2],
         $this->t('Weight'),
         $this->t('Operations'),
       ],
@@ -93,11 +93,15 @@ class ProductAttributeOverviewForm extends FormBase {
 
     foreach ($value_map as $index => $id) {
       $value_form = &$form['values'][$index];
+      // The tabledrag element is always added to the first cell in the row,
+      // so we add an empty cell to guide it there, for better styling.
       $value_form['#attributes']['class'][] = 'draggable';
+      $value_form['tabledrag'] = [
+        '#markup' => '',
+      ];
 
       $value_form['entity'] = [
         '#type' => 'inline_entity_form',
-        '#parents' => ['values', $index, 'entity'],
         '#entity_type' => 'commerce_product_attribute_value',
         '#bundle' => $this->attribute->id(),
         '#save_entity' => FALSE,
