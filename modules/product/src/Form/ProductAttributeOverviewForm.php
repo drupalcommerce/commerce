@@ -89,6 +89,10 @@ class ProductAttributeOverviewForm extends FormBase {
       '#weight' => 5,
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
+      // #input defaults to TRUE, which breaks file fields in the IEF element.
+      // This table is used for visual grouping only, the element itself
+      // doesn't have any values of its own that need processing.
+      '#input' => FALSE,
     ];
     // Make the weight list always reflect the current number of values.
     // Taken from WidgetBase::formMultipleElements().
