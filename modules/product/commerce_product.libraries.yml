@@ -3,3 +3,8 @@ form:
   css:
     theme:
       css/product.form.css: {}
+attributes-form:
+  version: VERSION
+  css:
+    theme:
+      css/product-attributes.form.css: {}
