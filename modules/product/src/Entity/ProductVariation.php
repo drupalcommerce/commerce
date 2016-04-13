@@ -184,10 +184,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public function getAttributeValueIds() {
     $attribute_ids = [];
-    foreach ($this->getAttributeFieldDefinitions() as $name => $definition) {
-      $field = $this->get($name);
+    foreach ($this->getAttributeFieldNames() as $field_name) {
+      $field = $this->get($field_name);
       if (!$field->isEmpty()) {
-        $attribute_ids[$name] = $field->target_id;
+        $attribute_ids[$field_name] = $field->target_id;
       }
     }
 
@@ -198,8 +198,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getAttributeValueId($field_name) {
-    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
-    if (!isset($attribute_field_definitions[$field_name])) {
+    $attribute_field_names = $this->getAttributeFieldNames();
+    if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
     $attribute_id = NULL;
@@ -216,7 +216,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public function getAttributeValues() {
     $attribute_values = [];
-    foreach ($this->getAttributeFieldDefinitions() as $field_name => $definition) {
+    foreach ($this->getAttributeFieldNames() as $field_name) {
       $field = $this->get($field_name);
       if (!$field->isEmpty()) {
         $attribute_values[$field_name] = $field->entity;
@@ -230,8 +230,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getAttributeValue($field_name) {
-    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
-    if (!isset($attribute_field_definitions[$field_name])) {
+    $attribute_field_names = $this->getAttributeFieldNames();
+    if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
     $attribute_value = NULL;
@@ -244,11 +244,15 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the names of the entity's attribute fields.
+   *
+   * @return string[]
+   *   The attribute field names.
    */
-  public function getAttributeFieldDefinitions() {
+  protected function getAttributeFieldNames() {
     $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
-    return $attribute_field_manager->getFieldDefinitions($this->bundle());
+    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
+    return array_column($field_map, 'field_name');
   }
 
   /**

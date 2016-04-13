@@ -8,6 +8,7 @@
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 /**
  * Implements hook_entity_create().
@@ -16,6 +17,18 @@ function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
   if ($entity_type_id == 'commerce_product' && !\Drupal::isConfigSyncing()) {
     // Clear the line item type map after a new product type has been created.
     \Drupal::service('commerce_product.line_item_type_map')->clearCache();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function commerce_product_entity_form_display_update(EntityFormDisplayInterface $form_display) {
+  // Reset the cached attribute field map when the 'default' product variation
+  // form mode is updated, since the map ordering is based on it.
+  if ($form_display->getTargetEntityTypeId() == 'commerce_product_variation' && $form_display->getMode() == 'default') {
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    $attribute_field_manager->clearCaches();
   }
 }
 

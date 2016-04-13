@@ -4,6 +4,7 @@ namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -125,12 +126,25 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
     $field_map = [];
     $bundle_info = $this->entityTypeBundleInfo->getBundleInfo('commerce_product_variation');
     foreach (array_keys($bundle_info) as $bundle) {
+      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+      $form_display = commerce_get_entity_display('commerce_product_variation', $bundle, 'form');
       foreach ($this->getFieldDefinitions($bundle) as $field_name => $definition) {
         $handler_settings = $definition->getSetting('handler_settings');
+        $component = $form_display->getComponent($field_name);
+
         $field_map[$bundle][] = [
           'attribute_id' => reset($handler_settings['target_bundles']),
           'field_name' => $field_name,
+          'weight' => $component ? $component['weight'] : 0,
         ];
+      }
+
+      if (!empty($field_map[$bundle])) {
+        uasort($field_map[$bundle], ['\Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+        // Remove the weight keys to reduce the size of the cached field map.
+        $field_map[$bundle] = array_map(function ($map) {
+          return array_diff_key($map, ['weight' => '']);
+        }, $field_map[$bundle]);
       }
     }
 
@@ -178,7 +192,7 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
       $form_display->setComponent($field_name, [
         'type' => 'options_select',
-        'weight' => 1,
+        'weight' => $this->getHighestWeight($form_display) + 1,
       ]);
       $form_display->save();
 
@@ -222,6 +236,27 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   protected function buildFieldName(ProductAttributeInterface $attribute) {
     return 'attribute_' . $attribute->id();
+  }
+
+  /**
+   * Gets the highest weight of the attribute field components in the display.
+   *
+   * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display
+   *   The form display.
+   *
+   * @return int
+   *   The highest weight of the components in the display.
+   */
+  protected function getHighestWeight(EntityFormDisplayInterface $form_display) {
+    $field_names = array_keys($this->getFieldDefinitions($form_display->getTargetBundle()));
+    $weights = [];
+    foreach ($field_names as $field_name) {
+      if ($component = $form_display->getComponent($field_name)) {
+        $weights[] = $component['weight'];
+      }
+    }
+
+    return $weights ? max($weights) : 0;
   }
 
 }

@@ -288,10 +288,11 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   protected function getAttributeInfo(ProductVariationInterface $selected_variation, array $variations) {
     $attributes = [];
     $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
-    $field_names = array_keys($field_definitions);
+    $field_map = $this->attributeFieldManager->getFieldMap($selected_variation->bundle());
+    $field_names = array_column($field_map, 'field_name');
     $index = 0;
-    foreach ($field_definitions as $field) {
-      $field_name = $field->getName();
+    foreach ($field_names as $field_name) {
+      $field = $field_definitions[$field_name];
       $attributes[$field_name] = [
         'field_name' => $field_name,
         'title' => $field->getLabel(),

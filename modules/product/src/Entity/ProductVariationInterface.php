@@ -147,12 +147,4 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    */
   public function getAttributeValue($field_name);
 
-  /**
-   * Gets an array of attribute field definitions.
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
-   *   An array of attribute field definitions, keyed by field name.
-   */
-  public function getAttributeFieldDefinitions();
-
 }

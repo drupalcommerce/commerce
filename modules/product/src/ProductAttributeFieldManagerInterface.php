@@ -15,6 +15,9 @@ interface ProductAttributeFieldManagerInterface {
   /**
    * Gets the attribute field definitions.
    *
+   * The field definitions are not ordered.
+   * Use the field map when the field order is important.
+   *
    * @param string $variation_type_id
    *   The product variation type ID.
    *
@@ -36,6 +39,8 @@ interface ProductAttributeFieldManagerInterface {
    *   Each map is an array with the following keys:
    *   - attribute_id: The attribute id;
    *   - field_name: The attribute field name.
+   *   The maps are ordered by the weight of the attribute fields on the
+   *   default product variation form display.
    */
   public function getFieldMap($variation_type_id = NULL);
 
