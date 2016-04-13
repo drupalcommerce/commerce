@@ -387,7 +387,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
-        'weight' => 10,
+        'weight' => 99,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
