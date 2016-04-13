@@ -6,6 +6,7 @@ use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -28,6 +29,13 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
+
+  /**
+   * The entity query factory.
+   *
+   * @var \Drupal\Core\Entity\Query\QueryFactory
+   */
+  public $queryFactory;
 
   /**
    * The cache backend.
@@ -57,12 +65,15 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
+   *   The entity query factory.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, CacheBackendInterface $cache) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, QueryFactory $query_factory, CacheBackendInterface $cache) {
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
+    $this->queryFactory = $query_factory;
     $this->cache = $cache;
   }
 
@@ -167,7 +178,6 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
         'settings' => [
           'target_type' => 'commerce_product_attribute_value',
         ],
-        'locked' => TRUE,
         'translatable' => FALSE,
       ]);
       $field_storage->save();
@@ -188,7 +198,7 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       ]);
       $field->save();
 
-      /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $form_display */
+      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
       $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
       $form_display->setComponent($field_name, [
         'type' => 'options_select',
@@ -203,17 +213,27 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
   /**
    * {@inheritdoc}
    */
-  public function canDeleteField(ProductAttributeInterface $attribute) {
+  public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    $field_storage = FieldStorageConfig::loadByName('commerce_product_variation', $field_name);
-    return !$field_storage->hasData();
+    // Prevent an EntityQuery crash by first confirming the field exists.
+    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
+    if (!$field) {
+      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
+    }
+    $query = $this->queryFactory->get('commerce_product_variation')
+      ->condition('type', $variation_type_id)
+      ->exists($field_name)
+      ->range(0, 1);
+    $result = $query->execute();
+
+    return empty($result);
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteField(ProductAttributeInterface $attribute, $variation_type_id) {
-    if (!$this->canDeleteField($attribute)) {
+    if (!$this->canDeleteField($attribute, $variation_type_id)) {
       return;
     }
 

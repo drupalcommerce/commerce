@@ -66,11 +66,16 @@ interface ProductAttributeFieldManagerInterface {
    *
    * @param \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute
    *   The product attribute.
+   * @param string $variation_type_id
+   *   The product variation type ID.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the attribute field does not exist.
    *
    * @return bool
    *   TRUE if the attribute field can be deleted, FALSE otherwise.
    */
-  public function canDeleteField(ProductAttributeInterface $attribute);
+  public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id);
 
   /**
    * Deletes the attribute field for the given attribute.

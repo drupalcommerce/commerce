@@ -112,7 +112,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
     ];
     // Disable options which cannot be unset because of existing data.
     foreach ($used_attributes as $attribute_id) {
-      if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id])) {
+      if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
         $form['attributes'][$attribute_id] = [
           '#disabled' => TRUE,
         ];
