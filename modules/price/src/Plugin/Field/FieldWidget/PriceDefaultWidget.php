@@ -63,7 +63,6 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
 
     $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->numberFormatter = $number_formatter_factory->createInstance(NumberFormatterInterface::DECIMAL);
-    $this->numberFormatter->setMinimumFractionDigits(0);
     $this->numberFormatter->setMaximumFractionDigits(6);
     $this->numberFormatter->setGroupingUsed(FALSE);
   }
@@ -87,13 +86,18 @@ class PriceDefaultWidget extends WidgetBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    // Load currencies.
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
     $currencies = $this->currencyStorage->loadMultiple();
     $currency_codes = array_keys($currencies);
     // Stop rendering if there are no currencies available.
     if (empty($currency_codes)) {
       return $element;
     }
+    $fraction_digits = [];
+    foreach ($currencies as $currency) {
+      $fraction_digits[] = $currency->getFractionDigits();
+    }
+    $this->numberFormatter->setMinimumFractionDigits(min($fraction_digits));
 
     $amount = $items[$delta]->amount;
     if (!empty($amount)) {
