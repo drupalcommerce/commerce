@@ -357,7 +357,12 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    * Ajax callback.
    */
   public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
-    return $form;
+    /** @var \Drupal\Core\Ajax\AjaxResponse $response */
+    $response = \Drupal::service('main_content_renderer.ajax')->renderResponse($form, \Drupal::service('request_stack')->getCurrentRequest(), \Drupal::service('current_route_match'));
+
+    // Allow other modules to add arbitrary AJAX commands on the refresh.
+    \Drupal::moduleHandler()->alter('commerce_product_attributes_refresh', $response, $form, $form_state);
+    return $response;
   }
 
 }
