@@ -3,11 +3,10 @@
 namespace Drupal\commerce_checkout\Controller;
 
 use Drupal\commerce_cart\CartSessionInterface;
-use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -22,11 +21,11 @@ class CheckoutController implements ContainerInjectionInterface {
   use DependencySerializationTrait;
 
   /**
-   * The entity type manager.
+   * The checkout order manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\commerce_checkout\CheckoutOrderManagerInterface
    */
-  protected $entityTypeManager;
+  protected $checkoutOrderManager;
 
   /**
    * The form builder.
@@ -45,15 +44,15 @@ class CheckoutController implements ContainerInjectionInterface {
   /**
    * Constructs a new CheckoutController object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
+   * @param \Drupal\commerce_checkout\CheckoutOrderManagerInterface $checkout_order_manager
+   *   The checkout order manager.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.
    * @param \Drupal\commerce_cart\CartSessionInterface $cart_session
    *   The cart session.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, CartSessionInterface $cart_session) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(CheckoutOrderManagerInterface $checkout_order_manager, FormBuilderInterface $form_builder, CartSessionInterface $cart_session) {
+    $this->checkoutOrderManager = $checkout_order_manager;
     $this->formBuilder = $form_builder;
     $this->cartSession = $cart_session;
   }
@@ -63,7 +62,7 @@ class CheckoutController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager'),
+      $container->get('commerce_checkout.checkout_order_manager'),
       $container->get('form_builder'),
       $container->get('commerce_cart.cart_session')
     );
@@ -81,7 +80,7 @@ class CheckoutController implements ContainerInjectionInterface {
   public function formPage(RouteMatchInterface $route_match) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
-    $checkout_flow = $this->getCheckoutFlow($order);
+    $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $form_state = new FormState();
     return $this->formBuilder->buildForm($checkout_flow->getPlugin(), $form_state);
   }
@@ -116,28 +115,5 @@ class CheckoutController implements ContainerInjectionInterface {
 
     return $access;
   }
-
-  /**
-   * Gets the order's checkout flow.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return \Drupal\commerce_checkout\Entity\CheckoutFlowInterface
-   *   THe checkout flow.
-   */
-  protected function getCheckoutFlow(OrderInterface $order) {
-    if ($order->checkout_flow->isEmpty()) {
-      /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
-      $order_type = $this->entityTypeManager->getStorage('commerce_order_type')->load($order->bundle());
-      $checkout_flow = $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow');
-      // @todo Allow other modules to add their own resolving logic.
-      $order->checkout_flow->target_id = $checkout_flow;
-      $order->save();
-    }
-
-    return $order->checkout_flow->entity;
-  }
-
 
 }

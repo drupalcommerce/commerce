@@ -48,7 +48,12 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
 
     $this->setConfiguration($configuration);
     $this->order = $route_match->getParameter('commerce_order');
-    $this->stepId = $this->processStepId($route_match->getParameter('step'));
+    // The order is empty when the checkout flow is initialized outside of the
+    // checkout form (usually in the checkout flow admin UI). There's no need
+    // to determine the current step ID in that case, it won't be used.
+    if ($this->order) {
+      $this->stepId = $this->processStepId($route_match->getParameter('step'));
+    }
   }
 
   /**
@@ -64,6 +69,29 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
+   * Processes the requested step ID.
+   *
+   * @param string $requested_step_id
+   *   The step ID.
+   *
+   * @return string
+   *   The processed step ID.
+   */
+  protected function processStepId($requested_step_id) {
+    $step_ids = array_keys($this->getVisibleSteps());
+    $step_id = $requested_step_id;
+    if (empty($step_id) || !in_array($step_id, $step_ids)) {
+      // Take the step ID from the order, or default to the first one.
+      $step_id = $this->order->checkout_step->value;
+      if (empty($step_id)) {
+        $step_id = reset($step_ids);
+      }
+    }
+
+    return $step_id;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getOrder() {
@@ -75,6 +103,24 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   public function getStepId() {
     return $this->stepId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPreviousStepId() {
+    $step_ids = array_keys($this->getVisibleSteps());
+    $current_index = array_search($this->stepId, $step_ids);
+    return isset($step_ids[$current_index - 1]) ? $step_ids[$current_index - 1] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNextStepId() {
+    $step_ids = array_keys($this->getVisibleSteps());
+    $current_index = array_search($this->stepId, $step_ids);
+    return isset($step_ids[$current_index + 1]) ? $step_ids[$current_index + 1] : NULL;
   }
 
   /**
@@ -101,59 +147,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function getVisibleSteps() {
     // All steps are visible by default.
     return $this->getSteps();
-  }
-
-  /**
-   * Processes the requested step ID.
-   *
-   * @param string $requested_step_id
-   *   The step ID.
-   *
-   * @return string
-   *   The processed step ID.
-   */
-  protected function processStepId($requested_step_id) {
-    if (empty($this->order)) {
-      // The checkout flow was initialized outside of the checkout form
-      // controller, the step ID won't be used.
-      return $requested_step_id;
-    }
-
-    $step_ids = array_keys($this->getVisibleSteps());
-    $step_id = $requested_step_id;
-    if (empty($step_id)) {
-      // Take the step ID from the order, or default to the first one.
-      $step_id = $this->order->checkout_step->value;
-      if (empty($step_id)) {
-        $step_id = reset($step_ids);
-      }
-    }
-
-    return $step_id;
-  }
-
-  /**
-   * Gets the previous step ID.
-   *
-   * @return string|null
-   *   The previous step, or NULL if there is none.
-   */
-  protected function getPreviousStepId() {
-    $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
-    return isset($step_ids[$current_index - 1]) ? $step_ids[$current_index - 1] : NULL;
-  }
-
-  /**
-   * Gets the next step ID.
-   *
-   * @return string|null
-   *   The next step ID, or NULL if there is none.
-   */
-  protected function getNextStepId() {
-    $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
-    return isset($step_ids[$current_index + 1]) ? $step_ids[$current_index + 1] : NULL;
   }
 
   /**

@@ -34,6 +34,28 @@ interface CheckoutFlowInterface extends FormInterface, ConfigurablePluginInterfa
   public function getStepId();
 
   /**
+   * Gets the previous step ID.
+   *
+   * Determined based on the position of the current step ID in the list
+   * of visible steps.
+   *
+   * @return string|null
+   *   The previous step, or NULL if there is none.
+   */
+  public function getPreviousStepId();
+
+  /**
+   * Gets the next step ID.
+   *
+   * Determined based on the position of the current step ID in the list
+   * of visible steps.
+   *
+   * @return string|null
+   *   The next step ID, or NULL if there is none.
+   */
+  public function getNextStepId();
+
+  /**
    * Gets the defined steps.
    *
    * @return array

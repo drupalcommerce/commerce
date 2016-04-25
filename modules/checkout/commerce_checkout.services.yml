@@ -1,4 +1,8 @@
 services:
+  commerce_checkout.checkout_order_manager:
+    class: Drupal\commerce_checkout\CheckoutOrderManager
+    arguments: ['@entity_type.manager']
+
   plugin.manager.commerce_checkout_flow:
     class: Drupal\commerce_checkout\CheckoutFlowManager
     parent: default_plugin_manager
