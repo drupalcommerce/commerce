@@ -27,7 +27,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   protected $currentUser;
 
   /**
-   * Constructs a new Email object.
+   * Constructs a new ContactInformation object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -72,12 +72,11 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildConfigurationSummary() {
-    $summary = [];
     if (!empty($this->configuration['double_entry'])) {
-      $summary[] = $this->t('Require double entry of email: Yes');
+      $summary = $this->t('Require double entry of email: Yes');
     }
     else {
-      $summary[] = $this->t('Require double entry of email: No');
+      $summary = $this->t('Require double entry of email: No');
     }
 
     return $summary;
@@ -121,7 +120,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
-    return [];
+    return $this->order->getEmail();
   }
 
   /**

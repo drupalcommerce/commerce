@@ -69,13 +69,13 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
   public function setWeight($weight);
 
   /**
-   * Builds a short summary of the pane configuration.
+   * Builds a summary of the pane configuration.
    *
    * Complements the methods provided by PluginFormInterface, allowing
    * the checkout flow form to provide a summary of pane configuration.
    *
-   * @return string[]
-   *   A short summary of the pane configuration.
+   * @return string
+   *   An HTML summary of the pane configuration.
    */
   public function buildConfigurationSummary();
   
@@ -88,10 +88,10 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
   public function isVisible();
 
   /**
-   * Builds a short summary of the pane values.
+   * Builds a summary of the pane values.
    *
-   * @return string[]
-   *   A short summary of the pane values.
+   * @return string
+   *   An HTML summary of the pane values.
    */
   public function buildPaneSummary();
 

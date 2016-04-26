@@ -74,12 +74,11 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function buildConfigurationSummary() {
-    $summary = [];
     if (!empty($this->configuration['allow_guest_checkout'])) {
-      $summary[] = $this->t('Guest checkout: Allowed');
+      $summary = $this->t('Guest checkout: Allowed');
     }
     else {
-      $summary[] = $this->t('Guest checkout: Not allowed');
+      $summary = $this->t('Guest checkout: Not allowed');
     }
 
     return $summary;
