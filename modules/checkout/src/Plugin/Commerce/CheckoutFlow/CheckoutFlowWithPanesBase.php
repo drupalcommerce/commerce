@@ -502,6 +502,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       $form[$pane_id] = [
         '#type' => 'container',
         '#parents' => [$pane_id],
+        '#access' => $pane->isVisible(),
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state);
     }

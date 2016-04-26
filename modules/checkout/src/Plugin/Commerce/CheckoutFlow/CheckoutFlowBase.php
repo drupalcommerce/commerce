@@ -206,6 +206,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $steps = $this->getVisibleSteps();
+    $form['#tree'] = TRUE;
     $form['#title'] = $steps[$this->stepId]['label'];
     $form['actions'] = $this->actions($form, $form_state);
 
@@ -287,8 +288,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
     // Hide the actions element if it has no buttons.
     $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
-    // Don't allow the user to leave the offsite_payment page.
-    if ($this->stepId == 'offsite_payment') {
+    // Once these two steps are reached, the user can't go back.
+    if (in_array($this->stepId, ['offsite_payment', 'complete'])) {
       $actions['#access'] = FALSE;
     }
 
