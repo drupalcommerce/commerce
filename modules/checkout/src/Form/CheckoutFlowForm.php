@@ -104,7 +104,9 @@ class CheckoutFlowForm extends BundleEntityFormBase {
 
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
     $checkout_flow = $this->entity;
-    $checkout_flow->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
+    if (!$checkout_flow->isNew()) {
+      $checkout_flow->getPlugin()->validateConfigurationForm($form['configuration'], $form_state);
+    }
   }
 
   /**
@@ -115,7 +117,9 @@ class CheckoutFlowForm extends BundleEntityFormBase {
 
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
     $checkout_flow = $this->entity;
-    $checkout_flow->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    if (!$checkout_flow->isNew()) {
+      $checkout_flow->getPlugin()->submitConfigurationForm($form['configuration'], $form_state);
+    }
   }
 
   /**
