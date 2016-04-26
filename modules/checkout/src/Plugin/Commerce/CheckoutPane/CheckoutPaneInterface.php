@@ -33,6 +33,17 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
   public function getLabel();
 
   /**
+   * Gets the pane wrapper element.
+   *
+   * Used when rendering the pane's form.
+   * E.g: 'container', 'fieldset'. Defaults to 'container'.
+   *
+   * @return string
+   *   The pane wrapper element.
+   */
+  public function getWrapperElement();
+
+  /**
    * Gets the pane step ID.
    *
    * @return string

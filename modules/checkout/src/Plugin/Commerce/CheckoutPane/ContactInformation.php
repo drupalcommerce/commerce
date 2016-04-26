@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "contact_information",
  *   label = "Contact information",
  *   default_step = "order_information",
+ *   wrapper_element = "fieldset",
  * )
  */
 class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterface, ContainerFactoryPluginInterface {

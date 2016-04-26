@@ -500,8 +500,9 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
     $panes = $this->getPanes($this->stepId);
     foreach ($panes as $pane_id => $pane) {
       $form[$pane_id] = [
-        '#type' => 'container',
         '#parents' => [$pane_id],
+        '#type' => $pane->getWrapperElement(),
+        '#title' => $pane->getLabel(),
         '#access' => $pane->isVisible(),
       ];
       $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state);

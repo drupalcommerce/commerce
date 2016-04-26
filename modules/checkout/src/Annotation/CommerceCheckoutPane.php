@@ -23,6 +23,8 @@ class CommerceCheckoutPane extends Plugin {
   /**
    * The human-readable name of the plugin.
    *
+   * Shown as the title of the pane form if the wrapper_element is 'fieldset'.
+   *
    * @ingroup plugin_translatable
    *
    * @var \Drupal\Core\Annotation\Translation
@@ -37,5 +39,14 @@ class CommerceCheckoutPane extends Plugin {
    * @var string
    */
   public $default_step;
+
+  /**
+   * The wrapper element to use when rendering the pane's form.
+   *
+   * E.g: 'container', 'fieldset'. Defaults to 'container'.
+   *
+   * @var string
+   */
+  public $wrapper_element;
 
 }

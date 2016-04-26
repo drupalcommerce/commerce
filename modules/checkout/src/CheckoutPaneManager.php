@@ -23,6 +23,7 @@ class CheckoutPaneManager extends DefaultPluginManager {
     'id' => '',
     'label' => '',
     'default_step' => '_disabled',
+    'wrapper_element' => 'container',
   ];
 
   /**

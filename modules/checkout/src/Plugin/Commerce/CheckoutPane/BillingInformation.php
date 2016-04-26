@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "billing_information",
  *   label = "Billing information",
  *   default_step = "order_information",
+ *   wrapper_element = "fieldset",
  * )
  */
 class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterface, ContainerFactoryPluginInterface {

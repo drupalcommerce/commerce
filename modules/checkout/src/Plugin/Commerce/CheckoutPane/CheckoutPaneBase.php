@@ -123,6 +123,13 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
+  public function getWrapperElement() {
+    return $this->pluginDefinition['wrapper_element'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getStepId() {
     return $this->configuration['step'];
   }
