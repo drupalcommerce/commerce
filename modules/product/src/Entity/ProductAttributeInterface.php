@@ -16,4 +16,12 @@ interface ProductAttributeInterface extends ConfigEntityInterface {
    */
   public function getValues();
 
+  /**
+   * Gets the attribute element type.
+   *
+   * @return string
+   *   The element type name.
+   */
+  public function getElementType();
+
 }

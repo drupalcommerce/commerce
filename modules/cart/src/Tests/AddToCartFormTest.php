@@ -17,6 +17,7 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -270,6 +271,59 @@ class AddToCartFormTest extends OrderTestBase {
   }
 
   /**
+   * Tests that the add to cart form renders an attribute entity.
+   */
+  public function testRenderedAttributeElement() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $color_attribute_values = $this->createAttributeSet($variation_type, 'color', [
+      'cyan' => 'Cyan',
+      'magenta' => 'Magenta',
+    ]);
+    $color_attribute_values['cyan']->set('rendered_test', 'Cyan (Rendered)')->save();
+    $color_attribute_values['cyan']->save();
+    $color_attribute_values['magenta']->set('rendered_test', 'Magenta (Rendered)')->save();
+    $color_attribute_values['magenta']->save();
+
+    $color_attribute = ProductAttribute::load($color_attribute_values['cyan']->getAttributeId());
+
+    $variation1 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => $this->randomMachineName(),
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['cyan'],
+    ]);
+    $variation2 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => $this->randomMachineName(),
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['magenta'],
+    ]);
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
+      'variations' => [$variation1, $variation2],
+    ]);
+
+    $this->drupalGet($product->toUrl());
+    $this->assertOptionWithDrupalSelector('edit-purchased-entity-0-attributes-attribute-color', $color_attribute_values['cyan']->id());
+
+    $color_attribute->set('elementType', 'commerce_product_rendered_attribute')->save();
+
+    $this->drupalGet($product->toUrl());
+    $this->assertText('Cyan (Rendered)');
+    $this->assertText('Magenta (Rendered)');
+  }
+
+  /**
    * Creates an attribute field and set of attribute values.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type
@@ -278,17 +332,50 @@ class AddToCartFormTest extends OrderTestBase {
    *   The attribute field name.
    * @param array $options
    *   Associative array of key name values. [red => Red].
+   * @param bool $test_field
+   *   Flag to create a test field on the attribute.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
    *   Array of attribute entities.
    */
-  protected function createAttributeSet(ProductVariationTypeInterface $variation_type, $name, array $options) {
+  protected function createAttributeSet(ProductVariationTypeInterface $variation_type, $name, array $options, $test_field = FALSE) {
     $attribute = ProductAttribute::create([
       'id' => $name,
       'label' => ucfirst($name),
     ]);
     $attribute->save();
     $this->attributeFieldManager->createField($attribute, $variation_type->id());
+
+    if ($test_field) {
+      $field_storage = FieldStorageConfig::loadByName('commerce_product_attribute_value', 'rendered_test');
+      if (!$field_storage) {
+        $field_storage = FieldStorageConfig::create([
+          'field_name' => 'rendered_test',
+          'entity_type' => 'commerce_product_attribute_value',
+          'type' => 'text',
+        ]);
+        $field_storage->save();
+      }
+
+      FieldConfig::create([
+        'field_storage' => $field_storage,
+        'bundle' => $attribute->id(),
+      ])->save();
+
+      /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $attribute_view_display */
+      $attribute_view_display = EntityViewDisplay::create([
+        'targetEntityType' => 'commerce_product_attribute_value',
+        'bundle' => $name,
+        'mode' => 'add_to_cart',
+        'status' => TRUE,
+      ]);
+      $attribute_view_display->removeComponent('name');
+      $attribute_view_display->setComponent('rendered_test', [
+        'label' => 'hidden',
+        'type' => 'string',
+      ]);
+      $attribute_view_display->save();
+    }
 
     $attribute_set = [];
     foreach ($options as $key => $value) {

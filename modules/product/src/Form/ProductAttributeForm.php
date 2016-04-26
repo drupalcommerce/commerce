@@ -3,9 +3,14 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\FieldConfigInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProductAttributeForm extends BundleEntityFormBase {
 
@@ -31,6 +36,16 @@ class ProductAttributeForm extends BundleEntityFormBase {
         'exists' => '\Drupal\commerce_product\Entity\ProductAttribute::load',
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+    ];
+    $form['elementType'] = [
+      '#type' => 'select',
+      '#default_value' => $attribute->getElementType(),
+      '#options' => [
+        'radios' => $this->t('Radio buttons'),
+        'select' => $this->t('Select list'),
+        'commerce_product_rendered_attribute' => $this->t('Rendered attribute'),
+      ],
+      '#description' => $this->t('Controls how the attribute is displayed on the add to cart form.'),
     ];
 
     if ($this->moduleHandler->moduleExists('language')) {

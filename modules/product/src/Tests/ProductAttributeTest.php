@@ -30,12 +30,14 @@ class ProductAttributeTest extends ProductTestBase {
     $this->drupalPostForm(NULL, [
       'id' => 'size',
       'label' => 'Size',
+      'elementType' => 'commerce_product_rendered_attribute',
     ], 'Save');
     $this->assertText("Created the Size product attribute.");
     $this->assertUrl("admin/commerce/product-attributes/manage/size/overview");
 
     $attribute = ProductAttribute::load('size');
     $this->assertEqual($attribute->label(), 'Size');
+    $this->assertEqual($attribute->getElementType(), 'commerce_product_rendered_attribute');
   }
 
   /**
@@ -49,12 +51,14 @@ class ProductAttributeTest extends ProductTestBase {
     $this->drupalGet('admin/commerce/product-attributes/manage/color');
     $this->drupalPostForm(NULL, [
       'label' => 'Colour',
+      'elementType' => 'radios',
     ], 'Save');
     $this->assertText('Updated the Colour product attribute.');
     $this->assertUrl('admin/commerce/product-attributes');
 
     $attribute = ProductAttribute::load('color');
     $this->assertEqual($attribute->label(), 'Colour');
+    $this->assertEqual($attribute->getElementType(), 'radios');
   }
 
   /**

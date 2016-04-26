@@ -45,6 +45,13 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   protected $variationStorage;
 
   /**
+   * The product attribute storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $attributeStorage;
+
+  /**
    * Constructs a new ProductVariationAttributesWidget object.
    *
    * @param string $plugin_id
@@ -67,6 +74,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
 
     $this->attributeFieldManager = $attribute_field_manager;
     $this->variationStorage = $entity_type_manager->getStorage('commerce_product_variation');
+    $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
   }
 
   /**
@@ -91,57 +99,6 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
     return $entity_type == 'commerce_line_item' && $field_name == 'purchased_entity';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings() {
-    return [
-      'attribute_widget_type' => 'select',
-    ] + parent::defaultSettings();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    $element = [];
-    $element['attribute_widget_type'] = [
-      '#type' => 'radios',
-      '#title' => t('Attribute widget type'),
-      '#description' => $this->t('Used to select attribute values.'),
-      '#options' => $this->getAttributeWidgetTypes(),
-      '#default_value' => $this->getSetting('attribute_widget_type'),
-    ];
-
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    $widget_types = $this->getAttributeWidgetTypes();
-    $widget_type = $this->getSetting('attribute_widget_type');
-    $widget_type = $widget_types[$widget_type];
-    $summary = [];
-    $summary['attribute_widget_type'] = $this->t('Attribute widget type: @widget_type', ['@widget_type' => $widget_type]);
-
-    return $summary;
-  }
-
-  /**
-   * Gets the available attribute widget types.
-   *
-   * @return string[]
-   *   The widget types.
-   */
-  protected function getAttributeWidgetTypes() {
-    return [
-      'radios' => $this->t('Radio buttons'),
-      'select' => $this->t('Select list'),
-    ];
   }
 
   /**
@@ -198,7 +155,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     ];
     foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
       $element['attributes'][$field_name] = [
-        '#type' => $this->getSetting('attribute_widget_type'),
+        '#type' => $attribute['element_type'],
         '#title' => $attribute['title'],
         '#options' => $attribute['values'],
         '#required' => $attribute['required'],
@@ -292,11 +249,14 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $field_names = array_column($field_map, 'field_name');
     $index = 0;
     foreach ($field_names as $field_name) {
+      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute_type */
+      $attribute_type = $this->attributeStorage->load(substr($field_name, 10));
       $field = $field_definitions[$field_name];
       $attributes[$field_name] = [
         'field_name' => $field_name,
         'title' => $field->getLabel(),
         'required' => $field->isRequired(),
+        'element_type' => $attribute_type->getElementType(),
       ];
       // The first attribute gets all values. Every next attribute gets only
       // the values from variations matching the previous attribute value.
