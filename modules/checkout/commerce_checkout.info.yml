@@ -7,3 +7,6 @@ dependencies:
   - commerce
   - commerce_order
   - commerce_cart
+config_devel:
+  install:
+    - commerce_checkout.commerce_checkout_flow.default
