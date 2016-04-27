@@ -203,7 +203,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
  * Form submission handler for 'commerce_order_type_form'.
  */
 function commerce_cart_order_type_form_submit($form, FormStateInterface $form_state) {
-  $settings = &$form_state->getValues('commerce_cart');
+  $settings = &$form_state->getValue('commerce_cart');
   $order_type = $form_state->getFormObject()->getEntity();
   $order_type->setThirdPartySetting('commerce_cart', 'refresh_mode', $settings['refresh_mode']);
   $order_type->setThirdPartySetting('commerce_cart', 'refresh_frequency', $settings['refresh_frequency']);
