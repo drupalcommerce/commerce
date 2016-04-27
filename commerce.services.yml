@@ -1,4 +1,8 @@
 services:
+  commerce.credentials_check_flood:
+    class: Drupal\commerce\CredentialsCheckFlood
+    arguments: ['@flood', '@entity_type.manager', '@config.factory']
+
   commerce.country_context:
     class: Drupal\commerce\CountryContext
     arguments: ['@request_stack', '@commerce.chain_country_resolver']
