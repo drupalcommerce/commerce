@@ -9,6 +9,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a base checkout flow that uses checkout panes.
@@ -45,15 +46,17 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    *   The plugin_id for the plugin instance.
    * @param mixed $pane_definition
    *   The plugin implementation definition.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    * @param \Drupal\commerce_checkout\CheckoutPaneManager $pane_manager
    *   The checkout pane manager.
    */
-  public function __construct(array $configuration, $pane_id, $pane_definition, RouteMatchInterface $route_match, CheckoutPaneManager $pane_manager) {
+  public function __construct(array $configuration, $pane_id, $pane_definition, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match, CheckoutPaneManager $pane_manager) {
     $this->paneManager = $pane_manager;
 
-    parent::__construct($configuration, $pane_id, $pane_definition, $route_match);
+    parent::__construct($configuration, $pane_id, $pane_definition, $event_dispatcher, $route_match);
   }
 
   /**
@@ -64,6 +67,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       $configuration,
       $pane_id,
       $pane_definition,
+      $container->get('event_dispatcher'),
       $container->get('current_route_match'),
       $container->get('plugin.manager.commerce_checkout_pane')
     );

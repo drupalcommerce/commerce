@@ -2,12 +2,15 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
+use Drupal\commerce_checkout\Event\CheckoutCompleteEvent;
+use Drupal\commerce_checkout\Event\CheckoutEvents;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides the base checkout flow class.
@@ -16,6 +19,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * checkout panes. Otherwise they should extend CheckoutFlowWithPanesBase.
  */
 abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterface, ContainerFactoryPluginInterface {
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * The current order.
@@ -40,13 +50,16 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
+    $this->eventDispatcher = $event_dispatcher;
     $this->order = $route_match->getParameter('commerce_order');
     // The order is empty when the checkout flow is initialized outside of the
     // checkout form (usually in the checkout flow admin UI). There's no need
@@ -64,6 +77,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container->get('event_dispatcher'),
       $container->get('current_route_match')
     );
   }
@@ -230,7 +244,15 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       ]);
 
       if ($next_step_id == 'complete') {
-        // @todo Fire a checkout complete event.
+        // @todo Do this earlier in the process.
+        $this->order->cart = FALSE;
+        // Place the order.
+        $transition = $this->order->getState()->getWorkflow()->getTransition('place');
+        $this->order->getState()->applyTransition($transition);
+
+        // Notify other modules.
+        $event = new CheckoutCompleteEvent($this->order);
+        $this->eventDispatcher->dispatch(CheckoutEvents::CHECKOUT_COMPLETE, $event);
       }
     }
 
