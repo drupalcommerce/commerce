@@ -64,7 +64,7 @@ class CompletionMessage extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
-  public function buildPaneForm(array $pane_form, FormStateInterface $form_state) {
+  public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     $message = $this->configuration['message'];
     $message = str_replace('%order_number', $this->order->getOrderNumber(), $message);
 

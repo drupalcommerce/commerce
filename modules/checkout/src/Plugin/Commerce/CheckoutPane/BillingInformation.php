@@ -89,7 +89,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function buildPaneForm(array $pane_form, FormStateInterface $form_state) {
+  public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     $billing_profile = $this->order->getBillingProfile();
     if (!$billing_profile) {
       $profile_storage = $this->entityTypeManager->getStorage('profile');
@@ -113,7 +113,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $billing_profile = clone $pane_form['#billing_profile'];
     $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
     $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
@@ -123,7 +123,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $billing_profile = clone $pane_form['#billing_profile'];
     $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
     $form_display->extractFormValues($billing_profile, $pane_form, $form_state);

@@ -167,7 +167,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   /**
    * {@inheritdoc}
    */
-  public function buildPaneForm(array $pane_form, FormStateInterface $form_state) {
+  public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     $pane_form['returning_customer'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Returning Customer'),
@@ -217,7 +217,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     parent::validatePaneForm($pane_form, $form_state);
 
     $triggering_element = $form_state->getTriggeringElement();
@@ -260,7 +260,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   /**
    * {@inheritdoc}
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
     if ($triggering_element['#op'] == 'login') {
       $storage = $this->entityTypeManager->getStorage('user');

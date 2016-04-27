@@ -116,8 +116,10 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    *     placed within $form_state->getValues().
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of the parent form.
+   * @param array $complete_form
+   *   The complete form structure.
    */
-  public function buildPaneForm(array $pane_form, FormStateInterface $form_state);
+  public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form);
 
   /**
    * Validates the pane form.
@@ -126,8 +128,10 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    *   The pane form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of the parent form.
+   * @param array $complete_form
+   *   The complete form structure.
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state);
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form);
 
   /**
    * Handles the submission of an pane form.
@@ -136,7 +140,9 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    *   The pane form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of the parent form.
+   * @param array $complete_form
+   *   The complete form structure.
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state);
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form);
 
 }

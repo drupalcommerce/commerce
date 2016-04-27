@@ -127,7 +127,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function buildPaneForm(array $pane_form, FormStateInterface $form_state) {
+  public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     $pane_form['email'] = [
       '#type' => 'email',
       '#title' => $this->t('Email'),
@@ -149,7 +149,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
     if ($this->configuration['double_entry'] && $values['email'] != $values['email_confirm']) {
       $form_state->setError($pane_form, $this->t('The specified emails do not match.'));
@@ -159,7 +159,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state) {
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
     $this->order->setEmail($values['email']);
   }

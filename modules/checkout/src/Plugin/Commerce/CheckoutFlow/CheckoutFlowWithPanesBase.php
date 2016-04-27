@@ -505,7 +505,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         '#title' => $pane->getLabel(),
         '#access' => $pane->isVisible(),
       ];
-      $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state);
+      $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
     }
 
     return $form;
@@ -519,7 +519,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
 
     $panes = $this->getPanes($this->stepId);
     foreach ($panes as $pane_id => $pane) {
-      $pane->validatePaneForm($form[$pane_id], $form_state);
+      $pane->validatePaneForm($form[$pane_id], $form_state, $form);
     }
   }
 
@@ -529,7 +529,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $panes = $this->getPanes($this->stepId);
     foreach ($panes as $pane_id => $pane) {
-      $pane->submitPaneForm($form[$pane_id], $form_state);
+      $pane->submitPaneForm($form[$pane_id], $form_state, $form);
     }
 
     parent::submitForm($form, $form_state);

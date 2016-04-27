@@ -172,11 +172,11 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state) {}
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state) {}
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {}
 
 }
