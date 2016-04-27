@@ -199,6 +199,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $pane_form['guest'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Guest Checkout'),
+      '#access' => $this->configuration['allow_guest_checkout'],
     ];
     $pane_form['guest']['text'] = [
       '#prefix' => '<p>',
@@ -218,8 +219,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    parent::validatePaneForm($pane_form, $form_state);
-
     $triggering_element = $form_state->getTriggeringElement();
     if ($triggering_element['#op'] == 'continue') {
       // No login in progress, nothing to validate.
