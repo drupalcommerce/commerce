@@ -191,6 +191,11 @@ class ProductAttributeOverviewForm extends FormBase {
       '#value' => t('Save values'),
       '#button_type' => 'primary',
     ];
+    $form['actions']['reset_alphabetical'] = [
+      '#type' => 'submit',
+      '#submit' => ['::submitReset'],
+      '#value' => $this->t('Reset to alphabetical'),
+    ];
 
     return $form;
   }
@@ -249,6 +254,13 @@ class ProductAttributeOverviewForm extends FormBase {
     }
 
     drupal_set_message($this->t('Saved the @attribute attribute values.', ['@attribute' => $this->attribute->label()]));
+  }
+
+  /**
+   * Redirects to the confirmation form for the reset action.
+   */
+  public function submitReset(array &$form, FormStateInterface $form_state) {
+    $form_state->setRedirectUrl($this->attribute->toUrl('reset-form'));
   }
 
 }
