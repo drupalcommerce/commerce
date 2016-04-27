@@ -38,17 +38,17 @@ class CartRefreshTest extends CommerceTestBase {
   function testCartRefreshSettings() {
     $url = 'admin/commerce/config/order-types/default/edit';
     $this->drupalGet($url);
-    $this->assertField('refresh_mode', 'Shopping cart refresh mode field found.');
-    $this->assertField('refresh_frequency', 'Shopping cart refresh frequency field found.');
+    $this->assertField('commerce_cart[refresh_mode]', 'Shopping cart refresh mode field found.');
+    $this->assertField('commerce_cart[refresh_frequency]', 'Shopping cart refresh frequency field found.');
 
-    $edit['refresh_mode'] = 'always';
-    $edit['refresh_frequency'] = 60;
+    $edit['commerce_cart[refresh_mode]'] = 'always';
+    $edit['commerce_cart[refresh_frequency]'] = 60;
     $this->drupalPostForm($url, $edit, t('Save'));
     $order_type = OrderType::load('default');
     $refresh_mode = $order_type->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
     $refresh_frequency = $order_type->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
-    $this->assertEqual($refresh_mode, $edit['refresh_mode'], 'The value of the shopping cart refresh mode has been changed.');
-    $this->assertEqual($refresh_frequency, $edit['refresh_frequency'], 'The value of the shopping cart refresh frequency has been changed.');
+    $this->assertEqual($refresh_mode, $edit['commerce_cart[refresh_mode]'], 'The value of the shopping cart refresh mode has been changed.');
+    $this->assertEqual($refresh_frequency, $edit['commerce_cart[refresh_frequency]'], 'The value of the shopping cart refresh frequency has been changed.');
   }
 
 }
