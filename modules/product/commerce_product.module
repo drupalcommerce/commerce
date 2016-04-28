@@ -8,6 +8,7 @@
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 /**
@@ -30,6 +31,23 @@ function commerce_product_entity_form_display_update(EntityFormDisplayInterface 
     $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
     $attribute_field_manager->clearCaches();
   }
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function commerce_product_entity_access(EntityInterface $entity, $operation, $account) {
+  // Allow published products to be viewed by all users for now.
+  // @todo Remove once we implement the full product permissions.
+  if ($operation == 'view') {
+    if ($entity->getEntityTypeId() == 'commerce_product' && $entity->isPublished()) {
+      return \Drupal\Core\Access\AccessResult::allowed();
+    }
+    elseif ($entity->getEntityTypeId() == 'commerce_product_variation' && $entity->isActive()) {
+      return \Drupal\Core\Access\AccessResult::allowed();
+    }
+  }
+  return \Drupal\Core\Access\AccessResult::neutral();
 }
 
 /**
