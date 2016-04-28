@@ -64,6 +64,9 @@ function commerce_product_theme() {
     'commerce_product_variation' => [
       'render element' => 'elements',
     ],
+    'commerce_product_attribute_value' => [
+      'render element' => 'elements',
+    ],
   ];
 }
 
@@ -79,6 +82,13 @@ function commerce_product_theme_suggestions_commerce_product(array $variables) {
  */
 function commerce_product_theme_suggestions_commerce_product_variation(array $variables) {
   return _commerce_entity_theme_suggestions('commerce_product_variation', $variables);
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_product_commerce_product_attribute_value().
+ */
+function commerce_product_theme_suggestions_commerce_product_attribute_value(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_product_attribute_value', $variables);
 }
 
 /**
@@ -122,6 +132,28 @@ function template_preprocess_commerce_product_variation(array &$variables) {
   $variables['product'] = $product;
   $variables['product_variation'] = $product_variation;
   $variables['product_url'] = $product->toUrl();
+  // Helpful $content variable for templates.
+  $variables['content'] = [];
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Prepares variables for product attribute value templates.
+ *
+ * Default template: commerce-product-attribute-value.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_product_commerce_product_attribute_value(array &$variables) {
+  /** @var Drupal\commerce_product\Entity\ProductAttributeValueInterface $product */
+  $attribute_value = $variables['elements']['#commerce_product_attribute_value'];
+
+  $variables['attribute_value'] = $attribute_value;
   // Helpful $content variable for templates.
   $variables['content'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
