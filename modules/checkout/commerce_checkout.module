@@ -63,7 +63,7 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
     '#type' => 'select',
     '#title' => t('Checkout flow'),
     '#options' => $checkout_flows,
-    '#default_value' => $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow'),
+    '#default_value' => $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default'),
     '#required' => TRUE,
   ];
   $form['actions']['submit']['#submit'][] = 'commerce_checkout_order_type_form_submit';

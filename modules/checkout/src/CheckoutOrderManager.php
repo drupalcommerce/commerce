@@ -31,7 +31,7 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
     if ($order->checkout_flow->isEmpty()) {
       /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
       $order_type = $this->entityTypeManager->getStorage('commerce_order_type')->load($order->bundle());
-      $checkout_flow = $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow');
+      $checkout_flow = $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default');
       // @todo Allow other modules to add their own resolving logic.
       $order->checkout_flow->target_id = $checkout_flow;
       $order->save();

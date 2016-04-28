@@ -1,11 +1,5 @@
 langcode: en
 status: true
-third_party_settings:
-  commerce_cart:
-    refresh_mode: owner_only
-    refresh_frequency: 30
-  commerce_checkout:
-    checkout_flow: default
 label: Default
 id: default
 workflow: order_default
