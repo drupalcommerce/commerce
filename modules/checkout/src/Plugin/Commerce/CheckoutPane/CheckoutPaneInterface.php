@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
