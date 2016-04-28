@@ -119,7 +119,7 @@ class OrderForm extends ContentEntityForm {
     if (isset($form['mail'])) {
       $form['mail']['#group'] = 'customer';
     }
-    else {
+    elseif (!empty($order->getEmail())) {
       $form['customer']['mail'] = $this->fieldAsReadOnly($this->t('Contact email'), $order->getEmail());
     }
     // All additional customer information should come after uid/mail.
