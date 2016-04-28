@@ -8,6 +8,20 @@ namespace Drupal\commerce_cart\Event;
 final class CartEvents {
 
   /**
+   * Name of the event fired after assigning the anonymous cart order to a user.
+   *
+   * Fired before the cart order is saved.
+   *
+   * Use this event to implement logic such as canceling any existing cart
+   * orders the user might already have prior to the anonymous cart assignment.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_cart\Event\CartAssignEvent
+   */
+  const CART_ASSIGN = 'commerce_cart.cart.assign';
+
+  /**
    * Name of the event fired after emptying the cart order.
    *
    * Fired before the cart order is saved.
