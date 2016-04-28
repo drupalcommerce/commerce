@@ -50,7 +50,9 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return [];
+    return [
+      'module' => [$this->pluginDefinition['provider']],
+    ];
   }
 
   /**

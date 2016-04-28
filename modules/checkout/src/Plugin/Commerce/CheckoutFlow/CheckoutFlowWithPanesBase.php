@@ -133,6 +133,23 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   /**
    * {@inheritdoc}
    */
+  public function calculateDependencies() {
+    $dependencies = parent::calculateDependencies();
+    // Merge-in the pane dependencies.
+    foreach ($this->getPanes() as $pane) {
+      foreach ($pane->calculateDependencies() as $dependency_type => $list) {
+        foreach ($list as $name) {
+          $dependencies[$dependency_type][] = $name;
+        }
+      }
+    }
+
+    return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     return [
       'panes' => [],
