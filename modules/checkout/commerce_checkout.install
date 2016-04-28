@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Checkout.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function commerce_checkout_install() {
+  // Allow all roles to use checkout.
+  user_role_grant_permissions('anonymous', ['access checkout']);
+  user_role_grant_permissions('authenticated', ['access checkout']);
+}
