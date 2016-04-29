@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_line_item_type",
  *   label = @Translation("Line item type"),
+ *   label_singular = @Translation("Line item type"),
+ *   label_plural = @Translation("Line item types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count line item type",
+ *     plural = "@count line item types",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\LineItemTypeForm",

@@ -17,6 +17,12 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   label_singular = @Translation("Product variation"),
+ *   label_plural = @Translation("Product variations"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product variation",
+ *     plural = "@count product variations",
+ *   ),
  *   bundle_label = @Translation("Product variation type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",

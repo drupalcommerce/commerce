@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
+ *   label_singular = @Translation("Store type"),
+ *   label_plural = @Translation("Store types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count store type",
+ *     plural = "@count store types",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_store\StoreTypeListBuilder",
  *     "form" = {

@@ -11,6 +11,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_checkout_flow",
  *   label = @Translation("Checkout flow"),
+ *   label_singular = @Translation("Checkout flow"),
+ *   label_plural = @Translation("Checkout flows"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count checkout flow",
+ *     plural = "@count checkout flows",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_checkout\CheckoutFlowListBuilder",
  *     "form" = {

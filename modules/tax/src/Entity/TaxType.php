@@ -13,6 +13,12 @@ use CommerceGuys\Tax\Enum\GenericLabel;
  * @ConfigEntityType(
  *   id = "commerce_tax_type",
  *   label = @Translation("Tax type"),
+ *   label_singular = @Translation("Tax type"),
+ *   label_plural = @Translation("Tax types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count tax type",
+ *     plural = "@count tax types",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_tax\Form\TaxTypeForm",

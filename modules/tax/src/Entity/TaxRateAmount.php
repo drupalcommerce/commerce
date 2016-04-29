@@ -11,6 +11,12 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_tax_rate_amount",
  *   label = @Translation("Tax rate amount"),
+ *   label_singular = @Translation("Tax rate amount"),
+ *   label_plural = @Translation("Tax rate amount"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count tax rate amount",
+ *     plural = "@count tax rate amounts",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_tax\Form\TaxRateAmountForm",

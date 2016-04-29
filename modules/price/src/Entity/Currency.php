@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_currency",
  *   label = @Translation("Currency"),
+ *   label_singular = @Translation("Currency"),
+ *   label_plural = @Translation("Currencies"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count currency",
+ *     plural = "@count currencies",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_price\Form\CurrencyForm",

@@ -11,6 +11,12 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",
  *   label = @Translation("Product variation type"),
+ *   label_singular = @Translation("Product variation type"),
+ *   label_plural = @Translation("Product variation types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product variation type",
+ *     plural = "@count product variation types",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_product\ProductVariationTypeListBuilder",
  *     "form" = {

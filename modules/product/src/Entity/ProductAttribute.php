@@ -11,6 +11,12 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_attribute",
  *   label = @Translation("Product attribute"),
+ *   label_singular = @Translation("Product attribute"),
+ *   label_plural = @Translation("Product attributes"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product attribute",
+ *     plural = "@count product attributes",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_product\ProductAttributeListBuilder",
  *     "form" = {

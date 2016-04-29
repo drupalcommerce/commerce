@@ -17,6 +17,12 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_singular = @Translation("Order"),
+ *   label_plural = @Translation("Orders"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count order",
+ *     plural = "@count orders",
+ *   ),
  *   bundle_label = @Translation("Order type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",

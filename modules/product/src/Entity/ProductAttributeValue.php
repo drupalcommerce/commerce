@@ -13,6 +13,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product_attribute_value",
  *   label = @Translation("Product attribute value"),
+ *   label_singular = @Translation("Product attribute value"),
+ *   label_plural = @Translation("Product attribute values"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product attribute value",
+ *     plural = "@count product attribute values",
+ *   ),
  *   bundle_label = @Translation("Product attribute"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductAttributeValueEvent",
