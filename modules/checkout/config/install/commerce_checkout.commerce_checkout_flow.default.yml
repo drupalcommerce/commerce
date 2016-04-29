@@ -5,6 +5,7 @@ id: default
 label: Default
 plugin: multistep_default
 configuration:
+  display_checkout_progress: true
   panes:
     login:
       allow_guest_checkout: true

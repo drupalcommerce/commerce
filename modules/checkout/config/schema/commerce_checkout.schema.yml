@@ -22,12 +22,22 @@ commerce_checkout.commerce_checkout_flow.*:
     configuration:
       type: commerce_checkout.commerce_checkout_flow.plugin.[%parent.plugin]
 
+commerce_checkout.commerce_checkout_flow.plugin.*:
+  type: mapping
+  mapping:
+    display_checkout_progress:
+      type: boolean
+      label: 'Display checkout progress'
+
 commerce_checkout.commerce_checkout_flow.plugin.multistep_default:
   type: commerce_checkout_flow_with_panes_configuration
 
 commerce_checkout_flow_with_panes_configuration:
   type: mapping
   mapping:
+    display_checkout_progress:
+      type: boolean
+      label: 'Display checkout progress'
     panes:
       type: sequence
       label: 'Panes'

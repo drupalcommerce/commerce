@@ -151,7 +151,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return [
+    return parent::defaultConfiguration() + [
       'panes' => [],
     ];
   }

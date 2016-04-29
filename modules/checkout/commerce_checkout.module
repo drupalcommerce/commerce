@@ -10,6 +10,21 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function commerce_checkout_theme() {
+  $theme = [
+    'commerce_checkout_progress' => [
+      'variables' => [
+        'steps' => [],
+      ],
+    ],
+  ];
+
+  return $theme;
+}
+
+/**
  * Implements hook_entity_base_field_info().
  */
 function commerce_checkout_entity_base_field_info(EntityTypeInterface $entity_type) {
