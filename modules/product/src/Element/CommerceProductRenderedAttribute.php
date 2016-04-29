@@ -13,12 +13,12 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *
  * Example usage:
  * @code
- * $form['rendered_attributes'] = array(
+ * $form['rendered_attributes'] = [
  *   '#type' => 'commerce_product_rendered_attribute',
  *   '#title' => $this->t('Attributes'),
  *   '#default_value' => 1,
  *   '#options' => [0 => 'Red', 1 => 'Blue'],
- * );
+ * ];
  * @endcode
  *
  * @FormElement("commerce_product_rendered_attribute")
@@ -30,21 +30,16 @@ class CommerceProductRenderedAttribute extends Radios {
    */
   public static function processRadios(&$element, FormStateInterface $form_state, &$complete_form) {
     if (count($element['#options']) > 0) {
-
-      $element['#attached']['library'][] = 'commerce_product/rendered-attributes';
-
       $storage = \Drupal::entityTypeManager()->getStorage('commerce_product_attribute_value');
       $view_builder = \Drupal::entityTypeManager()->getViewBuilder('commerce_product_attribute_value');
       /** @var \Drupal\Core\Render\RendererInterface $renderer */
       $renderer = \Drupal::service('renderer');
-
       $attribute_values = $storage->loadMultiple(array_keys($element['#options']));
 
       $weight = 0;
       foreach ($element['#options'] as $key => $choice) {
         $rendered_attribute = $view_builder->view($attribute_values[$key], 'add_to_cart');
         $attributes = $element['#attributes'];
-
         if (isset($element['#default_value']) && $element['#default_value'] == $key) {
           $attributes['class'][] = 'product--rendered-attribute__selected';
         }
@@ -73,6 +68,7 @@ class CommerceProductRenderedAttribute extends Radios {
       }
     }
 
+    $element['#attached']['library'][] = 'commerce_product/rendered-attributes';
     $element['#attributes']['class'][] = 'product--rendered-attribute';
 
     return $element;

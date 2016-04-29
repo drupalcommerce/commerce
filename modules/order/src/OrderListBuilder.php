@@ -108,11 +108,11 @@ class OrderListBuilder extends EntityListBuilder {
     $operations = parent::getDefaultOperations($entity);
 
     if ($entity->access('update') && $entity->hasLinkTemplate('reassign-form')) {
-      $operations['reassign'] = array(
+      $operations['reassign'] = [
         'title' => $this->t('Reassign'),
         'weight' => 20,
         'url' => $entity->toUrl('reassign-form'),
-      );
+      ];
     }
 
     return $operations;

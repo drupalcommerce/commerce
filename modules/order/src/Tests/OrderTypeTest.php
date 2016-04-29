@@ -40,10 +40,10 @@ class OrderTypeTest extends OrderTestBase {
     $this->drupalGet('/admin/commerce/config/order-types');
     $this->clickLink('Add a new order type');
 
-    $values = array(
+    $values = [
       'id' => 'foo',
       'label' => 'Label of foo',
-    );
+    ];
     $this->drupalPostForm(NULL, $values, t('Save'));
 
     $type_exists = (bool) OrderType::load($values['id']);
@@ -63,11 +63,10 @@ class OrderTypeTest extends OrderTestBase {
     commerce_order_add_line_items_field($type);
 
     // Create a order.
-    $order = $this->createEntity('commerce_order', array(
-        'type' => $type->id(),
-        'mail' => $this->loggedInUser->getEmail(),
-      )
-    );
+    $order = $this->createEntity('commerce_order', [
+      'type' => $type->id(),
+      'mail' => $this->loggedInUser->getEmail(),
+    ]);
 
     // Try to delete the order type.
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
@@ -80,11 +79,7 @@ class OrderTypeTest extends OrderTestBase {
     // Deleting the order type when its not being referenced by a order.
     $order->delete();
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
-    $this->assertRaw(
-      t('Are you sure you want to delete the order type %label?', array(
-        '%label' => $type->label(),
-      ))
-    );
+    $this->assertRaw(t('Are you sure you want to delete the order type %label?', ['%label' => $type->label()]));
     $this->assertText(t('This action cannot be undone.'), 'The order type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $type_exists = (bool) OrderType::load($type->id());

@@ -17,7 +17,7 @@ class LineItemMatcher implements LineItemMatcherInterface {
    *
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
-  protected $event_dispatcher;
+  protected $eventDispatcher;
 
   /**
    * Constructs a new LineItemMatcher object.
@@ -26,7 +26,7 @@ class LineItemMatcher implements LineItemMatcherInterface {
    *   The event dispatcher.
    */
   public function __construct(EventDispatcherInterface $event_dispatcher) {
-    $this->event_dispatcher = $event_dispatcher;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -49,7 +49,7 @@ class LineItemMatcher implements LineItemMatcherInterface {
 
     $comparison_fields = ['type', 'purchased_entity'];
     $event = new LineItemComparisonFieldsEvent($comparison_fields, $line_item);
-    $this->event_dispatcher->dispatch(CartEvents::LINE_ITEM_COMPARISON_FIELDS, $event);
+    $this->eventDispatcher->dispatch(CartEvents::LINE_ITEM_COMPARISON_FIELDS, $event);
     $comparison_fields = $event->getComparisonFields();
 
     $matched_line_items = [];

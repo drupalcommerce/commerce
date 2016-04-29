@@ -74,7 +74,7 @@ class CartTest extends OrderTestBase {
 
     // Confirm the presence and functioning of the Remove button.
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-remove-button')]", NULL, 'Remove button is present.');
-    $this->drupalPostForm(NULL, array(), t('Remove'));
+    $this->drupalPostForm(NULL, [], t('Remove'));
     $this->assertText(t('Your shopping cart is empty.'), 'Product removed, cart empty.');
   }
 
