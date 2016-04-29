@@ -96,7 +96,9 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {}
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    return $form;
+  }
 
   /**
    * {@inheritdoc}
