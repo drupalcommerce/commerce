@@ -18,8 +18,7 @@ content:
   purchased_entity:
     type: commerce_product_variation_attributes
     weight: 0
-    settings:
-      attribute_widget_type: select
+    settings: { }
     third_party_settings: {  }
 hidden:
   created: true

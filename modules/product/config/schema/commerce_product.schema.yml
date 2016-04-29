@@ -42,6 +42,9 @@ commerce_product.commerce_product_attribute.*:
     label:
       type: label
       label: 'Label'
+    elementType:
+      type: string
+      label: 'Element type'
 
 field.formatter.settings.commerce_add_to_cart:
   type: mapping
@@ -55,14 +58,6 @@ field.formatter.settings.commerce_add_to_cart:
     combine:
       type: boolean
       label: 'Whether to attempt to combine line items containing the same product variation'
-
-field.widget.settings.commerce_product_variation_attributes:
-  type: mapping
-  label: 'Settings for the "Product variation attributes" widget'
-  mapping:
-    attribute_widget_type:
-      type: string
-      label: 'Attribute widget type'
 
 action.configuration.commerce_publish_product:
   type: action_configuration_default

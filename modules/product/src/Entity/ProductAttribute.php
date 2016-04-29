@@ -39,7 +39,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   },
  *   config_export = {
  *     "id",
- *     "label"
+ *     "label",
+ *     "elementType"
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/product-attributes/add",
@@ -68,11 +69,25 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
   protected $label;
 
   /**
+   * The attribute element type.
+   *
+   * @var string
+   */
+  protected $elementType = 'select';
+
+  /**
    * {@inheritdoc}
    */
   public function getValues() {
     $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute_value');
     return $storage->loadByProperties(['attribute' => $this->id]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getElementType() {
+    return $this->elementType;
   }
 
   /**

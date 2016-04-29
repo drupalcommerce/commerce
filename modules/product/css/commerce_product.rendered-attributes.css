@@ -1,0 +1,19 @@
+/**
+ * @file
+ * Styles for the rendered product attributes element.
+ */
+
+.product--rendered-attribute .form-item {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 2px;
+}
+.product--rendered-attribute label.option {
+  display: inline-block;
+}
+.product--rendered-attribute .form-radio {
+  display: none;
+}
+.product--rendered-attribute__selected ~ label.option {
+  border: 1px solid;
+}

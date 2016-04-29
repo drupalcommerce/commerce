@@ -125,6 +125,7 @@ class ProductAttributeValue extends ContentEntityBase implements ProductAttribut
         'type' => 'string_textfield',
         'weight' => -5,
       ])
+      ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')

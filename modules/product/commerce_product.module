@@ -149,7 +149,7 @@ function template_preprocess_commerce_product_variation(array &$variables) {
  *   - elements: An associative array containing rendered fields.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_commerce_product_commerce_product_attribute_value(array &$variables) {
+function template_preprocess_commerce_product_attribute_value(array &$variables) {
   /** @var Drupal\commerce_product\Entity\ProductAttributeValueInterface $product */
   $attribute_value = $variables['elements']['#commerce_product_attribute_value'];
 
