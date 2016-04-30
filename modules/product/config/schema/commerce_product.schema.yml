@@ -14,6 +14,9 @@ commerce_product.commerce_product_type.*:
     variationType:
       type: string
       label: 'Variation type'
+    injectVariationFields:
+      type: boolean
+      label: 'Inject product variation fields into the rendered product'
 
 commerce_product.commerce_product_variation_type.*:
   type: config_entity

@@ -186,6 +186,20 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDefaultVariation() {
+    foreach ($this->variations as $item) {
+      /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
+      $variation = $item->entity;
+      // Return the first active variation.
+      if ($variation->isActive()) {
+        return $variation;
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
