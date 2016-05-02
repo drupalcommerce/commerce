@@ -280,7 +280,7 @@ class AddToCartFormTest extends OrderTestBase {
     $color_attribute_values = $this->createAttributeSet($variation_type, 'color', [
       'cyan' => 'Cyan',
       'magenta' => 'Magenta',
-    ]);
+    ], TRUE);
     $color_attribute_values['cyan']->set('rendered_test', 'Cyan (Rendered)')->save();
     $color_attribute_values['cyan']->save();
     $color_attribute_values['magenta']->set('rendered_test', 'Magenta (Rendered)')->save();
