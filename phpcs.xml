@@ -28,9 +28,6 @@
  <rule ref="Drupal.Commenting.ClassComment.Missing">
   <severity>0</severity>
  </rule>
- <rule ref="Drupal.Commenting.FunctionComment.Missing">
-  <severity>0</severity>
- </rule>
  <!-- Needs manual work to be fixed -->
  <rule ref="Squiz.Scope.MethodScope.Missing">
   <severity>0</severity>
