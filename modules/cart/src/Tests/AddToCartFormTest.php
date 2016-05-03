@@ -326,7 +326,7 @@ class AddToCartFormTest extends OrderTestBase {
   /**
    * Tests that an optional attribute field is required if only one value.
    */
-  public function testProductOptionalAttributeRequiredSingle() {
+  public function testProductOptionalAttribute() {
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
 
@@ -360,7 +360,7 @@ class AddToCartFormTest extends OrderTestBase {
     $variations = [
       $this->variation,
     ];
-    // Generate variations off of the attributes values matrix.
+    // Generate vartestsiations off of the attributes values matrix.
     foreach ($attribute_values_matrix as $key => $value) {
       $variation = $this->createEntity('commerce_product_variation', [
         'type' => $variation_type->id(),
@@ -379,6 +379,7 @@ class AddToCartFormTest extends OrderTestBase {
 
     // Go to the product.
     $this->drupalGet($product->toUrl());
+    // Color attribute field should be disabled and required.
     $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled and @required]', [
       ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-attribute-color',
     ]);
@@ -386,61 +387,14 @@ class AddToCartFormTest extends OrderTestBase {
 
     // Also the other fields should be there.
     $this->assertFieldByName('purchased_entity[0][attributes][attribute_size]', NULL, 'Size field is present');
-  }
 
-  /**
-   * Tests that an optional attribute field is hidden if no value.
-   */
-  public function testOptionalProductAttributeHidden() {
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = ProductVariationType::load($this->variation->bundle());
-
-    $size_attributes = $this->createAttributeSet($variation_type, 'size', [
-      'small' => 'Small',
-      'medium' => 'Medium',
-      'large' => 'Large',
-    ]);
-    $color_attributes = $this->createAttributeSet($variation_type, 'color', [
-      'red' => 'Red',
-    ]);
-
-    // Set the color field to non required.
-    $color_field = \Drupal::entityManager()->getStorage('field_config')->load('commerce_product_variation.default.attribute_color');
-    $color_field->setRequired(TRUE);
-    $color_field->save();
-
-    // Reload the variation since we have new fields.
-    $this->variation = ProductVariation::load($this->variation->id());
-    $product = $this->variation->getProduct();
-
-    // Update first variation to have the attribute's value.
-    $this->variation->attribute_size = $size_attributes['small']->id();
-    $this->variation->save();
-
-    $attribute_values_matrix = [
-      ['medium'],
-      ['large'],
-    ];
-    $variations = [
-      $this->variation,
-    ];
-    // Generate variations off of the attributes values matrix.
-    foreach ($attribute_values_matrix as $key => $value) {
-      $variation = $this->createEntity('commerce_product_variation', [
-        'type' => $variation_type->id(),
-        'sku' => $this->randomMachineName(),
-        'price' => [
-          'amount' => 999,
-          'currency_code' => 'USD',
-        ],
-        'attribute_size' => $size_attributes[$value[0]]->id(),
-      ]);
-      $variations[] = $variation;
-      $product->variations->appendItem($variation);
+    // Change the variation configuration.
+    foreach ($variations as $variation) {
+      $variation->attribute_color = NULL;
+      $this->variation->save();
     }
-    $product->save();
 
-    // Go to the product.
+    // Modify the variation.
     $this->drupalGet($product->toUrl());
 
     // Check that the correct fields are presented.
