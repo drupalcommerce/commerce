@@ -35,7 +35,7 @@ class CartRefreshTest extends CommerceTestBase {
   /**
    * Tests shopping cart refresh options in order type form.
    */
-  function testCartRefreshSettings() {
+  public function testCartRefreshSettings() {
     $url = 'admin/commerce/config/order-types/default/edit';
     $this->drupalGet($url);
     $this->assertField('commerce_cart[refresh_mode]', 'Shopping cart refresh mode field found.');

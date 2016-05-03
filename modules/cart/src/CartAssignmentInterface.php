@@ -26,7 +26,7 @@ interface CartAssignmentInterface {
    * Assigns the anonymous cart order to the given user account.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
-   *   The cart order
+   *   The cart order.
    * @param \Drupal\user\UserInterface $account
    *   The user account.
    */

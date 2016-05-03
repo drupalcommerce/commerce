@@ -19,6 +19,9 @@ class OrderAdminTest extends OrderTestBase {
    */
   protected $billingProfile;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     \Drupal::service('module_installer')->install(['profile']);

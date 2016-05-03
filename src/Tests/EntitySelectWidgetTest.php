@@ -83,7 +83,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
   /**
    * Tests widget's hidden input type.
    */
-  function testWidget() {
+  public function testWidget() {
     $form_url = 'product/' . $this->product->id() . '/edit';
     // Create the first store. Since the field is required, the widget
     // should be a hidden element.

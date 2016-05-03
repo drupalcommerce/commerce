@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Tests\AddToCartFormTest.
- */
-
 namespace Drupal\commerce_cart\Tests;
 
 use Drupal\commerce_order\Entity\LineItemInterface;

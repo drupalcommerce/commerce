@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\commerce\Unit\Resolver\DefaultLocaleResolverTest.
- */
-
 namespace Drupal\Tests\commerce\Unit\Resolver;
 
 use Drupal\commerce\Resolver\DefaultLocaleResolver;

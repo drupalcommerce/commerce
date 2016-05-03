@@ -25,7 +25,7 @@ class CurrencyTest extends CommerceTestBase {
   /**
    * Tests importing a currency.
    */
-  function testCurrencyImport() {
+  public function testCurrencyImport() {
     $this->drupalGet('admin/commerce/config/currency/import');
     $edit = [
       'currency_codes[]' => ['CHF'],
@@ -42,7 +42,7 @@ class CurrencyTest extends CommerceTestBase {
   /**
    * Tests creating a currency.
    */
-  function testCurrencyCreation() {
+  public function testCurrencyCreation() {
     $this->drupalGet('admin/commerce/config/currency');
     $this->clickLink('Add a new currency');
     $edit = [
@@ -66,7 +66,7 @@ class CurrencyTest extends CommerceTestBase {
   /**
    * Tests editing a currency.
    */
-  function testCurrencyEditing() {
+  public function testCurrencyEditing() {
     $this->createEntity('commerce_currency', [
       'currencyCode' => 'XXX',
       'name' => 'Test currency',
@@ -89,7 +89,7 @@ class CurrencyTest extends CommerceTestBase {
   /**
    * Tests deleting a currency via the admin.
    */
-  function testCurrencyDeletion() {
+  public function testCurrencyDeletion() {
     $currency = $this->createEntity('commerce_currency', [
       'currencyCode' => 'XXX',
       'name' => 'Test currency',

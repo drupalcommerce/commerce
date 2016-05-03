@@ -26,7 +26,7 @@ class ProductTypeTest extends ProductTestBase {
   /**
    * Tests creating a product type programmatically and via a form.
    */
-  function testProductTypeCreation() {
+  public function testProductTypeCreation() {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
@@ -61,7 +61,7 @@ class ProductTypeTest extends ProductTestBase {
   /**
    * Tests editing a product type using the UI.
    */
-  function testProductTypeEditing() {
+  public function testProductTypeEditing() {
     $edit = [
       'label' => 'Default2',
       'description' => 'New description.',

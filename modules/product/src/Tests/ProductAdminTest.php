@@ -15,7 +15,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests creating a product.
    */
-  function testCreateProduct() {
+  public function testCreateProduct() {
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add product');
     // Check the integrity of the add form.
@@ -72,7 +72,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests editing a product.
    */
-  function testEditProduct() {
+  public function testEditProduct() {
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
@@ -127,7 +127,7 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests deleting a product.
    */
-  function testDeleteProduct() {
+  public function testDeleteProduct() {
     $product = $this->createEntity('commerce_product', [
       'title' => $this->randomMachineName(),
       'type' => 'default',
