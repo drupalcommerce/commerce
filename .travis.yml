@@ -101,7 +101,7 @@ mysql:
 
 before_install:
   # Remove xdebug. We aren't generating code coverage, and it slows down Composer.
-  - rm /home/travis/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+  - phpenv config-rm xdebug.ini || true
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer self-update
