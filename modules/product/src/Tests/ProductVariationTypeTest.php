@@ -38,7 +38,7 @@ class ProductVariationTypeTest extends ProductTestBase {
   /**
    * Tests creating a product variation type programmatically and via a form.
    */
-  function testProductVariationTypeCreation() {
+  public function testProductVariationTypeCreation() {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
@@ -64,7 +64,7 @@ class ProductVariationTypeTest extends ProductTestBase {
   /**
    * Tests editing a product variation type using the UI.
    */
-  function testProductVariationTypeEditing() {
+  public function testProductVariationTypeEditing() {
     $edit = [
       'label' => 'Default2',
     ];
@@ -111,7 +111,7 @@ class ProductVariationTypeTest extends ProductTestBase {
   /**
    * Tests the attributes element on the product variation type form.
    */
-  function testProductVariationTypeAttributes() {
+  public function testProductVariationTypeAttributes() {
     $edit = [
       'label' => 'Default',
       'lineItemType' => 'product_variation',

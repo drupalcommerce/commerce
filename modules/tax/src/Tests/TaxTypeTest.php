@@ -60,7 +60,7 @@ class TaxTypeTest extends TaxTestBase {
   /**
    * Tests editing a tax type via a form.
    */
-  function testTaxTypeEditing() {
+  public function testTaxTypeEditing() {
     $values = [
       'id' => strtolower($this->randomMachineName(5)),
       'name' => $this->randomMachineName(5),

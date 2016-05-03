@@ -48,7 +48,7 @@ class ProductVariationStorageTest extends EntityKernelTestBase {
   /**
    * Tests loadEnabled() function.
    */
-  function testLoadEnabled() {
+  public function testLoadEnabled() {
     $variations = [];
     for ($i = 1; $i <= 3; $i++) {
       $variation = ProductVariation::create([
