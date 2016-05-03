@@ -324,9 +324,9 @@ class AddToCartFormTest extends OrderTestBase {
   }
 
   /**
-   * Tests that an attribute field is hidden if there's no value.
+   * Tests that an optional attribute field is required if only one value.
    */
-  public function testProductAttributeHiddenIfNone() {
+  public function testProductOptionalAttributeRequiredSingle() {
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
 
@@ -338,6 +338,11 @@ class AddToCartFormTest extends OrderTestBase {
     $color_attributes = $this->createAttributeSet($variation_type, 'color', [
       'red' => 'Red',
     ]);
+
+    // Set the color field to non required.
+    $color_field = \Drupal::entityManager()->getStorage('field_config')->load('commerce_product_variation.default.attribute_color');
+    $color_field->setRequired(TRUE);
+    $color_field->save();
 
     // Reload the variation since we have new fields.
     $this->variation = ProductVariation::load($this->variation->id());
@@ -372,17 +377,75 @@ class AddToCartFormTest extends OrderTestBase {
     }
     $product->save();
 
+    // Go to the product.
+    $this->drupalGet($product->toUrl());
+    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled and @required]', [
+      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-attribute-color',
+    ]);
+    $this->assertTrue(isset($selects[0]));
+
+    // Also the other fields should be there.
+    $this->assertFieldByName('purchased_entity[0][attributes][attribute_size]', NULL, 'Size field is present');
+  }
+
+  /**
+   * Tests that an optional attribute field is hidden if no value.
+   */
+  public function testOptionalProductAttributeHidden() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $size_attributes = $this->createAttributeSet($variation_type, 'size', [
+      'small' => 'Small',
+      'medium' => 'Medium',
+      'large' => 'Large',
+    ]);
+    $color_attributes = $this->createAttributeSet($variation_type, 'color', [
+      'red' => 'Red',
+    ]);
+
     // Set the color field to non required.
     $color_field = \Drupal::entityManager()->getStorage('field_config')->load('commerce_product_variation.default.attribute_color');
     $color_field->setRequired(TRUE);
     $color_field->save();
 
+    // Reload the variation since we have new fields.
+    $this->variation = ProductVariation::load($this->variation->id());
+    $product = $this->variation->getProduct();
+
+    // Update first variation to have the attribute's value.
+    $this->variation->attribute_size = $size_attributes['small']->id();
+    $this->variation->save();
+
+    $attribute_values_matrix = [
+      ['medium'],
+      ['large'],
+    ];
+    $variations = [
+      $this->variation,
+    ];
+    // Generate variations off of the attributes values matrix.
+    foreach ($attribute_values_matrix as $key => $value) {
+      $variation = $this->createEntity('commerce_product_variation', [
+        'type' => $variation_type->id(),
+        'sku' => $this->randomMachineName(),
+        'price' => [
+          'amount' => 999,
+          'currency_code' => 'USD',
+        ],
+        'attribute_size' => $size_attributes[$value[0]]->id(),
+      ]);
+      $variations[] = $variation;
+      $product->variations->appendItem($variation);
+    }
+    $product->save();
+
     // Go to the product.
     $this->drupalGet($product->toUrl());
-    $selects = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector and @disabled]', [
-      ':data_drupal_selector' => 'edit-purchased-entity-0-attributes-attribute-color',
-    ]);
-    $this->assertTrue(isset($selects[0]));
+
+    // Check that the correct fields are presented.
+    $this->assertNoFieldByName('purchased_entity[0][attributes][attribute_color]', NULL, 'Color field not present');
+    $this->assertFieldByName('purchased_entity[0][attributes][attribute_size]', NULL, 'Size field is present');
   }
 
   /**
