@@ -24,30 +24,29 @@
  -->
  <rule ref="Drupal"/>
 
+ <!-- The following rules should be kept excluded -->
  <!-- Can be fixed automatically -->
  <rule ref="Drupal.Commenting.ClassComment.Missing">
   <severity>0</severity>
  </rule>
  <!-- Needs manual work to be fixed -->
+ <rule ref="Drupal.Files.LineLength.TooLong">
+  <severity>0</severity>
+ </rule>
+ <!-- end -->
+
+ <!-- The following rules needs fixing -->
+ <!-- Needs manual work to be fixed -->
  <rule ref="Drupal.Commenting.FunctionComment.MissingParamType">
   <severity>0</severity>
  </rule>
- <rule ref="Drupal.Semantics.FunctionT.BackslashSingleQuote">
-  <severity>0</severity>
- </rule>
  <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Files.LineLength.TooLong">
   <severity>0</severity>
  </rule>
  <rule ref="Drupal.Commenting.InlineComment.DocBlock">
   <severity>0</severity>
  </rule>
  <rule ref="Drupal.Commenting.FunctionComment.MissingParamName">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Semantics.FunctionT.NotLiteralString">
   <severity>0</severity>
  </rule>
  <rule ref="Drupal.Commenting.DocComment.MissingShort">
@@ -62,16 +61,19 @@
  <rule ref="Drupal.Commenting.FunctionComment.MissingParamComment">
   <severity>0</severity>
  </rule>
- <rule ref="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps">
+ <rule ref="Drupal.Semantics.FunctionT.BackslashSingleQuote">
   <severity>0</severity>
  </rule>
- <rule ref="Drupal.Array.Array.LongLineDeclaration">
+ <rule ref="Drupal.Semantics.FunctionT.NotLiteralString">
+  <severity>0</severity>
+ </rule>
+ <rule ref="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps">
   <severity>0</severity>
  </rule>
  <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
   <severity>0</severity>
  </rule>
- <rule ref="Drupal.Commenting.FunctionComment.ParamCommentFullStop">
+ <rule ref="Drupal.Array.Array.LongLineDeclaration">
   <severity>0</severity>
  </rule>
 </ruleset>
