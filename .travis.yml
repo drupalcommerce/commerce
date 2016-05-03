@@ -106,6 +106,9 @@ before_install:
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer self-update
   - composer global require "lionsad/drupal_ti:dev-master"
+  - composer global require "squizlabs/php_codesniffer:2.*"
+  - composer global require "drupal/coder:8.2.*"
+  - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
   - drupal-ti before_install
 
 install:
@@ -116,6 +119,8 @@ before_script:
   - drupal-ti before_script
 
 script:
+  - phpcs --standard=phpcs.xml src -s
+  - phpcs --standard=phpcs.xml modules -s
   - drupal-ti script
 
 after_script:
