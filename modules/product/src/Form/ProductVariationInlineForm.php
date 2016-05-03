@@ -86,7 +86,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
   /**
    * Loads and returns a product variation type with the given id.
    *
-   * @param $variation_type_id
+   * @param string $variation_type_id
    *   The ID of the variation type.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationTypeInterface

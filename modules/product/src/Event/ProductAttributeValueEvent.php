@@ -33,6 +33,7 @@ class ProductAttributeValueEvent extends Event {
    * The attribute value the event refers to.
    *
    * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface
+   *   The ProductAttributeValueInterface object.
    */
   public function getAttributeValue() {
     return $this->attributeValue;

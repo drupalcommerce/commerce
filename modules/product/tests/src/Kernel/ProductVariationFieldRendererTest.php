@@ -105,6 +105,8 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
   }
 
   /**
+   * Test of getting field definitions.
+   *
    * @covers ::getFieldDefinitions
    */
   public function testGetFieldDefinitions() {
@@ -118,6 +120,8 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
   }
 
   /**
+   * Test render fields.
+   *
    * @covers ::renderFields
    * @covers ::renderField
    */

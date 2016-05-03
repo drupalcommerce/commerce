@@ -27,9 +27,11 @@ class ChainStoreResolverTest extends UnitTestCase {
   }
 
   /**
-   * ::covers addResolver
-   * ::covers getResolvers
-   * ::covers resolve.
+   * Test resolver.
+   *
+   * @covers ::addResolver
+   * @covers ::getResolvers
+   * @covers ::resolve
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce_store\Resolver\StoreResolverInterface')

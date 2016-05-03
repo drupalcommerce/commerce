@@ -1,79 +1,32 @@
 <?xml version="1.0"?>
 <ruleset name="Commerce coding standards">
 
- <!--
-    The name attribute of the ruleset tag is displayed
-    when running PHP_CodeSniffer with the -v command line
-    argument. The description tag below is not displayed anywhere
-    except in this file, so it can contain information for
-    developers who may change this file in the future.
- -->
  <description>Drupal 8 coding standards</description>
 
- <exclude-pattern>.git/*</exclude-pattern>
- <exclude-pattern>config/*</exclude-pattern>
- <exclude-pattern>css/*</exclude-pattern>
- <exclude-pattern>icons/*</exclude-pattern>
- <exclude-pattern>vendor/*</exclude-pattern>
+ <exclude-pattern>*/.git/*</exclude-pattern>
+ <exclude-pattern>*/config/*</exclude-pattern>
+ <exclude-pattern>*/css/*</exclude-pattern>
+ <exclude-pattern>*/icons/*</exclude-pattern>
+ <exclude-pattern>*/vendor/*</exclude-pattern>
 
- <!--
-    Include all sniffs in the PEAR standard. Note that the
-    path to the standard does not have to be specified as the
-    PEAR standard exists inside the PHP_CodeSniffer install
-    directory.
- -->
  <rule ref="Drupal"/>
 
- <!-- The following rules should be kept excluded -->
- <!-- Can be fixed automatically -->
- <rule ref="Drupal.Commenting.ClassComment.Missing">
-  <severity>0</severity>
- </rule>
- <!-- Needs manual work to be fixed -->
+ <!-- Rewrote to warning instead of error -->
  <rule ref="Drupal.Files.LineLength.TooLong">
-  <severity>0</severity>
+  <message>We are accepting that the line length is too long</message>
+  <type>warning</type>
  </rule>
- <!-- end -->
-
- <!-- The following rules needs fixing -->
- <!-- Needs manual work to be fixed -->
- <rule ref="Drupal.Commenting.FunctionComment.MissingParamType">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.InlineComment.DocBlock">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.FunctionComment.MissingParamName">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.MissingShort">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.ShortSingleLine">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.ShortNotCapital">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.FunctionComment.MissingParamComment">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Semantics.FunctionT.BackslashSingleQuote">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Semantics.FunctionT.NotLiteralString">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps">
-  <severity>0</severity>
+ <rule ref="Drupal.Commenting.ClassComment.Missing">
+  <message>We are leaving ClassComment out on purpose</message>
+  <type>warning</type>
+  </rule>
+ <rule ref="Drupal.Array.Array.LongLineDeclaration">
+  <message>We ignore to split long arrays because it is more readable not to</message>
+  <type>warning</type>
  </rule>
  <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Array.Array.LongLineDeclaration">
-  <severity>0</severity>
+  <message>We ignore variable name in lower camel for this particular file</message>
+  <type>warning</type>
+  <exclude-pattern>*/modules/checkout/src/Annotation/CommerceCheckoutPane.php</exclude-pattern>
  </rule>
 </ruleset>

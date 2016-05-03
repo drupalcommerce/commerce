@@ -6,12 +6,17 @@ use Drupal\commerce\Resolver\ChainCountryResolver;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass  Drupal\commerce\Resolver\ChainCountryResolver
+ * Test for ChainCountryResolver.
+ *
+ * @coversDefaultClass Drupal\commerce\Resolver\ChainCountryResolver
+ *
  * @group commerce
  */
 class ChainCountryResolverTest extends UnitTestCase {
 
   /**
+   * ChainCountryResolver object.
+   *
    * @var \Drupal\commerce\Resolver\ChainCountryResolver
    */
   protected $chainCountryResolver;
@@ -25,9 +30,11 @@ class ChainCountryResolverTest extends UnitTestCase {
   }
 
   /**
-   * ::covers addResolver
-   * ::covers getResolvers
-   * ::covers resolve.
+   * Test resolver.
+   *
+   * @covers ::addResolver
+   * @covers ::getResolvers
+   * @covers ::resolve
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\Resolver\CountryResolverInterface')

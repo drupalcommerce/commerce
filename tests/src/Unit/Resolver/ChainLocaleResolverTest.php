@@ -6,12 +6,17 @@ use Drupal\commerce\Resolver\ChainLocaleResolver;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass  Drupal\commerce\Resolver\ChainLocaleResolver
+ * Test for ChainLocaleResolver.
+ *
+ * @coversDefaultClass Drupal\commerce\Resolver\ChainLocaleResolver
+ *
  * @group commerce
  */
 class ChainLocaleResolverTest extends UnitTestCase {
 
   /**
+   * ChainLocaleResolver object.
+   *
    * @var \Drupal\commerce\Resolver\ChainLocaleResolver
    */
   protected $chainLocaleResolver;
@@ -25,9 +30,11 @@ class ChainLocaleResolverTest extends UnitTestCase {
   }
 
   /**
-   * ::covers addResolver
-   * ::covers getResolvers
-   * ::covers resolve.
+   * Test resolve.
+   *
+   * @covers ::addResolver
+   * @covers ::getResolvers
+   * @covers ::resolve
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\Resolver\LocaleResolverInterface')

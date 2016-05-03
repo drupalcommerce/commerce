@@ -51,6 +51,8 @@ class OrderTest extends KernelTestBase {
   }
 
   /**
+   * Test order.
+   *
    * @covers ::getState
    * @covers ::getOrderNumber
    * @covers ::setOrderNumber

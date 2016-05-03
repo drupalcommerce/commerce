@@ -35,7 +35,7 @@ class Store extends Field {
 
     $form['hide_single_store'] = [
       '#type' => 'checkbox',
-      '#title' => t('Hide if there\'s only one store.'),
+      '#title' => t("Hide if there's only one store."),
       '#default_value' => $this->options['hide_single_store'],
     ];
   }

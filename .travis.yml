@@ -119,10 +119,10 @@ before_script:
   - drupal-ti before_script
 
 script:
-  - phpcs --standard=phpcs.xml src -s
-  - phpcs --standard=phpcs.xml modules -s
-  - phpcs --standard=phpcs.xml tests -s
-  - phpcs --standard=phpcs.xml commerce.module
+  - phpcs --runtime-set ignore_warnings_on_exit 1 src -s
+  - phpcs --runtime-set ignore_warnings_on_exit 1 modules -s
+  - phpcs --runtime-set ignore_warnings_on_exit 1 tests -s
+  - phpcs --runtime-set ignore_warnings_on_exit 1 commerce.module
   - drupal-ti script
 
 after_script:

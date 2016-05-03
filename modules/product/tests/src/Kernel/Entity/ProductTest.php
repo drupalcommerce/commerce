@@ -40,6 +40,8 @@ class ProductTest extends KernelTestBase {
   }
 
   /**
+   * Test of getting default variation.
+   *
    * @covers ::getDefaultVariation
    */
   public function testGetDefaultVariation() {

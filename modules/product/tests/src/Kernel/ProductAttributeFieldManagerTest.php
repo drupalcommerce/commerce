@@ -62,6 +62,8 @@ class ProductAttributeFieldManagerTest extends KernelTestBase {
   }
 
   /**
+   * Test manager.
+   *
    * @covers ::getFieldDefinitions
    * @covers ::getFieldMap
    * @covers ::clearCaches

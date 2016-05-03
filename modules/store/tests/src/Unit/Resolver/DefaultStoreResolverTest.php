@@ -41,6 +41,8 @@ class DefaultStoreResolverTest extends UnitTestCase {
   }
 
   /**
+   * Test resolve.
+   *
    * @covers ::resolve
    */
   public function testResolve() {

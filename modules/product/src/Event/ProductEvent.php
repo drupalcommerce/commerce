@@ -33,6 +33,7 @@ class ProductEvent extends Event {
    * The product the event refers to.
    *
    * @return \Drupal\commerce_product\Entity\ProductInterface
+   *   The ProductInterface object.
    */
   public function getProduct() {
     return $this->product;

@@ -38,6 +38,7 @@ class FilterVariationsEvent extends Event {
    * Sets the enabled variations.
    *
    * @param array $variations
+   *   Variations to be set.
    */
   public function setVariations(array $variations) {
     $this->variations = $variations;
@@ -47,6 +48,7 @@ class FilterVariationsEvent extends Event {
    * Gets the enabled variations.
    *
    * @return array
+   *   Array with variations.
    */
   public function getVariations() {
     return $this->variations;
