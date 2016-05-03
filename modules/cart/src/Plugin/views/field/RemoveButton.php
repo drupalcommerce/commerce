@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Plugin\views\field\RemoveButton.
- */
-
 namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
