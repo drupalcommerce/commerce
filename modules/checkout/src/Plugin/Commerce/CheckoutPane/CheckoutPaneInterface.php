@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Defines the interface for checkout panes.
- * 
+ *
  * Checkout panes are configurable forms embedded into the checkout flow form.
  */
 interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
@@ -25,7 +25,7 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
 
   /**
    * Gets the pane label.
-   * 
+   *
    * @return string
    *   The pane label.
    */
@@ -88,7 +88,7 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    *   An HTML summary of the pane configuration.
    */
   public function buildConfigurationSummary();
-  
+
   /**
    * Determines whether the pane is visible.
    *

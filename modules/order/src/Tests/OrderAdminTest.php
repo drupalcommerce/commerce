@@ -13,7 +13,7 @@ use Drupal\profile\Entity\Profile;
 class OrderAdminTest extends OrderTestBase {
 
   /**
-   * The profile to test against
+   * The profile to test against.
    *
    * @var \Drupal\profile\Entity\Profile
    */

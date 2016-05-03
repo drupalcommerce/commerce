@@ -27,7 +27,7 @@ class AvailabilityManagerTest extends UnitTestCase {
   /**
    * ::covers addChecker
    * ::covers getCheckers
-   * ::covers check
+   * ::covers check.
    */
   public function testCheck() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\AvailabilityCheckerInterface')

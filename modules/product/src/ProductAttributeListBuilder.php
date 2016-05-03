@@ -30,7 +30,6 @@ class ProductAttributeListBuilder extends ConfigEntityListBuilder {
     return $operations;
   }
 
-
   /**
    * {@inheritdoc}
    */

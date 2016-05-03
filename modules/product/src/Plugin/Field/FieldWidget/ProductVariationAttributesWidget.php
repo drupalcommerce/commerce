@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Plugin implementation of the 'commerce_product_variation_attributes' widget.
  *
  * The widget form depends on the 'product' being present in $form_state.
+ *
  * @see \Drupal\commerce_product\Plugin\Field\FieldFormatter\AddToCartFormatter::viewElements().
  *
  * @FieldWidget(

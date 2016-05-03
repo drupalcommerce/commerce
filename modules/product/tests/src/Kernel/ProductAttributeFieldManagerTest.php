@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
  * Tests the attribute field manager.
  *
  * @coversDefaultClass \Drupal\commerce_product\ProductAttributeFieldManager
+ *
  * @group commerce
  */
 class ProductAttributeFieldManagerTest extends KernelTestBase {
@@ -27,8 +28,9 @@ class ProductAttributeFieldManagerTest extends KernelTestBase {
    * @var array
    */
   public static $modules = ['system', 'field', 'options', 'user', 'path', 'text',
-    'entity', 'views', 'address', 'inline_entity_form',  'commerce',
-    'commerce_price', 'commerce_store', 'commerce_product'];
+    'entity', 'views', 'address', 'inline_entity_form', 'commerce',
+    'commerce_price', 'commerce_store', 'commerce_product',
+  ];
 
   /**
    * {@inheritdoc}

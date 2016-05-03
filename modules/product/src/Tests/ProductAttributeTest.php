@@ -3,7 +3,6 @@
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
-use Drupal\commerce_product\Entity\ProductVariationType;
 
 /**
  * Create, edit, delete, and change product attributes.

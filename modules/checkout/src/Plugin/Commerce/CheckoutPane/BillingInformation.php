@@ -81,7 +81,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
     if ($billing_profile = $this->order->getBillingProfile()) {
       $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
       $summary = $profile_view_builder->view($billing_profile, 'default');
-      $summary =  $this->renderer->render($summary);
+      $summary = $this->renderer->render($summary);
     }
     return $summary;
   }

@@ -90,7 +90,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
     $this->createStores(1);
     $store_id = $this->stores[0]->id();
     $this->drupalGet($form_url);
-    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $store_id .'"]', NULL, 'Stores field is displayed as a hidden element.');
+    $this->assertFieldByXpath('//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $store_id . '"]', NULL, 'Stores field is displayed as a hidden element.');
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
@@ -102,8 +102,8 @@ class EntitySelectWidgetTest extends CommerceTestBase {
     $this->assertNoFieldChecked('edit-stores-target-id-value-1');
     $this->assertNoFieldChecked('edit-stores-target-id-value-2');
     // Check store 1.
-    $edit['stores[target_id][value][' . $store_ids[0] .']'] = $store_ids[0];
-    $edit['stores[target_id][value][' . $store_ids[1] .']'] = FALSE;
+    $edit['stores[target_id][value][' . $store_ids[0] . ']'] = $store_ids[0];
+    $edit['stores[target_id][value][' . $store_ids[1] . ']'] = FALSE;
     $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertResponse(200);
     \Drupal::entityTypeManager()->getStorage('commerce_product')->resetCache();

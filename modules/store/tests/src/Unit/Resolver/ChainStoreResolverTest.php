@@ -19,8 +19,8 @@ class ChainStoreResolverTest extends UnitTestCase {
   protected $resolver;
 
   /**
-  * {@inheritdoc}
-  */
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     $this->resolver = new ChainStoreResolver();
@@ -29,7 +29,7 @@ class ChainStoreResolverTest extends UnitTestCase {
   /**
    * ::covers addResolver
    * ::covers getResolvers
-   * ::covers resolve
+   * ::covers resolve.
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce_store\Resolver\StoreResolverInterface')
@@ -52,7 +52,7 @@ class ChainStoreResolverTest extends UnitTestCase {
     $this->resolver->addResolver($second_resolver);
     $this->resolver->addResolver($third_resolver);
 
-    $resolvers =  $this->resolver->getResolvers();
+    $resolvers = $this->resolver->getResolvers();
     $this->assertEquals([$first_resolver, $second_resolver, $third_resolver], $resolvers);
 
     $result = $this->resolver->resolve();

@@ -143,7 +143,7 @@ class OrderForm extends ContentEntityForm {
     return [
       '#type' => 'item',
       '#wrapper_attributes' => [
-        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline']
+        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline'],
       ],
       '#markup' => '<h4 class="label inline">' . $label . '</h4> ' . $value,
     ];

@@ -189,7 +189,7 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
    * {@inheritdoc}
    */
   public function getAmount(\DateTime $date) {
-    return null;
+    return NULL;
   }
 
   /**
@@ -242,7 +242,7 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
     }
 
     return $parameters;
-   }
+  }
 
   /**
    * {@inheritdoc}

@@ -73,7 +73,7 @@ class LineItemTypeTest extends OrderTestBase {
     $line_item_type = $this->createEntity('commerce_line_item_type', $values);
 
     $this->drupalGet('admin/commerce/config/line-item-types/' . $line_item_type->id() . '/delete');
-    $this->assertResponse(200, 'line item type delete form can be accessed at admin/commerce/config/line-item-types/'. $line_item_type->id() . '/delete.');
+    $this->assertResponse(200, 'line item type delete form can be accessed at admin/commerce/config/line-item-types/' . $line_item_type->id() . '/delete.');
     $this->assertText(t('This action cannot be undone.'), 'The line item type deletion confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
     $line_item_type_exists = (bool) LineItemType::load($line_item_type->id());

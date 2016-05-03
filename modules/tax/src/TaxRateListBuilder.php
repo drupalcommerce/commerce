@@ -59,7 +59,7 @@ class TaxRateListBuilder extends ConfigEntityListBuilder {
     $operations['rate_amounts'] = [
       'title' => $this->t('View rate amounts'),
       'url' => Url::fromRoute('entity.commerce_tax_rate_amount.collection', [
-        'commerce_tax_rate' => $entity->id()
+        'commerce_tax_rate' => $entity->id(),
       ]),
     ];
 

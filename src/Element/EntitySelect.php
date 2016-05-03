@@ -30,6 +30,7 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#target_type' => 'commerce_store',
  *   '#multiple' => TRUE,
  * ];
+ *
  * @end
  *
  * @FormElement("commerce_entity_select")

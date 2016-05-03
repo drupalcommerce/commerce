@@ -3,14 +3,9 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\FieldConfigInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProductAttributeForm extends BundleEntityFormBase {
 

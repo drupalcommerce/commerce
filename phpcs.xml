@@ -25,88 +25,13 @@
  <rule ref="Drupal"/>
 
  <!-- Can be fixed automatically -->
- <rule ref="Squiz.Strings.ConcatenationSpacing.PaddingFound">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Array.Array.CommaLastItem">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.ScopeIndent.IncorrectExact">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Array.Array.ArrayClosingIndentation">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Array.Array.ArrayIndentation">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.ShortFullStop">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.TagGroupSpacing">
-  <severity>0</severity>
- </rule>
  <rule ref="Drupal.Commenting.ClassComment.Missing">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Classes.UnusedUseStatement.UnusedUse">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.ScopeClosingBrace.Indent">
-  <severity>0</severity>
- </rule>
- <rule ref="Generic.PHP.UpperCaseConstant.Found">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.OperatorSpacing.SpacingAfter">
-  <severity>0</severity>
- </rule>
- <rule ref="Squiz.Commenting.DocCommentAlignment.SpaceBeforeStar">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Classes.ClassDeclaration.CloseBraceAfterBody">
-  <severity>0</severity>
- </rule>
- <rule ref="Squiz.WhiteSpace.FunctionSpacing.After">
-  <severity>0</severity>
- </rule>
- <rule ref="Squiz.Arrays.ArrayDeclaration.CloseBraceNewLine">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.Comma.TooManySpaces">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.ControlStructures.ControlSignature.SpaceAfterKeyword">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.SpacingBeforeTags">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.InlineComment.InvalidEndChar">
   <severity>0</severity>
  </rule>
  <rule ref="Drupal.Commenting.FunctionComment.Missing">
   <severity>0</severity>
  </rule>
- <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace.EndLine">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.DocComment.LongFullStop">
-  <severity>0</severity>
- </rule>
  <rule ref="Drupal.Commenting.FileComment.NamespaceNoFileDoc">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.Commenting.FileComment.NamespaceNoFileDoc">
-  <severity>0</severity>
- </rule>
- <rule ref="Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace">
   <severity>0</severity>
  </rule>
  <!-- Needs manual work to be fixed -->

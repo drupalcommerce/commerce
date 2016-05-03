@@ -12,6 +12,7 @@ use Drupal\profile\Entity\Profile;
  * Tests the Order entity.
  *
  * @coversDefaultClass \Drupal\commerce_order\Entity\Order
+ *
  * @group commerce
  */
 class OrderTest extends KernelTestBase {
@@ -21,11 +22,13 @@ class OrderTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'entity',
-                            'views', 'address',  'profile', 'state_machine',
-                            'inline_entity_form',  'commerce', 'commerce_price',
-                            'commerce_store', 'commerce_product',
-                            'commerce_order'];
+  public static $modules = [
+    'system', 'field', 'options', 'user', 'entity',
+    'views', 'address', 'profile', 'state_machine',
+    'inline_entity_form', 'commerce', 'commerce_price',
+    'commerce_store', 'commerce_product',
+    'commerce_order',
+  ];
 
   /**
    * {@inheritdoc}

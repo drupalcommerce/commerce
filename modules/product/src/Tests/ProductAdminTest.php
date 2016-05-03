@@ -33,7 +33,7 @@ class ProductAdminTest extends ProductTestBase {
       'title[0][value]' => $title,
     ];
     foreach ($store_ids as $store_id) {
-      $edit['stores[target_id][value]['. $store_id .']'] = $store_id;
+      $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
     }
     $variation_sku = $this->randomMachineName();
     $variations_edit = [
@@ -101,7 +101,7 @@ class ProductAdminTest extends ProductTestBase {
       'title[0][value]' => $title,
     ];
     foreach ($store_ids as $store_id) {
-      $edit['stores[target_id][value]['. $store_id .']'] = $store_id;
+      $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
     }
     $new_sku = strtolower($this->randomMachineName());
     $new_price_amount = '1.11';

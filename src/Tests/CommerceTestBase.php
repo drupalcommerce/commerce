@@ -80,7 +80,7 @@ abstract class CommerceTestBase extends WebTestBase {
     $status = $entity->save();
     $this->assertEqual($status, SAVED_NEW, new FormattableMarkup('Created %label entity %type.', [
       '%label' => $entity->getEntityType()->getLabel(),
-      '%type' => $entity->id()
+      '%type' => $entity->id(),
     ]));
     // The newly saved entity isn't identical to a loaded one, and would fail
     // comparisons.

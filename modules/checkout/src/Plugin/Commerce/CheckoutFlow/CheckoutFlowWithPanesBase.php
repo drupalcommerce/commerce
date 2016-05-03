@@ -385,7 +385,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
       $summary = $pane->buildConfigurationSummary();
       if (!empty($summary)) {
         $pane_row['configuration_summary'] = [
-          '#markup' =>  $summary,
+          '#markup' => $summary,
           '#prefix' => '<div class="pane-configuration-summary">',
           '#suffix' => '</div>',
           '#wrapper_attributes' => [

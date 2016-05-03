@@ -32,7 +32,7 @@ class ChainLocaleResolverTest extends UnitTestCase {
   /**
    * ::covers addResolver
    * ::covers getResolvers
-   * ::covers resolve
+   * ::covers resolve.
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\Resolver\LocaleResolverInterface')

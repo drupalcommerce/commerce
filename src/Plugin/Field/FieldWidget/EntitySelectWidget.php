@@ -44,7 +44,7 @@ class EntitySelectWidget extends WidgetBase {
       '#min' => 2,
       '#required' => TRUE,
     ];
-   $element['autocomplete_size'] = [
+    $element['autocomplete_size'] = [
       '#type' => 'number',
       '#title' => $this->t('Autocomplete size'),
       '#description' => $this->t('Size of the input field in characters.'),

@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines the checkout flow plugin annotation object.
  *
- * Plugin namespace: Plugin\Commerce\CheckoutFlow
+ * Plugin namespace: Plugin\Commerce\CheckoutFlow.
  *
  * @Annotation
  */

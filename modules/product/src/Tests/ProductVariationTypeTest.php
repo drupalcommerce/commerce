@@ -3,7 +3,6 @@
 namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Component\Utility\Unicode;
 
 /**
  * Ensure the product variation type works correctly.
@@ -80,7 +79,7 @@ class ProductVariationTypeTest extends ProductTestBase {
   public function testProductVariationTypeDeletion() {
     $variation_type = $this->createEntity('commerce_product_variation_type', [
       'id' => 'foo',
-      'label' => 'foo'
+      'label' => 'foo',
     ]);
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => $variation_type->id(),

@@ -5,7 +5,6 @@ namespace Drupal\commerce_checkout\Form;
 use Drupal\commerce_checkout\CheckoutFlowManager;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

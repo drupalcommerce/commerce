@@ -17,7 +17,7 @@ class ProductVariationStorage extends CommerceContentEntityStorage implements Pr
    */
   public function loadEnabled(ProductInterface $product) {
     $ids = [];
-    foreach($product->variations as $variation) {
+    foreach ($product->variations as $variation) {
       $ids[$variation->target_id] = $variation->target_id;
     }
     // Speed up loading by filtering out the IDs of disabled variations.

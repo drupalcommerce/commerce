@@ -67,7 +67,8 @@ class AddToCartFormatter extends FormatterBase {
       '#lazy_builder' => ['commerce_product.lazy_builders:addToCartForm', [
         $items->getEntity()->id(),
         $this->getSetting('combine'),
-      ]],
+      ],
+      ],
       '#create_placeholder' => TRUE,
     ];
   }

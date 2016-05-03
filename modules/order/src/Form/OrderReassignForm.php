@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\commerce_order\Form\CustomerFormTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;

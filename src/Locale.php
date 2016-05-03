@@ -8,7 +8,7 @@ namespace Drupal\commerce;
 final class Locale {
 
   /**
-   * The locale
+   * The locale.
    *
    * @var string
    */

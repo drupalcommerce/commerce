@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines the checkout pane plugin annotation object.
  *
- * Plugin namespace: Plugin\Commerce\CheckoutPane
+ * Plugin namespace: Plugin\Commerce\CheckoutPane.
  *
  * @Annotation
  */

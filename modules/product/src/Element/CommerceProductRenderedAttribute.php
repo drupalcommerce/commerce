@@ -73,4 +73,5 @@ class CommerceProductRenderedAttribute extends Radios {
 
     return $element;
   }
+
 }

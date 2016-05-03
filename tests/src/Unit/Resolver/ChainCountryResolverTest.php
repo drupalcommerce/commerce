@@ -25,14 +25,14 @@ class ChainCountryResolverTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-      parent::setUp();
-      $this->chainCountryResolver = new ChainCountryResolver();
+    parent::setUp();
+    $this->chainCountryResolver = new ChainCountryResolver();
   }
 
   /**
    * ::covers addResolver
    * ::covers getResolvers
-   * ::covers resolve
+   * ::covers resolve.
    */
   public function testResolver() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\Resolver\CountryResolverInterface')
@@ -55,7 +55,7 @@ class ChainCountryResolverTest extends UnitTestCase {
     $this->chainCountryResolver->addResolver($second_resolver);
     $this->chainCountryResolver->addResolver($third_resolver);
 
-    $resolvers =  $this->chainCountryResolver->getResolvers();
+    $resolvers = $this->chainCountryResolver->getResolvers();
     $this->assertEquals([$first_resolver, $second_resolver, $third_resolver], $resolvers);
 
     $result = $this->chainCountryResolver->resolve();
@@ -63,4 +63,3 @@ class ChainCountryResolverTest extends UnitTestCase {
   }
 
 }
-
