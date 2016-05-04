@@ -11,6 +11,8 @@
  */
 abstract class CommerceBaseTestCase extends DrupalWebTestCase {
 
+  protected $profile = 'minimal';
+
   /**
    * Helper function to determine which modules should be enabled. Should be
    * used in place of standard parent::setUp('moduleA', 'moduleB') call.
@@ -41,6 +43,8 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       'field',
       'field_ui',
       'field_sql_storage',
+      'text',
+      'list'
     );
     $api = array(
       'commerce',
@@ -107,27 +111,17 @@ abstract class CommerceBaseTestCase extends DrupalWebTestCase {
       $sets = array($sets);
     }
     $site_admin = array(
-      'administer blocks',
-      'administer comments',
-      'access dashboard',
-      'administer filters',
-      'administer image styles',
-      'administer menu',
       'administer content types',
       'administer nodes',
       'bypass node access',
-      'administer url aliases',
-      'administer search',
       'administer modules',
       'administer site configuration',
       'administer themes',
-      'administer software updates',
       'administer actions',
       'access administration pages',
       'access site in maintenance mode',
       'access site reports',
       'block IP addresses',
-      'administer taxonomy',
       'administer permissions',
       'administer users',
       'administer rules',
@@ -816,7 +810,7 @@ class CommerceBaseTesterTestCase extends CommerceBaseTestCase {
     $this->drupalLogin($this->site_admin);
     $this->drupalGet('admin/people/permissions');
     // This will break if it isn't the second role created
-    $this->assertFieldChecked('edit-5-configure-store');
+    $this->assertFieldChecked('edit-4-configure-store');
   }
 
   /**
