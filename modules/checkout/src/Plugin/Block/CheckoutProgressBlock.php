@@ -74,46 +74,47 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
    *   A render array.
    */
   public function build() {
-    $order = $this->routeMatch->getParameter('commerce_order');
-    $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-    $checkout_flow_plugin = $checkout_flow->getPlugin();
-    $configuration = $checkout_flow_plugin->getConfiguration();
-    if (empty($configuration['display_checkout_progress'])) {
-      return [];
-    }
-
-    // Prepare the steps as expected by the template.
-    $steps = [];
-    $visible_steps = $checkout_flow_plugin->getVisibleSteps();
-    $current_step_id = $checkout_flow_plugin->getStepId();
-    $current_step_index = array_search($current_step_id, array_keys($visible_steps));
-    $index = 0;
-    foreach ($visible_steps as $step_id => $step_definition) {
-      if ($index < $current_step_index) {
-        $position = 'previous';
-      }
-      elseif ($index == $current_step_index) {
-        $position = 'current';
-      }
-      else {
-        $position = 'next';
+    if ($order = $this->routeMatch->getParameter('commerce_order')) {
+      $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
+      $checkout_flow_plugin = $checkout_flow->getPlugin();
+      $configuration = $checkout_flow_plugin->getConfiguration();
+      if (empty($configuration['display_checkout_progress'])) {
+        return [];
       }
 
-      $steps[] = [
-        'id' => $step_id,
-        'label' => $step_definition['label'],
-        'position' => $position,
+      // Prepare the steps as expected by the template.
+      $steps = [];
+      $visible_steps = $checkout_flow_plugin->getVisibleSteps();
+      $current_step_id = $checkout_flow_plugin->getStepId();
+      $current_step_index = array_search($current_step_id, array_keys($visible_steps));
+      $index = 0;
+      foreach ($visible_steps as $step_id => $step_definition) {
+        if ($index < $current_step_index) {
+          $position = 'previous';
+        }
+        elseif ($index == $current_step_index) {
+          $position = 'current';
+        }
+        else {
+          $position = 'next';
+        }
+
+        $steps[] = [
+          'id' => $step_id,
+          'label' => $step_definition['label'],
+          'position' => $position,
+        ];
+        $index++;
+      }
+
+      return [
+        '#attached' => [
+          'library' => ['commerce_checkout/checkout_progress'],
+        ],
+        '#theme' => 'commerce_checkout_progress',
+        '#steps' => $steps,
       ];
-      $index++;
     }
-
-    return [
-      '#attached' => [
-        'library' => ['commerce_checkout/checkout_progress'],
-      ],
-      '#theme' => 'commerce_checkout_progress',
-      '#steps' => $steps,
-    ];
   }
 
   /**
