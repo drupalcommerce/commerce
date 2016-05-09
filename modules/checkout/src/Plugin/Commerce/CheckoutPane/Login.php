@@ -4,7 +4,6 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce\CredentialsCheckFloodInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -14,6 +13,7 @@ use Drupal\Core\Url;
 use Drupal\user\UserAuthInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+
 /**
  * Provides the login or continue pane.
  *
@@ -77,8 +77,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    *   The current user.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
    * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
    *   The entity form builder.
    * @param \Drupal\user\UserAuthInterface $user_auth
@@ -86,13 +84,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityManagerInterface $entity_manager, EntityFormBuilderInterface $entity_form_builder, UserAuthInterface $user_auth, RequestStack $request_stack) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, UserAuthInterface $user_auth, RequestStack $request_stack) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
 
     $this->credentialsCheckFlood = $credentials_check_flood;
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
-    $this->entityManager = $entity_manager;
     $this->entityFormBuilder = $entity_form_builder;
     $this->userAuth = $user_auth;
     $this->clientIp = $request_stack->getCurrentRequest()->getClientIp();
@@ -110,7 +107,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       $container->get('commerce.credentials_check_flood'),
       $container->get('current_user'),
       $container->get('entity_type.manager'),
-      $container->get('entity.manager'),
       $container->get('entity.form_builder'),
       $container->get('user.auth'),
       $container->get('request_stack')
@@ -255,7 +251,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       $renderer = \Drupal::service('renderer');
 
       // Create a dummy account for the registration form.
-      $account = $this->entityManager->getStorage('user')->create([]);
+      $account = $this->entityTypeManager->getStorage('user')->create([]);
       // Load the registration form.
       $form = $this->entityFormBuilder->getForm($account, 'register');
 
