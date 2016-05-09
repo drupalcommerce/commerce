@@ -75,6 +75,10 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
    */
   public function build() {
     $order = $this->routeMatch->getParameter('commerce_order');
+    if (!$order) {
+      // The block is being rendered outside of the checkout page.
+      return [];
+    }
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $checkout_flow_plugin = $checkout_flow->getPlugin();
     $configuration = $checkout_flow_plugin->getConfiguration();
