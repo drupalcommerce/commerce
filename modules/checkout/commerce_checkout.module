@@ -9,6 +9,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements hook_theme().
@@ -143,4 +145,27 @@ function commerce_checkout_form_alter(&$form, FormStateInterface $form_state, $f
 function commerce_checkout_line_item_views_form_submit($form, FormStateInterface $form_state) {
   $order_id = $form_state->getTriggeringElement()['#order_id'];
   $form_state->setRedirect('commerce_checkout.form', ['commerce_order' => $order_id]);
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function commerce_checkout_user_login($account) {
+  $route_match = \Drupal::getContainer()->get('current_route_match');
+  if ($order = $route_match->getParameter('commerce_order')) {
+    // Make sure we redirect to the correct step.
+    $checkout_order_manager = \Drupal::getContainer()->get('commerce_checkout.checkout_order_manager');
+    $checkout_flow = $checkout_order_manager->getCheckoutFlow($order);
+    $checkout_flow_plugin = $checkout_flow->getPlugin();
+
+    // Build the redirect target.
+    $redirect_target = Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $order->getOrderNumber(),
+      'step' => $checkout_flow_plugin->getNextStepId(),
+    ]);
+
+    // Redirect.
+    $response = new RedirectResponse($redirect_target->toString());
+    $response->send();
+  }
 }

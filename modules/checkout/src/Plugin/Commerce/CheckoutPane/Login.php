@@ -4,7 +4,9 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce\CredentialsCheckFloodInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -12,7 +14,6 @@ use Drupal\Core\Url;
 use Drupal\user\UserAuthInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-
 /**
  * Provides the login or continue pane.
  *
@@ -76,17 +77,23 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    *   The current user.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
+   *   The entity form builder.
    * @param \Drupal\user\UserAuthInterface $user_auth
    *   The user authentication object.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, UserAuthInterface $user_auth, RequestStack $request_stack) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityManagerInterface $entity_manager, EntityFormBuilderInterface $entity_form_builder, UserAuthInterface $user_auth, RequestStack $request_stack) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
 
     $this->credentialsCheckFlood = $credentials_check_flood;
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityManager = $entity_manager;
+    $this->entityFormBuilder = $entity_form_builder;
     $this->userAuth = $user_auth;
     $this->clientIp = $request_stack->getCurrentRequest()->getClientIp();
   }
@@ -103,6 +110,8 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       $container->get('commerce.credentials_check_flood'),
       $container->get('current_user'),
       $container->get('entity_type.manager'),
+      $container->get('entity.manager'),
+      $container->get('entity.form_builder'),
       $container->get('user.auth'),
       $container->get('request_stack')
     );
@@ -126,6 +135,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     }
     else {
       $summary = $this->t('Guest checkout: Not allowed');
+      if (!empty($this->configuration['show_registration_form'])) {
+        $summary .= '<br />' . $this->t('Registration form: Yes');
+      }
+      else {
+        $summary .= '<br />' . $this->t('Registration form: No');
+      }
     }
 
     return $summary;
@@ -142,6 +157,13 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#default_value' => $this->configuration['allow_guest_checkout'],
     ];
 
+    $form['show_registration_form'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show registration form'),
+      '#description' => $this->t('If checked, a registration form will be presented if guest checkout is disabled.'),
+      '#default_value' => $this->configuration['show_registration_form'],
+    ];
+
     return $form;
   }
 
@@ -154,6 +176,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['allow_guest_checkout'] = !empty($values['allow_guest_checkout']);
+      $this->configuration['show_registration_form'] = !empty($values['show_registration_form']);
     }
   }
 
@@ -225,6 +248,30 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#value' => $this->t('Continue as Guest'),
       '#op' => 'continue',
     ];
+
+    // Build the registration form if our config allows it.
+    if (!$this->configuration['allow_guest_checkout'] && $this->configuration['show_registration_form']) {
+      // Load the renderer service.
+      $renderer = \Drupal::service('renderer');
+
+      // Create a dummy account for the registration form.
+      $account = $this->entityManager->getStorage('user')->create([]);
+      // Load the registration form.
+      $form = $this->entityFormBuilder->getForm($account, 'register');
+
+      // Build a small form so we can output a fieldset.
+      $register_form['register'] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Create account'),
+      ];
+      $register_form['register']['registration_form'] = [
+        '#markup' => $renderer->render($form),
+      ];
+
+      // Attach it as a suffix to the complete form, this way it will remain a
+      // seperate form.
+      $complete_form['#suffix'] = \Drupal::service('renderer')->render($register_form);
+    }
 
     return $pane_form;
   }
