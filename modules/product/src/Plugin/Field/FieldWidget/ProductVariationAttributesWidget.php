@@ -167,15 +167,24 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
         ],
       ];
       // Convert the _none option into #empty_value.
-      if (isset($element['attributes'][$field_name]['options']['_none'])) {
+      if (isset($element['attributes'][$field_name]['#options']['_none'])) {
         if (!$element['attributes'][$field_name]['#required']) {
           $element['attributes'][$field_name]['#empty_value'] = '';
         }
-        unset($element['attributes'][$field_name]['options']['_none']);
+        unset($element['attributes'][$field_name]['#options']['_none']);
       }
       // 1 required value -> Disable the element to skip unneeded ajax calls.
       if ($attribute['required'] && count($attribute['values']) === 1) {
         $element['attributes'][$field_name]['#disabled'] = TRUE;
+      }
+      // Optimize the UX of optional attributes:
+      // - Hide attributes that have no values.
+      // - Require attributes that have a value on each variation.
+      if (empty($element['attributes'][$field_name]['#options'])) {
+        $element['attributes'][$field_name]['#access'] = FALSE;
+      }
+      if (!isset($element['attributes'][$field_name]['#empty_value'])) {
+        $element['attributes'][$field_name]['#required'] = TRUE;
       }
     }
 
