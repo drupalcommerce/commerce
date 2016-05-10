@@ -166,6 +166,17 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
           'wrapper' => $form['#wrapper_id'],
         ],
       ];
+
+      // If the attribute has no value, we hide it.
+      if (count($attribute['values']) == 1 && isset($attribute['values']['_none'])) {
+        $element['attributes'][$field_name]['#access'] = FALSE;
+      }
+
+      // If the attribute has no _none value. We make it required.
+      if (!isset($attribute['values']['_none'])) {
+        $element['attributes'][$field_name]['#required'] = TRUE;
+      }
+
       // Convert the _none option into #empty_value.
       if (isset($element['attributes'][$field_name]['options']['_none'])) {
         if (!$element['attributes'][$field_name]['#required']) {
