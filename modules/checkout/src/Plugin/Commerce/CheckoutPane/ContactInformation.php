@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @CommerceCheckoutPane(
  *   id = "contact_information",
- *   label = "Contact information",
+ *   label = @Translation("Contact information"),
  *   default_step = "order_information",
  *   wrapper_element = "fieldset",
  * )

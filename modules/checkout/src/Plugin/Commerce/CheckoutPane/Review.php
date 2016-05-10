@@ -10,7 +10,7 @@ use Drupal\Core\Link;
  *
  * @CommerceCheckoutPane(
  *   id = "review",
- *   label = "Review",
+ *   label = @Translation("Review"),
  *   default_step = "review",
  * )
  */

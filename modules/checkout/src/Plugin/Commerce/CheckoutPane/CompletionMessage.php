@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @CommerceCheckoutPane(
  *   id = "completion_message",
- *   label = "Completion message",
+ *   label = @Translation("Completion message"),
  *   default_step = "complete",
  * )
  */

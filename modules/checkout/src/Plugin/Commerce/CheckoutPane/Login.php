@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @CommerceCheckoutPane(
  *   id = "login",
- *   label = "Login or continue as guest",
+ *   label = @Translation("Login or continue as guest"),
  *   default_step = "login",
  * )
  */
