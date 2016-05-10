@@ -118,9 +118,9 @@ class AddToCartForm extends ContentEntityForm {
     }
     $this->cartManager->addLineItem($cart, $line_item, $form_state->get(['settings', 'combine']));
 
-    drupal_set_message(t('@entity added to @cart-link.', [
+    drupal_set_message($this->t('@entity added to @cart-link.', [
       '@entity' => $purchased_entity->label(),
-      '@cart-link' => Link::createFromRoute('your cart', 'commerce_cart.page')->toString(),
+      '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
     ]));
   }
 
