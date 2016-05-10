@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
+use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
@@ -143,11 +144,13 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
     $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
     $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
-
     $element['variation'] = [
       '#type' => 'value',
       '#value' => $selected_variation->id(),
     ];
+    // Set the selected variation in the form state for our AJAX callback.
+    $form_state->set('selected_variation', $selected_variation->id());
+
     $element['attributes'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -318,7 +321,19 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    * Ajax callback.
    */
   public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
-    return $form;
+    /** @var \Drupal\Core\Render\MainContent\MainContentRendererInterface $ajax_renderer */
+    $ajax_renderer = \Drupal::service('main_content_renderer.ajax');
+    $request = \Drupal::request();
+    $route_match = \Drupal::service('current_route_match');
+    /** @var \Drupal\Core\Ajax\AjaxResponse $response */
+    $response = $ajax_renderer->renderResponse($form, $request, $route_match);
+
+    $variation = ProductVariation::load($form_state->get('selected_variation'));
+    /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
+    $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
+    $variation_field_renderer->replaceRenderedFields($response, $variation, 'default');
+
+    return $response;
   }
 
 }
