@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 use Drupal\user\UserAuthInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -119,6 +120,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   public function defaultConfiguration() {
     return [
       'allow_guest_checkout' => TRUE,
+      'show_registration_form' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -216,11 +218,14 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#title' => $this->t('Password'),
       '#size' => 60,
     ];
-    // @todo Add a "forgotten password" link.
     $pane_form['returning_customer']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Log in'),
       '#op' => 'login',
+    ];
+    $pane_form['returning_customer']['forgot_password'] = [
+      '#type' => 'markup',
+      '#markup' => Link::createFromRoute($this->t('Forgot password?'), 'user.pass')->toString(),
     ];
 
     $pane_form['guest'] = [
@@ -245,29 +250,28 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#op' => 'continue',
     ];
 
-    // Build the registration form if our config allows it.
-    if (!$this->configuration['allow_guest_checkout'] && $this->configuration['show_registration_form']) {
-      // Load the renderer service.
-      $renderer = \Drupal::service('renderer');
-
-      // Create a dummy account for the registration form.
-      $account = $this->entityTypeManager->getStorage('user')->create([]);
-      // Load the registration form.
-      $form = $this->entityFormBuilder->getForm($account, 'register');
-
-      // Build a small form so we can output a fieldset.
-      $register_form['register'] = [
-        '#type' => 'fieldset',
-        '#title' => $this->t('Create account'),
-      ];
-      $register_form['register']['registration_form'] = [
-        '#markup' => $renderer->render($form),
-      ];
-
-      // Attach it as a suffix to the complete form, this way it will remain a
-      // seperate form.
-      $complete_form['#suffix'] = \Drupal::service('renderer')->render($register_form);
-    }
+    $pane_form['register'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Create new account'),
+      '#access' => !$this->configuration['allow_guest_checkout'] && $this->configuration['show_registration_form'],
+    ];
+    $pane_form['register']['mail'] = array(
+      '#type' => 'email',
+      '#title' => $this->t('Email address'),
+      '#description' => $this->t('A valid email address. All emails from the system will be sent to this address. The email address is not made public and will only be used if you wish to receive a new password or wish to receive certain news or notifications by email.'),
+      '#required' => FALSE,
+    );
+    $pane_form['register']['pass'] = array(
+      '#type' => 'password_confirm',
+      '#size' => 25,
+      '#description' => $this->t('Provide a password for the new account in both fields.'),
+      '#required' => FALSE,
+    );
+    $pane_form['register']['register'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Create account and continue'),
+      '#op' => 'register',
+    ];
 
     return $pane_form;
   }
@@ -277,40 +281,91 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
-    if ($triggering_element['#op'] == 'continue') {
-      // No login in progress, nothing to validate.
-      return;
-    }
 
-    $name_element = $pane_form['returning_customer']['name'];
-    $values = $form_state->getValue($pane_form['#parents']);
-    $username = $values['returning_customer']['name'];
-    $password = trim($values['returning_customer']['password']);
-    if (empty($username) || empty($password)) {
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
-      return;
-    }
-    if (user_is_blocked($username)) {
-      $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
-      return;
-    }
-    if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
-      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      return;
-    }
-    elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
-      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      return;
-    }
+    switch ($triggering_element['#op']) {
+      case 'continue':
+        // No login in progress, nothing to validate.
+        return;
 
-    $uid = $this->userAuth->authenticate($username, $password);
-    if (!$uid) {
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+      case 'login':
+        $name_element = $pane_form['returning_customer']['name'];
+        $values = $form_state->getValue($pane_form['#parents']);
+        $username = $values['returning_customer']['name'];
+        $password = trim($values['returning_customer']['password']);
+        if (empty($username) || empty($password)) {
+          $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+          return;
+        }
+        if (user_is_blocked($username)) {
+          $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
+          return;
+        }
+        if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
+          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          return;
+        }
+        elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
+          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          return;
+        }
+
+        $uid = $this->userAuth->authenticate($username, $password);
+        if (!$uid) {
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+        }
+        $form_state->set('logged_in_uid', $uid);
+        break;
+
+      case 'register':
+        $values = $form_state->getValue($pane_form['#parents']);
+
+        // Basic validation to check if fields are filled in.
+        if (empty($values['register']['mail'])) {
+          $form_state->setErrorByName('mail', $this->t('Email is mandatory.'));
+          return;
+        }
+        if (empty($values['register']['pass'])) {
+          $form_state->setErrorByName('pass', $this->t('Password is mandatory.'));
+          return;
+        }
+
+        // Advanced validation Make sure the account does not exist yet. And
+        // that the username is unused/valid.
+        if ($this->entityTypeManager->getStorage('user')->loadByProperties(['mail' => $values['register']['mail']])) {
+          $form_state->setErrorByName('mail', $this->t('A user is already registered with this email.'));
+          return;
+        }
+        if ($this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $values['register']['mail']])) {
+          $form_state->setErrorByName('mail', $this->t('A user is already registered with this username, please contact support to resolve this issue.'));
+          return;
+        }
+        // Make sure the email would be a valid username.
+        if (user_validate_name($values['register']['mail'])) {
+          $form_state->setErrorByName('mail', $this->t('The email you have used contains bad characters.'));
+          return;
+        }
+
+        // Create the new account.
+        $account = $this->entityTypeManager->getStorage('user')->create([]);
+        $account->setEmail($values['register']['mail']);
+        $account->setUsername($values['register']['mail']);
+        $account->setPassword($values['register']['pass']);
+        $account->enforceIsNew();
+        $account->activate();
+        $account->save();
+
+        // Login.
+        $form_state->set('logged_in_uid', $account->id());
+        drupal_set_message($this->t('Registration successful. You can now continue the checkout.'));
+        break;
+
+      default:
+        $form_state->setError($pane_form['returning_customer']['name'], $this->t('Invalid submission, please submit the form again.'));
+        break;
     }
-    $form_state->set('logged_in_uid', $uid);
   }
 
   /**
@@ -318,12 +373,23 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
-    if ($triggering_element['#op'] == 'login') {
-      $storage = $this->entityTypeManager->getStorage('user');
-      $account = $storage->load($form_state->get('logged_in_uid'));
-      user_login_finalize($account);
-      $this->order->setOwner($account);
-      $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
+
+    switch ($triggering_element['#op']) {
+      case 'login':
+      case 'register':
+        $storage = $this->entityTypeManager->getStorage('user');
+        /** @var \Drupal\user\UserInterface $account */
+        $account = $storage->load($form_state->get('logged_in_uid'));
+        user_login_finalize($account);
+        $this->order->setOwner($account);
+        $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
+        break;
+
+      case 'continue':
+        break;
+
+      default:
+        return;
     }
 
     $form_state->setRedirect('commerce_checkout.form', [
