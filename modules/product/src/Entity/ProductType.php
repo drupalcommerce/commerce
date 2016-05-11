@@ -87,6 +87,13 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $variationType;
 
   /**
+   * Indicates if variation fields should be injected.
+   *
+   * @var bool
+   */
+  protected $injectVariationFields = TRUE;
+
+  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -113,6 +120,21 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    */
   public function setVariationTypeId($variation_type_id) {
     $this->variationType = $variation_type_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldInjectVariationFields() {
+    return $this->injectVariationFields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInjectVariationFields($inject) {
+    $this->injectVariationFields = (bool) $inject;
     return $this;
   }
 

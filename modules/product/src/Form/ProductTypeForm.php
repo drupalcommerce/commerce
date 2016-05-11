@@ -97,6 +97,11 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#required' => TRUE,
       '#disabled' => !$product_type->isNew(),
     ];
+    $form['injectVariationFields'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Inject product variation fields into the rendered product.'),
+      '#default_value' => $product_type->shouldInjectVariationFields(),
+    ];
     $form['product_status'] = [
       '#type' => 'checkbox',
       '#title' => t('Publish new products of this type by default.'),

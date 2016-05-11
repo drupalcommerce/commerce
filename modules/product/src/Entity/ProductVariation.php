@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -257,6 +258,18 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
     $field_map = $attribute_field_manager->getFieldMap($this->bundle());
     return array_column($field_map, 'field_name');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTagsToInvalidate() {
+    $tags = parent::getCacheTagsToInvalidate();
+    // Invalidate the variations view builder and product caches.
+    return Cache::mergeTags($tags, [
+      'commerce_product:' . $this->getProductId(),
+      'commerce_product_variation_view',
+    ]);
   }
 
   /**

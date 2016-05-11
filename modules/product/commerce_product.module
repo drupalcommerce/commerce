@@ -10,6 +10,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\commerce_product\Entity\ProductType;
 
 /**
  * Implements hook_entity_create().
@@ -68,6 +70,23 @@ function commerce_product_theme() {
       'render element' => 'elements',
     ],
   ];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function commerce_product_commerce_product_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
+  $product_type = ProductType::load($entity->bundle());
+  if ($product_type->shouldInjectVariationFields()) {
+    /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
+    $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
+
+    $rendered_fields = $variation_field_renderer->renderFields($entity->getDefaultVariation(), $view_mode);
+    foreach ($rendered_fields as $field_name => $rendered_field) {
+      $build['product_variation_' . $field_name] = $rendered_field;
+    }
+  }
 }
 
 /**

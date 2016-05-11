@@ -28,4 +28,23 @@ interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionI
    */
   public function setVariationTypeId($variation_type_id);
 
+  /**
+   * Gets whether variation fields should be injected into the rendered product.
+   *
+   * @return bool
+   *   TRUE if the variation fields should be injected into the rendered
+   *   product, FALSE otherwise.
+   */
+  public function shouldInjectVariationFields();
+
+  /**
+   * Sets whether variation fields should be injected into the rendered product.
+   *
+   * @param bool $inject
+   *   Whether variation fields should be injected into the rendered product.
+   *
+   * @return $this
+   */
+  public function setInjectVariationFields($inject);
+
 }

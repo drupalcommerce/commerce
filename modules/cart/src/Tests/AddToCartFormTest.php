@@ -390,6 +390,58 @@ class AddToCartFormTest extends OrderTestBase {
   }
 
   /**
+   * Tests that the cart refreshes rendered variation fields.
+   */
+  public function testRenderedVariationFields() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $color_attribute_values = $this->createAttributeSet($variation_type, 'color', [
+      'cyan' => 'Cyan',
+      'magenta' => 'Magenta',
+    ], TRUE);
+
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation1 */
+    $variation1 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'RENDERED_VARIATION_TEST_CYAN',
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['cyan'],
+    ]);
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation2 */
+    $variation2 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'RENDERED_VARIATION_TEST_MAGENTA',
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['magenta'],
+    ]);
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'RENDERED_VARIATION_TEST',
+      'stores' => [$this->store],
+      'variations' => [$variation1, $variation2],
+    ]);
+
+    $this->drupalGet($product->toUrl());
+    $this->assertText($variation1->getSku(), 'The SKU for the first variation is visible');
+
+    $response = $this->drupalPostAjaxForm(NULL, [
+      'purchased_entity[0][attributes][attribute_color]' => $color_attribute_values['magenta']->id(),
+    ], 'purchased_entity[0][attributes][attribute_color]');
+    foreach ($response as $command) {
+      if ($command['command'] == 'insert' && $command['method'] == 'replaceWith' && $command['selector'] == '.product--variation-field--variation_sku__2') {
+        $this->assertTrue(strpos($command['data'], $variation2->getSku()) !== FALSE);
+      }
+    }
+  }
+
+  /**
    * Creates an attribute field and set of attribute values.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type
