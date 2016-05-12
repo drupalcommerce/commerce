@@ -30,7 +30,9 @@ class ProductAttributeForm extends BundleEntityFormBase {
       '#machine_name' => [
         'exists' => '\Drupal\commerce_product\Entity\ProductAttribute::load',
       ],
-      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      // Attribute field names are constructed as 'attribute_' + id, and must
+      // not be longer than 32 characters. Account for that prefix length here.
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH - 10,
     ];
     $form['elementType'] = [
       '#type' => 'select',
