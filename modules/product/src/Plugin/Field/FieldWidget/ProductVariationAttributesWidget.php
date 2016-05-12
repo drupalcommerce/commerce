@@ -4,6 +4,8 @@ namespace Drupal\commerce_product\Plugin\Field\FieldWidget;
 
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce_product\Event\ProductEvents;
+use Drupal\commerce_product\Event\ProductVariationAjaxChangeEvent;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
@@ -340,7 +342,12 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $variation = ProductVariation::load($form_state->get('selected_variation'));
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
-    $variation_field_renderer->replaceRenderedFields($response, $variation, 'default');
+    $view_mode = 'default';
+    $variation_field_renderer->replaceRenderedFields($response, $variation, $view_mode);
+
+    // Allow modules to add arbitrary AJAX commands to the response.
+    $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode);
+    \Drupal::service('event_dispatcher')->dispatch(ProductEvents::PRODUCT_VARIATION_AJAX_CHANGE, $event);
 
     return $response;
   }
