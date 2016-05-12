@@ -40,6 +40,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "description",
  *     "variationType",
+ *     "injectVariationFields",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",
