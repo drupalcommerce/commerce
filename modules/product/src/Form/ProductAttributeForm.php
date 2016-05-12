@@ -36,13 +36,14 @@ class ProductAttributeForm extends BundleEntityFormBase {
     ];
     $form['elementType'] = [
       '#type' => 'select',
-      '#default_value' => $attribute->getElementType(),
+      '#title' => $this->t('Element type'),
+      '#description' => $this->t('Controls how the attribute is displayed on the add to cart form.'),
       '#options' => [
         'radios' => $this->t('Radio buttons'),
         'select' => $this->t('Select list'),
         'commerce_product_rendered_attribute' => $this->t('Rendered attribute'),
       ],
-      '#description' => $this->t('Controls how the attribute is displayed on the add to cart form.'),
+      '#default_value' => $attribute->getElementType(),
     ];
 
     if ($this->moduleHandler->moduleExists('language')) {
