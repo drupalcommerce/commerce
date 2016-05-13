@@ -84,6 +84,10 @@ function commerce_product_commerce_product_view(array &$build, EntityInterface $
 
     $rendered_fields = $variation_field_renderer->renderFields($entity->getDefaultVariation(), $view_mode);
     foreach ($rendered_fields as $field_name => $rendered_field) {
+      // Handle attribute fields a bit differently, we want to group them.
+      if (strpos('attribute_', $field_name) !== FALSE) {
+        $build['product_variation_attributes']['product_variation_' . $field_name] = $rendered_field;
+      }
       $build['product_variation_' . $field_name] = $rendered_field;
     }
   }
