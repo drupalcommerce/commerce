@@ -123,7 +123,7 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
    */
   public function testRenderFields() {
     $variation = ProductVariation::create([
-      'type' => 'default',
+      'type' => $this->secondVariationType->id(),
       'sku' => strtolower($this->randomMachineName()),
       'title' => $this->randomString(),
       'status' => 1,
@@ -135,10 +135,26 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
     ]);
     $product->save();
 
+    $product_display = commerce_get_entity_display('commerce_product_variation', $variation->bundle(), 'view');
+    $product_display->setComponent('attribute_color', [
+      'label' => 'above',
+      'type' => 'entity_reference_label',
+    ]);
+    $product_display->save();
+
     $rendered_fields = $this->variationFieldRenderer->renderFields($variation);
-    $this->assertFalse(isset($rendered_fields['statis']), 'Variation status field was not rendered');
+    $this->assertFalse(isset($rendered_fields['status']), 'Variation status field was not rendered');
     $this->assertTrue(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
+    $this->assertTrue(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_fields['sku']['#ajax_replace_class']);
+    $this->assertEquals('product--variation-field--variation_attribute_color__' . $variation->getProductId(), $rendered_fields['attribute_color']['#ajax_replace_class']);
+
+    $product_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
+    $product_build = $product_view_builder->view($product);
+    $this->render($product_build);
+
+    $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
+    $this->assertNotEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
   }
 
 }
