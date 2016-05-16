@@ -342,7 +342,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     $variation = ProductVariation::load($form_state->get('selected_variation'));
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
-    $view_mode = 'default';
+    $view_mode = $form_state->get('form_display')->getMode();
     $variation_field_renderer->replaceRenderedFields($response, $variation, $view_mode);
     // Allow modules to add arbitrary ajax commands to the response.
     $event = new ProductVariationAjaxChangeEvent($variation, $response, $view_mode);
