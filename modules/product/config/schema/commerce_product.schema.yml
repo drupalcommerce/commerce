@@ -62,6 +62,19 @@ field.formatter.settings.commerce_add_to_cart:
       type: boolean
       label: 'Whether to attempt to combine line items containing the same product variation'
 
+field.formatter.settings.commerce_product_attributes_overview:
+  type: mapping
+  mapping:
+    attributes:
+      type: sequence
+      label: 'Attributes to render.'
+      sequence:
+        type: string
+        label: 'Attribute ID'
+    view_mode:
+      type: string
+      label: 'View mode'
+
 action.configuration.commerce_publish_product:
   type: action_configuration_default
   label: 'Configuration for the Publish product action'
