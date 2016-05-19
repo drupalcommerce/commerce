@@ -86,10 +86,10 @@ function commerce_product_commerce_product_view(array &$build, EntityInterface $
     foreach ($rendered_fields as $field_name => $rendered_field) {
       // Group attribute fields to allow them to be excluded together.
       if (strpos($field_name, 'attribute_') !== FALSE) {
-        $build['product_variation_attributes']['product_variation_' . $field_name] = $rendered_field;
+        $build['variation_attributes']['variation_' . $field_name] = $rendered_field;
       }
       else {
-        $build['product_variation_' . $field_name] = $rendered_field;
+        $build['variation_' . $field_name] = $rendered_field;
       }
     }
   }
@@ -130,12 +130,12 @@ function template_preprocess_commerce_product(array &$variables) {
   /** @var Drupal\commerce_product\Entity\ProductInterface $product */
   $product = $variables['elements']['#commerce_product'];
 
-  $variables['product'] = $product;
+  $variables['product_entity'] = $product;
   $variables['url'] = $product->toUrl();
   // Helpful $content variable for templates.
-  $variables['content'] = [];
+  $variables['product'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+    $variables['product'][$key] = $variables['elements'][$key];
   }
 }
 
@@ -154,13 +154,13 @@ function template_preprocess_commerce_product_variation(array &$variables) {
   $product_variation = $variables['elements']['#commerce_product_variation'];
   $product = $product_variation->getProduct();
 
-  $variables['product'] = $product;
-  $variables['product_variation'] = $product_variation;
+  $variables['product_entity'] = $product;
+  $variables['product_variation_entity'] = $product_variation;
   $variables['product_url'] = $product->toUrl();
   // Helpful $content variable for templates.
-  $variables['content'] = [];
+  $variables['product_variation'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+    $variables['product_variation'][$key] = $variables['elements'][$key];
   }
 }
 
@@ -178,11 +178,11 @@ function template_preprocess_commerce_product_attribute_value(array &$variables)
   /** @var Drupal\commerce_product\Entity\ProductAttributeValueInterface $product */
   $attribute_value = $variables['elements']['#commerce_product_attribute_value'];
 
-  $variables['attribute_value'] = $attribute_value;
+  $variables['attribute_value_entity'] = $attribute_value;
   // Helpful $content variable for templates.
-  $variables['content'] = [];
+  $variables['attribute_value'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+    $variables['attribute_value'][$key] = $variables['elements'][$key];
   }
 }
 

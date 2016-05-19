@@ -80,11 +80,11 @@ function template_preprocess_commerce_order(&$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
 
-  $variables['order'] = $order;
+  $variables['order_entity'] = $order;
   // Helpful $content variable for templates.
-  $variables['content'] = [];
+  $variables['order'] = [];
   foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+    $variables['order'][$key] = $variables['elements'][$key];
   }
 }
 

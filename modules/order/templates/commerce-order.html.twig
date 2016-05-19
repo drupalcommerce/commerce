@@ -4,18 +4,19 @@
  * Default theme implementation to display an order.
  *
  * Available variables:
- * - content: Items for the content of the term (fields and description).
- *   Use 'content' to print them all, or print a subset such as
- *   'content.description'. Use the following code to exclude the
+ * - order: Items for the content of the term (fields and description).
+ *   Use 'order' to print them all, or print a subset such as
+ *   'order.description'. Use the following code to exclude the
  *   printing of a given child element:
  *   @code
- *   {{ content|without('description') }}
+ *   {{ order|without('description') }}
  *   @endcode
  * - attributes: HTML attributes for the wrapper.
+ * - order_entity: The order object
  *
  * @ingroup themeable
  */
 #}
 <div{{ attributes}}>
-  {{ content }}
+  {{ order }}
 </div>
