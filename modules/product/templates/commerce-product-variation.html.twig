@@ -5,24 +5,24 @@
  * Default theme implementation for product variations.
  *
  * Available variables:
- * - content: Items for the content of the product variation.
- *   Use 'content' to print them all, or print a subset such as
- *   'content.sku'. Use the following code to exclude the
+ * - product_variation: Items for the content of the product variation.
+ *   Use 'product_variation' to print them all, or print a subset such as
+ *   'product_variation.sku'. Use the following code to exclude the
  *   printing of a given child element:
  *   @code
- *   {{ content|without('sku') }}
+ *   {{ product_variation|without('sku') }}
  *   @endcode
  * - attributes: HTML attributes for the wrapper.
- * - product_variation: The product variation object.
- * - product: The product object.
+ * - product_variation_entity: The product variation object.
+ * - product_entity: The product object.
  * - product_url: The product URL.
  *
  * @ingroup themeable
  */
 #}
-<div{{ attributes}}>
-  {{- content.product -}}
-  {% if content %}
-    {{- content|without('product_variation_attributes') -}}
+<div{{ attributes }}>
+  {{- product_variation.product -}}
+  {% if product_variation %}
+    {{- product_variation|without('variation_attributes') -}}
   {% endif %}
 </div>

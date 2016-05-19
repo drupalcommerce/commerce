@@ -5,22 +5,21 @@
  * Default theme implementation for product attribute values.
  *
  * Available variables:
- * - content: Items for the content of the product attribute value.
- *   Use 'content' to print them all, or print a subset such as
- *   'content.sku'. Use the following code to exclude the
+ * - attribute_value: Items for the content of the product attribute value.
+ *   Use 'attribute_value' to print them all, or print a subset such as
+ *   'attribute_value.name'. Use the following code to exclude the
  *   printing of a given child element:
  *   @code
  *   {{ content|without('name') }}
  *   @endcode
  * - attributes: HTML attributes for the wrapper.
- * - attribute_value: The product attribute value object.
+ * - attribute_value_entity: The product attribute value object.
  *
  * @ingroup themeable
  */
 #}
 <div{{ attributes}}>
-  {{- content.attribute_value -}}
-  {% if content %}
-    {{- content -}}
+  {% if attribute_value %}
+    {{- attribute_value -}}
   {% endif %}
 </div>

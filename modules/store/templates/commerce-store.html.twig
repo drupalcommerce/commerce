@@ -5,20 +5,20 @@
  * Default theme implementation for stores.
  *
  * Available variables:
- * - content: Items for the content of the store.
- *   Use 'content' to print them all, or print a subset such as
- *   'content.name'. Use the following code to exclude the
+ * - store: Items for the content of the store.
+ *   Use 'store' to print them all, or print a subset such as
+ *   'store.name'. Use the following code to exclude the
  *   printing of a given child element:
  *   @code
- *   {{ content|without('name') }}
+ *   {{ store|without('name') }}
  *   @endcode
  * - attributes: HTML attributes for the wrapper.
- * - store: The store object.
+ * - store_entity: The store object.
  * - url: The store URL.
  *
  * @ingroup themeable
  */
 #}
 <article{{ attributes }}>
-  {{ content }}
+  {{ store }}
 </article>
