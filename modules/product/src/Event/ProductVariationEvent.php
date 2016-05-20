@@ -33,6 +33,7 @@ class ProductVariationEvent extends Event {
    * The product variation the event refers to.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The ProductVariationInterface object.
    */
   public function getProductVariation() {
     return $this->productVariation;

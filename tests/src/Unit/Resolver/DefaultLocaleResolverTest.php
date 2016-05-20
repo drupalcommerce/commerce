@@ -12,6 +12,8 @@ use Drupal\Tests\UnitTestCase;
 class DefaultLocaleResolverTest extends UnitTestCase {
 
   /**
+   * Test Language Country.
+   *
    * @covers ::resolve
    */
   public function testLanguageCountry() {
@@ -41,6 +43,8 @@ class DefaultLocaleResolverTest extends UnitTestCase {
   }
 
   /**
+   * Test Language with country component.
+   *
    * @covers ::resolve
    */
   public function testLanguageWithCountryComponent() {
@@ -67,6 +71,8 @@ class DefaultLocaleResolverTest extends UnitTestCase {
   }
 
   /**
+   * Test Unknown Country.
+   *
    * @covers ::resolve
    */
   public function testUnknownCountry() {

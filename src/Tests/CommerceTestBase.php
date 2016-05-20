@@ -98,7 +98,7 @@ abstract class CommerceTestBase extends WebTestBase {
    *   The field values.
    * @param array $expected_values
    *   The expected values.
-   * @param $message
+   * @param string $message
    *   (optional) A message to display with the assertion. Do not translate
    *   messages:
    *   use \Drupal\Component\Render\FormattableMarkup::placeholderFormat()

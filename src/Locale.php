@@ -28,6 +28,7 @@ final class Locale {
    * Gets the locale code.
    *
    * @return string
+   *   Locale code
    */
   public function getLocaleCode() {
     return $this->localeCode;
@@ -37,6 +38,7 @@ final class Locale {
    * Gets the string representation of the locale.
    *
    * @return string
+   *   Locale code
    */
   public function __toString() {
     return $this->localeCode;

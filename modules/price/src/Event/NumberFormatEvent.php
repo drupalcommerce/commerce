@@ -33,6 +33,7 @@ class NumberFormatEvent extends GenericEvent {
    * The number format the event refers to.
    *
    * @return \CommerceGuys\Intl\NumberFormat\NumberFormatEntityInterface
+   *   The NumberFormatEntityInterface object.
    */
   public function getNumberFormat() {
     return $this->numberFormat;

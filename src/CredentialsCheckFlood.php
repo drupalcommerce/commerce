@@ -123,7 +123,7 @@ class CredentialsCheckFlood implements CredentialsCheckFloodInterface {
       $account_by_name = $storage->loadByProperties(['name' => $name]);
       $this->accounts[$name] = reset($account_by_name);
     }
-    /** @var \Drupal\Core\Session\AccountInterface $account **/
+    /** @var \Drupal\Core\Session\AccountInterface $account */
     $account = $this->accounts[$name];
     if ($account) {
       if ($this->config->get('uid_only')) {

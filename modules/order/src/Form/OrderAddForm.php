@@ -51,7 +51,7 @@ class OrderAddForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'commerce_order_add_form';
   }
 

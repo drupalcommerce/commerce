@@ -413,7 +413,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   }
 
   /**
-   * #element_validate callback: Validates for the pane configuration form.
+   * Validates for the pane configuration form (#element_validate callback).
    *
    * @param array $pane_configuration_form
    *   The pane configuration form.

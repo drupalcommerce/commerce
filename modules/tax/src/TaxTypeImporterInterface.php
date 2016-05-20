@@ -18,10 +18,11 @@ interface TaxTypeImporterInterface {
   /**
    * Creates a tax type entity from an id.
    *
-   * @param id
+   * @param string $taxTypeId
    *   The id of a tax type.
    *
    * @return \CommerceGuys\Tax\Model\TaxTypeInterface
+   *   The TaxTypeInterface object.
    */
   public function createTaxType($taxTypeId);
 

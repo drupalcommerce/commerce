@@ -33,6 +33,7 @@ class StoreEvent extends Event {
    * The store the event refers to.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface
+   *   The StoreInterface object.
    */
   public function getStore() {
     return $this->store;

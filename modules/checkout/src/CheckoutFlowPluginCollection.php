@@ -40,6 +40,7 @@ class CheckoutFlowPluginCollection extends DefaultSingleLazyPluginCollection {
    * {@inheritdoc}
    *
    * @return \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface
+   *   The CheckoutFlowInterface object.
    */
   public function &get($instance_id) {
     return parent::get($instance_id);

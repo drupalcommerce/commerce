@@ -6,12 +6,17 @@ use Drupal\commerce\AvailabilityManager;
 use Drupal\Tests\UnitTestCase;
 
 /**
+ * Test for AvailabilityManager.
+ *
  * @coversDefaultClass \Drupal\commerce\AvailabilityManager
+ *
  * @group commerce
  */
 class AvailabilityManagerTest extends UnitTestCase {
 
   /**
+   * AvailabilityManager object.
+   *
    * @var \Drupal\commerce\AvailabilityManager
    */
   protected $availabilityManager;
@@ -25,9 +30,11 @@ class AvailabilityManagerTest extends UnitTestCase {
   }
 
   /**
-   * ::covers addChecker
-   * ::covers getCheckers
-   * ::covers check.
+   * Test check.
+   *
+   * @covers ::addChecker
+   * @covers ::getCheckers
+   * @covers ::check
    */
   public function testCheck() {
     $mock_builder = $this->getMockBuilder('Drupal\commerce\AvailabilityCheckerInterface')
