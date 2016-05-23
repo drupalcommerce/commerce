@@ -5,6 +5,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 use Drupal\commerce_checkout\Event\CheckoutCompleteEvent;
 use Drupal\commerce_checkout\Event\CheckoutEvents;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
@@ -26,6 +27,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
+
+  /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The current order.
@@ -50,16 +58,19 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
     $this->eventDispatcher = $event_dispatcher;
+    $this->entityTypeManager = $entity_type_manager;
     $this->order = $route_match->getParameter('commerce_order');
     // The order is empty when the checkout flow is initialized outside of the
     // checkout form (usually in the checkout flow admin UI). There's no need
@@ -77,6 +88,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container->get('entity_type.manager'),
       $container->get('event_dispatcher'),
       $container->get('current_route_match')
     );
@@ -147,10 +159,12 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       'offsite_payment' => [
         'label' => $this->t('Payment'),
         'next_label' => $this->t('Continue to payment'),
+        'has_order_summary' => FALSE,
       ],
       'complete' => [
         'label' => $this->t('Complete'),
         'next_label' => $this->t('Pay and complete purchase'),
+        'has_order_summary' => FALSE,
       ],
     ];
   }
@@ -161,6 +175,19 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function getVisibleSteps() {
     // All steps are visible by default.
     return $this->getSteps();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOrderSummary(array $form, FormStateInterface $form_state) {
+    return [
+      '#type' => 'view',
+      '#name' => $this->configuration['order_summary_view'],
+      '#display_id' => 'default',
+      '#arguments' => [$this->order->id()],
+      '#embed' => TRUE,
+    ];
   }
 
   /**
@@ -190,6 +217,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function defaultConfiguration() {
     return [
       'display_checkout_progress' => TRUE,
+      'order_summary_view' => 'commerce_checkout_order_summary',
     ];
   }
 
@@ -202,6 +230,24 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       '#title' => $this->t('Display checkout progress'),
       '#description' => $this->t('Used by the checkout progress block to determine visibility.'),
       '#default_value' => $this->configuration['display_checkout_progress'],
+    ];
+
+    $view_storage = $this->entityTypeManager->getStorage('view');
+    $available_summary_views = [];
+    /** @var \Drupal\views\Entity\View $view */
+    foreach ($view_storage->loadMultiple() as $view) {
+      if (strpos($view->get('tag'), 'commerce_order_summary') !== FALSE) {
+        $available_summary_views[$view->id()] = $view->label();
+      }
+    }
+
+    $form['order_summary_view'] = [
+      '#type' => 'select',
+      '#options' => $available_summary_views,
+      '#title' => $this->t('Cart summary view'),
+      '#description' => $this->t('View to display as the order summary.'),
+      '#default_value' => $this->configuration['order_summary_view'],
+      '#disabled' => count($available_summary_views) == 1,
     ];
 
     return $form;
@@ -219,6 +265,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
+      $this->configuration['order_summary_view'] = $values['order_summary_view'];
     }
   }
 
@@ -236,6 +283,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
     $form['#title'] = $steps[$this->stepId]['label'];
+    $form['#theme'] = ['commerce_checkout_form'];
+    $form['#attached']['library'][] = 'commerce_checkout/form';
+
+    // If the step supports an order summary, use appropriate template.
+    if ($steps[$this->stepId]['has_order_summary']) {
+      $form['order_summary'] = $this->buildOrderSummary($form, $form_state);
+    }
     $form['actions'] = $this->actions($form, $form_state);
 
     return $form;
