@@ -84,4 +84,26 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
     return $entity;
   }
 
+  /**
+   * Debugger method to save additional HTML output.
+   *
+   * The base class will only save browser output when accessing page using
+   * ::drupalGet and providing a printer class to PHPUnit. This method
+   * is intended for developers to help debug browser test failures and capture
+   * more verbose output.
+   */
+  protected function saveHtmlOutput() {
+    $out = $this->getSession()->getPage()->getContent();
+
+    // Ensure that any changes to variables in the other thread are picked up.
+    $this->refreshVariables();
+
+    if ($this->htmlOutputEnabled) {
+      $html_output = '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr />' . $out;
+      $html_output .= $this->getHtmlOutputHeaders();
+      $this->htmlOutput($html_output);
+    }
+  }
+
 }
