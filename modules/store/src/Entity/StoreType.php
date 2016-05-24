@@ -52,18 +52,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 class StoreType extends ConfigEntityBundleBase implements StoreTypeInterface {
 
   /**
-   * The store type machine name.
+   * The store type ID.
    *
    * @var string
    */
   protected $id;
-
-  /**
-   * The store type UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
 
   /**
    * The store type label.

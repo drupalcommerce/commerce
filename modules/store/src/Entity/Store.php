@@ -7,7 +7,6 @@ use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -67,25 +66,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Store extends ContentEntityBase implements StoreInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    // If no owner has been set explicitly, make the current user the owner.
-    if (!$this->getOwner()) {
-      $this->setOwnerId($this->getCurrentUserId());
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->get('store_id')->value;
-  }
 
   /**
    * {@inheritdoc}
