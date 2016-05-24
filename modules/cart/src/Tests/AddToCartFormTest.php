@@ -507,7 +507,7 @@ class AddToCartFormTest extends OrderTestBase {
    * Creates an attribute value.
    *
    * @param string $attribute
-   *   The attribute id.
+   *   The attribute ID.
    * @param string $name
    *   The attribute value name.
    *

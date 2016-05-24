@@ -16,10 +16,10 @@ use Drupal\Core\Plugin\PluginFormInterface;
 interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
-   * Gets the pane id.
+   * Gets the pane ID.
    *
    * @return string
-   *   The pane id.
+   *   The pane ID.
    */
   public function getId();
 

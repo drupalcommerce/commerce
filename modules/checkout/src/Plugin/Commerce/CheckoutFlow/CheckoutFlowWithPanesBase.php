@@ -178,7 +178,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * Get the regions for the checkout pane overview table.
    *
    * @return array
-   *   The table regions, keyed by step id.
+   *   The table regions, keyed by step ID.
    */
   protected function getTableRegions() {
     $regions = [];

@@ -309,7 +309,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    *   An optional callback to use for filtering the list.
    *
    * @return array[]
-   *   The attribute values, keyed by attribute id.
+   *   The attribute values, keyed by attribute ID.
    */
   protected function getAttributeValues(array $variations, $field_name, callable $callback = NULL) {
     $values = [];

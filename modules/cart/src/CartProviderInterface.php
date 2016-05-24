@@ -16,7 +16,7 @@ interface CartProviderInterface {
    * Creates a cart order for the given store and user.
    *
    * @param string $order_type
-   *   The order type id.
+   *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
@@ -34,7 +34,7 @@ interface CartProviderInterface {
    * Gets the cart order for the given store and user.
    *
    * @param string $order_type
-   *   The order type id.
+   *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
@@ -46,17 +46,17 @@ interface CartProviderInterface {
   public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
 
   /**
-   * Gets the cart order id for the given store and user.
+   * Gets the cart order ID for the given store and user.
    *
    * @param string $order_type
-   *   The order type id.
+   *   The order type ID.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user. If empty, the current user is assumed.
    *
    * @return int|null
-   *   The cart order id, or NULL if none found.
+   *   The cart order ID, or NULL if none found.
    */
   public function getCartId($order_type, StoreInterface $store, AccountInterface $account = NULL);
 

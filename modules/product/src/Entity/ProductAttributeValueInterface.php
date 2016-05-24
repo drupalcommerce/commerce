@@ -11,12 +11,12 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface ProductAttributeValueInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
-   * Gets the attribute id.
+   * Gets the attribute ID.
    *
    * The attribute id is also the bundle of the attribute value.
    *
    * @return string
-   *   The attribute id.
+   *   The attribute ID.
    */
   public function getAttributeId();
 

@@ -101,7 +101,7 @@ class Order extends ContentEntityBase implements OrderInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
-    // If no order number has been set explicitly, set it to the order id.
+    // If no order number has been set explicitly, set it to the order ID.
     if (!$this->getOrderNumber()) {
       $this->setOrderNumber($this->id());
       $this->save();
@@ -537,7 +537,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    *   The order.
    *
    * @return string
-   *   The workflow id.
+   *   The workflow ID.
    */
   public static function getWorkflowId(OrderInterface $order) {
     $workflow = OrderType::load($order->bundle())->getWorkflowId();

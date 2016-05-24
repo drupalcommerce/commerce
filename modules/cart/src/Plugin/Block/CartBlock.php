@@ -167,7 +167,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The cart orders.
    *
    * @return array
-   *   An array of view ids keyed by cart order id.
+   *   An array of view ids keyed by cart order ID.
    */
   protected function getCartViews(array $carts) {
     $cart_views = [];

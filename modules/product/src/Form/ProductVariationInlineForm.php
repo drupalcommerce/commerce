@@ -84,7 +84,7 @@ class ProductVariationInlineForm extends EntityInlineForm {
   }
 
   /**
-   * Loads and returns a product variation type with the given id.
+   * Loads and returns a product variation type with the given ID.
    *
    * @param $variation_type_id
    *   The ID of the variation type.

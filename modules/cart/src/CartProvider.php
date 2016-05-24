@@ -34,11 +34,11 @@ class CartProvider implements CartProviderInterface {
   protected $cartSession;
 
   /**
-   * The loaded cart data, keyed by cart order id, then grouped by uid.
+   * The loaded cart data, keyed by cart order ID, then grouped by uid.
    *
    * Each data item is an array with the following keys:
    * - type: The order type.
-   * - store_id: The store id.
+   * - store_id: The store ID.
    *
    * Example:
    * @code

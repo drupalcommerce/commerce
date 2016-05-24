@@ -25,7 +25,7 @@ interface CartSessionInterface {
    * Adds the given cart order id to the session.
    *
    * @param int $cart_id
-   *   The cart order id.
+   *   The cart order ID.
    */
   public function addCartId($cart_id);
 
@@ -33,7 +33,7 @@ interface CartSessionInterface {
    * Checks whether the given cart order id exists in the session.
    *
    * @param int $cart_id
-   *   The cart order id.
+   *   The cart order ID.
    *
    * @return bool
    *   TRUE if the given cart order id exists in the session, FALSE otherwise.
@@ -44,7 +44,7 @@ interface CartSessionInterface {
    * Deletes the given cart order id from the session.
    *
    * @param int $cart_id
-   *   The cart order id.
+   *   The cart order ID.
    */
   public function deleteCartId($cart_id);
 

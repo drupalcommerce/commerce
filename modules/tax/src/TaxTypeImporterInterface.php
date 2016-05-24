@@ -16,7 +16,7 @@ interface TaxTypeImporterInterface {
   public function getImportableTaxTypes();
 
   /**
-   * Creates a tax type entity from an id.
+   * Creates a tax type entity from an ID.
    *
    * @param id
    *   The id of a tax type.

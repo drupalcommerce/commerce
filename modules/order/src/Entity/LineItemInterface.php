@@ -19,7 +19,7 @@ interface LineItemInterface extends EntityChangedInterface, ContentEntityInterfa
   public function getOrder();
 
   /**
-   * Gets the parent order id.
+   * Gets the parent order ID.
    *
    * @return int|null
    *   The order id, or null.

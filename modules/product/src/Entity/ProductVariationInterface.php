@@ -20,10 +20,10 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function getProduct();
 
   /**
-   * Gets the parent product id.
+   * Gets the parent product ID.
    *
    * @return int|null
-   *   The product id, or null.
+   *   The product ID, or null.
    */
   public function getProductId();
 

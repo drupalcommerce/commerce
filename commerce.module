@@ -101,7 +101,7 @@ function commerce_get_entity_display($entity_type, $bundle, $display_context) {
  * Helper for providing entity theme suggestions.
  *
  * @param string $entity_type_id
- *   The entity type id.
+ *   The entity type ID.
  * @param array $variables
  *   An array of variables passed to the theme hook.
  *

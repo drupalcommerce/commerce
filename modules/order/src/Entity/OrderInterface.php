@@ -205,18 +205,18 @@ interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, E
   public function setBillingProfile(ProfileInterface $profile);
 
   /**
-   * Gets the billing profile id.
+   * Gets the billing profile ID.
    *
    * @return int
-   *   The billing profile id.
+   *   The billing profile ID.
    */
   public function getBillingProfileId();
 
   /**
-   * Sets the billing profile id.
+   * Sets the billing profile ID.
    *
    * @param int $billingProfileId
-   *   The billing profile id.
+   *   The billing profile ID.
    *
    * @return $this
    */

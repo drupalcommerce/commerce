@@ -80,7 +80,7 @@ class CartController extends ControllerBase {
    *   The cart orders.
    *
    * @return array
-   *   An array of view ids keyed by cart order id.
+   *   An array of view ids keyed by cart order ID.
    */
   protected function getCartViews(array $carts) {
     $order_type_ids = array_map(function($cart) {

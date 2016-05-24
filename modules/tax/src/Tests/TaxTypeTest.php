@@ -34,7 +34,7 @@ class TaxTypeTest extends TaxTestBase {
     $this->assertEqual($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
-    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone id.');
+    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
     $this->assertEqual($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
 
     $zone = $this->createZone();
@@ -51,7 +51,7 @@ class TaxTypeTest extends TaxTestBase {
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $tax_type */
     $tax_type = TaxType::load($values['id']);
     $this->assertEqual($tax_type->getName(), $values['name'], 'The new tax type has the correct name.');
-    $this->assertEqual($tax_type->getZoneId(), $values['zone'], 'The new tax type has the correct zone id.');
+    $this->assertEqual($tax_type->getZoneId(), $values['zone'], 'The new tax type has the correct zone ID.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
     $this->assertEqual($tax_type->getRoundingMode(), $values['roundingMode'], 'The new tax type has the correct rounding mode.');
@@ -87,7 +87,7 @@ class TaxTypeTest extends TaxTestBase {
     $this->assertEqual($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
-    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone id.');
+    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
     $this->assertEqual($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
   }
 

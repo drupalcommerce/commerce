@@ -237,7 +237,7 @@ class ConfigUpdater implements ConfigUpdaterInterface {
    *   Name of the config object.
    *
    * @return string
-   *   Name of the config type. Either 'system.simple' or an entity type id.
+   *   Name of the config type. Either 'system.simple' or an entity type ID.
    */
   protected function getConfigType($config_name) {
     foreach ($this->typesByPrefix as $prefix => $config_type) {
