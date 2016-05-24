@@ -37,6 +37,7 @@ use Drupal\user\UserInterface;
  *   admin_permission = "administer products",
  *   fieldable = TRUE,
  *   translatable = TRUE,
+ *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_variation",
  *   data_table = "commerce_product_variation_field_data",
  *   entity_keys = {
@@ -345,7 +346,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDescription(t('The unique, machine-readable identifier for a variation.'))
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
-      ->setTranslatable(TRUE)
       ->setSetting('display_description', TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',

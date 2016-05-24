@@ -119,11 +119,8 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    $stores = [];
-    foreach ($this->get('stores') as $store_item) {
-      $stores[] = $store_item->entity;
-    }
-    return $stores;
+    $stores = $this->get('stores')->referencedEntities();
+    return $this->ensureTranslations($stores);
   }
 
   /**
@@ -187,7 +184,8 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getVariations() {
-    return $this->get('variations')->referencedEntities();
+    $variations = $this->get('variations')->referencedEntities();
+    return $this->ensureTranslations($variations);
   }
 
   /**
@@ -261,6 +259,27 @@ class Product extends ContentEntityBase implements ProductInterface {
         return $variation;
       }
     }
+  }
+
+  /**
+   * Ensures that the provided entities are in the current entity's language.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   The entities to process.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   The processed entities.
+   */
+  protected function ensureTranslations(array $entities) {
+    $langcode = $this->language()->getId();
+    foreach ($entities as $index => $entity) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      if ($entity->hasTranslation($langcode)) {
+        $entities[$index] = $entity->getTranslation($langcode);
+      }
+    }
+
+    return $entities;
   }
 
   /**
