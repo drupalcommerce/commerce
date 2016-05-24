@@ -104,10 +104,70 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function setStoreIds(array $store_ids);
 
   /**
-   * Gets the default product variation.
+   * Gets the variations.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface[]
+   *   The variations.
+   */
+  public function getVariations();
+
+  /**
+   * Sets the variations.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
+   *   The variations.
+   *
+   * @return $this
+   */
+  public function setVariations(array $variations);
+
+  /**
+   * Gets whether the product has variations.
+   *
+   * A product must always have at least one variation, but a newly initialized
+   * (or invalid) product entity might not have any.
+   *
+   * @return bool
+   *   TRUE if the product has variations, FALSE otherwise.
+   */
+  public function hasVariations();
+
+  /**
+   * Adds a variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return $this
+   */
+  public function addVariation(ProductVariationInterface $variation);
+
+  /**
+   * Removes a variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return $this
+   */
+  public function removeVariation(ProductVariationInterface $variation);
+
+  /**
+   * Checks whether the product has a given variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return bool
+   *   TRUE if the variation was found, FALSE otherwise.
+   */
+  public function hasVariation(ProductVariationInterface $variation);
+
+  /**
+   * Gets the default variation.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface
-   *   The default product variation.
+   *   The default variation.
    */
   public function getDefaultVariation();
 

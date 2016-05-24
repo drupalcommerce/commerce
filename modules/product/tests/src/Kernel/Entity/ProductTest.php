@@ -40,6 +40,12 @@ class ProductTest extends KernelTestBase {
   }
 
   /**
+   * @covers ::getVariations
+   * @covers ::setVariations
+   * @covers ::hasVariations
+   * @covers ::addVariation
+   * @covers ::removeVariation
+   * @covers ::hasVariation
    * @covers ::getDefaultVariation
    */
   public function testGetDefaultVariation() {
@@ -61,9 +67,25 @@ class ProductTest extends KernelTestBase {
 
     $product = Product::create([
       'type' => 'default',
-      'variations' => [$variation1, $variation2],
     ]);
     $product->save();
+
+    // An initially saved variation won't be the same as the loaded one.
+    $variation1 = ProductVariation::load($variation1->id());
+    $variation2 = ProductVariation::load($variation2->id());
+
+    $variations = [$variation1, $variation2];
+    $this->assertFalse($product->hasVariations());
+    $product->setVariations($variations);
+    $this->assertTrue($product->hasVariations());
+    $variations_match = $variations == $product->getVariations();
+    $this->assertTrue($variations_match);
+
+    $this->assertTrue($product->hasVariation($variation1));
+    $product->removeVariation($variation1);
+    $this->assertFalse($product->hasVariation($variation1));
+    $product->addVariation($variation1);
+    $this->assertTrue($product->hasVariation($variation1));
 
     $this->assertEquals($product->getDefaultVariation(), $variation2);
     $this->assertNotEquals($product->getDefaultVariation(), $variation1);

@@ -186,10 +186,76 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public function getVariations() {
+    return $this->get('variations')->referencedEntities();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVariations(array $variations) {
+    $this->set('variations', $variations);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariations() {
+    return !$this->get('variations')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addVariation(ProductVariationInterface $variation) {
+    if (!$this->hasVariation($variation)) {
+      $this->get('variations')->appendItem($variation);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeVariation(ProductVariationInterface $variation) {
+    $index = $this->getVariationIndex($variation);
+    if ($index !== FALSE) {
+      $this->get('variations')->offsetUnset($index);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariation(ProductVariationInterface $variation) {
+    return $this->getVariationIndex($variation) !== FALSE;
+  }
+
+  /**
+   * Gets the index of the given variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return int|bool
+   *   The index of the given variation, or FALSE if not found.
+   */
+  protected function getVariationIndex(ProductVariationInterface $variation) {
+    $values = $this->get('variations')->getValue();
+    $variation_ids = array_map(function ($value) {
+      return $value['target_id'];
+    }, $values);
+
+    return array_search($variation->id(), $variation_ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDefaultVariation() {
-    foreach ($this->variations as $item) {
-      /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $variation */
-      $variation = $item->entity;
+    foreach ($this->getVariations() as $variation) {
       // Return the first active variation.
       if ($variation->isActive()) {
         return $variation;
