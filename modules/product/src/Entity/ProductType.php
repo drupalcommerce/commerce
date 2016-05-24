@@ -53,18 +53,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface {
 
   /**
-   * The product type machine name and primary ID.
+   * The product type ID.
    *
    * @var string
    */
   protected $id;
-
-  /**
-   * The product type UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
 
   /**
    * The product type label.

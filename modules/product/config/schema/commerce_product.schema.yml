@@ -4,7 +4,7 @@ commerce_product.commerce_product_type.*:
   mapping:
     id:
       type: string
-      label: 'Type'
+      label: 'ID'
     label:
       type: label
       label: 'Label'
@@ -24,7 +24,7 @@ commerce_product.commerce_product_variation_type.*:
   mapping:
     id:
       type: string
-      label: 'Type'
+      label: 'ID'
     label:
       type: label
       label: 'Label'
@@ -41,7 +41,7 @@ commerce_product.commerce_product_attribute.*:
   mapping:
     id:
       type: string
-      label: 'Type'
+      label: 'ID'
     label:
       type: label
       label: 'Label'

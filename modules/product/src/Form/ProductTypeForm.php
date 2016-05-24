@@ -85,8 +85,9 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
     ];
     $form['description'] = [
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('Description'),
+      '#description' => $this->t('This text will be displayed on the <em>Add product</em> page.'),
       '#default_value' => $product_type->getDescription(),
     ];
     $form['variationType'] = [

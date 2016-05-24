@@ -21,8 +21,5 @@
  */
 #}
 <div{{ attributes}}>
-  {{- content.product -}}
-  {% if content %}
-    {{- content|without('product_variation_attributes') -}}
-  {% endif %}
+  {{- content -}}
 </div>

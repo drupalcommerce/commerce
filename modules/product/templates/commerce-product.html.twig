@@ -20,5 +20,5 @@
  */
 #}
 <article{{ attributes }}>
-  {{ content }}
+  {{- content|without('product_variation_attributes') -}}
 </article>
