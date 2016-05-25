@@ -4,6 +4,7 @@ namespace Drupal\commerce_store\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\Store;
+use Drupal\commerce_store\StoreCreationTrait;
 
 /**
  * Create, view, edit, delete, and change store entities.
@@ -11,6 +12,8 @@ use Drupal\commerce_store\Entity\Store;
  * @group commerce
  */
 class StoreTest extends CommerceTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -82,13 +85,9 @@ class StoreTest extends CommerceTestBase {
    * Tests editing a store.
    */
   public function testEditStore() {
-    $store = $this->createStore([
-      'type' => 'default',
-      'name' => $this->randomMachineName(8),
-    ]);
+    $store = $this->createStore();
 
-    $this->drupalGet('admin/commerce/stores');
-    $this->clickLink(t('Edit'));
+    $this->drupalGet($store->toUrl('edit-form'));
     $new_store_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_store_name,
@@ -104,10 +103,7 @@ class StoreTest extends CommerceTestBase {
    * Tests deleting a store.
    */
   public function testDeleteStore() {
-    $store = $this->createStore([
-      'type' => 'default',
-      'name' => $this->randomMachineName(8),
-    ]);
+    $store = $this->createStore();
     $this->drupalGet($store->toUrl('delete-form'));
     $this->assertResponse(200, 'The store delete form can be accessed.');
     $this->assertText(t('This action cannot be undone.'), 'The store delete confirmation form is available.');
@@ -116,36 +112,6 @@ class StoreTest extends CommerceTestBase {
     \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
     $this->assertFalse($store_exists, 'The new store has been deleted from the database using UI.');
-  }
-
-  /**
-   * Creates a new store entity.
-   *
-   * Initializes relevant defaults (mail, currency, address).
-   *
-   * @param array $values
-   *   An array of values.
-   *   Example: 'name' => 'Foo store'.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   A new store entity.
-   */
-  protected function createStore(array $values) {
-    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-    $values += [
-      'mail' => \Drupal::currentUser()->getEmail(),
-      'default_currency' => 'USD',
-      'address' => [
-        'country_code' => 'US',
-        'address_line1' => '1098 Alta Ave',
-        'locality' => 'Mountain View',
-        'administrative_area' => 'US-CA',
-        'postal_code' => '94043',
-      ],
-    ];
-    $store = $this->createEntity('commerce_store', $values);
-
-    return $store;
   }
 
 }

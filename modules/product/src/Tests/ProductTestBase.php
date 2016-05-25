@@ -4,6 +4,7 @@ namespace Drupal\commerce_product\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\commerce_store\StoreCreationTrait;
 
 /**
  * Defines base class for shortcut test cases.
@@ -11,6 +12,7 @@ use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 abstract class ProductTestBase extends CommerceTestBase {
 
   use EntityReferenceTestTrait;
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -58,19 +60,9 @@ abstract class ProductTestBase extends CommerceTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $store_type = $this->createEntity('commerce_store_type', [
-      'id' => strtolower($this->randomMachineName(8)),
-      'label' => $this->randomMachineName(8),
-    ]);
-
     $this->stores = [];
     for ($i = 0; $i < 3; $i++) {
-      $this->stores[] = $this->createEntity('commerce_store', [
-        'type' => $store_type->id(),
-        'name' => $this->randomMachineName(8),
-        'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'USD',
-      ]);
+      $this->stores[] = $this->createStore();
     }
   }
 
