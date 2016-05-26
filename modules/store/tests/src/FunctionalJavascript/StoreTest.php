@@ -1,18 +1,20 @@
 <?php
 
-namespace Drupal\commerce_store\Tests;
+namespace Drupal\Tests\commerce_store\FunctionalJavascript;
 
-use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\simpletest\BlockCreationTrait;
+use Drupal\Tests\commerce\Functional\CommerceJavascriptTestBase;
 
 /**
  * Create, view, edit, delete, and change store entities.
  *
  * @group commerce
  */
-class StoreTest extends CommerceTestBase {
+class StoreTest extends CommerceJavascriptTestBase {
 
+  use BlockCreationTrait;
   use StoreCreationTrait;
 
   /**
@@ -20,7 +22,7 @@ class StoreTest extends CommerceTestBase {
    *
    * @var array
    */
-  public static $modules = ['commerce_store'];
+  public static $modules = ['block', 'commerce_store'];
 
   /**
    * A store type entity to use in the tests.
@@ -28,6 +30,16 @@ class StoreTest extends CommerceTestBase {
    * @var \Drupal\commerce_store\Entity\StoreTypeInterface
    */
   protected $type;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    $this->placeBlock('local_tasks_block');
+    $this->placeBlock('local_actions_block');
+  }
 
   /**
    * {@inheritdoc}
@@ -44,28 +56,26 @@ class StoreTest extends CommerceTestBase {
    */
   public function testCreateStore() {
     $this->drupalGet('admin/commerce/stores');
-    $this->clickLink('Add a new store');
+    $this->getSession()->getPage()->clickLink('Add a new store');
 
     // Check the integrity of the form.
-    $this->assertFieldByName('name[0][value]', NULL, 'Name field is present.');
-    $this->assertFieldByName('mail[0][value]', NULL, 'Email field is present.');
-    $this->assertFieldByName('address[0][country_code]', NULL, 'Address field is present.');
-    $this->assertFieldByName('billing_countries[]', NULL, 'Supported billing countries field is present');
-    $this->assertFieldByName('uid[0][target_id]', NULL, 'Owner field is present');
-    $this->assertFieldByName('default', NULL, 'Default field is present');
-    $this->assertFieldsByValue(t('Save'), NULL, 'Save button is present');
+    $this->assertSession()->fieldExists('name[0][value]');
+    $this->assertSession()->fieldExists('mail[0][value]');
+    $this->assertSession()->fieldExists('address[0][country_code]');
+    $this->assertSession()->fieldExists('billing_countries[]');
+    $this->assertSession()->fieldExists('uid[0][target_id]');
+    $this->assertSession()->fieldExists('default');
 
+    $this->getSession()->getPage()->fillField('address[0][country_code]', 'US');
+    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][administrative_area]"]\').length > 0 && jQuery.active == 0;');
+
+    $name = $this->randomMachineName(8);
     $edit = [
-      'name[0][value]' => $this->randomMachineName(8),
+      'name[0][value]' => $name,
       'mail[0][value]' => \Drupal::currentUser()->getEmail(),
       'default_currency' => 'USD',
     ];
-    $address_country = [
-      'address[0][country_code]' => 'US',
-    ];
-    $this->drupalPostAjaxForm(NULL, $address_country, 'address[0][country_code]');
     $address = [
-      'country_code' => 'US',
       'address_line1' => '1098 Alta Ave',
       'locality' => 'Mountain View',
       'administrative_area' => 'US-CA',
@@ -75,10 +85,10 @@ class StoreTest extends CommerceTestBase {
       $path = 'address[0][' . $property . ']';
       $edit[$path] = $value;
     }
-    $this->drupalPostForm(NULL, $edit, t('Save'));
-
-    $store_count = $this->cssSelect('.view-commerce-stores tr td.views-field-name');
-    $this->assertEqual(count($store_count), 1, 'Stores exists in the table.');
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains("Saved the $name store.");
+    $store_count = $this->getSession()->getPage()->find('css', '.view-commerce-stores tr td.views-field-name');
+    $this->assertEquals(count($store_count), 1, 'Stores exists in the table.');
   }
 
   /**
@@ -92,11 +102,11 @@ class StoreTest extends CommerceTestBase {
     $edit = [
       'name[0][value]' => $new_store_name,
     ];
-    $this->drupalPostForm(NULL, $edit, 'Save');
+    $this->submitForm($edit, 'Save');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_changed = Store::load($store->id());
-    $this->assertEqual($new_store_name, $store_changed->getName(), 'The store name successfully updated.');
+    $this->assertEquals($new_store_name, $store_changed->getName(), 'The store name successfully updated.');
   }
 
   /**
@@ -105,9 +115,9 @@ class StoreTest extends CommerceTestBase {
   public function testDeleteStore() {
     $store = $this->createStore();
     $this->drupalGet($store->toUrl('delete-form'));
-    $this->assertResponse(200, 'The store delete form can be accessed.');
-    $this->assertText(t('This action cannot be undone.'), 'The store delete confirmation form is available.');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('This action cannot be undone.');
+    $this->submitForm([], t('Delete'));
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
