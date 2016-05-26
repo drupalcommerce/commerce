@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\commerce_product\Tests;
+use Drupal\commerce_product\ProductTestTrait;
 
 /**
  * Tests the product variation field display injection.
@@ -8,6 +9,8 @@ namespace Drupal\commerce_product\Tests;
  * @group commerce
  */
 class ProductVariationFieldInjectionTest extends ProductTestBase {
+
+  use ProductTestTrait;
 
   /**
    * The product to test against.
@@ -38,31 +41,17 @@ class ProductVariationFieldInjectionTest extends ProductTestBase {
       ]);
     }
 
+    $variations = $this->createProductVariations('default', [
+      ['sku' => 'INJECTION-CYAN', 'price' => 999, 'attribute_color' => $attribute_values['cyan']],
+      ['sku' => 'INJECTION-MAGENTA', 'price' => 999, 'attribute_color' => $attribute_values['magenta']],
+    ]);
+
     $this->product = $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => $this->randomMachineName(),
       'stores' => $this->stores,
       'body' => ['value' => 'Testing product variation field injection!'],
-      'variations' => [
-        $this->createEntity('commerce_product_variation', [
-          'type' => 'default',
-          'sku' => 'INJECTION-CYAN',
-          'attribute_color' => $attribute_values['cyan']->id(),
-          'price' => [
-            'amount' => 999,
-            'currency_code' => 'USD',
-          ],
-        ]),
-        $this->createEntity('commerce_product_variation', [
-          'type' => 'default',
-          'sku' => 'INJECTION-MAGENTA',
-          'attribute_color' => $attribute_values['magenta']->id(),
-          'price' => [
-            'amount' => 999,
-            'currency_code' => 'USD',
-          ],
-        ]),
-      ],
+      'variations' => $variations,
     ]);
   }
 
