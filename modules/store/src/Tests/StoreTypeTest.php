@@ -4,6 +4,7 @@ namespace Drupal\commerce_store\Tests;
 
 use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\Entity\StoreType;
+use Drupal\commerce_store\StoreCreationTrait;
 
 /**
  * Ensure the store type works correctly.
@@ -11,6 +12,8 @@ use Drupal\commerce_store\Entity\StoreType;
  * @group commerce
  */
 class StoreTypeTest extends CommerceTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -119,11 +122,7 @@ class StoreTypeTest extends CommerceTestBase {
     ]);
 
     // Create a store.
-    $store = $this->createEntity('commerce_store', [
-      'type' => $type->id(),
-      'name' => $this->randomMachineName(8),
-      'email' => \Drupal::currentUser()->getEmail(),
-    ]);
+    $store = $this->createStore(NULL, NULL, $type->id());
 
     // Try to delete the store type.
     $this->drupalGet('admin/commerce/config/store-types/' . $type->id() . '/delete');

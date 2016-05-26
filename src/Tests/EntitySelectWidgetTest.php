@@ -5,6 +5,7 @@ namespace Drupal\commerce\Tests;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\commerce_store\StoreCreationTrait;
 
 /**
  * Tests the Entity select widget.
@@ -12,6 +13,8 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  * @group commerce
  */
 class EntitySelectWidgetTest extends CommerceTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -149,12 +152,7 @@ class EntitySelectWidgetTest extends CommerceTestBase {
    */
   protected function createStores($num_stores) {
     for ($i = 0; $i < $num_stores; $i++) {
-      $this->stores[] = $this->createEntity('commerce_store', [
-        'type' => 'default',
-        'name' => $this->randomMachineName(8),
-        'mail' => \Drupal::currentUser()->getEmail(),
-        'default_currency' => 'USD',
-      ]);
+      $this->stores[] = $this->createStore();
     }
   }
 
