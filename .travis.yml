@@ -28,6 +28,7 @@ matrix:
 
 env:
   global:
+    - PHANTOMJS2_VERSION="2.0.0"
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -113,6 +114,11 @@ before_install:
 
 install:
   - drupal-ti install
+  - mkdir travis-phantomjs
+  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
+  - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
+  - export PATH=$PWD/travis-phantomjs:$PATH
+  - phantomjs --version
 
 before_script:
   - drupal-ti --include ".travis-before-script.sh"
