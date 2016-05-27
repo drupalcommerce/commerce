@@ -3,12 +3,15 @@
 namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 
 /**
  * Provides a base class for Commerce functional tests.
  */
 abstract class CommerceBrowserTestBase extends BrowserTestBase {
+
+  use BlockCreationTrait;
 
   /**
    * Modules to enable.
@@ -20,7 +23,9 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'commerce', 'commerce_price'];
+  public static $modules = ['system', 'block', 'field', 'commerce',
+    'commerce_price',
+  ];
 
   /**
    * A test user with administrative privileges.
@@ -34,6 +39,10 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->placeBlock('local_tasks_block');
+    $this->placeBlock('local_actions_block');
+    $this->placeBlock('page_title_block');
 
     $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
     $this->drupalLogin($this->adminUser);

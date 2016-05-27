@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_store\FunctionalJavascript;
 
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceJavascriptTestBase;
 
 /**
@@ -14,7 +13,6 @@ use Drupal\Tests\commerce\Functional\CommerceJavascriptTestBase;
  */
 class StoreTest extends CommerceJavascriptTestBase {
 
-  use BlockCreationTrait;
   use StoreCreationTrait;
 
   /**
@@ -30,16 +28,6 @@ class StoreTest extends CommerceJavascriptTestBase {
    * @var \Drupal\commerce_store\Entity\StoreTypeInterface
    */
   protected $type;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->placeBlock('local_tasks_block');
-    $this->placeBlock('local_actions_block');
-  }
 
   /**
    * {@inheritdoc}
