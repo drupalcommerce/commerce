@@ -2,24 +2,23 @@
 /**
  * @file
  *
- * Default theme implementation for product variations.
+ * Default template for product variations.
  *
  * Available variables:
- * - content: Items for the content of the product variation.
- *   Use 'content' to print them all, or print a subset such as
- *   'content.sku'. Use the following code to exclude the
- *   printing of a given child element:
- *   @code
- *   {{ content|without('sku') }}
- *   @endcode
  * - attributes: HTML attributes for the wrapper.
- * - product_variation: The product variation object.
- * - product: The product object.
- * - product_url: The product URL.
+ * - product_variation: The rendered product variation fields.
+ *   Use 'product_variation' to print them all, or print a subset such as
+ *   'product_variation.title'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ product_variation|without('title') }}
+ *   @endcode
+ * - product_variation_entity: The product variation entity.
+ * - url: The product URL.
  *
  * @ingroup themeable
  */
 #}
-<div{{ attributes}}>
-  {{- content -}}
+<div{{ attributes }}>
+  {{- product_variation -}}
 </div>

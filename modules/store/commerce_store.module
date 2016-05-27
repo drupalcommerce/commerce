@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_theme().
@@ -53,11 +54,10 @@ function template_preprocess_commerce_store(array &$variables) {
   /** @var Drupal\commerce_store\Entity\StoreInterface $store */
   $store = $variables['elements']['#commerce_store'];
 
-  $variables['store'] = $store;
-  $variables['url'] = $store->toUrl();
-  // Helpful $content variable for templates.
-  $variables['content'] = [];
-  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+  $variables['store_entity'] = $store;
+  $variables['store_url'] = $store->toUrl();
+  $variables['store'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['store'][$key] = $variables['elements'][$key];
   }
 }
