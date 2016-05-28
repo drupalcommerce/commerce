@@ -1,0 +1,54 @@
+/**
+ * @file
+ * Styles for the checkout form.
+ */
+
+/* Narrow screens */
+.layout-region {
+  box-sizing: border-box;
+}
+
+/* Wide screens */
+@media screen and (min-width: 780px), (orientation: landscape) and (min-device-height: 780px) {
+
+  .layout-region-checkout-main,
+  .layout-region-checkout-footer {
+    float: left; /* LTR */
+    width: 65%;
+    padding-right: 2em; /* LTR */
+    box-sizing: border-box;
+  }
+
+  [dir="rtl"] .layout-region-checkout-main,
+  [dir="rtl"] .layout-region-checkout-footer {
+    float: right;
+    padding-left: 2em;
+    padding-right: 0;
+  }
+
+  .layout-region-checkout-secondary {
+    float: right; /* LTR */
+    width: 35%;
+  }
+
+  [dir="rtl"] .layout-region-checkout-secondary {
+    float: left;
+  }
+}
+
+/**
+ * The vertical toolbar mode gets triggered for narrow screens, which throws off
+ * the intent of media queries written for the viewport width. When the vertical
+ * toolbar is on, we need to suppress layout for the original media width + the
+ * toolbar width (240px). In this case, 240px + 780px.
+ */
+@media screen and (max-width: 1020px) {
+
+  .toolbar-vertical.toolbar-tray-open .layout-region-checkout-main,
+  .toolbar-vertical.toolbar-tray-open .layout-region-checkout-footer,
+  .toolbar-vertical.toolbar-tray-open .layout-region-checkout-secondary {
+    float: none;
+    width: auto;
+    padding-right: 0;
+  }
+}

@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_theme().
@@ -19,9 +20,30 @@ function commerce_checkout_theme() {
         'steps' => [],
       ],
     ],
+    'commerce_checkout_form' => [
+      'render element' => 'form',
+    ],
+    'commerce_checkout_form__with_summary' => [
+      'base hook' => 'commerce_checkout_form',
+    ],
   ];
 
   return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_checkout_theme_suggestions_commerce_checkout_form(array $variables) {
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original;
+  // If the checkout form has an order summary, suggest the enhanced layout.
+  if (isset($variables['form']['order_summary']) && Element::isVisibleElement($variables['form']['order_summary'])) {
+    $suggestions[] = $original . '__with_summary';
+  }
+
+  return $suggestions;
 }
 
 /**

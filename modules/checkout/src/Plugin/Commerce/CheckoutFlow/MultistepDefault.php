@@ -20,13 +20,16 @@ class MultistepDefault extends CheckoutFlowWithPanesBase {
       'login' => [
         'label' => $this->t('Login'),
         'previous_label' => $this->t('Return to login'),
+        'has_order_summary' => FALSE,
       ],
       'order_information' => [
         'label' => $this->t('Order information'),
+        'has_order_summary' => TRUE,
       ],
       'review' => [
         'label' => $this->t('Review'),
         'next_label' => $this->t('Continue to review'),
+        'has_order_summary' => TRUE,
       ],
     ] + parent::getSteps();
   }
