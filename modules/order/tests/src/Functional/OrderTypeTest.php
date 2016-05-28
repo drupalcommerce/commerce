@@ -1,15 +1,16 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the commerce_order_type entity forms.
  *
  * @group commerce
  */
-class OrderTypeTest extends OrderTestBase {
+class OrderTypeTest extends OrderBrowserTestBase {
 
   /**
    * Tests if the default Order Type was created.
@@ -19,7 +20,7 @@ class OrderTypeTest extends OrderTestBase {
     $this->assertTrue(isset($order_types['default']), 'Order Type Order is available');
 
     $order_type = OrderType::load('default');
-    $this->assertEqual($order_types['default'], $order_type, 'The correct Order Type is loaded');
+    $this->assertEquals($order_types['default'], $order_type, 'The correct Order Type is loaded');
   }
 
   /**
@@ -38,13 +39,13 @@ class OrderTypeTest extends OrderTestBase {
 
     // Create a order type through the add form.
     $this->drupalGet('/admin/commerce/config/order-types');
-    $this->clickLink('Add a new order type');
+    $this->getSession()->getPage()->clickLink('Add a new order type');
 
     $values = [
       'id' => 'foo',
       'label' => 'Label of foo',
     ];
-    $this->drupalPostForm(NULL, $values, t('Save'));
+    $this->submitForm($values, t('Save'));
 
     $type_exists = (bool) OrderType::load($values['id']);
     $this->assertTrue($type_exists, 'The new order type has been created in the database.');
@@ -70,18 +71,15 @@ class OrderTypeTest extends OrderTestBase {
 
     // Try to delete the order type.
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
-    $this->assertRaw(
-      t('%type is used by 1 order on your site. You can not remove this order type until you have removed all of the %type orders.', array('%type' => $type->label())),
-      'The order type will not be deleted until all orders of that type are deleted'
-    );
-    $this->assertNoText(t('This action cannot be undone.'), 'The order type deletion confirmation form is not available');
+    $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You can not remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
+    $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
     // Deleting the order type when its not being referenced by a order.
     $order->delete();
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
-    $this->assertRaw(t('Are you sure you want to delete the order type %label?', ['%label' => $type->label()]));
-    $this->assertText(t('This action cannot be undone.'), 'The order type deletion confirmation form is available');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order type @label?', ['@label' => $type->label()]));
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], t('Delete'));
     $type_exists = (bool) OrderType::load($type->id());
     $this->assertFalse($type_exists, 'The order type has been deleted from the database.');
   }
