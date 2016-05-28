@@ -38,7 +38,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
+ *     "translation" = "Drupal\commerce_product\ProductTranslationHandler"
  *   },
  *   admin_permission = "administer products",
  *   fieldable = TRUE,
