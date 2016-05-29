@@ -14,18 +14,6 @@ entity.commerce_product_attribute.collection:
   requirements:
     _permission: 'administer product attributes'
 
-entity.commerce_product_attribute.overview_form:
-  path: '/admin/commerce/product-attributes/manage/{commerce_product_attribute}/overview'
-  defaults:
-    _form: 'Drupal\commerce_product\Form\ProductAttributeOverviewForm'
-    _title: 'List values'
-  options:
-    parameters:
-      commerce_product_attribute:
-        type: 'entity:commerce_product_attribute'
-  requirements:
-    _permission: 'administer product attributes'
-
 entity.commerce_product_type.collection:
   path: '/admin/commerce/config/product-types'
   defaults:
@@ -41,11 +29,3 @@ entity.commerce_product_variation_type.collection:
     _title: 'Product variation types'
   requirements:
     _permission: 'administer product types'
-
-entity.commerce_product_attribute.reset_form:
-  path: '/admin/commerce/product-attributes/manage/{commerce_product_attribute}/reset'
-  defaults:
-    _entity_form: 'commerce_product_attribute.reset'
-    _title: 'Reset'
-  requirements:
-    _permission: 'administer product attributes'

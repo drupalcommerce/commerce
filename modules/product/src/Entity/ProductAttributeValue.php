@@ -30,6 +30,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   admin_permission = "administer product attributes",
  *   fieldable = TRUE,
  *   translatable = TRUE,
+ *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_attribute_value",
  *   data_table = "commerce_product_attribute_value_field_data",
  *   entity_keys = {

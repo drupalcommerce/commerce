@@ -23,7 +23,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "add" = "Drupal\commerce_product\Form\ProductAttributeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductAttributeForm",
  *       "delete" = "Drupal\commerce_product\Form\ProductAttributeDeleteForm",
- *       "reset" = "Drupal\commerce_product\Form\ProductAttributeResetForm",
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -46,9 +45,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "add-form" = "/admin/commerce/product-attributes/add",
  *     "edit-form" = "/admin/commerce/product-attributes/manage/{commerce_product_attribute}",
  *     "delete-form" = "/admin/commerce/product-attributes/manage/{commerce_product_attribute}/delete",
- *     "overview-form" = "/admin/commerce/product-attributes/manage/{commerce_product_attribute}/overview",
  *     "collection" =  "/admin/commerce/product-attributes",
- *     "reset-form" = "/admin/commerce/product-attributes/manage/{commerce_product_attribute}/reset",
  *   }
  * )
  */

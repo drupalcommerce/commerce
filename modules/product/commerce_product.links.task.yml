@@ -8,12 +8,6 @@ entity.commerce_product.page_edit:
   base_route: entity.commerce_product.canonical
   title: Edit
 
-entity.commerce_product_attribute.overview_form:
-  route_name: entity.commerce_product_attribute.overview_form
-  base_route: entity.commerce_product_attribute.edit_form
-  title: 'List values'
-  weight: -10
-
 entity.commerce_product_attribute.edit_form:
   route_name: entity.commerce_product_attribute.edit_form
   base_route: entity.commerce_product_attribute.edit_form

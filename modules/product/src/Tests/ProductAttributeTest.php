@@ -32,7 +32,7 @@ class ProductAttributeTest extends ProductTestBase {
       'elementType' => 'commerce_product_rendered_attribute',
     ], 'Save');
     $this->assertText("Created the Size product attribute.");
-    $this->assertUrl("admin/commerce/product-attributes/manage/size/overview");
+    $this->assertUrl("admin/commerce/product-attributes/manage/size");
 
     $attribute = ProductAttribute::load('size');
     $this->assertEqual($attribute->label(), 'Size');
@@ -51,6 +51,7 @@ class ProductAttributeTest extends ProductTestBase {
     $this->drupalPostForm(NULL, [
       'label' => 'Colour',
       'elementType' => 'radios',
+      'values[0][entity][name][0][value]' => 'Red',
     ], 'Save');
     $this->assertText('Updated the Colour product attribute.');
     $this->assertUrl('admin/commerce/product-attributes');
@@ -77,30 +78,26 @@ class ProductAttributeTest extends ProductTestBase {
   }
 
   /**
-   * Tests creating a product attribute, and modifying list values.
+   * Tests managing product attribute values.
    */
-  public function testProductAttributeOverview() {
-    $this->drupalGet('admin/commerce/product-attributes');
-    $this->clickLink('Add product attribute');
-    $this->drupalPostForm(NULL, [
+  public function testProductAttributeValues() {
+    $this->createEntity('commerce_product_attribute', [
       'id' => 'color',
       'label' => 'Color',
-    ], 'Save');
-    $this->assertText('Created the Color product attribute.');
-    $this->assertUrl('admin/commerce/product-attributes/manage/color/overview');
-
+    ]);
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
     // Add three extra options.
-    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add']);
-    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add']);
-    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add']);
+    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add value']);
+    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add value']);
+    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add value']);
 
     $this->drupalPostForm(NULL, [
       'values[0][entity][name][0][value]' => 'Cyan',
       'values[1][entity][name][0][value]' => 'Yellow',
       'values[2][entity][name][0][value]' => 'Magenta',
       'values[3][entity][name][0][value]' => 'Black',
-    ], 'Save values');
-    $this->assertText('Saved the Color attribute values.');
+    ], 'Save');
+    $this->assertText('Updated the Color product attribute.');
 
     $attribute = ProductAttribute::load('color');
     $attribute_values = [];
@@ -108,19 +105,19 @@ class ProductAttributeTest extends ProductTestBase {
     foreach ($attribute->getValues() as $value) {
       $attribute_values[] = $value->label();
     }
-
     $this->assertTrue($attribute_values[0] == 'Cyan');
     $this->assertTrue($attribute_values[1] == 'Yellow');
     $this->assertTrue($attribute_values[2] == 'Magenta');
     $this->assertTrue($attribute_values[3] == 'Black');
 
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
     $this->drupalPostAjaxForm(NULL, [], ['remove_value1' => 'Remove']);
     $this->drupalPostAjaxForm(NULL, [], ['remove_value3' => 'Remove']);
-    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add']);
+    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Add value']);
     $this->drupalPostForm(NULL, [
       'values[3][entity][name][0][value]' => 'Cornflower Blue',
-    ], 'Save values');
-    $this->drupalPostForm(NULL, [], 'Save values');
+    ], 'Save');
+    $this->assertText('Updated the Color product attribute.');
 
     $attribute = ProductAttribute::load('color');
     $attribute_values = [];
@@ -128,10 +125,15 @@ class ProductAttributeTest extends ProductTestBase {
     foreach ($attribute->getValues() as $value) {
       $attribute_values[] = $value->label();
     }
-
     $this->assertTrue($attribute_values[0] == 'Cyan');
     $this->assertTrue($attribute_values[1] == 'Magenta');
     $this->assertTrue($attribute_values[2] == 'Cornflower Blue');
+
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $this->drupalPostAjaxForm(NULL, [], ['op' => 'Reset to alphabetical']);
+    $this->drupalPostForm(NULL, [], 'Save');
+    $this->assertText('Updated the Color product attribute.');
+    // @todo Confirm weights once $attribute->getValues() starts using them.
   }
 
 }
