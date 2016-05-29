@@ -45,6 +45,18 @@ class ProductAttributeForm extends BundleEntityFormBase {
       ],
       '#default_value' => $attribute->getElementType(),
     ];
+    if ($this->moduleHandler->moduleExists('content_translation')) {
+      $enabled = TRUE;
+      if (!$attribute->isNew()) {
+        $translation_manager = \Drupal::service('content_translation.manager');
+        $enabled = $translation_manager->isEnabled('commerce_product_attribute_value', $attribute->id());
+      }
+      $form['enable_value_translation'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable attribute value translation'),
+        '#default_value' => $enabled,
+      ];
+    }
     // The attribute acts as a bundle for attribute values, so the values can't
     // be created until the attribute is saved.
     if (!$attribute->isNew()) {
@@ -286,6 +298,16 @@ class ProductAttributeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
+    if ($this->moduleHandler->moduleExists('content_translation')) {
+      $translation_manager = \Drupal::service('content_translation.manager');
+      // Logic from content_translation_language_configuration_element_submit().
+      $enabled = $form_state->getValue('enable_value_translation');
+      if ($translation_manager->isEnabled('commerce_product_attribute_value', $this->entity->id()) != $enabled) {
+        $translation_manager->setEnabled('commerce_product_attribute_value', $this->entity->id(), $enabled);
+        $this->entityTypeManager->clearCachedDefinitions();
+        \Drupal::service('router.builder')->setRebuildNeeded();
+      }
+    }
 
     if ($status == SAVED_NEW) {
       drupal_set_message($this->t('Created the %label product attribute.', ['%label' => $this->entity->label()]));

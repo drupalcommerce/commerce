@@ -15,6 +15,13 @@ use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductType;
 
 /**
+ * Implements hook_config_translation_info_alter().
+ */
+function commerce_product_config_translation_info_alter(&$info) {
+  $info['commerce_product_attribute']['class'] = '\Drupal\commerce_product\ConfigTranslation\ProductAttributeMapper';
+}
+
+/**
  * Implements hook_entity_create().
  */
 function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
