@@ -1,18 +1,14 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order;
 
-use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Defines base class for commerce_order test cases.
- *
- * @todo Remove when commerce_cart moved to browser test.
  */
-abstract class OrderTestBase extends CommerceTestBase {
+abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
 
   use StoreCreationTrait;
 
@@ -59,37 +55,17 @@ abstract class OrderTestBase extends CommerceTestBase {
     parent::setUp();
 
     // Create a store.
-    $values = [
-      'name' => t('Default store'),
-      'uid' => 1,
-      'mail' => \Drupal::config('system.site')->get('mail'),
-      'type' => 'default',
-      'default_currency' => 'USD',
-      'address' => [
-        'country_code' => 'GB',
-        'locality' => 'London',
-        'postal_code' => 'NW1 6XE',
-        'address_line1' => '221B Baker Street',
-      ],
-    ];
-    $this->store = Store::create($values);
-    $this->store->save();
-
-    // Set as default store.
-    \Drupal::configFactory()->getEditable('commerce_store.settings')
-      ->set('default_store', $this->store->uuid())->save();
+    $this->store = $this->createStore();
 
     // Create a product variation.
-    $values = [
+    $this->variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => $this->randomMachineName(),
       'price' => [
         'amount' => 999,
         'currency_code' => 'USD',
       ],
-    ];
-    $this->variation = ProductVariation::create($values);
-    $this->variation->save();
+    ]);
 
     // We need a product too otherwise tests complain about the missing
     // backreference.

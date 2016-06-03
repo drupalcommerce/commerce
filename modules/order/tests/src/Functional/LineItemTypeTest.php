@@ -1,15 +1,16 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the commerce_line_item_type entity type.
  *
  * @group commerce
  */
-class LineItemTypeTest extends OrderTestBase {
+class LineItemTypeTest extends OrderBrowserTestBase {
 
   /**
    * Tests creating a line item type programmatically and through the add form.
@@ -23,21 +24,22 @@ class LineItemTypeTest extends OrderTestBase {
     ];
     $this->createEntity('commerce_line_item_type', $values);
     $line_item_type = LineItemType::load($values['id']);
-    $this->assertEqual($line_item_type->label(), $values['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($line_item_type->getPurchasableEntityTypeId(), $values['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
-    $this->assertEqual($line_item_type->getOrderTypeId(), $values['orderType'], 'The new line item type has the correct order type.');
+    $this->assertEquals($line_item_type->label(), $values['label'], 'The new line item type has the correct label.');
+    $this->assertEquals($line_item_type->getPurchasableEntityTypeId(), $values['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
+    $this->assertEquals($line_item_type->getOrderTypeId(), $values['orderType'], 'The new line item type has the correct order type.');
 
+    $this->drupalGet('admin/commerce/config/line-item-types/add');
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(16),
       'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
-    $this->drupalPostForm('admin/commerce/config/line-item-types/add', $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
     $line_item_type = LineItemType::load($edit['id']);
-    $this->assertEqual($line_item_type->label(), $edit['label'], 'The new line item type has the correct label.');
-    $this->assertEqual($line_item_type->getPurchasableEntityTypeId(), $edit['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
-    $this->assertEqual($line_item_type->getOrderTypeId(), $edit['orderType'], 'The new line item type has the correct order type.');
+    $this->assertEquals($line_item_type->label(), $edit['label'], 'The new line item type has the correct label.');
+    $this->assertEquals($line_item_type->getPurchasableEntityTypeId(), $edit['purchasableEntityType'], 'The new line item type has the correct purchasable entity type.');
+    $this->assertEquals($line_item_type->getOrderTypeId(), $edit['orderType'], 'The new line item type has the correct order type.');
   }
 
   /**
@@ -50,14 +52,16 @@ class LineItemTypeTest extends OrderTestBase {
       'purchasableEntityType' => 'commerce_product_variation',
       'orderType' => 'default',
     ];
-    $this->createEntity('commerce_line_item_type', $values);
+    /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $type */
+    $line_item_type = $this->createEntity('commerce_line_item_type', $values);
 
+    $this->drupalGet($line_item_type->toUrl('edit-form'));
     $edit = [
       'label' => $this->randomMachineName(16),
     ];
-    $this->drupalPostForm('admin/commerce/config/line-item-types/' . $values['id'] . '/edit', $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
     $line_item_type = LineItemType::load($values['id']);
-    $this->assertEqual($line_item_type->label(), $edit['label'], 'The label of the line item type has been changed.');
+    $this->assertEquals($line_item_type->label(), $edit['label'], 'The label of the line item type has been changed.');
   }
 
   /**
@@ -72,10 +76,10 @@ class LineItemTypeTest extends OrderTestBase {
     ];
     $line_item_type = $this->createEntity('commerce_line_item_type', $values);
 
-    $this->drupalGet('admin/commerce/config/line-item-types/' . $line_item_type->id() . '/delete');
-    $this->assertResponse(200, 'line item type delete form can be accessed at admin/commerce/config/line-item-types/' . $line_item_type->id() . '/delete.');
-    $this->assertText(t('This action cannot be undone.'), 'The line item type deletion confirmation form is available');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->drupalGet($line_item_type->toUrl('delete-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], t('Delete'));
     $line_item_type_exists = (bool) LineItemType::load($line_item_type->id());
     $this->assertFalse($line_item_type_exists, 'The line item type has been deleted form the database.');
   }

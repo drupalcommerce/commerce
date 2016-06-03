@@ -1,16 +1,17 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\LineItem;
+use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the commerce_order entity forms.
  *
  * @group commerce
  */
-class OrderTest extends OrderTestBase {
+class OrderTest extends OrderBrowserTestBase {
 
   /**
    * Tests creating an order programaticaly and through the UI.
@@ -27,7 +28,7 @@ class OrderTest extends OrderTestBase {
 
     $order_exists = (bool) Order::load($order->id());
     $this->assertTrue($order_exists, 'The new order has been created in the database.');
-    $this->assertEqual($order->id(), $order->getOrderNumber(), 'The order number matches the order ID');
+    $this->assertEquals($order->id(), $order->getOrderNumber(), 'The order number matches the order ID');
   }
 
   /**
@@ -71,7 +72,7 @@ class OrderTest extends OrderTestBase {
     $transition = $order->getState()->getWorkflow()->getTransition('place');
     $order->getState()->applyTransition($transition);
     $order->save();
-    $this->assertEqual($order->getPlacedTime(), REQUEST_TIME);
+    $this->assertEquals($order->getPlacedTime(), REQUEST_TIME);
   }
 
 }

@@ -1,13 +1,14 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order\Functional;
+use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests viewing commerce_order entities.
  *
  * @group commerce
  */
-class OrderViewTest extends OrderTestBase {
+class OrderViewTest extends OrderBrowserTestBase {
 
   /**
    * Tests that an admin can view an order's details.
@@ -27,20 +28,18 @@ class OrderViewTest extends OrderTestBase {
     ]);
 
     // First test that the current admin user can see the order.
-    $this->drupalGet('admin/commerce/orders/' . $order->id());
-    $this->assertResponse(200);
-    $this->assertNoText("You are not authorized to access this page.");
+    $this->drupalGet($order->toUrl()->toString());
+    $this->assertSession()->statusCodeEquals(200);
 
     // Order displays email address.
-    $this->assertText($this->loggedInUser->getEmail());
+    $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
 
     // Logout and check that anonymous users cannot see the order admin screen
     // and receive a 403 error code.
     $this->drupalLogout();
 
-    $this->drupalGet('admin/commerce/orders/' . $order->id());
-    $this->assertResponse(403);
-    $this->assertText("You are not authorized to access this page.");
+    $this->drupalGet($order->toUrl()->toString());
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }
