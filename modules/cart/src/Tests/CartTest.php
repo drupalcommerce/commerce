@@ -3,6 +3,8 @@
 namespace Drupal\commerce_cart\Tests;
 
 use Drupal\commerce_order\Tests\OrderTestBase;
+use Drupal\views\Entity\View;
+use Drupal\block\Entity\Block;
 
 /**
  * Tests the cart page.
@@ -53,6 +55,7 @@ class CartTest extends OrderTestBase {
 
     $this->cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $this->store);
     $this->cartManager = \Drupal::service('commerce_cart.cart_manager');
+    $this->drupalPlaceBlock('commerce_cart');
   }
 
   /**
@@ -76,6 +79,27 @@ class CartTest extends OrderTestBase {
     $this->assertFieldByXPath("//input[starts-with(@id, 'edit-remove-button')]", NULL, 'Remove button is present.');
     $this->drupalPostForm(NULL, [], t('Remove'));
     $this->assertText(t('Your shopping cart is empty.'), 'Product removed, cart empty.');
+  }
+
+  /**
+   * Test whether cart block cache contexts are obtained from views.
+   */
+  public function testCartBlockCache() {
+    $view = View::load('commerce_cart_block');
+    $view->addCacheContexts(['timezone']);
+
+    $block = Block::create([
+      'id' => $this->randomMachineName(),
+      'plugin' => 'commerce_cart',
+    ]);
+
+    // @TODO check whether `$block->getCacheContexts()` is same as
+    // `$view->getCacheContexts()`
+    // Check whether timezone context is found in `$block->getCacheContexts()`.
+
+    $this->cartManager->addEntity($this->cart, $this->variation);
+    $this->drupalGet('');
+    $this->assertFieldByXPath("//span[contains(@class, 'cart-block--summary__count')]", '1 items');
   }
 
 }
