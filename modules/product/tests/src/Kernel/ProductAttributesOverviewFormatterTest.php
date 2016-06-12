@@ -3,9 +3,7 @@
 namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\Product;
-use Drupal\commerce_product\Entity\ProductAttribute;
-use Drupal\commerce_product\Entity\ProductAttributeValue;
-use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\ProductTestTrait;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -15,6 +13,8 @@ use Drupal\KernelTests\KernelTestBase;
  * @group commerce
  */
 class ProductAttributesOverviewFormatterTest extends KernelTestBase {
+
+  use ProductTestTrait;
 
   /**
    * @var \Drupal\commerce_product\Entity\ProductInterface
@@ -62,16 +62,14 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
     $this->installConfig(['commerce_product']);
     $this->container->get('commerce_price.currency_importer')->import('USD');
 
+    $attribute_set = $this->createAttributeSet('default', 'color', [
+      'cyan' => 'Cyan',
+      'yellow' => 'Yellow',
+    ]);
+
     $this->productDefaultDisplay = commerce_get_entity_display('commerce_product', 'default', 'view');
     $this->attributeDefaultDisplay = commerce_get_entity_display('commerce_product_attribute_value', 'color', 'view');
     $this->productViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
-
-    $attribute = ProductAttribute::create([
-      'id' => 'color',
-      'label' => 'Color',
-    ]);
-    $attribute->save();
-    $this->container->get('commerce_product.attribute_field_manager')->createField($attribute, 'default');
 
     EntityViewMode::create([
       'id' => 'commerce_product.catalog',
@@ -81,46 +79,21 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
 
     $this->container->get('router.builder')->rebuildIfNeeded();
 
-    $attribute_values = [];
-    $attribute_values['cyan'] = ProductAttributeValue::create([
-      'attribute' => $attribute->id(),
-      'name' => 'Cyan',
-    ]);
-    $attribute_values['cyan']->save();
-    $attribute_values['yellow'] = ProductAttributeValue::create([
-      'attribute' => $attribute->id(),
-      'name' => 'Yellow',
-    ]);
-    $attribute_values['yellow']->save();
-
     $this->attributeDefaultDisplay->setComponent('name', [
       'label' => 'above',
     ]);
     $this->attributeDefaultDisplay->save();
 
-    $variation1 = ProductVariation::create([
-      'type' => 'default',
-      'sku' => strtolower($this->randomMachineName()),
-      'price' => [
-        'amount' => 999,
-        'currency_code' => 'USD',
-      ],
-      'attribute_color' => $attribute_values['cyan'],
+    $variations = $this->createProductVariations('default', [
+      ['price' => 999, 'attribute_color' => $attribute_set['cyan']],
+      ['price' => 999, 'attribute_color' => $attribute_set['yellow']],
     ]);
-    $variation2 = ProductVariation::create([
-      'type' => 'default',
-      'sku' => strtolower($this->randomMachineName()),
-      'price' => [
-        'amount' => 999,
-        'currency_code' => 'USD',
-      ],
-      'attribute_color' => $attribute_values['yellow'],
-    ]);
+
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $this->product = Product::create([
       'type' => 'default',
       'title' => 'My product',
-      'variations' => [$variation1, $variation2],
+      'variations' => $variations,
     ]);
     $this->product->save();
   }
