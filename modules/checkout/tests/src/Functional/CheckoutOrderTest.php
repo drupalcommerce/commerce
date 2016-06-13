@@ -34,7 +34,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'user', 'text', 'node',
+  public static $modules = ['system', 'field', 'user', 'text',
     'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
     'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
     'commerce_checkout', 'commerce_order',
@@ -66,9 +66,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ]);
 
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
-      // We need access content for Cart page.
-      // @todo update after https://www.drupal.org/node/2734259
-      'access content',
+      'access cart',
       'access checkout',
     ]);
   }
