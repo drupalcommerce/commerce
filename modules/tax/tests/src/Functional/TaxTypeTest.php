@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_tax\Tests;
+namespace Drupal\Tests\commerce_tax\Functional;
 
 use Drupal\commerce_tax\Entity\TaxType;
 
@@ -9,7 +9,7 @@ use Drupal\commerce_tax\Entity\TaxType;
  *
  * @group commerce
  */
-class TaxTypeTest extends TaxTestBase {
+class TaxTypeTest extends TaxBrowserTestBase {
 
   /**
    * Tests creating a tax type via a form and programmatically.
@@ -17,7 +17,7 @@ class TaxTypeTest extends TaxTestBase {
   public function testTaxTypeCreation() {
     $zone = $this->createZone();
     $this->drupalGet('admin/commerce/config/tax-types');
-    $this->clickLink('Add a new tax type');
+    $this->getSession()->getPage()->clickLink('Add a new tax type');
     $id = strtolower($this->randomMachineName(5));
     $edit = [
       'id' => $id,
@@ -27,15 +27,15 @@ class TaxTypeTest extends TaxTestBase {
       'displayInclusive' => TRUE,
       'roundingMode' => 4,
     ];
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->submitForm($edit, 'Save');
 
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $tax_type */
     $tax_type = TaxType::load($id);
-    $this->assertEqual($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
+    $this->assertEquals($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
-    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
-    $this->assertEqual($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
+    $this->assertEquals($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
+    $this->assertEquals($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
 
     $zone = $this->createZone();
     $values = [
@@ -50,11 +50,11 @@ class TaxTypeTest extends TaxTestBase {
 
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $tax_type */
     $tax_type = TaxType::load($values['id']);
-    $this->assertEqual($tax_type->getName(), $values['name'], 'The new tax type has the correct name.');
-    $this->assertEqual($tax_type->getZoneId(), $values['zone'], 'The new tax type has the correct zone ID.');
+    $this->assertEquals($tax_type->getName(), $values['name'], 'The new tax type has the correct name.');
+    $this->assertEquals($tax_type->getZoneId(), $values['zone'], 'The new tax type has the correct zone ID.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
-    $this->assertEqual($tax_type->getRoundingMode(), $values['roundingMode'], 'The new tax type has the correct rounding mode.');
+    $this->assertEquals($tax_type->getRoundingMode(), $values['roundingMode'], 'The new tax type has the correct rounding mode.');
   }
 
   /**
@@ -80,15 +80,15 @@ class TaxTypeTest extends TaxTestBase {
       'displayInclusive' => TRUE,
       'roundingMode' => PHP_ROUND_HALF_DOWN,
     ];
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->submitForm($edit, 'Save');
 
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface $tax_type */
     $tax_type = TaxType::load($tax_type->id());
-    $this->assertEqual($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
+    $this->assertEquals($tax_type->getName(), $edit['name'], 'The new tax type has the correct name.');
     $this->assertTrue($tax_type->isCompound(), 'Tax type is compound.');
     $this->assertTrue($tax_type->isDisplayInclusive(), 'Tax type is display inclusive.');
-    $this->assertEqual($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
-    $this->assertEqual($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
+    $this->assertEquals($tax_type->getZoneId(), $edit['zone'], 'The new tax type has the correct zone ID.');
+    $this->assertEquals($tax_type->getRoundingMode(), $edit['roundingMode'], 'Rounding mode 1');
   }
 
   /**
@@ -103,9 +103,9 @@ class TaxTypeTest extends TaxTestBase {
     $tax_type = $this->createEntity('commerce_tax_type', $values);
 
     $this->drupalGet('admin/commerce/config/tax-types/' . $tax_type->id() . '/delete');
-    $this->assertResponse(200, 'The tax type delete form can be accessed.');
-    $this->assertText(t('This action cannot be undone.'), 'The tax type delete confirmation form is available');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('This action cannot be undone.');
+    $this->submitForm([], 'Delete');
     $tax_type_exists = (bool) TaxType::load($tax_type->id());
     $this->assertFalse($tax_type_exists, 'The tax type has been deleted form the database.');
   }

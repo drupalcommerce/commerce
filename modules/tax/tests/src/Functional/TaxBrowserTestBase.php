@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\commerce_tax\Tests;
+namespace Drupal\Tests\commerce_tax\Functional;
 
-use Drupal\commerce\Tests\CommerceTestBase;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Defines the base class for commerce_tax test cases.
  */
-abstract class TaxTestBase extends CommerceTestBase {
+abstract class TaxBrowserTestBase extends CommerceBrowserTestBase {
 
   /**
    * Modules to enable.
