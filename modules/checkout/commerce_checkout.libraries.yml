@@ -10,6 +10,12 @@ admin:
     - core/drupal
     - core/jquery.once
 
+login_pane:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_checkout.layout.css: {}
+
 checkout_progress:
   version: VERSION
   css:

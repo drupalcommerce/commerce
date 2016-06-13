@@ -168,9 +168,17 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $pane_form['#attached']['library'][] = 'commerce_checkout/login_pane';
+
     $pane_form['returning_customer'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Returning Customer'),
+      '#attributes' => [
+        'class' => [
+          'form-wrapper__login-option',
+          'form-wrapper__returning-customer',
+        ],
+      ],
     ];
     $pane_form['returning_customer']['name'] = [
       '#type' => 'textfield',
@@ -200,6 +208,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'fieldset',
       '#title' => $this->t('Guest Checkout'),
       '#access' => $this->configuration['allow_guest_checkout'],
+      '#attributes' => [
+        'class' => [
+          'form-wrapper__login-option',
+          'form-wrapper__guest-checkout',
+        ],
+      ],
     ];
     $pane_form['guest']['text'] = [
       '#prefix' => '<p>',
