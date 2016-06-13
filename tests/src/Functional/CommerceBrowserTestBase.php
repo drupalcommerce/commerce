@@ -115,4 +115,37 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
     }
   }
 
+  /**
+   * Asserts that the passed field values are correct.
+   *
+   * Ignores differences in ordering.
+   *
+   * @param array $field_values
+   *   The field values.
+   * @param array $expected_values
+   *   The expected values.
+   * @param $message
+   *   (optional) A message to display with the assertion. Do not translate
+   *   messages:
+   *   use \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
+   *   to embed variables in the message text, not t().
+   *   If left blank, a default message will be displayed.
+   */
+  protected function assertFieldValues(array $field_values, array $expected_values, $message = '') {
+    $valid = TRUE;
+    if (count($field_values) == count($expected_values)) {
+      foreach ($expected_values as $value) {
+        if (!in_array($value, $field_values)) {
+          $valid = FALSE;
+          break;
+        }
+      }
+    }
+    else {
+      $valid = FALSE;
+    }
+
+    $this->assertTrue($valid, $message);
+  }
+
 }

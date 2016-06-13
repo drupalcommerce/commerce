@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
 
@@ -9,7 +9,7 @@ use Drupal\commerce_product\Entity\ProductAttribute;
  *
  * @group commerce
  */
-class ProductAttributeTranslationTest extends ProductTestBase {
+class ProductAttributeTranslationTest extends ProductBrowserTestBase {
 
   /**
    * Modules to enable.
@@ -41,7 +41,8 @@ class ProductAttributeTranslationTest extends ProductTestBase {
 
     // Add the French language.
     $edit = ['predefined_langcode' => 'fr'];
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add language'));
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm($edit, t('Add language'));
     \Drupal::languageManager()->reset();
   }
 
@@ -57,8 +58,8 @@ class ProductAttributeTranslationTest extends ProductTestBase {
     // Confirm that the attribute is translatable, and there's no value
     // translation form is missing.
     $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/fr/add');
-    $this->assertText('Label');
-    $this->assertNoText('Value');
+    $this->assertSession()->pageTextContains('Label');
+    $this->assertSession()->pageTextNotContains('Value');
 
     // Add two attribute values.
     $red_value = $this->createEntity('commerce_product_attribute_value', [
@@ -71,24 +72,25 @@ class ProductAttributeTranslationTest extends ProductTestBase {
     ]);
     // Confirm that the value translation form is still missing.
     $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/fr/add');
-    $this->assertNoText('Value');
+    $this->assertSession()->pageTextNotContains('Value');
 
     // Enable attribute value translations.
     $edit = [
       'enable_value_translation' => TRUE,
     ];
-    $this->drupalPostForm('admin/commerce/product-attributes/manage/color', $edit, t('Save'));
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $this->submitForm($edit, t('Save'));
 
     // Translate the attribute and its values to French.
     $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/fr/add');
-    $this->assertText('Label');
-    $this->assertText('Value');
+    $this->assertSession()->pageTextContains('Label');
+    $this->assertSession()->pageTextContains('Value');
     $edit = [
       'translation[config_names][commerce_product.commerce_product_attribute.color][label]' => 'Couleur',
       'values[' . $red_value->id() . '][translation][name][0][value]' => 'Rouge',
       // Leave the second value untouched.
     ];
-    $this->drupalPostForm(NULL, $edit, t('Save translation'));
+    $this->submitForm($edit, t('Save translation'));
 
     \Drupal::entityTypeManager()->getStorage('commerce_product_attribute')->resetCache();
     \Drupal::entityTypeManager()->getStorage('commerce_product_attribute_value')->resetCache();
@@ -97,18 +99,18 @@ class ProductAttributeTranslationTest extends ProductTestBase {
     $language_manager = \Drupal::languageManager();
     $config_name = $color_attribute->getConfigDependencyName();
     $config_translation = $language_manager->getLanguageConfigOverride('fr', $config_name);
-    $this->assertEqual($config_translation->get('label'), 'Couleur');
+    $this->assertEquals($config_translation->get('label'), 'Couleur');
 
     // Confirm the attribute value translations.
     $values = $color_attribute->getValues();
     $first_value = reset($values);
     $first_value = $first_value->getTranslation('fr');
-    $this->assertEqual($first_value->language()->getId(), 'fr');
-    $this->assertEqual($first_value->label(), 'Rouge');
+    $this->assertEquals($first_value->language()->getId(), 'fr');
+    $this->assertEquals($first_value->label(), 'Rouge');
     $second_value = end($values);
     $second_value = $second_value->getTranslation('fr');
-    $this->assertEqual($second_value->language()->getId(), 'fr');
-    $this->assertEqual($second_value->label(), 'Blue');
+    $this->assertEquals($second_value->language()->getId(), 'fr');
+    $this->assertEquals($second_value->label(), 'Blue');
   }
 
 }

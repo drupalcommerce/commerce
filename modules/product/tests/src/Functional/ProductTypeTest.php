@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductType;
 
@@ -9,18 +9,18 @@ use Drupal\commerce_product\Entity\ProductType;
  *
  * @group commerce
  */
-class ProductTypeTest extends ProductTestBase {
+class ProductTypeTest extends ProductBrowserTestBase {
 
   /**
    * Tests whether the default product type was created.
    */
   public function testDefaultProductType() {
     $product_type = ProductType::load('default');
-    $this->assertTrue($product_type, 'The default product type is available.');
+    $this->assertTrue(!empty($product_type), 'The default product type is available.');
 
     $this->drupalGet('admin/commerce/config/product-types');
-    $rows = $this->cssSelect('table tbody tr');
-    $this->assertEqual(count($rows), 1, '1 product type is correctly listed.');
+    $rows = $this->getSession()->getPage()->find('css', 'table tbody tr');
+    $this->assertEquals(count($rows), 1, '1 product type is correctly listed.');
   }
 
   /**
@@ -33,43 +33,46 @@ class ProductTypeTest extends ProductTestBase {
       'description' => 'My random product type',
       'variationType' => 'default',
     ];
-    $product_type = $this->createEntity('commerce_product_type', $values);
+    $this->createEntity('commerce_product_type', $values);
     $product_type = ProductType::load($values['id']);
-    $this->assertEqual($product_type->label(), $values['label'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getDescription(), $values['description'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getVariationTypeId(), $values['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertEquals($product_type->label(), $values['label'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->getDescription(), $values['description'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->getVariationTypeId(), $values['variationType'], 'The new product type has the correct associated variation type.');
 
     $this->drupalGet('product/add/' . $product_type->id());
-    $this->assertResponse(200, 'The new product type can be accessed at product/add.');
+    $this->assertSession()->statusCodeEquals(200);
 
     $user = $this->drupalCreateUser(['administer product types']);
     $this->drupalLogin($user);
+
+    $this->drupalGet('admin/commerce/config/product-types/add');
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
       'description' => 'My even more random product type',
       'variationType' => 'default',
     ];
-    $this->drupalPostForm('admin/commerce/config/product-types/add', $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load($edit['id']);
-    $this->assertTrue($product_type, 'The new product type has been created.');
-    $this->assertEqual($product_type->label(), $edit['label'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
-    $this->assertEqual($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
+    $this->assertTrue(!empty($product_type), 'The new product type has been created.');
+    $this->assertEquals($product_type->label(), $edit['label'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->getVariationTypeId(), $edit['variationType'], 'The new product type has the correct associated variation type.');
   }
 
   /**
    * Tests editing a product type using the UI.
    */
   public function testProductTypeEditing() {
+    $this->drupalGet('admin/commerce/config/product-types/default/edit');
     $edit = [
       'label' => 'Default2',
       'description' => 'New description.',
     ];
-    $this->drupalPostForm('admin/commerce/config/product-types/default/edit', $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load('default');
-    $this->assertEqual($product_type->label(), $edit['label'], 'The label of the product type has been changed.');
-    $this->assertEqual($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
+    $this->assertEquals($product_type->label(), $edit['label'], 'The label of the product type has been changed.');
+    $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
   }
 
   /**
@@ -96,20 +99,20 @@ class ProductTypeTest extends ProductTestBase {
     // @todo Make sure $product_type->delete() also does nothing if there's
     // a product of that type. Right now the check is done on the form level.
     $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
-    $this->assertRaw(
-      t('%type is used by 1 product on your site. You can not remove this product type until you have removed all of the %type products.', ['%type' => $product_type->label()]),
+    $this->assertSession()->pageTextContains(
+      t('@type is used by 1 product on your site. You can not remove this product type until you have removed all of the @type products.', ['@type' => $product_type->label()]),
       'The product type will not be deleted until all products of that type are deleted.'
     );
-    $this->assertNoText(t('This action cannot be undone.'), 'The product type deletion confirmation form is not available');
+    $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
     $product->delete();
     $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
-    $this->assertRaw(
-      t('Are you sure you want to delete the product type %type?', ['%type' => $product_type->label()]),
+    $this->assertSession()->pageTextContains(
+      t('Are you sure you want to delete the product type @type?', ['@type' => $product_type->label()]),
       'The product type is available for deletion'
     );
-    $this->assertText(t('This action cannot be undone.'), 'The product type deletion confirmation form is available');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], 'Delete');
     $exists = (bool) ProductType::load($product_type->id());
     $this->assertFalse($exists, 'The new product type has been deleted from the database.');
   }

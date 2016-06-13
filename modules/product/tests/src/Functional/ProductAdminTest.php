@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
@@ -10,20 +10,20 @@ use Drupal\commerce_product\Entity\ProductVariation;
  *
  * @group commerce
  */
-class ProductAdminTest extends ProductTestBase {
+class ProductAdminTest extends ProductBrowserTestBase {
 
   /**
    * Tests creating a product.
    */
   public function testCreateProduct() {
     $this->drupalGet('admin/commerce/products');
-    $this->clickLink('Add product');
+    $this->getSession()->getPage()->clickLink('Add product');
     // Check the integrity of the add form.
-    $this->assertFieldByName('title[0][value]', NULL, 'Title field is present');
-    $this->assertFieldByName('variations[form][inline_entity_form][sku][0][value]', NULL, 'SKU field is present');
-    $this->assertFieldByName('variations[form][inline_entity_form][price][0][amount]', NULL, 'Price field is present');
-    $this->assertFieldByName('variations[form][inline_entity_form][status][value]', NULL, 'Status field is present');
-    $this->assertFieldsByValue(t('Create variation'), NULL, 'Create variation button is present');
+    $this->assertSession()->fieldExists('title[0][value]');
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][sku][0][value]');
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][price][0][amount]');
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][status][value]');
+    $this->assertSession()->buttonExists('Create variation');
 
     $store_ids = array_map(function ($store) {
       return $store->id();
@@ -41,8 +41,8 @@ class ProductAdminTest extends ProductTestBase {
       'variations[form][inline_entity_form][price][0][amount]' => '9.99',
       'variations[form][inline_entity_form][status][value]' => 1,
     ];
-    $this->drupalPostForm(NULL, $variations_edit, t('Create variation'));
-    $this->drupalPostForm(NULL, $edit, t('Save and publish'));
+    $this->submitForm($variations_edit, t('Create variation'));
+    $this->submitForm($edit, t('Save and publish'));
 
     $result = \Drupal::entityQuery('commerce_product')
       ->condition("title", $edit['title[0][value]'])
@@ -52,13 +52,13 @@ class ProductAdminTest extends ProductTestBase {
     $product = Product::load($product_id);
 
     $this->assertNotNull($product, 'The new product has been created.');
-    $this->assertText(t('The product @title has been successfully saved', ['@title' => $title]), 'Product success text is shown');
-    $this->assertText($title, 'Created product name exists on this page.');
+    $this->assertSession()->pageTextContains(t('The product @title has been successfully saved', ['@title' => $title]));
+    $this->assertSession()->pageTextContains($title);
     $this->assertFieldValues($product->getStores(), $this->stores, 'Created product has the correct associated stores.');
     $this->assertFieldValues($product->getStoreIds(), $store_ids, 'Created product has the correct associated store ids.');
     $this->drupalGet($product->toUrl('canonical'));
-    $this->assertResponse(200);
-    $this->assertText($product->getTitle(), 'Product title exists');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($product->getTitle());
 
     $variation = \Drupal::entityQuery('commerce_product_variation')
       ->condition('sku', $variation_sku)
@@ -84,14 +84,14 @@ class ProductAdminTest extends ProductTestBase {
 
     // Check the integrity of the edit form.
     $this->drupalGet($product->toUrl('edit-form'));
-    $this->assertResponse(200, 'The product edit form can be accessed.');
-    $this->assertFieldByName('title[0][value]', NULL, 'Title field is present');
-    $this->assertFieldById('edit-variations-entities-0-actions-ief-entity-edit', NULL, 'The edit button for product variation is present');
-    $this->drupalPostForm(NULL, [], t('Edit'));
-    $this->assertFieldByName('variations[form][inline_entity_form][entities][0][form][sku][0][value]', NULL, 'SKU field is present');
-    $this->assertFieldByName('variations[form][inline_entity_form][entities][0][form][price][0][amount]', NULL, 'Price field is present');
-    $this->assertFieldByName('variations[form][inline_entity_form][entities][0][form][status][value]', NULL, 'Status field is present');
-    $this->assertFieldsByValue(t('Update variation'), NULL, 'Update variation button is present');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldExists('title[0][value]');
+    $this->assertSession()->buttonExists('edit-variations-entities-0-actions-ief-entity-edit');
+    $this->submitForm([], t('Edit'));
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][sku][0][value]');
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][price][0][amount]');
+    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][status][value]');
+    $this->assertSession()->buttonExists('Update variation');
 
     $title = $this->randomMachineName();
     $store_ids = array_map(function ($store) {
@@ -110,16 +110,16 @@ class ProductAdminTest extends ProductTestBase {
       'variations[form][inline_entity_form][entities][0][form][price][0][amount]' => $new_price_amount,
       'variations[form][inline_entity_form][entities][0][form][status][value]' => 1,
     ];
-    $this->drupalPostForm(NULL, $variations_edit, t('Update variation'));
-    $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
+    $this->submitForm($variations_edit, 'Update variation');
+    $this->submitForm($edit, 'Save and keep published');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());
-    $this->assertEqual($variation->getSku(), $new_sku, 'The variation sku successfully updated.');
-    $this->assertEqual($variation->get('price')->amount, $new_price_amount, 'The variation price successfully updated.');
+    $this->assertEquals($variation->getSku(), $new_sku, 'The variation sku successfully updated.');
+    $this->assertEquals($variation->get('price')->amount, $new_price_amount, 'The variation price successfully updated.');
     \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache([$product->id()]);
     $product = Product::load($product->id());
-    $this->assertEqual($product->getTitle(), $title, 'The product title successfully updated.');
+    $this->assertEquals($product->getTitle(), $title, 'The product title successfully updated.');
     $this->assertFieldValues($product->getStores(), $this->stores, 'Updated product has the correct associated stores.');
     $this->assertFieldValues($product->getStoreIds(), $store_ids, 'Updated product has the correct associated store ids.');
   }
@@ -133,9 +133,9 @@ class ProductAdminTest extends ProductTestBase {
       'type' => 'default',
     ]);
     $this->drupalGet($product->toUrl('delete-form'));
-    $this->assertText(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]), "Commerce Product deletion confirmation text is showing");
-    $this->assertText(t('This action cannot be undone.'), 'The product deletion confirmation form is available');
-    $this->drupalPostForm(NULL, NULL, t('Delete'));
+    $this->assertSession()->pageTextContains(t("Are you sure you want to delete the product @product?", ['@product' => $product->getTitle()]));
+    $this->assertSession()->pageTextContains(t('This action cannot be undone.'));
+    $this->submitForm([], 'Delete');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache();
     $product_exists = (bool) Product::load($product->id());
@@ -145,19 +145,19 @@ class ProductAdminTest extends ProductTestBase {
   /**
    * Tests that anonymous users cannot see the admin/commerce/products page.
    */
-  protected function testAdminProducts() {
+  public function testAdminProducts() {
     $this->drupalGet('admin/commerce/products');
-    $this->assertResponse(200);
-    $this->assertNoText('You are not authorized to access this page.');
-    $this->assertLink('Add product');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
+    $this->assertTrue($this->getSession()->getPage()->hasLink('Add product'));
 
     // Logout and check that anonymous users cannot see the products page
     // and receive a 403 error code.
     $this->drupalLogout();
     $this->drupalGet('admin/commerce/products');
-    $this->assertResponse(403);
-    $this->assertText("You are not authorized to access this page.");
-    $this->assertNoLink("Add product");
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->pageTextContains('You are not authorized to access this page.');
+    $this->assertTrue(!$this->getSession()->getPage()->hasLink('Add product'));
   }
 
 }

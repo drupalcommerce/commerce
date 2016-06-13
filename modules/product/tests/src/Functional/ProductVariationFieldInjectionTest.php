@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
 /**
  * Tests the product variation field display injection.
  *
  * @group commerce
  */
-class ProductVariationFieldInjectionTest extends ProductTestBase {
+class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
 
   /**
    * The product to test against.
@@ -77,11 +77,11 @@ class ProductVariationFieldInjectionTest extends ProductTestBase {
     $product_view_display->save();
 
     $this->drupalGet($this->product->toUrl());
-    $this->assertText('Testing product variation field injection!');
-    $this->assertText('Price');
-    $this->assertText('$999.00');
-    $this->assertText('INJECTION-CYAN');
-    $this->assertText($this->product->label() . ' - Cyan');
+    $this->assertSession()->pageTextContains('Testing product variation field injection!');
+    $this->assertSession()->pageTextContains('Price');
+    $this->assertSession()->pageTextContains('$999.00');
+    $this->assertSession()->pageTextContains('INJECTION-CYAN');
+    $this->assertSession()->pageTextContains($this->product->label() . ' - Cyan');
 
     // Set a display for the color attribute.
     /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $variation_view_display */
@@ -92,16 +92,19 @@ class ProductVariationFieldInjectionTest extends ProductTestBase {
       'label' => 'above',
       'type' => 'entity_reference_label',
     ]);
+
     $variation_view_display->save();
 
-    // Save the variation and reset its view caches. For some reason saving
-    // the view display doesn't do this?
-    $this->product->getDefaultVariation()->save();
+    // Have to call this save to get the cache to clear, we set the tags correctly in a hook,
+    // but unless you trigger the submit it doesn't seem to clear. Something additional happens
+    // on save that we're missing.
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/display');
+    $this->submitForm([], 'Save');
 
     $this->drupalGet($this->product->toUrl());
-    $this->assertNoText($this->product->label() . ' - Cyan');
-    $this->assertNoText('INJECTION-CYAN');
-    $this->assertText('$999.00');
+    $this->assertSession()->pageTextNotContains($this->product->label() . ' - Cyan');
+    $this->assertSession()->pageTextNotContains('INJECTION-CYAN');
+    $this->assertSession()->pageTextContains('$999.00');
   }
 
 }
