@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\commerce_cart\Tests;
+namespace Drupal\Tests\commerce_cart\Functional;
 
-use Drupal\commerce_order\Tests\OrderTestBase;
+use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the cart page.
  *
  * @group commerce
  */
-class CartTest extends OrderTestBase {
+class CartTest extends OrderBrowserTestBase {
 
   /**
    * The cart order to test against.
@@ -63,19 +63,18 @@ class CartTest extends OrderTestBase {
 
     $this->drupalGet('cart');
     // Confirm the presence and functioning of the Quantity field.
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", NULL, 'Quantity field present.');
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 1, 'Quantity field has correct number of items.');
-    $this->assertField("edit-submit", 'Update cart button is present.');
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 1);
+    $this->assertSession()->buttonExists('Update cart');
     $values = [
       'edit_quantity[0]' => 2,
     ];
-    $this->drupalPostForm(NULL, $values, t('Update cart'));
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-edit-quantity')]", 2, 'Cart updated with new quantity.');
+    $this->submitForm($values, t('Update cart'));
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 2);
 
     // Confirm the presence and functioning of the Remove button.
-    $this->assertFieldByXPath("//input[starts-with(@id, 'edit-remove-button')]", NULL, 'Remove button is present.');
-    $this->drupalPostForm(NULL, [], t('Remove'));
-    $this->assertText(t('Your shopping cart is empty.'), 'Product removed, cart empty.');
+    $this->assertSession()->buttonExists('Remove');
+    $this->submitForm([], t('Remove'));
+    $this->assertSession()->pageTextContains(t('Your shopping cart is empty.'));
   }
 
 }

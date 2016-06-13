@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\commerce_cart\Tests;
+namespace Drupal\Tests\commerce_cart\Functional;
 
-use Drupal\commerce\Tests\CommerceTestBase;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\commerce_order\Entity\OrderType;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\commerce_order\Entity\OrderType;
  *
  * @group commerce
  */
-class CartRefreshTest extends CommerceTestBase {
+class CartRefreshTest extends CommerceBrowserTestBase {
 
   /**
    * Modules to enable.
@@ -38,17 +38,17 @@ class CartRefreshTest extends CommerceTestBase {
   public function testCartRefreshSettings() {
     $url = 'admin/commerce/config/order-types/default/edit';
     $this->drupalGet($url);
-    $this->assertField('commerce_cart[refresh_mode]', 'Shopping cart refresh mode field found.');
-    $this->assertField('commerce_cart[refresh_frequency]', 'Shopping cart refresh frequency field found.');
+    $this->assertSession()->fieldExists('commerce_cart[refresh_mode]');
+    $this->assertSession()->fieldExists('commerce_cart[refresh_frequency]');
 
     $edit['commerce_cart[refresh_mode]'] = 'always';
     $edit['commerce_cart[refresh_frequency]'] = 60;
-    $this->drupalPostForm($url, $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
     $order_type = OrderType::load('default');
     $refresh_mode = $order_type->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
     $refresh_frequency = $order_type->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
-    $this->assertEqual($refresh_mode, $edit['commerce_cart[refresh_mode]'], 'The value of the shopping cart refresh mode has been changed.');
-    $this->assertEqual($refresh_frequency, $edit['commerce_cart[refresh_frequency]'], 'The value of the shopping cart refresh frequency has been changed.');
+    $this->assertEquals($refresh_mode, $edit['commerce_cart[refresh_mode]'], 'The value of the shopping cart refresh mode has been changed.');
+    $this->assertEquals($refresh_frequency, $edit['commerce_cart[refresh_frequency]'], 'The value of the shopping cart refresh frequency has been changed.');
   }
 
 }
