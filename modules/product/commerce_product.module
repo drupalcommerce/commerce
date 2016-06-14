@@ -5,6 +5,7 @@
  * Defines the Product entity and associated features.
  */
 
+use Drupal\Core\Cache\Cache;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
@@ -40,6 +41,17 @@ function commerce_product_entity_form_display_update(EntityFormDisplayInterface 
   if ($form_display->getTargetEntityTypeId() == 'commerce_product_variation' && $form_display->getMode() == 'default') {
     $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
     $attribute_field_manager->clearCaches();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function commerce_product_entity_view_display_update(Drupal\Core\Entity\EntityInterface $entity) {
+  // The product view uses the variation view and needs to be cleared, which doesn't happen automatically
+  // because we're editing the variation, not the product
+  if (substr($entity->getConfigTarget(), 0, 27) === 'commerce_product_variation.') {
+    Cache::invalidateTags(['commerce_product_view']);
   }
 }
 
