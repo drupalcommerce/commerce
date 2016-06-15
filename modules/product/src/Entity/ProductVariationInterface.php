@@ -66,7 +66,7 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   /**
    * Gets the variation price.
    *
-   * @return object
+   * @return \Drupal\commerce_price\Price
    *   The variation price.
    */
   public function getPrice();

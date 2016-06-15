@@ -115,14 +115,14 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public function getUnitPrice() {
-    return $this->get('unit_price')->first();
+    return $this->get('unit_price')->first()->toPrice();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getTotalPrice() {
-    return $this->get('total_price')->first();
+    return $this->get('total_price')->first()->toPrice();
   }
 
   /**

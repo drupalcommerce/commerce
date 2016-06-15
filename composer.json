@@ -12,7 +12,6 @@
         "drupal/profile": "8.1.x-dev",
         "drupal/state_machine": "8.1.x-dev",
         "commerceguys/intl": "dev-master",
-        "commerceguys/pricing": "dev-master",
         "commerceguys/tax": "dev-master"
     },
     "minimum-stability": "dev"

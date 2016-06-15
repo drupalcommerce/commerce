@@ -81,7 +81,7 @@ interface LineItemInterface extends EntityChangedInterface, ContentEntityInterfa
   /**
    * Gets the unit price.
    *
-   * @return object
+   * @return \Drupal\commerce_price\Price
    *   The unit price.
    */
   public function getUnitPrice();
@@ -89,7 +89,7 @@ interface LineItemInterface extends EntityChangedInterface, ContentEntityInterfa
   /**
    * Gets the total price.
    *
-   * @return object
+   * @return \Drupal\commerce_price\Price
    *   The total price.
    */
   public function getTotalPrice();

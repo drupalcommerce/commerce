@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_price\Plugin\Field\FieldType;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -17,7 +18,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   default_formatter = "commerce_price_default",
  * )
  */
-class Price extends FieldItemBase {
+class PriceItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
@@ -41,7 +42,7 @@ class Price extends FieldItemBase {
     return [
       'columns' => [
         'amount' => [
-          'description' => 'The price amount.',
+          'description' => 'The decimal amount.',
           'type' => 'numeric',
           'precision' => 19,
           'scale' => 6,
@@ -77,6 +78,30 @@ class Price extends FieldItemBase {
    */
   public function isEmpty() {
     return $this->amount === NULL || $this->amount === '' || empty($this->currency_code);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($values, $notify = TRUE) {
+    // Allow callers to pass a Price value object as the field item value.
+    if ($values instanceof Price) {
+      $values = [
+        'amount' => $price->getDecimalAmount(),
+        'currency_code' => $price->getCurrencyCode(),
+      ];
+    }
+    parent::setValue($values, $notify);
+  }
+
+  /**
+   * Gets the Price value object for the current field item.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The Price value object.
+   */
+  public function toPrice() {
+    return new Price($this->amount, $this->currency_code);
   }
 
 }
