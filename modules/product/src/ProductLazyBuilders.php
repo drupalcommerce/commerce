@@ -52,13 +52,15 @@ class ProductLazyBuilders {
    *
    * @param string $product_id
    *   The product ID.
+   * @param string $view_mode
+   *   The view mode used to render the product.
    * @param bool $combine
    *   TRUE to combine line items containing the same product variation.
    *
    * @return array
    *   A renderable array containing the cart form.
    */
-  public function addToCartForm($product_id, $combine) {
+  public function addToCartForm($product_id, $view_mode, $combine) {
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
     $line_item_type_id = $this->lineItemTypeMap->getLineItemTypeId($product->bundle());
     $line_item = $this->entityTypeManager->getStorage('commerce_line_item')->create([
@@ -66,6 +68,7 @@ class ProductLazyBuilders {
     ]);
     $form_state_additions = [
       'product' => $product,
+      'view_mode' => $view_mode,
       'settings' => [
         'combine' => $combine,
       ],
