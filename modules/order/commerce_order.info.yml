@@ -8,7 +8,6 @@ dependencies:
   - commerce_price
   - commerce_store
   - datetime
-  - inline_entity_form
   - options
   - profile
   - state_machine

@@ -7,7 +7,6 @@ dependencies:
   - commerce
   - commerce_price
   - commerce_store
-  - inline_entity_form
   - path
   - text
 config_devel:

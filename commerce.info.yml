@@ -5,6 +5,8 @@ package: Commerce
 core: 8.x
 configure: commerce.admin_commerce
 dependencies:
-  - entity
+  - address
+  - entity:entity
+  - inline_entity_form
   - views
   - system (>=8.1.0)
