@@ -59,6 +59,17 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if (in_array($rel, ['canonical', 'revision'])) {
+      return $this->getProduct()->toUrl();
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getProduct() {
     return $this->get('product_id')->entity;
   }
