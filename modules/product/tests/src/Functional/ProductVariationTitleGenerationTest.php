@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
 use Drupal\commerce_product\Entity\ProductVariationType;
 
@@ -9,7 +9,7 @@ use Drupal\commerce_product\Entity\ProductVariationType;
  *
  * @group commerce
  */
-class ProductVariationTitleGenerationTest extends ProductTestBase {
+class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
 
   /**
    * The variation type to test against.
@@ -62,12 +62,12 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
       'sku' => strtolower($this->randomMachineName()),
     ]);
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    $product = $this->createEntity('commerce_product', [
+    $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => 'My product',
       'variations' => [$variation],
     ]);
-    $this->assertFalse($variation->getTitle());
+    $this->assertTrue(empty($variation->getTitle()));
 
     $this->variationType->setGenerateTitle(TRUE);
     $this->variationType->save();
@@ -83,7 +83,7 @@ class ProductVariationTitleGenerationTest extends ProductTestBase {
       'title' => 'My second product',
       'variations' => [$variation],
     ]);
-    $this->assertEqual($variation->getTitle(), $product->getTitle());
+    $this->assertEquals($variation->getTitle(), $product->getTitle());
 
     // @todo Create attributes, then retest title generation.
   }

@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
-use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Defines base class for shortcut test cases.
  */
-abstract class ProductTestBase extends CommerceTestBase {
+abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
 
   use EntityReferenceTestTrait;
   use StoreCreationTrait;
@@ -51,6 +51,7 @@ abstract class ProductTestBase extends CommerceTestBase {
       'administer product types',
       'administer commerce_product fields',
       'administer commerce_product_variation fields',
+      'administer commerce_product_variation display',
     ], parent::getAdministratorPermissions());
   }
 
