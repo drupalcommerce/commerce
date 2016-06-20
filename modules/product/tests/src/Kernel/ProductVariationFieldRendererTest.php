@@ -105,6 +105,8 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
   }
 
   /**
+   * Tests the getFieldDefinitions method.
+   *
    * @covers ::getFieldDefinitions
    */
   public function testGetFieldDefinitions() {
@@ -114,10 +116,16 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
 
     $field_definitions = $this->variationFieldRenderer->getFieldDefinitions($this->secondVariationType->id());
     $field_names = array_keys($field_definitions);
-    $this->assertEquals(['sku', 'title', 'price', 'render_field', 'attribute_color'], $field_names, 'The title, sku, price, render_field, attribute_color variation fields are renderable.');
+    $this->assertEquals(
+      ['sku', 'title', 'price', 'render_field', 'attribute_color'],
+      $field_names,
+      'The title, sku, price, render_field, attribute_color variation fields are renderable.'
+    );
   }
 
   /**
+   * Tests renderFields.
+   *
    * @covers ::renderFields
    * @covers ::renderField
    */
@@ -155,6 +163,24 @@ class ProductVariationFieldRendererTest extends KernelTestBase {
 
     $this->assertEmpty($this->cssSelect('.product--variation-field--variation_attribute_color__' . $variation->getProductId()));
     $this->assertNotEmpty($this->cssSelect('.product--variation-field--variation_sku__' . $variation->getProductId()));
+  }
+
+  /**
+   * Tests that viewing a product without variations does not throw fatal error.
+   *
+   * @see commerce_product_commerce_product_view()
+   */
+  public function testRenderFieldsNoVariations() {
+    $product = Product::create([
+      'type' => 'default',
+      'variations' => [],
+    ]);
+    $product->save();
+
+    // The test will fail if we get a fatal error.
+    $product_view_builder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product');
+    $product_build = $product_view_builder->view($product);
+    $this->render($product_build);
   }
 
 }

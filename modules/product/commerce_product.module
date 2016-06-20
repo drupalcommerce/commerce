@@ -98,7 +98,7 @@ function commerce_product_theme() {
 function commerce_product_commerce_product_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
   /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
   $product_type = ProductType::load($entity->bundle());
-  if ($product_type->shouldInjectVariationFields()) {
+  if ($product_type->shouldInjectVariationFields() && $entity->getDefaultVariation()) {
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
 
