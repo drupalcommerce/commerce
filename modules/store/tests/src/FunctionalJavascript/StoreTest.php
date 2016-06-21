@@ -4,16 +4,18 @@ namespace Drupal\Tests\commerce_store\FunctionalJavascript;
 
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\Tests\commerce\Functional\CommerceJavascriptTestBase;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
 /**
  * Create, view, edit, delete, and change store entities.
  *
  * @group commerce
  */
-class StoreTest extends CommerceJavascriptTestBase {
+class StoreTest extends CommerceBrowserTestBase {
 
   use StoreCreationTrait;
+  use JavascriptTestTrait;
 
   /**
    * Modules to enable.
