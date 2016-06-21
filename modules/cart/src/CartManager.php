@@ -110,6 +110,7 @@ class CartManager implements CartManagerInterface {
       $new_quantity = $matching_line_item->getQuantity() + $quantity;
       $matching_line_item->setQuantity($new_quantity);
       $matching_line_item->save();
+      $needs_cart_save = TRUE;
     }
     else {
       $line_item->save();
@@ -135,6 +136,13 @@ class CartManager implements CartManagerInterface {
     $line_item->save();
     $event = new CartLineItemUpdateEvent($cart, $line_item, $original_line_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_LINE_ITEM_UPDATE, $event);
+    // Let's *always* update the order if a line item is changed.
+    //
+    // The only value you can change by default is the amount via the cart view.
+    // Once this changes, a cart update is required for the total_price__amount
+    // db column. We do not, like the addLineItem() function, test for 
+    // quantities and a possible difference, we expect we need to update it.
+    $cart->save();
   }
 
   /**
