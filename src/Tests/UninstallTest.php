@@ -29,7 +29,7 @@ class UninstallTest extends KernelTestBase {
    */
   public function testUninstall() {
     // Uninstall all modules. Throws an exception if we are trying to disable
-    // a module that is already disabled or if a module does not get enabled.
+    // a module that is already disabled or if a module does not get disabled.
     $this->disableModules(self::$modules);
     // Enable all modules.
     $this->enableModules(self::$modules);
