@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce\Tests;
+namespace Drupal\Tests\commerce\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 
