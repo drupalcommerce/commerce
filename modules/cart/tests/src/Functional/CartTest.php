@@ -41,7 +41,6 @@ class CartTest extends OrderBrowserTestBase {
   protected function getAdministratorPermissions() {
     return array_merge([
       'administer products',
-      'access cart',
     ], parent::getAdministratorPermissions());
   }
 

@@ -64,11 +64,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'variations' => [$variation],
       'stores' => [$store],
     ]);
-
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
-      'access cart',
-      'access checkout',
-    ]);
   }
 
   /**
