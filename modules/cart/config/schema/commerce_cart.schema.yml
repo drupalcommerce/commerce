@@ -17,8 +17,8 @@ block.settings.commerce_cart:
   label: 'Cart block'
   mapping:
     item_text:
-      type: string
-      label: 'Items text'
+      type: plural_label
+      label: 'item\x03items'
     dropdown:
       type: boolean
       label: 'Display cart contents in dropdown'
