@@ -254,6 +254,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'fieldset',
       '#title' => $this->t('Create new account'),
       '#access' => !$this->configuration['allow_guest_checkout'] && $this->configuration['show_registration_form'],
+      '#attributes' => [
+        'class' => [
+          'form-wrapper__login-option',
+          'form-wrapper__guest-checkout',
+        ],
+      ],
     ];
     $pane_form['register']['mail'] = array(
       '#type' => 'email',
