@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_order;
+namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;

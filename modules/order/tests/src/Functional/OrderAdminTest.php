@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\profile\Entity\Profile;
-use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the commerce_order entity forms.
