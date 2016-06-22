@@ -1,7 +1,6 @@
 <?php
 
 namespace Drupal\Tests\commerce_order\Functional;
-use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests viewing commerce_order entities.

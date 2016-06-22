@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\LineItemType;
-use Drupal\Tests\commerce_order\OrderBrowserTestBase;
 
 /**
  * Tests the commerce_line_item_type entity type.

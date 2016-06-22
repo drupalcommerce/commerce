@@ -10,7 +10,7 @@ use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\commerce_order\OrderBrowserTestBase;
+use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
 
 /**
  * Defines base class for commerce_cart test cases.
