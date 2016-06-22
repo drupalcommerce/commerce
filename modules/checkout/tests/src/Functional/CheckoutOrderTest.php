@@ -90,4 +90,30 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
   }
 
+  /**
+   * Tests that you can register from the checkout pane.
+   */
+  public function testRegisterOrderCheckout() {
+    // First we enable the checkout registration.
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
+    $config->set('configuration.panes.login.show_registration_form', TRUE);
+    $config->save();
+
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextContains('Create new account');
+    $this->submitForm([
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][pass][pass1]' => 'pass',
+      'login[register][pass][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Registration successful. You can now continue the checkout.');
+    $this->assertSession()->pageTextContains('Billing information');
+  }
+
 }

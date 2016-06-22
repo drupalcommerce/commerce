@@ -10,6 +10,7 @@ configuration:
   panes:
     login:
       allow_guest_checkout: true
+      show_registration_form: false
       step: login
       weight: 0
     contact_information:
