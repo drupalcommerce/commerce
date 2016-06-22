@@ -7,3 +7,6 @@ cart_block:
       css/commerce_cart.theme.css: {}
   js:
     js/commerce_cart.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
