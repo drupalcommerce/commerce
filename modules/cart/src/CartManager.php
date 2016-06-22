@@ -140,7 +140,7 @@ class CartManager implements CartManagerInterface {
     //
     // The only value you can change by default is the amount via the cart view.
     // Once this changes, a cart update is required for the total_price__amount
-    // db column. We do not, like the addLineItem() function, test for 
+    // db column. We do not, like the addLineItem() function, test for
     // quantities and a possible difference, we expect we need to update it.
     $cart->save();
   }
