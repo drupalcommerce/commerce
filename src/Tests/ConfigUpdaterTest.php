@@ -2,16 +2,26 @@
 
 namespace Drupal\commerce\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the ConfigUpdater class.
  *
  * @group commerce
  */
-class ConfigUpdaterTest extends WebTestBase {
+class ConfigUpdaterTest extends KernelTestBase {
 
-  public static $modules = ['commerce_update_test'];
+  /**
+   * Enable modules.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'system', 'field', 'options', 'user', 'entity', 'views', 'address',
+    'profile', 'state_machine', 'inline_entity_form', 'commerce',
+    'commerce_price', 'commerce_store', 'commerce_product', 'commerce_order',
+    'commerce_update_test'
+  ];
 
   /**
    * The config updater service.
@@ -25,6 +35,14 @@ class ConfigUpdaterTest extends WebTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->installSchema('system', 'router');
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_store');
+    $this->installEntitySchema('commerce_order');
+    $this->installConfig('commerce_order');
+    $this->installConfig('commerce_update_test');
 
     $this->configUpdater = \Drupal::service('commerce.config_updater');
   }
