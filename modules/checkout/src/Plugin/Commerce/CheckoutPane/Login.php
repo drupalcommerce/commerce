@@ -261,18 +261,18 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
         ],
       ],
     ];
-    $pane_form['register']['mail'] = array(
+    $pane_form['register']['mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Email address'),
       '#description' => $this->t('A valid email address. All emails from the system will be sent to this address. The email address is not made public and will only be used if you wish to receive a new password or wish to receive certain news or notifications by email.'),
       '#required' => FALSE,
-    );
-    $pane_form['register']['pass'] = array(
+    ];
+    $pane_form['register']['pass'] = [
       '#type' => 'password_confirm',
       '#size' => 25,
       '#description' => $this->t('Provide a password for the new account in both fields.'),
       '#required' => FALSE,
-    );
+    ];
     $pane_form['register']['register'] = [
       '#type' => 'submit',
       '#value' => $this->t('Create account and continue'),
@@ -340,11 +340,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
 
         // Advanced validation Make sure the account does not exist yet. And
         // that the username is unused/valid.
-        if ($this->entityTypeManager->getStorage('user')->loadByProperties(['mail' => $values['register']['mail']])) {
+        $user_storage = $this->entityTypeManager->getStorage('user');
+        if ($user_storage->loadByProperties(['mail' => $values['register']['mail']])) {
           $form_state->setErrorByName('mail', $this->t('A user is already registered with this email.'));
           return;
         }
-        if ($this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $values['register']['mail']])) {
+        if ($user_storage->loadByProperties(['name' => $values['register']['mail']])) {
           $form_state->setErrorByName('mail', $this->t('A user is already registered with this username, please contact support to resolve this issue.'));
           return;
         }
@@ -389,9 +390,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
         user_login_finalize($account);
         $this->order->setOwner($account);
         $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
-        break;
-
-      case 'continue':
         break;
 
       default:
