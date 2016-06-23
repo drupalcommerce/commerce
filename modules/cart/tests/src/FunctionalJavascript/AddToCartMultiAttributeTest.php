@@ -13,7 +13,7 @@ use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
  *
  * @group commerce
  */
-class AddToCartMultiAttribute extends CartBrowserTestBase {
+class AddToCartMultiAttributeTest extends CartBrowserTestBase {
 
   use JavascriptTestTrait;
 
