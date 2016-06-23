@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -63,11 +62,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'title' => 'My product',
       'variations' => [$variation],
       'stores' => [$store],
-    ]);
-
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
-      'access cart',
-      'access checkout',
     ]);
   }
 
