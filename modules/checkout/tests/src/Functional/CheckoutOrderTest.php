@@ -8,7 +8,7 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 /**
  * Tests the checkout of an order.
  *
- * @group niels
+ * @group commerce
  */
 class CheckoutOrderTest extends CommerceBrowserTestBase {
 
