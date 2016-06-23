@@ -114,6 +114,48 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ], 'Create account and continue');
     $this->assertSession()->pageTextContains('Registration successful. You can now continue the checkout.');
     $this->assertSession()->pageTextContains('Billing information');
+
+    // Test various validations. We first redo the same as above to emulate a
+    // double registration.
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextContains('Create new account');
+
+    // Already used e-mail.
+    $this->submitForm([
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][pass][pass1]' => 'pass',
+      'login[register][pass][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('A user is already registered with this email.');
+
+    // Invalid characters.
+    $this->submitForm([
+      'login[register][mail]' => 'guest@#.com',
+      'login[register][pass][pass1]' => 'pass',
+      'login[register][pass][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('The email you have used contains bad characters.');
+
+    // Empty e-mail.
+    $this->submitForm([
+      'login[register][mail]' => '',
+      'login[register][pass][pass1]' => 'pass',
+      'login[register][pass][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Email is mandatory.');
+
+    // Empty password.
+    $this->submitForm([
+      'login[register][mail]' => 'valid@example.com',
+      'login[register][pass][pass1]' => '',
+      'login[register][pass][pass2]' => '',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Password is mandatory.');
   }
 
 }
