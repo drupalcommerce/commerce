@@ -13,7 +13,7 @@ use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
  *
  * @group commerce
  */
-class AddToCartMultiAttribute extends CartBrowserTestBase {
+class AddToCartMultiAttributeTest extends CartBrowserTestBase {
 
   use JavascriptTestTrait;
 
@@ -77,7 +77,7 @@ class AddToCartMultiAttribute extends CartBrowserTestBase {
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $color_attributes['blue']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['medium']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['large']->id());
-    $this->postAddToCart($this->variation->getProduct());
+    $this->getSession()->getPage()->pressButton('Add to cart');
 
     $this->drupalGet($product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
@@ -97,11 +97,8 @@ class AddToCartMultiAttribute extends CartBrowserTestBase {
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $color_attributes['red']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['small']->id());
     $this->assertAttributeDoesNotExist('purchased_entity[0][attributes][attribute_size]', $size_attributes['large']->id());
+    $this->getSession()->getPage()->pressButton('Add to cart');
 
-    $this->postAddToCart($product, [
-      'purchased_entity[0][attributes][attribute_color]' => $color_attributes['blue']->id(),
-      'purchased_entity[0][attributes][attribute_size]' => $size_attributes['medium']->id(),
-    ]);
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
     $this->assertLineItemInOrder($variations[0], $line_items[0]);
