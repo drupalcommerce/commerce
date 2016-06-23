@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.

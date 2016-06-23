@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_cart\Functional;
 
-use Drupal\Tests\commerce_order\OrderBrowserTestBase;
+use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
