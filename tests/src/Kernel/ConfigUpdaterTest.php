@@ -20,7 +20,7 @@ class ConfigUpdaterTest extends KernelTestBase {
     'system', 'field', 'options', 'user', 'entity', 'views', 'address',
     'profile', 'state_machine', 'inline_entity_form', 'commerce',
     'commerce_price', 'commerce_store', 'commerce_product', 'commerce_order',
-    'commerce_update_test'
+    'commerce_update_test',
   ];
 
   /**
