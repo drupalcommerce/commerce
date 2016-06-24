@@ -108,6 +108,9 @@ class CartManager implements CartManagerInterface {
     $needs_cart_save = FALSE;
     if ($matching_line_item) {
       $new_quantity = $matching_line_item->getQuantity() + $quantity;
+      if ($quantity != $new_quantity) {
+        $needs_cart_save = TRUE;
+      }
       $matching_line_item->setQuantity($new_quantity);
       $matching_line_item->save();
     }
