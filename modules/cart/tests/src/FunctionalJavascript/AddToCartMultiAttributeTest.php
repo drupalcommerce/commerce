@@ -77,7 +77,8 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $color_attributes['blue']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['medium']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['large']->id());
-    $this->postAddToCart($this->variation->getProduct());
+    // Add Red+Small as first item to the cart.
+    $this->getSession()->getPage()->pressButton('Add to cart');
 
     $this->drupalGet($product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
@@ -97,11 +98,11 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_color]', $color_attributes['red']->id());
     $this->assertAttributeExists('purchased_entity[0][attributes][attribute_size]', $size_attributes['small']->id());
     $this->assertAttributeDoesNotExist('purchased_entity[0][attributes][attribute_size]', $size_attributes['large']->id());
+    // Add Blue+Medium to as second item to the cart.
+    $this->getSession()->getPage()->pressButton('Add to cart');
 
-    $this->postAddToCart($product, [
-      'purchased_entity[0][attributes][attribute_color]' => $color_attributes['blue']->id(),
-      'purchased_entity[0][attributes][attribute_size]' => $size_attributes['medium']->id(),
-    ]);
+
+    // Validate the cart-state: Red+Small and Blue+Medium.
     $this->cart = Order::load($this->cart->id());
     $line_items = $this->cart->getLineItems();
     $this->assertLineItemInOrder($variations[0], $line_items[0]);
