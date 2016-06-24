@@ -120,7 +120,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   public function defaultConfiguration() {
     return [
       'allow_guest_checkout' => TRUE,
-      'show_registration_form' => FALSE,
+      'allow_registration' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -128,17 +128,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function buildConfigurationSummary() {
+    $summary = $this->t('Login allowed');
     if (!empty($this->configuration['allow_guest_checkout'])) {
-      $summary = $this->t('Guest checkout: Allowed');
+      $summary .= '<br />' . $this->t('Guest checkout allowed');
     }
-    else {
-      $summary = $this->t('Guest checkout: Not allowed');
-      if (!empty($this->configuration['show_registration_form'])) {
-        $summary .= '<br />' . $this->t('Registration form: Yes');
-      }
-      else {
-        $summary .= '<br />' . $this->t('Registration form: No');
-      }
+    if (!empty($this->configuration['allow_registration'])) {
+      $summary .= '<br />' . $this->t('Registration allowed');
     }
 
     return $summary;
@@ -153,13 +148,22 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#type' => 'checkbox',
       '#title' => $this->t('Allow guest checkout'),
       '#default_value' => $this->configuration['allow_guest_checkout'],
+      '#states' => [
+        'visible' => [
+          ':input[name="configuration[panes][login][configuration][allow_registration]"]' => ['checked' => FALSE],
+        ],
+      ],
     ];
 
-    $form['show_registration_form'] = [
+    $form['allow_registration'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Show registration form'),
-      '#description' => $this->t('If checked, a registration form will be presented if guest checkout is disabled.'),
-      '#default_value' => $this->configuration['show_registration_form'],
+      '#title' => $this->t('Allow registration'),
+      '#default_value' => $this->configuration['allow_registration'],
+      '#states' => [
+        'visible' => [
+          ':input[name="configuration[panes][login][configuration][allow_guest_checkout]"]' => ['checked' => FALSE],
+        ],
+      ],
     ];
 
     return $form;
@@ -174,7 +178,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['allow_guest_checkout'] = !empty($values['allow_guest_checkout']);
-      $this->configuration['show_registration_form'] = !empty($values['show_registration_form']);
+      $this->configuration['allow_registration'] = !empty($values['allow_registration']);
     }
   }
 
@@ -253,7 +257,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $pane_form['register'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Create new account'),
-      '#access' => !$this->configuration['allow_guest_checkout'] && $this->configuration['show_registration_form'],
+      '#access' => $this->configuration['allow_registration'],
       '#attributes' => [
         'class' => [
           'form-wrapper__login-option',
@@ -269,7 +273,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     ];
     $pane_form['register']['pass'] = [
       '#type' => 'password_confirm',
-      '#size' => 25,
+      '#size' => 60,
       '#description' => $this->t('Provide a password for the new account in both fields.'),
       '#required' => FALSE,
     ];

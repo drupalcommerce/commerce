@@ -97,7 +97,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     // First we enable the checkout registration.
     $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
     $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
-    $config->set('configuration.panes.login.show_registration_form', TRUE);
+    $config->set('configuration.panes.login.allow_registration', TRUE);
     $config->save();
 
     $this->drupalLogout();
