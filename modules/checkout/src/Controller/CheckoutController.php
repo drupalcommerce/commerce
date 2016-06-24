@@ -110,10 +110,7 @@ class CheckoutController implements ContainerInjectionInterface {
 
     // Check if the user has access to the order. This is the most important
     // check.
-    $access = AccessResult::allowedIf($owner_check);
-
-    // We also verify additional permissions and requirements.
-    $access
+    $access = AccessResult::allowedIf($owner_check)
       ->andIf(AccessResult::allowedIf($order->hasLineItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
