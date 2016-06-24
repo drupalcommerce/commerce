@@ -4,6 +4,11 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\profile\Entity\Profile;
+use Drupal\commerce_order\Entity\LineItem;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -63,6 +68,66 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'variations' => [$variation],
       'stores' => [$store],
     ]);
+  }
+
+  /**
+   * Tests order access.
+   */
+  public function testOrderAccess() {
+    LineItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
+    $profile = Profile::create([
+      'type' => 'billing',
+      'address' => [
+        'country' => 'FR',
+        'postal_code' => '75002',
+        'locality' => 'Paris',
+        'address_line1' => 'A french street',
+        'recipient' => 'John LeSmith',
+      ],
+    ]);
+    $profile->save();
+    $line_item = LineItem::create([
+      'type' => 'test',
+    ]);
+    $line_item->save();
+    $user = $this->drupalCreateUser();
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'in_checkout',
+      'order_number' => '6',
+      'mail' => 'test@example.com',
+      'uid' => $user->id(),
+      'ip_address' => '127.0.0.1',
+      'billing_profile' => $profile,
+      'line_items' => [$line_item],
+    ]);
+    $order->save();
+
+    // I should not have access as anonymous.
+    $this->drupalLogout();
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+
+    // I should have access as the user that owns the order.
+    $this->drupalLogin($user);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(200);
+
+    // I should not have access if the order does not contain line items.
+    $order->removeLineItem($line_item)->save();
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+
+    // I should not have access as the user that owns the order if it does not
+    // have permission.
+    $order->addLineItem($line_item)->save();
+    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
