@@ -95,6 +95,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ]);
     $line_item->save();
     $user = $this->drupalCreateUser();
+    $user2 = $this->drupalCreateUser();
     $order = Order::create([
       'type' => 'default',
       'state' => 'in_checkout',
@@ -116,6 +117,12 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogin($user);
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(200);
+
+    // I should not have access as a user that does not own the order.
+    $this->drupalLogin($user2);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+    $this->drupalLogin($user);
 
     // I should not have access if the order does not contain line items.
     $order->removeLineItem($line_item)->save();
