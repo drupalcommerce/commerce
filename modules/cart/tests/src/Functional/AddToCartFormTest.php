@@ -7,6 +7,7 @@ use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Tests the add to cart form.
@@ -178,7 +179,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
       'red' => 'Red',
     ]);
     // Make the color attribute optional.
-    $color_field = \Drupal::entityManager()->getStorage('field_config')->load('commerce_product_variation.default.attribute_color');
+    $color_field = FieldConfig::loadByName('commerce_product_variation', 'default', 'attribute_color');
     $color_field->setRequired(TRUE);
     $color_field->save();
 
