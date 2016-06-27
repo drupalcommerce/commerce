@@ -100,7 +100,6 @@ class CheckoutController implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
 
-    $access = AccessResult::allowedIfHasPermission($account, 'access checkout');
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
       $owner_check = $account->id() == $order->getOwnerId();
@@ -108,9 +107,10 @@ class CheckoutController implements ContainerInjectionInterface {
     else {
       $owner_check = $this->cartSession->hasCartId($order->id());
     }
-    $access
-      ->andIf(AccessResult::allowedIf($owner_check))
+
+    $access = AccessResult::allowedIf($owner_check)
       ->andIf(AccessResult::allowedIf($order->hasLineItems()))
+      ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
 
     return $access;

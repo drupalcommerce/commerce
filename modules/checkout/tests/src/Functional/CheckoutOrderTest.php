@@ -4,6 +4,11 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\profile\Entity\Profile;
+use Drupal\commerce_order\Entity\LineItem;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -63,6 +68,73 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'variations' => [$variation],
       'stores' => [$store],
     ]);
+  }
+
+  /**
+   * Tests order access.
+   */
+  public function testOrderAccess() {
+    $user = $this->drupalCreateUser();
+    $user2 = $this->drupalCreateUser();
+
+    LineItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
+    $profile = Profile::create([
+      'type' => 'billing',
+      'address' => [
+        'country' => 'FR',
+        'postal_code' => '75002',
+        'locality' => 'Paris',
+        'address_line1' => 'A french street',
+        'recipient' => 'John LeSmith',
+      ],
+    ]);
+    $profile->save();
+    $line_item = LineItem::create([
+      'type' => 'test',
+    ]);
+    $line_item->save();
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'in_checkout',
+      'order_number' => '6',
+      'mail' => 'test@example.com',
+      'uid' => $user->id(),
+      'ip_address' => '127.0.0.1',
+      'billing_profile' => $profile,
+      'line_items' => [$line_item],
+    ]);
+    $order->save();
+
+    // Anonymous user with no session.
+    $this->drupalLogout();
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Authenticated order owner.
+    $this->drupalLogin($user);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Authenticated user who does not own the order.
+    $this->drupalLogin($user2);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+    $this->drupalLogin($user);
+
+    // Order with no line items.
+    $order->removeLineItem($line_item)->save();
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Authenticated order owner without the 'access checkout' permission.
+    $order->addLineItem($line_item)->save();
+    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
+    $this->drupalGet('/checkout/' . $order->id());
+    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
