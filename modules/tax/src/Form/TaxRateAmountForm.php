@@ -62,6 +62,7 @@ class TaxRateAmountForm extends EntityForm {
       '#default_value' => $tax_rate_amount->getAmount(),
       '#maxlength' => 255,
       '#required' => TRUE,
+      '#step' => 0.001,
     ];
     $form['startDate'] = [
       '#type' => 'date',
