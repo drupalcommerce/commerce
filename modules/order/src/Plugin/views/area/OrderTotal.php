@@ -11,8 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines an order total area handler.
  *
- * Defines an order total area handler that shows the order total field with its
- * components listed in the footer of a View.
+ * Shows the order total field with its components listed in the footer of a
+ * View.
  *
  * @ingroup views_area_handlers
  *
