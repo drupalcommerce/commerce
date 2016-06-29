@@ -50,6 +50,9 @@ use Drupal\user\UserInterface;
  *   },
  *   bundle_entity_type = "commerce_product_variation_type",
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
+ *   constraints = {
+ *     "ProductVariationAttribute" = {}
+ *   }
  * )
  */
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
