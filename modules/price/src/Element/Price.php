@@ -21,6 +21,9 @@ use Drupal\Core\Render\Element\Textfield;
  *   '#required' => TRUE,
  * ];
  * @endcode
+ * Note:
+ * $form_state->getValue('amount') will be an array.
+ * Use $form['amount']['#value'] to get the price object.
  *
  * @FormElement("commerce_price")
  */

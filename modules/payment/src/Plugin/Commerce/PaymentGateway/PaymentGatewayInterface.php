@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce\PluginForm\PluginWithFormsInterface;
+use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -51,6 +52,14 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getSupportedModes();
 
   /**
+   * Gets the payment type used by the payment gateway.
+   *
+   * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentTypeInterface
+   *   The payment type.
+   */
+  public function getPaymentType();
+
+  /**
    * Gets the payment method types handled by the payment gateway.
    *
    * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[]
@@ -65,5 +74,16 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    *   The credit card types.
    */
   public function getCreditCardTypes();
+
+  /**
+   * Builds the available operations for the given payment.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment.
+   *
+   * @return array
+   *   The operations.
+   */
+  public function buildPaymentOperations(PaymentInterface $payment);
 
 }

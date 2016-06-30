@@ -1,3 +1,65 @@
+entity.commerce_payment.add_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/add'
+  defaults:
+    _form: '\Drupal\commerce_payment\Form\PaymentAddForm'
+    _title: 'Add payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _entity_create_access: 'commerce_payment'
+
+entity.commerce_payment.capture_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/capture'
+  defaults:
+    _entity_form: 'commerce_payment.capture'
+    _title: 'Capture payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+      commerce_payment:
+        type: 'entity:commerce_payment'
+  requirements:
+    _permission: 'administer payments'
+
+entity.commerce_payment.void_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/void'
+  defaults:
+    _entity_form: 'commerce_payment.void'
+    _title: 'Void payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+      commerce_payment:
+        type: 'entity:commerce_payment'
+  requirements:
+    _permission: 'administer payments'
+
+entity.commerce_payment.refund_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/refund'
+  defaults:
+    _entity_form: 'commerce_payment.refund'
+    _title: 'Refund payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+      commerce_payment:
+        type: 'entity:commerce_payment'
+  requirements:
+    _permission: 'administer payments'
+
+entity.commerce_payment.collection:
+  path: '/admin/commerce/orders/{commerce_order}/payments'
+  defaults:
+    _entity_list: 'commerce_payment'
+    _title: 'Payments'
+  requirements:
+    _permission: 'administer payments'
+
 entity.commerce_payment_gateway.collection:
   path: '/admin/commerce/config/payment-gateways'
   defaults:
