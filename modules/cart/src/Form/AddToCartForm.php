@@ -5,6 +5,7 @@ namespace Drupal\commerce_cart\Form;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
+use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -32,6 +33,13 @@ class AddToCartForm extends ContentEntityForm {
   protected $cartProvider;
 
   /**
+   * The order type resolver.
+   *
+   * @var \Drupal\commerce_order\Resolver\OrderTypeResolverInterface
+   */
+  protected $orderTypeResolver;
+
+  /**
    * The store context.
    *
    * @var \Drupal\commerce_store\StoreContextInterface
@@ -47,14 +55,17 @@ class AddToCartForm extends ContentEntityForm {
    *   The cart manager.
    * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
    *   The cart provider.
+   * @param \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $order_type_resolver
+   *   The order type resolver.
    * @param \Drupal\commerce_store\StoreContextInterface $store_context
    *   The store context.
    */
-  public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, StoreContextInterface $store_context) {
+  public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context) {
     parent::__construct($entity_manager);
 
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
+    $this->orderTypeResolver = $order_type_resolver;
     $this->storeContext = $store_context;
   }
 
@@ -66,6 +77,7 @@ class AddToCartForm extends ContentEntityForm {
       $container->get('entity.manager'),
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
+      $container->get('commerce_order.chain_order_type_resolver'),
       $container->get('commerce_store.store_context')
     );
   }
@@ -103,18 +115,17 @@ class AddToCartForm extends ContentEntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $line_item_type_storage = $this->entityManager->getStorage('commerce_line_item_type');
     /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
     $line_item = $this->entity;
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = $line_item->getPurchasedEntity();
-    /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $line_item_type */
-    $line_item_type = $line_item_type_storage->load($line_item->bundle());
+
+    $order_type = $this->orderTypeResolver->resolve($line_item);
 
     $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($line_item_type->getOrderTypeId(), $store);
+    $cart = $this->cartProvider->getCart($order_type, $store);
     if (!$cart) {
-      $cart = $this->cartProvider->createCart('default', $store);
+      $cart = $this->cartProvider->createCart($order_type, $store);
     }
     $this->cartManager->addLineItem($cart, $line_item, $form_state->get(['settings', 'combine']));
 
