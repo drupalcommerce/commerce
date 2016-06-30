@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\PaymentMethodTypeManager;
+use Drupal\commerce_payment\PaymentTypeManager;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -24,6 +25,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   protected $entityTypeManager;
 
   /**
+   * The payment type used by the gateway.
+   *
+   * @var \Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentTypeInterface
+   */
+  protected $paymentType;
+
+  /**
    * The payment method types handled by the gateway.
    *
    * @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[]
@@ -41,14 +49,17 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\commerce_payment\PaymentTypeManager $payment_type_manager
+   *   The payment type manager.
    * @param \Drupal\commerce_payment\PaymentMethodTypeManager $payment_method_type_manager
    *   The payment method type manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentMethodTypeManager $payment_method_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, PaymentTypeManager $payment_type_manager, PaymentMethodTypeManager $payment_method_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     // Instantiate the types right away to ensure that their IDs are valid.
+    $this->paymentType = $payment_type_manager->createInstance($this->pluginDefinition['payment_type']);
     foreach ($this->pluginDefinition['payment_method_types'] as $plugin_id) {
       $this->paymentMethodTypes[$plugin_id] = $payment_method_type_manager->createInstance($plugin_id);
     }
@@ -64,6 +75,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
+      $container->get('plugin.manager.commerce_payment_type'),
       $container->get('plugin.manager.commerce_payment_method_type')
     );
   }
@@ -94,6 +106,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function getSupportedModes() {
     return $this->pluginDefinition['modes'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPaymentType() {
+    return $this->paymentType;
   }
 
   /**

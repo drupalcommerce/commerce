@@ -4,3 +4,27 @@
  * @file
  * Provides payment functionality.
  */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_order') {
+    $fields['payment_gateway'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Payment gateway'))
+      ->setDescription(t('The payment gateway.'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'commerce_payment_gateway');
+
+    $fields['payment_method'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Payment method'))
+      ->setDescription(t('The payment method.'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'commerce_payment_method');
+
+    return $fields;
+  }
+}
