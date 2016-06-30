@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
 use Drupal\commerce\PluginForm\PluginWithFormsInterface;
+use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -51,6 +52,14 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getSupportedModes();
 
   /**
+   * Gets the payment type used by the payment gateway.
+   *
+   * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentTypeInterface
+   *   The payment type.
+   */
+  public function getPaymentType();
+
+  /**
    * Gets the payment method types handled by the payment gateway.
    *
    * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[]
@@ -65,5 +74,21 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    *   The credit card types.
    */
   public function getCreditCardTypes();
+
+  /**
+   * Creates a payment.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
+   *   The payment.
+   * @param bool $capture
+   *   Whether the created payment should be captured (VS authorized only).
+   *   Allowed to be FALSE only if the plugin supports authorizations.
+   *
+   * @throws \InvalidArgumentException
+   *   If $capture is FALSE but the plugin does not support authorizations.
+   * @throws \Drupal\commerce_payment\Exception\PaymentGatewayException
+   *   Thrown when the transaction fails for any reason.
+   */
+  public function createPayment(PaymentInterface $payment, $capture = TRUE);
 
 }

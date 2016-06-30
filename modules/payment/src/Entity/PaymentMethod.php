@@ -24,7 +24,15 @@ use Drupal\profile\Entity\ProfileInterface;
  *   bundle_label = @Translation("Payment method type"),
  *   bundle_plugin_type = "commerce_payment_method_type",
  *   handlers = {
+ *     "list_builder" = "Drupal\commerce_payment\PaymentMethodListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentMethodStorage",
+ *     "form" = {
+ *       "edit" = "Drupal\commerce_payment\Form\PaymentMethodEditForm",
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "commerce_payment_method",
  *   admin_permission = "administer payments",
@@ -34,11 +42,25 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "uuid" = "uuid",
  *     "bundle" = "type"
  *   },
+ *   links = {
+ *     "canonical" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
+ *     "edit-form" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
+ *     "delete-form" = "/user/{user}/payment-methods/{commerce_payment_method}/delete",
+ *   },
  * )
  */
 class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters = parent::urlRouteParameters($rel);
+    $uri_route_parameters['user'] = $this->getOwnerId();
+    return $uri_route_parameters;
+  }
 
   /**
    * {@inheritdoc}

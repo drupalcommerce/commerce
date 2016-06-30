@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethods;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\user\UserInterface;
 
@@ -16,6 +17,10 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
    * {@inheritdoc}
    */
   public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway) {
+    if (!($payment_gateway instanceof SupportsStoredPaymentMethods)) {
+      return [];
+    }
+
     $query = $this->getQuery()
       ->condition('uid', $account->id())
       ->condition('payment_gateway', $payment_gateway->id())

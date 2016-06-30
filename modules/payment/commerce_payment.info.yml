@@ -6,3 +6,7 @@ core: 8.x
 dependencies:
   - commerce_order
   - user
+config_devel:
+  install:
+    - field.storage.user.commerce_remote_id
+    - field.field.user.user.commerce_remote_id.yml
