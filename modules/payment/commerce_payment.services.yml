@@ -1,0 +1,12 @@
+services:
+  plugin.manager.commerce_payment_gateway:
+    class: Drupal\commerce_payment\PaymentGatewayManager
+    parent: default_plugin_manager
+
+  plugin.manager.commerce_payment_method_type:
+    class: Drupal\commerce_payment\PaymentMethodTypeManager
+    parent: default_plugin_manager
+
+  plugin.manager.commerce_payment_type:
+    class: Drupal\commerce_payment\PaymentTypeManager
+    parent: default_plugin_manager

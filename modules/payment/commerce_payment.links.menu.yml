@@ -1,0 +1,5 @@
+entity.commerce_payment_gateway.collection:
+  title: 'Payment gateways'
+  route_name: 'entity.commerce_payment_gateway.collection'
+  parent: 'commerce.configuration'
+  description: 'Manage your payment gateways.'

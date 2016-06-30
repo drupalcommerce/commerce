@@ -1,0 +1,33 @@
+commerce_payment.commerce_payment_gateway.*:
+  type: config_entity
+  label: 'Payment gateway'
+  mapping:
+    id:
+      type: string
+      label: 'Machine-readable name'
+    label:
+      type: label
+      label: 'Label'
+    weight:
+      type: integer
+      label: 'Weight'
+    plugin:
+      type: string
+      label: 'Plugin'
+    configuration:
+      type: commerce_payment.commerce_payment_gateway.plugin.[%parent.plugin]
+
+commerce_payment.commerce_payment_gateway.plugin.*:
+  type: commerce_payment_gateway_configuration
+
+commerce_payment_gateway_configuration:
+  type: mapping
+  mapping:
+    mode:
+      type: string
+      label: 'Mode'
+    payment_method_types:
+      type: sequence
+      label: 'Payment method types'
+      sequence:
+        type: string
