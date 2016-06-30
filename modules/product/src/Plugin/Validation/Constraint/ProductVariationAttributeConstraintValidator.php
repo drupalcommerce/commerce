@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_product\Plugin\Validation\Constraint;
 
-use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,21 +21,13 @@ class ProductVariationAttributeConstraintValidator extends ConstraintValidator i
   protected $entityTypeManager;
 
   /**
-   * The attribute field manager.
-   *
-   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
-   */
-  protected $attributeFieldManager;
-
-  /**
    * Constructs a new ProductVariationTypeForm object.
    *
-   * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
-   *   The attribute field manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ProductAttributeFieldManagerInterface $attribute_field_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->attributeFieldManager = $attribute_field_manager;
   }
 
   /**
@@ -44,8 +35,7 @@ class ProductVariationAttributeConstraintValidator extends ConstraintValidator i
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager'),
-      $container->get('commerce_product.attribute_field_manager')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -54,16 +44,30 @@ class ProductVariationAttributeConstraintValidator extends ConstraintValidator i
    */
   public function validate($entity, Constraint $constraint) {
 
-    // Get all attribute-values for this product_variation.
-    $field_map = $this->attributeFieldManager->getFieldMap($entity->bundle());
-
-    // Do Drupal::entityQuery for the attributes-values.
-    $this->entityTypeManager->getStorage('commerce_product_variation');
+    // Lookup variations with same attributes from same bundle.
     $query = \Drupal::entityQuery('commerce_product_variation');
 
-    // If result:count == 0: ok
-    // If result:count == 1 && product_variation->id() == self-->id(): ok
-    // Else ->addViolation()
+    $attributes = $entity->getAttributeValueIds();
+    $query->condition('type', $entity->bundle());
+    foreach ($attributes as $field => $value) {
+      $query->condition($field, $value);
+    }
+    $r = $query->execute();
+
+    // New combination.
+    if (count($r) == 0) {
+      return;
+    }
+    // Combination exists, but it is this variation that is saved.
+    if (count($r) == 1 && reset($r) == $entity->id()) {
+      return;
+    }
+    // All other cases are violations.
+    foreach ($attributes as $field => $value) {
+      $this->context->buildViolation($constraint->message)
+        ->atPath($field)
+        ->addViolation();
+    }
   }
 
 }
