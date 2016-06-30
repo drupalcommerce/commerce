@@ -1,0 +1,7 @@
+name: Commerce Payment
+type: module
+description: 'Provides payment functionality.'
+package: Commerce
+core: 8.x
+dependencies:
+  - commerce

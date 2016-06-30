@@ -1,0 +1,7 @@
+entity.commerce_payment_gateway.collection:
+  path: '/admin/commerce/config/payment-gateways'
+  defaults:
+    _entity_list: 'commerce_payment_gateway'
+    _title: 'Payment gateways'
+  requirements:
+    _permission: 'administer payment gateways'

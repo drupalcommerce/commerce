@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * @file
+ * Provides payment functionality.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+
+/**
+ * Implements hook_entity_bundle_info().
+ *
+ * Use payment method type plugins as commerce_payment_method bundles.
+ */
+function commerce_payment_entity_bundle_info() {
+  $bundles = [];
+  $payment_method_type_manager = \Drupal::service('plugin.manager.commerce_payment_method_type');
+  foreach ($payment_method_type_manager->getDefinitions() as $plugin_id => $definition) {
+    $bundles['commerce_payment_method'][$plugin_id]['label'] = $definition['label'];
+  }
+
+  return $bundles;
+}
+
+/**
+ * Implements hook_entity_field_storage_info().
+ */
+function commerce_payment_entity_field_storage_info(EntityTypeInterface $entity_type) {
+  $definitions = [];
+  if ($entity_type->id() == 'commerce_payment_method') {
+    $payment_method_type_manager = \Drupal::service('plugin.manager.commerce_payment_method_type');
+    foreach (array_keys($payment_method_type_manager->getDefinitions()) as $plugin_id) {
+      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
+      $payment_method_type = $payment_method_type_manager->createInstance($plugin_id);
+      $definitions += $payment_method_type->buildFieldDefinitions();
+    }
+  }
+  elseif ($entity_type->id() == 'commerce_payment') {
+    $payment_gateway_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_gateway');
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways */
+    $payment_gateways = $payment_gateway_storage->loadMultiple();
+    foreach ($payment_gateways as $payment_gateway) {
+      $definitions += $payment_gateway->getPlugin()->buildPaymentFieldDefinitions();
+    }
+  }
+
+  // Process any found definitions, ensuring the presence of required keys.
+  foreach ($definitions as $field_name => $definition) {
+    $definition->setName($field_name);
+    $definition->setTargetEntityTypeId($entity_type->id());
+    $definitions[$field_name] = $definition;
+  }
+
+  return $definitions;
+}
+
+/**
+ * Implements hook_entity_bundle_field_info().
+ */
+function commerce_payment_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle) {
+  $definitions = [];
+  if ($entity_type->id() == 'commerce_payment_method') {
+    $payment_method_type_manager = \Drupal::service('plugin.manager.commerce_payment_method_type');
+    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
+    $payment_method_type = $payment_method_type_manager->createInstance($bundle);
+    $definitions = $payment_method_type->buildFieldDefinitions();
+  }
+  elseif ($entity_type->id() == 'commerce_payment') {
+    $payment_gateway_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_gateway');
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $payment_gateway_storage->load($bundle);
+    $definitions = $payment_gateway->getPlugin()->buildPaymentFieldDefinitions();
+  }
+
+  // Process any found definitions, ensuring the presence of required keys.
+  foreach ($definitions as $field_name => $definition) {
+    $definition->setName($field_name);
+    $definition->setTargetEntityTypeId($entity_type->id());
+    $definition->setTargetBundle($bundle);
+    $definitions[$field_name] = $definition;
+  }
+
+  return $definitions;
+}
+
+/**
+ * Implements hook_entity_bundle_create().
+ */
+function commerce_payment_entity_bundle_create($entity_type_id, $bundle) {
+  if (in_array($entity_type_id, ['commerce_payment', 'commerce_payment_method'])) {
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+    $definitions = commerce_payment_entity_bundle_field_info($entity_type, $bundle);
+    commerce_payment_create_field_definitions($definitions);
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_delete().
+ */
+function commerce_payment_entity_bundle_delete($entity_type_id, $bundle) {
+  if (in_array($entity_type_id, ['commerce_payment', 'commerce_payment_method'])) {
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+    $definitions = commerce_payment_entity_bundle_field_info($entity_type, $bundle);
+    commerce_payment_delete_field_definitions($definitions);
+  }
+}
+
+/**
+ * Creates the given field definitions.
+ *
+ * @param array $definitions
+ *   The field definitions.
+ */
+function commerce_payment_create_field_definitions(array $definitions) {
+  $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
+  $field_definition_listener = \Drupal::service('field_definition.listener');
+  foreach ($definitions as $definition) {
+    $field_storage_definition_listener->onFieldStorageDefinitionCreate($definition);
+    $field_definition_listener->onFieldDefinitionCreate($definition);
+  }
+}
+
+/**
+ * Deletes the given field definitions.
+ *
+ * @param array $definitions
+ *   The field definitions.
+ */
+function commerce_payment_delete_field_definitions(array $definitions) {
+  $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
+  $field_definition_listener = \Drupal::service('field_definition.listener');
+  foreach ($definitions as $definition) {
+    $field_storage_definition_listener->onFieldStorageDefinitionDelete($definition);
+    $field_definition_listener->onFieldDefinitionDelete($definition);
+  }
+}

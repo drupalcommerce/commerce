@@ -1,0 +1,5 @@
+entity.commerce_payment_gateway.add_form:
+  route_name: entity.commerce_payment_gateway.add_form
+  title: 'Add payment gateway'
+  appears_on:
+    - entity.commerce_payment_gateway.collection

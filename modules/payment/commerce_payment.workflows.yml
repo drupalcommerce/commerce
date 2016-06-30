@@ -1,0 +1,40 @@
+payment_default:
+  id: payment_default
+  group: payment
+  label: 'Default'
+  states:
+    new:
+      label: New
+    authorization:
+      label: 'Authorization'
+    authorization_void:
+      label: 'Authorization (Voided)'
+    authorization_expired:
+      label: 'Authorization (Expired)'
+    capture_completed:
+      label: Capture (Completed)
+    capture_partally_refunded:
+      label: Capture (Partially refunded)
+    capture_refunded:
+      label: Capture (Refunded)
+  transitions:
+    authorize:
+      label: 'Authorize payment'
+      from: [new]
+      to: authorization
+    void:
+      label: 'Void payment'
+      from: [authorization]
+      to: authorization_void
+    capture:
+      label: 'Capture payment'
+      from: [pending]
+      to: completed
+    charge:
+      label: 'Charge payment'
+      from: [new]
+      to: completed
+    refund:
+      label: 'Refund payment'
+      from: [capture_completed]
+      to: refunded

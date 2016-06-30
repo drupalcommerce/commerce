@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Payment.
+ */
+
+/**
+ * Implements hook_modules_installed().
+ */
+function commerce_payment_modules_installed($modules) {
+  $entity_bundle_listener = \Drupal::service('entity_bundle.listener');
+  $payment_method_type_manager = \Drupal::service('plugin.manager.commerce_payment_method_type');
+  $definitions = $payment_method_type_manager->getDefinitions();
+  $definitions = array_filter($definitions, function ($definition) use ($modules) {
+    return in_array($definition['provider'], $modules);
+  });
+  foreach ($definitions as $definition) {
+    $entity_bundle_listener->onBundleCreate($definition['id'], 'commerce_payment_method');
+  }
+}
+
+/**
+ * Implements hook_module_preuninstall().
+ */
+function commerce_payment_module_preuninstall($module) {
+  $entity_bundle_listener = \Drupal::service('entity_bundle.listener');
+  $payment_method_type_manager = \Drupal::service('plugin.manager.commerce_payment_method_type');
+  $definitions = $payment_method_type_manager->getDefinitions();
+  $definitions = array_filter($definitions, function ($definition) use ($module) {
+    return $definition['provider'] == $module;
+  });
+  foreach ($definitions as $definition) {
+    $entity_bundle_listener->onBundleDelete($definition['id'], 'commerce_payment_method');
+  }
+}
