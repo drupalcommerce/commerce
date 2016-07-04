@@ -11,50 +11,84 @@ use Drupal\commerce_product\Entity\ProductVariationType;
  */
 class ProductVariationAttributeUniqueTest extends CartBrowserTestBase {
 
-  // Create 2 product-variations with same attribute.
-  public function testProductVariationAttributeConflict() {
+  /**
+   * Create 1 product with 2 product-variations with non-conflicting attributes.
+   */
+  public function testProductVariationAttributeNoConflict() {
 
-    // a. Create attribute type.
-    // b. Create 1 attribute value for the created attribute type.
+    // Create attributes.
     $variation_type = ProductVariationType::load($this->variation->bundle());
-    $this->createAttributeSet($variation_type, 'attribute_value', [
-      'not_unique' => 'Not unique',
+    $attributes = $this->createAttributeSet($variation_type, 'color', [
+      'green' => 'Green',
+      'blue' => 'Blue',
     ]);
 
-    // c. Create product_variation type with attribute.
-    // d. Create 1 product_variation with the attribute-value from b.
+    // Create 2 product-variations with non-conflicting attributes.
     $variation1 = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => 'variation1',
-      'attribute_value' => 'not_unique',
+      'attribute_color' => $attributes['green'],
     ]);
-    // First must save.
-    $this->assertTrue($variation1->id());
-
-    // e. Create 2nd product_variation with the attribute-value from b.
     $variation2 = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => 'variation2',
-      'attribute_value' => 'not_unique',
+      'attribute_color' => $attributes['blue'],
     ]);
-    // Second should fail saving.
-    $this->assertFalse($variation2->id());
+    // Create 1 product with 2 product-variations.
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'Not conflicting variations',
+      'stores' => [$this->store],
+      'variations' => [$variation1, $variation2],
+    ]);
+    $product->save();
 
+    // Validate the product_variations.
+    $violations = $variation1->validate();
+    $this->assertEqual(count($violations), 0);
+    $violations = $variation2->validate();
+    $this->assertEqual(count($violations), 0);
 
-    // f. Query product-variations with attribute.
-    $q = \Drupal::entityQuery('commerce_product_variation')
-      ->condition('field_attribute_value', 'not_unique');
-    $r = $q->execute();
+  }
 
-    // Result count must be 1.
-    $this->assertTrue(function ($r) {
-      return count($r['commerce_product_variation']) === 1;
-    });
+  /**
+   * Create 1 product with 2 product-variations with conflicting attributes.
+   */
+  public function testProductVariationAttributeWithConflict() {
 
-    // Result must not be variation2.
-    $this->assertFalse(function ($r) {
-      return $r['commerce_product_variation'][0]['sku'] === 'variation2';
-    });
+    // Create attributes.
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+    $attributes = $this->createAttributeSet($variation_type, 'color', [
+      'green' => 'Green',
+      'blue' => 'Blue',
+    ]);
+
+    // Create 2 product-variations with non-conflicting attributes.
+    $variation1 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'variation1',
+      'attribute_color' => $attributes['green'],
+    ]);
+    $variation2 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'variation2',
+      'attribute_color' => $attributes['green'], // CONFLICT.
+    ]);
+    // Create 1 product with 2 product-variations.
+    $product = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'Conflicting variations',
+      'stores' => [$this->store],
+      'variations' => [$variation1, $variation2],
+    ]);
+    $product->save();
+
+    // Validate the product_variations.
+    $violations = $variation1->validate();
+    $this->assertEqual(count($violations), 1);
+    $violations = $variation2->validate();
+    $this->assertEqual(count($violations), 1);
+
   }
 
 }
