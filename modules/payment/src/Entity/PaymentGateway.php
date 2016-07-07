@@ -162,42 +162,6 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
-
-    $bundle_of = $this->getEntityType()->getBundleOf();
-    if (!$update) {
-      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
-    }
-    else {
-      $entity_field_manager = \Drupal::getContainer()->get('entity_field.manager');
-      // Entity bundle field definitions may depend on bundle settings.
-      $entity_field_manager->clearCachedFieldDefinitions();
-      $entity_field_manager->clearCachedBundles();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function preDelete(EntityStorageInterface $storage, array $entities) {
-    parent::preDelete($storage, $entities);
-    
-    foreach ($entities as $entity) {
-      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleDelete($entity->id(), $entity->getEntityType()->getBundleOf());
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    parent::postDelete($storage, $entities);
-  }
-
-  /**
    * Acts on an entity before the presave hook is invoked.
    *
    * Used before the entity is saved and before invoking the presave hook.
@@ -222,6 +186,42 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
         throw new ConfigNameException("The machine name of the '{$bundle_type->getLabel()}' bundle cannot be changed.");
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    $bundle_of = $this->getEntityType()->getBundleOf();
+    if (!$update) {
+      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
+    }
+    else {
+      $entity_field_manager = \Drupal::getContainer()->get('entity_field.manager');
+      // Entity bundle field definitions may depend on bundle settings.
+      $entity_field_manager->clearCachedFieldDefinitions();
+      $entity_field_manager->clearCachedBundles();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    foreach ($entities as $entity) {
+      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleDelete($entity->id(), $entity->getEntityType()->getBundleOf());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
   }
 
 }
