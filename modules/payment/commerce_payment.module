@@ -66,10 +66,12 @@ function commerce_payment_entity_bundle_field_info(EntityTypeInterface $entity_t
     $definitions = $payment_method_type->buildFieldDefinitions();
   }
   elseif ($entity_type->id() == 'commerce_payment') {
+    /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_gateway');
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-    $payment_gateway = $payment_gateway_storage->load($bundle);
-    $definitions = $payment_gateway->getPlugin()->buildPaymentFieldDefinitions();
+    $payment_gateway_manager = \Drupal::service('plugin.manager.commerce_payment_gateway');
+    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $payment_gateway_manager->createInstance($payment_gateway_storage->getPluginId());
+    $definitions = $payment_gateway->buildPaymentFieldDefinitions();
   }
 
   // Process any found definitions, ensuring the presence of required keys.

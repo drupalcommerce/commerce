@@ -32,7 +32,7 @@ class PaymentGatewayStorage extends ConfigEntityStorage implements PaymentGatewa
   /**
    * {@inheritdoc}
    */
-  public function getPluginId() {
+  public function getPluginId($entity_id) {
     return $this->plugin;
   }
 }
