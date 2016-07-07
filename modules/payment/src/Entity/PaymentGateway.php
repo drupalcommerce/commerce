@@ -3,7 +3,9 @@
 namespace Drupal\commerce_payment\Entity;
 
 use Drupal\commerce_payment\PaymentGatewayPluginCollection;
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\ConfigNameException;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the payment gateway entity class.
@@ -52,7 +54,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class PaymentGateway extends ConfigEntityBundleBase implements PaymentGatewayInterface {
+class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface {
 
   /**
    * The payment gateway ID.
@@ -157,6 +159,69 @@ class PaymentGateway extends ConfigEntityBundleBase implements PaymentGatewayInt
       $this->pluginCollection = new PaymentGatewayPluginCollection($plugin_manager, $this->plugin, $this->configuration, $this->id);
     }
     return $this->pluginCollection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    $bundle_of = $this->getEntityType()->getBundleOf();
+    if (!$update) {
+      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
+    }
+    else {
+      $entity_field_manager = \Drupal::getContainer()->get('entity_field.manager');
+      // Entity bundle field definitions may depend on bundle settings.
+      $entity_field_manager->clearCachedFieldDefinitions();
+      $entity_field_manager->clearCachedBundles();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+    
+    foreach ($entities as $entity) {
+      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleDelete($entity->id(), $entity->getEntityType()->getBundleOf());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+  }
+
+  /**
+   * Acts on an entity before the presave hook is invoked.
+   *
+   * Used before the entity is saved and before invoking the presave hook.
+   *
+   * Ensure that config entities which are bundles of other entities cannot have
+   * their ID changed.
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity storage object.
+   *
+   * @throws \Drupal\Core\Config\ConfigNameException
+   *   Thrown when attempting to rename a bundle entity.
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    // Only handle renames, not creations.
+    if (!$this->isNew() && $this->getOriginalId() !== $this->id()) {
+      $bundle_type = $this->getEntityType();
+      $bundle_of = $bundle_type->getBundleOf();
+      if (!empty($bundle_of)) {
+        throw new ConfigNameException("The machine name of the '{$bundle_type->getLabel()}' bundle cannot be changed.");
+      }
+    }
   }
 
 }
