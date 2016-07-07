@@ -99,9 +99,23 @@ function commerce_payment_entity_bundle_create($entity_type_id, $bundle) {
  */
 function commerce_payment_entity_bundle_delete($entity_type_id, $bundle) {
   if (in_array($entity_type_id, ['commerce_payment', 'commerce_payment_method'])) {
+    $delete_storage = TRUE;
+    if ($entity_type_id == 'commerce_payment') {
+      $storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_gateway');
+      // Check if other payment gateways are using the same plugin
+      $usage_count = \Drupal::entityQuery('commerce_payment_gateway')
+        ->condition('plugin', $storage->load($bundle)->getPluginId())
+        ->condition('id', $bundle, '<>')
+        ->count()
+        ->execute();
+      // Avoid deleting field storage definitions
+      if ($usage_count) {
+        $delete_storage = FALSE;
+      }
+    }
     $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
     $definitions = commerce_payment_entity_bundle_field_info($entity_type, $bundle);
-    commerce_payment_delete_field_definitions($definitions);
+    commerce_payment_delete_field_definitions($definitions, $delete_storage);
   }
 }
 
@@ -125,12 +139,16 @@ function commerce_payment_create_field_definitions(array $definitions) {
  *
  * @param array $definitions
  *   The field definitions.
+ * @param bool $delete_storage
+ *   If set TRUE, field storage definition will be deleted also
  */
-function commerce_payment_delete_field_definitions(array $definitions) {
+function commerce_payment_delete_field_definitions(array $definitions, $delete_storage=FALSE) {
   $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
   $field_definition_listener = \Drupal::service('field_definition.listener');
   foreach ($definitions as $definition) {
-    $field_storage_definition_listener->onFieldStorageDefinitionDelete($definition);
     $field_definition_listener->onFieldDefinitionDelete($definition);
+    if ($delete_storage) {
+      $field_storage_definition_listener->onFieldStorageDefinitionDelete($definition);
+    }
   }
 }
