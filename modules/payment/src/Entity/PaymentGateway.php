@@ -27,6 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
+ *     "storage" = "Drupal\commerce_payment\PaymentGatewayStorage",
  *   },
  *   admin_permission = "administer payment gateways",
  *   config_prefix = "commerce_payment_gateway",
