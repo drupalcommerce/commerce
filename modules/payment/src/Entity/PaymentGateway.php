@@ -22,11 +22,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
  *       "edit" = "Drupal\commerce_payment\Form\PaymentGatewayForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *       "delete" = "Drupal\commerce_payment\Form\PaymentGatewayDeleteForm"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
+ *     "storage" = "Drupal\commerce_payment\PaymentGatewayStorage",
  *   },
  *   admin_permission = "administer payment gateways",
  *   config_prefix = "commerce_payment_gateway",
