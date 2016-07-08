@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
 use Drupal\user\UserInterface;
 
 /**
@@ -55,6 +56,33 @@ use Drupal\user\UserInterface;
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if (in_array($rel, ['canonical'])) {
+      // Set our variation id as query string.
+      $options = [
+        'query' => [
+          'v' => $this->id(),
+        ],
+      ];
+
+      // Build our url.
+      $route_parameters = $this->getProduct()->urlRouteParameters('canonical');
+      $route_name = 'entity.commerce_product.canonical';
+      $uri = new Url($route_name, $route_parameters, $options);
+
+      // Pass the entity data through as options, so that alter functions do not
+      // need to look up this entity again.
+      $uri
+        ->setOption('entity_type', $this->getProduct()->getEntityType())
+        ->setOption('entity', $this->getProduct());
+
+      return $uri;
+    }
+  }
 
   /**
    * {@inheritdoc}
