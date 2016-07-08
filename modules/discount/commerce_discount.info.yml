@@ -1,0 +1,9 @@
+name: Commerce Discount
+type: module
+description: 'Provides a UI for managing discounts.'
+package: Commerce
+core: 8.x
+dependencies:
+  - datetime
+  - commerce
+  - commerce_order
