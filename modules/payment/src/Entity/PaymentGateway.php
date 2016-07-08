@@ -199,10 +199,13 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
       \Drupal::service('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
     }
     else {
+      /** @var \Drupal\Core\Entity\EntityFieldManager $entity_field_manager */
       $entity_field_manager = \Drupal::service('entity_field.manager');
       // Entity bundle field definitions may depend on bundle settings.
       $entity_field_manager->clearCachedFieldDefinitions();
-      $entity_field_manager->clearCachedBundles();
+      /** @var \Drupal\Core\Entity\EntityTypeBundleInfo $entity_type_bundle_info */
+      $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
+      $entity_type_bundle_info->clearCachedBundles();
     }
   }
 
