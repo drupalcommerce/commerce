@@ -58,6 +58,7 @@ class Price {
    * Gets the string representation of the price.
    *
    * @return string
+   *   The string representation of the price.
    */
   public function __toString() {
     return $this->amount . ' ' . $this->currencyCode;

@@ -13,6 +13,7 @@ interface ProductAttributeInterface extends ConfigEntityInterface {
    * Gets the attribute values.
    *
    * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
+   *   The attribute values.
    */
   public function getValues();
 

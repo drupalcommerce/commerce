@@ -15,7 +15,7 @@ interface OrderTypeResolverInterface {
    * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
    *   The line item being added to an order.
    *
-   * @return \Drupal\commerce_order\Entity\OrderTypeInterface|NULL
+   * @return \Drupal\commerce_order\Entity\OrderTypeInterface|null
    *   The order type, if resolved. Otherwise NULL, indicating that the next
    *   resolver in the chain should be called.
    */

@@ -305,7 +305,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
    *   The variations.
    * @param string $field_name
    *   The field name of the attribute.
-   * @param callable|NULL $callback
+   * @param callable|null $callback
    *   An optional callback to use for filtering the list.
    *
    * @return array[]

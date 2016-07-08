@@ -30,9 +30,10 @@ class LineItemEvent extends Event {
   }
 
   /**
-   * The line item the event refers to.
+   * Gets the line item.
    *
    * @return \Drupal\commerce_order\Entity\LineItemInterface
+   *   The line item.
    */
   public function getLineItem() {
     return $this->lineItem;

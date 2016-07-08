@@ -35,6 +35,7 @@ class ProductAttributeTranslationAddForm extends ConfigTranslationAddForm {
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
   public function __construct(TypedConfigManagerInterface $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, ConfigurableLanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($typed_config_manager, $config_mapper_manager, $language_manager);

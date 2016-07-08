@@ -30,9 +30,10 @@ class OrderEvent extends Event {
   }
 
   /**
-   * The order the event refers to.
+   * Gets the order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface
+   *   Gets the order.
    */
   public function getOrder() {
     return $this->order;

@@ -83,7 +83,7 @@ class CartController extends ControllerBase {
    *   An array of view ids keyed by cart order ID.
    */
   protected function getCartViews(array $carts) {
-    $order_type_ids = array_map(function($cart) {
+    $order_type_ids = array_map(function ($cart) {
       return $cart->bundle();
     }, $carts);
     $order_type_storage = $this->entityTypeManager()->getStorage('commerce_order_type');

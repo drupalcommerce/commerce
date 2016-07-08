@@ -12,6 +12,8 @@ use Drupal\Tests\UnitTestCase;
 class ChainCountryResolverTest extends UnitTestCase {
 
   /**
+   * The chain country resolver.
+   *
    * @var \Drupal\commerce\Resolver\ChainCountryResolver
    */
   protected $chainCountryResolver;

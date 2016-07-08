@@ -47,7 +47,9 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param string
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
+   *   The string translation service.
+   * @param string $taxTypesFolder
    *   The tax types folder of definitions.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager, TranslationInterface $stringTranslation, $taxTypesFolder = NULL) {
@@ -96,7 +98,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
 
     $values = [
       'id' => $taxType->getId(),
-      'name' => $this->t($taxType->getName()),
+      'name' => $taxType->getName(),
       'compound' => $taxType->isCompound(),
       'displayInclusive' => $taxType->isDisplayInclusive(),
       'roundingMode' => $taxType->getRoundingMode(),
@@ -117,7 +119,7 @@ class TaxTypeImporter implements TaxTypeImporterInterface {
     $values = [
       'type' => $taxRate->getType()->getId(),
       'id' => $taxRate->getId(),
-      'name' => $this->t($taxRate->getName()),
+      'name' => $taxRate->getName(),
       'default' => $taxRate->isDefault(),
       'amounts' => array_keys($taxRate->getAmounts()),
     ];

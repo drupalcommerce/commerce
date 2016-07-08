@@ -57,7 +57,7 @@ class ProductTypeForm extends BundleEntityFormBase {
     /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
     $product_type = $this->entity;
     $variation_types = $this->variationTypeStorage->loadMultiple();
-    $variation_types = array_map(function($variation_type) {
+    $variation_types = array_map(function ($variation_type) {
       return $variation_type->label();
     }, $variation_types);
     // Create an empty product to get the default status value.

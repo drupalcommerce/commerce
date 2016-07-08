@@ -75,6 +75,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
    *   The current state of the form.
    *
    * @return array
+   *   The attribute values form.
    */
   public function buildValuesForm(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */

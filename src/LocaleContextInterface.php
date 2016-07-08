@@ -13,6 +13,7 @@ interface LocaleContextInterface {
    * Gets the locale for the current request.
    *
    * @return \Drupal\commerce\Locale
+   *   The locale.
    */
   public function getLocale();
 

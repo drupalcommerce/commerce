@@ -113,7 +113,7 @@ class CredentialsCheckFlood implements CredentialsCheckFloodInterface {
    * @param string $name
    *   The account name.
    *
-   * @return string|NULL
+   * @return string|null
    *   The flood identifier name or NULL if there is no account with the
    *   given name.
    */
@@ -123,7 +123,7 @@ class CredentialsCheckFlood implements CredentialsCheckFloodInterface {
       $account_by_name = $storage->loadByProperties(['name' => $name]);
       $this->accounts[$name] = reset($account_by_name);
     }
-    /** @var \Drupal\Core\Session\AccountInterface $account **/
+    /** @var \Drupal\Core\Session\AccountInterface $account */
     $account = $this->accounts[$name];
     if ($account) {
       if ($this->config->get('uid_only')) {

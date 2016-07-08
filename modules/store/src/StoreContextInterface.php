@@ -13,6 +13,7 @@ interface StoreContextInterface {
    * Gets the active store for the current request.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface
+   *   The active store.
    */
   public function getStore();
 

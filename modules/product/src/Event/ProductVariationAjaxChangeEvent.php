@@ -41,7 +41,7 @@ class ProductVariationAjaxChangeEvent extends Event {
    *   The product variation.
    * @param \Drupal\Core\Ajax\AjaxResponse $response
    *   The ajax response.
-   * @param string
+   * @param string $view_mode
    *   The view mode used to render the product variation.
    */
   public function __construct(ProductVariationInterface $product_variation, AjaxResponse $response, $view_mode = 'default') {
@@ -51,18 +51,20 @@ class ProductVariationAjaxChangeEvent extends Event {
   }
 
   /**
-   * The product variation the event refers to.
+   * The product variation.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The product variation.
    */
   public function getProductVariation() {
     return $this->productVariation;
   }
 
   /**
-   * The ajax response the event refers to.
+   * The ajax response.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The ajax reponse.
    */
   public function getResponse() {
     return $this->response;
@@ -72,6 +74,7 @@ class ProductVariationAjaxChangeEvent extends Event {
    * The view mode used to render the product variation.
    *
    * @return string
+   *   The view mode.
    */
   public function getViewMode() {
     return $this->viewMode;

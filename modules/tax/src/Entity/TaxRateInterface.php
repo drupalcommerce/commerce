@@ -79,7 +79,8 @@ interface TaxRateInterface extends ExternalTaxRateInterface, ConfigEntityInterfa
    * @param \Drupal\commerce_tax\Entity\TaxRateAmountInterface $amount
    *   The tax rate amount.
    *
-   * @return bool TRUE if the tax rate amount was found, FALSE otherwise.
+   * @return bool
+   *   TRUE if the tax rate amount was found, FALSE otherwise.
    */
   public function hasAmount(TaxRateAmountInterface $amount);
 

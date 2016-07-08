@@ -10,7 +10,7 @@ interface StoreResolverInterface {
   /**
    * Resolves the store.
    *
-   * @return \Drupal\commerce_store\Entity\StoreInterface|NULL
+   * @return \Drupal\commerce_store\Entity\StoreInterface|null
    *   The store, if resolved. Otherwise NULL, indicating that the next
    *   resolver in the chain should be called.
    */

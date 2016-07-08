@@ -12,6 +12,8 @@ use Drupal\Tests\UnitTestCase;
 class ChainLocaleResolverTest extends UnitTestCase {
 
   /**
+   * The chain locale resolver.
+   *
    * @var \Drupal\commerce\Resolver\ChainLocaleResolver
    */
   protected $chainLocaleResolver;

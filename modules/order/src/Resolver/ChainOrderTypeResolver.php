@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\commerce_order\Resolver;
+
 use Drupal\commerce_order\Entity\LineItemInterface;
 
 /**

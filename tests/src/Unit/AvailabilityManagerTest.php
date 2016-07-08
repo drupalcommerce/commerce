@@ -12,6 +12,8 @@ use Drupal\Tests\UnitTestCase;
 class AvailabilityManagerTest extends UnitTestCase {
 
   /**
+   * The availability manager.
+   *
    * @var \Drupal\commerce\AvailabilityManager
    */
   protected $availabilityManager;
