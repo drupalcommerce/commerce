@@ -86,6 +86,7 @@ class PriceItem extends FieldItemBase {
   public function setValue($values, $notify = TRUE) {
     // Allow callers to pass a Price value object as the field item value.
     if ($values instanceof Price) {
+      $price = $values;
       $values = [
         'amount' => $price->getDecimalAmount(),
         'currency_code' => $price->getCurrencyCode(),
