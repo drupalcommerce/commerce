@@ -116,11 +116,20 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
       ],
       'attribute_color' => $attribute_values['yellow'],
     ]);
+    $variation3 = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'amount' => 999,
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $attribute_values['yellow'],
+    ]);
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $this->product = Product::create([
       'type' => 'default',
       'title' => 'My product',
-      'variations' => [$variation1, $variation2],
+      'variations' => [$variation1, $variation2, $variation3],
     ]);
     $this->product->save();
   }
@@ -146,6 +155,9 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
     $this->assertFieldByXPath('//ul/li[1]/a/div/div/div[text()=\'Cyan\']');
     $this->assertFieldByXPath('//ul/li[2]/a/div/div/div[text()=\'Name\']');
     $this->assertFieldByXPath('//ul/li[2]/a/div/div/div[text()=\'Yellow\']');
+
+    // Ensure Yellow rendered once, even though two variations have it.
+    $this->assertEquals(1, count($this->xpath('//ul/li[2]/a/div/div/div[text()=\'Yellow\']')));
 
     $this->attributeDefaultDisplay->setComponent('name', [
       'label' => 'hidden',

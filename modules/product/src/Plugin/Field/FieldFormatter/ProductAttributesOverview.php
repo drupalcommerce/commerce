@@ -188,6 +188,7 @@ class ProductAttributesOverview extends FormatterBase implements ContainerFactor
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $attribute_storage = $this->entityTypeManager->getStorage('commerce_product_attribute');
     $elements = [];
+    /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface[] $attributes */
     $attributes = $attribute_storage->loadMultiple(array_filter($this->getSetting('attributes')));
     foreach ($attributes as $attribute) {
       $elements[] = $this->getAttributeItemList($items, $attribute);
@@ -218,10 +219,15 @@ class ProductAttributesOverview extends FormatterBase implements ContainerFactor
     foreach ($variation_items as $variation) {
       /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $attribute_value */
       $attribute_value = $variation->entity->getAttributeValue('attribute_' . $attribute->id());
+      // If this attribute value has already been added, skip.
+      if (isset($build['#items'][$attribute_value->id()])) {
+        continue;
+      }
+
       $attribute_render_array = $view_builder->view($attribute_value, $this->getSetting('view_mode'));
       $attribute_build = $this->renderer->render($attribute_render_array);
       $attribute_build = Link::fromTextAndUrl($attribute_build, $variation_items->getEntity()->toUrl())->toRenderable();
-      $build['#items'][] = $attribute_build;
+      $build['#items'][$attribute_value->id()] = $attribute_build;
     }
 
     return $build;
