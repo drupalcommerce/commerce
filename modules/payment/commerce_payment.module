@@ -142,7 +142,7 @@ function commerce_payment_create_field_definitions(array $definitions) {
  * @param bool $delete_storage
  *   If set TRUE, field storage definition will be deleted also
  */
-function commerce_payment_delete_field_definitions(array $definitions, $delete_storage=FALSE) {
+function commerce_payment_delete_field_definitions(array $definitions, $delete_storage = FALSE) {
   $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
   $field_definition_listener = \Drupal::service('field_definition.listener');
   foreach ($definitions as $definition) {
