@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Provides a UI for managing discounts.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_discount_theme() {
+  return [
+    'commerce_discount' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_discount().
+ */
+function commerce_discount_theme_suggestions_commerce_discount(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_discount', $variables);
+}
+
+/**
+ * Prepares variables for discount templates.
+ *
+ * Default template: commerce-discount.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_discount(array &$variables) {
+  /** @var Drupal\commerce_discount\Entity\DiscountInterface $discount */
+  $discount = $variables['elements']['#commerce_discount'];
+
+  $variables['discount_entity'] = $discount;
+  $variables['discount_url'] = $discount->toUrl();
+  $variables['discount'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['discount'][$key] = $variables['elements'][$key];
+  }
+}
