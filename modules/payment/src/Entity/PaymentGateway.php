@@ -196,7 +196,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
 
     $bundle_of = $this->getEntityType()->getBundleOf();
     if (!$update) {
-      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
+      \Drupal::service('entity_bundle.listener')->onBundleCreate($this->id(), $bundle_of);
     }
     else {
       $entity_field_manager = \Drupal::getContainer()->get('entity_field.manager');
@@ -213,7 +213,7 @@ class PaymentGateway extends ConfigEntityBase implements PaymentGatewayInterface
     parent::preDelete($storage, $entities);
 
     foreach ($entities as $entity) {
-      \Drupal::getContainer()->get('entity_bundle.listener')->onBundleDelete($entity->id(), $entity->getEntityType()->getBundleOf());
+      \Drupal::service('entity_bundle.listener')->onBundleDelete($entity->id(), $entity->getEntityType()->getBundleOf());
     }
   }
 
