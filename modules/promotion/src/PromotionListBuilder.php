@@ -1,14 +1,14 @@
 <?php
 
-namespace Drupal\commerce_discount;
+namespace Drupal\commerce_promotion;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
 /**
- * Defines the list builder for discounts.
+ * Defines the list builder for promotions.
  */
-class DiscountListBuilder extends EntityListBuilder {
+class PromotionListBuilder extends EntityListBuilder {
 
   /**
    * {@inheritdoc}

@@ -1,6 +1,6 @@
-name: Commerce Discount
+name: Commerce Promotion
 type: module
-description: 'Provides a UI for managing discounts.'
+description: 'Provides a UI for managing promotions.'
 package: Commerce
 core: 8.x
 dependencies:

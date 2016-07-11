@@ -1,9 +1,0 @@
-entity.commerce_discount.collection:
-  route_name: entity.commerce_discount.collection
-  base_route: entity.commerce_discount.collection
-  title: List
-
-entity.commerce_discount.edit_form:
-  route_name: entity.commerce_discount.edit_form
-  base_route: entity.commerce_discount.edit_form
-  title: Edit
