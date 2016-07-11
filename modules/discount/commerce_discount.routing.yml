@@ -1,7 +1,0 @@
-entity.commerce_discount.collection:
-  path: '/admin/commerce/discounts'
-  defaults:
-    _entity_list: 'commerce_discount'
-    _title: 'Discounts'
-  requirements:
-    _permission: 'administer discounts'

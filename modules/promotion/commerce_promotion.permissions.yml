@@ -1,0 +1,4 @@
+'administer promotions':
+  title: 'Administer promotions'
+  description: 'Allows users to create, update, and delete promotions.'
+  'restrict access': TRUE
