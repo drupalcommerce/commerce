@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\commerce_discount;
+namespace Drupal\commerce_promotion;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 
 /**
- * Defines the discount storage.
+ * Defines the promotion storage.
  */
-class DiscountStorage extends CommerceContentEntityStorage implements DiscountStorageInterface {
+class PromotionStorage extends CommerceContentEntityStorage implements PromotionStorageInterface {
 
   /**
    * {@inheritdoc}
@@ -25,9 +25,9 @@ class DiscountStorage extends CommerceContentEntityStorage implements DiscountSt
     if (empty($result)) {
       return [];
     }
-    $discounts = $this->loadMultiple($result);
+    $promotions = $this->loadMultiple($result);
 
-    return $discounts;
+    return $promotions;
   }
 
 }

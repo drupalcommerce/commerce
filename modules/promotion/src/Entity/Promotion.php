@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_discount\Entity;
+namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -8,22 +8,22 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the discount entity class.
+ * Defines the promotion entity class.
  *
  * @ContentEntityType(
- *   id = "commerce_discount",
- *   label = @Translation("Discount"),
- *   label_singular = @Translation("Discount"),
- *   label_plural = @Translation("Discounts"),
+ *   id = "commerce_promotion",
+ *   label = @Translation("Promotion"),
+ *   label_singular = @Translation("Promotion"),
+ *   label_plural = @Translation("Promotions"),
  *   label_count = @PluralTranslation(
- *     singular = "@count discount",
- *     plural = "@count discounts",
+ *     singular = "@count promotion",
+ *     plural = "@count promotions",
  *   ),
  *   handlers = {
- *     "event" = "Drupal\commerce_discount\Event\DiscountEvent",
- *     "storage" = "Drupal\commerce_discount\DiscountStorage",
+ *     "event" = "Drupal\commerce_promotion\Event\PromotionEvent",
+ *     "storage" = "Drupal\commerce_promotion\PromotionStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\commerce_discount\DiscountListBuilder",
+ *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\ContentEntityForm",
@@ -36,28 +36,28 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   base_table = "commerce_discount",
- *   data_table = "commerce_discount_field_data",
- *   admin_permission = "administer discounts",
+ *   base_table = "commerce_promotion",
+ *   data_table = "commerce_promotion_field_data",
+ *   admin_permission = "administer promotions",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
- *     "id" = "discount_id",
+ *     "id" = "promotion_id",
  *     "label" = "name",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "status" = "status",
  *   },
  *   links = {
- *     "add-form" = "/discount/add",
- *     "edit-form" = "/discount/{commerce_discount}/edit",
- *     "delete-form" = "/discount/{commerce_discount}/delete",
- *     "delete-multiple-form" = "/admin/commerce/discounts/delete",
- *     "collection" = "/admin/commerce/discounts",
+ *     "add-form" = "/promotion/add",
+ *     "edit-form" = "/promotion/{commerce_promotion}/edit",
+ *     "delete-form" = "/promotion/{commerce_promotion}/delete",
+ *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
+ *     "collection" = "/admin/commerce/promotions",
  *   },
  * )
  */
-class Discount extends ContentEntityBase implements DiscountInterface {
+class Promotion extends ContentEntityBase implements PromotionInterface {
 
   /**
    * {@inheritdoc}
@@ -225,7 +225,7 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
-      ->setDescription(t('The discount name.'))
+      ->setDescription(t('The promotion name.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings([
@@ -241,7 +241,7 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['order_types'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Order types'))
-      ->setDescription(t('The order types for which the discount is valid.'))
+      ->setDescription(t('The order types for which the promotion is valid.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_order_type')
@@ -254,7 +254,7 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['stores'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Stores'))
-      ->setDescription(t('The stores for which the discount is valid.'))
+      ->setDescription(t('The stores for which the promotion is valid.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_store')
@@ -267,12 +267,12 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['current_usage'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Current usage'))
-      ->setDescription(t('The number of times the discount was used.'))
+      ->setDescription(t('The number of times the promotion was used.'))
       ->setDefaultValue(0);
 
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))
-      ->setDescription(t('The maximum number of times the discount can be used. 0 for unlimited.'))
+      ->setDescription(t('The maximum number of times the promotion can be used. 0 for unlimited.'))
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
         'type' => 'number',
@@ -281,10 +281,10 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['start_date'] = BaseFieldDefinition::create('datetime')
       ->setLabel(t('Start date'))
-      ->setDescription(t('The date the discount becomes valid.'))
+      ->setDescription(t('The date the promotion becomes valid.'))
       ->setRequired(TRUE)
       ->setSetting('datetime_type', 'date')
-      ->setDefaultValueCallback('Drupal\commerce_discount\Entity\Discount::getDefaultStartDate')
+      ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultStartDate')
       ->setDisplayOptions('form', [
         'type' => 'datetime_default',
         'weight' => 4,
@@ -292,10 +292,10 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['end_date'] = BaseFieldDefinition::create('datetime')
       ->setLabel(t('End date'))
-      ->setDescription(t('The date after which the discount is invalid.'))
+      ->setDescription(t('The date after which the promotion is invalid.'))
       ->setRequired(TRUE)
       ->setSetting('datetime_type', 'date')
-      ->setDefaultValueCallback('Drupal\commerce_discount\Entity\Discount::getDefaultEndDate')
+      ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultEndDate')
       ->setDisplayOptions('form', [
         'type' => 'datetime_default',
         'weight' => 4,
@@ -303,7 +303,7 @@ class Discount extends ContentEntityBase implements DiscountInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Enabled'))
-      ->setDescription(t('Whether the discount is enabled.'))
+      ->setDescription(t('Whether the promotion is enabled.'))
       ->setDefaultValue(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
