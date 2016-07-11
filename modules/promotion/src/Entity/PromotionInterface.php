@@ -1,195 +1,195 @@
 <?php
 
-namespace Drupal\commerce_discount\Entity;
+namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Defines the interface for discounts.
+ * Defines the interface for promotions.
  */
-interface DiscountInterface extends EntityInterface {
+interface PromotionInterface extends EntityInterface {
 
   /**
-   * Gets the discount name.
+   * Gets the promotion name.
    *
    * @return string
-   *   The discount name.
+   *   The promotion name.
    */
   public function getName();
 
   /**
-   * Sets the discount name.
+   * Sets the promotion name.
    *
    * @param string $name
-   *   The discount name.
+   *   The promotion name.
    *
    * @return $this
    */
   public function setName($name);
 
   /**
-   * Gets the discount order types.
+   * Gets the promotion order types.
    *
    * @return \Drupal\commerce_order\Entity\OrderTypeInterface[]
-   *   The discount order types.
+   *   The promotion order types.
    */
   public function getOrderTypes();
 
   /**
-   * Sets the discount order types.
+   * Sets the promotion order types.
    *
    * @param \Drupal\commerce_order\Entity\OrderTypeInterface[] $order_types
-   *   The discount order types.
+   *   The promotion order types.
    *
    * @return $this
    */
   public function setOrderTypes(array $order_types);
 
   /**
-   * Gets the discount order type IDs.
+   * Gets the promotion order type IDs.
    *
    * @return int[]
-   *   The discount order type IDs.
+   *   The promotion order type IDs.
    */
   public function getOrderTypeIds();
 
   /**
-   * Sets the discount order type IDs.
+   * Sets the promotion order type IDs.
    *
    * @param int[] $order_type_ids
-   *   The discount order type IDs.
+   *   The promotion order type IDs.
    *
    * @return $this
    */
   public function setOrderTypeIds(array $order_type_ids);
 
   /**
-   * Gets the discount stores.
+   * Gets the promotion stores.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface[]
-   *   The discount stores.
+   *   The promotion stores.
    */
   public function getStores();
 
   /**
-   * Sets the discount stores.
+   * Sets the promotion stores.
    *
    * @param \Drupal\commerce_store\Entity\StoreInterface[] $stores
-   *   The discount stores.
+   *   The promotion stores.
    *
    * @return $this
    */
   public function setStores(array $stores);
 
   /**
-   * Gets the discount store IDs.
+   * Gets the promotion store IDs.
    *
    * @return int[]
-   *   The discount store IDs.
+   *   The promotion store IDs.
    */
   public function getStoreIds();
 
   /**
-   * Sets the discount store IDs.
+   * Sets the promotion store IDs.
    *
    * @param int[] $store_ids
-   *   The discount store IDs.
+   *   The promotion store IDs.
    *
    * @return $this
    */
   public function setStoreIds(array $store_ids);
 
   /**
-   * Gets the discount current usage.
+   * Gets the promotion current usage.
    *
-   * Represents the number of times the discount was used.
+   * Represents the number of times the promotion was used.
    *
    * @return int
-   *   The discount current usage.
+   *   The promotion current usage.
    */
   public function getCurrentUsage();
 
   /**
-   * Sets the discount current usage.
+   * Sets the promotion current usage.
    *
    * @param int $current_usage
-   *   The discount current usage.
+   *   The promotion current usage.
    *
    * @return $this
    */
   public function setCurrentUsage($current_usage);
 
   /**
-   * Gets the discount usage limit.
+   * Gets the promotion usage limit.
    *
-   * Represents the maximum number of times the discount can be used.
+   * Represents the maximum number of times the promotion can be used.
    * 0 for unlimited.
    *
    * @return int
-   *   The discount usage limit.
+   *   The promotion usage limit.
    */
   public function getUsageLimit();
 
   /**
-   * Sets the discount usage limit.
+   * Sets the promotion usage limit.
    *
    * @param int $usage_limit
-   *   The discount usage limit.
+   *   The promotion usage limit.
    *
    * @return $this
    */
   public function setUsageLimit($usage_limit);
 
   /**
-   * Gets the discount start date.
+   * Gets the promotion start date.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The discount start date.
+   *   The promotion start date.
    */
   public function getStartDate();
 
   /**
-   * Sets the discount start date.
+   * Sets the promotion start date.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
-   *   The discount start date.
+   *   The promotion start date.
    *
    * @return $this
    */
   public function setStartDate(DrupalDateTime $start_date);
 
   /**
-   * Gets the discount end date.
+   * Gets the promotion end date.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The discount end date.
+   *   The promotion end date.
    */
   public function getEndDate();
 
   /**
-   * Sets the discount end date.
+   * Sets the promotion end date.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
-   *   The discount end date.
+   *   The promotion end date.
    *
    * @return $this
    */
   public function setEndDate(DrupalDateTime $end_date);
 
   /**
-   * Get whether the discount is enabled.
+   * Get whether the promotion is enabled.
    *
    * @return bool
-   *   TRUE if the discount is enabled, FALSE otherwise.
+   *   TRUE if the promotion is enabled, FALSE otherwise.
    */
   public function isEnabled();
 
   /**
-   * Sets whether the discount is enabled.
+   * Sets whether the promotion is enabled.
    *
    * @param bool $enabled
-   *   Whether the discount is enabled.
+   *   Whether the promotion is enabled.
    *
    * @return $this
    */

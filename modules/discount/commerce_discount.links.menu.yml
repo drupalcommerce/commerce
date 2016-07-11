@@ -1,5 +1,0 @@
-entity.commerce_discount.collection:
-  title: 'Discounts'
-  route_name: 'entity.commerce_discount.collection'
-  parent: 'commerce.admin_commerce'
-  description: 'Manage your discounts.'
