@@ -1,4 +1,0 @@
-'administer discounts':
-  title: 'Administer discounts'
-  description: 'Allows users to create, update, and delete discounts.'
-  'restrict access': TRUE

@@ -1,0 +1,5 @@
+entity.commerce_promotion.add_form:
+  route_name: entity.commerce_promotion.add_form
+  title: 'Add a new promotion'
+  appears_on:
+    - entity.commerce_promotion.collection
