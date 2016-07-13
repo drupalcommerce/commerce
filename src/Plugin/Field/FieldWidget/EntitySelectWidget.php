@@ -112,7 +112,7 @@ class EntitySelectWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    return array_values($values['target_id']);
+    return $values['target_id'];
   }
 
 }
