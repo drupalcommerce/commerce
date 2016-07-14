@@ -15,12 +15,17 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    * {@inheritdoc}
    */
   public function loadValid(OrderTypeInterface $order_type, StoreInterface $store) {
-    $query = $this->getQuery()
+    $query = $this->getQuery();
+
+    $or_condition = $query->orConditionGroup()
+      ->condition('end_date', gmdate('Y-m-d'), '>=')
+      ->notExists('end_date', gmdate('Y-m-d'));
+    $query
       ->condition('stores', [$store->id()], 'IN')
       ->condition('order_types', [$order_type->id()], 'IN')
       ->condition('start_date', gmdate('Y-m-d'), '<=')
-      ->condition('end_date', gmdate('Y-m-d'), '>=')
-      ->condition('status', TRUE);
+      ->condition('status', TRUE)
+      ->condition($or_condition);
     $result = $query->execute();
     if (empty($result)) {
       return [];
