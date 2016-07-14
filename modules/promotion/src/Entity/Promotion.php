@@ -293,11 +293,10 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     $fields['end_date'] = BaseFieldDefinition::create('datetime')
       ->setLabel(t('End date'))
       ->setDescription(t('The date after which the promotion is invalid.'))
-      ->setRequired(TRUE)
+      ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
-      ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultEndDate')
       ->setDisplayOptions('form', [
-        'type' => 'datetime_default',
+        'type' => 'commerce_optional_date',
         'weight' => 4,
       ]);
 
