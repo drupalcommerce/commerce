@@ -6,6 +6,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines the promotion entity class.
@@ -26,8 +27,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\Core\Entity\ContentEntityForm",
- *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "default" = "Drupal\commerce_promotion\Form\PromotionForm",
+ *       "add" = "Drupal\Core\Entity\Form\PromotionForm",
+ *       "edit" = "Drupal\Core\Entity\Form\PromotionForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
@@ -205,6 +207,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function hasEndDate() {
+    return (bool) $this->getEntityKey('has_end_date');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setHasEndDate($hasEndDate) {
+    $this->set('has_end_date', (bool) $hasEndDate);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
@@ -293,11 +310,23 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     $fields['end_date'] = BaseFieldDefinition::create('datetime')
       ->setLabel(t('End date'))
       ->setDescription(t('The date after which the promotion is invalid.'))
-      ->setRequired(TRUE)
+      ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
       ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultEndDate')
       ->setDisplayOptions('form', [
         'type' => 'datetime_default',
+        'weight' => 4,
+      ]);
+
+    $fields['has_end_date'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('No expiration'))
+      ->setDescription(t('Whether the promotion expires.'))
+      ->setDefaultValue(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
         'weight' => 4,
       ]);
 
@@ -342,3 +371,5 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   }
 
 }
+
+
