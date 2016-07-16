@@ -3,7 +3,6 @@
 namespace Drupal\commerce;
 
 use Drupal\Core\Entity\EntityHandlerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Handles plugin-provided bundles.
@@ -21,18 +20,18 @@ interface BundlePluginHandlerInterface extends EntityHandlerInterface {
 
   /**
    * Gets the field storage definitions.
-   *
-   * @return \Drupal\commerce\BundleFieldDefinition[]
-   *   An array of bundle field definitions, keyed by field name.
    */
-  public function getFieldStorageDefinitions(EntityTypeInterface $entity_type);
+  public function getFieldStorageDefinitions();
 
   /**
-   * Gets the field definitions.
+   * Gets the field definitions for a specific bundle.
+   *
+   * @param string $bundle
+   *   The bundle name.
    *
    * @return \Drupal\commerce\BundleFieldDefinition[]
    *   An array of bundle field definitions, keyed by field name.
    */
-  public function getFieldDefinitions(EntityTypeInterface $entity_type, $bundle);
+  public function getFieldDefinitions($bundle);
 
 }

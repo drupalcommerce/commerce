@@ -41,7 +41,7 @@ class BundlePluginHandler implements BundlePluginHandlerInterface {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('plugin.manager.' . $entity_type->bundle_plugin_type)
+      $container->get('plugin.manager.' . $entity_type->get('bundle_plugin_type'))
     );
   }
 
@@ -63,7 +63,7 @@ class BundlePluginHandler implements BundlePluginHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldStorageDefinitions(EntityTypeInterface $entity_type) {
+  public function getFieldStorageDefinitions() {
     $definitions = [];
     foreach (array_keys($this->pluginManager->getDefinitions()) as $plugin_id) {
       /** @var \Drupal\commerce\BundlePluginInterface $plugin */
@@ -73,7 +73,7 @@ class BundlePluginHandler implements BundlePluginHandlerInterface {
     // Ensure the presence of required keys which aren't set by the plugin.
     foreach ($definitions as $field_name => $definition) {
       $definition->setName($field_name);
-      $definition->setTargetEntityTypeId($entity_type->id());
+      $definition->setTargetEntityTypeId($this->entityType->id());
       $definitions[$field_name] = $definition;
     }
 
@@ -83,14 +83,14 @@ class BundlePluginHandler implements BundlePluginHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldDefinitions(EntityTypeInterface $entity_type, $bundle) {
+  public function getFieldDefinitions($bundle) {
     /** @var \Drupal\commerce\BundlePluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($bundle);
     $definitions = $plugin->buildFieldDefinitions();
     // Ensure the presence of required keys which aren't set by the plugin.
     foreach ($definitions as $field_name => $definition) {
       $definition->setName($field_name);
-      $definition->setTargetEntityTypeId($entity_type->id());
+      $definition->setTargetEntityTypeId($this->entityType->id());
       $definition->setTargetBundle($bundle);
       $definitions[$field_name] = $definition;
     }

@@ -1,0 +1,4 @@
+services:
+  plugin.manager.commerce_plugin_bundle:
+    class: Drupal\commerce_plugin_bundles_test\PluginBundleManager
+    arguments: ['@cache.discovery', '@module_handler']

@@ -157,6 +157,7 @@ function commerce_entity_type_build(array &$entity_types) {
 function commerce_entity_bundle_info() {
   $bundles = [];
   foreach (commerce_get_bundle_plugin_entity_types() as $entity_type) {
+    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
     $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
     $bundles[$entity_type->id()] = $bundle_handler->getBundleInfo();
   }
@@ -168,6 +169,7 @@ function commerce_entity_bundle_info() {
  */
 function commerce_entity_field_storage_info(EntityTypeInterface $entity_type) {
   if ($entity_type->hasHandlerClass('bundle_plugin')) {
+    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
     $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
     return $bundle_handler->getFieldStorageDefinitions();
   }
@@ -178,6 +180,7 @@ function commerce_entity_field_storage_info(EntityTypeInterface $entity_type) {
  */
 function commerce_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle) {
   if ($entity_type->hasHandlerClass('bundle_plugin')) {
+    /** @var \Drupal\commerce\BundlePluginHandler $bundle_handler */
     $bundle_handler = \Drupal::entityTypeManager()->getHandler($entity_type->id(), 'bundle_plugin');
     return $bundle_handler->getFieldDefinitions($bundle);
   }
