@@ -145,7 +145,7 @@ function commerce_get_bundle_plugin_entity_types() {
  */
 function commerce_entity_type_build(array &$entity_types) {
   foreach ($entity_types as $entity_type) {
-    if (!empty($entity_type->bundle_plugin_type)) {
+    if ($entity_type->get('bundle_plugin_type')) {
       $entity_type->setHandlerClass('bundle_plugin', 'Drupal\commerce\BundlePluginHandler');
     }
   }
