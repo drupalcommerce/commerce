@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ *
+ * Default template for promotions.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - promotion: The rendered promotion fields.
+ *   Use 'promotion' to print them all, or print a subset such as
+ *   'promotion.name'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ promotion|without('name') }}
+ *   @endcode
+ * - promotion_entity: The promotion entity.
+ * - promotion_url: The promotion URL.
+ *
+ * @ingroup themeable
+ */
+#}
+<article{{ attributes }}>
+  {{ promotion }}
+</article>
