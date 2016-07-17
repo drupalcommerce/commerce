@@ -1,4 +1,8 @@
 services:
+  commerce.bundle_plugin_installer:
+    class: Drupal\commerce\BundlePluginInstaller
+    arguments: ['@entity_type.manager', '@entity_bundle.listener', '@field_storage_definition.listener', '@field_definition.listener']
+
   commerce.credentials_check_flood:
     class: Drupal\commerce\CredentialsCheckFlood
     arguments: ['@flood', '@entity_type.manager', '@config.factory']
