@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\Console\Utils\Create\Base;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -71,6 +72,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public function setName($name) {
     $this->set('name', $name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->get('description')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->set('description', $description);
     return $this;
   }
 
@@ -235,6 +251,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['description'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Description'))
+      ->setDescription(t('The description of the promotion.'))
+      ->setTranslatable(TRUE)
+      ->setDefaultValue('')
+      ->setDisplayOptions('form', [
+        'type' => 'string_textarea',
+        'weight' => 1,
+        'settings' => [
+          'rows' => 3,
+        ],
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);

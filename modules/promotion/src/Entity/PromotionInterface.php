@@ -29,6 +29,24 @@ interface PromotionInterface extends EntityInterface {
   public function setName($name);
 
   /**
+   * Gets the promotion description.
+   *
+   * @return string
+   *    The promotion description.
+   */
+  public function getDescription();
+
+  /**
+   * Sets the promotion description.
+   *
+   * @param string $description
+   *   The promotion description.
+   *
+   * @return $this
+   */
+  public function setDescription($description);
+
+  /**
    * Gets the promotion order types.
    *
    * @return \Drupal\commerce_order\Entity\OrderTypeInterface[]
