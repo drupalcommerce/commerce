@@ -265,6 +265,24 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         'weight' => 2,
       ]);
 
+    $fields['coupons'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Coupons'))
+      ->setDescription(t('Coupons which allow promotion to be redeemed.'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'commerce_promotion_coupon')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'inline_entity_form_complex',
+        'weight' => 3,
+        'settings' => [
+          'override_labels' => TRUE,
+          'label_singular' => 'coupon',
+          'label_plural' => 'coupons',
+        ],
+      ]);
+
     $fields['current_usage'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Current usage'))
       ->setDescription(t('The number of times the promotion was used.'))
@@ -276,7 +294,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
         'type' => 'number',
-        'weight' => 3,
+        'weight' => 4,
       ]);
 
     $fields['start_date'] = BaseFieldDefinition::create('datetime')
@@ -287,7 +305,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDefaultValueCallback('Drupal\commerce_promotion\Entity\Promotion::getDefaultStartDate')
       ->setDisplayOptions('form', [
         'type' => 'datetime_default',
-        'weight' => 4,
+        'weight' => 5,
       ]);
 
     $fields['end_date'] = BaseFieldDefinition::create('datetime')
@@ -297,7 +315,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
         'type' => 'commerce_optional_date',
-        'weight' => 4,
+        'weight' => 6,
       ]);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
