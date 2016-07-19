@@ -1,0 +1,5 @@
+entity.commerce_promotion.collection:
+  title: 'Promotions'
+  route_name: 'entity.commerce_promotion.collection'
+  parent: 'commerce.admin_commerce'
+  description: 'Manage your promotions.'
