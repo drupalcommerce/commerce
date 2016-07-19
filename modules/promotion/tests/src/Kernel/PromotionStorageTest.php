@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -53,6 +54,7 @@ class PromotionStorageTest extends KernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_promotion');
+    $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
       'profile',
       'commerce_order',
@@ -124,6 +126,42 @@ class PromotionStorageTest extends KernelTestBase {
 
     $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
     $this->assertEquals(2, count($valid_promotions));
+  }
+
+  /**
+   * Tests loading a promotion by a coupon.
+   */
+  public function testLoadByCoupon() {
+    $order_type = OrderType::load('default');
+
+    $coupon_code = $this->randomMachineName();
+    $coupon = Coupon::create([
+      'code' => $coupon_code,
+      'status' => TRUE,
+    ]);
+    $coupon->save();
+
+    // Starts now, enabled. No end time.
+    $promotion1 = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'coupons' => [$coupon],
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    // Starts now, enabled. No end time.
+    $promotion2 = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion2->save());
+
+    // Verify valid promotions load.
+    $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
+    $this->assertEquals($promotion1->label(), $valid_promotion->label());
   }
 
 }
