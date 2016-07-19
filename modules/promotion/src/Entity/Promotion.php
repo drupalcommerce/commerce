@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
-use Drupal\Console\Utils\Create\Base;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
