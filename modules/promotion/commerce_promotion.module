@@ -16,6 +16,9 @@ function commerce_promotion_theme() {
     'commerce_promotion' => [
       'render element' => 'elements',
     ],
+    'commerce_promotion_form' => [
+      'render element' => 'form',
+    ],
   ];
 }
 

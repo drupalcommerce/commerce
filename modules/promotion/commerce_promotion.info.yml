@@ -5,5 +5,6 @@ package: Commerce
 core: 8.x
 dependencies:
   - datetime
+  - inline_entity_form
   - commerce
   - commerce_order
