@@ -18,6 +18,7 @@ class PluginItemDeriver extends DeriverBase {
     $supported = [
       'condition' => $this->t('Conditions'),
       'action' => $this->t('Action'),
+      'commerce_promotion_offer' => $this->t('Promotion offer'),
     ];
 
     foreach ($supported as $id => $label) {

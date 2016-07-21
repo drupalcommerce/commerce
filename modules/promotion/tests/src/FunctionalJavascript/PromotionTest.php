@@ -45,14 +45,22 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->wait(4000);
+
     $name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $name,
+      'offer[0][target_plugin_configuration][amount]' => '10.0',
     ];
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = Promotion::load(1)->get('offer')->first();
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
   }
 
   /**
@@ -63,17 +71,34 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $promotion = $this->createEntity('commerce_promotion', [
       'name' => $this->randomMachineName(8),
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
     ]);
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = $promotion->get('offer')->first();
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+
     $this->drupalGet($promotion->toUrl('edit-form'));
     $new_promotion_name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $new_promotion_name,
+      'offer[0][target_plugin_configuration][amount]' => '20',
     ];
     $this->submitForm($edit, 'Save');
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_changed = Promotion::load($promotion->id());
     $this->assertEquals($new_promotion_name, $promotion_changed->getName(), 'The promotion name successfully updated.');
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = $promotion_changed->get('offer')->first();
+    $this->assertEquals('0.20', $offer_field->target_plugin_configuration['amount']);
   }
 
   /**

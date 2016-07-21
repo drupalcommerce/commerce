@@ -1,0 +1,4 @@
+services:
+  plugin.manager.commerce_promotion_offer:
+    class: Drupal\commerce_promotion\PromotionOfferManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']

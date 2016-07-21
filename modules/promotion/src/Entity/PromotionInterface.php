@@ -213,4 +213,12 @@ interface PromotionInterface extends EntityInterface {
    */
   public function setEnabled($enabled);
 
+  /**
+   * Applies the promotion to an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity.
+   */
+  public function apply(EntityInterface $entity);
+
 }
