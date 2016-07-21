@@ -26,8 +26,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\Core\Entity\ContentEntityForm",
- *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "default" = "Drupal\commerce_promotion\Form\PromotionForm",
+ *       "add" = "Drupal\commerce_promotion\Form\PromotionForm",
+ *       "edit" = "Drupal\commerce_promotion\Form\PromotionForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
@@ -269,7 +270,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setLabel(t('Coupons'))
       ->setDescription(t('Coupons which allow promotion to be redeemed.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setRequired(TRUE)
+      ->setRequired(FALSE)
       ->setSetting('target_type', 'commerce_promotion_coupon')
       ->setSetting('handler', 'default')
       ->setTranslatable(TRUE)
