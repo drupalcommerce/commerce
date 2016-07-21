@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Template for the promotion add/edit form.
+ *
+ * Available variables:
+ * - form: The form.
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="layout-promotion-form clearfix">
+  <div class="layout-region layout-region-promotion-main">
+    {{ form|without('actions') }}
+  </div>
+  <div class="layout-region layout-region-promotion-footer">
+    {{ form.actions }}
+  </div>
+</div>

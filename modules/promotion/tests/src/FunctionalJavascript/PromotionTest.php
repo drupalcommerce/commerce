@@ -37,6 +37,8 @@ class PromotionTest extends CommerceBrowserTestBase {
    * Tests creating a promotion.
    */
   public function testCreatePromotion() {
+    $this->createStore(NULL, NULL, 'default', TRUE);
+
     $this->drupalGet('admin/commerce/promotions');
     $this->getSession()->getPage()->clickLink('Add a new promotion');
 
@@ -48,8 +50,8 @@ class PromotionTest extends CommerceBrowserTestBase {
       'name[0][value]' => $name,
     ];
     $this->submitForm($edit, t('Save'));
-    $this->assertSession()->pageTextContains("Saved the $name promotion.");
-    $promotion_count = $this->getSession()->getPage()->find('css', '.view-commerce-promotions tr td.views-field-name');
+    $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
+    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
   }
 
@@ -57,6 +59,8 @@ class PromotionTest extends CommerceBrowserTestBase {
    * Tests editing a promotion.
    */
   public function testEditPromotion() {
+    $this->createStore(NULL, NULL, 'default', TRUE);
+
     $promotion = $this->createEntity('commerce_promotion', [
       'name' => $this->randomMachineName(8),
     ]);
