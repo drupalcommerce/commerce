@@ -6,6 +6,9 @@ use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
+/**
+ * Provides an order type form.
+ */
 class OrderTypeForm extends BundleEntityFormBase {
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -87,11 +88,25 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
 
     // Recalculate the total.
+    $this->recalculateTotalPrice();
+  }
+
+  /**
+   * Recalculates the line item total price.
+   *
+   * This will update the total price based on line item and adjustment prices.
+   */
+  protected function recalculateTotalPrice() {
     // @todo Rework this once pricing is finished.
     $this->total_price->amount = 0;
     foreach ($this->getLineItems() as $line_item) {
       $this->total_price->amount += $line_item->total_price->amount;
       $this->total_price->currency_code = $line_item->total_price->currency_code;
+    }
+
+    foreach ($this->getAdjustments() as $adjustment) {
+      // @todo The price field should have an ::addPrice method.
+      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
     }
   }
 
@@ -270,6 +285,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function setLineItems(array $line_items) {
     $this->set('line_items', $line_items);
+    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -286,6 +302,7 @@ class Order extends ContentEntityBase implements OrderInterface {
   public function addLineItem(LineItemInterface $line_item) {
     if (!$this->hasLineItem($line_item)) {
       $this->get('line_items')->appendItem($line_item);
+      $this->recalculateTotalPrice();
     }
     return $this;
   }
@@ -389,6 +406,40 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAdjustments() {
+    return $this->get('adjustments')->getAdjustments();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAdjustments(array $adjustments) {
+    $this->set('adjustments', $adjustments);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addAdjustment(Adjustment $adjustment) {
+    $this->get('adjustments')->appendItem($adjustment);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeAdjustment(Adjustment $adjustment) {
+    $this->get('adjustments')->removeAdjustment($adjustment);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
@@ -468,6 +519,18 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
+
+    $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
+      ->setLabel(t('Adjustments'))
+      ->setDescription(t('Adjustments to the order total.'))
+      ->setRequired(FALSE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_adjustment_default',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', FALSE);
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))

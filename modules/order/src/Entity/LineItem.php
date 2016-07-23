@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -158,11 +159,59 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAdjustments() {
+    return $this->get('adjustments')->getAdjustments();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAdjustments(array $adjustments) {
+    $this->set('adjustments', $adjustments);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addAdjustment(Adjustment $adjustment) {
+    $this->get('adjustments')->appendItem($adjustment);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeAdjustment(Adjustment $adjustment) {
+    $this->get('adjustments')->removeAdjustment($adjustment);
+    $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
+    $this->recalculateTotalPrice();
+  }
 
+  /**
+   * Recalculates the line item total price.
+   *
+   * This will update the total price based on line item and adjustment prices.
+   */
+  protected function recalculateTotalPrice() {
+    // @todo Rework this once pricing is finished.
     $this->total_price->amount = $this->unit_price->amount * $this->quantity->value;
     $this->total_price->currency_code = $this->unit_price->currency_code;
+
+    foreach ($this->getAdjustments() as $adjustment) {
+      // @todo The price field should have an ::addPrice method.
+      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
+    }
   }
 
   /**
@@ -226,6 +275,14 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
+      ->setLabel(t('Adjustments'))
+      ->setDescription(t('Adjustments to the order total.'))
+      ->setRequired(FALSE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the line item.'))
@@ -271,7 +328,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     else {
       // This line item type won't reference a purchasable entity. The field
       // can't be removed here, or converted to a configurable one, so it's
-      // hidden instead. See https://www.drupal.org/node/2346347#comment-10254087.
+      // hidden instead. https://www.drupal.org/node/2346347#comment-10254087.
       $fields['purchased_entity']->setRequired(FALSE);
       $fields['purchased_entity']->setDisplayOptions('form', [
         'type' => 'hidden',
