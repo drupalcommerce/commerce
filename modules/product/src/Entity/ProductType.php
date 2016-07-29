@@ -39,6 +39,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "id",
  *     "label",
  *     "description",
+ *     "new_revision",
  *     "variationType",
  *     "injectVariationFields",
  *   },
@@ -74,6 +75,13 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $description;
 
   /**
+   * Default value of the 'Create new revision' checkbox of this node type.
+   *
+   * @var bool
+   */
+  protected $new_revision = TRUE;
+
+  /**
    * The variation type ID.
    *
    * @var string
@@ -86,6 +94,20 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    * @var bool
    */
   protected $injectVariationFields = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isNewRevision() {
+    return $this->new_revision;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNewRevision($new_revision) {
+    $this->new_revision = $new_revision;
+  }
 
   /**
    * {@inheritdoc}

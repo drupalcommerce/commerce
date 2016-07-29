@@ -69,6 +69,19 @@ class ProductForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  protected function prepareEntity() {
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $this->entity;
+
+    if (!$product->isNew()) {
+      // Remove the revision log message from the original product entity.
+      $product->revision_log = NULL;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function form(array $form, FormStateInterface $form_state) {
     /* @var \Drupal\commerce_product\Entity\Product $product */
     $product = $this->entity;
@@ -83,6 +96,41 @@ class ProductForm extends ContentEntityForm {
       '#type' => 'hidden',
       '#default_value' => $product->getChangedTime(),
     ];
+
+    // Add a revision_log field if the "Create new revision" option is checked,
+    // or if the current user has the ability to check that option.
+    $form['revision_information'] = array(
+      '#type' => 'details',
+      '#group' => 'advanced',
+      '#title' => t('Revision information'),
+      // Open by default when "Create new revision" is checked.
+      '#open' => $product->isNewRevision(),
+      '#attributes' => array(
+        'class' => array('node-form-revision-information'),
+      ),
+      '#attached' => array(
+        'library' => array('node/drupal.node'),
+      ),
+      '#weight' => 20,
+      '#optional' => TRUE,
+    );
+
+    $form['revision'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Create new revision'),
+      '#default_value' => $product->type->entity->isNewRevision(),
+      '#access' => $current_user->hasPermission('administer nodes'),
+      '#group' => 'revision_information',
+    );
+
+    $form['revision_log'] += array(
+      '#states' => array(
+        'visible' => array(
+          ':input[name="revision"]' => array('checked' => TRUE),
+        ),
+      ),
+      '#group' => 'revision_information',
+    );
 
     $last_saved = t('Not saved yet');
     if (!$product->isNew()) {
@@ -266,6 +314,32 @@ class ProductForm extends ContentEntityForm {
     $element['submit']['#access'] = FALSE;
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Updates the node object by processing the submitted values.
+   *
+   * This function can be called by a "Next" button of a wizard to update the
+   * form state's entity with the current step's values before proceeding to the
+   * next step.
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Build the node object from the submitted values.
+    parent::submitForm($form, $form_state);
+    $product = $this->entity;
+
+    // Save as a new revision if requested to do so.
+    if (!$form_state->isValueEmpty('revision') && $form_state->getValue('revision') != FALSE) {
+      $product->setNewRevision();
+      // If a new revision is created, save the current user as revision author.
+      $product->setRevisionCreationTime(REQUEST_TIME);
+      $product->setRevisionUserId(\Drupal::currentUser()->id());
+    }
+    else {
+      $product->setNewRevision(FALSE);
+    }
   }
 
   /**

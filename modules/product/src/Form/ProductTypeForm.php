@@ -108,6 +108,11 @@ class ProductTypeForm extends BundleEntityFormBase {
       '#title' => t('Publish new products of this type by default.'),
       '#default_value' => $product->isPublished(),
     ];
+    $form['revision'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Create new revision'),
+      '#default_value' => $product_type->isNewRevision(),
+    ];
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -134,6 +139,10 @@ class ProductTypeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
+    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    $product_type = $this->entity;
+    $product_type->setNewRevision($form_state->getValue(array('options', 'revision')));
+
     // Update the default value of the status field.
     $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $this->entity->id()]);
     $value = (bool) $form_state->getValue('product_status');

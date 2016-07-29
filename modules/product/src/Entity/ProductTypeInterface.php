@@ -47,4 +47,19 @@ interface ProductTypeInterface extends ConfigEntityInterface, EntityDescriptionI
    */
   public function setInjectVariationFields($inject);
 
+  /**
+   * Gets whether a new revision should be created by default.
+   *
+   * @return bool
+   *   TRUE if a new revision should be created by default.
+   */
+  public function isNewRevision();
+
+  /**
+   * Sets whether a new revision should be created by default.
+   *
+   * @param bool $new_revision_
+   *   TRUE if a new revision should be created by default.
+   */
+  public function setNewRevision($new_revision);
 }
