@@ -18,14 +18,15 @@ class PaymentMethodDeleteForm extends ContentEntityDeleteForm {
     $payment_method = $this->getEntity();
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethods $payment_gateway_plugin */
     $payment_gateway_plugin = $payment_method->getPaymentGateway()->getPlugin();
+    $form_state->setRedirectUrl($this->getRedirectUrl());
     try {
       $payment_gateway_plugin->deletePaymentMethod($payment_method);
     }
     catch (\Exception $e) {
-      // Now what? Just set a message?
+      drupal_set_message($e->getMessage(), 'error');
+      return;
     }
 
-    $form_state->setRedirectUrl($this->getRedirectUrl());
     drupal_set_message($this->getDeletionMessage());
     $this->logDeletionMessage();
   }

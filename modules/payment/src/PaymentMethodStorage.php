@@ -17,7 +17,7 @@ class PaymentMethodStorage extends CommerceContentEntityStorage implements Payme
    * {@inheritdoc}
    */
   public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway) {
-    if (!($payment_gateway instanceof SupportsStoredPaymentMethods)) {
+    if (!($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethods)) {
       return [];
     }
 
