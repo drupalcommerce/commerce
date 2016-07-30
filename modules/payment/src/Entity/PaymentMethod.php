@@ -28,7 +28,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "storage" = "Drupal\commerce_payment\PaymentMethodStorage",
  *     "form" = {
  *       "edit" = "Drupal\commerce_payment\Form\PaymentMethodEditForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
+ *       "delete" = "Drupal\commerce_payment\Form\PaymentMethodDeleteForm"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
@@ -43,6 +43,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "bundle" = "type"
  *   },
  *   links = {
+ *     "collection" = "/user/{user}/payment-methods",
  *     "canonical" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "edit-form" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "delete-form" = "/user/{user}/payment-methods/{commerce_payment_method}/delete",
