@@ -4,7 +4,6 @@ namespace Drupal\commerce_payment\Element;
 
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 
 /**
