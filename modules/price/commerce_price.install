@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Install file for commerce_price.
+ */
+
+/**
  * Implements hook_requirements().
  *
  * Check that the Commerce Guys' Libraries have been installed.

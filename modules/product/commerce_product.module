@@ -5,6 +5,7 @@
  * Defines the Product entity and associated features.
  */
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -47,7 +48,7 @@ function commerce_product_entity_form_display_update(EntityFormDisplayInterface 
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
-function commerce_product_entity_view_display_update(Drupal\Core\Entity\EntityInterface $entity) {
+function commerce_product_entity_view_display_update(EntityInterface $entity) {
   // The product view uses the variation view and needs to be cleared, which doesn't happen automatically
   // because we're editing the variation, not the product
   if (substr($entity->getConfigTarget(), 0, 27) === 'commerce_product_variation.') {
@@ -63,13 +64,13 @@ function commerce_product_entity_access(EntityInterface $entity, $operation, $ac
   // @todo Remove once we implement the full product permissions.
   if ($operation == 'view') {
     if ($entity->getEntityTypeId() == 'commerce_product' && $entity->isPublished()) {
-      return \Drupal\Core\Access\AccessResult::allowed();
+      return AccessResult::allowed();
     }
     elseif ($entity->getEntityTypeId() == 'commerce_product_variation' && $entity->isActive()) {
-      return \Drupal\Core\Access\AccessResult::allowed();
+      return AccessResult::allowed();
     }
   }
-  return \Drupal\Core\Access\AccessResult::neutral();
+  return AccessResult::neutral();
 }
 
 /**
