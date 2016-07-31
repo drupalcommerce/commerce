@@ -106,11 +106,16 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
-    $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+    $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways */
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
+
+    // When no payment gateways are defined, throw an error and fail reliably.
+    if (empty($payment_gateways)) {
+      throw new \Exception("No payment gateways are defined, create one first.");
+    }
 
     $options = [];
     $default_option = NULL;
