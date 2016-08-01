@@ -23,6 +23,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
 
+    $form['#attached']['library'][] = 'commerce_payment/payment_method_form';
     $form['#tree'] = TRUE;
     $form['payment_details'] = [
       '#parents' => array_merge($form['#parents'], ['payment_details']),
@@ -107,6 +108,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       $years[$current_year_4 + $i] = $current_year_2 + $i;
     }
 
+    $element['#attributes']['class'][] = 'credit-card-form';
     // Placeholder for the detected card type. Set by validateCreditCardForm().
     $element['type'] = [
       '#type' => 'hidden',
@@ -123,7 +125,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $element['expiration'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => ['commerce-credit-card-expiration'],
+        'class' => ['credit-card-form__expiration'],
       ],
     ];
     $element['expiration']['month'] = [
@@ -136,7 +138,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $element['expiration']['divider'] = [
       '#type' => 'item',
       '#title' => '',
-      '#markup' => '<span class="commerce-month-year-divider">/</span>',
+      '#markup' => '<span class="credit-card-form__divider">/</span>',
     ];
     $element['expiration']['year'] = [
       '#type' => 'select',

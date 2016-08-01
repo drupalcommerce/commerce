@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_payment\Form;
 
-use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -67,29 +66,40 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     }
     $step = $form_state->get('step');
     if (!$step) {
-      $step = 'select_payment_method_type';
+      $step = 'payment_method_type';
       // Skip the payment method type selection if there's only 1 type.
       $payment_method_types = $payment_gateway->getPlugin()->getPaymentMethodTypes();
       if (count($payment_method_types) === 1) {
         /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
         $payment_method_type = reset($payment_method_types);
         $form_state->set('payment_method_type', $payment_method_type->getPluginId());
-        $step = 'add_payment_method';
+        $step = 'payment_method';
       }
       $form_state->set('step', $step);
     }
 
-    if ($step == 'select_payment_method_type') {
-      $form = $this->buildSelectPaymentMethodTypeForm($form, $form_state);
+    if ($step == 'payment_method_type') {
+      $form = $this->buildPaymentMethodTypeForm($form, $form_state);
     }
-    elseif ($step == 'add_payment_method') {
+    elseif ($step == 'payment_method') {
       $form = $this->buildPaymentMethodForm($form, $form_state);
     }
 
     return $form;
   }
 
-  protected function buildSelectPaymentMethodTypeForm(array $form, FormStateInterface $form_state) {
+  /**
+   * Builds the form for selecting a payment method type.
+   *
+   * @param array $form
+   *   The parent form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   *
+   * @return array
+   *   The built form.
+   */
+  protected function buildPaymentMethodTypeForm(array $form, FormStateInterface $form_state) {
     $payment_method_types = $form_state->get('payment_gateway')->getPlugin()->getPaymentMethodTypes();
     $payment_method_type_options = array_map(function ($payment_method_type) {
       /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
@@ -112,6 +122,17 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
     return $form;
   }
 
+  /**
+   * Builds the form for adding a payment method.
+   *
+   * @param array $form
+   *   The parent form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   *
+   * @return array
+   *   The built form.
+   */
   protected function buildPaymentMethodForm(array $form, FormStateInterface $form_state) {
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
     $payment_method = $payment_method_storage->create([
@@ -125,6 +146,11 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
       '#operation' => 'add-payment-method',
       '#default_value' => $payment_method,
     ];
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Save'),
+      '#button_type' => 'primary',
+    ];
 
     return $form;
   }
@@ -134,15 +160,15 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $step = $form_state->get('step');
-    if ($step == 'select_payment_method_type') {
+    if ($step == 'payment_method_type') {
       $form_state->set('payment_method_type', $form_state->getValue('payment_method_type'));
-      $form_state->set('step', 'add_payment_method');
+      $form_state->set('step', 'payment_method');
       $form_state->setRebuild(TRUE);
     }
-    elseif ($step == 'add_payment_method') {
+    elseif ($step == 'payment_method') {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $payment_method = $form_state->getValue('payment_method');
-      drupal_set_message($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label(),]));
+      drupal_set_message($this->t('%label saved to your payment methods.', ['%label' => $payment_method->label()]));
       $form_state->setRedirect('entity.commerce_payment_method.collection', ['user' => $payment_method->getOwnerId()]);
     }
   }
