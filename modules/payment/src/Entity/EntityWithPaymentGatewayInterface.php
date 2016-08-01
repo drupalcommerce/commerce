@@ -2,10 +2,6 @@
 
 namespace Drupal\commerce_payment\Entity;
 
-use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\user\EntityOwnerInterface;
-use Drupal\profile\Entity\ProfileInterface;
 
 /**
  * Defines the interface for entities managed by a payment gateway.
