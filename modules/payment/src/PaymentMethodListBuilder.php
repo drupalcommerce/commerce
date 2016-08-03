@@ -25,6 +25,22 @@ class PaymentMethodListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
+  protected function getEntityIds() {
+    /** @var \Drupal\Core\Routing\RouteMatchInterface $route */
+    $route = \Drupal::service('current_route_match');
+    $user = $route->getParameter('user');
+    $query = $this->getStorage()->getQuery()
+      ->condition('uid', $user)
+      ->sort($this->entityType->getKey('id'));
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+    return $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
     $header['label'] = $this->t('Payment method');
     return $header + parent::buildHeader();
