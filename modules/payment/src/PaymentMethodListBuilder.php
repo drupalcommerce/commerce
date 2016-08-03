@@ -4,7 +4,6 @@ namespace Drupal\commerce_payment;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Defines the list builder for payment methods.
