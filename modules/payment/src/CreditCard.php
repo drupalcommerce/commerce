@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Provides logic for listing card types and validating card details.
  */
@@ -42,48 +44,48 @@ final class CreditCard {
     $definitions = [
       'visa' => [
         'id' => 'visa',
-        'label' => t('Visa'),
+        'label' => new TranslatableMarkup('Visa'),
         'number_prefixes' => ['4'],
       ],
       'mastercard' => [
         'id' => 'mastercard',
-        'label' => t('MasterCard'),
+        'label' => new TranslatableMarkup('MasterCard'),
         'number_prefixes' => ['51-55', '222100-272099'],
       ],
       'amex' => [
         'id' => 'amex',
-        'label' => t('American Express'),
+        'label' => new TranslatableMarkup('American Express'),
         'number_prefixes' => ['34', '37'],
         'number_lengths' => [15],
         'security_code_length' => 4,
       ],
       'dinersclub' => [
         'id' => 'dinersclub',
-        'label' => t('Diners Club'),
+        'label' => new TranslatableMarkup('Diners Club'),
         'number_prefixes' => ['300-305', '309', '36', '38', '39'],
         'number_lengths' => [14],
       ],
       'discover' => [
         'id' => 'discover',
-        'label' => t('Discover Card'),
+        'label' => new TranslatableMarkup('Discover Card'),
         'number_prefixes' => ['6011', '622126-622925', '644-649', '65'],
         'number_lengths' => [16, 19],
       ],
       'jcb' => [
         'id' => 'jcb',
-        'label' => t('JCB'),
+        'label' => new TranslatableMarkup('JCB'),
         'number_prefixes' => ['3528-3589'],
       ],
       'unionpay' => [
         'id' => 'unionpay',
-        'label' => t('UnionPay'),
+        'label' => new TranslatableMarkup('UnionPay'),
         'number_prefixes' => ['62', '88'],
         'number_lengths' => [16, 17, 18, 19],
         'uses_luhn' => FALSE,
       ],
       'maestro' => [
         'id' => 'maestro',
-        'label' => t('Maestro'),
+        'label' => new TranslatableMarkup('Maestro'),
         'number_prefixes' => [
           '5018', '5020', '5038', '5612', '5893', '6304',
           '6759', '6761', '6762', '6763', '0604', '6390',
