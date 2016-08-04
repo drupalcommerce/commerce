@@ -53,6 +53,7 @@ class CurrencyForm extends EntityForm {
     $form['currencyCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
+      '#description' => $this->t('The uppercase alphabetic currency code. For example USD.'),
       '#default_value' => $currency->getCurrencyCode(),
       '#element_validate' => ['::validateCurrencyCode'],
       '#pattern' => '[A-Z]{3}',
@@ -65,6 +66,9 @@ class CurrencyForm extends EntityForm {
     $form['numericCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
+      '#description' => $this->t('The numeric currency code. According to ISO 4217 this code consists of three digits 
+         and first digit can be a zero. <a href="https://en.wikipedia.org/wiki/ISO_4217" target="_blank">
+         Wikipedia page about ISO 4217</a>.'),
       '#default_value' => $currency->getNumericCode(),
       '#element_validate' => ['::validateNumericCode'],
       '#pattern' => '[\d]{3}',
