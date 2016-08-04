@@ -1,21 +1,19 @@
 <?php
 
-namespace Drupal\commerce_order\Tests;
+namespace Drupal\Tests\commerce_order\Functional;
 
-use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\Core\Url;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Empty Store order page test.
  *
  * @group commerce
  */
-class OrderEmptyStoreTest extends CommerceTestBase {
+class OrderEmptyStoreTest extends CommerceBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = [
     'commerce_order',
@@ -38,8 +36,9 @@ class OrderEmptyStoreTest extends CommerceTestBase {
     $this->drupalGet('admin/commerce/orders');
     $this->clickLink('Create a new order');
 
-    // Check the link is present.
-    $this->assertLink(t('Add a new store.'));
-    $this->assertLinkByHref(Url::fromRoute('entity.commerce_store.add_page')->toString());
+    // Check that the link is present.
+    $session = $this->assertSession();
+    $session->linkExists('Add a new store.');
+    $session->linkByHrefExists(Url::fromRoute('entity.commerce_store.add_page')->toString());
   }
 }

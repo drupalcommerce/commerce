@@ -1,21 +1,19 @@
 <?php
 
-namespace Drupal\commerce_product\Tests;
+namespace Drupal\Tests\commerce_product\Functional;
 
-use Drupal\commerce\Tests\CommerceTestBase;
 use Drupal\Core\Url;
+use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
  * Empty Store product page test.
  *
  * @group commerce
  */
-class ProductEmptyStoreTest extends CommerceTestBase {
+class ProductEmptyStoreTest extends CommerceBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = [
     'commerce_store',
@@ -39,8 +37,9 @@ class ProductEmptyStoreTest extends CommerceTestBase {
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add product');
 
-    // Check the link is present.
-    $this->assertLink(t('Add a new store.'));
-    $this->assertLinkByHref(Url::fromRoute('entity.commerce_store.add_page')->toString());
+    // Check that the link is present.
+    $session = $this->assertSession();
+    $session->linkExists('Add a new store.');
+    $session->linkByHrefExists(Url::fromRoute('entity.commerce_store.add_page')->toString());
   }
 }
