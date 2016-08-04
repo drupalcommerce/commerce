@@ -4,6 +4,7 @@ namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -42,6 +43,12 @@ class CurrencyForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $currency = $this->entity;
+
+    $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
+    $form['message'] = [
+      '#type' => 'markup',
+      '#markup' => $this->t('This form is only intended to be used to create custom currencies. Real-world currencies <a href="!url">should be imported</a>', ['!url' => $import_url]),
+    ];
 
     $form['name'] = [
       '#type' => 'textfield',
