@@ -243,7 +243,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $username = $values['returning_customer']['name'];
     $password = trim($values['returning_customer']['password']);
     // Setting url for "forgotten password" link in the error message.
-    $route_parameters = !empty($username) ? array('name' => $username) : array();
+    $route_parameters = !empty($username) ? ['name' => $username] : [];
     $route = Url::fromRoute('user.pass', [], ['query' => $route_parameters])->toString();
     if (empty($username) || empty($password)) {
       $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $route]));
