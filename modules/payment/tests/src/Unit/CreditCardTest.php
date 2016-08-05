@@ -18,9 +18,9 @@ class CreditCardTest extends \PHPUnit_Framework_TestCase {
   public function testGetTypes() {
     $types = CreditCard::getTypes();
     $this->assertInternalType('array', $types);
-    foreach ($types as $key => $cardType) {
-      $this->assertInstanceOf(CreditCardType::class, $cardType);
-      $this->assertEquals($key, $cardType->getId());
+    foreach ($types as $key => $type) {
+      $this->assertInstanceOf(CreditCardType::class, $type);
+      $this->assertEquals($key, $type->getId());
     }
   }
 
@@ -46,15 +46,18 @@ class CreditCardTest extends \PHPUnit_Framework_TestCase {
    * @covers ::matchPrefix
    * @dataProvider cardsProvider
    */
-  public function testDetectType($number, $cardType) {
-    // Card number has to be an integer.
-    $card = CreditCard::detectType('4111 1111 1111 1111');
-    $this->assertFalse($card);
-
-    // 4111 1111 1111 1111 is the visa test card.
+  public function testDetectType($number, $type) {
     $card = CreditCard::detectType($number);
     $this->assertInstanceOf(CreditCardType::class, $card);
-    $this->assertEquals($cardType, $card->getId());
+    $this->assertEquals($type, $card->getId());
+  }
+
+  /**
+   * @covers ::detectType
+   */
+  public function testInvalidType() {
+    $card = CreditCard::detectType('4111 1111 1111 1111');
+    $this->assertFalse($card);
   }
 
   /**
@@ -67,6 +70,17 @@ class CreditCardTest extends \PHPUnit_Framework_TestCase {
     $creditCardType = CreditCard::getType($type);
     $validated = CreditCard::validateNumber($number, $creditCardType);
     $this->assertTrue($validated);
+  }
+
+  /**
+   * @covers ::detectType
+   * @covers ::matchPrefix
+   * @dataProvider invalidCardsProvider
+   */
+  public function testInvalidNumbers($number) {
+    $card = CreditCard::detectType($number);
+    $validated = CreditCard::validateNumber($number, $card);
+    $this->assertFalse($validated);
   }
 
   /**
@@ -106,6 +120,21 @@ class CreditCardTest extends \PHPUnit_Framework_TestCase {
       [6011000400000000, 'discover'],
       [6208205838887174, 'unionpay'],
       [374251018720018, 'amex'],
+    ];
+  }
+
+  /**
+   * Data provider for ::testInvalidTypes.
+   *
+   * @return array
+   *   An array of invalid credit cards numbers.
+   */
+  public function invalidCardsProvider() {
+    return [
+      [41111111111111],
+      [3742510187200181212],
+      [37425101872],
+      [37],
     ];
   }
 
