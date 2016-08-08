@@ -47,7 +47,7 @@ class CurrencyForm extends EntityForm {
     $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
     $form['message'] = [
       '#type' => 'markup',
-      '#markup' => $this->t('This form is only intended to be used to create custom currencies. Real-world currencies <a href="!url">should be imported</a>', ['!url' => $import_url]),
+      '#markup' => $this->t('This form is only intended to be used to create custom currencies. Real-world currencies <a href=":url">should be imported</a>', [':url' => $import_url]),
     ];
 
     $form['name'] = [
