@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
+use Drupal\commerce_payment\CreditCard;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -78,6 +79,14 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function getSupportedModes() {
     return $this->pluginDefinition['modes'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreditCardTypes() {
+    // @todo Allow the list to be restricted by the merchant.
+    return array_intersect_key(CreditCard::getTypes(), array_flip($this->pluginDefinition['credit_card_types']));
   }
 
   /**

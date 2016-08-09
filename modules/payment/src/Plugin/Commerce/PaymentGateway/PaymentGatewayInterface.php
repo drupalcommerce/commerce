@@ -50,4 +50,12 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    */
   public function getSupportedModes();
 
+  /**
+   * Gets the credit card types handled by the gateway.
+   *
+   * @return \Drupal\commerce_payment\CreditCardType[]
+   *   The credit card types.
+   */
+  public function getCreditCardTypes();
+
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Annotation;
 
+use Drupal\commerce_payment\CreditCard;
 use Drupal\Component\Annotation\Plugin;
 
 /**
@@ -64,6 +65,13 @@ class CommercePaymentGateway extends Plugin {
   public $forms = [];
 
   /**
+   * The credit card types handled by the payment gateway.
+   *
+   * @var string[]
+   */
+  public $credit_card_types = [];
+
+  /**
    * Constructs a new CommercePaymentGateway object.
    *
    * @param array $values
@@ -75,6 +83,9 @@ class CommercePaymentGateway extends Plugin {
         'test' => t('Test'),
         'live' => t('Live'),
       ];
+    }
+    if (empty($values['credit_card_types'])) {
+      $values['credit_card_types'] = array_keys(CreditCard::getTypes());
     }
     parent::__construct($values);
   }
