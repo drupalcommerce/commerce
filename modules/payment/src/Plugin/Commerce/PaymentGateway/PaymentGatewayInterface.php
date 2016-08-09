@@ -51,6 +51,14 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getSupportedModes();
 
   /**
+   * Gets the payment method types handled by the payment gateway.
+   *
+   * @return \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[]
+   *   The payment method types.
+   */
+  public function getPaymentMethodTypes();
+
+  /**
    * Gets the credit card types handled by the gateway.
    *
    * @return \Drupal\commerce_payment\CreditCardType[]

@@ -65,6 +65,13 @@ class CommercePaymentGateway extends Plugin {
   public $forms = [];
 
   /**
+   * The payment method types handled by the payment gateway.
+   *
+   * @var string[]
+   */
+  public $payment_method_types = [];
+
+  /**
    * The credit card types handled by the payment gateway.
    *
    * @var string[]
@@ -83,6 +90,10 @@ class CommercePaymentGateway extends Plugin {
         'test' => t('Test'),
         'live' => t('Live'),
       ];
+    }
+    if (empty($values['payment_method_types'])) {
+      // NestedArray merging causes duplicates for array defaults on properties.
+      $values['payment_method_types'] = ['credit_card'];
     }
     if (empty($values['credit_card_types'])) {
       $values['credit_card_types'] = array_keys(CreditCard::getTypes());
