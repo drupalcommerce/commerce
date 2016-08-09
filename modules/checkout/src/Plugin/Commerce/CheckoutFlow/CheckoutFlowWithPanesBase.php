@@ -360,7 +360,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         '#attributes' => [
           'class' => ['pane-configuration-edit-form'],
         ],
-        '#element_validate' => [get_class($this), 'validatePaneConfigurationForm'],
+        '#element_validate' => [static::class . '::validatePaneConfigurationForm'],
         '#pane_id' => $pane_id,
       ];
       $pane_row['configuration'] = $pane->buildConfigurationForm($pane_row['configuration'], $form_state);

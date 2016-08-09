@@ -109,7 +109,7 @@ class CheckoutFlowTest extends CommerceBrowserTestBase {
     $edit = ['configuration[panes][contact_information][configuration][double_entry]' => 1];
     $this->submitForm($edit, 'Update');
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains(t('Saved the @name checkout flow.', ['@name' => $edit['label']]));
+    $this->assertSession()->pageTextContains(t('Saved the @name checkout flow.', ['@name' => 'Test checkout flow']));
 
     // Go back to the edit page, and check that the text has changed.
     $this->drupalGet('admin/commerce/config/checkout-flows/manage/test_checkout_flow');
