@@ -16,6 +16,7 @@ use Drupal\user\Entity\Role;
  * @group commerce
  */
 class PluginItemTest extends CommerceBrowserTestBase {
+
   use JavascriptTestTrait;
   use StoreCreationTrait;
 

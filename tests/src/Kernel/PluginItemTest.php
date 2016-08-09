@@ -11,7 +11,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 
 /**
- * Tests the conditions field.
+ * Tests the 'commerce_plugin_item' field type.
  *
  * @group commerce
  */
