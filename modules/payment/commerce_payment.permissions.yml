@@ -1,0 +1,3 @@
+administer payment gateways:
+  title: 'Administer payment gateways'
+  'restrict access': TRUE
