@@ -68,7 +68,7 @@ class CompletionMessage extends CheckoutPaneBase {
     $message = $this->configuration['message'];
     $message = str_replace('%order_number', $this->order->getOrderNumber(), $message);
 
-    $pane_form = [
+    $pane_form['message'] = [
       '#markup' => $message,
     ];
     return $pane_form;
