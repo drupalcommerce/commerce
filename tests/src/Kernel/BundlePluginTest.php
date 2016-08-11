@@ -8,7 +8,7 @@ use Drupal\KernelTests\KernelTestBase;
 /**
  * Tests the bundle plugin API.
  *
- * @group commmerce
+ * @group commerce
  */
 class BundlePluginTest extends KernelTestBase {
 
