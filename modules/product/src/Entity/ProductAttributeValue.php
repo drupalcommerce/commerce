@@ -22,7 +22,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   bundle_label = @Translation("Product attribute"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductAttributeValueEvent",
- *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
+ *     "storage" = "Drupal\commerce_product\ProductAttributeValueStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"

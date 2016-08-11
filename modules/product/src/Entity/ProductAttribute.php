@@ -77,7 +77,7 @@ class ProductAttribute extends ConfigEntityBundleBase implements ProductAttribut
    */
   public function getValues() {
     $storage = $this->entityTypeManager()->getStorage('commerce_product_attribute_value');
-    return $storage->loadByProperties(['attribute' => $this->id]);
+    return $storage->loadByAttribute($this->id());
   }
 
   /**
