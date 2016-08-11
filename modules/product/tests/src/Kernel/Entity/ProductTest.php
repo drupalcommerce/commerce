@@ -40,6 +40,7 @@ class ProductTest extends KernelTestBase {
   }
 
   /**
+   * @covers ::getVariationIds
    * @covers ::getVariations
    * @covers ::setVariations
    * @covers ::hasVariations
@@ -80,6 +81,9 @@ class ProductTest extends KernelTestBase {
     $this->assertTrue($product->hasVariations());
     $variations_match = $variations == $product->getVariations();
     $this->assertTrue($variations_match);
+    $variation_ids = [$variation1->id(), $variation2->id()];
+    $variation_ids_match = $variation_ids == $product->getVariationIds();
+    $this->assertTrue($variation_ids_match);
 
     $this->assertTrue($product->hasVariation($variation1));
     $product->removeVariation($variation1);

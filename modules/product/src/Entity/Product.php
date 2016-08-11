@@ -183,6 +183,17 @@ class Product extends ContentEntityBase implements ProductInterface {
   /**
    * {@inheritdoc}
    */
+  public function getVariationIds() {
+    $variation_ids = [];
+    foreach ($this->get('variations') as $field_item) {
+      $variation_ids[] = $field_item->target_id;
+    }
+    return $variation_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getVariations() {
     $variations = $this->get('variations')->referencedEntities();
     return $this->ensureTranslations($variations);
@@ -228,7 +239,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function hasVariation(ProductVariationInterface $variation) {
-    return $this->getVariationIndex($variation) !== FALSE;
+    return in_array($variation->id(), $this->getVariationIds());
   }
 
   /**
@@ -241,12 +252,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    *   The index of the given variation, or FALSE if not found.
    */
   protected function getVariationIndex(ProductVariationInterface $variation) {
-    $values = $this->get('variations')->getValue();
-    $variation_ids = array_map(function ($value) {
-      return $value['target_id'];
-    }, $values);
-
-    return array_search($variation->id(), $variation_ids);
+    return array_search($variation->id(), $this->getVariationIds());
   }
 
   /**

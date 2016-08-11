@@ -104,6 +104,14 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function setStoreIds(array $store_ids);
 
   /**
+   * Gets the variation IDs.
+   *
+   * @return int[]
+   *   The variation IDs.
+   */
+  public function getVariationIds();
+
+  /**
    * Gets the variations.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationInterface[]
