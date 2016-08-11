@@ -43,7 +43,7 @@ class CurrencyTest extends CommerceBrowserTestBase {
    */
   public function testCurrencyCreation() {
     $this->drupalGet('admin/commerce/config/currency');
-    $this->getSession()->getPage()->clickLink('Add a new currency');
+    $this->getSession()->getPage()->clickLink('Add currency');
     $edit = [
       'name' => 'Test currency',
       'currencyCode' => 'XXX',

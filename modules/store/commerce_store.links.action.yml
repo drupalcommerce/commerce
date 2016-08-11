@@ -1,11 +1,11 @@
 entity.commerce_store.add_page:
   route_name: entity.commerce_store.add_page
-  title: 'Add a new store'
+  title: 'Add store'
   appears_on:
     - entity.commerce_store.collection
 
 entity.commerce_store_type.add_form:
   route_name: entity.commerce_store_type.add_form
-  title: 'Add a new store type'
+  title: 'Add store type'
   appears_on:
     - entity.commerce_store_type.collection

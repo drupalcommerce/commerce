@@ -42,12 +42,13 @@ class CurrencyForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $this->entity;
 
     $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
     $form['message'] = [
       '#type' => 'markup',
-      '#markup' => $this->t('This form is only intended to be used to create custom currencies. Real-world currencies <a href=":url">should be imported</a>', [':url' => $import_url]),
+      '#markup' => $this->t('This form is only intended for creating custom currencies. Real-world currencies should be <a href=":url">imported</a>.', [':url' => $import_url]),
     ];
 
     $form['name'] = [
@@ -60,13 +61,12 @@ class CurrencyForm extends EntityForm {
     $form['currencyCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
-      '#description' => $this->t('For example: USD.'),
       '#default_value' => $currency->getCurrencyCode(),
       '#element_validate' => ['::validateCurrencyCode'],
       '#pattern' => '[A-Z]{3}',
       '#placeholder' => 'XXX',
       '#maxlength' => 3,
-      '#size' => 3,
+      '#size' => 4,
       '#disabled' => !$currency->isNew(),
       '#required' => TRUE,
     ];
@@ -80,7 +80,7 @@ class CurrencyForm extends EntityForm {
       '#pattern' => '[\d]{3}',
       '#placeholder' => '999',
       '#maxlength' => 3,
-      '#size' => 3,
+      '#size' => 4,
       '#required' => TRUE,
     ];
     $form['symbol'] = [

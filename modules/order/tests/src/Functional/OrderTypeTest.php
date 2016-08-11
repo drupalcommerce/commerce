@@ -38,7 +38,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
 
     // Create a order type through the add form.
     $this->drupalGet('/admin/commerce/config/order-types');
-    $this->getSession()->getPage()->clickLink('Add a new order type');
+    $this->getSession()->getPage()->clickLink('Add order type');
 
     $values = [
       'id' => 'foo',

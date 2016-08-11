@@ -17,7 +17,7 @@ class TaxTypeTest extends TaxBrowserTestBase {
   public function testTaxTypeCreation() {
     $zone = $this->createZone();
     $this->drupalGet('admin/commerce/config/tax-types');
-    $this->getSession()->getPage()->clickLink('Add a new tax type');
+    $this->getSession()->getPage()->clickLink('Add tax type');
     $id = strtolower($this->randomMachineName(5));
     $edit = [
       'id' => $id,

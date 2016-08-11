@@ -26,7 +26,7 @@ entity.commerce_tax_rate.add_form:
   path: '/admin/commerce/config/tax-rates/{commerce_tax_type}/add'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateController::addForm'
-    _title: 'Add a new tax rate'
+    _title: 'Add tax rate'
   requirements:
     _entity_create_access: 'commerce_tax_rate'
 
@@ -42,6 +42,6 @@ entity.commerce_tax_rate_amount.add_form:
   path: '/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate}/add'
   defaults:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::addForm'
-    _title: 'Add a new tax rate amount'
+    _title: 'Add tax rate amount'
   requirements:
     _entity_create_access: 'commerce_tax_rate_amount'
