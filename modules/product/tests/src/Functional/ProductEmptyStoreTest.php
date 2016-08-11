@@ -33,7 +33,7 @@ class ProductEmptyStoreTest extends CommerceBrowserTestBase {
   /**
    * Tests creating a product.
    */
-  function testCreateProduct() {
+  public function testCreateProduct() {
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add product');
 
@@ -42,4 +42,5 @@ class ProductEmptyStoreTest extends CommerceBrowserTestBase {
     $session->linkExists('Add a new store.');
     $session->linkByHrefExists(Url::fromRoute('entity.commerce_store.add_page')->toString());
   }
+
 }

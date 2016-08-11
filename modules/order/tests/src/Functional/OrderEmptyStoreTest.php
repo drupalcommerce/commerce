@@ -32,7 +32,7 @@ class OrderEmptyStoreTest extends CommerceBrowserTestBase {
   /**
    * Tests order create page.
    */
-  function testCreateOrderPage() {
+  public function testCreateOrderPage() {
     $this->drupalGet('admin/commerce/orders');
     $this->clickLink('Create a new order');
 
@@ -41,4 +41,5 @@ class OrderEmptyStoreTest extends CommerceBrowserTestBase {
     $session->linkExists('Add a new store.');
     $session->linkByHrefExists(Url::fromRoute('entity.commerce_store.add_page')->toString());
   }
+
 }
