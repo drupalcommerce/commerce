@@ -7,8 +7,3 @@ entity.commerce_currency.collection:
   route_name: 'entity.commerce_currency.collection'
   base_route: 'entity.commerce_currency.collection'
   title: 'List'
-
-entity.commerce_currency.import:
-  route_name: 'entity.commerce_currency.import'
-  base_route: 'entity.commerce_currency.collection'
-  title: 'Import'
