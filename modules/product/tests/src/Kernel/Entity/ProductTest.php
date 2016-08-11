@@ -95,4 +95,27 @@ class ProductTest extends KernelTestBase {
     $this->assertNotEquals($product->getDefaultVariation(), $variation1);
   }
 
+  /**
+   * Tests variation's canonical URL.
+   */
+  public function testCanonicalVariationLink() {
+    $variation1 = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
+      'status' => 0,
+    ]);
+    $variation1->save();
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation1],
+    ]);
+    $product->save();
+
+    $product_url = $product->toUrl()->toString();
+    $variation_url = $variation1->toUrl()->toString();
+    $this->assertEquals($product_url . '?v=' . $variation1->id(), $variation_url);
+  }
+
 }

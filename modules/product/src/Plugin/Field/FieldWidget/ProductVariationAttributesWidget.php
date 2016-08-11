@@ -145,7 +145,17 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
     ];
     $parents = array_merge($element['#field_parents'], [$items->getName(), $delta]);
     $user_input = (array) NestedArray::getValue($form_state->getUserInput(), $parents);
-    $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+    if (!empty($user_input)) {
+      $selected_variation = $this->selectVariationFromUserInput($variations, $user_input);
+    }
+    else {
+      $selected_variation = $this->variationStorage->loadFromContext($product);
+      // The returned variation must also be enabled.
+      if (!in_array($selected_variation, $variations)) {
+        $selected_variation = reset($variations);
+      }
+    }
+
     $element['variation'] = [
       '#type' => 'value',
       '#value' => $selected_variation->id(),
@@ -211,7 +221,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   }
 
   /**
-   * Selects a product variation based on user input containing attribute values.
+   * Selects a product variation based on user input having attribute values.
    *
    * If there's no user input (form viewed for the first time), the default
    * variation is returned.
@@ -235,7 +245,6 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
             $match = FALSE;
           }
         }
-
         if ($match) {
           $current_variation = $variation;
           break;

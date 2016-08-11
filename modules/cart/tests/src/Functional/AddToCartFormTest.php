@@ -38,6 +38,52 @@ class AddToCartFormTest extends CartBrowserTestBase {
   }
 
   /**
+   * Test adding a product to the cart, via the variant's canonical link.
+   */
+  public function testVariationCanonicalLinkAddToCartForm() {
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = ProductVariationType::load($this->variation->bundle());
+
+    $color_attribute_values = $this->createAttributeSet($variation_type, 'color', [
+      'cyan' => 'Cyan',
+      'magenta' => 'Magenta',
+    ]);
+
+    $variation1 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => $this->randomMachineName(),
+      'price' => [
+        'amount' => '5.00',
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['cyan'],
+    ]);
+    $variation2 = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => 'canonical-test',
+      'price' => [
+        'amount' => '9.99',
+        'currency_code' => 'USD',
+      ],
+      'attribute_color' => $color_attribute_values['magenta'],
+    ]);
+    $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
+      'variations' => [$variation1, $variation2],
+    ]);
+
+    $this->drupalGet($variation2->toUrl());
+    $this->assertSession()->pageTextContains('$9.99');
+    $this->submitForm([], 'Add to cart');
+
+    $this->cart = Order::load($this->cart->id());
+    $line_items = $this->cart->getLineItems();
+    $this->assertEquals($variation2->getSku(), $line_items[0]->getPurchasedEntity()->getSku());
+  }
+
+  /**
    * Tests ability to expose line item fields on the add to cart form.
    */
   public function testExposedLineItemFields() {

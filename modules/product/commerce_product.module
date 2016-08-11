@@ -14,6 +14,7 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductType;
+use Drupal\commerce_product\Entity\ProductVariation;
 
 /**
  * Implements hook_config_translation_info_alter().
@@ -102,7 +103,8 @@ function commerce_product_commerce_product_view(array &$build, EntityInterface $
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
 
-    $rendered_fields = $variation_field_renderer->renderFields($entity->getDefaultVariation(), $view_mode);
+    $variation = \Drupal::entityTypeManager()->getStorage('commerce_product_variation')->loadFromContext($entity);
+    $rendered_fields = $variation_field_renderer->renderFields($variation, $view_mode);
     foreach ($rendered_fields as $field_name => $rendered_field) {
       // Group attribute fields to allow them to be excluded together.
       if (strpos($field_name, 'attribute_') !== FALSE) {

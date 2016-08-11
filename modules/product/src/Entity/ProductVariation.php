@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
 use Drupal\user\UserInterface;
 
 /**
@@ -55,6 +56,31 @@ use Drupal\user\UserInterface;
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if ($rel == 'canonical') {
+      $route_name = 'entity.commerce_product.canonical';
+      $route_parameters = [
+        'commerce_product' => $this->getProductId(),
+      ];
+      $options = [
+        'query' => [
+          'v' => $this->id(),
+        ],
+        'entity_type' => 'commerce_product',
+        'entity' => $this->getProduct(),
+        // Display links by default based on the current language.
+        'language' => $this->language(),
+      ];
+      return new Url($route_name, $route_parameters, $options);
+    }
+    else {
+      return parent::toUrl($rel, $options);
+    }
+  }
 
   /**
    * {@inheritdoc}
