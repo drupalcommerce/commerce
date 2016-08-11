@@ -13,9 +13,7 @@ use Drupal\commerce_checkout\Entity\CheckoutFlow;
 class CheckoutFlowTest extends CommerceBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   public static $modules = [
     'commerce_checkout',
@@ -92,6 +90,34 @@ class CheckoutFlowTest extends CommerceBrowserTestBase {
 
     $checkout_flow_exists = (bool) CheckoutFlow::load($checkout_flow->id());
     $this->assertFalse($checkout_flow_exists, 'The checkout flow has been deleted from the database.');
+  }
+
+  /**
+   * Tests changing pane settings.
+   */
+  public function testCheckoutPaneSettings() {
+    $this->createEntity('commerce_checkout_flow', [
+      'label' => 'Test checkout flow',
+      'id' => 'test_checkout_flow',
+      'plugin' => 'multistep_default',
+    ]);
+    $this->drupalGet('admin/commerce/config/checkout-flows/manage/test_checkout_flow');
+    $this->assertSession()->pageTextContains('Require double entry of email: No');
+    $this->click('#edit-configuration-panes-contact-information-configuration-edit');
+
+    // Enable required double entry.
+    $edit = ['configuration[panes][contact_information][configuration][double_entry]' => 1];
+    $this->submitForm($edit, 'Update');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains(t('Saved the @name checkout flow.', ['@name' => 'Test checkout flow']));
+
+    // Go back to the edit page, and check that the text has changed.
+    $this->drupalGet('admin/commerce/config/checkout-flows/manage/test_checkout_flow');
+    $this->assertSession()->pageTextContains('Require double entry of email: Yes');
+
+    // Double check by using the api to see if the changes are saved.
+    $checkout_flow = CheckoutFlow::load('test_checkout_flow');
+    $this->assertEquals(1, $checkout_flow->get('configuration')['panes']['contact_information']['double_entry']);
   }
 
 }

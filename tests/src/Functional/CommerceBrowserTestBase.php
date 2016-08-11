@@ -23,7 +23,11 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'block', 'field', 'commerce',
+  public static $modules = [
+    'system',
+    'block',
+    'field',
+    'commerce',
     'commerce_price',
   ];
 
