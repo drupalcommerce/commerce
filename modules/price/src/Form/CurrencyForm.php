@@ -4,6 +4,7 @@ namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -43,6 +44,12 @@ class CurrencyForm extends EntityForm {
     $form = parent::form($form, $form_state);
     $currency = $this->entity;
 
+    $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
+    $form['message'] = [
+      '#type' => 'markup',
+      '#markup' => $this->t('This form is only intended to be used to create custom currencies. Real-world currencies <a href=":url">should be imported</a>', [':url' => $import_url]),
+    ];
+
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
@@ -53,6 +60,7 @@ class CurrencyForm extends EntityForm {
     $form['currencyCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Currency code'),
+      '#description' => $this->t('For example: USD.'),
       '#default_value' => $currency->getCurrencyCode(),
       '#element_validate' => ['::validateCurrencyCode'],
       '#pattern' => '[A-Z]{3}',
@@ -62,9 +70,11 @@ class CurrencyForm extends EntityForm {
       '#disabled' => !$currency->isNew(),
       '#required' => TRUE,
     ];
+    $iso_4217_url = Url::fromUri('https://en.wikipedia.org/wiki/ISO_4217')->toString();
     $form['numericCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
+      '#description' => $this->t('The three digit code, as defined by <a href=":url" target="_blank">ISO 4217</a>.', [':url' => $iso_4217_url]),
       '#default_value' => $currency->getNumericCode(),
       '#element_validate' => ['::validateNumericCode'],
       '#pattern' => '[\d]{3}',
