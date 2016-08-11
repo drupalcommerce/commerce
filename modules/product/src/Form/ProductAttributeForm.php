@@ -166,7 +166,22 @@ class ProductAttributeForm extends BundleEntityFormBase {
       ];
       // Used by SortArray::sortByWeightProperty to sort the rows.
       if (isset($user_input['values'][$index]) && !$form_state->get('reset_alphabetical')) {
-        $value_form['#weight'] = $user_input['values'][$index]['weight'];
+        $input_weight = $user_input['values'][$index]['weight'];
+        // This might be running in a removal, so we need to ensure that the
+        // default weight is not greater than the maximum or equals to the _new
+        // item.
+        if ($input_weight > $max_weight) {
+          $input_weight = (string) ($max_weight - 1);
+
+          // Make sure the weight input value is not out of bounds.
+          $value_form['weight']['#value'] = $input_weight;
+        }
+        $value_form['#weight'] = $input_weight;
+      }
+      elseif ($form_state->get('reset_alphabetical')) {
+        // User input will override newly generated weights.
+        $value_form['weight']['#value'] = $default_weight;
+        $value_form['#weight'] = $default_weight;
       }
       else {
         $value_form['#weight'] = $default_weight;
