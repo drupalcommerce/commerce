@@ -74,7 +74,7 @@ class CurrencyForm extends EntityForm {
     $form['numericCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
-      '#description' => $this->t('The three digit code, as defined by <a href="!url" target="_blank">ISO 4217</a>.', ['!url' => $iso_4217_url]),
+      '#description' => $this->t('The three digit code, as defined by <a href=":url" target="_blank">ISO 4217</a>.', [':url' => $iso_4217_url]),
       '#default_value' => $currency->getNumericCode(),
       '#element_validate' => ['::validateNumericCode'],
       '#pattern' => '[\d]{3}',
