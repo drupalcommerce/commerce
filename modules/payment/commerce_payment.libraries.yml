@@ -1,0 +1,12 @@
+payment_method_form:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_payment.payment_method_form.css: {}
+
+credit_card_validation:
+  version: VERSION
+  js:
+    js/credit-card-validation.js: {}
+  dependencies:
+    - core/jquery

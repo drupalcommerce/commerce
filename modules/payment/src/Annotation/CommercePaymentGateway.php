@@ -65,6 +65,13 @@ class CommercePaymentGateway extends Plugin {
   public $forms = [];
 
   /**
+   * The payment type used by the payment gateway.
+   *
+   * @var string
+   */
+  public $payment_type = 'payment_default';
+
+  /**
    * The payment method types handled by the payment gateway.
    *
    * @var string[]

@@ -1,3 +1,23 @@
+entity.commerce_payment.add_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/add'
+  defaults:
+    _form: '\Drupal\commerce_payment\Form\PaymentAddForm'
+    _title: 'Add payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _entity_create_access: 'commerce_payment'
+
+entity.commerce_payment.collection:
+  path: '/admin/commerce/orders/{commerce_order}/payments'
+  defaults:
+    _entity_list: 'commerce_payment'
+    _title: 'Payments'
+  requirements:
+    _permission: 'administer payments'
+
 entity.commerce_payment_gateway.collection:
   path: '/admin/commerce/config/payment-gateways'
   defaults:
@@ -5,3 +25,19 @@ entity.commerce_payment_gateway.collection:
     _title: 'Payment gateways'
   requirements:
     _permission: 'administer payment gateways'
+
+entity.commerce_payment_method.add_form:
+  path: '/user/{user}/payment-methods/add'
+  defaults:
+    _form: '\Drupal\commerce_payment\Form\PaymentMethodAddForm'
+    _title: 'Add payment method'
+  requirements:
+    _entity_create_access: 'commerce_payment_method'
+
+entity.commerce_payment_method.collection:
+  path: '/user/{user}/payment-methods'
+  defaults:
+    _entity_list: 'commerce_payment_method'
+    _title: 'Payment methods'
+  requirements:
+    _user_is_logged_in: 'TRUE'

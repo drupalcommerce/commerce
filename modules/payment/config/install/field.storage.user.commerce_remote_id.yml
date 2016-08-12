@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - commerce_payment
+  module:
+    - commerce
+    - user
+id: user.commerce_remote_id
+field_name: commerce_remote_id
+entity_type: user
+type: commerce_remote_id
+settings: {  }
+module: commerce
+locked: true
+cardinality: -1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
