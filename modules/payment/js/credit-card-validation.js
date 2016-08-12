@@ -10,6 +10,10 @@
   var types = {};
   var VISA = 'visa';
   var MASTERCARD = 'master-card';
+  var AMEX = 'amex';
+  var DINERSCLUB = 'dinersclub';
+  var DISCOVER = 'discover';
+  var MAESTRO = 'maestro';
 
   types[VISA] = {
     niceType: 'Visa',
@@ -26,6 +30,48 @@
     gaps: [4, 8, 12],
     lengths: [16]
   };
+
+  types[AMEX] = {
+    niceType: 'American Express',
+    type: AMEX,
+    pattern: ['34', '37'],
+    lengths: [15]
+  };
+
+  types[DINERSCLUB] = {
+    niceType: 'Diners Club',
+    type: DINERSCLUB,
+    pattern: ['300-305', '309', '36', '38', '39'],
+    lengths: [14]
+  };
+
+  types[DISCOVER] = {
+    niceType: 'Discover Card',
+    type: DISCOVER,
+    pattern: ['6011', '622126-622925', '644-649', '65'],
+    lengths: [16, 19]
+  };
+
+  types[MAESTRO] = {
+    niceType: 'Maestro',
+    type: MAESTRO,
+    pattern: [
+      '5018',
+      '5020',
+      '5038',
+      '5612',
+      '5893',
+      '6304',
+      '6759',
+      '6761',
+      '6762',
+      '6763',
+      '0604',
+      '6390'
+    ],
+    lenghts: [12, 13, 14, 15, 16, 17, 18, 19]
+  };
+
 
   /**
    * Detect the type of credit card.
