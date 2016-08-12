@@ -5,7 +5,7 @@
 
 (function ($) {
 
-  "use strict";
+  'use strict';
 
   var types = {};
   var VISA = 'visa';
@@ -32,9 +32,9 @@
    *
    * @param {string} number
    *
-   * @returns {object|boolean}
+   * @return {object|boolean}
    */
-  var detectType = function(number) {
+  var detectType = function (number) {
     // Loop over all available types.
     for (var x in types) {
       var type = types[x];
@@ -45,7 +45,9 @@
 
         // If the pattern has a dash, we should create a range of patterns.
         if (pattern.indexOf('-') >= 0) {
-          var exploded_pattern, ranges = [], range;
+          var exploded_pattern;
+          var ranges = [];
+          var range;
           exploded_pattern = pattern.split('-');
 
           while (exploded_pattern[0] <= exploded_pattern[1]) {
@@ -75,9 +77,9 @@
    * @param {string} number
    * @param {string} prefix
    *
-   * @returns {boolean}
+   * @return {boolean}
    */
-  var validatePrefix = function(number, prefix) {
+  var validatePrefix = function (number, prefix) {
     return number.substring(0, prefix.length) == prefix + '';
   };
 
@@ -87,9 +89,9 @@
    * @param {string} number
    * @param {object} type
    *
-   * @returns {boolean}
+   * @return {boolean}
    */
-  var validateCreditCard = function(number, type) {
+  var validateCreditCard = function (number, type) {
     // Make sure that the type is really the expected type.
     if (detectType(number) != type) {
       return false;
@@ -99,7 +101,7 @@
     // defined in the type.
     for (var x in type.lengths) {
       var expected_lenght = type.lengths[x];
-      if (number.length == expected_lenght) {
+      if (number.length === expected_lenght) {
         return true;
       }
     }
@@ -112,7 +114,7 @@
    *
    * @param {object} element
    */
-  var validation = function(element) {
+  var validation = function (element) {
     var value = element.val();
     // Strip spaces from the value for all validations.
     value = value.replace(/ /gi, '');
@@ -147,9 +149,9 @@
     attach: function (context, settings) {
       $('#edit-payment-information-add-payment-details-number', context).each(function () {
         var element = $(this);
-        $(element).on('blur', function() {
+        $(element).on('blur', function () {
           validation(element);
-        })
+        });
       });
     }
   };
