@@ -140,8 +140,9 @@
     var ValidationDiv = element.parent().parent().find('#cc-validation');
     ValidationDiv.html('');
 
-    if ($("input[name='payment_information[add][payment_details][security_code]']").size() > 0) {
-      var ccv_value = $("input[name='payment_information[add][payment_details][security_code]']").val();
+    var ccv_field = $("input[name='payment_information[add][payment_details][security_code]']");
+    if (ccv_field.size() > 0) {
+      var ccv_value = ccv_field.val();
       if (ccv_value.length == 0) {
         ValidationDiv.append('CCV is not filled in');
         return;
