@@ -138,7 +138,17 @@
     element.addClass('credit_card--' + type.type);
 
     var ValidationDiv = element.parent().parent().find('#cc-validation');
-    ValidationDiv.html('CC is of type: ' + type.niceType);
+    ValidationDiv.html('');
+
+    if ($("input[name='payment_information[add][payment_details][security_code]']").size() > 0) {
+      var ccv_value = $("input[name='payment_information[add][payment_details][security_code]']").val();
+      if (ccv_value.length == 0) {
+        ValidationDiv.append('CCV is not filled in');
+        return;
+      }
+    }
+
+    ValidationDiv.append('CC is of type: ' + type.niceType);
 
     // Check if the card is actually valid as well.
     var is_valid = validateCreditCard(value, type);
