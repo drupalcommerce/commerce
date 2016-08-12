@@ -26,7 +26,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     $payment_method = $this->entity;
 
     $form['#attached']['library'][] = 'commerce_payment/payment_method_form';
-    $form['#attached']['library'][] = 'commerce_payment/credit_card_validation';
     $form['#tree'] = TRUE;
     $form['payment_details'] = [
       '#parents' => array_merge($form['#parents'], ['payment_details']),
@@ -35,6 +34,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     ];
     if ($payment_method->bundle() == 'credit_card') {
       $form['payment_details'] = $this->buildCreditCardForm($form['payment_details'], $form_state);
+      $form['#attached']['library'][] = 'commerce_payment/credit_card_validation';
     }
     elseif ($payment_method->bundle() == 'paypal') {
       $form['payment_details'] = $this->buildPayPalForm($form['payment_details'], $form_state);
