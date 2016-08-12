@@ -134,7 +134,8 @@
       element.addClass('invalid-cc');
       return;
     }
-    element.addClass(type.type);
+    element.addClass('credit_card');
+    element.addClass('credit_card--' + type.type);
 
     var ValidationDiv = element.parent().parent().find('#cc-validation');
     ValidationDiv.html('CC is of type: ' + type.niceType);
