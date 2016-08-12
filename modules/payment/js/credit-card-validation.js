@@ -114,7 +114,7 @@
    *
    * @param {object} element
    */
-  var validation = function (element) {
+  var validateCreditCardInput = function (element) {
     var value = element.val();
     // Strip spaces from the value for all validations.
     value = value.replace(/ /gi, '');
@@ -122,6 +122,7 @@
     // If the value is not filled in, don't do any validation.
     var empty_value = value.length === 0;
     if (empty_value) {
+      element.addClass('invalid-cc');
       return;
     }
 
@@ -130,18 +131,25 @@
 
     // If no type is found, don't bother doing anything else.
     if (!type) {
+      element.addClass('invalid-cc');
       return;
     }
+    element.addClass(type.type);
 
-    element.parent().parent().find('#cc-validation').html('CC is of type: ' + type.niceType);
+    var ValidationDiv = element.parent().parent().find('#cc-validation');
+    ValidationDiv.html('CC is of type: ' + type.niceType);
 
     // Check if the card is actually valid as well.
     var is_valid = validateCreditCard(value, type);
     if (is_valid) {
-      element.parent().parent().find('#cc-validation').append(' CC is valid');
+      ValidationDiv.append(' CC is valid');
+      element.removeClass('invalid-cc');
+      element.addClass('valid-cc');
     }
     else {
-      element.parent().parent().find('#cc-validation').append(' CC is not valid');
+      ValidationDiv.append(' CC is not valid');
+      element.removeClass('valid-cc');
+      element.addClass('invalid-cc');
     }
   };
 
@@ -150,7 +158,7 @@
       $('#edit-payment-information-add-payment-details-number', context).each(function () {
         var element = $(this);
         $(element).on('blur', function () {
-          validation(element);
+          validateCreditCardInput(element);
         });
       });
     }
