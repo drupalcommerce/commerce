@@ -132,6 +132,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#required' => TRUE,
       '#maxlength' => 19,
       '#size' => 20,
+      '#suffix' => '<div id="cc-validation"></div>',
     ];
     $element['expiration'] = [
       '#type' => 'container',

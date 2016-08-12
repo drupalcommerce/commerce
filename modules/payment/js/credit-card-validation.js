@@ -133,15 +133,15 @@
       return;
     }
 
-    element.parent().append('<br /> CC is of type: ' + type.niceType);
+    element.parent().parent().find('#cc-validation').html('CC is of type: ' + type.niceType);
 
     // Check if the card is actually valid as well.
     var is_valid = validateCreditCard(value, type);
     if (is_valid) {
-      element.parent().append(' CC is valid');
+      element.parent().parent().find('#cc-validation').append(' CC is valid');
     }
     else {
-      element.parent().append(' CC is not valid');
+      element.parent().parent().find('#cc-validation').append(' CC is not valid');
     }
   };
 
