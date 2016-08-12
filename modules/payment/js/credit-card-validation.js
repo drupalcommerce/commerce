@@ -160,7 +160,7 @@
    *
    * @param {object} element
    */
-  var validateCreditCardInput = function (element) {
+  var cardInputBlur = function (element) {
     var value = element.val();
     // Strip spaces from the value for all validations.
     value = value.replace(/ /gi, '');
@@ -211,12 +211,45 @@
     }
   };
 
+  /**
+   * Element onkey upvalidation.
+   *
+   * @param {object} element
+   */
+  var cardInputKeyup = function (element) {
+    var value = element.val();
+    // Strip spaces from the value for all validations.
+    value = value.replace(/ /gi, '');
+
+    // If the value is not filled in, don't do any validation.
+    var empty_value = value.length === 0;
+    if (empty_value) {
+      element.addClass('invalid-cc');
+      return;
+    }
+
+    // Get the type of the card.
+    var type = detectType(value);
+
+    // If no type is found, don't bother doing anything else.
+    if (!type) {
+      element.addClass('invalid-cc');
+      return;
+    }
+    element.removeClass('invalid-cc');
+    element.addClass('credit_card');
+    element.addClass('credit_card--' + type.type);
+  };
+
   Drupal.behaviors.creditCardValidation = {
     attach: function (context, settings) {
       $('#edit-payment-information-add-payment-details-number', context).each(function () {
         var element = $(this);
         $(element).on('blur', function () {
-          validateCreditCardInput(element);
+          cardInputBlur(element);
+        });
+        $(element).on('keyup', function() {
+          cardInputKeyup(element);
         });
       });
     }
