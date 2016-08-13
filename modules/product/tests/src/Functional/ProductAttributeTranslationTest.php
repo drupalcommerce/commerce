@@ -65,10 +65,12 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
     $red_value = $this->createEntity('commerce_product_attribute_value', [
       'attribute' => 'color',
       'name' => 'Red',
+      'weight' => 0,
     ]);
     $blue_value = $this->createEntity('commerce_product_attribute_value', [
       'attribute' => 'color',
       'name' => 'Blue',
+      'weight' => 1,
     ]);
     // Confirm that the value translation form is still missing.
     $this->drupalGet('admin/commerce/product-attributes/manage/color/translate/fr/add');

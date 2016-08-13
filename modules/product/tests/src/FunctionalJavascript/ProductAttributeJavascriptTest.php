@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce_product\FunctionalJavascript;
 
-use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 use Drupal\Tests\commerce_product\Functional\ProductBrowserTestBase;
 
@@ -28,7 +27,7 @@ class ProductAttributeJavascriptTest extends ProductBrowserTestBase {
    * Tests managing product attribute values.
    */
   public function testProductAttributeValues() {
-    $this->createEntity('commerce_product_attribute', [
+    $attribute = $this->createEntity('commerce_product_attribute', [
       'id' => 'color',
       'label' => 'Color',
     ]);
@@ -44,21 +43,16 @@ class ProductAttributeJavascriptTest extends ProductBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Add value');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('values[3][entity][name][0][value]', 'Black');
-
     $this->getSession()->getPage()->pressButton('Save');
-
     $this->assertSession()->pageTextContains('Updated the Color product attribute.');
 
-    $attribute = ProductAttribute::load('color');
-    $attribute_values = [];
-    /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
-    foreach ($attribute->getValues() as $value) {
-      $attribute_values[] = $value->label();
-    }
-    $this->assertTrue($attribute_values[0] == 'Cyan');
-    $this->assertTrue($attribute_values[1] == 'Yellow');
-    $this->assertTrue($attribute_values[2] == 'Magenta');
-    $this->assertTrue($attribute_values[3] == 'Black');
+    // Assert order by weights.
+    \Drupal::entityTypeManager()->getStorage('commerce_product_attribute_value')->resetCache();
+    $attribute_values = array_values($attribute->getValues());
+    $this->assertEquals('Cyan', $attribute_values[0]->label());
+    $this->assertEquals('Yellow', $attribute_values[1]->label());
+    $this->assertEquals('Magenta', $attribute_values[2]->label());
+    $this->assertEquals('Black', $attribute_values[3]->label());
 
     $this->drupalGet('admin/commerce/product-attributes/manage/color');
     $this->getSession()->getPage()->pressButton('remove_value1');
@@ -69,26 +63,28 @@ class ProductAttributeJavascriptTest extends ProductBrowserTestBase {
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('values[3][entity][name][0][value]', 'Cornflower Blue');
     $this->getSession()->getPage()->pressButton('Save');
-
     $this->assertSession()->pageTextContains('Updated the Color product attribute.');
 
-    $attribute = ProductAttribute::load('color');
-    $attribute_values = [];
-    /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $value */
-    foreach ($attribute->getValues() as $value) {
-      $attribute_values[] = $value->label();
-    }
-    $this->assertTrue($attribute_values[0] == 'Cyan');
-    $this->assertTrue($attribute_values[1] == 'Magenta');
-    $this->assertTrue($attribute_values[2] == 'Cornflower Blue');
+    // Assert order by weights.
+    \Drupal::entityTypeManager()->getStorage('commerce_product_attribute_value')->resetCache();
+    $attribute_values = array_values($attribute->getValues());
+    $this->assertEquals('Cyan', $attribute_values[0]->label());
+    $this->assertEquals('Magenta', $attribute_values[1]->label());
+    $this->assertEquals('Cornflower Blue', $attribute_values[2]->label());
 
     $this->drupalGet('admin/commerce/product-attributes/manage/color');
     $this->getSession()->getPage()->pressButton('Reset to alphabetical');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->pressButton('Save');
 
+    // Assert order by weights.
+    \Drupal::entityTypeManager()->getStorage('commerce_product_attribute_value')->resetCache();
+    $attribute_values = array_values($attribute->getValues());
+    $this->assertEquals('Cornflower Blue', $attribute_values[0]->label());
+    $this->assertEquals('Cyan', $attribute_values[1]->label());
+    $this->assertEquals('Magenta', $attribute_values[2]->label());
+
     $this->assertSession()->pageTextContains('Updated the Color product attribute.');
-    // @todo Confirm weights once $attribute->getValues() starts using them.
   }
 
 }
