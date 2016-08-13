@@ -63,7 +63,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
  *     "delete-multiple-form" = "/admin/commerce/products/delete",
- *     "collection" = "/admin/commerce/products",
+ *     "collection" = "/admin/commerce/products"
  *   },
  *   bundle_entity_type = "commerce_product_type",
  *   field_ui_base_route = "entity.commerce_product_type.edit_form",
@@ -455,6 +455,7 @@ class Product extends ContentEntityBase implements ProductInterface {
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
       ])
+      ->setRevisionable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
@@ -475,6 +476,7 @@ class Product extends ContentEntityBase implements ProductInterface {
         'type' => 'string_textfield',
         'weight' => -5,
       ])
+      ->setRevisionable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['path'] = BaseFieldDefinition::create('path')
@@ -493,6 +495,7 @@ class Product extends ContentEntityBase implements ProductInterface {
       ->setDescription(t('Whether the product is published.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -504,11 +507,13 @@ class Product extends ContentEntityBase implements ProductInterface {
         'type' => 'datetime_timestamp',
         'weight' => 10,
       ])
+      ->setRevisionable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time when the product was last edited.'))
+      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE);
 
     $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
