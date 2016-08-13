@@ -63,9 +63,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
  *     "delete-multiple-form" = "/admin/commerce/products/delete",
- *     "collection" = "/admin/commerce/products"
- *     "version-history" = "/product/{commerce_product}/revisions",
- *     "revision" = "/product/{commerce_product}/revisions/{commerce_product_revision}/view",
+ *     "collection" = "/admin/commerce/products",
  *   },
  *   bundle_entity_type = "commerce_product_type",
  *   field_ui_base_route = "entity.commerce_product_type.edit_form",
@@ -322,7 +320,7 @@ class Product extends ContentEntityBase implements ProductInterface {
     parent::preSaveRevision($storage, $record);
 
     if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing node without adding a new revision, we
+      // If we are updating an existing product without adding a new revision, we
       // need to make sure $entity->revision_log is reset whenever it is empty.
       // Therefore, this code allows us to avoid clobbering an existing log
       // entry with an empty one.

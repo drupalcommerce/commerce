@@ -75,7 +75,7 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
   protected $description;
 
   /**
-   * Default value of the 'Create new revision' checkbox of this node type.
+   * Default value of the 'Create new revision' checkbox of this product type.
    *
    * @var bool
    */

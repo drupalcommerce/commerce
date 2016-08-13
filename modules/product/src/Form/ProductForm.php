@@ -106,7 +106,7 @@ class ProductForm extends ContentEntityForm {
       // Open by default when "Create new revision" is checked.
       '#open' => $product->isNewRevision(),
       '#attributes' => array(
-        'class' => array('node-form-revision-information'),
+        'class' => array('product-form-revision-information'),
       ),
       '#attached' => array(
         'library' => array('node/drupal.node'),
@@ -115,11 +115,12 @@ class ProductForm extends ContentEntityForm {
       '#optional' => TRUE,
     );
 
+    $current_user = $this->currentUser();
     $form['revision'] = array(
       '#type' => 'checkbox',
       '#title' => t('Create new revision'),
       '#default_value' => $product->type->entity->isNewRevision(),
-      '#access' => $current_user->hasPermission('administer nodes'),
+      '#access' => $current_user->hasPermission('administer products'),
       '#group' => 'revision_information',
     );
 
@@ -317,16 +318,14 @@ class ProductForm extends ContentEntityForm {
   }
 
   /**
-   * {@inheritdoc}
-   *
-   * Updates the node object by processing the submitted values.
+   * Updates the product object by processing the submitted values.
    *
    * This function can be called by a "Next" button of a wizard to update the
    * form state's entity with the current step's values before proceeding to the
    * next step.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Build the node object from the submitted values.
+    // Build the product object from the submitted values.
     parent::submitForm($form, $form_state);
     $product = $this->entity;
 
