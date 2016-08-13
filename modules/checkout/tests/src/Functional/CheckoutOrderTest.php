@@ -41,7 +41,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   public static $modules = ['system', 'field', 'user', 'text',
     'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
     'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
-    'commerce_checkout', 'commerce_order',
+    'commerce_checkout', 'commerce_order', 'views_ui',
   ];
 
   /**
@@ -138,6 +138,16 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer checkout flows',
+      'administer views',
+    ], parent::getAdministratorPermissions());
+  }
+
+  /**
    * Tests than an order can go through checkout steps.
    */
   public function testGuestOrderCheckout() {
@@ -147,6 +157,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
     $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextNotContains('Order Summary');
     $this->submitForm([], 'Continue as Guest');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
@@ -158,8 +169,35 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+  }
+
+  /**
+   * Tests the order summary.
+   */
+  public function testOrderSummary() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+
+    // Test the default settings: ensure the default view is shown.
+    $this->drupalGet('/checkout/1');
+    $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
+
+    // Disable the order summary.
+    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
+    $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
+    $this->drupalGet('/checkout/1');
+    $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
+
+    // Use a different view for the order summary.
+    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
+    $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
+    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
+    $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
+    $this->drupalGet('/checkout/1');
+    $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
   }
 
 }
