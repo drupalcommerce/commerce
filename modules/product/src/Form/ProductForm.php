@@ -105,12 +105,6 @@ class ProductForm extends ContentEntityForm {
       '#title' => t('Revision information'),
       // Open by default when "Create new revision" is checked.
       '#open' => $product->isNewRevision(),
-      '#attributes' => array(
-        'class' => array('product-form-revision-information'),
-      ),
-      '#attached' => array(
-        'library' => array('node/drupal.node'),
-      ),
       '#weight' => 20,
       '#optional' => TRUE,
     );
