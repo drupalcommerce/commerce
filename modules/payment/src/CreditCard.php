@@ -233,6 +233,24 @@ final class CreditCard {
   }
 
   /**
+   * Calculates the unix timestamp for a credit card expiration date.
+   *
+   * @param string $month
+   *   The 1 or 2-digit numeric representation of the month, i.e. 1, 6, 12.
+   * @param string $year
+   *   The 4-digit numeric representation of the year, i.e. 2010.
+   *
+   * @return int
+   *   The expiration date as a unix timestamp.
+   */
+  public static function calculateExpirationTimestamp($month, $year) {
+    // Credit cards expire on the last day of the month.
+    $month_start = strtotime($year . '-' . $month . '-01');
+    $last_day = date('t', $month_start);
+    return strtotime($year . '-' . $month . '-' . $last_day);
+  }
+
+  /**
    * Validates the given credit card security code.
    *
    * @param string $security_code

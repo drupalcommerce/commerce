@@ -69,6 +69,16 @@ class CreditCardTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @covers ::calculateExpirationTimestamp
+   */
+  public function testCalculateExpirationTimestamp() {
+    $timestamp = CreditCard::calculateExpirationTimestamp(12, 2012);
+    $date = date('Y-m-d H:i:s', $timestamp);
+    $expected_date = date('2012-12-31 00:00:00');
+    $this->assertEquals($expected_date, $date);
+  }
+
+  /**
    * @covers ::validateSecurityCode
    * @dataProvider securityCodeProvider
    */
