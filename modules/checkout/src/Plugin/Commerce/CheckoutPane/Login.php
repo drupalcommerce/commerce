@@ -197,7 +197,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#title' => $this->t('Password'),
       '#size' => 60,
     ];
-    // @todo Add a "forgotten password" link.
     $pane_form['returning_customer']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Log in'),
@@ -243,8 +242,11 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $values = $form_state->getValue($pane_form['#parents']);
     $username = $values['returning_customer']['name'];
     $password = trim($values['returning_customer']['password']);
+    // Setting url for "forgotten password" link in the error message.
+    $route_parameters = !empty($username) ? ['name' => $username] : [];
+    $route = Url::fromRoute('user.pass', [], ['query' => $route_parameters])->toString();
     if (empty($username) || empty($password)) {
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+      $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $route]));
       return;
     }
     if (user_is_blocked($username)) {
@@ -265,7 +267,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     $uid = $this->userAuth->authenticate($username, $password);
     if (!$uid) {
       $this->credentialsCheckFlood->register($this->clientIp, $username);
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+      $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $route]));
     }
     $form_state->set('logged_in_uid', $uid);
   }
