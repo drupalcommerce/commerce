@@ -4,15 +4,15 @@
  */
 
 .credit-card-form__expiration {
-    display: flex;
+  display: flex;
 }
 .credit-card-form__expiration .form-item {
-    display: inline-block;
-    margin-bottom: 0;
-    margin-top: 0;
-    vertical-align: middle;
+  display: inline-block;
+  margin-bottom: 0;
+  margin-top: 0;
+  vertical-align: middle;
 }
 .credit-card-form__divider {
-    display: inline-block;
-    margin: 1.6em 0.5em 0 0.5em;
+  display: inline-block;
+  margin: 1.6em 0.5em 0 0.5em;
 }

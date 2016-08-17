@@ -52,6 +52,15 @@ final class CreditCard {
         'label' => new TranslatableMarkup('MasterCard'),
         'number_prefixes' => ['51-55', '222100-272099'],
       ],
+      'maestro' => [
+        'id' => 'maestro',
+        'label' => new TranslatableMarkup('Maestro'),
+        'number_prefixes' => [
+          '5018', '5020', '5038', '5612', '5893', '6304',
+          '6759', '6761', '6762', '6763', '0604', '6390',
+        ],
+        'number_lengths' => [12, 13, 14, 15, 16, 17, 18, 19],
+      ],
       'amex' => [
         'id' => 'amex',
         'label' => new TranslatableMarkup('American Express'),
@@ -82,15 +91,6 @@ final class CreditCard {
         'number_prefixes' => ['62', '88'],
         'number_lengths' => [16, 17, 18, 19],
         'uses_luhn' => FALSE,
-      ],
-      'maestro' => [
-        'id' => 'maestro',
-        'label' => new TranslatableMarkup('Maestro'),
-        'number_prefixes' => [
-          '5018', '5020', '5038', '5612', '5893', '6304',
-          '6759', '6761', '6762', '6763', '0604', '6390',
-        ],
-        'number_lengths' => [12, 13, 14, 15, 16, 17, 18, 19],
       ],
     ];
     foreach ($definitions as $id => $definition) {
