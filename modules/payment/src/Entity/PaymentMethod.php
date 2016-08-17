@@ -125,7 +125,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function setBillingProfile(ProfileInterface $profile) {
-    $this->set('billing_profile', $profile->id());
+    $this->set('billing_profile', $profile);
     return $this;
   }
 
@@ -139,8 +139,8 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
-  public function setBillingProfileId($billingProfileId) {
-    $this->set('billing_profile', $billingProfileId);
+  public function setBillingProfileId($billing_profile_id) {
+    $this->set('billing_profile', $billing_profile_id);
     return $this;
   }
 
@@ -172,6 +172,13 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   public function setDefault($default) {
     $this->set('is_default', $default);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isExpired() {
+    return REQUEST_TIME >= $this->get('expires')->value;
   }
 
   /**
@@ -261,16 +268,17 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
 
     $fields['expires'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Expires'))
-      ->setDescription(t('The time when the payment authorization expires.'))
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDescription(t('The time when the payment method expires. 0 for never.'))
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDefaultValue(0);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time when the payment was created.'));
+      ->setDescription(t('The time when the payment method was created.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the payment was last edited.'));
+      ->setDescription(t('The time when the payment method was last edited.'));
 
     return $fields;
   }

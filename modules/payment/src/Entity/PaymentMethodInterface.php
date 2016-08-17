@@ -67,12 +67,12 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
   /**
    * Sets the billing profile ID.
    *
-   * @param int $billingProfileId
+   * @param int $billing_profile_id
    *   The billing profile ID.
    *
    * @return $this
    */
-  public function setBillingProfileId($billingProfileId);
+  public function setBillingProfileId($billing_profile_id);
 
   /**
    * Gets whether the payment method is reusable.
@@ -109,6 +109,14 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
    * @return $this
    */
   public function setDefault($default);
+
+  /**
+   * Gets whether the payment method has expired.
+   *
+   * @return bool
+   *   TRUE if the payment method has expired, FALSE otherwise.
+   */
+  public function isExpired();
 
   /**
    * Gets the payment method expiration timestamp.
