@@ -1,0 +1,5 @@
+payment_method_form:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_payment.payment_method_form.css: {}

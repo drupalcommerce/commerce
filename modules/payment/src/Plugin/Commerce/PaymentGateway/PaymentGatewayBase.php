@@ -52,6 +52,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     foreach ($this->pluginDefinition['payment_method_types'] as $plugin_id) {
       $this->paymentMethodTypes[$plugin_id] = $payment_method_type_manager->createInstance($plugin_id);
     }
+    $this->pluginDefinition['forms'] += $this->getDefaultForms();
     $this->setConfiguration($configuration);
   }
 
@@ -66,6 +67,24 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.commerce_payment_method_type')
     );
+  }
+
+  /**
+   * Gets the default payment gateway forms.
+   *
+   * @return array
+   *   A list of plugin form classes keyed by operation.
+   */
+  protected function getDefaultForms() {
+    $default_forms = [];
+    if ($this instanceof SupportsStoredPaymentMethodsInterface) {
+      $default_forms['add-payment-method'] = 'Drupal\commerce_payment\PluginForm\PaymentMethodAddForm';
+    }
+    if ($this instanceof SupportsUpdatingStoredPaymentMethodsInterface) {
+      $default_forms['edit-payment-method'] = 'Drupal\commerce_payment\PluginForm\PaymentMethodEditForm';
+    }
+
+    return $default_forms;
   }
 
   /**
