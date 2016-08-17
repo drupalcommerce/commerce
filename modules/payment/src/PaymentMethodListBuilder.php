@@ -58,7 +58,13 @@ class PaymentMethodListBuilder extends EntityListBuilder {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $entity */
     $expires = $entity->getExpiresTime();
 
-    $row['label'] = $entity->label();
+    $row['label']['data'] = [
+      '#markup' => $entity->label(),
+    ];
+    if ($entity->bundle() == 'credit_card') {
+      $icon = 'payment-method-icon--' . $entity->card_type->value;
+      $row['label']['data']['#prefix'] = '<span class="payment-method-icon ' . $icon . '"></span>';
+    }
     $row['expires']['data'] = [
       '#markup' => $expires ? date('n/Y', $expires) : $this->t('Never'),
     ];
@@ -67,6 +73,15 @@ class PaymentMethodListBuilder extends EntityListBuilder {
     }
 
     return $row + parent::buildRow($entity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $build = parent::render();
+    $build['#attached']['library'][] = 'commerce_payment/payment_method_icons';
+    return $build;
   }
 
   /**

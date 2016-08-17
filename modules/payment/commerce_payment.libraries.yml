@@ -3,3 +3,9 @@ payment_method_form:
   css:
     theme:
       css/commerce_payment.payment_method_form.css: {}
+
+payment_method_icons:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_payment.payment_method_icons.css: {}
