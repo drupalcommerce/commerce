@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_payment_test
+id: testing
+label: Gateway Testing
+weight: null
+plugin: gateway_testing
+configuration:
+  api_key: testing_key
+  mode: test
+  payment_method_types:
+    - dummy
