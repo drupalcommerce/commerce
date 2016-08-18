@@ -49,6 +49,21 @@ class OrderTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\state_machine\WorkflowManager $workflow_manager */
+    $workflow_manager = \Drupal::service('plugin.manager.workflow');
+    /** @var \Drupal\state_machine\Plugin\Workflow\WorkflowInterface $workflow */
+    $workflow = $workflow_manager->createInstance($form_state->getValue('workflow'));
+    if (!$workflow->getTransition('place')) {
+      $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Place" transition.', [
+        '@workflow' => $workflow->getLabel(),
+      ]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
     drupal_set_message($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
