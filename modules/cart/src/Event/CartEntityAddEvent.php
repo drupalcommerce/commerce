@@ -78,7 +78,7 @@ class CartEntityAddEvent extends Event {
    *   The added entity.
    */
   public function getEntity() {
-    return $this->cart;
+    return $this->entity;
   }
 
   /**
