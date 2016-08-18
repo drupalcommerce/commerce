@@ -47,14 +47,14 @@ class CartEntityAddEvent extends Event {
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   * @param \Drupal\commerce\PurchasableEntityInterface|NULL $entity
    *   The added entity.
    * @param float $quantity
    *   The quantity.
    * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
    *   The destination line item.
    */
-  public function __construct(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity, LineItemInterface $line_item) {
+  public function __construct(OrderInterface $cart, PurchasableEntityInterface $entity = NULL, $quantity, LineItemInterface $line_item) {
     $this->cart = $cart;
     $this->entity = $entity;
     $this->quantity = $quantity;
