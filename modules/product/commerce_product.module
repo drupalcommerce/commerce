@@ -14,7 +14,6 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductType;
-use Drupal\commerce_product\Entity\ProductVariation;
 
 /**
  * Implements hook_config_translation_info_alter().

@@ -88,7 +88,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
 
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $payment_method = $this->order->payment_method->entity;
-    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface && $payment_method && FALSE) {
+    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface && $payment_method) {
       $view_builder = $this->entityTypeManager->getViewBuilder('commerce_payment_method');
       $payment_method_view = $view_builder->view($payment_method, 'default');
       $summary = $this->renderer->render($payment_method_view);

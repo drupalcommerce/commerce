@@ -276,6 +276,11 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
         'weight' => 0,
         'settings' => [],
       ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'entity_reference_entity_view',
+        'weight' => 2,
+      ])
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['reusable'] = BaseFieldDefinition::create('boolean')
@@ -292,6 +297,15 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
     $fields['expires'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Expires'))
       ->setDescription(t('The time when the payment method expires. 0 for never.'))
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 1,
+        'settings' => [
+          'date_format' => 'custom',
+          'custom_date_format' => 'n/Y',
+        ],
+      ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDefaultValue(0);
 
