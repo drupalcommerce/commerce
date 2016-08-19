@@ -2,13 +2,14 @@
 
 namespace Drupal\commerce_order\Entity;
 
+use Drupal\commerce_order\AdjustableInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Defines the interface for line items.
  */
-interface LineItemInterface extends EntityChangedInterface, ContentEntityInterface {
+interface LineItemInterface extends EntityChangedInterface, ContentEntityInterface, AdjustableInterface {
 
   /**
    * Gets the parent order.

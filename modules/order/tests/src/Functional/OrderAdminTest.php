@@ -76,11 +76,18 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->submitForm($edit, 'Update line item');
     $edit = [
       'billing_profile' => $this->billingProfile->id(),
+      'adjustments[0][type]' => 'order_adjustment',
+      'adjustments[0][definition][label]' => 'Test fee',
+      'adjustments[0][definition][amount][amount]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
 
     $order_number = $this->getSession()->getPage()->find('css', 'tr td.views-field-order-number');
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
+
+    $order = Order::load(1);
+    $this->assertEquals(1, count($order->getLineItems()));
+    $this->assertEquals(5.33, $order->total_price->amount);
   }
 
   /**
