@@ -2,9 +2,11 @@
 
 namespace Drupal\Tests\commerce_order\Kernel\Entity;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\LineItem;
 use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_price\Price;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\profile\Entity\Profile;
 
@@ -51,6 +53,8 @@ class OrderTest extends KernelTestBase {
   }
 
   /**
+   * Tests the order entity and its methods.
+   *
    * @covers ::getState
    * @covers ::getOrderNumber
    * @covers ::setOrderNumber
@@ -70,6 +74,10 @@ class OrderTest extends KernelTestBase {
    * @covers ::setBillingProfileId
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
+   * @covers ::recalculateTotalPrice
+   * @covers ::addAdjustment
+   * @covers ::setAdjustments
+   * @covers ::getAdjustments
    */
   public function testOrder() {
     // @todo Test the store and owner getters/setters as well.
@@ -157,6 +165,31 @@ class OrderTest extends KernelTestBase {
 
     $order->setCreatedTime('635879700');
     $this->assertEquals('635879700', $order->getCreatedTime('635879700'));
+
+    $order->setLineItems([]);
+    $order->addAdjustment(new Adjustment([
+      'type' => 'discount',
+      'label' => '10% off',
+      'amount' => new Price(-1.00, 'USD'),
+      'source_id' => '1',
+    ]));
+    $order->addAdjustment(new Adjustment([
+      'type' => 'order_adjustment',
+      'label' => 'Random fee',
+      'amount' => new Price(10.00, 'USD'),
+      'source_id' => '',
+    ]));
+    $this->assertEquals(9, $order->total_price->amount);
+
+    $adjustments = $order->getAdjustments();
+    $this->assertEquals(2, count($adjustments));
+
+    foreach ($adjustments as $adjustment) {
+      $order->removeAdjustment($adjustment);
+    }
+    $this->assertEquals(0, $order->total_price->amount);
+    $order->setAdjustments($adjustments);
+    $this->assertEquals(9, $order->total_price->amount);
   }
 
 }
