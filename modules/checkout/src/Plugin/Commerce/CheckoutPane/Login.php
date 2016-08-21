@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Provides the login or continue pane.
+ * Provides the login pane.
  *
  * @CommerceCheckoutPane(
  *   id = "login",
@@ -307,8 +307,12 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
         $name_element = $pane_form['returning_customer']['name'];
         $username = $values['returning_customer']['name'];
         $password = trim($values['returning_customer']['password']);
+        // Generate the "reset password" url.
+        $query = !empty($username) ? ['name' => $username] : [];
+        $password_url = Url::fromRoute('user.pass', [], ['query' => $query])->toString();
+
         if (empty($username) || empty($password)) {
-          $form_state->setError($pane_form['returning_customer'], $this->t('Unrecognized username or password.'));
+          $form_state->setError($pane_form['returning_customer'], $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
           return;
         }
         if (user_is_blocked($username)) {
@@ -329,7 +333,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
         $uid = $this->userAuth->authenticate($username, $password);
         if (!$uid) {
           $this->credentialsCheckFlood->register($this->clientIp, $username);
-          $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+          $form_state->setError($name_element, $this->t('Unrecognized username or password. <a href=":url">Have you forgotten your password?</a>', [':url' => $password_url]));
         }
         $form_state->set('logged_in_uid', $uid);
         break;
