@@ -1,0 +1,7 @@
+commerce_redirect_test.throw_form:
+  path: '/commerce_redirect_test/throw_form'
+  defaults:
+    _form: '\Drupal\commerce_redirect_test\Form\RedirectTestForm'
+    _title: 'Form with immediate redirect.'
+  requirements:
+    _access: 'TRUE'

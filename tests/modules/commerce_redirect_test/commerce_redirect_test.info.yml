@@ -1,0 +1,7 @@
+name: 'Commerce redirect test'
+type: module
+description: 'Module for testing redirect exceptions and subscriber.'
+package: Testing
+core: 8.x
+dependencies:
+  - commerce
