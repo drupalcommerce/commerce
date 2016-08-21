@@ -1,0 +1,7 @@
+commerce_test.redirect_form:
+  path: '/commerce_test/redirect_form'
+  defaults:
+    _form: '\Drupal\commerce_test\Form\RedirectForm'
+    _title: 'Redirect form.'
+  requirements:
+    _access: 'TRUE'
