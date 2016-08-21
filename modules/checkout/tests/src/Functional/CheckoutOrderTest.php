@@ -175,6 +175,88 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests that you can register from the checkout pane.
+   */
+  public function testRegisterOrderCheckout() {
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
+    $config->set('configuration.panes.login.allow_registration', TRUE);
+    $config->save();
+
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextContains('New Customer');
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Billing information');
+
+    // Test account validation.
+    $this->drupalLogout();
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextContains('New Customer');
+
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => '',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Email field is required.');
+
+    $this->submitForm([
+      'login[register][name]' => '',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Username field is required.');
+
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => '',
+      'login[register][password][pass2]' => '',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('Password field is required.');
+
+    $this->submitForm([
+      'login[register][name]' => 'User name double email',
+      'login[register][mail]' => 'guest@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('The email address guest@example.com is already taken.');
+
+    $this->submitForm([
+      'login[register][name]' => 'User @#.``^ ù % name invalid',
+      'login[register][mail]' => 'guest2@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('The username contains an illegal character.');
+
+    $this->submitForm([
+      'login[register][name]' => 'User name',
+      'login[register][mail]' => 'guest2@example.com',
+      'login[register][password][pass1]' => 'pass',
+      'login[register][password][pass2]' => 'pass',
+    ], 'Create account and continue');
+    $this->assertSession()->pageTextContains('The username User name is already taken.');
+  }
+
+  /**
    * Tests the order summary.
    */
   public function testOrderSummary() {

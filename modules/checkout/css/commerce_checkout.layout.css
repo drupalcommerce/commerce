@@ -11,7 +11,8 @@
   box-sizing: border-box;
 }
 
-.form-wrapper__returning-customer input:not([type="submit"]) {
+.form-wrapper__login-option input:not([type="submit"]):not([type="password"]),
+.form-wrapper__returning-customer input[type="password"]{
   width: 100%;
 }
 

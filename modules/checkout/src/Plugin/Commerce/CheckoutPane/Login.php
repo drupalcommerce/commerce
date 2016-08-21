@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 use Drupal\user\UserAuthInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -114,6 +115,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   public function defaultConfiguration() {
     return [
       'allow_guest_checkout' => TRUE,
+      'allow_registration' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -125,7 +127,13 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       $summary = $this->t('Guest checkout: Allowed');
     }
     else {
-      $summary = $this->t('Guest checkout: Not allowed');
+      $summary = $this->t('Guest checkout: Not allowed') . '<br>';
+      if (!empty($this->configuration['allow_registration'])) {
+        $summary .= $this->t('Registration: Allowed');
+      }
+      else {
+        $summary .= $this->t('Registration: Not allowed');
+      }
     }
 
     return $summary;
@@ -141,6 +149,16 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#title' => $this->t('Allow guest checkout'),
       '#default_value' => $this->configuration['allow_guest_checkout'],
     ];
+    $form['allow_registration'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow registration'),
+      '#default_value' => $this->configuration['allow_registration'],
+      '#states' => [
+        'visible' => [
+          ':input[name="configuration[panes][login][configuration][allow_guest_checkout]"]' => ['checked' => FALSE],
+        ],
+      ],
+    ];
 
     return $form;
   }
@@ -154,6 +172,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['allow_guest_checkout'] = !empty($values['allow_guest_checkout']);
+      $this->configuration['allow_registration'] = !empty($values['allow_registration']);
     }
   }
 
@@ -197,11 +216,14 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#title' => $this->t('Password'),
       '#size' => 60,
     ];
-    // @todo Add a "forgotten password" link.
     $pane_form['returning_customer']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Log in'),
       '#op' => 'login',
+    ];
+    $pane_form['returning_customer']['forgot_password'] = [
+      '#type' => 'markup',
+      '#markup' => Link::createFromRoute($this->t('Forgot password?'), 'user.pass')->toString(),
     ];
 
     $pane_form['guest'] = [
@@ -226,6 +248,48 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       '#op' => 'continue',
     ];
 
+    $pane_form['register'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('New Customer'),
+      '#access' => $this->configuration['allow_registration'],
+      '#attributes' => [
+        'class' => [
+          'form-wrapper__login-option',
+          'form-wrapper__guest-checkout',
+        ],
+      ],
+    ];
+    $pane_form['register']['mail'] = [
+      '#type' => 'email',
+      '#title' => $this->t('Email address'),
+      '#required' => FALSE,
+    ];
+    $pane_form['register']['name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Username'),
+      '#maxlength' => USERNAME_MAX_LENGTH,
+      '#description' => $this->t("Several special characters are allowed, including space, period (.), hyphen (-), apostrophe ('), underscore (_), and the @ sign."),
+      '#required' => FALSE,
+      '#attributes' => [
+        'class' => ['username'],
+        'autocorrect' => 'off',
+        'autocapitalize' => 'off',
+        'spellcheck' => 'false',
+      ],
+      '#default_value' => '',
+    ];
+    $pane_form['register']['password'] = [
+      '#type' => 'password_confirm',
+      '#size' => 60,
+      '#description' => $this->t('Provide a password for the new account in both fields.'),
+      '#required' => FALSE,
+    ];
+    $pane_form['register']['register'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Create account and continue'),
+      '#op' => 'register',
+    ];
+
     return $pane_form;
   }
 
@@ -233,41 +297,81 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $triggering_element = $form_state->getTriggeringElement();
-    if ($triggering_element['#op'] == 'continue') {
-      // No login in progress, nothing to validate.
-      return;
-    }
-
-    $name_element = $pane_form['returning_customer']['name'];
     $values = $form_state->getValue($pane_form['#parents']);
-    $username = $values['returning_customer']['name'];
-    $password = trim($values['returning_customer']['password']);
-    if (empty($username) || empty($password)) {
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
-      return;
-    }
-    if (user_is_blocked($username)) {
-      $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
-      return;
-    }
-    if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
-      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      return;
-    }
-    elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
-      $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      return;
-    }
+    $triggering_element = $form_state->getTriggeringElement();
+    switch ($triggering_element['#op']) {
+      case 'continue':
+        return;
 
-    $uid = $this->userAuth->authenticate($username, $password);
-    if (!$uid) {
-      $this->credentialsCheckFlood->register($this->clientIp, $username);
-      $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+      case 'login':
+        $name_element = $pane_form['returning_customer']['name'];
+        $username = $values['returning_customer']['name'];
+        $password = trim($values['returning_customer']['password']);
+        if (empty($username) || empty($password)) {
+          $form_state->setError($pane_form['returning_customer'], $this->t('Unrecognized username or password.'));
+          return;
+        }
+        if (user_is_blocked($username)) {
+          $form_state->setError($name_element, $this->t('The username %name has not been activated or is blocked.', ['%name' => $username]));
+          return;
+        }
+        if (!$this->credentialsCheckFlood->isAllowedHost($this->clientIp)) {
+          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          return;
+        }
+        elseif (!$this->credentialsCheckFlood->isAllowedAccount($this->clientIp, $username)) {
+          $form_state->setErrorByName($name_element, $this->t('Too many failed login attempts for this account. It is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')]));
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          return;
+        }
+
+        $uid = $this->userAuth->authenticate($username, $password);
+        if (!$uid) {
+          $this->credentialsCheckFlood->register($this->clientIp, $username);
+          $form_state->setErrorByName('name', $this->t('Unrecognized username or password.'));
+        }
+        $form_state->set('logged_in_uid', $uid);
+        break;
+
+      case 'register':
+        $email = $values['register']['mail'];
+        $username = $values['register']['name'];
+        $password = trim($values['register']['password']);
+        if (empty($email)) {
+          $form_state->setError($pane_form['register']['mail'], $this->t('Email field is required.'));
+          return;
+        }
+        if (empty($username)) {
+          $form_state->setError($pane_form['register']['name'], $this->t('Username field is required.'));
+          return;
+        }
+        if (empty($password)) {
+          $form_state->setError($pane_form['register']['password'], $this->t('Password field is required.'));
+          return;
+        }
+
+        /** @var \Drupal\user\UserInterface $account */
+        $account = $this->entityTypeManager->getStorage('user')->create([
+          'mail' => $email,
+          'name' => $username,
+          'pass' => $password,
+          'status' => TRUE,
+        ]);
+        // Validate the entity. This will ensure that the username and email
+        // are in the right format and not already taken.
+        $violations = $account->validate();
+        foreach ($violations->getByFields(['name', 'mail']) as $violation) {
+          list($field_name) = explode('.', $violation->getPropertyPath(), 2);
+          $form_state->setError($pane_form['register'][$field_name], $violation->getMessage());
+        }
+
+        if (!$form_state->hasAnyErrors()) {
+          $account->save();
+          $form_state->set('logged_in_uid', $account->id());
+        }
+        break;
     }
-    $form_state->set('logged_in_uid', $uid);
   }
 
   /**
@@ -275,12 +379,19 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
-    if ($triggering_element['#op'] == 'login') {
-      $storage = $this->entityTypeManager->getStorage('user');
-      $account = $storage->load($form_state->get('logged_in_uid'));
-      user_login_finalize($account);
-      $this->order->setOwner($account);
-      $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
+    switch ($triggering_element['#op']) {
+      case 'continue':
+        break;
+
+      case 'login':
+      case 'register':
+        $storage = $this->entityTypeManager->getStorage('user');
+        /** @var \Drupal\user\UserInterface $account */
+        $account = $storage->load($form_state->get('logged_in_uid'));
+        user_login_finalize($account);
+        $this->order->setOwner($account);
+        $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
+        break;
     }
 
     $form_state->setRedirect('commerce_checkout.form', [
