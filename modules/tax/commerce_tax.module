@@ -31,7 +31,7 @@ function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
       ->setLabel(t('Tax registrations'))
       ->setDescription(t('The countries where the store is additionally registered to collect taxes.'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store','getAvailableCountries'])
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getAvailableCountries'])
       ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 4,
