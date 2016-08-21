@@ -4,7 +4,9 @@ namespace Drupal\Tests\commerce_product\Kernel\Entity;
 
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_store\Entity\Store;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Tests the Product entity.
@@ -27,16 +29,98 @@ class ProductTest extends KernelTestBase {
   ];
 
   /**
+   * A sample store.
+   *
+   * @var \Drupal\commerce_store\Entity\StoreInterface
+   */
+  protected $store;
+
+  /**
+   * A sample user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
 
+    $this->installSchema('system', ['sequences']);
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_type');
+    $this->installEntitySchema('commerce_store');
+    $this->installEntitySchema('user');
     $this->installConfig(['commerce_product']);
+    $this->installConfig(['commerce_store']);
+
+    $store = Store::create([
+      'type' => 'default',
+      'name' => 'Sample store',
+    ]);
+    $store->save();
+    $this->store = Store::load($store->id());
+
+    $user = User::create([
+      'name' => $this->randomMachineName(),
+    ]);
+    $user->save();
+    $this->user = User::load($user->id());
+  }
+
+  /**
+   * @covers ::getTitle
+   * @covers ::setTitle
+   * @covers ::isPublished
+   * @covers ::setPublished
+   * @covers ::getCreatedTime
+   * @covers ::setCreatedTime
+   * @covers ::getStores
+   * @covers ::setStores
+   * @covers ::getStoreIds
+   * @covers ::setStoreIds
+   * @covers ::getOwner
+   * @covers ::setOwner
+   * @covers ::getOwnerId
+   * @covers ::setOwnerId
+   */
+  public function testProduct() {
+    $product = Product::create([
+      'type' => 'default',
+    ]);
+    $product->save();
+
+    $product->setTitle('My title');
+    $this->assertEquals('My title', $product->getTitle());
+
+    $this->assertEquals(TRUE, $product->isPublished());
+    $product->setPublished(FALSE);
+    $this->assertEquals(FALSE, $product->isPublished());
+
+    $product->setCreatedTime(635879700);
+    $this->assertEquals(635879700, $product->getCreatedTime());
+
+    $product->setStores([$this->store]);
+    $this->assertEquals([$this->store], $product->getStores());
+    $this->assertEquals([$this->store->id()], $product->getStoreIds());
+    $product->setStores([]);
+    $this->assertEquals([], $product->getStores());
+    $product->setStoreIds([$this->store->id()]);
+    $this->assertEquals([$this->store], $product->getStores());
+    $this->assertEquals([$this->store->id()], $product->getStoreIds());
+
+    $product->setOwner($this->user);
+    $this->assertEquals($this->user, $product->getOwner());
+    $this->assertEquals($this->user->id(), $product->getOwnerId());
+    $product->setOwnerId(0);
+    $this->assertEquals(NULL, $product->getOwner());
+    $product->setOwnerId($this->user->id());
+    $this->assertEquals($this->user, $product->getOwner());
+    $this->assertEquals($this->user->id(), $product->getOwnerId());
   }
 
   /**
@@ -49,7 +133,7 @@ class ProductTest extends KernelTestBase {
    * @covers ::hasVariation
    * @covers ::getDefaultVariation
    */
-  public function testGetDefaultVariation() {
+  public function testVariationMethods() {
     $variation1 = ProductVariation::create([
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),

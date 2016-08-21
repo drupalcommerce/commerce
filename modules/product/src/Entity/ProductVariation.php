@@ -182,15 +182,15 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    $this->get('uid')->target_id;
-    return $this;
+    return $this->get('uid')->target_id;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setOwnerId($uid) {
-    return $this->set('uid', $uid);
+    $this->set('uid', $uid);
+    return $this;
   }
 
   /**
