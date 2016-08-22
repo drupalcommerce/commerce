@@ -19,7 +19,7 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
       'variables' => [
         'icon' => NULL,
         'count' => NULL,
-        'item_text' => 'items',
+        'count_text' => '',
         'content' => NULL,
         'url' => NULL,
         'links' => [],

@@ -74,7 +74,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function defaultConfiguration() {
     return [
-      'item_text' => $this->t('items'),
       'dropdown' => TRUE,
     ];
   }
@@ -83,12 +82,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $form['commerce_cart_item_text'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Items text'),
-      '#default_value' => $this->configuration['item_text'],
-      '#description' => $this->t('Shown after the number. Defaults to "items"'),
-    ];
     $form['commerce_cart_dropdown'] = [
       '#type' => 'radios',
       '#title' => $this->t('Display cart contents in a dropdown'),
@@ -106,7 +99,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->configuration['item_text'] = $form_state->getValue('commerce_cart_item_text');
     $this->configuration['dropdown'] = $form_state->getValue('commerce_cart_dropdown');
   }
 
@@ -153,7 +145,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
         '#alt' => $this->t('Shopping cart'),
       ],
       '#count' => $count,
-      '#item_text' => $this->configuration['item_text'],
+      '#count_text' => $this->formatPlural($count, '@count item', '@count items'),
       '#url' => Url::fromRoute('commerce_cart.page')->toString(),
       '#content' => $cart_views,
       '#links' => $links,
