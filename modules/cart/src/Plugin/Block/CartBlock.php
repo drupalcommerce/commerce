@@ -7,6 +7,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -74,7 +75,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function defaultConfiguration() {
     return [
-      'item_text' => $this->t('items'),
+      'item_text' => 'item' . PluralTranslatableMarkup::DELIMITER . 'items',
       'dropdown' => TRUE,
     ];
   }
@@ -83,12 +84,42 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $form['commerce_cart_item_text'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Items text'),
-      '#default_value' => $this->configuration['item_text'],
-      '#description' => $this->t('Shown after the number. Defaults to "items"'),
-    ];
+    $plural_array = explode(
+      PluralTranslatableMarkup::DELIMITER,
+      $this->configuration['item_text']
+    );
+    $plurals = $this->getNumberOfPlurals();
+    for ($i = 0; $i < $plurals; $i++) {
+      $form['commerce_cart_item_text'][$i] = array(
+        '#type' => 'textfield',
+        // @todo Should use better labels https://www.drupal.org/node/2499639
+        '#title' => ($i == 0 ? $this->t('Singular form') : $this->formatPlural(
+          $i,
+          'First plural form',
+          '@count. plural form'
+        )),
+        '#default_value' => isset($plural_array[$i]) ? $plural_array[$i] : '',
+        '#description' => $this->t(
+          'Text to use for this variant, shown after the number.'
+        ),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="options[format_plural]"]' => array('checked' => TRUE),
+          ),
+        ),
+      );
+    }
+    if ($plurals == 2) {
+      // Simplify interface text for the most common case.
+      $form['commerce_cart_item_text'][0]['#description'] = $this->t(
+        'Text to use for the singular form, shown after the number.'
+      );
+      $form['commerce_cart_item_text'][1]['#title'] = $this->t('Plural form');
+      $form['commerce_cart_item_text'][1]['#description'] = $this->t(
+        'Text to use for the plural form, shown after the number.'
+      );
+    }
+
     $form['commerce_cart_dropdown'] = [
       '#type' => 'radios',
       '#title' => $this->t('Display cart contents in a dropdown'),
@@ -106,7 +137,10 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->configuration['item_text'] = $form_state->getValue('commerce_cart_item_text');
+    $this->configuration['item_text'] = implode(
+      PluralTranslatableMarkup::DELIMITER,
+      $form_state->getValue('commerce_cart_item_text')
+    );
     $this->configuration['dropdown'] = $form_state->getValue('commerce_cart_dropdown');
   }
 
@@ -153,7 +187,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
         '#alt' => $this->t('Shopping cart'),
       ],
       '#count' => $count,
-      '#item_text' => $this->configuration['item_text'],
+      '#item_text' => PluralTranslatableMarkup::createFromTranslatedString($count, $this->configuration['item_text']),
       '#url' => Url::fromRoute('commerce_cart.page')->toString(),
       '#content' => $cart_views,
       '#links' => $links,
