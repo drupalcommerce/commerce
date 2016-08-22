@@ -78,6 +78,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDescription() {
+    return $this->get('description')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->set('description', $description);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOrderTypes() {
     return $this->get('order_types')->referencedEntities();
   }
@@ -236,6 +251,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['description'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Description'))
+      ->setDescription(t('Additional information about the promotion to show to the customer'))
+      ->setTranslatable(TRUE)
+      ->setDefaultValue('')
+      ->setDisplayOptions('form', [
+        'type' => 'string_textarea',
+        'weight' => 1,
+        'settings' => [
+          'rows' => 3,
+        ],
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
