@@ -17,14 +17,12 @@ class PaymentAddForm extends PaymentGatewayFormBase {
     if (!$order) {
       throw new \InvalidArgumentException('Payment entity with no order reference given to PaymentAddForm.');
     }
-    // @todo The order needs a getter for total_price.
-    // @todo Implement a balance method (unpaid portion of the total).
-    $order_total = $order->get('total_price')->first()->toPrice();
 
+    // @todo Implement a balance method (unpaid portion of the total).
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $order_total,
+      '#default_value' => $order->getTotalPrice(),
       '#required' => TRUE,
     ];
     $form['transaction_type'] = [
