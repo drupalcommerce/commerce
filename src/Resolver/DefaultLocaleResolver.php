@@ -42,22 +42,24 @@ class DefaultLocaleResolver implements LocaleResolverInterface {
    * {@inheritdoc}
    */
   public function resolve() {
-    $language = $this->languageManager->getConfigOverrideLanguage()->getId();
-    $language_parts = explode('-', $language);
-    if (count($language_parts) > 1 && strlen(end($language_parts)) == 2) {
+    // The getCurrentLanguage() fallback is a workaround for core bug #2684873.
+    $language = $this->languageManager->getConfigOverrideLanguage() ?: $this->languageManager->getCurrentLanguage();
+    $langcode = $language->getId();
+    $langcode_parts = explode('-', $langcode);
+    if (count($langcode_parts) > 1 && strlen(end($langcode_parts)) == 2) {
       // The current language already has a country component (e.g. 'pt-br'),
       // it qualifies as a full locale.
-      $locale = $language;
+      $locale = $langcode;
     }
     elseif ($country = $this->countryContext->getCountry()) {
       // Assemble the locale using the resolved country. This can result
       // in non-existent combinations such as 'en-RS', it's up to the locale
       // consumers (e.g. the number format repository) to perform fallback.
-      $locale = $language . '-' . $country;
+      $locale = $langcode . '-' . $country;
     }
     else {
       // Worst case scenario, the country is unknown.
-      $locale = $language;
+      $locale = $langcode;
     }
 
     return new Locale($locale);

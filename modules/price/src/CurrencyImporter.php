@@ -55,7 +55,9 @@ class CurrencyImporter implements CurrencyImporterInterface {
    */
   public function getImportable() {
     $imported_currencies = $this->storage->loadMultiple();
-    $langcode = $this->languageManager->getConfigOverrideLanguage()->getId();
+    // The getCurrentLanguage() fallback is a workaround for core bug #2684873.
+    $language = $this->languageManager->getConfigOverrideLanguage() ?: $this->languageManager->getCurrentLanguage();
+    $langcode = $language->getId();
     $all_currencies = $this->externalRepository->getAll($langcode, 'en');
     $importable_currencies = array_diff_key($all_currencies, $imported_currencies);
     $importable_currencies = array_map(function ($currency) {
