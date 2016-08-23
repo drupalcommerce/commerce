@@ -4,15 +4,15 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\AdjustableInterface;
 use Drupal\commerce_store\Entity\EntityStoreInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
 /**
  * Defines the interface for orders.
  */
-interface OrderInterface extends EntityStoreInterface, EntityChangedInterface, EntityInterface, EntityOwnerInterface, AdjustableInterface {
+interface OrderInterface extends AdjustableInterface, ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityStoreInterface {
 
   /**
    * Gets the order number.

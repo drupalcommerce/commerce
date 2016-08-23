@@ -4,13 +4,13 @@ namespace Drupal\commerce_store\Entity;
 
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for stores.
  */
-interface StoreInterface extends EntityInterface, EntityOwnerInterface {
+interface StoreInterface extends ContentEntityInterface, EntityOwnerInterface {
 
   /**
    * Gets the store name.

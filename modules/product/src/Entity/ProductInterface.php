@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for products.
  */
-interface ProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
    * Gets the product title.

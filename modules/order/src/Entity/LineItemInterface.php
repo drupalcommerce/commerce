@@ -9,7 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 /**
  * Defines the interface for line items.
  */
-interface LineItemInterface extends EntityChangedInterface, ContentEntityInterface, AdjustableInterface {
+interface LineItemInterface extends AdjustableInterface, ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Gets the parent order.
