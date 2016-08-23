@@ -14,6 +14,14 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface PurchasableEntityInterface extends ContentEntityInterface {
 
   /**
+   * Gets the stores through which the purchasable entity is sold.
+   *
+   * @return \Drupal\commerce_store\Entity\StoreInterface[]
+   *   The stores.
+   */
+  public function getStores();
+
+  /**
    * Gets the purchasable entity's line item type ID.
    *
    * Used for finding/creating the appropriate line item when purchasing a
@@ -27,7 +35,7 @@ interface PurchasableEntityInterface extends ContentEntityInterface {
   /**
    * Gets the purchasable entity's line item title.
    *
-   * Saved in the $lineItem->title field to protect the line items of
+   * Saved in the $line_item->title field to protect the line items of
    * completed orders against changes in the referenced purchased entity.
    *
    * @return string

@@ -166,8 +166,7 @@ class AddToCartForm extends ContentEntityForm {
    *   The selected store.
    */
   protected function selectStore(PurchasableEntityInterface $entity) {
-    // @todo Add getStores() to the PurchasableEntityInterface.
-    $stores = $entity->getProduct()->getStores();
+    $stores = $entity->getStores();
     if (count($stores) === 1) {
       $store = reset($stores);
     }
