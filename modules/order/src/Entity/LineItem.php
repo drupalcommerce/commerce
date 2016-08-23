@@ -122,43 +122,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTotalPrice() {
-    return $this->get('total_price')->first()->toPrice();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getData() {
-    return $this->get('data')->first()->getValue();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setData($data) {
-    $this->set('data', [$data]);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getAdjustments() {
     return $this->get('adjustments')->getAdjustments();
   }
@@ -187,6 +150,28 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   public function removeAdjustment(Adjustment $adjustment) {
     $this->get('adjustments')->removeAdjustment($adjustment);
     $this->recalculateTotalPrice();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTotalPrice() {
+    return $this->get('total_price')->first()->toPrice();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
     return $this;
   }
 
@@ -288,10 +273,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
-
-    $fields['data'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Data'))
-      ->setDescription(t('A serialized array of additional data.'));
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

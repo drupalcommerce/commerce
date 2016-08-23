@@ -69,86 +69,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    // If no owner has been set explicitly, make the current user the owner.
-    if (!$this->getOwner()) {
-      $this->setOwnerId(\Drupal::currentUser()->id());
-    }
-
-    if ($this->isNew()) {
-      if (!$this->getIpAddress()) {
-        $this->setIpAddress(\Drupal::request()->getClientIp());
-      }
-
-      if (!$this->getEmail()) {
-        $this->setEmail($this->getOwner()->getEmail());
-      }
-    }
-
-    // Recalculate the total.
-    $this->recalculateTotalPrice();
-  }
-
-  /**
-   * Recalculates the line item total price.
-   *
-   * This will update the total price based on line item and adjustment prices.
-   */
-  protected function recalculateTotalPrice() {
-    // @todo Rework this once pricing is finished.
-    $this->total_price->amount = 0;
-    foreach ($this->getLineItems() as $line_item) {
-      $this->total_price->amount += $line_item->total_price->amount;
-      $this->total_price->currency_code = $line_item->total_price->currency_code;
-    }
-
-    foreach ($this->getAdjustments() as $adjustment) {
-      // @todo The price field should have an addPrice method.
-      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
-
-    // If no order number has been set explicitly, set it to the order ID.
-    if (!$this->getOrderNumber()) {
-      $this->setOrderNumber($this->id());
-      $this->save();
-    }
-
-    // Ensure there's a back-reference on each line item.
-    foreach ($this->getLineItems() as $line_item) {
-      if ($line_item->order_id->isEmpty()) {
-        $line_item->order_id = $this->id();
-        $line_item->save();
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    // Delete the line items of a deleted order.
-    $line_items = [];
-    foreach ($entities as $entity) {
-      foreach ($entity->getLineItems() as $line_item) {
-        $line_items[$line_item->id()] = $line_item;
-      }
-    }
-    $line_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
-    $line_item_storage->delete($line_items);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOrderNumber() {
     return $this->get('order_number')->value;
   }
@@ -158,28 +78,6 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function setOrderNumber($order_number) {
     $this->set('order_number', $order_number);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getState() {
-    return $this->get('state')->first();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
     return $this;
   }
 
@@ -216,36 +114,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBillingProfile() {
-    return $this->get('billing_profile')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBillingProfile(ProfileInterface $profile) {
-    $this->set('billing_profile', $profile->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBillingProfileId() {
-    return $this->get('billing_profile')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBillingProfileId($billingProfileId) {
-    $this->set('billing_profile', $billingProfileId);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOwner() {
     return $this->get('uid')->entity;
   }
@@ -270,6 +138,66 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function setOwner(UserInterface $account) {
     $this->set('uid', $account->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEmail() {
+    return $this->get('mail')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setEmail($mail) {
+    $this->set('mail', $mail);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getIpAddress() {
+    return $this->get('ip_address')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setIpAddress($ip_address) {
+    $this->set('ip_address', $ip_address);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBillingProfile() {
+    return $this->get('billing_profile')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBillingProfile(ProfileInterface $profile) {
+    $this->set('billing_profile', $profile->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBillingProfileId() {
+    return $this->get('billing_profile')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBillingProfileId($billingProfileId) {
+    $this->set('billing_profile', $billingProfileId);
     return $this;
   }
 
@@ -346,66 +274,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIpAddress() {
-    return $this->get('ip_address')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setIpAddress($ip_address) {
-    $this->set('ip_address', $ip_address);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEmail() {
-    return $this->get('mail')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setEmail($mail) {
-    $this->set('mail', $mail);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPlacedTime() {
-    return $this->get('placed')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPlacedTime($timestamp) {
-    $this->set('placed', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getData() {
-    return $this->get('data')->first()->getValue();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setData($data) {
-    $this->set('data', [$data]);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getAdjustments() {
     return $this->get('adjustments')->getAdjustments();
   }
@@ -435,6 +303,133 @@ class Order extends ContentEntityBase implements OrderInterface {
     $this->get('adjustments')->removeAdjustment($adjustment);
     $this->recalculateTotalPrice();
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getState() {
+    return $this->get('state')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData() {
+    return $this->get('data')->first()->getValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($data) {
+    $this->set('data', [$data]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPlacedTime() {
+    return $this->get('placed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPlacedTime($timestamp) {
+    $this->set('placed', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    if ($this->isNew()) {
+      if (!$this->getIpAddress()) {
+        $this->setIpAddress(\Drupal::request()->getClientIp());
+      }
+
+      if (!$this->getEmail()) {
+        $this->setEmail($this->getOwner()->getEmail());
+      }
+    }
+
+    $this->recalculateTotalPrice();
+  }
+
+  /**
+   * Recalculates the line item total price.
+   *
+   * This will update the total price based on line item and adjustment prices.
+   */
+  protected function recalculateTotalPrice() {
+    // @todo Rework this once pricing is finished.
+    $this->total_price->amount = 0;
+    foreach ($this->getLineItems() as $line_item) {
+      $this->total_price->amount += $line_item->total_price->amount;
+      $this->total_price->currency_code = $line_item->total_price->currency_code;
+    }
+
+    foreach ($this->getAdjustments() as $adjustment) {
+      // @todo The price field should have an addPrice method.
+      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // If no order number has been set explicitly, set it to the order ID.
+    if (!$this->getOrderNumber()) {
+      $this->setOrderNumber($this->id());
+      $this->save();
+    }
+
+    // Ensure there's a back-reference on each line item.
+    foreach ($this->getLineItems() as $line_item) {
+      if ($line_item->order_id->isEmpty()) {
+        $line_item->order_id = $this->id();
+        $line_item->save();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the line items of a deleted order.
+    $line_items = [];
+    foreach ($entities as $entity) {
+      foreach ($entity->getLineItems() as $line_item) {
+        $line_items[$line_item->id()] = $line_item;
+      }
+    }
+    /** @var \Drupal\commerce_order\LineItemStorageInterface $line_item_storage */
+    $line_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
+    $line_item_storage->delete($line_items);
   }
 
   /**
@@ -491,6 +486,23 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['ip_address'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('IP address'))
+      ->setDescription(t('The IP address of the order.'))
+      ->setDefaultValue('')
+      ->setSetting('max_length', 128)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'hidden',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Billing profile'))
       ->setDescription(t('Billing profile'))
@@ -505,20 +517,6 @@ class Order extends ContentEntityBase implements OrderInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
-
-    $fields['state'] = BaseFieldDefinition::create('state')
-      ->setLabel(t('State'))
-      ->setDescription(t('The order state.'))
-      ->setRequired(TRUE)
-      ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'list_default',
-        'weight' => 0,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
 
     $fields['adjustments'] = BaseFieldDefinition::create('commerce_adjustment')
       ->setLabel(t('Adjustments'))
@@ -538,22 +536,19 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['ip_address'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('IP address'))
-      ->setDescription(t('The IP address of the order.'))
-      ->setDefaultValue('')
-      ->setSetting('max_length', 128)
+    $fields['state'] = BaseFieldDefinition::create('state')
+      ->setLabel(t('State'))
+      ->setDescription(t('The order state.'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'type' => 'list_default',
         'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayConfigurable('view', TRUE)
+      ->setSetting('workflow_callback', ['\Drupal\commerce_order\Entity\Order', 'getWorkflowId']);
 
     $fields['data'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Data'))

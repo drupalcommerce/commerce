@@ -33,30 +33,76 @@ interface OrderInterface extends AdjustableInterface, ContentEntityInterface, En
   public function setOrderNumber($order_number);
 
   /**
-   * Gets the order state.
+   * Gets the order email.
    *
-   * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface
-   *   The order state.
+   * @return string
+   *   The order email.
    */
-  public function getState();
+  public function getEmail();
 
   /**
-   * Gets the order creation timestamp.
+   * Sets the order email.
    *
-   * @return int
-   *   Creation timestamp of the order.
-   */
-  public function getCreatedTime();
-
-  /**
-   * Sets the order creation timestamp.
-   *
-   * @param int $timestamp
-   *   The order creation timestamp.
+   * @param string $mail
+   *   The order email.
    *
    * @return $this
    */
-  public function setCreatedTime($timestamp);
+  public function setEmail($mail);
+
+  /**
+   * Gets the order IP address.
+   *
+   * @return string
+   *   The IP address.
+   */
+  public function getIpAddress();
+
+  /**
+   * Sets the order IP address.
+   *
+   * @param string $ip_address
+   *   The IP address.
+   *
+   * @return $this
+   */
+  public function setIpAddress($ip_address);
+
+  /**
+   * Gets the billing profile.
+   *
+   * @return \Drupal\profile\Entity\ProfileInterface
+   *   The billing profile.
+   */
+  public function getBillingProfile();
+
+  /**
+   * Sets the billing profile.
+   *
+   * @param \Drupal\profile\Entity\ProfileInterface $profile
+   *   The billing profile.
+   *
+   * @return $this
+   */
+  public function setBillingProfile(ProfileInterface $profile);
+
+  /**
+   * Gets the billing profile ID.
+   *
+   * @return int
+   *   The billing profile ID.
+   */
+  public function getBillingProfileId();
+
+  /**
+   * Sets the billing profile ID.
+   *
+   * @param int $billingProfileId
+   *   The billing profile ID.
+   *
+   * @return $this
+   */
+  public function setBillingProfileId($billingProfileId);
 
   /**
    * Gets the line items.
@@ -116,111 +162,67 @@ interface OrderInterface extends AdjustableInterface, ContentEntityInterface, En
   public function hasLineItem(LineItemInterface $line_item);
 
   /**
-   * Gets the additional data stored in this order.
+   * Gets the order state.
+   *
+   * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface
+   *   The order state.
+   */
+  public function getState();
+
+  /**
+   * Gets the order data.
+   *
+   * Used to store temporary data during order processing (i.e. checkout).
    *
    * @return array
-   *   An array of additional data.
+   *   The order data.
    */
   public function getData();
 
   /**
-   * Sets random information related to this order.
+   * Sets the order data.
    *
    * @param array $data
-   *   An array of additional data.
+   *   The order data.
    *
    * @return $this
    */
   public function setData($data);
 
   /**
-   * Gets the order IP address.
-   *
-   * @return string
-   *   The IP address.
-   */
-  public function getIpAddress();
-
-  /**
-   * Sets the order IP address.
-   *
-   * @param string $ip_address
-   *   The IP address.
-   *
-   * @return $this
-   */
-  public function setIpAddress($ip_address);
-
-  /**
-   * Gets the email address associated with the order.
-   *
-   * @return string
-   *   The order mail.
-   */
-  public function getEmail();
-
-  /**
-   * Sets the order mail.
-   *
-   * @param string $mail
-   *   The email address associated with the order.
-   *
-   * @return $this
-   */
-  public function setEmail($mail);
-
-  /**
-   * Gets the timestamp of when the order was placed.
+   * Gets the order creation timestamp.
    *
    * @return int
-   *   The timestamp of when the order was placed.
+   *   Creation timestamp of the order.
+   */
+  public function getCreatedTime();
+
+  /**
+   * Sets the order creation timestamp.
+   *
+   * @param int $timestamp
+   *   The order creation timestamp.
+   *
+   * @return $this
+   */
+  public function setCreatedTime($timestamp);
+
+  /**
+   * Gets the order placed timestamp.
+   *
+   * @return int
+   *   The order placed timestamp.
    */
   public function getPlacedTime();
 
   /**
-   * Sets the timestamp of when the order was placed.
+   * Sets the order placed timestamp.
    *
    * @param int $timestamp
-   *   The timestamp of when the order was placed.
+   *   The order placed timestamp.
    *
    * @return $this
    */
   public function setPlacedTime($timestamp);
-
-  /**
-   * Gets the billing profile.
-   *
-   * @return \Drupal\profile\Entity\ProfileInterface
-   *   The billing profile entity.
-   */
-  public function getBillingProfile();
-
-  /**
-   * Sets the billing profile.
-   *
-   * @param \Drupal\profile\Entity\ProfileInterface $profile
-   *   The billing profile entity.
-   *
-   * @return $this
-   */
-  public function setBillingProfile(ProfileInterface $profile);
-
-  /**
-   * Gets the billing profile ID.
-   *
-   * @return int
-   *   The billing profile ID.
-   */
-  public function getBillingProfileId();
-
-  /**
-   * Sets the billing profile ID.
-   *
-   * @param int $billingProfileId
-   *   The billing profile ID.
-   *
-   * @return $this
-   */
-  public function setBillingProfileId($billingProfileId);
 
 }

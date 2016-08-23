@@ -15,7 +15,7 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    * Gets the parent order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface|null
-   *   The order entity, or null.
+   *   The order, or NULL.
    */
   public function getOrder();
 
@@ -23,7 +23,7 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    * Gets the parent order ID.
    *
    * @return int|null
-   *   The order id, or null.
+   *   The order ID, or NULL.
    */
   public function getOrderId();
 
@@ -31,7 +31,7 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    * Gets the purchased entity.
    *
    * @return \Drupal\commerce\PurchasableEntityInterface|null
-   *   The purchased entity, or null.
+   *   The purchased entity, or NULL.
    */
   public function getPurchasedEntity();
 
@@ -99,7 +99,7 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    * Gets the line item creation timestamp.
    *
    * @return int
-   *   Creation timestamp of the line item.
+   *   The line item creation timestamp.
    */
   public function getCreatedTime();
 
@@ -112,23 +112,5 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    * @return $this
    */
   public function setCreatedTime($timestamp);
-
-  /**
-   * Gets the additional data stored in this line item.
-   *
-   * @return array
-   *   An array of additional data.
-   */
-  public function getData();
-
-  /**
-   * Sets random information related to this line item.
-   *
-   * @param array $data
-   *   An array of additional data.
-   *
-   * @return $this
-   */
-  public function setData($data);
 
 }
