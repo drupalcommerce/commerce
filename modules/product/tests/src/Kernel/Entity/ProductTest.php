@@ -5,8 +5,7 @@ namespace Drupal\Tests\commerce_product\Kernel\Entity;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\user\Entity\User;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests the Product entity.
@@ -15,7 +14,7 @@ use Drupal\user\Entity\User;
  *
  * @group commerce
  */
-class ProductTest extends KernelTestBase {
+class ProductTest extends EntityKernelTestBase {
 
   /**
    * Modules to enable.
@@ -23,9 +22,17 @@ class ProductTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'path', 'text', 'filter', 'entity',
-    'entity', 'entity_test', 'address', 'views', 'inline_entity_form',
-    'commerce', 'commerce_price', 'commerce_store', 'commerce_product',
+    'options',
+    'path',
+    'entity',
+    'entity',
+    'address',
+    'views',
+    'inline_entity_form',
+    'commerce',
+    'commerce_price',
+    'commerce_store',
+    'commerce_product',
   ];
 
   /**
@@ -48,13 +55,11 @@ class ProductTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', ['sequences']);
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_type');
     $this->installEntitySchema('commerce_store');
-    $this->installEntitySchema('user');
     $this->installConfig(['commerce_product']);
     $this->installConfig(['commerce_store']);
 
@@ -63,13 +68,10 @@ class ProductTest extends KernelTestBase {
       'name' => 'Sample store',
     ]);
     $store->save();
-    $this->store = Store::load($store->id());
+    $this->store = $this->reloadEntity($store);
 
-    $user = User::create([
-      'name' => $this->randomMachineName(),
-    ]);
-    $user->save();
-    $this->user = User::load($user->id());
+    $user = $this->createUser();
+    $this->user = $this->reloadEntity($user);
   }
 
   /**
