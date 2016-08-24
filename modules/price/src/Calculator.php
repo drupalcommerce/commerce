@@ -1,0 +1,200 @@
+<?php
+
+namespace Drupal\commerce_price;
+
+/**
+ * Provides helpers for bcmath-based arithmetic.
+ *
+ * The bcmath extension provides support for arbitrary precision arithmetic,
+ * which does not suffer from the precision loses that make floating point
+ * arithmetic unsafe for eCommerce.
+ *
+ * Important: All numbers must be passed as strings.
+ */
+final class Calculator {
+
+  /**
+   * Adds the second number to the first number.
+   *
+   * @param string $first_number
+   *   The first number.
+   * @param string $second_number
+   *   The second number.
+   * @param int $scale
+   *   The maximum number of digits after the decimal place.
+   *   Any digit after $scale will be truncated.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function add($first_number, $second_number, $scale = 6) {
+    self::assertNumberFormat($first_number);
+    self::assertNumberFormat($second_number);
+    $result = bcadd($first_number, $second_number, $scale);
+    return self::trim($result);
+  }
+
+  /**
+   * Subtracts the second number from the first number.
+   *
+   * @param string $first_number
+   *   The first number.
+   * @param string $second_number
+   *   The second number.
+   * @param int $scale
+   *   The maximum number of digits after the decimal place.
+   *   Any digit after $scale will be truncated.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function subtract($first_number, $second_number, $scale = 6) {
+    self::assertNumberFormat($first_number);
+    self::assertNumberFormat($second_number);
+    $result = bcsub($first_number, $second_number, $scale);
+    return self::trim($result);
+  }
+
+  /**
+   * Multiplies the first number by the second number.
+   *
+   * @param string $first_number
+   *   The first number.
+   * @param string $second_number
+   *   The second number.
+   * @param int $scale
+   *   The maximum number of digits after the decimal place.
+   *   Any digit after $scale will be truncated.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function multiply($first_number, $second_number, $scale = 6) {
+    self::assertNumberFormat($first_number);
+    self::assertNumberFormat($second_number);
+    $result = bcmul($first_number, $second_number, $scale);
+    return self::trim($result);
+  }
+
+  /**
+   * Divides the first number by the second number.
+   *
+   * @param string $first_number
+   *   The first number.
+   * @param string $second_number
+   *   The second number.
+   * @param int $scale
+   *   The maximum number of digits after the decimal place.
+   *   Any digit after $scale will be truncated.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function divide($first_number, $second_number, $scale = 6) {
+    self::assertNumberFormat($first_number);
+    self::assertNumberFormat($second_number);
+    $result = bcdiv($first_number, $second_number, $scale);
+    return self::trim($result);
+  }
+
+  /**
+   * Calculates the next highest whole value of a number.
+   *
+   * @param string $number
+   *   A numeric string value.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function ceil($number) {
+    if (self::compare($number, 0) == 1) {
+      $result = bcadd($number, '1', 0);
+    }
+    else {
+      $result = bcadd($number, '0', 0);
+    }
+    return $result;
+  }
+
+  /**
+   * Calculates the next lowest whole value of a number.
+   *
+   * @param string $number
+   *   The number.
+   *
+   * @return string
+   *   The result.
+   */
+  public static function floor($number) {
+    if (self::compare($number, 0) == 1) {
+      $result = bcadd($number, '0', 0);
+    }
+    else {
+      $result = bcadd($number, '-1', 0);
+    }
+    return $result;
+  }
+
+  /**
+   * Compares the first number to the second number.
+   *
+   * @param string $first_number
+   *   The first number.
+   * @param string $second_number
+   *   The second number.
+   * @param int $scale
+   *   The maximum number of digits after the decimal place.
+   *   Any digit after $scale will be truncated.
+   *
+   * @return int
+   *   0 if both numbers are equal, 1 if the first one is greater, -1 otherwise.
+   */
+  public static function compare($first_number, $second_number, $scale = 6) {
+    self::assertNumberFormat($first_number);
+    self::assertNumberFormat($second_number);
+    return bccomp($first_number, $second_number, $scale);
+  }
+
+  /**
+   * Trims the given number.
+   *
+   * By default bcmath returns numbers with the number of digits according
+   * to $scale. This means that bcadd('2', '2', 6) will return '4.00000'.
+   * Trimming the number removes the excess zeroes.
+   *
+   * @param string $number
+   *   The number to trim.
+   *
+   * @return string
+   *   The trimmed number.
+   */
+  public static function trim($number) {
+    if (strpos($number, '.') != FALSE) {
+      // The number is decimal, strip trailing zeroes.
+      // If no digits remain after the decimal point, strip it as well.
+      $number = rtrim($number, '0');
+      $number = rtrim($number, '.');
+    }
+
+    return $number;
+  }
+
+  /**
+   * Assert that the given number is a numeric string value.
+   *
+   * @param string $number
+   *   The number to check.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the given number is not a numeric string value.
+   */
+  public static function assertNumberFormat($number) {
+    if (is_float($number)) {
+      throw new \InvalidArgumentException(sprintf('The provided value "%s" must be a string, not a float.', $number));
+    }
+    if (!is_numeric($number)) {
+      throw new \InvalidArgumentException(sprintf('The provided value "%s" is not a numeric value.', $number));
+    }
+  }
+
+}
