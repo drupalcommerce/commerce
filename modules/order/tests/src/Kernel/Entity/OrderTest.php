@@ -7,7 +7,8 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\LineItem;
 use Drupal\commerce_order\Entity\LineItemType;
 use Drupal\commerce_price\Price;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\commerce_store\Entity\Store;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
 
 /**
@@ -17,7 +18,21 @@ use Drupal\profile\Entity\Profile;
  *
  * @group commerce
  */
-class OrderTest extends KernelTestBase {
+class OrderTest extends EntityKernelTestBase {
+
+  /**
+   * A sample user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
+   * A sample store.
+   *
+   * @var \Drupal\commerce_store\Entity\StoreInterface
+   */
+  protected $store;
 
   /**
    * Modules to enable.
@@ -25,10 +40,17 @@ class OrderTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity',
-    'views', 'address', 'profile', 'state_machine',
-    'inline_entity_form', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product',
+    'options',
+    'entity',
+    'views',
+    'address',
+    'profile',
+    'state_machine',
+    'inline_entity_form',
+    'commerce',
+    'commerce_price',
+    'commerce_store',
+    'commerce_product',
     'commerce_order',
   ];
 
@@ -37,134 +59,140 @@ class OrderTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
+
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_line_item');
+    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
+
     // A line item type that doesn't need a purchasable entity, for simplicity.
     LineItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
     ])->save();
+
+    $user = $this->createUser();
+    $this->user = $this->reloadEntity($user);
+
+    $store = Store::create([
+      'type' => 'default',
+      'name' => 'Sample store',
+    ]);
+    $store->save();
+    $this->store = $this->reloadEntity($store);
   }
 
   /**
    * Tests the order entity and its methods.
    *
-   * @covers ::getState
    * @covers ::getOrderNumber
    * @covers ::setOrderNumber
+   * @covers ::getStore
+   * @covers ::setStore
+   * @covers ::getStoreId
+   * @covers ::setStoreId
+   * @covers ::getOwner
+   * @covers ::setOwner
+   * @covers ::getOwnerId
+   * @covers ::setOwnerId
    * @covers ::getEmail
    * @covers ::setEmail
    * @covers ::getIpAddress
    * @covers ::setIpAddress
+   * @covers ::getBillingProfile
+   * @covers ::setBillingProfile
+   * @covers ::getBillingProfileId
+   * @covers ::setBillingProfileId
    * @covers ::getLineItems
    * @covers ::setLineItems
    * @covers ::hasLineItems
    * @covers ::addLineItem
    * @covers ::removeLineItem
    * @covers ::hasLineItem
-   * @covers ::getBillingProfile
-   * @covers ::setBillingProfile
-   * @covers ::getBillingProfileId
-   * @covers ::setBillingProfileId
+   * @covers ::getAdjustments
+   * @covers ::setAdjustments
+   * @covers ::addAdjustment
+   * @covers ::recalculateTotalPrice
+   * @covers ::getTotalPrice
+   * @covers ::getState
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
-   * @covers ::recalculateTotalPrice
-   * @covers ::addAdjustment
-   * @covers ::setAdjustments
-   * @covers ::getAdjustments
+   * @covers ::getPlacedTime
+   * @covers ::setPlacedTime
    */
   public function testOrder() {
-    // @todo Test the store and owner getters/setters as well.
     $profile = Profile::create([
       'type' => 'billing',
-      'address' => [
-        'country' => 'FR',
-        'postal_code' => '75002',
-        'locality' => 'Paris',
-        'address_line1' => 'A french street',
-        'recipient' => 'John LeSmith',
-      ],
     ]);
     $profile->save();
+    $profile = $this->reloadEntity($profile);
+
     $line_item = LineItem::create([
       'type' => 'test',
     ]);
     $line_item->save();
-    $order = Order::create([
-      'type' => 'default',
-      'state' => 'completed',
-      'order_number' => '6',
-      'mail' => 'test@example.com',
-      'ip_address' => '127.0.0.1',
-      'billing_profile' => $profile,
-      'line_items' => [$line_item],
-    ]);
-    $order->save();
-
-    // getState() returns a StateItem.
-    $this->assertEquals('completed', $order->getState()->value);
-
-    $this->assertEquals('6', $order->getOrderNumber());
-    $order->setOrderNumber(7);
-    $this->assertEquals('7', $order->getOrderNumber());
-
-    $this->assertEquals('test@example.com', $order->getEmail());
-    $order->setEmail('commerce@example.com');
-    $this->assertEquals('commerce@example.com', $order->getEmail());
-
-    $this->assertEquals('127.0.0.1', $order->getIpAddress());
-    $order->setIpAddress('127.0.0.2');
-    $this->assertEquals('127.0.0.2', $order->getIpAddress());
-
-    // Avoid passing an entire entity to assertEquals(), causes a crash.
-    $profiles_match = $profile === $order->getBillingProfile();
-    $this->assertTrue($profiles_match);
-    $this->assertEquals($profile->id(), $order->getBillingProfileId());
-    $another_profile = Profile::create([
-      'type' => 'billing',
-      'address' => [
-        'country' => 'FR',
-        'postal_code' => '75003',
-        'locality' => 'Paris',
-        'address_line1' => 'A different french street',
-        'recipient' => 'Pierre Bertrand',
-      ],
-    ]);
-    $another_profile->save();
-    $order->setBillingProfileId($another_profile->id());
-    $this->assertEquals($another_profile->id(), $order->getBillingProfileId());
-    $order->setBillingProfile($profile);
-    $this->assertEquals($profile->id(), $order->getBillingProfileId());
-
-    // An initially saved line item won't be the same as the loaded one.
-    $line_item = LineItem::load($line_item->id());
-    $line_items_match = [$line_item] == $order->getLineItems();
-    $this->assertTrue($line_items_match);
-    $this->assertTrue($order->hasLineItem($line_item));
-    $order->removeLineItem($line_item);
-    $this->assertFalse($order->hasLineItems());
-    $this->assertFalse($order->hasLineItem($line_item));
-    $order->addLineItem($line_item);
-    $this->assertTrue($order->hasLineItem($line_item));
+    $line_item = $this->reloadEntity($line_item);
     $another_line_item = LineItem::create([
       'type' => 'test',
     ]);
     $another_line_item->save();
-    $another_line_item = LineItem::load($another_line_item->id());
-    $new_line_items = [$line_item, $another_line_item];
-    $order->setLineItems($new_line_items);
-    $line_items_match = $new_line_items == $order->getLineItems();
-    $this->assertTrue($line_items_match);
-    $this->assertTrue($order->hasLineItems());
+    $another_line_item = $this->reloadEntity($another_line_item);
 
-    $order->setCreatedTime('635879700');
-    $this->assertEquals('635879700', $order->getCreatedTime('635879700'));
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order->save();
+
+    $order->setOrderNumber(7);
+    $this->assertEquals(7, $order->getOrderNumber());
+
+    $order->setStore($this->store);
+    $this->assertEquals($this->store, $order->getStore());
+    $this->assertEquals($this->store->id(), $order->getStoreId());
+    $order->setStoreId(0);
+    $this->assertEquals(NULL, $order->getStore());
+    $order->setStoreId([$this->store->id()]);
+    $this->assertEquals($this->store, $order->getStore());
+    $this->assertEquals($this->store->id(), $order->getStoreId());
+
+    $order->setOwner($this->user);
+    $this->assertEquals($this->user, $order->getOwner());
+    $this->assertEquals($this->user->id(), $order->getOwnerId());
+    $order->setOwnerId(0);
+    $this->assertEquals(NULL, $order->getOwner());
+    $order->setOwnerId($this->user->id());
+    $this->assertEquals($this->user, $order->getOwner());
+    $this->assertEquals($this->user->id(), $order->getOwnerId());
+
+    $order->setEmail('commerce@example.com');
+    $this->assertEquals('commerce@example.com', $order->getEmail());
+
+    $order->setIpAddress('127.0.0.2');
+    $this->assertEquals('127.0.0.2', $order->getIpAddress());
+
+    $order->setBillingProfile($profile);
+    $this->assertEquals($profile, $order->getBillingProfile());
+    $this->assertEquals($profile->id(), $order->getBillingProfileId());
+    $order->setBillingProfileId(0);
+    $this->assertEquals(NULL, $order->getBillingProfile());
+    $order->setBillingProfileId([$profile->id()]);
+    $this->assertEquals($profile, $order->getBillingProfile());
+    $this->assertEquals($profile->id(), $order->getBillingProfileId());
+
+    $order->setLineItems([$line_item, $another_line_item]);
+    $this->assertEquals([$line_item, $another_line_item], $order->getLineItems());
+    $this->assertTrue($order->hasLineItems());
+    $order->removeLineItem($another_line_item);
+    $this->assertEquals([$line_item], $order->getLineItems());
+    $this->assertTrue($order->hasLineItem($line_item));
+    $this->assertFalse($order->hasLineItem($another_line_item));
+    $order->addLineItem($another_line_item);
+    $this->assertEquals([$line_item, $another_line_item], $order->getLineItems());
+    $this->assertTrue($order->hasLineItem($another_line_item));
 
     $order->setLineItems([]);
     $order->addAdjustment(new Adjustment([
@@ -179,7 +207,7 @@ class OrderTest extends KernelTestBase {
       'amount' => new Price(10.00, 'USD'),
       'source_id' => '',
     ]));
-    $this->assertEquals(9, $order->total_price->amount);
+    $this->assertEquals(9, $order->getTotalPrice()->getDecimalAmount());
 
     $adjustments = $order->getAdjustments();
     $this->assertEquals(2, count($adjustments));
@@ -187,9 +215,17 @@ class OrderTest extends KernelTestBase {
     foreach ($adjustments as $adjustment) {
       $order->removeAdjustment($adjustment);
     }
-    $this->assertEquals(0, $order->total_price->amount);
+    $this->assertEquals(0, $order->getTotalPrice()->getDecimalAmount());
     $order->setAdjustments($adjustments);
-    $this->assertEquals(9, $order->total_price->amount);
+    $this->assertEquals(9, $order->getTotalPrice()->getDecimalAmount());
+
+    $this->assertEquals('completed', $order->getState()->value);
+
+    $order->setCreatedTime(635879700);
+    $this->assertEquals(635879700, $order->getCreatedTime(635879700));
+
+    $order->setPlacedTime(635879800);
+    $this->assertEquals(635879800, $order->getPlacedTime());
   }
 
 }

@@ -375,8 +375,8 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
 
-      if (!$this->getEmail()) {
-        $this->setEmail($this->getOwner()->getEmail());
+      if (!$this->getEmail() && $owner = $this->getOwner()) {
+        $this->setEmail($owner->getEmail());
       }
     }
 
