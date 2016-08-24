@@ -69,7 +69,7 @@ class AdjustmentItemTest extends EntityKernelTestBase {
     $adjustment_item_list->appendItem(new Adjustment([
       'type' => 'discount',
       'label' => '10% off',
-      'amount' => new Price(-1.00, 'USD'),
+      'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
     ]));
 
@@ -77,7 +77,7 @@ class AdjustmentItemTest extends EntityKernelTestBase {
     $adjustment = $adjustment_item_list->first()->value;
     $this->assertEquals('discount', $adjustment->getType());
     $this->assertEquals('10% off', $adjustment->getLabel());
-    $this->assertEquals(-1.00, $adjustment->getAmount()->getDecimalAmount());
+    $this->assertEquals('-1.00', $adjustment->getAmount()->getDecimalAmount());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());
     $this->assertEquals('1', $adjustment->getSourceId());
   }

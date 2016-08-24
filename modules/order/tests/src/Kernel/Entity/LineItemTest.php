@@ -76,7 +76,7 @@ class LineItemTest extends EntityKernelTestBase {
   public function testLineItem() {
     $line_item = LineItem::create([
       'type' => 'test',
-      'unit_price' => new Price(9.99, 'USD'),
+      'unit_price' => new Price('9.99', 'USD'),
     ]);
     $line_item->save();
 
@@ -91,18 +91,18 @@ class LineItemTest extends EntityKernelTestBase {
     $line_item->addAdjustment(new Adjustment([
       'type' => 'discount',
       'label' => '10% off',
-      'amount' => new Price(-1.00, 'USD'),
+      'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
     ]));
-    $this->assertEquals(8.99, $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals('8.99', $line_item->getTotalPrice()->getDecimalAmount());
 
     $line_item->addAdjustment(new Adjustment([
       'type' => 'order_adjustment',
       'label' => 'Random fee',
-      'amount' => new Price(2.00, 'USD'),
+      'amount' => new Price('2.00', 'USD'),
       'source_id' => '',
     ]));
-    $this->assertEquals(10.99, $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals('10.99', $line_item->getTotalPrice()->getDecimalAmount());
 
     $adjustments = $line_item->getAdjustments();
     $this->assertEquals(2, count($adjustments));
@@ -110,12 +110,12 @@ class LineItemTest extends EntityKernelTestBase {
     foreach ($adjustments as $adjustment) {
       $line_item->removeAdjustment($adjustment);
     }
-    $this->assertEquals(9.99, $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals('9.99', $line_item->getTotalPrice()->getDecimalAmount());
     $line_item->setAdjustments($adjustments);
-    $this->assertEquals(10.99, $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals('10.99', $line_item->getTotalPrice()->getDecimalAmount());
 
     $line_item->setCreatedTime(635879700);
-    $this->assertEquals(635879700, $line_item->getCreatedTime(635879700));
+    $this->assertEquals(635879700, $line_item->getCreatedTime());
   }
 
 }

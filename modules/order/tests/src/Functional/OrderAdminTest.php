@@ -59,7 +59,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $edit = [
       'line_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
-      'line_items[form][inline_entity_form][quantity][0][value]' => 1,
+      'line_items[form][inline_entity_form][quantity][0][value]' => '1',
       'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99',
     ];
     $this->submitForm($edit, 'Create line item');
@@ -87,7 +87,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getLineItems()));
-    $this->assertEquals(5.33, $order->total_price->amount);
+    $this->assertEquals('5.33', $order->total_price->amount);
   }
 
   /**

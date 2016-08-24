@@ -102,7 +102,7 @@ class PriceItem extends FieldItemBase {
    *   The Price value object.
    */
   public function toPrice() {
-    return new Price($this->amount, $this->currency_code);
+    return new Price((string) $this->amount, $this->currency_code);
   }
 
 }

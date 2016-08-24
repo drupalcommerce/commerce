@@ -62,6 +62,10 @@ class Price extends Textfield {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if ($input !== FALSE && $input !== NULL) {
+      // Convert empty string value to numeric value.
+      if ($input['amount'] === '') {
+        $input['amount'] = '0';
+      }
       return new PriceValue($input['amount'], $input['currency_code']);
     }
     return NULL;
