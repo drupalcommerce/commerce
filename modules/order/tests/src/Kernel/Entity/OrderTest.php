@@ -198,13 +198,13 @@ class OrderTest extends EntityKernelTestBase {
     $order->addAdjustment(new Adjustment([
       'type' => 'discount',
       'label' => '10% off',
-      'amount' => new Price(-1.00, 'USD'),
+      'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
     ]));
     $order->addAdjustment(new Adjustment([
       'type' => 'order_adjustment',
       'label' => 'Random fee',
-      'amount' => new Price(10.00, 'USD'),
+      'amount' => new Price('10.00', 'USD'),
       'source_id' => '',
     ]));
     $this->assertEquals(9, $order->getTotalPrice()->getDecimalAmount());
