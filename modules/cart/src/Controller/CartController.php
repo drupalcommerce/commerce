@@ -66,7 +66,7 @@ class CartController extends ControllerBase {
       $build['empty'] = [
         '#prefix' => '<div class="cart-empty-page">',
         '#markup' => $this->t('Your shopping cart is empty.'),
-        '#suffix' => '</div.',
+        '#suffix' => '</div>',
       ];
     }
 
