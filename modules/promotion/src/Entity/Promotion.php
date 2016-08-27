@@ -4,8 +4,11 @@ namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 
 /**
  * Defines the promotion entity class.
@@ -236,6 +239,18 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function apply(EntityInterface $entity) {
+    $entity_type_id = $entity->getEntityTypeId();
+    // @todo should whatever invokes this method be providing the context?
+    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
+    $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
+    $offer->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
@@ -294,6 +309,15 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDisplayOptions('form', [
         'type' => 'commerce_entity_select',
         'weight' => 2,
+      ]);
+
+    $fields['offer'] = BaseFieldDefinition::create('commerce_plugin_item:commerce_promotion_offer')
+      ->setLabel(t('Offer'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_plugin_select',
+        'weight' => 3,
       ]);
 
     $fields['coupons'] = BaseFieldDefinition::create('entity_reference')

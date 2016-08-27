@@ -2,13 +2,15 @@
 
 namespace Drupal\commerce_order;
 
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Defines an interface for objects that contain adjustments.
  *
- * @see \Drupal\commerce_order\Entity\OrderInterface
- * @see \Drupal\commerce_order\Entity\LineItemInterface
+ * @see \Drupal\commerce_order\Entity\OrderInterfaceEntity
+ * @see \Drupal\commerce_order\Entity\LineItemInterfaceEntity
  */
-interface AdjustableInterface {
+interface EntityAdjustableInterface extends EntityInterface {
 
   /**
    * Gets the adjustments.

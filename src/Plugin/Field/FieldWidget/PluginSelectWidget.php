@@ -60,7 +60,7 @@ class PluginSelectWidget extends WidgetBase {
       if ($plugin instanceof PluginFormInterface) {
 
         /** @var \Drupal\Component\Plugin\ConfigurablePluginInterface $plugin */
-        $plugin->submitConfigurationForm($element, $form_state);
+        $plugin->submitConfigurationForm($element['target_plugin_configuration'], $form_state);
         $item_value['target_plugin_configuration'] = $plugin->getConfiguration();
       }
     }

@@ -45,6 +45,7 @@ class PluginSelect extends FormElement {
       '#element_validate' => [
         [$class, 'validatePlugin'],
       ],
+      '#theme_wrappers' => ['container'],
     ];
   }
 
@@ -107,7 +108,13 @@ class PluginSelect extends FormElement {
         continue;
       }
 
-      $element['target_plugin_id']['#options'][$definition['id']] = $definition['label'];
+      // Group categorized plugins.
+      if (isset($definition['category'])) {
+        $element['target_plugin_id']['#options'][(string) $definition['category']][$definition['id']] = $definition['label'];
+      }
+      else {
+        $element['target_plugin_id']['#options'][$definition['id']] = $definition['label'];
+      }
     }
 
     if ($target_plugin_id != '_none') {
