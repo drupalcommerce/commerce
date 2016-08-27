@@ -33,6 +33,8 @@ final class Price {
    */
   public function __construct($amount, $currency_code) {
     Calculator::assertNumberFormat($amount);
+    $this->assertCurrencyCodeFormat($currency_code);
+
     $this->amount = (string) $amount;
     $this->currencyCode = strtoupper($currency_code);
   }
@@ -232,6 +234,23 @@ final class Price {
    */
   public function lessThanOrEqual(Price $price) {
     return $this->lessThan($price) || $this->equals($price);
+  }
+
+  /**
+   * Asserts that the currency code is in the right format.
+   *
+   * Serves only as a basic sanity check.
+   *
+   * @param string $currency_code
+   *   The currency code.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the currency code is not in the right format.
+   */
+  protected function assertCurrencyCodeFormat($currency_code) {
+    if (strlen($currency_code) != '3') {
+      throw new \InvalidArgumentException();
+    }
   }
 
   /**

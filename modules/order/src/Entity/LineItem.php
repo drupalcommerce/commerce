@@ -143,7 +143,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public function setAdjustments(array $adjustments) {
     $this->set('adjustments', $adjustments);
-    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -152,7 +151,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public function addAdjustment(Adjustment $adjustment) {
     $this->get('adjustments')->appendItem($adjustment);
-    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -161,7 +159,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    */
   public function removeAdjustment(Adjustment $adjustment) {
     $this->get('adjustments')->removeAdjustment($adjustment);
-    $this->recalculateTotalPrice();
     return $this;
   }
 
@@ -199,17 +196,10 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
 
   /**
    * Recalculates the line item total price.
-   *
-   * This will update the total price based on line item and adjustment prices.
    */
   protected function recalculateTotalPrice() {
-    // @todo Rework this once pricing is finished.
-    $this->total_price->amount = $this->unit_price->amount * $this->quantity->value;
-    $this->total_price->currency_code = $this->unit_price->currency_code;
-
-    foreach ($this->getAdjustments() as $adjustment) {
-      // @todo The price field should have an addPrice method.
-      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
+    if ($unit_price = $this->getUnitPrice()) {
+      $this->total_price = $unit_price->multiply($this->getQuantity());
     }
   }
 

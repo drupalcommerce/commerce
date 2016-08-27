@@ -80,6 +80,7 @@ class OrderTest extends EntityKernelTestBase {
     $store = Store::create([
       'type' => 'default',
       'name' => 'Sample store',
+      'default_currency' => 'USD',
     ]);
     $store->save();
     $this->store = $this->reloadEntity($store);
@@ -130,15 +131,18 @@ class OrderTest extends EntityKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
+    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
     $line_item = LineItem::create([
       'type' => 'test',
-      'unit_price' => new Price('0', 'EUR'),
+      'unit_price' => new Price('2.00', 'USD'),
     ]);
     $line_item->save();
     $line_item = $this->reloadEntity($line_item);
+    /** @var \Drupal\commerce_order\Entity\LineItemInterface $another_line_item */
     $another_line_item = LineItem::create([
       'type' => 'test',
-      'unit_price' => new Price('0', 'EUR'),
+      'quantity' => '2',
+      'unit_price' => new Price('3.00', 'USD'),
     ]);
     $another_line_item->save();
     $another_line_item = $this->reloadEntity($another_line_item);
@@ -196,30 +200,38 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals([$line_item, $another_line_item], $order->getLineItems());
     $this->assertTrue($order->hasLineItem($another_line_item));
 
-    $order->setLineItems([]);
-    $order->addAdjustment(new Adjustment([
-      'type' => 'discount',
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
+    $adjustments = [];
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
-      'source_id' => '1',
-    ]));
-    $order->addAdjustment(new Adjustment([
-      'type' => 'order_adjustment',
-      'label' => 'Random fee',
+    ]);
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
+      'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
-      'source_id' => '',
-    ]));
-    $this->assertEquals(9, $order->getTotalPrice()->getDecimalAmount());
-
+    ]);
+    $order->addAdjustment($adjustments[0]);
+    $order->addAdjustment($adjustments[1]);
     $adjustments = $order->getAdjustments();
-    $this->assertEquals(2, count($adjustments));
-
-    foreach ($adjustments as $adjustment) {
-      $order->removeAdjustment($adjustment);
-    }
-    $this->assertEquals(0, $order->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals($adjustments, $order->getAdjustments());
+    $order->removeAdjustment($adjustments[0]);
+    $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
-    $this->assertEquals(9, $order->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals($adjustments, $order->getAdjustments());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
+    // Add an adjustment to the second line item, confirm it's a part of the
+    // order total, multiplied by quantity.
+    $order->removeLineItem($another_line_item);
+    $another_line_item->addAdjustment(new Adjustment([
+      'type' => 'custom',
+      'label' => 'Random fee',
+      'amount' => new Price('5.00', 'USD'),
+    ]));
+    $order->addLineItem($another_line_item);
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
 
     $this->assertEquals('completed', $order->getState()->value);
 

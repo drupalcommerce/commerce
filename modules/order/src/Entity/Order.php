@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -387,20 +388,56 @@ class Order extends ContentEntityBase implements OrderInterface {
 
   /**
    * Recalculates the line item total price.
-   *
-   * This will update the total price based on line item and adjustment prices.
    */
   protected function recalculateTotalPrice() {
-    // @todo Rework this once pricing is finished.
-    $this->total_price->amount = 0;
-    foreach ($this->getLineItems() as $line_item) {
-      $this->total_price->amount += $line_item->total_price->amount;
-      $this->total_price->currency_code = $line_item->total_price->currency_code;
+    $total_price = $this->getTotalPrice();
+    if ($total_price) {
+      $currency_code = $total_price->getCurrencyCode();
+    }
+    else {
+      $currency_code = $this->initializeCurrencyCode();
+      if (!$currency_code) {
+        // The order object is not complete enough to have a total price yet.
+        return;
+      }
     }
 
+    $total_price = new Price('0', $currency_code);
+    foreach ($this->getLineItems() as $line_item) {
+      $total_price = $total_price->add($line_item->getTotalPrice());
+      foreach ($line_item->getAdjustments() as $adjustment) {
+        $adjustment_total = $adjustment->getAmount()->multiply($line_item->getQuantity());
+        $total_price = $total_price->add($adjustment_total);
+      }
+    }
     foreach ($this->getAdjustments() as $adjustment) {
-      // @todo The price field should have an addPrice method.
-      $this->total_price->amount += $adjustment->getAmount()->getDecimalAmount();
+      $total_price = $total_price->add($adjustment->getAmount());
+    }
+    $this->total_price = $total_price;
+  }
+
+  /**
+   * Initializes the order currency code.
+   *
+   * Takes the currency of the first line item if found.
+   * Otherwise it falls back to the store's default currency.
+   *
+   * @return string|null
+   *   The currency code, or NULL if the order is in an incomplete state
+   *   (no line items, no store).
+   */
+  protected function initializeCurrencyCode() {
+    if ($this->hasLineItems()) {
+      $line_items = $this->getLineItems();
+      $first_line_item = reset($line_items);
+      /** @var \Drupal\commerce_price\Price $unit_price */
+      $unit_price = $first_line_item->getUnitPrice();
+      if ($unit_price) {
+        return $unit_price->getCurrencyCode();
+      }
+    }
+    if ($store = $this->getStore()) {
+      return $store->getDefaultCurrencyCode();
     }
   }
 

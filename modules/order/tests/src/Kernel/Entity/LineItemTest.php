@@ -94,31 +94,25 @@ class LineItemTest extends EntityKernelTestBase {
     $this->assertEquals($unit_price, $line_item->getUnitPrice());
 
     $line_item->setQuantity('1');
-    $line_item->addAdjustment(new Adjustment([
-      'type' => 'discount',
+    $adjustments = [];
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
-      'source_id' => '1',
-    ]));
-    $this->assertEquals('8.99', $line_item->getTotalPrice()->getDecimalAmount());
-
-    $line_item->addAdjustment(new Adjustment([
-      'type' => 'order_adjustment',
+    ]);
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
       'label' => 'Random fee',
       'amount' => new Price('2.00', 'USD'),
-      'source_id' => '',
-    ]));
-    $this->assertEquals('10.99', $line_item->getTotalPrice()->getDecimalAmount());
-
+    ]);
+    $line_item->addAdjustment($adjustments[0]);
+    $line_item->addAdjustment($adjustments[1]);
     $adjustments = $line_item->getAdjustments();
-    $this->assertEquals(2, count($adjustments));
-
-    foreach ($adjustments as $adjustment) {
-      $line_item->removeAdjustment($adjustment);
-    }
-    $this->assertEquals('9.99', $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals($adjustments, $line_item->getAdjustments());
+    $line_item->removeAdjustment($adjustments[0]);
+    $this->assertEquals([$adjustments[1]], $line_item->getAdjustments());
     $line_item->setAdjustments($adjustments);
-    $this->assertEquals('10.99', $line_item->getTotalPrice()->getDecimalAmount());
+    $this->assertEquals($adjustments, $line_item->getAdjustments());
 
     $line_item->setCreatedTime(635879700);
     $this->assertEquals(635879700, $line_item->getCreatedTime());
