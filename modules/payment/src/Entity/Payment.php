@@ -140,7 +140,9 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    * {@inheritdoc}
    */
   public function getAmount() {
-    return $this->get('amount')->first()->toPrice();
+    if (!$this->get('amount')->isEmpty()) {
+      return $this->get('amount')->first()->toPrice();
+    }
   }
 
   /**
@@ -155,7 +157,9 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    * {@inheritdoc}
    */
   public function getRefundedAmount() {
-    return $this->get('refunded_amount')->first()->toPrice();
+    if (!$this->get('refunded_amount')->isEmpty()) {
+      return $this->get('refunded_amount')->first()->toPrice();
+    }
   }
 
   /**

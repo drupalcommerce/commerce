@@ -80,18 +80,18 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
   public function setQuantity($quantity);
 
   /**
-   * Gets the unit price.
+   * Gets the line item unit price.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The unit price.
+   * @return \Drupal\commerce_price\Price|null
+   *   The line item unit price, or NULL.
    */
   public function getUnitPrice();
 
   /**
-   * Gets the total price.
+   * Gets the line item total price.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The total price.
+   * @return \Drupal\commerce_price\Price|null
+   *   The line item total price, or NULL.
    */
   public function getTotalPrice();
 

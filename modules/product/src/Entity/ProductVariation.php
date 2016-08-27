@@ -130,7 +130,9 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getPrice() {
-    return $this->get('price')->first()->toPrice();
+    if (!$this->get('price')->isEmpty()) {
+      return $this->get('price')->first()->toPrice();
+    }
   }
 
   /**

@@ -309,7 +309,9 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getTotalPrice() {
-    return $this->get('total_price')->first()->toPrice();
+    if (!$this->get('total_price')->isEmpty()) {
+      return $this->get('total_price')->first()->toPrice();
+    }
   }
 
   /**

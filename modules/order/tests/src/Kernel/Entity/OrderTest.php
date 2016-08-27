@@ -132,11 +132,13 @@ class OrderTest extends EntityKernelTestBase {
 
     $line_item = LineItem::create([
       'type' => 'test',
+      'unit_price' => new Price('0', 'EUR'),
     ]);
     $line_item->save();
     $line_item = $this->reloadEntity($line_item);
     $another_line_item = LineItem::create([
       'type' => 'test',
+      'unit_price' => new Price('0', 'EUR'),
     ]);
     $another_line_item->save();
     $another_line_item = $this->reloadEntity($another_line_item);
@@ -222,7 +224,7 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals('completed', $order->getState()->value);
 
     $order->setCreatedTime(635879700);
-    $this->assertEquals(635879700, $order->getCreatedTime(635879700));
+    $this->assertEquals(635879700, $order->getCreatedTime());
 
     $order->setPlacedTime(635879800);
     $this->assertEquals(635879800, $order->getPlacedTime());

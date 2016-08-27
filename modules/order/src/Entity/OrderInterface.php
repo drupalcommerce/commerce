@@ -162,10 +162,10 @@ interface OrderInterface extends AdjustableInterface, ContentEntityInterface, En
   public function hasLineItem(LineItemInterface $line_item);
 
   /**
-   * Gets the total price.
+   * Gets the order total price.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The total price.
+   * @return \Drupal\commerce_price\Price|null
+   *   The order total price, or NULL.
    */
   public function getTotalPrice();
 

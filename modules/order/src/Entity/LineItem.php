@@ -116,7 +116,9 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public function getUnitPrice() {
-    return $this->get('unit_price')->first()->toPrice();
+    if (!$this->get('unit_price')->isEmpty()) {
+      return $this->get('unit_price')->first()->toPrice();
+    }
   }
 
   /**
@@ -157,7 +159,9 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public function getTotalPrice() {
-    return $this->get('total_price')->first()->toPrice();
+    if (!$this->get('total_price')->isEmpty()) {
+      return $this->get('total_price')->first()->toPrice();
+    }
   }
 
   /**

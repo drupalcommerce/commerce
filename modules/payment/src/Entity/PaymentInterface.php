@@ -71,8 +71,8 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   /**
    * Gets the payment amount.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The payment amount.
+   * @return \Drupal\commerce_price\Price|null
+   *   The payment amount, or NULL.
    */
   public function getAmount();
 
@@ -89,8 +89,8 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   /**
    * Gets the refunded payment amount.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The refunded payment amount.
+   * @return \Drupal\commerce_price\Price|null
+   *   The refunded payment amount, or NULL.
    */
   public function getRefundedAmount();
 
