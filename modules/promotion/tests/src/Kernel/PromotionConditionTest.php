@@ -11,11 +11,11 @@ use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Tests promotion offers.
+ * Tests promotion conditions.
  *
  * @group commerce
  */
-class PromotionOfferTest extends KernelTestBase {
+class PromotionConditionTest extends KernelTestBase {
 
   use StoreCreationTrait;
 
@@ -27,13 +27,15 @@ class PromotionOfferTest extends KernelTestBase {
   protected $store;
 
   /**
-   * The offer manager.
+   * The condition manager.
    *
-   * @var \Drupal\commerce_promotion\PromotionOfferManager
+   * @var \Drupal\commerce_promotion\PromotionConditionManager
    */
-  protected $offerManager;
+  protected $conditionManager;
 
   /**
+   * The test order.
+   *
    * @var \Drupal\commerce_order\Entity\OrderInterface
    */
   protected $order;
@@ -68,7 +70,6 @@ class PromotionOfferTest extends KernelTestBase {
       'commerce_promotion',
     ]);
     $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
-    $this->offerManager = $this->container->get('plugin.manager.commerce_promotion_offer');
 
     // A line item type that doesn't need a purchasable entity, for simplicity.
     LineItemType::create([
@@ -89,13 +90,13 @@ class PromotionOfferTest extends KernelTestBase {
   }
 
   /**
-   * Tests order percentage off.
+   * Tests the order amount condition.
    */
-  public function testOrderPercentageOff() {
+  public function testOrderTotal() {
     // Use addLineItem so the total is calculated.
     $line_item = LineItem::create([
       'type' => 'test',
-      'quantity' => '2',
+      'quantity' => 2,
       'unit_price' => [
         'amount' => '20.00',
         'currency_code' => 'USD',
@@ -116,69 +117,46 @@ class PromotionOfferTest extends KernelTestBase {
           'amount' => '0.10',
         ],
       ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_configuration' => [
+            'amount' => new Price('20.00', 'USD'),
+          ],
+        ],
+      ],
     ]);
     $promotion->save();
 
-    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
-    $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+    $result = $promotion->applies($this->order);
 
-    $promotion->apply($this->order);
+    $this->assertTrue($result);
 
-    $this->assertEquals(1, count($this->order->getAdjustments()));
-    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
-
-  }
-
-  /**
-   * Tests product percentage off.
-   */
-  public function testProductPercentageOff() {
-    // Use addLineItem so the total is calculated.
-    $line_item = LineItem::create([
-      'type' => 'test',
-      'quantity' => '2',
-      'unit_price' => [
-        'amount' => '10.00',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $line_item->save();
-
-    // Starts now, enabled. No end time.
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.50',
+          'amount' => '0.10',
+        ],
+      ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_configuration' => [
+            'amount' => new Price('50.00', 'USD'),
+          ],
         ],
       ],
     ]);
     $promotion->save();
 
-    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
-    $offer_field = $promotion->get('offer')->first();
-    $this->assertEquals('0.50', $offer_field->target_plugin_configuration['amount']);
+    $result = $promotion->applies($this->order);
 
-    $promotion->apply($line_item);
-    $line_item->save();
-
-    $adjustments = $line_item->getAdjustments();
-    $this->assertEquals(1, count($adjustments));
-    /** @var \Drupal\commerce_order\Adjustment $adjustment */
-    $adjustment = reset($adjustments);
-    // Adjustment for 50% of the line item total.
-    $this->assertEquals(new Price('-5.00', 'USD'), $adjustment->getAmount());
-    // Adjustments don't affect total line item price, but the order's total.
-    $this->assertEquals(new Price('20.00', 'USD'), $line_item->getTotalPrice());
-
-    $this->order->addLineItem($line_item);
-    $this->assertEquals(1, count($this->order->getLineItems()));
-    $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
+    $this->assertFalse($result);
   }
 
 }

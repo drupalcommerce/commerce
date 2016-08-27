@@ -239,10 +239,33 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function applies(EntityInterface $entity) {
+    $entity_type_id = $entity->getEntityTypeId();
+    // @todo should whatever invokes this method be providing the context?
+    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+
+    // Execute each plugin, this is an AND operation.
+    // @todo support OR operations.
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
+    foreach ($this->get('conditions') as $item) {
+      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+      $condition = $item->getTargetInstance([$entity_type_id => $context]);
+      if (!$condition->evaluate()) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function apply(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
     $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
     $offer->execute();
@@ -315,6 +338,15 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setLabel(t('Offer'))
       ->setCardinality(1)
       ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'commerce_plugin_select',
+        'weight' => 3,
+      ]);
+
+    $fields['conditions'] = BaseFieldDefinition::create('commerce_plugin_item:commerce_promotion_condition')
+      ->setLabel(t('Conditions'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'commerce_plugin_select',
         'weight' => 3,

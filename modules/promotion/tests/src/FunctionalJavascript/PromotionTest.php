@@ -35,24 +35,33 @@ class PromotionTest extends CommerceBrowserTestBase {
 
   /**
    * Tests creating a promotion.
+   *
+   * @group create
    */
   public function testCreatePromotion() {
     $this->createStore(NULL, NULL, 'default', TRUE);
 
     $this->drupalGet('admin/commerce/promotions');
     $this->getSession()->getPage()->clickLink('Add a new promotion');
+    $this->drupalGet('promotion/add');
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(4000);
+    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
 
     $name = $this->randomMachineName(8);
     $edit = [
       'name[0][value]' => $name,
       'offer[0][target_plugin_configuration][amount]' => '10.0',
     ];
+
+    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
+    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+
+    $edit['conditions[0][target_plugin_configuration][amount][amount]'] = '50.00';
+
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');

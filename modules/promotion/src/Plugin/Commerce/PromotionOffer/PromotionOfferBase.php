@@ -28,7 +28,7 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   /**
    * {@inheritdoc}
    */
-  public function appliesTo() {
+  public function getTargetEntityType() {
     return $this->pluginDefinition['target_entity_type'];
   }
 
@@ -36,7 +36,7 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
    * {@inheritdoc}
    */
   public function getTargetEntity() {
-    return $this->getContextValue($this->appliesTo());
+    return $this->getContextValue($this->getTargetEntityType());
   }
 
   /**

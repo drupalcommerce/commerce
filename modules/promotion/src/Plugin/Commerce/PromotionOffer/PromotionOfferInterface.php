@@ -19,12 +19,12 @@ interface PromotionOfferInterface extends ExecutableInterface, PluginFormInterfa
   const LINE_ITEM = 'commerce_line_item';
 
   /**
-   * Returns what entity the promotion offer applies to.
+   * Gets the entity type the offer is for.
    *
    * @return string
    *   The entity type it applies to.
    */
-  public function appliesTo();
+  public function getTargetEntityType();
 
   /**
    * Get the target entity for the offer.
