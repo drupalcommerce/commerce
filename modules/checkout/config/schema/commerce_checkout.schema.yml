@@ -76,9 +76,6 @@ commerce_checkout.commerce_checkout_pane.login:
     allow_registration:
       type: boolean
       label: 'Allow registration'
-    show_registration_form:
-      type: boolean
-      label: 'Show registration form'
 
 commerce_checkout_pane_configuration:
   type: mapping
