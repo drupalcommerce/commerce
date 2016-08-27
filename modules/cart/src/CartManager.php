@@ -10,6 +10,7 @@ use Drupal\commerce_cart\Event\CartEmptyEvent;
 use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartLineItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartLineItemUpdateEvent;
+use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -107,7 +108,7 @@ class CartManager implements CartManagerInterface {
     }
     $needs_cart_save = FALSE;
     if ($matching_line_item) {
-      $new_quantity = $matching_line_item->getQuantity() + $quantity;
+      $new_quantity = Calculator::add($matching_line_item->getQuantity(), $quantity);
       $matching_line_item->setQuantity($new_quantity);
       $matching_line_item->save();
     }

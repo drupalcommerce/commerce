@@ -109,7 +109,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public function setQuantity($quantity) {
-    $this->set('quantity', $quantity);
+    $this->set('quantity', (string) $quantity);
     return $this;
   }
 

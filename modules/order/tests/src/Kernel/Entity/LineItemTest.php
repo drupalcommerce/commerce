@@ -85,7 +85,7 @@ class LineItemTest extends EntityKernelTestBase {
     $this->assertEquals('My line item', $line_item->getTitle());
 
     $this->assertEquals(1, $line_item->getQuantity());
-    $line_item->setQuantity(2);
+    $line_item->setQuantity('2');
     $this->assertEquals(2, $line_item->getQuantity());
 
     $this->assertEquals(NULL, $line_item->getUnitPrice());
@@ -93,7 +93,7 @@ class LineItemTest extends EntityKernelTestBase {
     $line_item->setUnitPrice($unit_price);
     $this->assertEquals($unit_price, $line_item->getUnitPrice());
 
-    $line_item->setQuantity(1);
+    $line_item->setQuantity('1');
     $line_item->addAdjustment(new Adjustment([
       'type' => 'discount',
       'label' => '10% off',
