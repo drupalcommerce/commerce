@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
 
@@ -70,6 +71,16 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    *   The variation price, or NULL.
    */
   public function getPrice();
+
+  /**
+   * Sets the variation price.
+   *
+   * @param \Drupal\commerce_price\Price $price
+   *   The price.
+   *
+   * @return $this
+   */
+  public function setPrice(Price $price);
 
   /**
    * Gets whether the variation is active.

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -119,6 +120,15 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     if (!$this->get('unit_price')->isEmpty()) {
       return $this->get('unit_price')->first()->toPrice();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUnitPrice(Price $unit_price) {
+    $this->set('unit_price', $unit_price);
+    $this->recalculateTotalPrice();
+    return $this;
   }
 
   /**

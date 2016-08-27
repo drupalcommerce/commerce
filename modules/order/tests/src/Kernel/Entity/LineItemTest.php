@@ -64,6 +64,8 @@ class LineItemTest extends EntityKernelTestBase {
    * @covers ::setTitle
    * @covers ::getQuantity
    * @covers ::setQuantity
+   * @covers ::getUnitPrice
+   * @covers ::setUnitPrice
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
@@ -76,7 +78,6 @@ class LineItemTest extends EntityKernelTestBase {
   public function testLineItem() {
     $line_item = LineItem::create([
       'type' => 'test',
-      'unit_price' => new Price('9.99', 'USD'),
     ]);
     $line_item->save();
 
@@ -86,6 +87,11 @@ class LineItemTest extends EntityKernelTestBase {
     $this->assertEquals(1, $line_item->getQuantity());
     $line_item->setQuantity(2);
     $this->assertEquals(2, $line_item->getQuantity());
+
+    $this->assertEquals(NULL, $line_item->getUnitPrice());
+    $unit_price = new Price('9.99', 'USD');
+    $line_item->setUnitPrice($unit_price);
+    $this->assertEquals($unit_price, $line_item->getUnitPrice());
 
     $line_item->setQuantity(1);
     $line_item->addAdjustment(new Adjustment([

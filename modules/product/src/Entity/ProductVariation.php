@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -133,6 +134,14 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     if (!$this->get('price')->isEmpty()) {
       return $this->get('price')->first()->toPrice();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPrice(Price $price) {
+    $this->set('price', $price);
+    return $this;
   }
 
   /**

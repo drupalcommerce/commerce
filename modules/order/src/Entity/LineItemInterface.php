@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\AdjustableInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
@@ -86,6 +87,16 @@ interface LineItemInterface extends AdjustableInterface, ContentEntityInterface,
    *   The line item unit price, or NULL.
    */
   public function getUnitPrice();
+
+  /**
+   * Sets the line item unit price.
+   *
+   * @param \Drupal\commerce_price\Price $unit_price
+   *   The line item unit price.
+   *
+   * @return $this
+   */
+  public function setUnitPrice(Price $unit_price);
 
   /**
    * Gets the line item total price.
