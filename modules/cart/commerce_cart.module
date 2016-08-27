@@ -108,7 +108,7 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
  * Hides irrelevant purchased_entity widgets on the add_to_cart line item
  * form display.
  */
-function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+function commerce_cart_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
   $entity = $form_state->getFormObject()->getEntity();
   if ($form['#entity_type'] == 'commerce_line_item' && $entity->getMode() == 'add_to_cart') {
@@ -183,7 +183,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   ];
 
   $form['commerce_cart']['refresh_intro'] = [
-    '#markup' => '<p> ' . t('These settings let you control how shopping carts are refreshed, the process during which line item prices are recalculated.') . '</p>',
+    '#markup' => '<p>' . t('These settings let you control how shopping carts are refreshed, the process during which line item prices are recalculated.') . '</p>',
   ];
   $form['commerce_cart']['refresh_mode'] = [
     '#type' => 'radios',
