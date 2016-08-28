@@ -85,8 +85,8 @@ class BundlePluginInstaller implements BundlePluginInstallerInterface {
     foreach (array_keys($bundles) as $bundle) {
       $this->entityBundleListener->onBundleDelete($bundle, $entity_type->id());
       foreach ($bundle_handler->getFieldDefinitions($bundle) as $definition) {
-        $this->fieldStorageDefinitionListener->onFieldStorageDefinitionDelete($definition);
         $this->fieldDefinitionListener->onFieldDefinitionDelete($definition);
+        $this->fieldStorageDefinitionListener->onFieldStorageDefinitionDelete($definition);
       }
     }
   }
