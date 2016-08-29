@@ -6,6 +6,7 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
+use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -47,6 +48,13 @@ class AddToCartForm extends ContentEntityForm {
   protected $storeContext;
 
   /**
+   * The chain base price resolver.
+   *
+   * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
+   */
+  protected $chainPriceResolver;
+
+  /**
    * Constructs a new AddToCartForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -59,14 +67,17 @@ class AddToCartForm extends ContentEntityForm {
    *   The order type resolver.
    * @param \Drupal\commerce_store\StoreContextInterface $store_context
    *   The store context.
+   * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
+   *   The chain base price resolver.
    */
-  public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context) {
+  public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver) {
     parent::__construct($entity_manager);
 
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
     $this->orderTypeResolver = $order_type_resolver;
     $this->storeContext = $store_context;
+    $this->chainPriceResolver = $chain_price_resolver;
   }
 
   /**
@@ -78,7 +89,8 @@ class AddToCartForm extends ContentEntityForm {
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
       $container->get('commerce_order.chain_order_type_resolver'),
-      $container->get('commerce_store.store_context')
+      $container->get('commerce_store.store_context'),
+      $container->get('commerce_price.chain_price_resolver')
     );
   }
 
@@ -143,8 +155,7 @@ class AddToCartForm extends ContentEntityForm {
     $entity = parent::buildEntity($form, $form_state);
     // Now that the purchased entity is set, populate the title and price.
     $entity->setTitle($entity->getPurchasedEntity()->getLineItemTitle());
-    // @todo Remove once the price calculation is in place.
-    $entity->unit_price = $entity->getPurchasedEntity()->price;
+    $entity->setUnitPrice($this->chainPriceResolver->resolve($entity->getPurchasedEntity()));
 
     return $entity;
   }
