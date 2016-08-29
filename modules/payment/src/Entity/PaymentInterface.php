@@ -123,6 +123,27 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function getState();
 
   /**
+   * Gets whether this is a test payment.
+   *
+   * Test payments are created while the payment gateway is in a test mode,
+   * and can be deleted at any time.
+   *
+   * @return bool
+   *   TRUE if this is a test payment, FALSE otherwise.
+   */
+  public function isTest();
+
+  /**
+   * Sets whether this is a test payment.
+   *
+   * @param bool $test
+   *   The test flag.
+   *
+   * @return $this
+   */
+  public function setTest($test);
+
+  /**
    * Gets the payment authorization timestamp.
    *
    * @return int

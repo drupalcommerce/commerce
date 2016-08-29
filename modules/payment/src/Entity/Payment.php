@@ -23,12 +23,14 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   bundle_label = @Translation("Payment type"),
  *   bundle_plugin_type = "commerce_payment_type",
  *   handlers = {
+ *     "access" = "Drupal\commerce_payment\PaymentAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_payment\PaymentListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentStorage",
  *     "form" = {
  *       "capture" = "Drupal\commerce_payment\Form\PaymentCaptureForm",
  *       "void" = "Drupal\commerce_payment\Form\PaymentVoidForm",
  *       "refund" = "Drupal\commerce_payment\Form\PaymentRefundForm",
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "route_provider" = {
@@ -49,7 +51,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "capture-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/capture",
  *     "void-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/void",
  *     "refund-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/refund",
- *     "delete-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment/delete",
+ *     "delete-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/delete",
  *   },
  * )
  */
@@ -191,6 +193,21 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function isTest() {
+    return $this->get('test')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTest($test) {
+    $this->set('test', $test);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAuthorizedTime() {
     return $this->get('authorized')->value;
   }
@@ -300,6 +317,10 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('workflow_callback', ['\Drupal\commerce_payment\Entity\Payment', 'getWorkflowId']);
+
+    $fields['test'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Test'))
+      ->setDescription(t('Whether this is a test payment.'));
 
     $fields['authorized'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Authorized'))

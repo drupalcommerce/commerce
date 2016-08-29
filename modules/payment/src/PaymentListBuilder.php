@@ -48,7 +48,6 @@ class PaymentListBuilder extends EntityListBuilder {
     $payment_gateway_plugin = $entity->getPaymentGateway()->getPlugin();
     $operations = $payment_gateway_plugin->buildPaymentOperations($entity);
     if ($entity->access('delete')) {
-      // @todo Limit delete access to test payments.
       $operations['delete'] = [
         'title' => $this->t('Delete'),
         'weight' => 100,
