@@ -16,7 +16,7 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $payment->getAmount(),
+      '#default_value' => $payment->getBalance(),
       '#required' => TRUE,
     ];
 

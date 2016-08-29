@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\Entity;
 
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -139,6 +140,16 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function getBalance() {
+    if ($amount = $this->getAmount()) {
+      $refunded_amount = $this->getRefundedAmount();
+      return $amount->subtract($refunded_amount);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAmount() {
     if (!$this->get('amount')->isEmpty()) {
       return $this->get('amount')->first()->toPrice();
@@ -220,6 +231,20 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   public function setCapturedTime($timestamp) {
     $this->set('captured', $timestamp);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    // Initialize the refunded amount.
+    $refunded_amount = $this->getRefundedAmount();
+    if (!$refunded_amount) {
+      $refunded_amount = new Price('0', $this->getAmount()->getCurrencyCode());
+      $this->setRefundedAmount($refunded_amount);
+    }
   }
 
   /**

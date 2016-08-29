@@ -69,6 +69,16 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function setRemoteId($remote_ID);
 
   /**
+   * Gets the payment balance.
+   *
+   * The balance represents the payment amount minus the refunded amount.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The payment balance, or NULL if the payment does not have an amount yet.
+   */
+  public function getBalance();
+
+  /**
    * Gets the payment amount.
    *
    * @return \Drupal\commerce_price\Price|null
