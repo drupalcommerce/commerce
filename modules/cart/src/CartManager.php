@@ -11,6 +11,7 @@ use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartLineItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartLineItemUpdateEvent;
 use Drupal\commerce_price\Calculator;
+use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -44,6 +45,13 @@ class CartManager implements CartManagerInterface {
   protected $eventDispatcher;
 
   /**
+   * The chain base price resolver.
+   *
+   * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
+   */
+  protected $chainPriceResolver;
+
+  /**
    * Constructs a new CartManager object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -52,11 +60,14 @@ class CartManager implements CartManagerInterface {
    *   The line item matcher.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
+   *   The chain base price resolver.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, EventDispatcherInterface $event_dispatcher, ChainPriceResolverInterface $chain_price_resolver) {
     $this->lineItemStorage = $entity_type_manager->getStorage('commerce_line_item');
     $this->lineItemMatcher = $line_item_matcher;
     $this->eventDispatcher = $event_dispatcher;
+    $this->chainPriceResolver = $chain_price_resolver;
   }
 
   /**
@@ -89,9 +100,8 @@ class CartManager implements CartManagerInterface {
   public function createLineItem(PurchasableEntityInterface $entity, $quantity = 1) {
     $line_item = $this->lineItemStorage->createFromPurchasableEntity($entity, [
       'quantity' => $quantity,
-      // @todo Remove once the price calculation is in place.
-      'unit_price' => $entity->price,
     ]);
+    $line_item->setUnitPrice($this->chainPriceResolver->resolve($entity, $quantity));
 
     return $line_item;
   }
