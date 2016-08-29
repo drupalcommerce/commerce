@@ -10,11 +10,10 @@ entity.commerce_payment.add_form:
   requirements:
     _entity_create_access: 'commerce_payment'
 
-entity.commerce_payment.capture_form:
-  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/capture'
+entity.commerce_payment.operation_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}'
   defaults:
-    _entity_form: 'commerce_payment.capture'
-    _title: 'Capture payment'
+    _entity_form: 'commerce_payment.operation'
   options:
     parameters:
       commerce_order:
@@ -22,35 +21,7 @@ entity.commerce_payment.capture_form:
       commerce_payment:
         type: 'entity:commerce_payment'
   requirements:
-    _permission: 'administer payments'
-
-entity.commerce_payment.void_form:
-  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/void'
-  defaults:
-    _entity_form: 'commerce_payment.void'
-    _title: 'Void payment'
-  options:
-    parameters:
-      commerce_order:
-        type: 'entity:commerce_order'
-      commerce_payment:
-        type: 'entity:commerce_payment'
-  requirements:
-    _permission: 'administer payments'
-
-entity.commerce_payment.refund_form:
-  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/refund'
-  defaults:
-    _entity_form: 'commerce_payment.refund'
-    _title: 'Refund payment'
-  options:
-    parameters:
-      commerce_order:
-        type: 'entity:commerce_order'
-      commerce_payment:
-        type: 'entity:commerce_payment'
-  requirements:
-    _permission: 'administer payments'
+    _commerce_payment_operation_access: 'TRUE'
 
 entity.commerce_payment.collection:
   path: '/admin/commerce/orders/{commerce_order}/payments'

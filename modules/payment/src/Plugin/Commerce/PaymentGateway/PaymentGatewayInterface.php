@@ -83,6 +83,11 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    *
    * @return array
    *   The operations.
+   *   Keyed by operation ID, each value is an array with the following keys:
+   *   - title: The operation title.
+   *   - page_title: The operation page title.
+   *   - plugin_form: The plugin form ID.
+   *   - access: Whether the operation is allowed for the given payment.
    */
   public function buildPaymentOperations(PaymentInterface $payment);
 

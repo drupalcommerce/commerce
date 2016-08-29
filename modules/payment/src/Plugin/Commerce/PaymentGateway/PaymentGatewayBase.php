@@ -99,6 +99,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
     if ($this instanceof SupportsAuthorizationsInterface) {
       $default_forms['capture-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentCaptureForm';
+      $default_forms['void-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentVoidForm';
     }
     if ($this instanceof SupportsRefundsInterface) {
       $default_forms['refund-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentRefundForm';
@@ -265,26 +266,29 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function buildPaymentOperations(PaymentInterface $payment) {
     $operations = [];
-    // @todo Implement access checking for operations.
     if ($this instanceof SupportsAuthorizationsInterface) {
-      if ($payment->getState()->value == 'authorization') {
-        $operations['capture'] = [
-          'title' => $this->t('Capture'),
-          'url' => $payment->toUrl('capture-form'),
-        ];
-        $operations['void'] = [
-          'title' => $this->t('Void'),
-          'url' => $payment->toUrl('void-form'),
-        ];
-      }
+      $access = $payment->getState()->value == 'authorization';
+      $operations['capture'] = [
+        'title' => $this->t('Capture'),
+        'page_title' => $this->t('Capture payment'),
+        'plugin_form' => 'capture-payment',
+        'access' => $access,
+      ];
+      $operations['void'] = [
+        'title' => $this->t('Void'),
+        'page_title' => $this->t('Void payment'),
+        'plugin_form' => 'void-payment',
+        'access' => $access,
+      ];
     }
     if ($this instanceof SupportsRefundsInterface) {
-      if (in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded'])) {
-        $operations['refund'] = [
-          'title' => $this->t('Refund'),
-          'url' => $payment->toUrl('refund-form'),
-        ];
-      }
+      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded']);
+      $operations['refund'] = [
+        'title' => $this->t('Refund'),
+        'page_title' => $this->t('Refund payment'),
+        'plugin_form' => 'refund-payment',
+        'access' => $access,
+      ];
     }
 
     return $operations;

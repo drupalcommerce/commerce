@@ -13,6 +13,7 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
 
+    $form['#success_message'] = t('Payment captured.');
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),

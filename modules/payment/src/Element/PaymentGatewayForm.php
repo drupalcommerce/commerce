@@ -78,6 +78,10 @@ class PaymentGatewayForm extends RenderElement {
     }
     $plugin_form = static::createPluginForm($element);
     $element = $plugin_form->buildConfigurationForm($element, $form_state);
+    // Allow the plugin form to override the page title.
+    if (isset($element['#page_title'])) {
+      $complete_form['#title'] = $element['#page_title'];
+    }
     // The #validate callbacks of the complete form run last.
     // That allows executeElementSubmitHandlers() to be completely certain that
     // the form has passed validation before proceeding.

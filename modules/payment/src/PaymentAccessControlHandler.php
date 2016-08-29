@@ -25,6 +25,16 @@ class PaymentAccessControlHandler extends EntityAccessControlHandler {
     if ($operation == 'delete') {
       $access = $access->andIf(AccessResult::allowedIf($entity->isTest()));
     }
+    elseif (!in_array($operation, ['view', 'view label', 'delete'])) {
+      $payment_gateway_plugin = $entity->getPaymentGateway()->getPlugin();
+      $operations = $payment_gateway_plugin->buildPaymentOperations($entity);
+      if (!isset($operations[$operation])) {
+        // Invalid operation.
+        return AccessResult::neutral();
+      }
+      $allowed = !empty($operations[$operation]['access']);
+      $access = $access->andIf(AccessResult::allowedIf($allowed));
+    }
 
     return $access;
   }

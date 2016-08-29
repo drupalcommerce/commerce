@@ -27,9 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "list_builder" = "Drupal\commerce_payment\PaymentListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentStorage",
  *     "form" = {
- *       "capture" = "Drupal\commerce_payment\Form\PaymentCaptureForm",
- *       "void" = "Drupal\commerce_payment\Form\PaymentVoidForm",
- *       "refund" = "Drupal\commerce_payment\Form\PaymentRefundForm",
+ *       "operation" = "Drupal\commerce_payment\Form\PaymentOperationForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -48,9 +46,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "collection" = "/admin/commerce/orders/{commerce_order}/payments",
  *     "canonical" = "/admin/commerce/orders/{commerce_order}/payments/commerce_payment/edit",
- *     "capture-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/capture",
- *     "void-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/void",
- *     "refund-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/refund",
+ *     "operation-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}",
  *     "delete-form" = "/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/delete",
  *   },
  * )
