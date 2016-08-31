@@ -42,6 +42,10 @@ class AdjustmentItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function setValue($values, $notify = TRUE) {
+    if (is_array($values)) {
+      // The property definition causes the adjustment to be in 'value' key.
+      $values = reset($values);
+    }
     if (!$values instanceof Adjustment) {
       $values = NULL;
     }

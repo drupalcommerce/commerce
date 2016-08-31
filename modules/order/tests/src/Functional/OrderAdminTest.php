@@ -2,7 +2,9 @@
 
 namespace Drupal\Tests\commerce_order\Functional;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 
 /**
@@ -88,6 +90,36 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getLineItems()));
     $this->assertEquals('5.33', $order->total_price->amount);
+  }
+
+  /**
+   * Tests editing an order.
+   */
+  public function testEditOrder() {
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order->save();
+
+    $adjustments = [];
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
+      'label' => '10% off',
+      'amount' => new Price('-1.00', 'USD'),
+    ]);
+    $adjustments[] = new Adjustment([
+      'type' => 'custom',
+      'label' => 'Handling fee',
+      'amount' => new Price('10.00', 'USD'),
+    ]);
+    $order->addAdjustment($adjustments[0]);
+    $order->addAdjustment($adjustments[1]);
+    $order->save();
+
+    $this->drupalGet($order->toUrl('edit-form'));
+    $this->assertSession()->fieldValueEquals('adjustments[0][definition][label]', '10% off');
+    $this->assertSession()->fieldValueEquals('adjustments[1][definition][label]', 'Handling fee');
   }
 
   /**
