@@ -61,7 +61,8 @@ class Price extends FormElement {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if ($input !== FALSE && $input !== NULL) {
+    // Ensure we have all possible values before creating price object.
+    if ($input !== FALSE && $input !== NULL && isset($input['amount']) && isset($input['currency_code'])) {
       // Convert empty string value to numeric value.
       if ($input['amount'] === '') {
         $input['amount'] = '0';
