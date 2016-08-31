@@ -5,7 +5,7 @@ namespace Drupal\commerce_price\Element;
 use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Drupal\commerce_price\Price as PriceValue;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\Textfield;
+use Drupal\Core\Render\Element\FormElement;
 
 /**
  * Provides a price form element.
@@ -27,7 +27,7 @@ use Drupal\Core\Render\Element\Textfield;
  *
  * @FormElement("commerce_price")
  */
-class Price extends Textfield {
+class Price extends FormElement {
 
   /**
    * {@inheritdoc}
@@ -134,6 +134,9 @@ class Price extends Textfield {
       // separator to use. This is the same pattern Drupal core uses.
       '#placeholder' => $number_formatter->format('9.99'),
     ];
+    unset($element['#size']);
+    unset($element['#maxlength']);
+
     if (count($currency_codes) == 1) {
       $last_visible_element = 'amount';
       $currency_code = reset($currency_codes);
