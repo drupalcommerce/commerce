@@ -233,4 +233,9 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    */
   public function setPlacedTime($timestamp);
 
+  /**
+   * Recalculates the line item total price.
+   */
+  public function recalculateTotalPrice();
+
 }

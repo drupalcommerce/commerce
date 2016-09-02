@@ -387,9 +387,9 @@ class Order extends ContentEntityBase implements OrderInterface {
   }
 
   /**
-   * Recalculates the line item total price.
+   * {@inheritdoc}
    */
-  protected function recalculateTotalPrice() {
+  public function recalculateTotalPrice() {
     $total_price = $this->getTotalPrice();
     if ($total_price) {
       $currency_code = $total_price->getCurrencyCode();

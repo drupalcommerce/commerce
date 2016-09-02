@@ -15,7 +15,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * Helper method to return base query for valid promotions.
    *
-   * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
+   * @param string $order_type
    *   The order type.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
@@ -23,7 +23,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query.
    */
-  protected function loadValidQuery(OrderTypeInterface $order_type, StoreInterface $store) {
+  protected function loadValidQuery($order_type, StoreInterface $store) {
     $query = $this->getQuery();
 
     $or_condition = $query->orConditionGroup()
@@ -31,7 +31,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       ->notExists('end_date', gmdate('Y-m-d'));
     $query
       ->condition('stores', [$store->id()], 'IN')
-      ->condition('order_types', [$order_type->id()], 'IN')
+      ->condition('order_types', [$order_type], 'IN')
       ->condition('start_date', gmdate('Y-m-d'), '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
@@ -41,7 +41,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * {@inheritdoc}
    */
-  public function loadValid(OrderTypeInterface $order_type, StoreInterface $store) {
+  public function loadValid($order_type, StoreInterface $store) {
     $query = $this->loadValidQuery($order_type, $store);
     $result = $query->execute();
     if (empty($result)) {
@@ -55,7 +55,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * {@inheritdoc}
    */
-  public function loadByCoupon(OrderTypeInterface $order_type, StoreInterface $store, CouponInterface $coupon) {
+  public function loadByCoupon($order_type, StoreInterface $store, CouponInterface $coupon) {
     $query = $this->loadValidQuery($order_type, $store);
     $query->condition('coupons', $coupon->id());
     $result = $query->execute();

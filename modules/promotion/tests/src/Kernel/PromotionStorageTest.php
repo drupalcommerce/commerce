@@ -132,8 +132,6 @@ class PromotionStorageTest extends KernelTestBase {
    * Tests loading a promotion by a coupon.
    */
   public function testLoadByCoupon() {
-    $order_type = OrderType::load('default');
-
     $coupon_code = $this->randomMachineName();
     $coupon = Coupon::create([
       'code' => $coupon_code,
@@ -144,7 +142,7 @@ class PromotionStorageTest extends KernelTestBase {
     // Starts now, enabled. No end time.
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
-      'order_types' => [$order_type],
+      'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'coupons' => [$coupon],
@@ -153,14 +151,14 @@ class PromotionStorageTest extends KernelTestBase {
     // Starts now, enabled. No end time.
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
-      'order_types' => [$order_type],
+      'order_types' => ['default'],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
     $this->assertEquals(SAVED_NEW, $promotion2->save());
 
     // Verify valid promotions load.
-    $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
+    $valid_promotion = $this->promotionStorage->loadByCoupon('default', $this->store, $coupon);
     $this->assertEquals($promotion1->label(), $valid_promotion->label());
   }
 
