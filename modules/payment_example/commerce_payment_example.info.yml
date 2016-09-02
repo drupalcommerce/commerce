@@ -1,0 +1,7 @@
+name: Commerce Payment Example
+type: module
+description: 'Provides payment gateway examples.'
+package: Commerce
+core: 8.x
+dependencies:
+  - commerce_payment
