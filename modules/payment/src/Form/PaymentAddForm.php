@@ -4,7 +4,6 @@ namespace Drupal\commerce_payment\Form;
 
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
@@ -116,8 +115,12 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       throw new AccessDeniedHttpException();
     }
 
+    $user_input = $form_state->getUserInput();
     $first_payment_gateway = reset($payment_gateways);
-    $selected_payment_gateway_id = $form_state->getValue('payment_gateway', $first_payment_gateway->id());
+    $selected_payment_gateway_id = $first_payment_gateway->id();
+    if (isset($user_input['payment_gateway'])) {
+      $selected_payment_gateway_id = $user_input['payment_gateway'];
+    }
     $selected_payment_gateway = $payment_gateways[$selected_payment_gateway_id];
     if (count($payment_gateways) > 1) {
       $payment_gateway_options = array_map(function ($payment_gateway) {
@@ -129,6 +132,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
         '#type' => 'radios',
         '#title' => $this->t('Payment gateway'),
         '#options' => $payment_gateway_options,
+        '#default_value' => $selected_payment_gateway_id,
         '#required' => TRUE,
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
@@ -146,17 +150,24 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
     $payment_methods = $payment_method_storage->loadReusable($this->order->getOwner(), $selected_payment_gateway);
-    $payment_method_options = array_map(function ($payment_method) {
-      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-      return $payment_method->label();
-    }, $payment_methods);
+    $selected_payment_method = reset($payment_methods);
+    $payment_method_options = [];
+    foreach ($payment_methods as $id => $payment_method) {
+      $payment_method_options[$id] = $payment_method->label();
+      if ($payment_method->isDefault()) {
+        $selected_payment_method = $payment_method;
+      }
+    }
 
     $form['payment_method'] = [
       '#type' => 'radios',
       '#title' => $this->t('Payment method'),
       '#options' => $payment_method_options,
-      '#default_value' => '',
+      '#default_value' => $selected_payment_method->id(),
       '#required' => TRUE,
+      '#after_build' => [
+        [get_class($this), 'fixDefaultValue'],
+      ],
     ];
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -165,6 +176,24 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     ];
 
     return $form;
+  }
+
+  /**
+   * Clears the payment method value when the payment gateway changes.
+   *
+   * Changing the payment gateway results in a new set of payment methods,
+   * causing the submitted value to trigger an "Illegal choice" error, cause
+   * it's no longer allowed. Clearing the value causes the element to fallback
+   * to the default value, avoiding the error.
+   */
+  public static function clearsValue(array $element, FormStateInterface $form_state) {
+    $value = $element['#value'];
+    if (!isset($element['#options'][$value])) {
+      $element['#value'] = NULL;
+      $user_input = &$form_state->getUserInput();
+      unset($user_input['payment_method']);
+    }
+    return $element;
   }
 
   /**
@@ -223,9 +252,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    * Ajax callback.
    */
   public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
-    $parents = $form_state->getTriggeringElement()['#parents'];
-    array_pop($parents);
-    return NestedArray::getValue($form, $parents);
+    return $form;
   }
 
 }
