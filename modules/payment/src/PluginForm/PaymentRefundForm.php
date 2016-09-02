@@ -27,6 +27,20 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
+    $payment = $this->entity;
+    /** @var \Drupal\commerce_price\Price $amount */
+    $amount = $form['amount']['#value'];
+    $balance = $payment->getBalance();
+    if ($amount->greaterThan($balance)) {
+      $form_state->setError($form['amount'], t("Can't refund more than @amount.", ['@amount' => $balance->__toString()]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
