@@ -11,6 +11,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\Html;
 
 /**
  * Defines the product variation entity class.
@@ -388,7 +390,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $fields['sku'] = BaseFieldDefinition::create('string')
       ->setLabel(t('SKU'))
-      ->setDescription(t('The unique, machine-readable identifier for a variation.'))
+      ->setDescription(t("The unique, machine-readable identifier for a variation. Default is the PHP's iniqid()."))
+      ->setDefaultValueCallback('Drupal\commerce_product\Entity\ProductVariation::getUniqSku')
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
       ->setSetting('display_description', TRUE)
@@ -498,6 +501,226 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public static function getCurrentUserId() {
     return [\Drupal::currentUser()->id()];
+  }
+
+  /**
+   * Default value callback for 'sku' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return string
+   *   A prefixed unique identifier based on the current time in microseconds.
+   */
+  public static function getUniqSku() {
+    return \uniqid('sku-');
+  }
+
+  /**
+   * An AJAX callback to create all possible variations for commerce_product.
+   *
+   * @see commerce_product_field_widget_form_alter()
+   *
+   * @param array $form
+   *
+   *   An array form for commerce_product.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   *   The form state of the commerce_product form with at least one variation
+   *   created.
+   */
+  public static function createAllVariations(array $form, FormStateInterface $form_state) {
+    $ief_id = $form['variations']['widget']['#ief_id'];
+    if (!$all = static::getUsedAttributesCombinations($form_state, $ief_id)) {
+      return;
+    }
+    $timestamp = time();
+    $ief_entity = end($all['ief_entities']);
+    foreach ($all['possible']['combinations'] as $combination) {
+      if (!in_array($combination, $all['combinations'])) {
+        $variation = $all['last_variation']->createDuplicate()
+          ->set('variation_id', NULL)
+          ->setSku(static::getUniqSku())
+          ->setChangedTime($timestamp)
+          ->setCreatedTime($timestamp);
+        foreach ($combination as $field_name => $id) {
+          $variation->get($field_name)->setValue(['target_id' => $id == '_none' ? NULL : $id]);
+        }
+        $variation->updateOriginalValues();
+        $ief_entity['entity'] = $variation;
+        $ief_entity['weight'] += 1;
+        array_push($all['ief_entities'], $ief_entity);
+        // To avoid the same CreatedTime on multiple variations increase the
+        // $timestamp by one second instead of calling time() in the loop.
+        $timestamp++;
+      }
+    }
+    $form_state->set(['inline_entity_form', $ief_id, 'entities'], $all['ief_entities']);
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Gets duplicated variations combinations and labels.
+   *
+   * @param string $ief_id
+   *
+   *   The id of inline_entity_form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   *   The form state of the commerce_product form with at least one variation
+   *   created.
+   *
+   * @return array|null
+   *   An array of used combinations, possible combinations and their quantity,
+   *   last variation, inline_entity_form entities, duplicated combinations and
+   *   an HTML list of duplicated variations labels if they are found.
+   */
+  public static function getDuplicatedAttributesCombinations(FormStateInterface $form_state, $ief_id = '') {
+    if (!$all = static::getUsedAttributesCombinations($form_state, $ief_id)) {
+      return;
+    }
+    $all['used'] = $all['duplications'] = [];
+    foreach ($all['combinations'] as $combination) {
+      if (in_array($combination, $all['used'])) {
+        $all['duplications'][] = $combination;
+      }
+      else {
+        $all['used'][] = $combination;
+      }
+    }
+    if (!empty($all['duplications'])) {
+      $field_options = $all['last_variation']->getAttributeFieldOptionIds();
+      $all['duplications_list'] = '<ul>';
+      foreach ($all['duplications'] as $fields) {
+        $label = [];
+        foreach ($fields as $field_name => $id) {
+          if (isset($field_options['options'][$field_name][$id])) {
+            $label[] = $field_options['options'][$field_name][$id];
+          }
+        }
+        $label = Html::escape(implode(', ', $label));
+        $all['duplications_list'] .= '<li>' . $label . '</li>';
+      }
+      $all['duplications_list'] .= '</ul>';
+    }
+
+    return $all;
+  }
+
+  /**
+   * Gets all used variations attributes combinations on a commerce_product.
+   *
+   * @param string $ief_id
+   *
+   *   The id of inline_entity_form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   *   The form state of the commerce_product form with at least one variation
+   *   created.
+   *
+   * @return array|null
+   *   An array of used combinations, possible combinations and their quantity,
+   *   last variation and inline_entity_form entities.
+   */
+  public static function getUsedAttributesCombinations(FormStateInterface $form_state, $ief_id = '') {
+    $ief_entities = $form_state->get(['inline_entity_form', $ief_id, 'entities']) ?: [];
+    $ief_entity = end($ief_entities);
+    if (!isset($ief_entity['entity'])) {
+      return;
+    }
+    $all = [];
+    $all['ief_entities'] = $ief_entities;
+    $all['last_variation'] = $ief_entity['entity'];
+    $all['possible'] = $all['last_variation']->getAttributesCombinations();
+    $nones = array_fill_keys(array_keys($all['last_variation']->getAttributeFieldOptionIds()['ids']), '_none');
+    foreach ($ief_entities as $variation) {
+      $last = $variation['entity'];
+      // getAttributeValueIds() does not return empty optional fields.
+      // Merge 'field_name' => '_none' as a choice in the combination.
+      // @todo Render '_none' option on an Add to Cart form.
+      // @see ProductVariationAttributesWidget->formElement()
+      // @see CommerceProductRenderedAttribute::processRadios()
+      $all['combinations'][] = array_merge($nones, $last->getAttributeValueIds());
+    }
+
+    return $all;
+  }
+
+  /**
+   * Gets the ids of the variation's attribute fields.
+   *
+   * @return array
+   *   An array of ids arrays keyed by field name.
+   */
+  public function getAttributeFieldOptionIds() {
+    $field_options = $ids = $fields = [];
+    foreach ($this->getAttributeFieldNames() as $field_name) {
+      $definition = $this->get($field_name)->getFieldDefinition();
+      $fields[$field_name] = $definition->getFieldStorageDefinition()
+        ->getOptionsProvider('target_id', $this)
+        ->getSettableOptions(\Drupal::currentUser());
+      $ids[$field_name] = array_keys($fields[$field_name]);
+      // Optional fields need '_none' id as a possible choice.
+      !$definition->isRequired() && array_unshift($ids[$field_name], '_none');
+    }
+    $field_options['ids'] = $ids;
+    $field_options['options'] = $fields;
+
+    return $field_options;
+  }
+
+  /**
+   * Gets all ids combinations of the commerce_product's attribute fields.
+   *
+   * @return array
+   *   An array of ids combinations and combinations quantity.
+   */
+  public function getAttributesCombinations() {
+    $combinations = $this->getArrayValueCombinations($this->getAttributeFieldOptionIds()['ids']);
+    $field_names = array_values($this->getAttributeFieldNames());
+    $all = [];
+    foreach ($combinations as $combination) {
+      array_walk($combination, function (&$id) {
+      $id = (string) $id;
+      }
+      );
+      $all['combinations'][] = array_combine($field_names, $combination);
+    }
+    $all['count'] = count($combinations);
+
+    return $all;
+  }
+
+  /**
+   * Gets combinations of an Array values.
+   *
+   * See the function
+   * @link https://gist.github.com/fabiocicerchia/4556892 source origin @endlink
+   * .
+   *
+   * @param array $data
+   *
+   *   An array with mixed data.
+   *
+   * @return array
+   *   An array of all possible array values combinations.
+   */
+  protected function getArrayValueCombinations(array $data = array(), array &$all = array(), array $group = array(), $value = NULL, $i = 0) {
+    $keys = array_keys($data);
+    if (isset($value) === TRUE) {
+      array_push($group, $value);
+    }
+    if ($i >= count($data)) {
+      array_push($all, $group);
+    }
+    elseif (isset($keys[$i])) {
+      $currentKey = $keys[$i];
+      $currentElement = $data[$currentKey];
+      foreach ($currentElement as $key => $val) {
+        $this->getArrayValueCombinations($data, $all, $group, $val, $i + 1);
+      }
+    }
+
+    return $all;
   }
 
 }

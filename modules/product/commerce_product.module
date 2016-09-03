@@ -15,7 +15,7 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductType;
-
+use Drupal\commerce_product\Entity\ProductVariation;
 /**
  * Implements hook_config_translation_info_alter().
  */
@@ -373,12 +373,59 @@ function commerce_product_field_widget_form_alter(&$element, FormStateInterface 
   $entity_type = $field_definition->getTargetEntityTypeId();
   $widget_name = $context['widget']->getPluginId();
   $required = $field_definition->isRequired();
-  if ($field_name == 'path' && $entity_type == 'commerce_product' && $widget_name == 'path') {
-    $element['alias']['#description'] = t('The alternative URL for this product. Use a relative path. For example, "/my-product".');
+  if ($entity_type == 'commerce_product') {
+    if ($field_name == 'path' && $widget_name == 'path') {
+      $element['alias']['#description'] = t('The alternative URL for this product. Use a relative path. For example, "/my-product".');
+    }
+    elseif ($field_name == 'variations') {
+      if (!$all = ProductVariation::getDuplicatedAttributesCombinations($form_state, $element['#ief_id'])) {
+        return;
+      }
+      $one = $context['widget']->getSettings()['label_singular'];
+      $many = $context['widget']->getSettings()['label_plural'];
+      if (isset($all['duplications_list'])) {
+        $labels = \Drupal\Core\Render\Markup::create($all['duplications_list']);
+        $count_duplications = count($all['duplications']);
+        $placeholders = [
+          '@variations' => $count_duplications > 1 ? $many : $one,
+          '@count' => $count_duplications,
+          '@labels' => $labels,
+        ];
+        $warning = t('You have @count @variations duplicated: @labels', $placeholders);
+        drupal_set_message($warning, 'warning');
+      }
+      foreach ($all['possible']['combinations'] as $combination) {
+        if (!in_array($combination, $all['combinations'])) {
+          $form_state->setValue('next_attribute_value_ids', $combination);
+          $form_state->setValue('last_added_price', $all['last_variation']->getPrice());
+          if (isset($element['actions']['ief_add'])) {
+            $count = $all['possible']['count'] - count($all['used']);
+            $element['actions']['ief_add_all'] = [
+              '#submit' => [['\Drupal\commerce_product\Entity\ProductVariation', 'createAllVariations']],
+              '#value' => t('Create @count @variations', ['@count'=> $count, '@variations' => $count > 1 ? $many : $one]),
+              '#weight' => 10,
+              '#attributes'=> [
+                'title' => t('Automatically create all the rest @variations based on price and attributes combination of the last added @variation. Other specific values such as @variation image or SKU may be edited inline later. Helpful for not missing any @variation.',
+                  ['@variation'=> $one, '@variations'=> $many])
+                ],
+            ] + $element['actions']['ief_add'];
+          }
+          break;
+        }
+      }
+    }
   }
-  elseif ($field_name == 'title' && $entity_type == 'commerce_product_variation' && !$required) {
-    // The title field is optional only when its value is automatically
-    // generated, in which case the widget needs to be hidden.
-    $element['#access'] = FALSE;
+  elseif ($entity_type == 'commerce_product_variation') {
+    if ($field_name == 'title' && !$required) {
+      // The title field is optional only when its value is automatically
+      // generated, in which case the widget needs to be hidden.
+      $element['#access'] = FALSE;
+    }
+    elseif ($field_name == 'price' && empty($element['#default_value']) && ($price = $form_state->getValue('last_added_price'))) {
+      $element['#default_value'] = $price;
+    }
+    elseif (($Ids = $form_state->getValue('next_attribute_value_ids')) && isset($Ids[$field_name]) && empty($element['#default_value'])) {
+     $element['#default_value'] = $Ids[$field_name];
+    }
   }
 }
