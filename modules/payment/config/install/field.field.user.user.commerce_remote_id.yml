@@ -17,9 +17,7 @@ label: 'Remote ID'
 description: ''
 required: false
 translatable: false
-default_value:
-  -
-    provider: {  }
+default_value: {  }
 default_value_callback: ''
 settings: {  }
 field_type: commerce_remote_id
