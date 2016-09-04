@@ -92,6 +92,13 @@ class AddToCartForm extends ContentEntityForm {
     if ($form_state->get('hide_form')) {
       $form['#access'] = FALSE;
     }
+    // Change the 'quantity' field HTML property on form display.
+    isset($form['quantity']) && array_walk_recursive($form['quantity'], function(&$value, $key) {
+      if ($key === '#step') {
+        $value = 1;
+      }
+    }
+    );
 
     return $form;
   }
