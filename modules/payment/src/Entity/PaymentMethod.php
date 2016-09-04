@@ -201,7 +201,8 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function isExpired() {
-    return REQUEST_TIME >= $this->get('expires')->value;
+    $expires = $this->getExpiresTime();
+    return $expires > 0 && $expires <= REQUEST_TIME;
   }
 
   /**
