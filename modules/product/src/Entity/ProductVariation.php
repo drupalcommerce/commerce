@@ -215,6 +215,36 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
+  public function setStores(array $stores) {
+    $product = $this->getProduct();
+    if ($product) {
+      $product->set('stores', $stores);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStoreIds() {
+    $product = $this->getProduct();
+    return $product ? $product->getStoreIds() : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setStoreIds(array $store_ids) {
+    $product = $this->getProduct();
+    if ($product) {
+      $product->set('stores', $store_ids);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getLineItemTypeId() {
     // The line item type is a bundle-level setting.
     $type_storage = $this->entityTypeManager()->getStorage('commerce_product_variation_type');

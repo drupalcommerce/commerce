@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -9,7 +10,7 @@ use Drupal\user\EntityOwnerInterface;
 /**
  * Defines the interface for products.
  */
-interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityStoresInterface {
 
   /**
    * Gets the product title.
@@ -66,42 +67,6 @@ interface ProductInterface extends ContentEntityInterface, EntityChangedInterfac
    * @return $this
    */
   public function setCreatedTime($timestamp);
-
-  /**
-   * Gets the stores through which the product is sold.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface[]
-   *   The stores.
-   */
-  public function getStores();
-
-  /**
-   * Sets the stores through which the product is sold.
-   *
-   * @param \Drupal\commerce_store\Entity\StoreInterface[] $stores
-   *   The stores through which the product is sold.
-   *
-   * @return $this
-   */
-  public function setStores(array $stores);
-
-  /**
-   * Gets the ids of stores through which the product is sold.
-   *
-   * @return int[]
-   *   The ids of stores through which the product is sold.
-   */
-  public function getStoreIds();
-
-  /**
-   * Sets the ids of stores through which the product is sold.
-   *
-   * @param int[] $store_ids
-   *   The ids of stores through which the product is sold.
-   *
-   * @return $this
-   */
-  public function setStoreIds(array $store_ids);
 
   /**
    * Gets the variation IDs.
