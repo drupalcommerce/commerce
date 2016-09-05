@@ -23,6 +23,7 @@ function commerce_store_theme() {
  * Implements hook_field_widget_form_alter().
  */
 function commerce_store_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+  /** @var \Drupal\Core\Field\BaseFieldDefinition $field_definition */
   $field_definition = $context['items']->getFieldDefinition();
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();

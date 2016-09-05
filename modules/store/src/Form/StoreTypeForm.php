@@ -14,6 +14,7 @@ class StoreTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = $this->entity;
 
     $form['label'] = [

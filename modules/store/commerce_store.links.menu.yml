@@ -9,4 +9,3 @@ entity.commerce_store_type.collection:
   route_name: 'entity.commerce_store_type.collection'
   parent: 'commerce.configuration'
   description: 'Manage your store types.'
-
