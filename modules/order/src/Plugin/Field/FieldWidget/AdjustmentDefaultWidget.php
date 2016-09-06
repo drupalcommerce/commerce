@@ -69,7 +69,11 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
       '#default_value' => ($adjustment) ? $adjustment->getAmount() : NULL,
-      '#required' => TRUE,
+      '#states' => [
+        'required' => [
+          'select[name="' . $states_selector_name . '"]' => ['value' => 'order_adjustment'],
+        ],
+      ],
     ];
 
     return $element;
