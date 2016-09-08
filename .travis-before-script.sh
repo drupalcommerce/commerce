@@ -6,29 +6,18 @@ set -e $DRUPAL_TI_DEBUG
 # Note: This function is re-entrant.
 drupal_ti_ensure_drupal
 
+# @todo Patch drupal_ti to not link, but add self as VCS and require.
+if [ -L "$DRUPAL_TI_MODULES_PATH/$DRUPAL_TI_MODULE_NAME" ]
+then
+  unlink "$DRUPAL_TI_MODULES_PATH/$DRUPAL_TI_MODULE_NAME"
+fi
+
 # Add custom modules to drupal build.
 cd "$DRUPAL_TI_DRUPAL_DIR"
 
-# Download custom branches of address and composer_manager.
-(
-    # These variables come from environments/drupal-*.sh
-    mkdir -p "$DRUPAL_TI_MODULES_PATH"
-    cd "$DRUPAL_TI_MODULES_PATH"
+composer config repositories.commerce path $TRAVIS_BUILD_DIR
+composer require drupal/commerce:2.x-dev
 
-    git clone --branch 8.x-1.x http://git.drupal.org/project/composer_manager.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/address.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/entity.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/inline_entity_form.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/state_machine.git
-    git clone --branch 8.x-1.x http://git.drupal.org/project/profile.git
-)
-
-# Ensure the module is linked into the codebase.
-drupal_ti_ensure_module_linked
-
-# Initialize composer_manager.
-php modules/composer_manager/scripts/init.php
-composer drupal-rebuild
 composer update -n --lock --verbose
 
 # Enable main module and submodules.
