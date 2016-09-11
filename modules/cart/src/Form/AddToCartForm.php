@@ -85,6 +85,30 @@ class AddToCartForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  public function getBaseFormId() {
+    return $this->entity->getEntityTypeId() . '_' . $this->operation . '_form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId() {
+    $product_id = $this->entity->getPurchasedEntity()->getProductId();
+    $form_id = $this->entity->getEntityTypeId();
+    if ($this->entity->getEntityType()->hasKey('bundle')) {
+      $form_id .= '_' . $this->entity->bundle();
+    }
+    if ($this->operation != 'default') {
+      $form_id = $form_id . '_' . $this->operation;
+    }
+    $form_id .= '_' . $product_id;
+
+    return $form_id . '_form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     // The widgets are allowed to signal that the form should be hidden
