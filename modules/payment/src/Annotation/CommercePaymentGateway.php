@@ -79,6 +79,15 @@ class CommercePaymentGateway extends Plugin {
   public $payment_method_types = [];
 
   /**
+   * The default payment method type if gateway provides multiple types.
+   *
+   * Defaults to the first payment method type if no value is provided.
+   *
+   * @var string
+   */
+  public $default_payment_method_type;
+
+  /**
    * The credit card types handled by the payment gateway.
    *
    * @var string[]
@@ -104,6 +113,9 @@ class CommercePaymentGateway extends Plugin {
     }
     if (empty($values['credit_card_types'])) {
       $values['credit_card_types'] = array_keys(CreditCard::getTypes());
+    }
+    if (empty($values['default_payment_method_type'])) {
+      $values['default_payment_method_type'] = reset($values['payment_method_types']);
     }
     parent::__construct($values);
   }
