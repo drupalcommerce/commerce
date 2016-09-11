@@ -65,6 +65,7 @@ class ProductLazyBuilders {
     $line_item_type_id = $this->lineItemTypeMap->getLineItemTypeId($product->bundle());
     $line_item = $this->entityTypeManager->getStorage('commerce_line_item')->create([
       'type' => $line_item_type_id,
+      'purchased_entity' => $product->getDefaultVariation()->id(),
     ]);
     $form_state_additions = [
       'product' => $product,
