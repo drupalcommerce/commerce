@@ -227,7 +227,12 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getLineItemTitle() {
-    return $this->label();
+    $label = $this->label();
+    if (!$label) {
+      $label = $this->generateTitle();
+    }
+
+    return $label;
   }
 
   /**

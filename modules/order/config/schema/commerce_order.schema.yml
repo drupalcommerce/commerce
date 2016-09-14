@@ -11,6 +11,12 @@ commerce_order.commerce_order_type.*:
     workflow:
       type: string
       label: 'Workflow'
+    refresh_mode:
+        type: string
+        label: 'Order refresh mode'
+    refresh_frequency:
+        type: integer
+        label: 'Order refresh frequency'
 
 commerce_order.commerce_line_item_type.*:
   type: config_entity

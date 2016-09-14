@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce_order\Entity\OrderType;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -16,6 +17,7 @@ class OrderTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $this->entity;
     $workflow_manager = \Drupal::service('plugin.manager.workflow');
     $workflows = $workflow_manager->getGroupedLabels('commerce_order');
@@ -44,6 +46,37 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#options' => $workflows,
       '#default_value' => $order_type->getWorkflowId(),
       '#description' => $this->t('Used by all orders of this type.'),
+    ];
+
+    $form['refresh'] = [
+      '#type' => 'details',
+      '#title' => t('Order refresh'),
+      '#weight' => 5,
+      '#open' => TRUE,
+      '#collapsible' => TRUE,
+      '#tree' => FALSE,
+    ];
+
+    $form['refresh']['refresh_intro'] = [
+      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which line item prices are recalculated.') . '</p>',
+    ];
+    $form['refresh']['refresh_mode'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Order refresh mode'),
+      '#options' => [
+        OrderType::REFRESH_ALWAYS => t('Refresh a draft order when it is loaded regardless of who it belongs to.'),
+        OrderType::REFRESH_OWNER => t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
+      ],
+      '#default_value' => ($order_type->isNew()) ? OrderType::REFRESH_ALWAYS : $order_type->getRefreshMode(),
+    ];
+    $form['refresh']['refresh_frequency'] = [
+      '#type' => 'textfield',
+      '#title' => t('Order refresh frequency'),
+      '#description' => t('Draft orders will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
+      '#default_value' => ($order_type->isNew()) ? 30 : $order_type->getRefreshFrequency(),
+      '#required' => TRUE,
+      '#size' => 10,
+      '#field_suffix' => t('seconds'),
     ];
 
     return $this->protectBundleIdElement($form);
