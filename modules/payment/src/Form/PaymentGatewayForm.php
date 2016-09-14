@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_payment\Form;
 
+use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_payment\PaymentGatewayManager;
-use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PaymentGatewayForm extends BundleEntityFormBase {
+class PaymentGatewayForm extends CommercePluginEntityFormBase {
 
   /**
    * The payment gateway plugin manager.
@@ -82,9 +82,7 @@ class PaymentGatewayForm extends BundleEntityFormBase {
       '#default_value' => $gateway->status(),
     ];
 
-    // Payment gateway is technically not a bundle config entity, but the logic
-    // for preventing id change on edit applies the same.
-    return $this->protectBundleIdElement($form);
+    return $this->protectPluginIdElement($form);
   }
 
   /**
