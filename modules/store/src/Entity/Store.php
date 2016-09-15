@@ -268,7 +268,9 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setSetting('fields', array_diff(AddressField::getAll(), $disabled_fields))
       ->setDisplayOptions('form', [
         'type' => 'address_default',
-        'settings' => [],
+        'settings' => [
+          'default_country' => 'site_default',
+        ],
         'weight' => 3,
       ])
       ->setDisplayConfigurable('view', TRUE)

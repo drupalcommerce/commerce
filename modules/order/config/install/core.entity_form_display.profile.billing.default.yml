@@ -18,6 +18,6 @@ content:
     type: address_default
     weight: 0
     settings:
-      default_country: null
+      default_country: 'site_default'
     third_party_settings: {  }
 hidden: {  }
