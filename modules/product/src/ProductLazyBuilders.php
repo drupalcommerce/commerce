@@ -25,26 +25,16 @@ class ProductLazyBuilders {
   protected $entityFormBuilder;
 
   /**
-   * The line item type map.
-   *
-   * @var \Drupal\commerce_product\LineItemTypeMapInterface
-   */
-  protected $lineItemTypeMap;
-
-  /**
    * Constructs a new CartLazyBuilders object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
    *   The entity form builder.
-   * @param \Drupal\commerce_product\LineItemTypeMapInterface $line_item_type_map
-   *   The line item type map.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, LineItemTypeMapInterface $line_item_type_map) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFormBuilder = $entity_form_builder;
-    $this->lineItemTypeMap = $line_item_type_map;
   }
 
   /**
@@ -61,12 +51,12 @@ class ProductLazyBuilders {
    *   A renderable array containing the cart form.
    */
   public function addToCartForm($product_id, $view_mode, $combine) {
+    /** @var \Drupal\commerce_order\LineItemStorageInterface $line_item_storage */
+    $line_item_storage = $this->entityTypeManager->getStorage('commerce_line_item');
+
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
-    $line_item_type_id = $this->lineItemTypeMap->getLineItemTypeId($product->bundle());
-    $line_item = $this->entityTypeManager->getStorage('commerce_line_item')->create([
-      'type' => $line_item_type_id,
-      'purchased_entity' => $product->getDefaultVariation()->id(),
-    ]);
+    $line_item = $line_item_storage->createFromPurchasableEntity($product->getDefaultVariation());
     $form_state_additions = [
       'product' => $product,
       'view_mode' => $view_mode,

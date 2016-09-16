@@ -19,4 +19,4 @@ services:
   commerce_price.default_price_resolver:
     class: Drupal\commerce_price\Resolver\DefaultPriceResolver
     tags:
-      - { name: commerce_price.base_price_resolver, priority: -100 }
+      - { name: commerce_price.price_resolver, priority: -100 }
