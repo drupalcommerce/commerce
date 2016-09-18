@@ -21,6 +21,9 @@
   <rule ref="Drupal.Array.Array.LongLineDeclaration">
     <severity>0</severity>
   </rule>
+  <rule ref="Drupal.Commenting.VariableComment.VarOrder">
+    <severity>0</severity>
+  </rule>
   <!-- Complains about '#element_validate callback:' -->
   <rule ref="Drupal.Commenting.DocComment.ShortNotCapital">
     <severity>0</severity>

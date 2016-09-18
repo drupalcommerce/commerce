@@ -14,7 +14,7 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
   /**
    * The variation type to test against.
    *
-   * @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variationType
+   * @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface
    */
   protected $variationType;
 

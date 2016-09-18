@@ -32,7 +32,7 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
   protected $attributeDefaultDisplay;
 
   /**
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface.
+   * @var \Drupal\Core\Entity\EntityViewBuilderInterface
    */
   protected $productViewBuilder;
 

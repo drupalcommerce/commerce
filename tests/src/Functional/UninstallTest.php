@@ -12,7 +12,7 @@ use Drupal\Tests\BrowserTestBase;
 class UninstallTest extends BrowserTestBase {
 
   /**
-   * Enables all required modules.
+   * {@inheritdoc}
    */
   public static $modules = [
     'commerce',

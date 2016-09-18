@@ -21,7 +21,7 @@ class PromotionStorageTest extends KernelTestBase {
   /**
    * The promotion storage.
    *
-   * @var \Drupal\commerce_promotion\PromotionStorageInterface;
+   * @var \Drupal\commerce_promotion\PromotionStorageInterface
    */
   protected $promotionStorage;
 

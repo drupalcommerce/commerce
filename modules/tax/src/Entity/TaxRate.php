@@ -81,7 +81,7 @@ class TaxRate extends ConfigEntityBase implements TaxRateInterface {
   /**
    * Whether the tax rate is the default for its tax type.
    *
-   * @var boolean
+   * @var bool
    */
   protected $default;
 
