@@ -18,6 +18,7 @@ class LineItemStorage extends CommerceContentEntityStorage implements LineItemSt
       'type' => $entity->getLineItemTypeId(),
       'title' => $entity->getLineItemTitle(),
       'purchased_entity' => $entity,
+      'unit_price' => $entity->getPrice(),
     ];
     return self::create($values);
   }
