@@ -12,16 +12,20 @@ then
   unlink "$DRUPAL_TI_MODULES_PATH/$DRUPAL_TI_MODULE_NAME"
 fi
 
-# Add custom modules to drupal build.
-cd "$DRUPAL_TI_DRUPAL_DIR"
-
+# drupal_ti adds the repos in the wrong order, the module one must be first.
+composer config --unset repo.drupal
 composer config repositories.commerce path $TRAVIS_BUILD_DIR
-composer require drupal/commerce:2.x-dev
+composer config repositories.drupal composer https://packages.drupal.org/8
+composer config repositories
 
+# Add Commerce. '*@dev' is used because the path repo can't detect any versions
+# in PR branches.
+cd "$DRUPAL_TI_DRUPAL_DIR"
+composer require drupal/commerce *@dev
 composer update -n --lock --verbose
 
 # Enable main module and submodules.
-drush en -y commerce commerce_product commerce_order commerce_checkout
+drush en -y commerce_product commerce_order commerce_checkout commerce_payment
 
 # Turn on PhantomJS for functional Javascript tests
 phantomjs --ssl-protocol=any --ignore-ssl-errors=true $DRUPAL_TI_DRUPAL_DIR/vendor/jcalderonzumba/gastonjs/src/Client/main.js 8510 1024 768 2>&1 >> /dev/null &
