@@ -8,7 +8,7 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDefaultWidget;
 
 /**
- * Plugin implementation of the 'commerce_entity_select' widget.
+ * Plugin implementation of the 'commerce_optional_date' widget.
  *
  * @FieldWidget(
  *   id = "commerce_optional_date",

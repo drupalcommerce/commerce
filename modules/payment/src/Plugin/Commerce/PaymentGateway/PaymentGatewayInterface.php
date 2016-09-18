@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 
-use Drupal\commerce\PluginForm\PluginWithFormsInterface;
 use Drupal\commerce_payment\Entity\PaymentInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Plugin\PluginWithFormsInterface;
 
 /**
  * Defines the base interface for payment gateways.

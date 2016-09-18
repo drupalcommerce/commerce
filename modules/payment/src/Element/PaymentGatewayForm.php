@@ -145,7 +145,7 @@ class PaymentGatewayForm extends RenderElement {
    */
   public static function createPluginForm($element) {
     /** @var \Drupal\commerce\PluginForm\PluginFormFactoryInterface $plugin_form_factory */
-    $plugin_form_factory = \Drupal::service('commerce.plugin_form_factory');
+    $plugin_form_factory = \Drupal::service('plugin_form.factory');
     /** @var \Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface $entity */
     $entity = $element['#default_value'];
     $plugin = $entity->getPaymentGateway()->getPlugin();

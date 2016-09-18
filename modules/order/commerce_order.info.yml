@@ -7,7 +7,6 @@ dependencies:
   - commerce
   - commerce_price
   - commerce_store
-  - datetime
   - options
   - profile
   - state_machine

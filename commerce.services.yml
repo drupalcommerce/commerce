@@ -7,10 +7,6 @@ services:
     class: Drupal\commerce\CredentialsCheckFlood
     arguments: ['@flood', '@entity_type.manager', '@config.factory']
 
-  commerce.plugin_form_factory:
-    class: Drupal\commerce\PluginForm\PluginFormFactory
-    arguments: ['@class_resolver']
-
   commerce.country_context:
     class: Drupal\commerce\CountryContext
     arguments: ['@request_stack', '@commerce.chain_country_resolver']

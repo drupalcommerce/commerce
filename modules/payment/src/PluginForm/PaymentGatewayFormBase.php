@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
-use Drupal\commerce\PluginForm\PluginFormBase;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\PluginFormBase;
 
 /**
  * Provides a base class for payment gateway plugin forms.
  *
- * @see \Drupal\commerce\PluginForm\PluginFormBase
+ * @see \Drupal\Core\Plugin\PluginFormBase
  */
 abstract class PaymentGatewayFormBase extends PluginFormBase implements PaymentGatewayFormInterface {
 
