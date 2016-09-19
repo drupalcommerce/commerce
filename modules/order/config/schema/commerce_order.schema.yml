@@ -28,3 +28,10 @@ commerce_order.commerce_line_item_type.*:
     orderType:
       type: string
       label: 'Order type'
+
+field.formatter.settings.commerce_line_item_table:
+  type: mapping
+  mapping:
+    view_name:
+      type: string
+      label: 'Line item table view'
