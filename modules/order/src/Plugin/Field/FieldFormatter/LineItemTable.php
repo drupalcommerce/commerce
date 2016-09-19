@@ -79,17 +79,12 @@ class LineItemTable extends FormatterBase {
       '#name' => $this->getSetting('view_name'),
       '#arguments' => [$order->id()],
       '#embed' => TRUE,
-    ];
-
-    if (!empty($items[0])) {
-      // Add a entity view mode config cache, cache must expire if the field
-      // formatter settings change.
-      $elements['#cache'] = [
+      '#cache' => [
         'tags' => [
-          'config:' . $items[0]->getFieldDefinition()->getTargetEntityTypeId() . '.' . $items[0]->getFieldDefinition()->getTargetBundle() . '.' . $this->viewMode,
+          'config:' . $this->fieldDefinition->getTargetEntityTypeId() . '.' . $this->fieldDefinition->getTargetBundle() . '.' . $this->viewMode,
         ],
-      ];
-    }
+      ],
+    ];
 
     return $elements;
   }
