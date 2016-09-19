@@ -142,6 +142,9 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
             'languages:' . LanguageInterface::TYPE_INTERFACE,
             'country',
           ],
+          'tags' => [
+            'config:' . $items[$delta]->getFieldDefinition()->getTargetEntityTypeId() . '.' . $items[$delta]->getFieldDefinition()->getTargetBundle() . '.' . $this->viewMode,
+          ],
         ],
       ];
     }
