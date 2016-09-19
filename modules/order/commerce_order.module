@@ -8,8 +8,30 @@
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_help().
+ */
+function commerce_order_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'entity.commerce_order_type.collection':
+      $output = '<p>' . t('Order types are configurations of shopping cart, workflow and checkout settings for customizing the experience of ordering different types of products. For example, physical products, digital products and event registrations may each have different ordering experiences by configuring their <a href=":line_item_types">line item types</a> to use one of these order types.', [
+          ':line_item_types' => \Drupal::url('entity.commerce_line_item_type.collection')
+        ]) . '</p>';
+      return $output;
+      break;
+    case 'entity.commerce_line_item_type.collection':
+      $output = '<p>' . t('Line item types determine the <a href=":order_types">order type</a>, purchasable entity and the configuration of the add to cart form for each of the <a href=":variation_types">product variation types</a>.', [
+          ':variation_types' => \Drupal::url('entity.commerce_product_variation_type.collection'),
+          ':order_types' => \Drupal::url('entity.commerce_order_type.collection'),
+        ]) . '</p>';
+      return $output;
+      break;
+  }
+}
 
 /**
  * Implements hook_theme().

@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_theme().
@@ -29,6 +30,20 @@ function commerce_checkout_theme() {
   ];
 
   return $theme;
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_checkout_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'entity.commerce_checkout_flow.collection':
+      $output = '<p>' . t('Checkout flows are used by <a href=":order_types">order types</a> to determine the order and appearance of checkout panes including payment, contact, and shipping information.', [
+        ':order_types' => \Drupal::url('entity.commerce_order_type.collection')
+        ]) . '</p>';
+      return $output;
+      break;
+  }
 }
 
 /**

@@ -7,6 +7,21 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function commerce_store_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'entity.commerce_store_type.collection':
+      $output = '<p>' . t('Store types allow <a href=":stores">stores</a> to be created for different locations or by individual sellers. Configure the entity fields, forms and displays for each type of store on your site.', [
+          ':stores' => \Drupal::url('entity.commerce_store.collection')
+        ]) . '</p>';
+      return $output;
+      break;
+  }
+}
 
 /**
  * Implements hook_theme().

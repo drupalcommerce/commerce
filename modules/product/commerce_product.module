@@ -14,7 +14,28 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\commerce_product\Entity\ProductType;
+
+/**
+ * Implements hook_help().
+ */
+function commerce_product_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'entity.commerce_product_type.collection':
+      $output = '<p>' . t('Select the <a href=":variation_types">product variation type</a> and configure the entity fields, forms and displays for each type of product in your store.', [
+          ':variation_types' => \Drupal::url('entity.commerce_product_variation_type.collection')
+        ]) . '</p>';
+      return $output;
+      break;
+    case 'entity.commerce_product_variation_type.collection':
+      $output = '<p>' . t('Product variation types determine the <a href=":line_item_types">line item type</a> and attributes for each type of product variation.', [
+          ':line_item_types' => \Drupal::url('entity.commerce_line_item_type.collection')
+        ]) . '</p>';
+      return $output;
+      break;
+  }
+}
 
 /**
  * Implements hook_config_translation_info_alter().
