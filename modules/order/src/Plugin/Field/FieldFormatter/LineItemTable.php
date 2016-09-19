@@ -79,11 +79,6 @@ class LineItemTable extends FormatterBase {
       '#name' => $this->getSetting('view_name'),
       '#arguments' => [$order->id()],
       '#embed' => TRUE,
-      '#cache' => [
-        'tags' => [
-          'config:' . $this->fieldDefinition->getTargetEntityTypeId() . '.' . $this->fieldDefinition->getTargetBundle() . '.' . $this->viewMode,
-        ],
-      ],
     ];
 
     return $elements;
