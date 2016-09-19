@@ -65,14 +65,6 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setTitle($title);
 
   /**
-   * Gets the variation price.
-   *
-   * @return \Drupal\commerce_price\Price|null
-   *   The variation price, or NULL.
-   */
-  public function getPrice();
-
-  /**
    * Sets the variation price.
    *
    * @param \Drupal\commerce_price\Price $price

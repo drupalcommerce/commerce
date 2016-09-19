@@ -46,8 +46,8 @@ interface PurchasableEntityInterface extends ContentEntityInterface {
   /**
    * Gets the purchasable entity's price.
    *
-   * @return \Drupal\commerce_price\Price
-   *   The price.
+   * @return \Drupal\commerce_price\Price|null
+   *   The price, or NULL.
    */
   public function getPrice();
 
