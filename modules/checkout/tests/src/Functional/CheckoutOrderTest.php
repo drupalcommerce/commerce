@@ -50,6 +50,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $this->placeBlock('commerce_cart');
+
     $store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
 
     $variation = $this->createEntity('commerce_product_variation', [
@@ -172,6 +174,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('0 items');
   }
 
   /**

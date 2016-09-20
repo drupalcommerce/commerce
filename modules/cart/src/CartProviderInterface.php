@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_cart;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -29,6 +30,19 @@ interface CartProviderInterface {
    *   When a cart with the given criteria already exists.
    */
   public function createCart($order_type, StoreInterface $store, AccountInterface $account = NULL);
+
+  /**
+   * Finalizes the given cart order.
+   *
+   * This will finalize the cart, under the assumption the order will no longer
+   * be treated as a draft order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   * @param bool $save_cart
+   *   Whether the cart should be saved after the operation.
+   */
+  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE);
 
   /**
    * Gets the cart order for the given store and user.
@@ -81,5 +95,17 @@ interface CartProviderInterface {
    *   A list of cart orders ids.
    */
   public function getCartIds(AccountInterface $account = NULL);
+
+  /**
+   * Invalidates a cart ID from internal cache.
+   *
+   * This is used when a cart is finalized and is no longer a cart.
+   *
+   * @param string $cart_id
+   *   The cart order ID.
+   *
+   * @return $this
+   */
+  public function invalidateCartId($cart_id);
 
 }
