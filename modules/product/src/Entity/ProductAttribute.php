@@ -29,7 +29,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *   },
  *   config_prefix = "commerce_product_attribute",
- *   admin_permission = "administer product attributes",
+ *   admin_permission = "administer commerce product attributes",
  *   bundle_of = "commerce_product_attribute_value",
  *   entity_keys = {
  *     "id" = "id",

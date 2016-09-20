@@ -24,8 +24,8 @@ class OrderNoStoreTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer orders',
-      'administer order types',
+      'administer commerce orders',
+      'administer commerce order types',
     ], parent::getAdministratorPermissions());
   }
 

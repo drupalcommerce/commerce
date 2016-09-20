@@ -4,7 +4,7 @@ entity.commerce_store.collection:
     _entity_list: 'commerce_store'
     _title: 'Store information'
   requirements:
-    _permission: 'administer stores'
+    _permission: 'administer commerce stores'
 
 entity.commerce_store_type.collection:
   path: '/admin/commerce/config/store-types'
@@ -12,4 +12,4 @@ entity.commerce_store_type.collection:
     _entity_list: 'commerce_store_type'
     _title: 'Store types'
   requirements:
-    _permission: 'administer store types'
+    _permission: 'administer commerce store types'

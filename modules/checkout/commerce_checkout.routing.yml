@@ -4,7 +4,7 @@ entity.commerce_checkout_flow.collection:
     _entity_list: 'commerce_checkout_flow'
     _title: 'Checkout flows'
   requirements:
-    _permission: 'administer checkout flows'
+    _permission: 'administer commerce checkout flows'
 
 commerce_checkout.form:
   path: '/checkout/{commerce_order}/{step}'

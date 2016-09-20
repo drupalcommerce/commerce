@@ -130,9 +130,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);
 
-    // Authenticated order owner without the 'access checkout' permission.
+    // Authenticated order owner without the 'access commerce checkout' permission.
     $order->addLineItem($line_item)->save();
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
+    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access commerce checkout']);
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);
   }
@@ -142,7 +142,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer checkout flows',
+      'administer commerce checkout flows',
       'administer views',
     ], parent::getAdministratorPermissions());
   }

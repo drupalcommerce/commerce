@@ -33,7 +33,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "inline_form" = "Drupal\commerce_order\Form\LineItemInlineForm",
  *   },
  *   base_table = "commerce_line_item",
- *   admin_permission = "administer orders",
+ *   admin_permission = "administer commerce orders",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "line_item_id",

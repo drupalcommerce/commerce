@@ -36,7 +36,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *   },
  *   base_table = "commerce_payment",
- *   admin_permission = "administer payments",
+ *   admin_permission = "administer commerce payments",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "payment_id",

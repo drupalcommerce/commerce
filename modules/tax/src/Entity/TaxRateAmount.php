@@ -28,7 +28,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *     "list_builder" = "Drupal\commerce_tax\TaxRateAmountListBuilder"
  *   },
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce stores",
  *   config_prefix = "commerce_tax_rate_amount",
  *   entity_keys = {
  *     "id" = "id",

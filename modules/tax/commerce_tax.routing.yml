@@ -4,7 +4,7 @@ entity.commerce_tax_type.collection:
     _entity_list: 'commerce_tax_type'
     _title: 'Tax types'
   requirements:
-    _permission: 'administer stores'
+    _permission: 'administer commerce stores'
 
 entity.commerce_tax_type.import_form:
   path: '/admin/commerce/config/tax-types/import'
@@ -20,7 +20,7 @@ entity.commerce_tax_rate.collection:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateController::buildList'
     _title: 'Tax rates'
   requirements:
-    _permission: 'administer stores'
+    _permission: 'administer commerce stores'
 
 entity.commerce_tax_rate.add_form:
   path: '/admin/commerce/config/tax-rates/{commerce_tax_type}/add'
@@ -36,7 +36,7 @@ entity.commerce_tax_rate_amount.collection:
     _controller: '\Drupal\commerce_tax\Controller\TaxRateAmountController::buildList'
     _title: 'Tax rate amounts'
   requirements:
-    _permission: 'administer stores'
+    _permission: 'administer commerce stores'
 
 entity.commerce_tax_rate_amount.add_form:
   path: '/admin/commerce/config/tax-rate-amounts/{commerce_tax_rate}/add'

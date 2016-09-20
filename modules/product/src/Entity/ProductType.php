@@ -28,7 +28,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *   },
  *   config_prefix = "commerce_product_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce product types",
  *   bundle_of = "commerce_product",
  *   entity_keys = {
  *     "id" = "id",

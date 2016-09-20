@@ -1,14 +1,14 @@
-'administer orders':
+'administer commerce orders':
   title: 'Administer orders'
   description: 'Allows users to create, update, and delete orders.'
-  'restrict access': TRUE
+  restrict access: TRUE
 
-'administer order types':
+'administer commerce order types':
   title: 'Administer order types'
   description: 'Allows users to create, update, and delete order types.'
-  'restrict access': TRUE
+  restrict access: TRUE
 
-'administer line item types':
+'administer commerce line item types':
   title: 'Administer line item types'
   description: 'Allows users to administer line item types.'
-  'restrict access': TRUE
+  restrict access: TRUE

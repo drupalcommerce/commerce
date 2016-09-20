@@ -42,7 +42,7 @@ class CartTest extends OrderBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer products',
+      'administer commerce products',
     ], parent::getAdministratorPermissions());
   }
 
@@ -81,7 +81,7 @@ class CartTest extends OrderBrowserTestBase {
 
     // Test that cart is denied for user without permission.
     Role::load(RoleInterface::ANONYMOUS_ID)
-      ->revokePermission('access cart')
+      ->revokePermission('access commerce cart')
       ->save();
     $this->drupalLogout();
     $this->drupalGet('cart');

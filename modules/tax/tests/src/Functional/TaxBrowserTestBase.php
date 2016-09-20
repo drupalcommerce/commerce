@@ -24,7 +24,7 @@ abstract class TaxBrowserTestBase extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer stores',
+      'administer commerce stores',
     ], parent::getAdministratorPermissions());
   }
 

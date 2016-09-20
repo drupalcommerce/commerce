@@ -29,7 +29,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *   },
  *   config_prefix = "commerce_checkout_flow",
- *   admin_permission = "administer checkout flows",
+ *   admin_permission = "administer commerce checkout flows",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",

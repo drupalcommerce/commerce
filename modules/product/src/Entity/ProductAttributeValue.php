@@ -27,7 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer product attributes",
+ *   admin_permission = "administer commerce product attributes",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,

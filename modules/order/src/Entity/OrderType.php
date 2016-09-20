@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "list_builder" = "Drupal\commerce_order\OrderTypeListBuilder",
  *   },
- *   admin_permission = "administer order types",
+ *   admin_permission = "administer commerce order types",
  *   config_prefix = "commerce_order_type",
  *   bundle_of = "commerce_order",
  *   entity_keys = {

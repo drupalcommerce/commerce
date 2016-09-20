@@ -1,6 +1,6 @@
-administer checkout flows:
+'administer commerce checkout flows':
   title: 'Administer checkout flows'
-  'restrict access': TRUE
-access checkout:
+  restrict access: TRUE
+'access commerce checkout':
   title: 'Access checkout'
   description: 'Complete a purchase through the checkout form.'

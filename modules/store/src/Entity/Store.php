@@ -42,7 +42,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_store",
  *   data_table = "commerce_store_field_data",
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce stores",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {

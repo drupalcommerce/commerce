@@ -43,7 +43,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *   },
  *   base_table = "commerce_order",
- *   admin_permission = "administer orders",
+ *   admin_permission = "administer commerce orders",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",

@@ -129,7 +129,7 @@ function commerce_checkout_form_alter(&$form, FormStateInterface $form_state, $f
         '#type' => 'submit',
         '#value' => t('Checkout'),
         '#weight' => 5,
-        '#access' => \Drupal::currentUser()->hasPermission('access checkout'),
+        '#access' => \Drupal::currentUser()->hasPermission('access commerce checkout'),
         '#submit' => array_merge($form['#submit'], ['commerce_checkout_line_item_views_form_submit']),
         '#order_id' => $view->argument['order_id']->value[0],
       ];
