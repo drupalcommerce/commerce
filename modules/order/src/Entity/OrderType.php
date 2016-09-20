@@ -39,6 +39,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "workflow",
+ *     "refresh_mode",
+ *     "refresh_frequency"
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -72,6 +74,20 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   protected $workflow;
 
   /**
+   * The order type refresh mode.
+   *
+   * @var string
+   */
+  protected $refresh_mode;
+
+  /**
+   * The order type refresh frequency.
+   *
+   * @var int
+   */
+  protected $refresh_frequency;
+
+  /**
    * {@inheritdoc}
    */
   public function getWorkflowId() {
@@ -83,6 +99,36 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setWorkflowId($workflow_id) {
     $this->workflow = $workflow_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRefreshMode() {
+    return $this->refresh_mode;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRefreshMode($refresh_mode) {
+    $this->refresh_mode = $refresh_mode;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRefreshFrequency() {
+    return $this->refresh_frequency;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRefreshFrequency($refresh_frequency) {
+    $this->refresh_frequency = $refresh_frequency;
     return $this;
   }
 

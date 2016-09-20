@@ -51,6 +51,24 @@ class OrderTypeTest extends OrderBrowserTestBase {
   }
 
   /**
+   * Tests draft order refresh options in order type form.
+   */
+  public function testDraftOrderRefreshSettings() {
+    $url = 'admin/commerce/config/order-types/default/edit';
+    $this->drupalGet($url);
+    $this->assertSession()->fieldExists('refresh_mode');
+    $this->assertSession()->fieldExists('refresh_frequency');
+
+    $edit['refresh_mode'] = 'always';
+    $edit['refresh_frequency'] = 60;
+    $this->submitForm($edit, t('Save'));
+    $order_type = OrderType::load('default');
+    $this->drupalGet($url);
+    $this->assertEquals($order_type->getRefreshMode(), $edit['refresh_mode'], 'The value of the draft order refresh mode has been changed.');
+    $this->assertEquals($order_type->getRefreshFrequency(), $edit['refresh_frequency'], 'The value of the draft order refresh frequency has been changed.');
+  }
+
+  /**
    * Tests deleting a Order Type programmaticaly and through the form.
    */
   public function testDeleteOrderType() {

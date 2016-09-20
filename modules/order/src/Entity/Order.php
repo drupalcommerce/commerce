@@ -28,7 +28,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *   bundle_label = @Translation("Order type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
- *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
+ *     "storage" = "Drupal\commerce_order\OrderStorage",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
