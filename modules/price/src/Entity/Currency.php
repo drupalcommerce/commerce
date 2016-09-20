@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce stores",
  *   config_prefix = "commerce_currency",
  *   entity_keys = {
  *     "id" = "currencyCode",

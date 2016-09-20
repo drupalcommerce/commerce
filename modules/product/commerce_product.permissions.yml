@@ -1,14 +1,14 @@
-'administer products':
+'administer commerce products':
   title: 'Administer products'
   description: 'Allows users to administer products.'
-  'restrict access': TRUE
+  restrict access: TRUE
 
-'administer product attributes':
+'administer commerce product attributes':
   title: 'Administer product attributes'
   description: 'Allows users to administer product attributes.'
-  'restrict access': TRUE
+  restrict access: TRUE
 
-'administer product types':
+'administer commerce product types':
   title: 'Administer product types'
   description: 'Allows users to administer product types.'
-  'restrict access': TRUE
+  restrict access: TRUE

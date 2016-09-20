@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "list_builder" = "Drupal\commerce_order\LineItemTypeListBuilder",
  *   },
- *   admin_permission = "administer line item types",
+ *   admin_permission = "administer commerce line item types",
  *   config_prefix = "commerce_line_item_type",
  *   bundle_of = "commerce_line_item",
  *   entity_keys = {

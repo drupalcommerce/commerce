@@ -39,8 +39,8 @@ class StoreTypeTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer store types',
-      'administer stores',
+      'administer commerce store types',
+      'administer commerce stores',
     ], parent::getAdministratorPermissions());
   }
 

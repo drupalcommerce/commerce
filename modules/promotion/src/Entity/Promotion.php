@@ -42,7 +42,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   },
  *   base_table = "commerce_promotion",
  *   data_table = "commerce_promotion_field_data",
- *   admin_permission = "administer promotions",
+ *   admin_permission = "administer commerce promotions",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {

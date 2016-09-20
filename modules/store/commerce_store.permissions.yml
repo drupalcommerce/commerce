@@ -1,9 +1,9 @@
-'administer stores':
+'administer commerce stores':
   title: 'Administer stores'
   description: 'Allows users to create, update, and delete stores.'
-  'restrict access': TRUE
+  restrict access: TRUE
 
-'administer store types':
+'administer commerce store types':
   title: 'Administer store types'
   description: 'Allows users to create, update, and delete store types.'
-  'restrict access': TRUE
+  restrict access: TRUE

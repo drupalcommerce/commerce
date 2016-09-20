@@ -12,6 +12,6 @@ use Drupal\Core\Session\AccountInterface;
  */
 function commerce_checkout_install() {
   // Allow all roles to use checkout.
-  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access checkout']);
-  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['access checkout']);
+  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access commerce checkout']);
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['access commerce checkout']);
 }

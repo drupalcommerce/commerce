@@ -36,7 +36,7 @@ use Drupal\user\UserInterface;
  *     "inline_form" = "Drupal\commerce_product\Form\ProductVariationInlineForm",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce products",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,

@@ -29,7 +29,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer payment gateways",
+ *   admin_permission = "administer commerce payment gateways",
  *   config_prefix = "commerce_payment_gateway",
  *   entity_keys = {
  *     "id" = "id",

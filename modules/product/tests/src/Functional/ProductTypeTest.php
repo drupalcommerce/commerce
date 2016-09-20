@@ -42,7 +42,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $this->drupalGet('product/add/' . $product_type->id());
     $this->assertSession()->statusCodeEquals(200);
 
-    $user = $this->drupalCreateUser(['administer product types']);
+    $user = $this->drupalCreateUser(['administer commerce product types']);
     $this->drupalLogin($user);
 
     $this->drupalGet('admin/commerce/config/product-types/add');

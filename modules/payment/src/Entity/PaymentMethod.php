@@ -35,7 +35,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *   },
  *   base_table = "commerce_payment_method",
- *   admin_permission = "administer payments",
+ *   admin_permission = "administer commerce payments",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "method_id",

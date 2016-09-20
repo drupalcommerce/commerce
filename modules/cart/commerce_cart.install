@@ -12,6 +12,6 @@ use Drupal\Core\Session\AccountInterface;
  */
 function commerce_cart_install() {
   // Allow all roles to use cart.
-  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access cart']);
-  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['access cart']);
+  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access commerce cart']);
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['access commerce cart']);
 }

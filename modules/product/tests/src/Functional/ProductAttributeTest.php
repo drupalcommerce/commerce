@@ -16,7 +16,7 @@ class ProductAttributeTest extends ProductBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer product attributes',
+      'administer commerce product attributes',
     ], parent::getAdministratorPermissions());
   }
 

@@ -40,7 +40,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "translation" = "Drupal\commerce_product\ProductTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce products",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",

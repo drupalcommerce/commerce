@@ -29,7 +29,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *   },
  *   config_prefix = "commerce_product_variation_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce product types",
  *   bundle_of = "commerce_product_variation",
  *   entity_keys = {
  *     "id" = "id",

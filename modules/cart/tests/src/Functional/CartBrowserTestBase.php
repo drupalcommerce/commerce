@@ -54,7 +54,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer products',
+      'administer commerce products',
       'access content',
     ], parent::getAdministratorPermissions());
   }

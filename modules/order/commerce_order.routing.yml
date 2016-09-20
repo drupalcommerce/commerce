@@ -16,7 +16,7 @@ entity.commerce_order.reassign_form:
       commerce_order:
         type: 'entity:commerce_order'
   requirements:
-    _permission: 'administer orders'
+    _permission: 'administer commerce orders'
 
 entity.commerce_order_type.collection:
   path: '/admin/commerce/config/order-types'
@@ -24,7 +24,7 @@ entity.commerce_order_type.collection:
     _entity_list: 'commerce_order_type'
     _title: 'Order types'
   requirements:
-    _permission: 'administer order types'
+    _permission: 'administer commerce order types'
 
 entity.commerce_order.collection:
   path: '/admin/commerce/orders'
@@ -32,7 +32,7 @@ entity.commerce_order.collection:
     _entity_list: 'commerce_order'
     _title: 'Orders'
   requirements:
-    _permission: 'administer orders'
+    _permission: 'administer commerce orders'
 
 entity.commerce_order.user_view:
   path: '/user/{user}/orders/{commerce_order}'
@@ -53,4 +53,4 @@ entity.commerce_line_item_type.collection:
     _entity_list: 'commerce_line_item_type'
     _title: 'Line item types'
   requirements:
-    _permission: 'administer line item types'
+    _permission: 'administer commerce line item types'

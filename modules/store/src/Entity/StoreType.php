@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer store types",
+ *   admin_permission = "administer commerce store types",
  *   config_prefix = "commerce_store_type",
  *   bundle_of = "commerce_store",
  *   entity_keys = {
