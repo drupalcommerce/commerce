@@ -2,9 +2,14 @@
 
 namespace Drupal\commerce_payment;
 
+use Drupal\commerce_price\Entity\Currency;
+use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the list builder for payments.
@@ -12,9 +17,43 @@ use Drupal\Core\Url;
 class PaymentListBuilder extends EntityListBuilder {
 
   /**
+   * The number formatter.
+   *
+   * @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface
+   */
+  protected $numberFormatter;
+
+  /**
    * {@inheritdoc}
    */
   protected $entitiesKey = 'payments';
+
+  /**
+   * Constructs a new PaymentListBuilder object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity storage class.
+   * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
+   *   The number formatter factory.
+   */
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NumberFormatterFactoryInterface $number_formatter_factory) {
+    parent::__construct($entity_type, $storage);
+
+    $this->numberFormatter = $number_formatter_factory->createInstance();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('commerce_price.number_formatter_factory')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -79,6 +118,7 @@ class PaymentListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = $this->t('Payment');
+    $header['remote_id'] = $this->t('Remote ID');
     $header['state'] = $this->t('State');
     return $header + parent::buildHeader();
   }
@@ -88,7 +128,17 @@ class PaymentListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $entity */
-    $row['label'] = $entity->label();
+    $amount = $entity->getAmount();
+    // @todo Refactor the number formatter to work with just a currency code.
+    $currency = Currency::load($amount->getCurrencyCode());
+    $formatted_amount = $this->numberFormatter->formatCurrency($amount->getDecimalAmount(), $currency);
+    $refunded_amount = $entity->getRefundedAmount();
+    if ($refunded_amount && !$refunded_amount->isZero()) {
+      $formatted_amount .= ' Refunded: ' . $this->numberFormatter->formatCurrency($refunded_amount->getDecimalAmount(), $currency);
+    }
+
+    $row['label'] = $formatted_amount;
+    $row['remote_id'] = $entity->getRemoteId();
     $row['state'] = $entity->getState()->getLabel();
 
     return $row + parent::buildRow($entity);

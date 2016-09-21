@@ -66,7 +66,7 @@ final class Price {
    *   The string representation of the price.
    */
   public function __toString() {
-    return $this->amount . ' ' . $this->currencyCode;
+    return Calculator::trim($this->amount) . ' ' . $this->currencyCode;
   }
 
   /**
