@@ -166,7 +166,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
       '#default_value' => $selected_payment_method->id(),
       '#required' => TRUE,
       '#after_build' => [
-        [get_class($this), 'fixDefaultValue'],
+        [get_class($this), 'clearValue'],
       ],
     ];
     $form['actions']['submit'] = [
@@ -186,7 +186,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
    * it's no longer allowed. Clearing the value causes the element to fallback
    * to the default value, avoiding the error.
    */
-  public static function clearsValue(array $element, FormStateInterface $form_state) {
+  public static function clearValue(array $element, FormStateInterface $form_state) {
     $value = $element['#value'];
     if (!isset($element['#options'][$value])) {
       $element['#value'] = NULL;
