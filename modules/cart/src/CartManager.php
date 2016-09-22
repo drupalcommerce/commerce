@@ -109,6 +109,7 @@ class CartManager implements CartManagerInterface {
       $new_quantity = Calculator::add($matching_line_item->getQuantity(), $quantity);
       $matching_line_item->setQuantity($new_quantity);
       $matching_line_item->save();
+      $needs_cart_save = TRUE;
     }
     else {
       $line_item->save();
@@ -134,6 +135,8 @@ class CartManager implements CartManagerInterface {
     $line_item->save();
     $event = new CartLineItemUpdateEvent($cart, $line_item, $original_line_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_LINE_ITEM_UPDATE, $event);
+    // We need to recalculate the order's total when updating line items.
+    $cart->save();
   }
 
   /**
