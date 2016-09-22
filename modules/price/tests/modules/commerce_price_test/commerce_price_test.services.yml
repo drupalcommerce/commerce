@@ -1,0 +1,5 @@
+services:
+  commerce_test.test_price_resolver:
+    class: Drupal\commerce_price_test\TestPriceResolver
+    tags:
+      - { name: commerce_price.price_resolver, priority: 100 }
