@@ -39,7 +39,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   config_export = {
  *     "id",
  *     "label",
- *     "lineItemType",
+ *     "orderItemType",
  *     "generateTitle",
  *   },
  *   links = {
@@ -60,11 +60,11 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   protected $id;
 
   /**
-   * The line item type ID.
+   * The order item type ID.
    *
    * @var string
    */
-  protected $lineItemType;
+  protected $orderItemType;
 
   /**
    * Whether the product variation title should be automatically generated.
@@ -76,15 +76,15 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   /**
    * {@inheritdoc}
    */
-  public function getLineItemTypeId() {
-    return $this->lineItemType;
+  public function getOrderItemTypeId() {
+    return $this->orderItemType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLineItemTypeId($line_item_type_id) {
-    $this->lineItemType = $line_item_type_id;
+  public function setOrderItemTypeId($order_item_type_id) {
+    $this->orderItemType = $order_item_type_id;
     return $this;
   }
 
@@ -108,9 +108,9 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
-    if ($update && $this->getLineItemTypeId() != $this->original->getLineItemTypeId()) {
-      // The line item type ID has changed, clear the relevant cache.
-      \Drupal::service('commerce_product.line_item_type_map')->clearCache();
+    if ($update && $this->getOrderItemTypeId() != $this->original->getOrderItemTypeId()) {
+      // The order item type ID has changed, clear the relevant cache.
+      \Drupal::service('commerce_product.order_item_type_map')->clearCache();
     }
   }
 

@@ -10,9 +10,9 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for removing the line item.
+ * Defines a form element for removing the order item.
  *
- * @ViewsField("commerce_line_item_remove_button")
+ * @ViewsField("commerce_order_item_remove_button")
  */
 class RemoveButton extends FieldPluginBase {
 
@@ -91,10 +91,10 @@ class RemoveButton extends FieldPluginBase {
       $form[$this->options['id']][$row_index] = [
         '#type' => 'submit',
         '#value' => t('Remove'),
-        '#name' => 'delete-line-item-' . $row_index,
-        '#remove_line_item' => TRUE,
+        '#name' => 'delete-order-item-' . $row_index,
+        '#remove_order_item' => TRUE,
         '#row_index' => $row_index,
-        '#attributes' => ['class' => ['delete-line-item']],
+        '#attributes' => ['class' => ['delete-order-item']],
       ];
     }
   }
@@ -109,11 +109,11 @@ class RemoveButton extends FieldPluginBase {
    */
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#remove_line_item'])) {
+    if (!empty($triggering_element['#remove_order_item'])) {
       $row_index = $triggering_element['#row_index'];
-      /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-      $line_item = $this->getEntity($this->view->result[$row_index]);
-      $this->cartManager->removeLineItem($line_item->getOrder(), $line_item);
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $this->getEntity($this->view->result[$row_index]);
+      $this->cartManager->removeOrderItem($order_item->getOrder(), $order_item);
     }
   }
 

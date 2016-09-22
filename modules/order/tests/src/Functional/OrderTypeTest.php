@@ -23,10 +23,10 @@ class OrderTypeTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests creating a Order Type programaticaly and through the add form.
+   * Tests creating an order Type programaticaly and through the add form.
    */
   public function testCreateOrderType() {
-    // Create a order type programmaticaly.
+    // Create an order type programmaticaly.
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'kitten',
       'label' => 'Label of kitten',
@@ -36,7 +36,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $type_exists = (bool) OrderType::load($type->id());
     $this->assertTrue($type_exists, 'The new order type has been created in the database.');
 
-    // Create a order type through the add form.
+    // Create an order type through the add form.
     $this->drupalGet('/admin/commerce/config/order-types');
     $this->getSession()->getPage()->clickLink('Add order type');
 
@@ -69,18 +69,18 @@ class OrderTypeTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests deleting a Order Type programmaticaly and through the form.
+   * Tests deleting an order Type programmaticaly and through the form.
    */
   public function testDeleteOrderType() {
-    // Create a order type programmaticaly.
+    // Create an order type programmaticaly.
     $type = $this->createEntity('commerce_order_type', [
       'id' => 'foo',
       'label' => 'Label for foo',
       'workflow' => 'order_default',
     ]);
-    commerce_order_add_line_items_field($type);
+    commerce_order_add_order_items_field($type);
 
-    // Create a order.
+    // Create an order.
     $order = $this->createEntity('commerce_order', [
       'type' => $type->id(),
       'mail' => $this->loggedInUser->getEmail(),
@@ -91,7 +91,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You can not remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
-    // Deleting the order type when its not being referenced by a order.
+    // Deleting the order type when its not being referenced by an order.
     $order->delete();
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
     $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order type @label?', ['@label' => $type->label()]));

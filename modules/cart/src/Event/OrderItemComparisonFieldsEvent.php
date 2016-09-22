@@ -2,15 +2,15 @@
 
 namespace Drupal\commerce_cart\Event;
 
-use Drupal\commerce_order\Entity\LineItemInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Defines the line item comparison fields event.
+ * Defines the order item comparison fields event.
  *
  * @see \Drupal\commerce_cart\Event\CartEvents
  */
-class LineItemComparisonFieldsEvent extends Event {
+class OrderItemComparisonFieldsEvent extends Event {
 
   /**
    * The comparison fields.
@@ -20,23 +20,23 @@ class LineItemComparisonFieldsEvent extends Event {
   protected $comparisonFields;
 
   /**
-   * The line item being added to the cart.
+   * The order item being added to the cart.
    *
-   * @var \Drupal\commerce_order\Entity\LineItemInterface
+   * @var \Drupal\commerce_order\Entity\OrderItemInterface
    */
-  protected $lineItem;
+  protected $orderItem;
 
   /**
-   * Constructs a new LineItemComparisonFieldsEvent.
+   * Constructs a new OrderItemComparisonFieldsEvent.
    *
    * @param string[] $comparison_fields
    *   The comparison fields.
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item being added to the cart.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item being added to the cart.
    */
-  public function __construct(array $comparison_fields, LineItemInterface $line_item) {
+  public function __construct(array $comparison_fields, OrderItemInterface $order_item) {
     $this->comparisonFields = $comparison_fields;
-    $this->lineItem = $line_item;
+    $this->orderItem = $order_item;
   }
 
   /**
@@ -60,13 +60,13 @@ class LineItemComparisonFieldsEvent extends Event {
   }
 
   /**
-   * The line item being added to the cart.
+   * The order item being added to the cart.
    *
-   * @return \Drupal\commerce_order\Entity\LineItemInterface
-   *   The line item being added to the cart.
+   * @return \Drupal\commerce_order\Entity\OrderItemInterface
+   *   The order item being added to the cart.
    */
-  public function getLineItem() {
-    return $this->lineItem;
+  public function getOrderItem() {
+    return $this->orderItem;
   }
 
 }

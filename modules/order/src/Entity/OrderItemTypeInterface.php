@@ -5,14 +5,14 @@ namespace Drupal\commerce_order\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
- * Defines the interface for line item types.
+ * Defines the interface for order item types.
  */
-interface LineItemTypeInterface extends ConfigEntityInterface {
+interface OrderItemTypeInterface extends ConfigEntityInterface {
 
   /**
-   * Gets the line item type's purchasable entity type ID.
+   * Gets the order item type's purchasable entity type ID.
    *
-   * E.g, if line items of this type are used to purchase product variations,
+   * E.g, if order items of this type are used to purchase product variations,
    * the purchasable entity type ID will be 'commerce_product_variation'.
    *
    * @return string
@@ -21,7 +21,7 @@ interface LineItemTypeInterface extends ConfigEntityInterface {
   public function getPurchasableEntityTypeId();
 
   /**
-   * Sets the line item type's purchasable entity type ID.
+   * Sets the order item type's purchasable entity type ID.
    *
    * @param string $purchasable_entity_type_id
    *   The purchasable entity type.
@@ -31,7 +31,7 @@ interface LineItemTypeInterface extends ConfigEntityInterface {
   public function setPurchasableEntityTypeId($purchasable_entity_type_id);
 
   /**
-   * Gets the line item type's order type ID.
+   * Gets the order item type's order type ID.
    *
    * @return string
    *   The order type.
@@ -39,7 +39,7 @@ interface LineItemTypeInterface extends ConfigEntityInterface {
   public function getOrderTypeId();
 
   /**
-   * Sets the line item type's order type ID.
+   * Sets the order item type's order type ID.
    *
    * @param string $order_type_id
    *   The order type ID.

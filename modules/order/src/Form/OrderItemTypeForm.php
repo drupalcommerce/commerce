@@ -6,14 +6,14 @@ use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
-class LineItemTypeForm extends BundleEntityFormBase {
+class OrderItemTypeForm extends BundleEntityFormBase {
 
   /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $line_item_type = $this->entity;
+    $order_item_type = $this->entity;
     // Prepare the list of purchasable entity types.
     $entity_types = $this->entityTypeManager->getDefinitions();
     $purchasable_entity_types = array_filter($entity_types, function ($entity_type) {
@@ -34,15 +34,15 @@ class LineItemTypeForm extends BundleEntityFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $line_item_type->label(),
-      '#description' => $this->t('Label for the line item type.'),
+      '#default_value' => $order_item_type->label(),
+      '#description' => $this->t('Label for the order item type.'),
       '#required' => TRUE,
     ];
     $form['id'] = [
       '#type' => 'machine_name',
-      '#default_value' => $line_item_type->id(),
+      '#default_value' => $order_item_type->id(),
       '#machine_name' => [
-        'exists' => '\Drupal\commerce_order\Entity\LineItemType::load',
+        'exists' => '\Drupal\commerce_order\Entity\OrderItemType::load',
         'source' => ['label'],
       ],
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
@@ -50,15 +50,15 @@ class LineItemTypeForm extends BundleEntityFormBase {
     $form['purchasableEntityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Purchasable entity type'),
-      '#default_value' => $line_item_type->getPurchasableEntityTypeId(),
+      '#default_value' => $order_item_type->getPurchasableEntityTypeId(),
       '#options' => $purchasable_entity_types,
       '#empty_value' => '',
-      '#disabled' => !$line_item_type->isNew(),
+      '#disabled' => !$order_item_type->isNew(),
     ];
     $form['orderType'] = [
       '#type' => 'select',
       '#title' => $this->t('Order type'),
-      '#default_value' => $line_item_type->getOrderTypeId(),
+      '#default_value' => $order_item_type->getOrderTypeId(),
       '#options' => $order_types,
       '#required' => TRUE,
     ];
@@ -71,10 +71,10 @@ class LineItemTypeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    drupal_set_message($this->t('Saved the %label line item type.', [
+    drupal_set_message($this->t('Saved the %label order item type.', [
       '%label' => $this->entity->label(),
     ]));
-    $form_state->setRedirect('entity.commerce_line_item_type.collection');
+    $form_state->setRedirect('entity.commerce_order_item_type.collection');
   }
 
 }

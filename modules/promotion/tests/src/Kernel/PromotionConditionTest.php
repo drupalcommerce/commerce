@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\commerce_promotion\Kernel;
 
-use Drupal\commerce_order\Entity\LineItem;
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
@@ -61,7 +61,7 @@ class PromotionConditionTest extends KernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installConfig([
       'profile',
@@ -71,8 +71,8 @@ class PromotionConditionTest extends KernelTestBase {
     ]);
     $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
 
-    // A line item type that doesn't need a purchasable entity, for simplicity.
-    LineItemType::create([
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
@@ -85,7 +85,7 @@ class PromotionConditionTest extends KernelTestBase {
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'store_id' => $this->store,
-      'line_items' => [],
+      'order_items' => [],
     ]);
   }
 
@@ -93,8 +93,8 @@ class PromotionConditionTest extends KernelTestBase {
    * Tests the order amount condition.
    */
   public function testOrderTotal() {
-    // Use addLineItem so the total is calculated.
-    $line_item = LineItem::create([
+    // Use addOrderItem so the total is calculated.
+    $order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => 2,
       'unit_price' => [
@@ -102,8 +102,8 @@ class PromotionConditionTest extends KernelTestBase {
         'currency_code' => 'USD',
       ],
     ]);
-    $line_item->save();
-    $this->order->addLineItem($line_item);
+    $order_item->save();
+    $this->order->addItem($order_item);
 
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([

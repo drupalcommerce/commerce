@@ -11,47 +11,47 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines the line item entity class.
+ * Defines the order item entity class.
  *
  * @ContentEntityType(
- *   id = "commerce_line_item",
- *   label = @Translation("Line item"),
- *   label_singular = @Translation("Line item"),
- *   label_plural = @Translation("Line items"),
+ *   id = "commerce_order_item",
+ *   label = @Translation("order item"),
+ *   label_singular = @Translation("order item"),
+ *   label_plural = @Translation("order items"),
  *   label_count = @PluralTranslation(
- *     singular = "@count line item",
- *     plural = "@count line items",
+ *     singular = "@count order item",
+ *     plural = "@count order items",
  *   ),
- *   bundle_label = @Translation("Line item type"),
+ *   bundle_label = @Translation("order item type"),
  *   handlers = {
- *     "event" = "Drupal\commerce_order\Event\LineItemEvent",
- *     "storage" = "Drupal\commerce_order\LineItemStorage",
- *     "views_data" = "Drupal\commerce_order\LineItemViewsData",
+ *     "event" = "Drupal\commerce_order\Event\OrderItemEvent",
+ *     "storage" = "Drupal\commerce_order\OrderItemStorage",
+ *     "views_data" = "Drupal\commerce_order\OrderItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
  *     },
- *     "inline_form" = "Drupal\commerce_order\Form\LineItemInlineForm",
+ *     "inline_form" = "Drupal\commerce_order\Form\OrderItemInlineForm",
  *   },
- *   base_table = "commerce_line_item",
+ *   base_table = "commerce_order_item",
  *   admin_permission = "administer orders",
  *   fieldable = TRUE,
  *   entity_keys = {
- *     "id" = "line_item_id",
+ *     "id" = "order_item_id",
  *     "uuid" = "uuid",
  *     "bundle" = "type",
  *     "label" = "title",
  *   },
  *   links = {
- *     "canonical" = "/admin/commerce/config/line-item/{commerce_line_item}",
- *     "edit-form" = "/admin/commerce/config/line-item/{commerce_line_item}/edit",
- *     "delete-form" = "/admin/commerce/config/line-item/{commerce_line_item}/delete",
- *     "collection" = "/admin/commerce/config/line-item"
+ *     "canonical" = "/admin/commerce/config/order-item/{commerce_order_item}",
+ *     "edit-form" = "/admin/commerce/config/order-item/{commerce_order_item}/edit",
+ *     "delete-form" = "/admin/commerce/config/order-item/{commerce_order_item}/delete",
+ *     "collection" = "/admin/commerce/config/order-item"
  *   },
- *   bundle_entity_type = "commerce_line_item_type",
- *   field_ui_base_route = "entity.commerce_line_item_type.edit_form",
+ *   bundle_entity_type = "commerce_order_item_type",
+ *   field_ui_base_route = "entity.commerce_order_item_type.edit_form",
  * )
  */
-class LineItem extends ContentEntityBase implements LineItemInterface {
+class OrderItem extends ContentEntityBase implements OrderItemInterface {
 
   use EntityChangedTrait;
 
@@ -195,7 +195,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
   }
 
   /**
-   * Recalculates the line item total price.
+   * Recalculates the order item total price.
    */
   protected function recalculateTotalPrice() {
     if ($unit_price = $this->getUnitPrice()) {
@@ -234,7 +234,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
-      ->setDescription(t('The line item title.'))
+      ->setDescription(t('The order item title.'))
       ->setSettings([
         'default_value' => '',
         'max_length' => 512,
@@ -273,14 +273,14 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
-      ->setDescription(t('The total price of the line item.'))
+      ->setDescription(t('The total price of the order item.'))
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time when the line item was created.'))
+      ->setDescription(t('The time when the order item was created.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -291,7 +291,7 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the line item was last edited.'))
+      ->setDescription(t('The time when the order item was last edited.'))
       ->setRequired(TRUE);
 
     return $fields;
@@ -301,16 +301,16 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
    * {@inheritdoc}
    */
   public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
-    /** @var \Drupal\commerce_order\Entity\LineItemTypeInterface $line_item_type */
-    $line_item_type = LineItemType::load($bundle);
-    $purchasable_entity_type = $line_item_type->getPurchasableEntityTypeId();
+    /** @var \Drupal\commerce_order\Entity\OrderItemTypeInterface $order_item_type */
+    $order_item_type = OrderItemType::load($bundle);
+    $purchasable_entity_type = $order_item_type->getPurchasableEntityTypeId();
     $fields = [];
     $fields['purchased_entity'] = clone $base_field_definitions['purchased_entity'];
     if ($purchasable_entity_type) {
       $fields['purchased_entity']->setSetting('target_type', $purchasable_entity_type);
     }
     else {
-      // This line item type won't reference a purchasable entity. The field
+      // This order item type won't reference a purchasable entity. The field
       // can't be removed here, or converted to a configurable one, so it's
       // hidden instead. https://www.drupal.org/node/2346347#comment-10254087.
       $fields['purchased_entity']->setRequired(FALSE);

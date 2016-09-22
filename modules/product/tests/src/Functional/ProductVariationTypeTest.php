@@ -42,24 +42,24 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
-      'lineItemType' => 'product_variation',
+      'orderItemType' => 'product_variation',
     ];
     $this->createEntity('commerce_product_variation_type', $values);
     $variation_type = ProductVariationType::load($values['id']);
     $this->assertEquals($variation_type->label(), $values['label'], 'The new product variation type has the correct label.');
-    $this->assertEquals($variation_type->getLineItemTypeId(), $values['lineItemType'], 'The new product variation type has the correct line item type.');
+    $this->assertEquals($variation_type->getOrderItemTypeId(), $values['orderItemType'], 'The new product variation type has the correct order item type.');
 
     $this->drupalGet('admin/commerce/config/product-variation-types/add');
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
-      'lineItemType' => 'product_variation',
+      'orderItemType' => 'product_variation',
     ];
     $this->submitForm($edit, t('Save'));
     $variation_type = ProductVariationType::load($edit['id']);
     $this->assertTrue(!empty($variation_type), 'The new product variation type has been created.');
     $this->assertEquals($variation_type->label(), $edit['label'], 'The new product variation type has the correct label.');
-    $this->assertEquals($variation_type->getLineItemTypeId(), $edit['lineItemType'], 'The new product variation type has the correct line item type.');
+    $this->assertEquals($variation_type->getOrderItemTypeId(), $edit['orderItemType'], 'The new product variation type has the correct order item type.');
   }
 
   /**
@@ -117,7 +117,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit');
     $edit = [
       'label' => 'Default',
-      'lineItemType' => 'product_variation',
+      'orderItemType' => 'product_variation',
       'attributes[color]' => 'color',
     ];
     $this->submitForm($edit, t('Save'));
@@ -127,7 +127,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit');
     $edit = [
       'label' => 'Default',
-      'lineItemType' => 'product_variation',
+      'orderItemType' => 'product_variation',
       'attributes[color]' => FALSE,
     ];
     $this->submitForm($edit, t('Save'));

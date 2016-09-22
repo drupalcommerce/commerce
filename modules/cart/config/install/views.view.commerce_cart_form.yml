@@ -84,9 +84,9 @@ display:
       fields:
         purchased_entity:
           id: purchased_entity
-          table: commerce_line_item
+          table: commerce_order_item
           field: purchased_entity
-          relationship: line_items
+          relationship: order_items
           group_type: group
           admin_label: ''
           label: Item
@@ -144,14 +144,14 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: purchased_entity
           plugin_id: field
         unit_price__amount:
           id: unit_price__amount
-          table: commerce_line_item
+          table: commerce_order_item
           field: unit_price__amount
-          relationship: line_items
+          relationship: order_items
           group_type: group
           admin_label: ''
           label: Price
@@ -210,14 +210,14 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: unit_price
           plugin_id: field
         edit_quantity:
           id: edit_quantity
-          table: commerce_line_item
+          table: commerce_order_item
           field: edit_quantity
-          relationship: line_items
+          relationship: order_items
           group_type: group
           admin_label: ''
           label: Quantity
@@ -261,13 +261,13 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          entity_type: commerce_line_item
-          plugin_id: commerce_line_item_edit_quantity
+          entity_type: commerce_order_item
+          plugin_id: commerce_order_item_edit_quantity
         remove_button:
           id: remove_button
-          table: commerce_line_item
+          table: commerce_order_item
           field: remove_button
-          relationship: line_items
+          relationship: order_items
           group_type: group
           admin_label: ''
           label: Remove
@@ -311,13 +311,13 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          entity_type: commerce_line_item
-          plugin_id: commerce_line_item_remove_button
+          entity_type: commerce_order_item
+          plugin_id: commerce_order_item_remove_button
         total_price__amount:
           id: total_price__amount
-          table: commerce_line_item
+          table: commerce_order_item
           field: total_price__amount
-          relationship: line_items
+          relationship: order_items
           group_type: group
           admin_label: ''
           label: Total
@@ -376,36 +376,36 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: total_price
           plugin_id: field
       filters: {  }
       sorts:
-        line_item_id:
-          id: line_item_id
-          table: commerce_line_item
-          field: line_item_id
-          relationship: line_items
+        order_item_id:
+          id: order_item_id
+          table: commerce_order_item
+          field: order_item_id
+          relationship: order_items
           group_type: group
           admin_label: ''
           order: ASC
           exposed: false
           expose:
             label: ''
-          entity_type: commerce_line_item
-          entity_field: line_item_id
+          entity_type: commerce_order_item
+          entity_field: order_item_id
           plugin_id: standard
       header: {  }
       footer: {  }
       empty: {  }
       relationships:
-        line_items:
-          id: line_items
-          table: commerce_order__line_items
-          field: line_items
+        order_items:
+          id: order_items
+          table: commerce_order__order_items
+          field: order_items
           relationship: none
           group_type: group
-          admin_label: 'line_items: Line Item'
+          admin_label: 'order_items: Order Item'
           required: true
           plugin_id: standard
       arguments:

@@ -63,9 +63,9 @@ class OrderRefreshTest extends EntityKernelTestBase {
   protected $variation2;
 
   /**
-   * @var \Drupal\commerce_order\LineItemStorageInterface
+   * @var \Drupal\commerce_order\OrderItemStorageInterface
    */
-  protected $lineItemStorage;
+  protected $orderItemStorage;
 
   /**
    * Modules to enable.
@@ -90,7 +90,7 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installConfig(['commerce_product', 'commerce_order']);
@@ -100,8 +100,8 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
 
-    $this->lineItemStorage = $this->container->get('entity_type.manager')
-      ->getStorage('commerce_line_item');
+    $this->orderItemStorage = $this->container->get('entity_type.manager')
+      ->getStorage('commerce_order_item');
 
     $store = Store::create([
       'type' => 'default',
@@ -170,12 +170,12 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @group failing
    */
   public function testOrderCanRefresh() {
-    $line_item = $this->lineItemStorage->createFromPurchasableEntity($this->variation2, [
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
       'unit_price' => new Price('2.00', 'USD'),
     ]);
-    $line_item->save();
-    $line_item = $this->reloadEntity($line_item);
-    $this->order->addLineItem($line_item);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    $this->order->addItem($order_item);
     $this->order->save();
 
     $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
@@ -196,17 +196,17 @@ class OrderRefreshTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests that a line item's title is updated based on product changes.
+   * Tests that an order item's title is updated based on product changes.
    */
-  public function testLineItemTitleUpdate() {
-    $line_item = $this->lineItemStorage->createFromPurchasableEntity($this->variation2, [
+  public function testOrderItemTitleUpdate() {
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
       'unit_price' => new Price('2.00', 'USD'),
     ]);
-    $line_item->save();
-    $line_item = $this->reloadEntity($line_item);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($line_item->label(), 'Default testing product');
-    $this->order->addLineItem($line_item);
+    $this->assertEquals($order_item->label(), 'Default testing product');
+    $this->order->addItem($order_item);
     $this->order->save();
 
     $this->variation2->getProduct()->setTitle('Changed title')->save();
@@ -214,58 +214,58 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $this->orderRefresh->refresh($this->order);
 
     $this->variation2 = $this->reloadEntity($this->variation2);
-    $line_item = $this->reloadEntity($line_item);
+    $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($line_item->label(), 'Changed title');
+    $this->assertEquals($order_item->label(), 'Changed title');
   }
 
   /**
-   * Tests that a line item's unit price is set and updated on refresh.
+   * Tests that an order item's unit price is set and updated on refresh.
    */
   public function testUnitPriceRefresh() {
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $this->lineItemStorage->createFromPurchasableEntity($this->variation2);
-    $line_item->save();
-    $line_item = $this->reloadEntity($line_item);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
 
-    $this->order->addLineItem($line_item);
+    $this->order->addItem($order_item);
     $this->order->save();
     $this->orderRefresh->refresh($this->order);
-    $line_item = $this->reloadEntity($line_item);
+    $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($this->variation2->getPrice(), $line_item->getUnitPrice());
+    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
 
     $this->variation2->setPrice(new Price('12.00', 'USD'))->save();
 
     $this->orderRefresh->refresh($this->order);
-    $line_item = $this->reloadEntity($line_item);
+    $order_item = $this->reloadEntity($order_item);
 
-    $this->assertEquals($this->variation2->getPrice(), $line_item->getUnitPrice());
+    $this->assertEquals($this->variation2->getPrice(), $order_item->getUnitPrice());
   }
 
   /**
    * Tests the order refresh, with the availability processor.
    */
   public function testAvailabilityOrderRefr() {
-    $line_item = $this->lineItemStorage->createFromPurchasableEntity($this->variation1, [
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation1, [
       'unit_price' => new Price('2.00', 'USD'),
     ]);
-    $line_item->save();
-    $line_item = $this->reloadEntity($line_item);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
 
-    $another_line_item = $this->lineItemStorage->createFromPurchasableEntity($this->variation2, [
+    $another_order_item = $this->orderItemStorage->createFromPurchasableEntity($this->variation2, [
       'unit_price' => new Price('3.00', 'USD'),
       'quantity' => '2',
 
     ]);
-    $another_line_item->save();
-    $another_line_item = $this->reloadEntity($another_line_item);
+    $another_order_item->save();
+    $another_order_item = $this->reloadEntity($another_order_item);
 
-    $this->order->setLineItems([$line_item, $another_line_item])->save();
-    $this->assertEquals(2, count($this->order->getLineItems()));
+    $this->order->setItems([$order_item, $another_order_item])->save();
+    $this->assertEquals(2, count($this->order->getItems()));
 
     $this->orderRefresh->refresh($this->order);
-    $this->assertEquals(1, count($this->order->getLineItems()));
+    $this->assertEquals(1, count($this->order->getItems()));
   }
 
 }

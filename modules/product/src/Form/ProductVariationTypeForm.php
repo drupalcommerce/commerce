@@ -67,21 +67,21 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
     ];
 
     if ($this->moduleHandler->moduleExists('commerce_order')) {
-      // Prepare a list of line item types used to purchase product variations.
-      $line_item_type_storage = $this->entityTypeManager->getStorage('commerce_line_item_type');
-      $line_item_types = $line_item_type_storage->loadMultiple();
-      $line_item_types = array_filter($line_item_types, function ($line_item_type) {
-        return $line_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
+      // Prepare a list of order item types used to purchase product variations.
+      $order_item_type_storage = $this->entityTypeManager->getStorage('commerce_order_item_type');
+      $order_item_types = $order_item_type_storage->loadMultiple();
+      $order_item_types = array_filter($order_item_types, function ($order_item_type) {
+        return $order_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
       });
-      $line_item_types = array_map(function ($line_item_type) {
-        return $line_item_type->label();
-      }, $line_item_types);
+      $order_item_types = array_map(function ($order_item_type) {
+        return $order_item_type->label();
+      }, $order_item_types);
 
-      $form['lineItemType'] = [
+      $form['orderItemType'] = [
         '#type' => 'select',
-        '#title' => $this->t('Line item type'),
-        '#default_value' => $variation_type->getLineItemTypeId(),
-        '#options' => $line_item_types,
+        '#title' => $this->t('order item type'),
+        '#default_value' => $variation_type->getOrderItemTypeId(),
+        '#options' => $order_item_types,
         '#empty_value' => '',
         '#required' => TRUE,
       ];

@@ -5,9 +5,9 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\profile\Entity\Profile;
-use Drupal\commerce_order\Entity\LineItem;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\user\RoleInterface;
 
 /**
@@ -79,7 +79,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $user = $this->drupalCreateUser();
     $user2 = $this->drupalCreateUser();
 
-    LineItemType::create([
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
@@ -95,10 +95,10 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       ],
     ]);
     $profile->save();
-    $line_item = LineItem::create([
+    $order_item = OrderItem::create([
       'type' => 'test',
     ]);
-    $line_item->save();
+    $order_item->save();
     $order = Order::create([
       'type' => 'default',
       'state' => 'in_checkout',
@@ -107,7 +107,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
-      'line_items' => [$line_item],
+      'order_items' => [$order_item],
     ]);
     $order->save();
 
@@ -127,13 +127,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
     $this->drupalLogin($user);
 
-    // Order with no line items.
-    $order->removeLineItem($line_item)->save();
+    // Order with no order items.
+    $order->removeItem($order_item)->save();
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);
 
     // Authenticated order owner without the 'access checkout' permission.
-    $order->addLineItem($line_item)->save();
+    $order->addItem($order_item)->save();
     user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);

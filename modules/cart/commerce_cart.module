@@ -57,16 +57,16 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 /**
  * Implements hook_entity_bundle_create().
  *
- * Creates an 'add_to_cart' form display for each new line item type.
+ * Creates an 'add_to_cart' form display for each new order item type.
  */
 function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
-  if ($entity_type_id == 'commerce_line_item' && !\Drupal::isConfigSyncing()) {
+  if ($entity_type_id == 'commerce_order_item' && !\Drupal::isConfigSyncing()) {
     $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
-    $form_display = $storage->load('commerce_line_item.' . $bundle . '.add_to_cart');
+    $form_display = $storage->load('commerce_order_item.' . $bundle . '.add_to_cart');
     if (!$form_display) {
       /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
       $form_display = $storage->create([
-        'targetEntityType' => 'commerce_line_item',
+        'targetEntityType' => 'commerce_order_item',
         'bundle' => $bundle,
         'mode' => 'add_to_cart',
         'status' => TRUE,
@@ -82,7 +82,7 @@ function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
  * Implements hook_entity_type_build().
  */
 function commerce_cart_entity_type_build(array &$entity_types) {
-  $entity_types['commerce_line_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
+  $entity_types['commerce_order_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
 }
 
 /**
@@ -120,13 +120,13 @@ function commerce_cart_commerce_order_presave(OrderInterface $order) {
 /**
  * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
  *
- * Hides irrelevant purchased_entity widgets on the add_to_cart line item
+ * Hides irrelevant purchased_entity widgets on the add_to_cart order item
  * form display.
  */
 function commerce_cart_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
   $entity = $form_state->getFormObject()->getEntity();
-  if ($form['#entity_type'] == 'commerce_line_item' && $entity->getMode() == 'add_to_cart') {
+  if ($form['#entity_type'] == 'commerce_order_item' && $entity->getMode() == 'add_to_cart') {
     $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
     unset($options['entity_reference_autocomplete_tags']);
     unset($options['entity_reference_autocomplete']);
@@ -212,15 +212,15 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
  * Implements hook_views_data_alter().
  */
 function commerce_cart_views_data_alter(array &$data) {
-  $data['commerce_line_item']['edit_quantity']['field'] = [
+  $data['commerce_order_item']['edit_quantity']['field'] = [
     'title' => t('Quantity text field'),
     'help' => t('Adds a text field for editing the quantity.'),
-    'id' => 'commerce_line_item_edit_quantity',
+    'id' => 'commerce_order_item_edit_quantity',
   ];
-  $data['commerce_line_item']['remove_button']['field'] = [
+  $data['commerce_order_item']['remove_button']['field'] = [
     'title' => t('Remove button'),
-    'help' => t('Adds a button for removing the line item.'),
-    'id' => 'commerce_line_item_remove_button',
+    'help' => t('Adds a button for removing the order item.'),
+    'id' => 'commerce_order_item_remove_button',
   ];
 }
 

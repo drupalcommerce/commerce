@@ -7,17 +7,17 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 
 /**
- * Plugin implementation of the 'commerce_line_item_table' formatter.
+ * Plugin implementation of the 'commerce_order_item_table' formatter.
  *
  * @FieldFormatter(
- *   id = "commerce_line_item_table",
- *   label = @Translation("Line item table"),
+ *   id = "commerce_order_item_table",
+ *   label = @Translation("order item table"),
  *   field_types = {
  *     "entity_reference",
  *   },
  * )
  */
-class LineItemTable extends FormatterBase {
+class OrderItemTable extends FormatterBase {
 
   /**
    * {@inheritdoc}
@@ -27,7 +27,7 @@ class LineItemTable extends FormatterBase {
     return [
       '#type' => 'view',
       // @todo Allow the view to be configurable.
-      '#name' => 'commerce_line_item_table',
+      '#name' => 'commerce_order_item_table',
       '#arguments' => [$order->id()],
       '#embed' => TRUE,
     ];
@@ -39,7 +39,7 @@ class LineItemTable extends FormatterBase {
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
-    return $entity_type == 'commerce_order' && $field_name == 'line_items';
+    return $entity_type == 'commerce_order' && $field_name == 'order_items';
   }
 
 }

@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_payment\Kernel\Entity;
 
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\CreditCard;
@@ -56,14 +56,14 @@ class PaymentMethodTest extends EntityKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment');
     $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 
-    // A line item type that doesn't need a purchasable entity, for simplicity.
-    LineItemType::create([
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',

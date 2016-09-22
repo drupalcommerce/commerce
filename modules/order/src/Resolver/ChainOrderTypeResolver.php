@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Resolver;
 
-use Drupal\commerce_order\Entity\LineItemInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 
 /**
  * Default implementation of the chain order type resolver.
@@ -43,9 +43,9 @@ class ChainOrderTypeResolver implements ChainOrderTypeResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(LineItemInterface $line_item) {
+  public function resolve(OrderItemInterface $order_item) {
     foreach ($this->resolvers as $resolver) {
-      $result = $resolver->resolve($line_item);
+      $result = $resolver->resolve($order_item);
       if ($result) {
         return $result;
       }

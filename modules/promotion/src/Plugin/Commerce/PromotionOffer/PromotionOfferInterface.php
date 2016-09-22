@@ -16,7 +16,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 interface PromotionOfferInterface extends ExecutableInterface, PluginFormInterface, ConfigurablePluginInterface, PluginInspectionInterface, ContextAwarePluginInterface {
 
   const ORDER = 'commerce_order';
-  const LINE_ITEM = 'commerce_line_item';
+  const ORDER_ITEM = 'commerce_order_item';
 
   /**
    * Gets the entity type the offer is for.

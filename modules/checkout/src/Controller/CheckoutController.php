@@ -109,7 +109,7 @@ class CheckoutController implements ContainerInjectionInterface {
     }
 
     $access = AccessResult::allowedIf($owner_check)
-      ->andIf(AccessResult::allowedIf($order->hasLineItems()))
+      ->andIf(AccessResult::allowedIf($order->hasItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
 

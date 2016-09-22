@@ -41,7 +41,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests creating/editing an Order.
    */
   public function testCreateOrder() {
-    // Create a order through the add form.
+    // Create an order through the add form.
     $this->drupalGet('/admin/commerce/orders');
     $this->getSession()->getPage()->clickLink('Create a new order');
     $user = $this->loggedInUser->getAccountName() . ' (' . $this->loggedInUser->id() . ')';
@@ -54,28 +54,28 @@ class OrderAdminTest extends OrderBrowserTestBase {
     // Check the integrity of the edit form.
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldExists('billing_profile');
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][purchased_entity][0][target_id]');
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][quantity][0][value]');
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][unit_price][0][amount]');
-    $this->assertSession()->buttonExists('Create line item');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][amount]');
+    $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $edit = [
-      'line_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
-      'line_items[form][inline_entity_form][quantity][0][value]' => '1',
-      'line_items[form][inline_entity_form][unit_price][0][amount]' => '9.99',
+      'order_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
+      'order_items[form][inline_entity_form][quantity][0][value]' => '1',
+      'order_items[form][inline_entity_form][unit_price][0][amount]' => '9.99',
     ];
-    $this->submitForm($edit, 'Create line item');
+    $this->submitForm($edit, 'Create order item');
     $this->submitForm([], t('Edit'));
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][entities][0][form][purchased_entity][0][target_id]');
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][entities][0][form][quantity][0][value]');
-    $this->assertSession()->fieldExists('line_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]');
-    $this->assertSession()->buttonExists('Update line item');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][purchased_entity][0][target_id]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][quantity][0][value]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]');
+    $this->assertSession()->buttonExists('Update order item');
 
     $edit = [
-      'line_items[form][inline_entity_form][entities][0][form][quantity][0][value]' => 3,
-      'line_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]' => '1.11',
+      'order_items[form][inline_entity_form][entities][0][form][quantity][0][value]' => 3,
+      'order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]' => '1.11',
     ];
-    $this->submitForm($edit, 'Update line item');
+    $this->submitForm($edit, 'Update order item');
     $edit = [
       'billing_profile' => $this->billingProfile->id(),
       'adjustments[0][type]' => 'custom',
@@ -88,7 +88,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertEquals(1, count($order_number), 'Order exists in the table.');
 
     $order = Order::load(1);
-    $this->assertEquals(1, count($order->getLineItems()));
+    $this->assertEquals(1, count($order->getItems()));
     $this->assertEquals('5.33', $order->total_price->amount);
   }
 
@@ -123,7 +123,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests deleting a order.
+   * Tests deleting an order.
    */
   public function testDeleteOrder() {
     $order = $this->createEntity('commerce_order', [

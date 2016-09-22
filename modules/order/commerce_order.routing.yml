@@ -47,10 +47,10 @@ entity.commerce_order.user_view:
         user: 'entity:user'
         commerce_order: 'entity:order'
 
-entity.commerce_line_item_type.collection:
-  path: '/admin/commerce/config/line-item-types'
+entity.commerce_order_item_type.collection:
+  path: '/admin/commerce/config/order-item-types'
   defaults:
-    _entity_list: 'commerce_line_item_type'
-    _title: 'Line item types'
+    _entity_list: 'commerce_order_item_type'
+    _title: 'order item types'
   requirements:
-    _permission: 'administer line item types'
+    _permission: 'administer order item types'

@@ -28,9 +28,9 @@ commerce_product.commerce_product_variation_type.*:
     label:
       type: label
       label: 'Label'
-    lineItemType:
+    orderItemType:
       type: string
-      label: 'Line item type'
+      label: 'order item type'
     generateTitle:
       type: boolean
       label: 'Generate variation titles based on attribute values'
@@ -60,7 +60,7 @@ field.formatter.settings.commerce_add_to_cart:
       label: 'Default quantity'
     combine:
       type: boolean
-      label: 'Whether to attempt to combine line items containing the same product variation'
+      label: 'Whether to attempt to combine order items containing the same product variation'
 
 field.formatter.settings.commerce_product_attributes_overview:
   type: mapping

@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\commerce_order\Kernel;
 
-use Drupal\commerce_order\Entity\LineItem;
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -36,10 +36,10 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
-    // A line item type that doesn't need a purchasable entity, for simplicity.
-    LineItemType::create([
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
@@ -50,15 +50,15 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
    * Tests resolving the order type.
    */
   public function testOrderTypeResolution() {
-    $line_item = LineItem::create([
+    $order_item = OrderItem::create([
       'type' => 'test',
     ]);
-    $line_item->save();
+    $order_item->save();
 
     /** @var \Drupal\commerce_order\Resolver\ChainOrderTypeResolverInterface $resolver */
     $resolver = \Drupal::service('commerce_order.chain_order_type_resolver');
 
-    $order_type = $resolver->resolve($line_item);
+    $order_type = $resolver->resolve($order_item);
 
     $this->assertEquals('default', $order_type);
   }

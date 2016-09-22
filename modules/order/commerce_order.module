@@ -50,13 +50,13 @@ function commerce_order_commerce_order_presave(OrderInterface $order) {
  *
  * - Changes the label of the purchased_entity field to the label of the
  *   target type (e.g. 'Product variation').
- * - Forbids editing the purchased_entity once the line item is no longer new.
+ * - Forbids editing the purchased_entity once the order item is no longer new.
  */
 function commerce_order_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();
-  if ($field_name == 'purchased_entity' && $entity_type == 'commerce_line_item') {
+  if ($field_name == 'purchased_entity' && $entity_type == 'commerce_order_item') {
     if (!empty($element['target_id']['#target_type'])) {
       $target_type = \Drupal::service('entity_type.manager')->getDefinition($element['target_id']['#target_type']);
       $element['target_id']['#title'] = $target_type->getLabel();
@@ -96,25 +96,25 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
 }
 
 /**
- * Adds the default line_items field to an order type.
+ * Adds the default order_items field to an order type.
  *
- * Line items can't be a base field because the Views integration is broken.
+ * order items can't be a base field because the Views integration is broken.
  * Instead, it is created as a configurable field for each order type.
  *
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
  */
-function commerce_order_add_line_items_field($order_type) {
-  $field_storage = FieldStorageConfig::loadByName('commerce_order', 'line_items');
-  $field = FieldConfig::loadByName('commerce_order', $order_type->id(), 'line_items');
+function commerce_order_add_order_items_field($order_type) {
+  $field_storage = FieldStorageConfig::loadByName('commerce_order', 'order_items');
+  $field = FieldConfig::loadByName('commerce_order', $order_type->id(), 'order_items');
   if (empty($field_storage)) {
     $field_storage = FieldStorageConfig::create([
-      'field_name' => 'line_items',
+      'field_name' => 'order_items',
       'entity_type' => 'commerce_order',
       'type' => 'entity_reference',
       'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
       'settings' => [
-        'target_type' => 'commerce_line_item',
+        'target_type' => 'commerce_order_item',
       ],
       'locked' => TRUE,
       'translatable' => FALSE,
@@ -125,7 +125,7 @@ function commerce_order_add_line_items_field($order_type) {
     $field = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => $order_type->id(),
-      'label' => 'Line items',
+      'label' => 'order items',
       'required' => TRUE,
       'settings' => [
         'handler' => 'default',
@@ -136,20 +136,20 @@ function commerce_order_add_line_items_field($order_type) {
     $field->save();
 
     $view_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'view');
-    $view_display->setComponent('line_items', [
-      'type' => 'commerce_line_item_table',
+    $view_display->setComponent('order_items', [
+      'type' => 'commerce_order_item_table',
       'weight' => 0,
     ]);
     $view_display->save();
 
     $form_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'form');
-    $form_display->setComponent('line_items', [
+    $form_display->setComponent('order_items', [
       'type' => 'inline_entity_form_complex',
       'weight' => 0,
       'settings' => [
         'override_labels' => TRUE,
-        'label_singular' => 'line item',
-        'label_plural' => 'line items',
+        'label_singular' => 'order item',
+        'label_plural' => 'order items',
       ],
     ]);
     $form_display->save();

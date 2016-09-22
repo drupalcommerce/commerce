@@ -35,7 +35,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
     return array_merge([
       'administer orders',
       'administer order types',
-      'administer line item types',
+      'administer order item types',
     ], parent::getAdministratorPermissions());
   }
 
@@ -51,7 +51,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
    * Tests the reassign form with a new user.
    */
   public function testOrderReassign() {
-    $line_item = $this->createEntity('commerce_line_item', [
+    $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'product_variation',
       'unit_price' => [
         'amount' => '999',
@@ -63,7 +63,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'uid' => $this->loggedInUser->id(),
-      'line_items' => [$line_item],
+      'order_items' => [$order_item],
     ]);
 
     $this->assertTrue($order->hasLinkTemplate('reassign-form'));

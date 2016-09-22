@@ -6,17 +6,17 @@ use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
- * Defines the line item storage.
+ * Defines the order item storage.
  */
-class LineItemStorage extends CommerceContentEntityStorage implements LineItemStorageInterface {
+class OrderItemStorage extends CommerceContentEntityStorage implements OrderItemStorageInterface {
 
   /**
    * {@inheritdoc}
    */
   public function createFromPurchasableEntity(PurchasableEntityInterface $entity, array $values = []) {
     $values += [
-      'type' => $entity->getLineItemTypeId(),
-      'title' => $entity->getLineItemTitle(),
+      'type' => $entity->getOrderItemTypeId(),
+      'title' => $entity->getOrderItemTitle(),
       'purchased_entity' => $entity,
       'unit_price' => $entity->getPrice(),
     ];

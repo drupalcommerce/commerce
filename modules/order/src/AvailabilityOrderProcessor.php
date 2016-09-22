@@ -31,13 +31,13 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
-    foreach ($order->getLineItems() as $line_item) {
-      $purchased_entity = $line_item->getPurchasedEntity();
+    foreach ($order->getItems() as $order_item) {
+      $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
-        $available = $this->availabilityManager->check($line_item->getPurchasedEntity(), $line_item->getQuantity());
+        $available = $this->availabilityManager->check($order_item->getPurchasedEntity(), $order_item->getQuantity());
         if (!$available) {
-          $order->removeLineItem($line_item);
-          $line_item->delete();
+          $order->removeItem($order_item);
+          $order_item->delete();
         }
       }
     }

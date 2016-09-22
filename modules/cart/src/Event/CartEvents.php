@@ -44,38 +44,38 @@ final class CartEvents {
   const CART_ENTITY_ADD = 'commerce_cart.entity.add';
 
   /**
-   * Name of the event fired after updating a cart's line item.
+   * Name of the event fired after updating a cart's order item.
    *
    * Fired before the cart order is saved.
    *
    * @Event
    *
-   * @see \Drupal\commerce_cart\Event\CartLineItemUpdateEvent
+   * @see \Drupal\commerce_cart\Event\CartOrderItemUpdateEvent
    */
-  const CART_LINE_ITEM_UPDATE = 'commerce_cart.line_item.update';
+  const CART_ORDER_ITEM_UPDATE = 'commerce_cart.order_item.update';
 
   /**
-   * Name of the event fired after removing a line item from the cart.
+   * Name of the event fired after removing an order item from the cart.
    *
    * Fired before the cart order is saved.
    *
    * @Event
    *
-   * @see \Drupal\commerce_cart\Event\CartLineItemRemoveEvent
+   * @see \Drupal\commerce_cart\Event\CartOrderItemRemoveEvent
    */
-  const CART_LINE_ITEM_REMOVE = 'commerce_cart.line_item.remove';
+  const CART_ORDER_ITEM_REMOVE = 'commerce_cart.order_item.remove';
 
   /**
    * Name of the event fired when altering the list of comparison fields.
    *
    * Use this event to add additional field names to the list of fields used
-   * to determine whether a line item can be combined into an existing line
+   * to determine whether an order item can be combined into an existing order
    * item.
    *
    * @Event
    *
-   * @see \Drupal\commerce_cart\Event\LineItemComparisonFieldsEvent
+   * @see \Drupal\commerce_cart\Event\OrderItemComparisonFieldsEvent
    */
-  const LINE_ITEM_COMPARISON_FIELDS = 'commerce_cart.line_item.comparison_fields';
+  const ORDER_ITEM_COMPARISON_FIELDS = 'commerce_cart.order_item.comparison_fields';
 
 }

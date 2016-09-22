@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_cart\Functional;
 
-use Drupal\commerce_order\Entity\LineItemInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
@@ -210,20 +210,20 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
   }
 
   /**
-   * Assert the line item in the order is correct.
+   * Assert the order item in the order is correct.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
    *   The purchased product variation.
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
    * @param int $quantity
    *   The quantity.
    */
-  protected function assertLineItemInOrder(ProductVariationInterface $variation, LineItemInterface $line_item, $quantity = 1) {
-    $this->assertEquals($line_item->getTitle(), $variation->getLineItemTitle());
-    $this->assertTrue(($line_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
-      '@product' => $line_item->getTitle(),
-      '@quantity' => $line_item->getQuantity(),
+  protected function assertOrderItemInOrder(ProductVariationInterface $variation, OrderItemInterface $order_item, $quantity = 1) {
+    $this->assertEquals($order_item->getTitle(), $variation->getOrderItemTitle());
+    $this->assertTrue(($order_item->getQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
+      '@product' => $order_item->getTitle(),
+      '@quantity' => $order_item->getQuantity(),
     ]));
   }
 

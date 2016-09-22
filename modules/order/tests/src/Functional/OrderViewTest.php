@@ -13,7 +13,7 @@ class OrderViewTest extends OrderBrowserTestBase {
    * Tests that an admin can view an order's details.
    */
   public function testAdminOrderView() {
-    $line_item = $this->createEntity('commerce_line_item', [
+    $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'product_variation',
       'unit_price' => [
         'amount' => '999',
@@ -23,7 +23,7 @@ class OrderViewTest extends OrderBrowserTestBase {
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
-      'line_items' => [$line_item],
+      'order_items' => [$order_item],
     ]);
 
     // First test that the current admin user can see the order.

@@ -100,9 +100,9 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Add to cart');
 
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertLineItemInOrder($variations[0], $line_items[0]);
-    $this->assertLineItemInOrder($variations[5], $line_items[1]);
+    $order_items = $this->cart->getItems();
+    $this->assertOrderItemInOrder($variations[0], $order_items[0]);
+    $this->assertOrderItemInOrder($variations[5], $order_items[1]);
   }
 
   /**

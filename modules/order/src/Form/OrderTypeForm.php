@@ -58,7 +58,7 @@ class OrderTypeForm extends BundleEntityFormBase {
     ];
 
     $form['refresh']['refresh_intro'] = [
-      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which line item prices are recalculated.') . '</p>',
+      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which order item prices are recalculated.') . '</p>',
     ];
     $form['refresh']['refresh_mode'] = [
       '#type' => 'radios',
@@ -106,7 +106,7 @@ class OrderTypeForm extends BundleEntityFormBase {
     $form_state->setRedirect('entity.commerce_order_type.collection');
 
     if ($status == SAVED_NEW) {
-      commerce_order_add_line_items_field($this->entity);
+      commerce_order_add_order_items_field($this->entity);
     }
   }
 
