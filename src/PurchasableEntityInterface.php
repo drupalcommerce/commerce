@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce;
 
+use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
@@ -11,15 +12,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  * type providing modules such as commerce_product don't need to depend
  * on commerce_order.
  */
-interface PurchasableEntityInterface extends ContentEntityInterface {
-
-  /**
-   * Gets the stores through which the purchasable entity is sold.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface[]
-   *   The stores.
-   */
-  public function getStores();
+interface PurchasableEntityInterface extends ContentEntityInterface, EntityStoresInterface {
 
   /**
    * Gets the purchasable entity's line item type ID.
