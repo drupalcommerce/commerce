@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_checkout\Form;
 
+use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_checkout\CheckoutFlowManager;
-use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CheckoutFlowForm extends BundleEntityFormBase {
+class CheckoutFlowForm extends CommercePluginEntityFormBase {
 
   /**
    * The checkout flow plugin manager.
@@ -78,9 +78,7 @@ class CheckoutFlowForm extends BundleEntityFormBase {
       $form['configuration'] = $checkout_flow->getPlugin()->buildConfigurationForm($form['configuration'], $form_state);
     }
 
-    // Checkout flow is technically not a bundle config entity, but the logic
-    // for preventing id change on edit applies the same.
-    return $this->protectBundleIdElement($form);
+    return $this->protectPluginIdElement($form);
   }
 
   /**
