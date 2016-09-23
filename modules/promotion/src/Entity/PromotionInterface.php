@@ -2,13 +2,14 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the interface for promotions.
  */
-interface PromotionInterface extends EntityInterface {
+interface PromotionInterface extends EntityInterface, EntityStoresInterface {
 
   /**
    * Gets the promotion name.
@@ -81,42 +82,6 @@ interface PromotionInterface extends EntityInterface {
    * @return $this
    */
   public function setOrderTypeIds(array $order_type_ids);
-
-  /**
-   * Gets the promotion stores.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface[]
-   *   The promotion stores.
-   */
-  public function getStores();
-
-  /**
-   * Sets the promotion stores.
-   *
-   * @param \Drupal\commerce_store\Entity\StoreInterface[] $stores
-   *   The promotion stores.
-   *
-   * @return $this
-   */
-  public function setStores(array $stores);
-
-  /**
-   * Gets the promotion store IDs.
-   *
-   * @return int[]
-   *   The promotion store IDs.
-   */
-  public function getStoreIds();
-
-  /**
-   * Sets the promotion store IDs.
-   *
-   * @param int[] $store_ids
-   *   The promotion store IDs.
-   *
-   * @return $this
-   */
-  public function setStoreIds(array $store_ids);
 
   /**
    * Gets the promotion current usage.
