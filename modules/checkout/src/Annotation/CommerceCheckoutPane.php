@@ -32,6 +32,15 @@ class CommerceCheckoutPane extends Plugin {
   public $label;
 
   /**
+   * The administrative label of the plugin.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $admin_label = '';
+
+  /**
    * The ID of the default step for this pane.
    *
    * Optional. If missing, the pane will be disabled by default.
