@@ -5,7 +5,7 @@ namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 /**
  * Provides a 'Order: Percentage off' condition.
  *
- * @PromotionOffer(
+ * @CommercePromotionOffer(
  *   id = "commerce_promotion_order_percentage_off",
  *   label = @Translation("Percentage off"),
  *   target_entity_type = "commerce_order",
