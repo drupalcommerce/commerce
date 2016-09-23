@@ -393,6 +393,49 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function addPayment(Price $amount) {
+    $this->setTotalPaid($this->getTotalPaid()->add($amount));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function subtractPayment(Price $amount) {
+    $this->setTotalPaid($this->getTotalPaid()->subtract($amount));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTotalPaid() {
+    if (!$this->get('total_paid')->isEmpty()) {
+      return $this->get('total_paid')->first()->toPrice();
+    }
+    return new Price('0', $this->getStore()->getDefaultCurrencyCode());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTotalPaid(Price $amount) {
+    $this->set('total_paid', $amount);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBalance() {
+    if ($this->getTotalPrice() && $this->getTotalPaid()) {
+      return $this->getTotalPrice()->subtract($this->getTotalPaid());
+    }
+    return $this->getTotalPrice();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getState() {
     return $this->get('state')->first();
   }
@@ -668,6 +711,13 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'commerce_order_total_summary',
         'weight' => 0,
       ])
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['total_paid'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Total paid'))
+      ->setDescription(t('The total amount paid on the order.'))
+      ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
