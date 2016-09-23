@@ -78,7 +78,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->submitForm($edit, 'Update line item');
     $edit = [
       'billing_profile' => $this->billingProfile->id(),
-      'adjustments[0][type]' => 'order_adjustment',
+      'adjustments[0][type]' => 'custom',
       'adjustments[0][definition][label]' => 'Test fee',
       'adjustments[0][definition][amount][amount]' => '2.00',
     ];
