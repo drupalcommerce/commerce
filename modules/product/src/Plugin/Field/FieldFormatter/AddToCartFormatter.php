@@ -36,8 +36,8 @@ class AddToCartFormatter extends FormatterBase {
     $form = parent::settingsForm($form, $form_state);
     $form['combine'] = [
       '#type' => 'checkbox',
-      '#title' => t('Combine line items containing the same product variation.'),
-      '#description' => t('The line item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
+      '#title' => t('Combine order items containing the same product variation.'),
+      '#description' => t('The order item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
       '#default_value' => $this->getSetting('combine'),
     ];
 
@@ -50,10 +50,10 @@ class AddToCartFormatter extends FormatterBase {
   public function settingsSummary() {
     $summary = [];
     if ($this->getSetting('combine')) {
-      $summary[] = $this->t('Combine line items containing the same product variation.');
+      $summary[] = $this->t('Combine order items containing the same product variation.');
     }
     else {
-      $summary[] = $this->t('Do not combine line items containing the same product variation.');
+      $summary[] = $this->t('Do not combine order items containing the same product variation.');
     }
 
     return $summary;

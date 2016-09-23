@@ -6,7 +6,7 @@ dependencies:
   enforced:
     module:
       - commerce_cart
-id: commerce_line_item.add_to_cart
+id: commerce_order_item.add_to_cart
 label: 'Add to cart'
-targetEntityType: commerce_line_item
+targetEntityType: commerce_order_item
 cache: true

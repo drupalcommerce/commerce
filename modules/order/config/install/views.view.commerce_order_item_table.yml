@@ -4,13 +4,13 @@ dependencies:
   module:
     - commerce_order
     - commerce_price
-id: commerce_line_item_table
-label: 'Line items'
+id: commerce_order_item_table
+label: 'order items'
 module: views
-description: 'Display a set of line items in a table.'
+description: 'Display a set of order items in a table.'
 tag: ''
-base_table: commerce_line_item
-base_field: line_item_id
+base_table: commerce_order_item
+base_field: order_item_id
 core: 8.x
 display:
   default:
@@ -80,7 +80,7 @@ display:
       fields:
         title:
           id: title
-          table: commerce_line_item
+          table: commerce_order_item
           field: title
           relationship: none
           group_type: group
@@ -145,7 +145,7 @@ display:
           plugin_id: field
         unit_price__amount:
           id: unit_price__amount
-          table: commerce_line_item
+          table: commerce_order_item
           field: unit_price__amount
           relationship: none
           group_type: group
@@ -206,12 +206,12 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: unit_price
           plugin_id: field
         quantity:
           id: quantity
-          table: commerce_line_item
+          table: commerce_order_item
           field: quantity
           relationship: none
           group_type: group
@@ -274,12 +274,12 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: quantity
           plugin_id: field
         total_price__amount:
           id: total_price__amount
-          table: commerce_line_item
+          table: commerce_order_item
           field: total_price__amount
           relationship: none
           group_type: group
@@ -340,7 +340,7 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: total_price
           plugin_id: field
       filters: {  }
@@ -352,7 +352,7 @@ display:
       arguments:
         order_id:
           id: order_id
-          table: commerce_line_item
+          table: commerce_order_item
           field: order_id
           relationship: none
           group_type: group
@@ -384,7 +384,7 @@ display:
           validate_options: {  }
           break_phrase: false
           not: false
-          entity_type: commerce_line_item
+          entity_type: commerce_order_item
           entity_field: order_id
           plugin_id: numeric
       display_extenders: {  }

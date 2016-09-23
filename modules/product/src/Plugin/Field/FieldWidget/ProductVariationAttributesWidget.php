@@ -102,7 +102,7 @@ class ProductVariationAttributesWidget extends WidgetBase implements ContainerFa
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
-    return $entity_type == 'commerce_line_item' && $field_name == 'purchased_entity';
+    return $entity_type == 'commerce_order_item' && $field_name == 'purchased_entity';
   }
 
   /**

@@ -23,18 +23,18 @@ class AddToCartFormTest extends CartBrowserTestBase {
     // Confirm that the initial add to cart submit works.
     $this->postAddToCart($this->variation->getProduct());
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertLineItemInOrder($this->variation, $line_items[0]);
+    $order_items = $this->cart->getItems();
+    $this->assertOrderItemInOrder($this->variation, $order_items[0]);
 
     // Confirm that the second add to cart submit increments the quantity
-    // of the first line item..
+    // of the first order item..
     $this->postAddToCart($this->variation->getProduct());
     \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();
-    \Drupal::entityTypeManager()->getStorage('commerce_line_item')->resetCache();
+    \Drupal::entityTypeManager()->getStorage('commerce_order_item')->resetCache();
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertTrue(count($line_items) == 1, 'No additional line items were created');
-    $this->assertLineItemInOrder($this->variation, $line_items[0], 2);
+    $order_items = $this->cart->getItems();
+    $this->assertTrue(count($order_items) == 1, 'No additional order items were created');
+    $this->assertOrderItemInOrder($this->variation, $order_items[0], 2);
   }
 
   /**
@@ -79,28 +79,28 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $this->submitForm([], 'Add to cart');
 
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertEquals($variation2->getSku(), $line_items[0]->getPurchasedEntity()->getSku());
+    $order_items = $this->cart->getItems();
+    $this->assertEquals($variation2->getSku(), $order_items[0]->getPurchasedEntity()->getSku());
   }
 
   /**
-   * Tests ability to expose line item fields on the add to cart form.
+   * Tests ability to expose order item fields on the add to cart form.
    */
-  public function testExposedLineItemFields() {
-    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $line_item_form_display */
-    $line_item_form_display = EntityFormDisplay::load('commerce_line_item.product_variation.add_to_cart');
-    $line_item_form_display->setComponent('quantity', [
+  public function testExposedOrderItemFields() {
+    /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $order_item_form_display */
+    $order_item_form_display = EntityFormDisplay::load('commerce_order_item.product_variation.add_to_cart');
+    $order_item_form_display->setComponent('quantity', [
       'type' => 'number',
     ]);
-    $line_item_form_display->save();
+    $order_item_form_display->save();
     // Get the existing product page and submit Add to cart form.
     $this->postAddToCart($this->variation->getProduct(), [
       'quantity[0][value]' => 3,
     ]);
-    // Check if the quantity was increased for the existing line item.
+    // Check if the quantity was increased for the existing order item.
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertLineItemInOrder($this->variation, $line_items[0], 3);
+    $order_items = $this->cart->getItems();
+    $this->assertOrderItemInOrder($this->variation, $order_items[0], 3);
   }
 
   /**

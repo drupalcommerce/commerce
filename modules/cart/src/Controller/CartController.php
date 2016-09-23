@@ -47,7 +47,8 @@ class CartController extends ControllerBase {
     $build = [];
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
-      return $cart->hasLineItems();
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
+      return $cart->hasItems();
     });
     if (!empty($carts)) {
       $cart_views = $this->getCartViews($carts);
@@ -84,6 +85,7 @@ class CartController extends ControllerBase {
    */
   protected function getCartViews(array $carts) {
     $order_type_ids = array_map(function ($cart) {
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
       return $cart->bundle();
     }, $carts);
     $order_type_storage = $this->entityTypeManager()->getStorage('commerce_order_type');

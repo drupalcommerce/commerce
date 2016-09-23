@@ -8,7 +8,7 @@
   description: 'Allows users to create, update, and delete order types.'
   'restrict access': TRUE
 
-'administer line item types':
-  title: 'Administer line item types'
-  description: 'Allows users to administer line item types.'
+'administer order item types':
+  title: 'Administer order item types'
+  description: 'Allows users to administer order item types.'
   'restrict access': TRUE

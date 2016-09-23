@@ -27,9 +27,9 @@ config_devel:
     - system.action.commerce_unpublish_product
     - views.view.commerce_products
   optional:
-    - commerce_order.commerce_line_item_type.product_variation
-    - core.entity_form_display.commerce_line_item.product_variation.default
-    - core.entity_form_display.commerce_line_item.product_variation.add_to_cart
-    - core.entity_view_display.commerce_line_item.product_variation.default
+    - commerce_order.commerce_order_item_type.product_variation
+    - core.entity_form_display.commerce_order_item.product_variation.default
+    - core.entity_form_display.commerce_order_item.product_variation.add_to_cart
+    - core.entity_view_display.commerce_order_item.product_variation.default
     - core.entity_view_display.commerce_product_variation.default.cart
     - core.entity_view_mode.commerce_product_variation.cart

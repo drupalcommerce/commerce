@@ -205,15 +205,15 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLineItems() {
-    return $this->get('line_items')->referencedEntities();
+  public function getItems() {
+    return $this->get('order_items')->referencedEntities();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLineItems(array $line_items) {
-    $this->set('line_items', $line_items);
+  public function setItems(array $order_items) {
+    $this->set('order_items', $order_items);
     $this->recalculateTotalPrice();
     return $this;
   }
@@ -221,16 +221,16 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasLineItems() {
-    return !$this->get('line_items')->isEmpty();
+  public function hasItems() {
+    return !$this->get('order_items')->isEmpty();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addLineItem(LineItemInterface $line_item) {
-    if (!$this->hasLineItem($line_item)) {
-      $this->get('line_items')->appendItem($line_item);
+  public function addItem(OrderItemInterface $order_item) {
+    if (!$this->hasItem($order_item)) {
+      $this->get('order_items')->appendItem($order_item);
       $this->recalculateTotalPrice();
     }
     return $this;
@@ -239,10 +239,10 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeLineItem(LineItemInterface $line_item) {
-    $index = $this->getLineItemIndex($line_item);
+  public function removeItem(OrderItemInterface $order_item) {
+    $index = $this->getItemIndex($order_item);
     if ($index !== FALSE) {
-      $this->get('line_items')->offsetUnset($index);
+      $this->get('order_items')->offsetUnset($index);
     }
     return $this;
   }
@@ -250,26 +250,26 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasLineItem(LineItemInterface $line_item) {
-    return $this->getLineItemIndex($line_item) !== FALSE;
+  public function hasItem(OrderItemInterface $order_item) {
+    return $this->getItemIndex($order_item) !== FALSE;
   }
 
   /**
-   * Gets the index of the given line item.
+   * Gets the index of the given order item.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
    *
    * @return int|bool
-   *   The index of the given line item, or FALSE if not found.
+   *   The index of the given order item, or FALSE if not found.
    */
-  protected function getLineItemIndex(LineItemInterface $line_item) {
-    $values = $this->get('line_items')->getValue();
-    $line_item_ids = array_map(function ($value) {
+  protected function getItemIndex(OrderItemInterface $order_item) {
+    $values = $this->get('order_items')->getValue();
+    $order_item_ids = array_map(function ($value) {
       return $value['target_id'];
     }, $values);
 
-    return array_search($line_item->id(), $line_item_ids);
+    return array_search($order_item->id(), $order_item_ids);
   }
 
   /**
@@ -387,7 +387,7 @@ class Order extends ContentEntityBase implements OrderInterface {
   }
 
   /**
-   * Recalculates the line item total price.
+   * Recalculates the order item total price.
    */
   protected function recalculateTotalPrice() {
     $total_price = $this->getTotalPrice();
@@ -403,10 +403,10 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
 
     $total_price = new Price('0', $currency_code);
-    foreach ($this->getLineItems() as $line_item) {
-      $total_price = $total_price->add($line_item->getTotalPrice());
-      foreach ($line_item->getAdjustments() as $adjustment) {
-        $adjustment_total = $adjustment->getAmount()->multiply($line_item->getQuantity());
+    foreach ($this->getItems() as $order_item) {
+      $total_price = $total_price->add($order_item->getTotalPrice());
+      foreach ($order_item->getAdjustments() as $adjustment) {
+        $adjustment_total = $adjustment->getAmount()->multiply($order_item->getQuantity());
         $total_price = $total_price->add($adjustment_total);
       }
     }
@@ -419,19 +419,19 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * Initializes the order currency code.
    *
-   * Takes the currency of the first line item if found.
+   * Takes the currency of the first order item if found.
    * Otherwise it falls back to the store's default currency.
    *
    * @return string|null
    *   The currency code, or NULL if the order is in an incomplete state
-   *   (no line items, no store).
+   *   (no order items, no store).
    */
   protected function initializeCurrencyCode() {
-    if ($this->hasLineItems()) {
-      $line_items = $this->getLineItems();
-      $first_line_item = reset($line_items);
+    if ($this->hasItems()) {
+      $order_items = $this->getItems();
+      $first_order_item = reset($order_items);
       /** @var \Drupal\commerce_price\Price $unit_price */
-      $unit_price = $first_line_item->getUnitPrice();
+      $unit_price = $first_order_item->getUnitPrice();
       if ($unit_price) {
         return $unit_price->getCurrencyCode();
       }
@@ -453,11 +453,11 @@ class Order extends ContentEntityBase implements OrderInterface {
       $this->save();
     }
 
-    // Ensure there's a back-reference on each line item.
-    foreach ($this->getLineItems() as $line_item) {
-      if ($line_item->order_id->isEmpty()) {
-        $line_item->order_id = $this->id();
-        $line_item->save();
+    // Ensure there's a back-reference on each order item.
+    foreach ($this->getItems() as $order_item) {
+      if ($order_item->order_id->isEmpty()) {
+        $order_item->order_id = $this->id();
+        $order_item->save();
       }
     }
   }
@@ -466,16 +466,17 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    // Delete the line items of a deleted order.
-    $line_items = [];
+    // Delete the order items of a deleted order.
+    $order_items = [];
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
     foreach ($entities as $entity) {
-      foreach ($entity->getLineItems() as $line_item) {
-        $line_items[$line_item->id()] = $line_item;
+      foreach ($entity->getItems() as $order_item) {
+        $order_items[$order_item->id()] = $order_item;
       }
     }
-    /** @var \Drupal\commerce_order\LineItemStorageInterface $line_item_storage */
-    $line_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_line_item');
-    $line_item_storage->delete($line_items);
+    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
+    $order_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_order_item');
+    $order_item_storage->delete($order_items);
   }
 
   /**

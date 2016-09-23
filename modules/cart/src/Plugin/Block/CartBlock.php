@@ -120,7 +120,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       // There is a chance the cart may have converted from a draft order, but
       // is still in session. Such as just completing check out. So we verify
       // that the cart is still a cart.
-      return $cart->hasLineItems() && $cart->cart->value;
+      return $cart->hasItems() && $cart->cart->value;
     });
 
     $count = 0;
@@ -128,8 +128,8 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     if (!empty($carts)) {
       $cart_views = $this->getCartViews($carts);
       foreach ($carts as $cart_id => $cart) {
-        foreach ($cart->getLineItems() as $line_item) {
-          $count += (int) $line_item->getQuantity();
+        foreach ($cart->getItems() as $order_item) {
+          $count += (int) $order_item->getQuantity();
         }
         $cachable_metadata->addCacheableDependency($cart);
       }

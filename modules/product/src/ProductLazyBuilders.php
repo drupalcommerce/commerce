@@ -45,18 +45,18 @@ class ProductLazyBuilders {
    * @param string $view_mode
    *   The view mode used to render the product.
    * @param bool $combine
-   *   TRUE to combine line items containing the same product variation.
+   *   TRUE to combine order items containing the same product variation.
    *
    * @return array
    *   A renderable array containing the cart form.
    */
   public function addToCartForm($product_id, $view_mode, $combine) {
-    /** @var \Drupal\commerce_order\LineItemStorageInterface $line_item_storage */
-    $line_item_storage = $this->entityTypeManager->getStorage('commerce_line_item');
+    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
+    $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
 
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
-    $line_item = $line_item_storage->createFromPurchasableEntity($product->getDefaultVariation());
+    $order_item = $order_item_storage->createFromPurchasableEntity($product->getDefaultVariation());
     $form_state_additions = [
       'product' => $product,
       'view_mode' => $view_mode,
@@ -64,7 +64,7 @@ class ProductLazyBuilders {
         'combine' => $combine,
       ],
     ];
-    return $this->entityFormBuilder->getForm($line_item, 'add_to_cart', $form_state_additions);
+    return $this->entityFormBuilder->getForm($order_item, 'add_to_cart', $form_state_additions);
   }
 
 }

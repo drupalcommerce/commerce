@@ -44,7 +44,7 @@ abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
     return array_merge([
       'administer orders',
       'administer order types',
-      'administer line item types',
+      'administer order item types',
     ], parent::getAdministratorPermissions());
   }
 

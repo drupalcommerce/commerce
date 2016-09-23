@@ -8,9 +8,9 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Defines the interface for line items.
+ * Defines the interface for order items.
  */
-interface LineItemInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
+interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
 
   /**
    * Gets the parent order.
@@ -45,80 +45,80 @@ interface LineItemInterface extends ContentEntityInterface, EntityAdjustableInte
   public function getPurchasedEntityId();
 
   /**
-   * Gets the line item title.
+   * Gets the order item title.
    *
    * @return string
-   *   The line item title
+   *   The order item title
    */
   public function getTitle();
 
   /**
-   * Sets the line item title.
+   * Sets the order item title.
    *
    * @param string $title
-   *   The line item title.
+   *   The order item title.
    *
    * @return $this
    */
   public function setTitle($title);
 
   /**
-   * Gets the line item quantity.
+   * Gets the order item quantity.
    *
    * @return string
-   *   The line item quantity
+   *   The order item quantity
    */
   public function getQuantity();
 
   /**
-   * Sets the line item quantity.
+   * Sets the order item quantity.
    *
    * @param string $quantity
-   *   The line item quantity.
+   *   The order item quantity.
    *
    * @return $this
    */
   public function setQuantity($quantity);
 
   /**
-   * Gets the line item unit price.
+   * Gets the order item unit price.
    *
    * @return \Drupal\commerce_price\Price|null
-   *   The line item unit price, or NULL.
+   *   The order item unit price, or NULL.
    */
   public function getUnitPrice();
 
   /**
-   * Sets the line item unit price.
+   * Sets the order item unit price.
    *
    * @param \Drupal\commerce_price\Price $unit_price
-   *   The line item unit price.
+   *   The order item unit price.
    *
    * @return $this
    */
   public function setUnitPrice(Price $unit_price);
 
   /**
-   * Gets the line item total price.
+   * Gets the order item total price.
    *
    * @return \Drupal\commerce_price\Price|null
-   *   The line item total price, or NULL.
+   *   The order item total price, or NULL.
    */
   public function getTotalPrice();
 
   /**
-   * Gets the line item creation timestamp.
+   * Gets the order item creation timestamp.
    *
    * @return int
-   *   The line item creation timestamp.
+   *   The order item creation timestamp.
    */
   public function getCreatedTime();
 
   /**
-   * Sets the line item creation timestamp.
+   * Sets the order item creation timestamp.
    *
    * @param int $timestamp
-   *   The line item creation timestamp.
+   *   The order item creation timestamp.
    *
    * @return $this
    */

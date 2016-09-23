@@ -27,7 +27,7 @@ class ProductVariationTitleGenerationTest extends ProductBrowserTestBase {
     $this->variationType = $this->createEntity('commerce_product_variation_type', [
       'id' => 'test_default',
       'label' => 'Test Default',
-      'lineItemType' => 'product_variation',
+      'orderItemType' => 'product_variation',
     ]);
   }
 

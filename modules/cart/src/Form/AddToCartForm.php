@@ -15,7 +15,7 @@ use Drupal\Core\Link;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides the line item add to cart form.
+ * Provides the order item add to cart form.
  */
 class AddToCartForm extends ContentEntityForm {
 
@@ -151,19 +151,19 @@ class AddToCartForm extends ContentEntityForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = $this->entity;
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $this->entity;
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
-    $purchased_entity = $line_item->getPurchasedEntity();
+    $purchased_entity = $order_item->getPurchasedEntity();
 
-    $order_type = $this->orderTypeResolver->resolve($line_item);
+    $order_type = $this->orderTypeResolver->resolve($order_item);
 
     $store = $this->selectStore($purchased_entity);
     $cart = $this->cartProvider->getCart($order_type, $store);
     if (!$cart) {
       $cart = $this->cartProvider->createCart($order_type, $store);
     }
-    $this->cartManager->addLineItem($cart, $line_item, $form_state->get(['settings', 'combine']));
+    $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
 
     drupal_set_message($this->t('@entity added to @cart-link.', [
       '@entity' => $purchased_entity->label(),
@@ -175,10 +175,10 @@ class AddToCartForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $entity */
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
     // Now that the purchased entity is set, populate the title and price.
-    $entity->setTitle($entity->getPurchasedEntity()->getLineItemTitle());
+    $entity->setTitle($entity->getPurchasedEntity()->getOrderItemTitle());
     $entity->setUnitPrice($this->chainPriceResolver->resolve($entity->getPurchasedEntity()));
 
     return $entity;

@@ -13,7 +13,7 @@ entity.commerce_order_type.edit_form:
   base_route: 'entity.commerce_order_type.edit_form'
   title: 'Edit'
 
-entity.commerce_line_item_type.edit_form:
-  route_name: entity.commerce_line_item_type.edit_form
-  base_route: entity.commerce_line_item_type.edit_form
+entity.commerce_order_item_type.edit_form:
+  route_name: entity.commerce_order_item_type.edit_form
+  base_route: entity.commerce_order_item_type.edit_form
   title: 'Edit'

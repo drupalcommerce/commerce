@@ -106,18 +106,18 @@ class OrderRefresh implements OrderRefreshInterface {
       }
       $order->setAdjustments($adjustments);
 
-      foreach ($order->getLineItems() as $line_item) {
-        $line_item->setAdjustments([]);
+      foreach ($order->getItems() as $order_item) {
+        $order_item->setAdjustments([]);
 
-        $purchased_entity = $line_item->getPurchasedEntity();
+        $purchased_entity = $order_item->getPurchasedEntity();
         // @todo resolve pricing for items without purchaseable entity.
         if ($purchased_entity) {
-          $line_item->setTitle($purchased_entity->getLineItemTitle());
-          $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $line_item->getQuantity());
-          $line_item->setUnitPrice($unit_price);
+          $order_item->setTitle($purchased_entity->getOrderItemTitle());
+          $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity());
+          $order_item->setUnitPrice($unit_price);
         }
 
-        $line_item->save();
+        $order_item->save();
       }
 
       foreach ($this->processors as $processor) {

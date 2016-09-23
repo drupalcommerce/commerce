@@ -18,9 +18,9 @@ commerce_order.commerce_order_type.*:
         type: integer
         label: 'Order refresh frequency'
 
-commerce_order.commerce_line_item_type.*:
+commerce_order.commerce_order_item_type.*:
   type: config_entity
-  label: 'Line item type'
+  label: 'order item type'
   mapping:
     label:
       type: label

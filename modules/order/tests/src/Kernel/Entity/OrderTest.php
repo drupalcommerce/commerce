@@ -4,8 +4,8 @@ namespace Drupal\Tests\commerce_order\Kernel\Entity;
 
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_order\Entity\LineItem;
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
@@ -63,12 +63,12 @@ class OrderTest extends EntityKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
 
-    // A line item type that doesn't need a purchasable entity, for simplicity.
-    LineItemType::create([
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
@@ -107,12 +107,12 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::setBillingProfile
    * @covers ::getBillingProfileId
    * @covers ::setBillingProfileId
-   * @covers ::getLineItems
-   * @covers ::setLineItems
-   * @covers ::hasLineItems
-   * @covers ::addLineItem
-   * @covers ::removeLineItem
-   * @covers ::hasLineItem
+   * @covers ::getItems
+   * @covers ::setItems
+   * @covers ::hasItems
+   * @covers ::addItem
+   * @covers ::removeItem
+   * @covers ::hasItem
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
@@ -131,21 +131,21 @@ class OrderTest extends EntityKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $line_item */
-    $line_item = LineItem::create([
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
       'type' => 'test',
       'unit_price' => new Price('2.00', 'USD'),
     ]);
-    $line_item->save();
-    $line_item = $this->reloadEntity($line_item);
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $another_line_item */
-    $another_line_item = LineItem::create([
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $another_order_item */
+    $another_order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => '2',
       'unit_price' => new Price('3.00', 'USD'),
     ]);
-    $another_line_item->save();
-    $another_line_item = $this->reloadEntity($another_line_item);
+    $another_order_item->save();
+    $another_order_item = $this->reloadEntity($another_order_item);
 
     $order = Order::create([
       'type' => 'default',
@@ -189,16 +189,16 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals($profile, $order->getBillingProfile());
     $this->assertEquals($profile->id(), $order->getBillingProfileId());
 
-    $order->setLineItems([$line_item, $another_line_item]);
-    $this->assertEquals([$line_item, $another_line_item], $order->getLineItems());
-    $this->assertTrue($order->hasLineItems());
-    $order->removeLineItem($another_line_item);
-    $this->assertEquals([$line_item], $order->getLineItems());
-    $this->assertTrue($order->hasLineItem($line_item));
-    $this->assertFalse($order->hasLineItem($another_line_item));
-    $order->addLineItem($another_line_item);
-    $this->assertEquals([$line_item, $another_line_item], $order->getLineItems());
-    $this->assertTrue($order->hasLineItem($another_line_item));
+    $order->setItems([$order_item, $another_order_item]);
+    $this->assertEquals([$order_item, $another_order_item], $order->getItems());
+    $this->assertTrue($order->hasItems());
+    $order->removeItem($another_order_item);
+    $this->assertEquals([$order_item], $order->getItems());
+    $this->assertTrue($order->hasItem($order_item));
+    $this->assertFalse($order->hasItem($another_order_item));
+    $order->addItem($another_order_item);
+    $this->assertEquals([$order_item, $another_order_item], $order->getItems());
+    $this->assertTrue($order->hasItem($another_order_item));
 
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
     $adjustments = [];
@@ -222,15 +222,15 @@ class OrderTest extends EntityKernelTestBase {
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
-    // Add an adjustment to the second line item, confirm it's a part of the
+    // Add an adjustment to the second order item, confirm it's a part of the
     // order total, multiplied by quantity.
-    $order->removeLineItem($another_line_item);
-    $another_line_item->addAdjustment(new Adjustment([
+    $order->removeItem($another_order_item);
+    $another_order_item->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Random fee',
       'amount' => new Price('5.00', 'USD'),
     ]));
-    $order->addLineItem($another_line_item);
+    $order->addItem($another_order_item);
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
 
     $this->assertEquals('completed', $order->getState()->value);

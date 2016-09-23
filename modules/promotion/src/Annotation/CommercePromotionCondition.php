@@ -16,7 +16,7 @@ class CommercePromotionCondition extends Condition {
   /**
    * The target entity type this action applies to.
    *
-   * For example, this should be 'commerce_order' or 'commerce_line_item'.
+   * For example, this should be 'commerce_order' or 'commerce_order_item'.
    *
    * @var string
    */

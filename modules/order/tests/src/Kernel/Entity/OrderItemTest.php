@@ -3,19 +3,19 @@
 namespace Drupal\Tests\commerce_order\Kernel\Entity;
 
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_order\Entity\LineItem;
-use Drupal\commerce_order\Entity\LineItemType;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
- * Tests the Line item entity.
+ * Tests the order item entity.
  *
- * @coversDefaultClass \Drupal\commerce_order\Entity\LineItem
+ * @coversDefaultClass \Drupal\commerce_order\Entity\OrderItem
  *
  * @group commerce
  */
-class LineItemTest extends EntityKernelTestBase {
+class OrderItemTest extends EntityKernelTestBase {
 
   /**
    * Modules to enable.
@@ -46,11 +46,11 @@ class LineItemTest extends EntityKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_line_item');
+    $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
 
-    // A line item type that doesn't need a purchasable entity, for simplicity.
-    LineItemType::create([
+    // An order item type that doesn't need a purchasable entity, for simplicity.
+    OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
       'orderType' => 'default',
@@ -58,7 +58,7 @@ class LineItemTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests the line item entity and its methods.
+   * Tests the order item entity and its methods.
    *
    * @covers ::getTitle
    * @covers ::setTitle
@@ -75,25 +75,25 @@ class LineItemTest extends EntityKernelTestBase {
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    */
-  public function testLineItem() {
-    $line_item = LineItem::create([
+  public function testOrderItem() {
+    $order_item = OrderItem::create([
       'type' => 'test',
     ]);
-    $line_item->save();
+    $order_item->save();
 
-    $line_item->setTitle('My line item');
-    $this->assertEquals('My line item', $line_item->getTitle());
+    $order_item->setTitle('My order item');
+    $this->assertEquals('My order item', $order_item->getTitle());
 
-    $this->assertEquals(1, $line_item->getQuantity());
-    $line_item->setQuantity('2');
-    $this->assertEquals(2, $line_item->getQuantity());
+    $this->assertEquals(1, $order_item->getQuantity());
+    $order_item->setQuantity('2');
+    $this->assertEquals(2, $order_item->getQuantity());
 
-    $this->assertEquals(NULL, $line_item->getUnitPrice());
+    $this->assertEquals(NULL, $order_item->getUnitPrice());
     $unit_price = new Price('9.99', 'USD');
-    $line_item->setUnitPrice($unit_price);
-    $this->assertEquals($unit_price, $line_item->getUnitPrice());
+    $order_item->setUnitPrice($unit_price);
+    $this->assertEquals($unit_price, $order_item->getUnitPrice());
 
-    $line_item->setQuantity('1');
+    $order_item->setQuantity('1');
     $adjustments = [];
     $adjustments[] = new Adjustment([
       'type' => 'custom',
@@ -105,17 +105,17 @@ class LineItemTest extends EntityKernelTestBase {
       'label' => 'Random fee',
       'amount' => new Price('2.00', 'USD'),
     ]);
-    $line_item->addAdjustment($adjustments[0]);
-    $line_item->addAdjustment($adjustments[1]);
-    $adjustments = $line_item->getAdjustments();
-    $this->assertEquals($adjustments, $line_item->getAdjustments());
-    $line_item->removeAdjustment($adjustments[0]);
-    $this->assertEquals([$adjustments[1]], $line_item->getAdjustments());
-    $line_item->setAdjustments($adjustments);
-    $this->assertEquals($adjustments, $line_item->getAdjustments());
+    $order_item->addAdjustment($adjustments[0]);
+    $order_item->addAdjustment($adjustments[1]);
+    $adjustments = $order_item->getAdjustments();
+    $this->assertEquals($adjustments, $order_item->getAdjustments());
+    $order_item->removeAdjustment($adjustments[0]);
+    $this->assertEquals([$adjustments[1]], $order_item->getAdjustments());
+    $order_item->setAdjustments($adjustments);
+    $this->assertEquals($adjustments, $order_item->getAdjustments());
 
-    $line_item->setCreatedTime(635879700);
-    $this->assertEquals(635879700, $line_item->getCreatedTime());
+    $order_item->setCreatedTime(635879700);
+    $this->assertEquals(635879700, $order_item->getCreatedTime());
   }
 
 }

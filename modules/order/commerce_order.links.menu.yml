@@ -10,8 +10,8 @@ entity.commerce_order_type.collection:
   parent: commerce.configuration
   description: 'Manage your order types.'
 
-entity.commerce_line_item_type.collection:
-  title: Line item types
-  route_name: entity.commerce_line_item_type.collection
+entity.commerce_order_item_type.collection:
+  title: order item types
+  route_name: entity.commerce_order_item_type.collection
   parent: commerce.configuration
-  description: 'Manage your line item types.'
+  description: 'Manage your order item types.'

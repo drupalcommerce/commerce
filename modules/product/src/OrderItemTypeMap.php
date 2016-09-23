@@ -6,9 +6,9 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Default implementation of the LineItemTypeMapInterface.
+ * Default implementation of the OrderItemTypeMapInterface.
  */
-class LineItemTypeMap implements LineItemTypeMapInterface {
+class OrderItemTypeMap implements OrderItemTypeMapInterface {
 
   /**
    * The cache backend.
@@ -25,14 +25,14 @@ class LineItemTypeMap implements LineItemTypeMapInterface {
   protected $entityTypeManager;
 
   /**
-   * The product type ID <-> line item type ID map.
+   * The product type ID <-> order item type ID map.
    *
    * @var array
    */
   protected $map;
 
   /**
-   * Constructs a new LineItemTypeMap object.
+   * Constructs a new OrderItemTypeMap object.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
@@ -47,19 +47,19 @@ class LineItemTypeMap implements LineItemTypeMapInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLineItemTypeId($product_type_id) {
+  public function getOrderItemTypeId($product_type_id) {
     if (!isset($this->map)) {
-      if ($cached_map = $this->cache->get('commerce_product.line_item_type_map')) {
+      if ($cached_map = $this->cache->get('commerce_product.order_item_type_map')) {
         $this->map = $cached_map->data;
       }
       else {
         $this->map = $this->buildMap();
-        $this->cache->set('commerce_product.line_item_type_map', $this->map);
+        $this->cache->set('commerce_product.order_item_type_map', $this->map);
       }
     }
-    // A valid product type ID should always have a matching line item type ID.
+    // A valid product type ID should always have a matching order item type ID.
     if (empty($this->map[$product_type_id])) {
-      throw new \InvalidArgumentException(sprintf('No line item type found for the "%s" product type.', $product_type_id));
+      throw new \InvalidArgumentException(sprintf('No order item type found for the "%s" product type.', $product_type_id));
     }
 
     return $this->map[$product_type_id];
@@ -70,15 +70,15 @@ class LineItemTypeMap implements LineItemTypeMapInterface {
    */
   public function clearCache() {
     $this->map = NULL;
-    $this->cache->delete('commerce_product.line_item_type_map');
+    $this->cache->delete('commerce_product.order_item_type_map');
   }
 
   /**
-   * Builds the product type ID <-> line item type ID map.
+   * Builds the product type ID <-> order item type ID map.
    *
    * @throws \Exception
    *   Thrown when the product type references an invalid variation type, or
-   *   when the variation type does not reference a line item type.
+   *   when the variation type does not reference an order item type.
    *
    * @return array
    *   The built map.
@@ -98,12 +98,12 @@ class LineItemTypeMap implements LineItemTypeMapInterface {
         throw new \Exception(sprintf('The "%s" product type references an invalid variation type.', $product_type_id));
       }
       $variation = $variation_types[$variation_type_id];
-      $line_item_type_id = $variation->getLineItemTypeId();
-      if (empty($line_item_type_id)) {
-        throw new \Exception(sprintf('The "%s" product variation type does not reference a line item type.', $variation_type_id));
+      $order_item_type_id = $variation->getOrderItemTypeId();
+      if (empty($order_item_type_id)) {
+        throw new \Exception(sprintf('The "%s" product variation type does not reference an order item type.', $variation_type_id));
       }
 
-      $map[$product_type_id] = $line_item_type_id;
+      $map[$product_type_id] = $order_item_type_id;
     }
 
     return $map;

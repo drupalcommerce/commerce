@@ -3,8 +3,8 @@ services:
     class: Drupal\commerce_product\ProductAttributeFieldManager
     arguments: ['@entity_field.manager', '@entity_type.bundle.info', '@entity.query', '@cache.data']
 
-  commerce_product.line_item_type_map:
-    class: Drupal\commerce_product\LineItemTypeMap
+  commerce_product.order_item_type_map:
+    class: Drupal\commerce_product\OrderItemTypeMap
     arguments: ['@cache.data', '@entity_type.manager']
 
   commerce_product.lazy_builders:

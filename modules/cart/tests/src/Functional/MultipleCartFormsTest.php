@@ -58,13 +58,13 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
     $this->drupalGet('/test-multiple-cart-forms');
 
     /** @var \Behat\Mink\Element\NodeElement[] $forms */
-    $forms = $this->getSession()->getPage()->findAll('css', '.commerce-line-item-add-to-cart-form');
+    $forms = $this->getSession()->getPage()->findAll('css', '.commerce-order-item-add-to-cart-form');
     $this->assertEquals(5, count($forms));
     $this->submitForm([], 'Add to cart', $forms[2]->getAttribute('id'));
 
     $this->cart = Order::load($this->cart->id());
-    $line_items = $this->cart->getLineItems();
-    $this->assertEquals(new Price('6', 'USD'), $line_items[0]->getTotalPrice());
+    $order_items = $this->cart->getItems();
+    $this->assertEquals(new Price('6', 'USD'), $order_items[0]->getTotalPrice());
   }
 
 }

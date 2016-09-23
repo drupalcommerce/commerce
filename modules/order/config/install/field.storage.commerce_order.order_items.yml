@@ -3,12 +3,12 @@ status: true
 dependencies:
   module:
     - commerce_order
-id: commerce_order.line_items
-field_name: line_items
+id: commerce_order.order_items
+field_name: order_items
 entity_type: commerce_order
 type: entity_reference
 settings:
-  target_type: commerce_line_item
+  target_type: commerce_order_item
 module: core
 locked: true
 cardinality: -1

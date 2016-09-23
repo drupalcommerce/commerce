@@ -105,61 +105,61 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setBillingProfileId($billingProfileId);
 
   /**
-   * Gets the line items.
+   * Gets the order items.
    *
-   * @return \Drupal\commerce_order\Entity\LineItemInterface[]
-   *   The line items.
+   * @return \Drupal\commerce_order\Entity\OrderItemInterface[]
+   *   The order items.
    */
-  public function getLineItems();
+  public function getItems();
 
   /**
-   * Sets the line items.
+   * Sets the order items.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface[] $line_items
-   *   The line items.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface[] $order_items
+   *   The order items.
    *
    * @return $this
    */
-  public function setLineItems(array $line_items);
+  public function setItems(array $order_items);
 
   /**
-   * Gets whether the order has line items.
+   * Gets whether the order has order items.
    *
    * @return bool
-   *   TRUE if the order has line items, FALSE otherwise.
+   *   TRUE if the order has order items, FALSE otherwise.
    */
-  public function hasLineItems();
+  public function hasItems();
 
   /**
-   * Adds a line item.
+   * Adds an order item.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
    *
    * @return $this
    */
-  public function addLineItem(LineItemInterface $line_item);
+  public function addItem(OrderItemInterface $order_item);
 
   /**
-   * Removes a line item.
+   * Removes an order item.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
    *
    * @return $this
    */
-  public function removeLineItem(LineItemInterface $line_item);
+  public function removeItem(OrderItemInterface $order_item);
 
   /**
-   * Checks whether the order has a given line item.
+   * Checks whether the order has a given order item.
    *
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The order item.
    *
    * @return bool
-   *   TRUE if the line item was found, FALSE otherwise.
+   *   TRUE if the order item was found, FALSE otherwise.
    */
-  public function hasLineItem(LineItemInterface $line_item);
+  public function hasItem(OrderItemInterface $order_item);
 
   /**
    * Gets the order total price.

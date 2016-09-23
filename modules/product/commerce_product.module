@@ -28,8 +28,8 @@ function commerce_product_config_translation_info_alter(&$info) {
  */
 function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
   if ($entity_type_id == 'commerce_product' && !\Drupal::isConfigSyncing()) {
-    // Clear the line item type map after a new product type has been created.
-    \Drupal::service('commerce_product.line_item_type_map')->clearCache();
+    // Clear the order item type map after a new product type has been created.
+    \Drupal::service('commerce_product.order_item_type_map')->clearCache();
   }
 }
 

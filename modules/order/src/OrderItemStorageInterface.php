@@ -6,22 +6,22 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
- * Defines the interface for line item storage.
+ * Defines the interface for order item storage.
  */
-interface LineItemStorageInterface extends ContentEntityStorageInterface {
+interface OrderItemStorageInterface extends ContentEntityStorageInterface {
 
   /**
-   * Constructs a new line item using the given purchasable entity.
+   * Constructs a new order item using the given purchasable entity.
    *
-   * The new line item isn't saved.
+   * The new order item isn't saved.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    * @param array $values
    *   (optional) An array of values to set, keyed by property name.
    *
-   * @return \Drupal\commerce_order\Entity\LineItemInterface
-   *   The created line item.
+   * @return \Drupal\commerce_order\Entity\OrderItemInterface
+   *   The created order item.
    */
   public function createFromPurchasableEntity(PurchasableEntityInterface $entity, array $values = []);
 

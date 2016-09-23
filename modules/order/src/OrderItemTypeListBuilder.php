@@ -6,15 +6,15 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Defines the list builder for line item types.
+ * Defines the list builder for order item types.
  */
-class LineItemTypeListBuilder extends ConfigEntityListBuilder {
+class OrderItemTypeListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Line item type');
+    $header['label'] = $this->t('Order item type');
     $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
   }
