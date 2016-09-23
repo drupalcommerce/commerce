@@ -267,7 +267,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Adds an amount to the order total paid.
    *
    * @param \Drupal\commerce_price\Price $amount
-   *  The amount to add to the total paid.
+   *   The amount to add to the total paid.
    *
    * @return $this
    */
@@ -277,7 +277,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Subtracts an amount from the order total paid.
    *
    * @param \Drupal\commerce_price\Price $amount
-   *  The amount to subtract from the total paid.
+   *   The amount to subtract from the total paid.
    *
    * @return $this
    */
@@ -295,6 +295,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * Sets the total amount paid on the order.
    *
    * @param \Drupal\commerce_price\Price $amount
+   *   The amount to set as the order total paid.
    */
   public function setTotalPaid(Price $amount);
 
