@@ -181,6 +181,7 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function setAmount(Price $amount) {
     $this->set('amount', $amount);
+    $this->getOrder()->addPayment($amount);
     return $this;
   }
 
@@ -198,6 +199,7 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function setRefundedAmount(Price $refunded_amount) {
     $this->set('refunded_amount', $refunded_amount);
+    $this->getOrder()->subtractPayment($refunded_amount);
     return $this;
   }
 
