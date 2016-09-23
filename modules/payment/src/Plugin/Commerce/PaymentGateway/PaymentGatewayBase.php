@@ -154,6 +154,17 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
+  public function getDefaultPaymentMethodType() {
+    $default_payment_method_type = $this->pluginDefinition['default_payment_method_type'];
+    if (!isset($this->paymentMethodTypes[$default_payment_method_type])) {
+      throw new \InvalidArgumentException('Invalid default_payment_method_type specified.');
+    }
+    return $this->paymentMethodTypes[$default_payment_method_type];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreditCardTypes() {
     // @todo Allow the list to be restricted by the merchant.
     return array_intersect_key(CreditCard::getTypes(), array_flip($this->pluginDefinition['credit_card_types']));

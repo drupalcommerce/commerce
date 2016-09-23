@@ -119,7 +119,9 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       throw new \Exception('No payment gateways are defined, create one first.');
     }
     // @todo Support multiple gateways.
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = reset($payment_gateways);
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $options = [];
     $default_option = NULL;
@@ -130,8 +132,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
         $options[$payment_method->id()] = $payment_method->label();
       }
     }
-    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface[] $payment_method_types */
-    $payment_method_types = $payment_gateway->getPlugin()->getPaymentMethodTypes();
+    $payment_method_types = $payment_gateway_plugin->getPaymentMethodTypes();
     foreach ($payment_method_types as $payment_method_type) {
       $id = 'new_' . $payment_method_type->getPluginId();
       $options[$id] = $payment_method_type->getCreateLabel();
@@ -141,8 +142,8 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $selected_option = $values['payment_method'];
     }
     else {
-      // @todo Use the default payment method instead.
-      $selected_option = 'new_credit_card';
+      $default_payment_method_type = $payment_gateway_plugin->getDefaultPaymentMethodType();
+      $selected_option = 'new_' . $default_payment_method_type->getPluginId();
     }
 
     // Prepare the form for ajax.
