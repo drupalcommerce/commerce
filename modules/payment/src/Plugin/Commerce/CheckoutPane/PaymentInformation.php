@@ -141,8 +141,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $selected_option = $values['payment_method'];
     }
     else {
-      // @todo Use the default payment method instead.
-      $selected_option = 'new_credit_card';
+      $selected_option = 'new_' . $payment_gateway->getPlugin()->getDefaultPaymentMethodType();
     }
 
     // Prepare the form for ajax.

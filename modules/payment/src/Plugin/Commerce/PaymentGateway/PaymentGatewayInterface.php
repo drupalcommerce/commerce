@@ -25,6 +25,14 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   public function getLabel();
 
   /**
+   * Gets the default payment method type.
+   *
+   * @return string
+   *   The default payment method type.
+   */
+  public function getDefaultPaymentMethodType();
+
+  /**
    * Gets the payment gateway display label.
    *
    * The display label is customer-facing and more generic.
