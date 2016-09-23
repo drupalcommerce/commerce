@@ -4,6 +4,7 @@ namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -109,11 +110,17 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   A render array.
    */
   public function build() {
+    $cachable_metadata = new CacheableMetadata();
+    $cachable_metadata->addCacheContexts(['user', 'session']);
+
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
       /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
-      return $cart->hasLineItems();
+      // There is a chance the cart may have converted from a draft order, but
+      // is still in session. Such as just completing check out. So we verify
+      // that the cart is still a cart.
+      return $cart->hasLineItems() && $cart->cart->value;
     });
 
     $count = 0;
@@ -124,6 +131,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
         foreach ($cart->getLineItems() as $line_item) {
           $count += (int) $line_item->getQuantity();
         }
+        $cachable_metadata->addCacheableDependency($cart);
       }
     }
 
@@ -149,6 +157,11 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       '#url' => Url::fromRoute('commerce_cart.page')->toString(),
       '#content' => $cart_views,
       '#links' => $links,
+      '#cache' => [
+        'contexts' => $cachable_metadata->getCacheContexts(),
+        'tags' => $cachable_metadata->getCacheTags(),
+        'max-age' => $cachable_metadata->getCacheMaxAge(),
+      ],
     ];
   }
 

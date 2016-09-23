@@ -316,8 +316,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       ]);
 
       if ($next_step_id == 'complete') {
-        // @todo Do this earlier in the process.
-        $this->order->cart = FALSE;
         // Place the order.
         $transition = $this->order->getState()->getWorkflow()->getTransition('place');
         $this->order->getState()->applyTransition($transition);

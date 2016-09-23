@@ -3,6 +3,7 @@
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_cart\Exception\DuplicateCartException;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -106,6 +107,18 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE) {
+    $cart->cart = FALSE;
+    $this->invalidateCartId($cart->id());
+
+    if ($save_cart) {
+      $cart->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL) {
     $cart = NULL;
     $cart_id = $this->getCartId($order_type, $store, $account);
@@ -152,6 +165,16 @@ class CartProvider implements CartProviderInterface {
   public function getCartIds(AccountInterface $account = NULL) {
     $cart_data = $this->loadCartData($account);
     return array_keys($cart_data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function invalidateCartId($cart_id, AccountInterface $account = NULL) {
+    $account = $account ?: $this->currentUser;
+    $uid = $account->id();
+    unset($this->cartData[$uid][$cart_id]);
+    return $this;
   }
 
   /**

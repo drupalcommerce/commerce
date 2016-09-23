@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\state_machine\Plugin\Workflow\WorkflowState;
 
 /**
  * Implements hook_theme().
@@ -99,6 +100,20 @@ function commerce_cart_user_login($account) {
 function commerce_cart_commerce_order_delete(OrderInterface $order) {
   if (!empty($order->cart)) {
     \Drupal::service('commerce_cart.cart_session')->deleteCartId($order->id());
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function commerce_cart_commerce_order_presave(OrderInterface $order) {
+  if (!$order->isNew() && $order->cart->value == TRUE) {
+    $place_transition = $order->getState()->getWorkflow()->getTransition('place');
+    $from_states = $place_transition->getFromStates();
+    $to_state = $place_transition->getToState()->getId();
+    if (in_array($order->original->state->value, array_keys($from_states)) && $order->state->value == $to_state) {
+      \Drupal::service('commerce_cart.cart_provider')->finalizeCart($order);
+    }
   }
 }
 
