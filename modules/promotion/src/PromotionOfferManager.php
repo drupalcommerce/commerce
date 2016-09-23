@@ -39,7 +39,7 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
    *   The entity type handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct('Plugin/Commerce/PromotionOffer', $namespaces, $module_handler, 'Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface', 'Drupal\commerce_promotion\Annotation\PromotionOffer');
+    parent::__construct('Plugin/Commerce/PromotionOffer', $namespaces, $module_handler, 'Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface', 'Drupal\commerce_promotion\Annotation\CommercePromotionOffer');
 
     $this->alterInfo('commerce_promotion_offer_info');
     $this->setCacheBackend($cache_backend, 'commerce_promotion_offer_plugins');

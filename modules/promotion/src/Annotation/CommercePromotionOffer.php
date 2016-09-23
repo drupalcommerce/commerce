@@ -7,11 +7,11 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines the promotion offer plugin annotation object.
  *
- * Plugin namespace: Plugin\Commerce\PromotionOffer.
+ * Plugin namespace: Plugin\Commerce\CommercePromotionOffer.
  *
  * @Annotation
  */
-class PromotionOffer extends Plugin {
+class CommercePromotionOffer extends Plugin {
 
   /**
    * The plugin ID.
