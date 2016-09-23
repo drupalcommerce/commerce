@@ -35,7 +35,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#title' => $this->t('Type'),
       '#options' => [
         '_none' => $this->t('- Select -'),
-        'order_adjustment' => $this->t('Apply order adjustment'),
+        'custom' => $this->t('Apply order adjustment'),
       ],
       '#weight' => 1,
       '#default_value' => ($adjustment) ? $adjustment->getType() : '_none',
@@ -55,7 +55,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#weight' => 2,
       '#states' => [
         'visible' => [
-          'select[name="' . $states_selector_name . '"]' => ['value' => 'order_adjustment'],
+          'select[name="' . $states_selector_name . '"]' => ['value' => 'custom'],
         ],
       ],
     ];
@@ -71,7 +71,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#default_value' => ($adjustment) ? $adjustment->getAmount() : NULL,
       '#states' => [
         'required' => [
-          'select[name="' . $states_selector_name . '"]' => ['value' => 'order_adjustment'],
+          'select[name="' . $states_selector_name . '"]' => ['value' => 'custom'],
         ],
       ],
     ];

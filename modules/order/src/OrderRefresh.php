@@ -97,7 +97,15 @@ class OrderRefresh implements OrderRefreshInterface {
     if (!isset(self::$refreshingOrders[$order->id()])) {
       self::$refreshingOrders[$order->id()] = TRUE;
 
-      $order->setAdjustments([]);
+      // Do not remove adjustments added in the user interface.
+      $adjustments = $order->getAdjustments();
+      foreach ($adjustments as $key => $adjustment) {
+        if ($adjustment->getType() != 'custom') {
+          unset($adjustments[$key]);
+        }
+      }
+      $order->setAdjustments($adjustments);
+
       foreach ($order->getLineItems() as $line_item) {
         $line_item->setAdjustments([]);
 
