@@ -3,7 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\EntityAdjustableInterface;
-use Drupal\commerce_store\Entity\EntityStoreInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -12,7 +12,7 @@ use Drupal\profile\Entity\ProfileInterface;
 /**
  * Defines the interface for orders.
  */
-interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface, EntityOwnerInterface, EntityStoreInterface {
+interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
    * Gets the order number.
@@ -31,6 +31,42 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return $this
    */
   public function setOrderNumber($order_number);
+
+  /**
+   * Gets the store.
+   *
+   * @return \Drupal\commerce_store\Entity\StoreInterface|null
+   *   The store entity, or null.
+   */
+  public function getStore();
+
+  /**
+   * Sets the store.
+   *
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store entity.
+   *
+   * @return $this
+   */
+  public function setStore(StoreInterface $store);
+
+  /**
+   * Gets the store ID.
+   *
+   * @return int
+   *   The store ID.
+   */
+  public function getStoreId();
+
+  /**
+   * Sets the store ID.
+   *
+   * @param int $storeId
+   *   The store ID.
+   *
+   * @return $this
+   */
+  public function setStoreId($storeId);
 
   /**
    * Gets the order email.
