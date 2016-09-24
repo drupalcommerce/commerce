@@ -27,8 +27,8 @@ class ChainStoreResolver implements ChainStoreResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function addResolver(StoreResolverInterface $resolver) {
-    $this->resolvers[] = $resolver;
+  public function addResolver(StoreResolverInterface $resolver, $priority) {
+    $this->resolvers[$priority] = $resolver;
   }
 
   /**
