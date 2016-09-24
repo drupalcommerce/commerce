@@ -38,7 +38,7 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');
-    // An order item type that doesn't need a purchasable entity, for simplicity.
+
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
@@ -55,8 +55,7 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
     ]);
     $order_item->save();
 
-    /** @var \Drupal\commerce_order\Resolver\ChainOrderTypeResolverInterface $resolver */
-    $resolver = \Drupal::service('commerce_order.chain_order_type_resolver');
+    $resolver = $this->container->get('commerce_order.chain_order_type_resolver');
 
     $order_type = $resolver->resolve($order_item);
 

@@ -8,7 +8,7 @@ services:
     class: Drupal\commerce_order\Resolver\DefaultOrderTypeResolver
     arguments: ['@entity_type.manager']
     tags:
-      - { name: commerce_order.order_type_resolver, priority: 10 }
+      - { name: commerce_order.order_type_resolver, priority: -100 }
 
   commerce_order.order_refresh:
     class: Drupal\commerce_order\OrderRefresh

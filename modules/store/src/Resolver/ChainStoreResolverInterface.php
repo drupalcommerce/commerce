@@ -15,8 +15,10 @@ interface ChainStoreResolverInterface extends StoreResolverInterface {
    *
    * @param \Drupal\commerce_store\Resolver\StoreResolverInterface $resolver
    *   The resolver.
+   * @param int $priority
+   *   The priority.
    */
-  public function addResolver(StoreResolverInterface $resolver);
+  public function addResolver(StoreResolverInterface $resolver, $priority);
 
   /**
    * Gets all added resolvers.
