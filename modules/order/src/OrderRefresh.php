@@ -71,9 +71,13 @@ class OrderRefresh implements OrderRefreshInterface {
    * {@inheritdoc}
    */
   public function needsRefresh(OrderInterface $order) {
+    // Refresh should only run on draft orders.
+    if ($order->getState()->value != 'draft') {
+      return FALSE;
+    }
+
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $this->orderTypeStorage->load($order->bundle());
-
     // Check the order's changed time against the refresh frequency.
     // We use time() since the REQUEST_TIME constant can become stale. This is
     // especially true during CLI operations.

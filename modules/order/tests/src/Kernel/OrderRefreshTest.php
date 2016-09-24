@@ -19,7 +19,7 @@ use Drupal\profile\Entity\Profile;
 class OrderRefreshTest extends EntityKernelTestBase {
 
   /**
-   * The order refresh service.
+   * The order refresh.
    *
    * @var \Drupal\commerce_order\OrderRefreshInterface
    */
@@ -63,6 +63,8 @@ class OrderRefreshTest extends EntityKernelTestBase {
   protected $variation2;
 
   /**
+   * The order item storage.
+   *
    * @var \Drupal\commerce_order\OrderItemStorageInterface
    */
   protected $orderItemStorage;
@@ -193,6 +195,12 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
     $this->order->setOwner($this->user);
     $this->assertTrue($this->orderRefresh->needsRefresh($this->order));
+
+    sleep(1);
+    $workflow = $this->order->getState()->getWorkflow();
+    $this->order->getState()->applyTransition($workflow->getTransition('place'));
+    $this->order->save();
+    $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
   }
 
   /**
