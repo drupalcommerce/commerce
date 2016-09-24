@@ -71,6 +71,12 @@ class OrderRefresh implements OrderRefreshInterface {
    * {@inheritdoc}
    */
   public function needsRefresh(OrderInterface $order) {
+
+    // Refresh should only run on draft orders.
+    if ($order->getState()->value != 'draft') {
+      return FALSE;
+    }
+
     /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
     $order_type = $this->orderTypeStorage->load($order->bundle());
 
