@@ -243,6 +243,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     $index = $this->getItemIndex($order_item);
     if ($index !== FALSE) {
       $this->get('order_items')->offsetUnset($index);
+      $this->recalculateTotalPrice();
     }
     return $this;
   }
