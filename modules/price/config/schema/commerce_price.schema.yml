@@ -31,7 +31,7 @@ field.formatter.settings.commerce_price_default:
 
 field.formatter.settings.commerce_price_calculated:
   type: mapping
-  label: 'Default price formatter settings'
+  label: 'Calculated price formatter settings'
   mapping:
     strip_trailing_zeroes:
       type: boolean
