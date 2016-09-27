@@ -10,11 +10,10 @@ use Drupal\commerce_store\Entity\StoreType;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
- * Tests the Cart Provider.
+ * Tests the cart Provider.
  *
  * @coversDefaultClass \Drupal\commerce_cart\CartProvider
  * @group commerce
- * @group commerce_cart
  */
 class CartProviderTest extends EntityKernelTestBase {
 
@@ -57,7 +56,7 @@ class CartProviderTest extends EntityKernelTestBase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $registeredUser;
+  protected $authenticatedUser;
 
   /**
    * The entity type manager.
@@ -97,7 +96,7 @@ class CartProviderTest extends EntityKernelTestBase {
       'name' => '',
       'status' => 0,
     ]);
-    $this->registeredUser = $this->createUser();
+    $this->authenticatedUser = $this->createUser();
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');
   }
@@ -119,108 +118,90 @@ class CartProviderTest extends EntityKernelTestBase {
   }
 
   /**
-   * This test the createCart method in the CartProvider for an anonymous user.
-   *
-   * It specifically tests the exception thrown when trying to create a cart
-   * twice.
+   * Tests cart creation for an anonymous user.
    *
    * @covers ::createCart
    */
-  public function testCreateAnonymousUserCartProvider() {
+  public function testCreateAnonymousCart() {
     $this->installCommerceCart();
     $cartProvider = $this->container->get('commerce_cart.cart_provider');
 
-    // Test the createCart method.
     $order_type = 'default';
     $cart = $cartProvider->createCart($order_type, $this->store, $this->anonymousUser);
     $this->assertInstanceOf(OrderInterface::class, $cart);
 
-    // Recreating a cart again will throw an exception.
+    // Trying to recreate the same cart should throw an exception.
     $this->setExpectedException(DuplicateCartException::class);
     $cartProvider->createCart($order_type, $this->store, $this->anonymousUser);
   }
 
   /**
-   * This tests the get methods for the CartProvider with an anonymous user.
+   * Tests getting an anonymous user's cart.
    *
    * @covers ::getCart
    * @covers ::getCartId
    * @covers ::getCarts
    * @covers ::getCartIds
    */
-  public function testGetAnonymousUserCartProvider() {
+  public function testGetAnonymousCart() {
     $this->installCommerceCart();
     $cartProvider = $this->container->get('commerce_cart.cart_provider');
 
-    // Test the getCart method.
-    $cart = $cartProvider->createCart('default', $this->store, $this->anonymousUser);
-    $this->assertInstanceOf(OrderInterface::class, $cart, 'The cart is found when an order type, store and user is given.');
+    $cartProvider->createCart('default', $this->store, $this->anonymousUser);
     $cart = $cartProvider->getCart('default', $this->store, $this->anonymousUser);
-    $this->assertInstanceOf(OrderInterface::class, $cart, 'The cart is found when an order type, store and user is given.');
+    $this->assertInstanceOf(OrderInterface::class, $cart);
 
-    // Test the getCartId method.
     $cart_id = $cartProvider->getCartId('default', $this->store, $this->anonymousUser);
-    $this->assertInternalType('int', $cart_id, 'The cart id is when an order type, store and user is given.');
-    $this->assertEquals(1, $cart_id, 'The expected cart id 1 for the given order type, store and user.');
+    $this->assertEquals(1, $cart_id);
 
-    // Test the getCarts method.
     $carts = $cartProvider->getCarts($this->anonymousUser);
-    $this->assertContainsOnlyInstancesOf(OrderInterface::class, $carts, 'The carts returned should all be objects that implement the OrderInterface.');
+    $this->assertContainsOnlyInstancesOf(OrderInterface::class, $carts);
 
-    // Test the getCartIds method.
     $cart_ids = $cartProvider->getCartIds($this->anonymousUser);
-    $this->assertContainsOnly('int', $cart_ids, 'The cart ids returned should all be integers.');
-    $this->assertContains(1, $cart_ids, 'The cart ids returned should contain an id with value 1.');
+    $this->assertContains(1, $cart_ids);
   }
 
   /**
-   * This test the createCart method in the CartProvider for a registered user.
+   * Tests creating a cart for an authenticated user.
    *
    * @covers ::createCart
    */
-  public function testCreateRegisteredUserCartProvider() {
+  public function testCreateAuthenticatedCart() {
     $this->installCommerceCart();
     $cartProvider = $this->container->get('commerce_cart.cart_provider');
 
-    // Test the createCart method.
-    $cart = $cartProvider->createCart('default', $this->store, $this->registeredUser);
-    $this->assertInstanceOf(OrderInterface::class, $cart, 'The cart is created for a registered user if createCart returns an Order entity.');
+    $cart = $cartProvider->createCart('default', $this->store, $this->authenticatedUser);
+    $this->assertInstanceOf(OrderInterface::class, $cart);
 
-    // Recreating a cart again will throw an exception.
+    // Trying to recreate the same cart should throw an exception.
     $this->setExpectedException(DuplicateCartException::class);
-    $cartProvider->createCart('default', $this->store, $this->registeredUser);
+    $cartProvider->createCart('default', $this->store, $this->authenticatedUser);
   }
 
   /**
-   * This tests the get methods for the CartProvider with a registered user.
+   * Tests getting an authenticated user's cart.
    *
    * @covers ::getCart
    * @covers ::getCartId
    * @covers ::getCarts
    * @covers ::getCartIds
    */
-  public function testGetRegisteredUserCartProvider() {
+  public function testGetAuthenticatedCart() {
     $this->installCommerceCart();
     $cartProvider = $this->container->get('commerce_cart.cart_provider');
-    $cartProvider->createCart('default', $this->store, $this->registeredUser);
+    $cartProvider->createCart('default', $this->store, $this->authenticatedUser);
 
-    // Test the getCart method.
-    $cart = $cartProvider->getCart('default', $this->store, $this->registeredUser);
-    $this->assertInstanceOf(OrderInterface::class, $cart, 'The cart is found when an order type, store and user is given.');
+    $cart = $cartProvider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertInstanceOf(OrderInterface::class, $cart);
 
-    // Test the getCartId method.
-    $cart_id = $cartProvider->getCartId('default', $this->store, $this->registeredUser);
-    $this->assertInternalType('int', $cart_id, 'The cart id is when an order type, store and user is given.');
-    $this->assertEquals(1, $cart_id, 'The expected cart id 1 for the given order type, store and user.');
+    $cart_id = $cartProvider->getCartId('default', $this->store, $this->authenticatedUser);
+    $this->assertEquals(1, $cart_id);
 
-    // Test the getCarts method.
-    $carts = $cartProvider->getCarts($this->registeredUser);
-    $this->assertContainsOnlyInstancesOf(OrderInterface::class, $carts, 'The carts returned should all be objects that implement the OrderInterface.');
+    $carts = $cartProvider->getCarts($this->authenticatedUser);
+    $this->assertContainsOnlyInstancesOf(OrderInterface::class, $carts);
 
-    // Test the getCartIds method.
-    $cart_ids = $cartProvider->getCartIds($this->registeredUser);
-    $this->assertContainsOnly('int', $cart_ids, 'The cart ids returned should all be integers.');
-    $this->assertContains(1, $cart_ids, 'The cart ids returned should contain an id with value 1.');
+    $cart_ids = $cartProvider->getCartIds($this->authenticatedUser);
+    $this->assertContains(1, $cart_ids);
   }
 
 }
