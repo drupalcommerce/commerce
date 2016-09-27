@@ -34,15 +34,12 @@ interface CartProviderInterface {
   /**
    * Finalizes the given cart order.
    *
-   * This will finalize the cart, under the assumption the order will no longer
-   * be treated as a draft order.
+   * Removes the cart flag from the order and saves it.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
-   * @param bool $save_cart
-   *   Whether the cart should be saved after the operation.
    */
-  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE);
+  public function finalizeCart(OrderInterface $cart);
 
   /**
    * Gets the cart order for the given store and user.
@@ -95,17 +92,5 @@ interface CartProviderInterface {
    *   A list of cart orders ids.
    */
   public function getCartIds(AccountInterface $account = NULL);
-
-  /**
-   * Invalidates a cart ID from internal cache.
-   *
-   * This is used when a cart is finalized and is no longer a cart.
-   *
-   * @param string $cart_id
-   *   The cart order ID.
-   *
-   * @return $this
-   */
-  public function invalidateCartId($cart_id);
 
 }
