@@ -107,13 +107,11 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE) {
+  public function finalizeCart(OrderInterface $cart) {
     $cart->cart = FALSE;
-    $this->invalidateCartId($cart->id());
-
-    if ($save_cart) {
-      $cart->save();
-    }
+    $cart->save();
+    // Remove the cart order from the internal cache, if present.
+    unset($this->cartData[$cart->getOwnerId()][$cart->id()]);
   }
 
   /**
@@ -165,16 +163,6 @@ class CartProvider implements CartProviderInterface {
   public function getCartIds(AccountInterface $account = NULL) {
     $cart_data = $this->loadCartData($account);
     return array_keys($cart_data);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function invalidateCartId($cart_id, AccountInterface $account = NULL) {
-    $account = $account ?: $this->currentUser;
-    $uid = $account->id();
-    unset($this->cartData[$uid][$cart_id]);
-    return $this;
   }
 
   /**
