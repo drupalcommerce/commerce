@@ -24,16 +24,6 @@ function commerce_product_config_translation_info_alter(&$info) {
 }
 
 /**
- * Implements hook_entity_create().
- */
-function commerce_product_entity_bundle_create($entity_type_id, $bundle) {
-  if ($entity_type_id == 'commerce_product' && !\Drupal::isConfigSyncing()) {
-    // Clear the order item type map after a new product type has been created.
-    \Drupal::service('commerce_product.order_item_type_map')->clearCache();
-  }
-}
-
-/**
  * Implements hook_ENTITY_TYPE_presave().
  */
 function commerce_product_entity_form_display_update(EntityFormDisplayInterface $form_display) {
