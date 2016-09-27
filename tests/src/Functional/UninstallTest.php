@@ -23,7 +23,6 @@ class UninstallTest extends BrowserTestBase {
     'commerce_cart',
     'commerce_checkout',
     'commerce_payment',
-    'commerce_tax',
   ];
 
   /**

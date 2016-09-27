@@ -11,8 +11,7 @@
         "drupal/inline_entity_form": "1.x-dev",
         "drupal/profile": "1.x-dev",
         "drupal/state_machine": "1.x-dev",
-        "commerceguys/intl": "~0.7",
-        "commerceguys/tax": "~0.7"
+        "commerceguys/intl": "~0.7"
     },
     "minimum-stability": "dev"
 }
