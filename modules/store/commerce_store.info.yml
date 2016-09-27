@@ -9,8 +9,8 @@ dependencies:
   - options
 config_devel:
   install:
-    - commerce_store.commerce_store_type.default
+    - commerce_store.commerce_store_type.online
     - commerce_store.settings
-    - core.entity_view_display.commerce_store.default.default
+    - core.entity_view_display.commerce_store.online.default
     - views.view.commerce_stores
     - system.action.commerce_delete_store_action
