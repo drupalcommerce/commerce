@@ -299,7 +299,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    */
   protected function buildPaneRow(CheckoutPaneInterface $pane, array &$form, FormStateInterface $form_state) {
     $pane_id = $pane->getPluginId();
-    $label = $pane->getLabel();
+    $label = $pane->getAdminLabel();
     $region_titles = array_map(function ($region) {
       return $region['title'];
     }, $this->getTableRegions());
