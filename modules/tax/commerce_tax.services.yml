@@ -1,4 +1,0 @@
-services:
-  commerce_tax.tax_type_importer_factory:
-    class: Drupal\commerce_tax\TaxTypeImporterFactory
-    arguments: ['@entity_type.manager', '@string_translation']

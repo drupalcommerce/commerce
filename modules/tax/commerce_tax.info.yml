@@ -1,7 +1,0 @@
-name: Commerce Tax
-type: module
-description: 'Provides tax functionality.'
-package: Commerce
-core: 8.x
-dependencies:
-  - commerce
