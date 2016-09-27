@@ -21,7 +21,7 @@ class CommerceCheckoutPane extends Plugin {
   public $id;
 
   /**
-   * The human-readable name of the plugin.
+   * The checkout pane label.
    *
    * Shown as the title of the pane form if the wrapper_element is 'fieldset'.
    *
@@ -30,6 +30,17 @@ class CommerceCheckoutPane extends Plugin {
    * @var \Drupal\Core\Annotation\Translation
    */
   public $label;
+
+  /**
+   * The checkout pane administrative label.
+   *
+   * Defaults to the main label.
+   *
+   * @ingroup plugin_translatable
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   */
+  public $admin_label;
 
   /**
    * The ID of the default step for this pane.
@@ -48,5 +59,18 @@ class CommerceCheckoutPane extends Plugin {
    * @var string
    */
   public $wrapper_element;
+
+  /**
+   * Constructs a new CommerceCheckoutPane object.
+   *
+   * @param array $values
+   *   The annotation values.
+   */
+  public function __construct($values) {
+    if (empty($values['admin_label'])) {
+      $values['admin_label'] = $values['label'];
+    }
+    parent::__construct($values);
+  }
 
 }
