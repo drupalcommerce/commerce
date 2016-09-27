@@ -22,6 +22,7 @@ class CheckoutPaneManager extends DefaultPluginManager {
   protected $defaults = [
     'id' => '',
     'label' => '',
+    'admin_label' => '',
     'default_step' => '_disabled',
     'wrapper_element' => 'container',
   ];
@@ -71,6 +72,11 @@ class CheckoutPaneManager extends DefaultPluginManager {
       if (empty($definition[$required_property])) {
         throw new PluginException(sprintf('The checkout pane %s must define the %s property.', $plugin_id, $required_property));
       }
+    }
+
+    // Ensure that every plugin has an admin label.
+    if (empty($definition['admin_label'])) {
+      $definition['admin_label'] = $definition['label'];
     }
   }
 
