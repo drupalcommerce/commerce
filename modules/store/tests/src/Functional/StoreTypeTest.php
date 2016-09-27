@@ -50,11 +50,10 @@ class StoreTypeTest extends CommerceBrowserTestBase {
   public function testDefaultStoreType() {
     $this->drupalGet('admin/commerce/config/store-types');
     $store_types = StoreType::loadMultiple();
+    $this->assertTrue(isset($store_types['online']), 'The online store type is available');
 
-    $this->assertTrue(isset($store_types['default']), 'The default store type is available');
-
-    $store_type = StoreType::load('default');
-    $this->assertEquals($store_type, $store_types['default'], 'The correct store type is loaded');
+    $store_type = StoreType::load('online');
+    $this->assertEquals($store_type, $store_types['online'], 'The correct store type is loaded');
   }
 
   /**
@@ -116,8 +115,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
       'label' => 'Label for foo',
     ]);
 
-    $this->drupalGet('admin/commerce/config/store-types/default/edit');
-
+    $this->drupalGet('admin/commerce/config/store-types/foo/edit');
     // Only change the label.
     $edit = [
       'label' => $this->randomMachineName(8),
