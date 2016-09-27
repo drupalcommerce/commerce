@@ -144,7 +144,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer checkout flows',
+      'administer commerce_checkout_flow',
       'administer views',
     ], parent::getAdministratorPermissions());
   }

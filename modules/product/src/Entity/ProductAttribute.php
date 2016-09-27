@@ -11,13 +11,15 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_attribute",
  *   label = @Translation("Product attribute"),
- *   label_singular = @Translation("Product attribute"),
- *   label_plural = @Translation("Product attributes"),
+ *   label_singular = @Translation("product attribute"),
+ *   label_plural = @Translation("product attributes"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product attribute",
  *     plural = "@count product attributes",
  *   ),
  *   handlers = {
+ *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_product\ProductAttributeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductAttributeForm",
@@ -29,7 +31,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *   },
  *   config_prefix = "commerce_product_attribute",
- *   admin_permission = "administer product attributes",
+ *   admin_permission = "administer commerce_product_attribute",
  *   bundle_of = "commerce_product_attribute_value",
  *   entity_keys = {
  *     "id" = "id",

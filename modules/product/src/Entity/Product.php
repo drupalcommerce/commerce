@@ -15,8 +15,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
- *   label_singular = @Translation("Product"),
- *   label_plural = @Translation("Products"),
+ *   label_singular = @Translation("product"),
+ *   label_plural = @Translation("products"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product",
  *     plural = "@count products",
@@ -25,6 +25,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
+ *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -40,7 +42,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "translation" = "Drupal\commerce_product\ProductTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce_product",
+ *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",

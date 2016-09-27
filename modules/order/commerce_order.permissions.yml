@@ -1,14 +1,4 @@
-'administer orders':
-  title: 'Administer orders'
-  description: 'Allows users to create, update, and delete orders.'
-  'restrict access': TRUE
-
-'administer order types':
+'administer commerce_order_type':
   title: 'Administer order types'
-  description: 'Allows users to create, update, and delete order types.'
-  'restrict access': TRUE
-
-'administer order item types':
-  title: 'Administer order item types'
-  description: 'Allows users to administer order item types.'
+  description: 'Maintain the types of orders available and the fields that are associated with those types.'
   'restrict access': TRUE

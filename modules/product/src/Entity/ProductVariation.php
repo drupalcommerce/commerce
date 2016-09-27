@@ -18,8 +18,8 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
- *   label_singular = @Translation("Product variation"),
- *   label_plural = @Translation("Product variations"),
+ *   label_singular = @Translation("product variation"),
+ *   label_plural = @Translation("product variations"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product variation",
  *     plural = "@count product variations",
@@ -36,7 +36,7 @@ use Drupal\user\UserInterface;
  *     "inline_form" = "Drupal\commerce_product\Form\ProductVariationInlineForm",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce_product",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,

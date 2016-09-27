@@ -4,4 +4,4 @@ entity.commerce_promotion.collection:
     _entity_list: 'commerce_promotion'
     _title: 'Promotions'
   requirements:
-    _permission: 'administer promotions'
+    _permission: 'administer commerce_promotion'

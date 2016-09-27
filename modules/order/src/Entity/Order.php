@@ -19,8 +19,8 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
- *   label_singular = @Translation("Order"),
- *   label_plural = @Translation("Orders"),
+ *   label_singular = @Translation("order"),
+ *   label_plural = @Translation("orders"),
  *   label_count = @PluralTranslation(
  *     singular = "@count order",
  *     plural = "@count orders",
@@ -29,6 +29,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce_order\OrderStorage",
+ *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -43,7 +45,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *   },
  *   base_table = "commerce_order",
- *   admin_permission = "administer orders",
+ *   admin_permission = "administer commerce_order",
+ *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",

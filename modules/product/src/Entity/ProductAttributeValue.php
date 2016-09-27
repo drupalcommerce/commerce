@@ -13,8 +13,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product_attribute_value",
  *   label = @Translation("Product attribute value"),
- *   label_singular = @Translation("Product attribute value"),
- *   label_plural = @Translation("Product attribute values"),
+ *   label_singular = @Translation("product attribute value"),
+ *   label_plural = @Translation("product attribute values"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product attribute value",
  *     plural = "@count product attribute values",
@@ -27,7 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer product attributes",
+ *   admin_permission = "administer commerce_product_attribute",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   content_translation_ui_skip = TRUE,

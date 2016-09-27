@@ -12,4 +12,4 @@ commerce.configuration:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Configuration'
   requirements:
-    _permission: 'access administration pages'
+    _permission: 'access commerce administration pages'

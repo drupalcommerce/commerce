@@ -16,8 +16,8 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  * @ContentEntityType(
  *   id = "commerce_promotion",
  *   label = @Translation("Promotion"),
- *   label_singular = @Translation("Promotion"),
- *   label_plural = @Translation("Promotions"),
+ *   label_singular = @Translation("promotion"),
+ *   label_plural = @Translation("promotions"),
  *   label_count = @PluralTranslation(
  *     singular = "@count promotion",
  *     plural = "@count promotions",
@@ -25,6 +25,8 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_promotion\Event\PromotionEvent",
  *     "storage" = "Drupal\commerce_promotion\PromotionStorage",
+ *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -42,7 +44,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   },
  *   base_table = "commerce_promotion",
  *   data_table = "commerce_promotion_field_data",
- *   admin_permission = "administer promotions",
+ *   admin_permission = "administer commerce_promotion",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {

@@ -26,7 +26,7 @@ class ProductAttributeTranslationTest extends ProductBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer product attributes',
+      'administer commerce_product_attribute',
       'administer languages',
       'translate any entity',
       'translate configuration',

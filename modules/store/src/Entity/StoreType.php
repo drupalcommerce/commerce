@@ -10,8 +10,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
- *   label_singular = @Translation("Store type"),
- *   label_plural = @Translation("Store types"),
+ *   label_singular = @Translation("store type"),
+ *   label_plural = @Translation("store types"),
  *   label_count = @PluralTranslation(
  *     singular = "@count store type",
  *     plural = "@count store types",
@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer store types",
+ *   admin_permission = "administer commerce_store_type",
  *   config_prefix = "commerce_store_type",
  *   bundle_of = "commerce_store",
  *   entity_keys = {

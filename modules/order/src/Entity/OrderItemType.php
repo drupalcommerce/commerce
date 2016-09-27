@@ -9,7 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *
  * @ConfigEntityType(
  *   id = "commerce_order_item_type",
- *   label = @Translation("order item type"),
+ *   label = @Translation("Order item type"),
  *   label_singular = @Translation("order item type"),
  *   label_plural = @Translation("order item types"),
  *   label_count = @PluralTranslation(
@@ -27,7 +27,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "list_builder" = "Drupal\commerce_order\OrderItemTypeListBuilder",
  *   },
- *   admin_permission = "administer order item types",
+ *   admin_permission = "administer commerce_order_type",
  *   config_prefix = "commerce_order_item_type",
  *   bundle_of = "commerce_order_item",
  *   entity_keys = {

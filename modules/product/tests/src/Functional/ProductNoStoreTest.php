@@ -25,8 +25,8 @@ class ProductNoStoreTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer products',
-      'administer product types',
+      'administer commerce_product',
+      'administer commerce_product_type',
     ], parent::getAdministratorPermissions());
   }
 
