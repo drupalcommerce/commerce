@@ -65,7 +65,8 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
     return [
       'view the administration theme',
       'access administration pages',
-      'configure store',
+      'access commerce administration pages',
+      'administer commerce_currency',
     ];
   }
 

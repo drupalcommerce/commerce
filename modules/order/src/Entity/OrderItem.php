@@ -15,7 +15,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *
  * @ContentEntityType(
  *   id = "commerce_order_item",
- *   label = @Translation("order item"),
+ *   label = @Translation("Order item"),
  *   label_singular = @Translation("order item"),
  *   label_plural = @Translation("order items"),
  *   label_count = @PluralTranslation(
@@ -33,7 +33,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "inline_form" = "Drupal\commerce_order\Form\OrderItemInlineForm",
  *   },
  *   base_table = "commerce_order_item",
- *   admin_permission = "administer orders",
+ *   admin_permission = "administer commerce_order",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_item_id",

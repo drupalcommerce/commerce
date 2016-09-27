@@ -14,8 +14,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_payment",
  *   label = @Translation("Payment"),
- *   label_singular = @Translation("Payment"),
- *   label_plural = @Translation("Payments"),
+ *   label_singular = @Translation("payment"),
+ *   label_plural = @Translation("payments"),
  *   label_count = @PluralTranslation(
  *     singular = "@count payment",
  *     plural = "@count payments",
@@ -36,7 +36,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *   },
  *   base_table = "commerce_payment",
- *   admin_permission = "administer payments",
+ *   admin_permission = "administer commerce_payment",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "payment_id",

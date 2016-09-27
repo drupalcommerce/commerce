@@ -11,8 +11,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_payment_gateway",
  *   label = @Translation("Payment gateway"),
- *   label_singular = @Translation("Payment gateway"),
- *   label_plural = @Translation("Payment gateways"),
+ *   label_singular = @Translation("payment gateway"),
+ *   label_plural = @Translation("payment gateways"),
  *   label_count = @PluralTranslation(
  *     singular = "@count payment gateway",
  *     plural = "@count payment gateways",
@@ -29,7 +29,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer payment gateways",
+ *   admin_permission = "administer commerce_payment_gateway",
  *   config_prefix = "commerce_payment_gateway",
  *   entity_keys = {
  *     "id" = "id",

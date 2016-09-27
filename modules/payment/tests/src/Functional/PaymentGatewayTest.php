@@ -24,7 +24,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer payment gateways',
+      'administer commerce_payment_gateway',
     ], parent::getAdministratorPermissions());
   }
 

@@ -29,7 +29,7 @@ class PromotionTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer promotions',
+      'administer commerce_promotion',
     ], parent::getAdministratorPermissions());
   }
 

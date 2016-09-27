@@ -52,8 +52,8 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer products',
-      'administer stores',
+      'administer commerce_product',
+      'administer commerce_store',
     ], parent::getAdministratorPermissions());
   }
 

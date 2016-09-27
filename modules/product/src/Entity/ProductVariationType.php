@@ -11,8 +11,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",
  *   label = @Translation("Product variation type"),
- *   label_singular = @Translation("Product variation type"),
- *   label_plural = @Translation("Product variation types"),
+ *   label_singular = @Translation("product variation type"),
+ *   label_plural = @Translation("product variation types"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product variation type",
  *     plural = "@count product variation types",
@@ -29,7 +29,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     },
  *   },
  *   config_prefix = "commerce_product_variation_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce_product_type",
  *   bundle_of = "commerce_product_variation",
  *   entity_keys = {
  *     "id" = "id",

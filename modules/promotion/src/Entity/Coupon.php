@@ -21,7 +21,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     },
  *   },
  *   base_table = "commerce_promotion_coupon",
- *   admin_permission = "administer coupon entities",
+ *   admin_permission = "administer commerce_promotion",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "code",

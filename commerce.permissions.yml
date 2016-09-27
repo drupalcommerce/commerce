@@ -1,8 +1,5 @@
 'access commerce administration pages':
   title: 'Use the commerce administration pages'
-  'restrict access': TRUE
 
-'configure store':
-  title: 'Configure store settings'
-  description: 'Allows users to update store currency and contact settings.'
-  'restrict access': TRUE
+permission_callbacks:
+  - \Drupal\commerce\EntityPermissions::buildPermissions

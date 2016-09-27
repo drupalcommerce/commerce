@@ -10,8 +10,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
- *   label_singular = @Translation("Product type"),
- *   label_plural = @Translation("Product types"),
+ *   label_singular = @Translation("product type"),
+ *   label_plural = @Translation("product types"),
  *   label_count = @PluralTranslation(
  *     singular = "@count product type",
  *     plural = "@count product types",
@@ -28,7 +28,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *   },
  *   config_prefix = "commerce_product_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce_product_type",
  *   bundle_of = "commerce_product",
  *   entity_keys = {
  *     "id" = "id",

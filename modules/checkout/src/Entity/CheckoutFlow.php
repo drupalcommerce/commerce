@@ -11,8 +11,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_checkout_flow",
  *   label = @Translation("Checkout flow"),
- *   label_singular = @Translation("Checkout flow"),
- *   label_plural = @Translation("Checkout flows"),
+ *   label_singular = @Translation("checkout flow"),
+ *   label_plural = @Translation("checkout flows"),
  *   label_count = @PluralTranslation(
  *     singular = "@count checkout flow",
  *     plural = "@count checkout flows",
@@ -29,7 +29,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *   },
  *   config_prefix = "commerce_checkout_flow",
- *   admin_permission = "administer checkout flows",
+ *   admin_permission = "administer commerce_checkout_flow",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",

@@ -13,15 +13,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 class CurrencyTest extends CommerceBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'commerce_store',
-  ];
-
-  /**
    * Tests importing a currency.
    */
   public function testCurrencyImport() {
@@ -104,15 +95,6 @@ class CurrencyTest extends CommerceBrowserTestBase {
 
     $currency_exists = (bool) Currency::load($currency->id());
     $this->assertFalse($currency_exists, 'The currency has been deleted from the database.');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getAdministratorPermissions() {
-    return array_merge([
-      'administer stores',
-    ], parent::getAdministratorPermissions());
   }
 
 }

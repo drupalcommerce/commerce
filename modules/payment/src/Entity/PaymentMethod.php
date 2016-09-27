@@ -15,8 +15,8 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_payment_method",
  *   label = @Translation("Payment method"),
- *   label_singular = @Translation("Payment method"),
- *   label_plural = @Translation("Payment methods"),
+ *   label_singular = @Translation("payment method"),
+ *   label_plural = @Translation("payment methods"),
  *   label_count = @PluralTranslation(
  *     singular = "@count payment method",
  *     plural = "@count payment methods",
@@ -35,7 +35,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *   },
  *   base_table = "commerce_payment_method",
- *   admin_permission = "administer payments",
+ *   admin_permission = "administer commerce_payment",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "method_id",

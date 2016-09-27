@@ -16,8 +16,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
- *   label_singular = @Translation("Store"),
- *   label_plural = @Translation("Stores"),
+ *   label_singular = @Translation("store"),
+ *   label_plural = @Translation("stores"),
  *   label_count = @PluralTranslation(
  *     singular = "@count store",
  *     plural = "@count stores",
@@ -26,6 +26,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
+ *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -42,7 +44,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "commerce_store",
  *   data_table = "commerce_store_field_data",
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce_store",
+ *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
