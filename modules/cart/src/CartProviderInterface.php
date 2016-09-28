@@ -38,8 +38,10 @@ interface CartProviderInterface {
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
+   * @param bool $save_cart
+   *   Whether to immediately save the cart or not.
    */
-  public function finalizeCart(OrderInterface $cart);
+  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE);
 
   /**
    * Gets the cart order for the given store and user.

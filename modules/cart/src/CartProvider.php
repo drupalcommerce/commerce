@@ -107,9 +107,11 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function finalizeCart(OrderInterface $cart) {
+  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE) {
     $cart->cart = FALSE;
-    $cart->save();
+    if ($save_cart) {
+      $cart->save();
+    }
     // Remove the cart order from the internal cache, if present.
     unset($this->cartData[$cart->getOwnerId()][$cart->id()]);
   }
