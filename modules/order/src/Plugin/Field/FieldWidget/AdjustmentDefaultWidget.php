@@ -91,7 +91,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       $values[$key] = new Adjustment([
         'type' => $value['type'],
         'label' => $value['definition']['label'],
-        'amount' => new Price($value['definition']['amount']['amount'], $value['definition']['amount']['currency_code']),
+        'amount' => new Price($value['definition']['amount']['number'], $value['definition']['amount']['currency_code']),
         'source_id' => $value['source_id'],
       ]);
     }
