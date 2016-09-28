@@ -49,7 +49,7 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
           'sku' => 'INJECTION-CYAN',
           'attribute_color' => $attribute_values['cyan']->id(),
           'price' => [
-            'amount' => 999,
+            'number' => 999,
             'currency_code' => 'USD',
           ],
         ]),
@@ -58,7 +58,7 @@ class ProductVariationFieldInjectionTest extends ProductBrowserTestBase {
           'sku' => 'INJECTION-MAGENTA',
           'attribute_color' => $attribute_values['magenta']->id(),
           'price' => [
-            'amount' => 999,
+            'number' => 999,
             'currency_code' => 'USD',
           ],
         ]),

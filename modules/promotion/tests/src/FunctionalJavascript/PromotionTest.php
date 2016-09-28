@@ -60,7 +60,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
     $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
 
-    $edit['conditions[0][target_plugin_configuration][amount][amount]'] = '50.00';
+    $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");

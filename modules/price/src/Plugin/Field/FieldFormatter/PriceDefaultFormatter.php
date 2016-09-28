@@ -136,7 +136,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     foreach ($items as $delta => $item) {
       $currency = $currencies[$item->currency_code];
       $elements[$delta] = [
-        '#markup' => $this->numberFormatter->formatCurrency($item->amount, $currency),
+        '#markup' => $this->numberFormatter->formatCurrency($item->number, $currency),
         '#cache' => [
           'contexts' => [
             'languages:' . LanguageInterface::TYPE_INTERFACE,

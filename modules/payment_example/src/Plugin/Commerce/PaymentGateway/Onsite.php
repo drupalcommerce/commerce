@@ -128,7 +128,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     // Perform the capture request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     $remote_id = $payment->getRemoteId();
-    $decimal_amount = $amount->getDecimalAmount();
+    $number = $amount->getNumber();
 
     $payment->state = 'capture_completed';
     $payment->setAmount($amount);
@@ -170,7 +170,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     // Perform the refund request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     $remote_id = $payment->getRemoteId();
-    $decimal_amount = $amount->getDecimalAmount();
+    $number = $amount->getNumber();
 
     $old_refunded_amount = $payment->getRefundedAmount();
     $new_refunded_amount = $old_refunded_amount->add($amount);

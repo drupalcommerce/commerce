@@ -13,7 +13,7 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "commerce_price",
  *   label = @Translation("Price"),
- *   description = @Translation("Stores a decimal amount and a three letter currency code."),
+ *   description = @Translation("Stores a decimal number and a three letter currency code."),
  *   category = @Translation("Commerce"),
  *   default_widget = "commerce_price_default",
  *   default_formatter = "commerce_price_default",
@@ -25,8 +25,8 @@ class PriceItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['amount'] = DataDefinition::create('string')
-      ->setLabel(t('Amount'))
+    $properties['number'] = DataDefinition::create('string')
+      ->setLabel(t('Number'))
       ->setRequired(FALSE);
 
     $properties['currency_code'] = DataDefinition::create('string')
@@ -42,14 +42,14 @@ class PriceItem extends FieldItemBase {
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return [
       'columns' => [
-        'amount' => [
-          'description' => 'The decimal amount.',
+        'number' => [
+          'description' => 'The number.',
           'type' => 'numeric',
           'precision' => 19,
           'scale' => 6,
         ],
         'currency_code' => [
-          'description' => 'The currency code for the price.',
+          'description' => 'The currency code.',
           'type' => 'varchar',
           'length' => 3,
         ],
@@ -64,7 +64,7 @@ class PriceItem extends FieldItemBase {
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
     $constraints = parent::getConstraints();
     $constraints[] = $manager->create('ComplexData', [
-      'amount' => [
+      'number' => [
         'Regex' => [
           'pattern' => '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i',
         ],
@@ -78,7 +78,7 @@ class PriceItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return $this->amount === NULL || $this->amount === '' || empty($this->currency_code);
+    return $this->number === NULL || $this->number === '' || empty($this->currency_code);
   }
 
   /**
@@ -89,7 +89,7 @@ class PriceItem extends FieldItemBase {
     if ($values instanceof Price) {
       $price = $values;
       $values = [
-        'amount' => $price->getDecimalAmount(),
+        'number' => $price->getNumber(),
         'currency_code' => $price->getCurrencyCode(),
       ];
     }
@@ -103,7 +103,7 @@ class PriceItem extends FieldItemBase {
    *   The Price value object.
    */
   public function toPrice() {
-    return new Price($this->amount, $this->currency_code);
+    return new Price($this->number, $this->currency_code);
   }
 
 }

@@ -60,7 +60,7 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
         'type' => $variation_type->id(),
         'sku' => $this->randomMachineName(),
         'price' => [
-          'amount' => 999,
+          'number' => 999,
           'currency_code' => 'USD',
         ],
         'attribute_color' => $color_attributes[$value[0]],
@@ -122,7 +122,7 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => 'RENDERED_VARIATION_TEST_CYAN',
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['cyan'],
@@ -132,7 +132,7 @@ class AddToCartMultiAttributeTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => 'RENDERED_VARIATION_TEST_MAGENTA',
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['magenta'],

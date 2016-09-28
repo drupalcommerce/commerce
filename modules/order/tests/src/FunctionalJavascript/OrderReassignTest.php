@@ -53,7 +53,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'product_variation',
       'unit_price' => [
-        'amount' => '999',
+        'number' => '999',
         'currency_code' => 'USD',
       ],
     ]);

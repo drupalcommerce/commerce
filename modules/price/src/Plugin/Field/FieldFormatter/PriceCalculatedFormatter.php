@@ -96,11 +96,11 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
       $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, '1');
-      $amount = $resolved_price->getDecimalAmount();
+      $number = $resolved_price->getNumber();
       $currency = $currencies[$resolved_price->getCurrencyCode()];
 
       $elements[$delta] = [
-        '#markup' => $this->numberFormatter->formatCurrency($amount, $currency),
+        '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
         '#cache' => [
           'tags' => $purchasable_entity->getCacheTags(),
           'contexts' => Cache::mergeContexts($purchasable_entity->getCacheContexts(), [

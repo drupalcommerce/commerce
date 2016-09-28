@@ -97,7 +97,7 @@ class PromotionOfferTest extends KernelTestBase {
       'type' => 'test',
       'quantity' => '2',
       'unit_price' => [
-        'amount' => '20.00',
+        'number' => '20.00',
         'currency_code' => 'USD',
       ],
     ]);
@@ -139,7 +139,7 @@ class PromotionOfferTest extends KernelTestBase {
       'type' => 'test',
       'quantity' => '2',
       'unit_price' => [
-        'amount' => '10.00',
+        'number' => '10.00',
         'currency_code' => 'USD',
       ],
     ]);
@@ -154,7 +154,7 @@ class PromotionOfferTest extends KernelTestBase {
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_product_percentage_off',
         'target_plugin_configuration' => [
-          'amount' => '0.50',
+          'number' => '0.50',
         ],
       ],
     ]);

@@ -77,7 +77,7 @@ class AdjustmentItemTest extends EntityKernelTestBase {
     $adjustment = $adjustment_item_list->first()->value;
     $this->assertEquals('discount', $adjustment->getType());
     $this->assertEquals('10% off', $adjustment->getLabel());
-    $this->assertEquals('-1.00', $adjustment->getAmount()->getDecimalAmount());
+    $this->assertEquals('-1.00', $adjustment->getAmount()->getNumber());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());
     $this->assertEquals('1', $adjustment->getSourceId());
   }

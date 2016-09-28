@@ -14,7 +14,7 @@ function commerce_price_theme() {
   return [
     'commerce_price_plain' => [
       'variables' => [
-        'amount' => 0,
+        'number' => 0,
         'currency' => NULL,
       ],
       'template' => 'commerce-price-plain',
