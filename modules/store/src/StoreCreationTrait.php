@@ -52,7 +52,7 @@ trait StoreCreationTrait {
         'country_code' => $country,
         'address_line1' => $this->randomString(),
         'locality' => $this->randomString(5),
-        'administrative_area' => 'US-WI',
+        'administrative_area' => 'WI',
         'postal_code' => '53597',
       ],
       'default_currency' => $currency,

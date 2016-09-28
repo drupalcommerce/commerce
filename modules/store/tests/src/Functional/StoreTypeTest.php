@@ -122,7 +122,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $changed = StoreType::load($store_type->id());
-    $this->assertEquals($changed->label(), $store_type->label(), 'The label of the store type has been changed.');
+    $this->assertEquals($edit['label'], $changed->label(), 'The label of the store type has been changed.');
   }
 
   /**

@@ -91,7 +91,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
         'postal_code' => '75002',
         'locality' => 'Paris',
         'address_line1' => 'A french street',
-        'recipient' => 'John LeSmith',
+        'given_name' => 'John',
+        'family_name' => 'LeSmith',
       ],
     ]);
     $profile->save();
@@ -164,7 +165,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[address][0][recipient]' => $this->randomString(),
+      'billing_information[address][0][given_name]' => $this->randomString(),
+      'billing_information[address][0][family_name]' => $this->randomString(),
       'billing_information[address][0][organization]' => $this->randomString(),
       'billing_information[address][0][address_line1]' => $this->randomString(),
       'billing_information[address][0][locality]' => $this->randomString(),
