@@ -2,16 +2,16 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.profile.billing.address
-    - profile.type.billing
+    - field.field.profile.customer.address
+    - profile.type.customer
   enforced:
     module:
       - commerce_order
   module:
     - address
-id: profile.billing.default
+id: profile.customer.default
 targetEntityType: profile
-bundle: billing
+bundle: customer
 mode: default
 content:
   address:

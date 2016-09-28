@@ -25,6 +25,7 @@ class CartProviderTest extends EntityKernelTestBase {
   public static $modules = [
     'options',
     'entity',
+    'entity_reference_revisions',
     'views',
     'address',
     'profile',

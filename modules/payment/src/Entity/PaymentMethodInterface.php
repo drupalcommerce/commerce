@@ -57,24 +57,6 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
   public function setBillingProfile(ProfileInterface $profile);
 
   /**
-   * Gets the billing profile ID.
-   *
-   * @return int
-   *   The billing profile ID.
-   */
-  public function getBillingProfileId();
-
-  /**
-   * Sets the billing profile ID.
-   *
-   * @param int $billing_profile_id
-   *   The billing profile ID.
-   *
-   * @return $this
-   */
-  public function setBillingProfileId($billing_profile_id);
-
-  /**
    * Gets whether the payment method is reusable.
    *
    * @return bool

@@ -75,7 +75,8 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity', 'path',
+    'system', 'field', 'options', 'user', 'entity',
+    'entity_reference_revisions', 'path',
     'views', 'address', 'profile', 'state_machine',
     'inline_entity_form', 'commerce', 'commerce_price',
     'commerce_store', 'commerce_product',
@@ -146,7 +147,7 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $variation2->save();
 
     $profile = Profile::create([
-      'type' => 'billing',
+      'type' => 'customer',
     ]);
     $profile->save();
     $profile = $this->reloadEntity($profile);
@@ -159,7 +160,7 @@ class OrderRefreshTest extends EntityKernelTestBase {
       'uid' => 0,
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
-      'billing_profile' => $profile->id(),
+      'billing_profile' => $profile,
       'store_id' => $this->store->id(),
     ]);
     $order->save();

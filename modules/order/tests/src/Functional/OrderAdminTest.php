@@ -29,7 +29,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
     \Drupal::service('module_installer')->install(['profile']);
 
     $profile_values = [
-      'type' => 'billing',
+      'type' => 'customer',
       'uid' => 1,
       'status' => 1,
     ];

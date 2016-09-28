@@ -30,6 +30,14 @@ function commerce_order_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_local_tasks_alter().
+ */
+function commerce_order_local_tasks_alter(&$definitions) {
+  $id = 'entity.profile.user_profile_form:profile.type.customer';
+  $definitions[$id]['title'] = t('Address book');
+}
+
+/**
  * Implements hook_ENTITY_TYPE_presave().
  */
 function commerce_order_commerce_order_presave(OrderInterface $order) {

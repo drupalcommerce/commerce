@@ -8,6 +8,7 @@
         "drupal/core": "~8.2",
         "drupal/address": "1.x-dev",
         "drupal/entity": "1.x-dev",
+        "drupal/entity_reference_revisions": "~1.0",
         "drupal/inline_entity_form": "1.x-dev",
         "drupal/profile": "1.x-dev",
         "drupal/state_machine": "1.x-dev",

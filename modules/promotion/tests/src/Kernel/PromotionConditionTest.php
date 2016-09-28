@@ -45,10 +45,11 @@ class PromotionConditionTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'views', 'profile',
-    'text', 'entity', 'commerce', 'commerce_price', 'address', 'commerce_order',
-    'commerce_store', 'commerce_product', 'inline_entity_form', 'commerce_promotion',
-    'state_machine', 'datetime',
+  public static $modules = [
+    'system', 'field', 'options', 'user', 'views', 'profile', 'text', 'entity',
+    'entity_reference_revisions', 'commerce', 'commerce_price', 'address',
+    'commerce_order', 'commerce_store', 'commerce_product', 'inline_entity_form',
+    'commerce_promotion', 'state_machine', 'datetime',
   ];
 
   /**

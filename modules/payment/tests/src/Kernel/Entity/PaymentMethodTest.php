@@ -33,6 +33,7 @@ class PaymentMethodTest extends EntityKernelTestBase {
   public static $modules = [
     'options',
     'entity',
+    'entity_reference_revisions',
     'views',
     'address',
     'profile',
@@ -90,8 +91,6 @@ class PaymentMethodTest extends EntityKernelTestBase {
    * @covers ::setRemoteId
    * @covers ::getBillingProfile
    * @covers ::setBillingProfile
-   * @covers ::getBillingProfileId
-   * @covers ::setBillingProfileId
    * @covers ::isReusable
    * @covers ::setReusable
    * @covers ::isDefault
@@ -105,7 +104,7 @@ class PaymentMethodTest extends EntityKernelTestBase {
   public function testPaymentMethod() {
     /** @var \Drupal\profile\Entity\ProfileInterface $profile */
     $profile = Profile::create([
-      'type' => 'billing',
+      'type' => 'customer',
     ]);
     $profile->save();
     $profile = $this->reloadEntity($profile);
@@ -133,12 +132,6 @@ class PaymentMethodTest extends EntityKernelTestBase {
 
     $payment_method->setBillingProfile($profile);
     $this->assertEquals($profile, $payment_method->getBillingProfile());
-    $this->assertEquals($profile->id(), $payment_method->getBillingProfileId());
-    $payment_method->setBillingProfileId(0);
-    $this->assertEquals(NULL, $payment_method->getBillingProfile());
-    $payment_method->setBillingProfileId($profile->id());
-    $this->assertEquals($profile, $payment_method->getBillingProfile());
-    $this->assertEquals($profile->id(), $payment_method->getBillingProfileId());
 
     $this->assertTrue($payment_method->isReusable());
     $payment_method->setReusable(FALSE);

@@ -42,6 +42,7 @@ class OrderTest extends EntityKernelTestBase {
   public static $modules = [
     'options',
     'entity',
+    'entity_reference_revisions',
     'views',
     'address',
     'profile',
@@ -105,8 +106,6 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::setIpAddress
    * @covers ::getBillingProfile
    * @covers ::setBillingProfile
-   * @covers ::getBillingProfileId
-   * @covers ::setBillingProfileId
    * @covers ::getItems
    * @covers ::setItems
    * @covers ::hasItems
@@ -126,7 +125,7 @@ class OrderTest extends EntityKernelTestBase {
    */
   public function testOrder() {
     $profile = Profile::create([
-      'type' => 'billing',
+      'type' => 'customer',
     ]);
     $profile->save();
     $profile = $this->reloadEntity($profile);
@@ -182,12 +181,6 @@ class OrderTest extends EntityKernelTestBase {
 
     $order->setBillingProfile($profile);
     $this->assertEquals($profile, $order->getBillingProfile());
-    $this->assertEquals($profile->id(), $order->getBillingProfileId());
-    $order->setBillingProfileId(0);
-    $this->assertEquals(NULL, $order->getBillingProfile());
-    $order->setBillingProfileId([$profile->id()]);
-    $this->assertEquals($profile, $order->getBillingProfile());
-    $this->assertEquals($profile->id(), $order->getBillingProfileId());
 
     $order->setItems([$order_item, $another_order_item]);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());

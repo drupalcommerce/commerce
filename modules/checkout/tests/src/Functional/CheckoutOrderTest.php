@@ -87,7 +87,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'orderType' => 'default',
     ])->save();
     $profile = Profile::create([
-      'type' => 'billing',
+      'type' => 'customer',
       'address' => [
         'country' => 'FR',
         'postal_code' => '75002',

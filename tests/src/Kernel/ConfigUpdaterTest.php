@@ -17,9 +17,10 @@ class ConfigUpdaterTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity', 'views', 'address',
-    'profile', 'state_machine', 'inline_entity_form', 'commerce',
-    'commerce_price', 'commerce_store', 'commerce_product', 'commerce_order',
+    'system', 'field', 'options', 'user', 'entity',
+    'entity_reference_revisions', 'views', 'address', 'profile',
+    'state_machine', 'inline_entity_form', 'commerce', 'commerce_price',
+    'commerce_store', 'commerce_product', 'commerce_order',
     'commerce_update_test',
   ];
 
