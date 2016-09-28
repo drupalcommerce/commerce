@@ -27,7 +27,7 @@ config_devel:
     - system.action.commerce_unpublish_product
     - views.view.commerce_products
   optional:
-    - commerce_order.commerce_order_item_type.product_variation
+    - commerce_order.commerce_order_item_type.default
     - core.entity_form_display.commerce_order_item.product_variation.default
     - core.entity_form_display.commerce_order_item.product_variation.add_to_cart
     - core.entity_view_display.commerce_order_item.product_variation.default

@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - commerce_order.commerce_order_item_type.product_variation
+    - commerce_order.commerce_order_item_type.default
     - core.entity_form_mode.commerce_order_item.add_to_cart
   enforced:
     module:
@@ -10,9 +10,9 @@ dependencies:
       - commerce_product
   module:
     - commerce_product
-id: commerce_order_item.product_variation.add_to_cart
+id: commerce_order_item.default.add_to_cart
 targetEntityType: commerce_order_item
-bundle: product_variation
+bundle: default
 mode: add_to_cart
 content:
   purchased_entity:
