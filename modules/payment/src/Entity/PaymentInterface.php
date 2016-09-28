@@ -69,6 +69,24 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function setRemoteId($remote_ID);
 
   /**
+   * Gets the payment remote state.
+   *
+   * @return string
+   *   The payment remote state.
+   */
+  public function getRemoteState();
+
+  /**
+   * Sets the payment remote state.
+   *
+   * @param string $remote_state
+   *   The payment remote state.
+   *
+   * @return $this
+   */
+  public function setRemoteState($remote_state);
+
+  /**
    * Gets the payment balance.
    *
    * The balance represents the payment amount minus the refunded amount.
