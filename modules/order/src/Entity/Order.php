@@ -374,6 +374,21 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCompletedTime() {
+    return $this->get('completed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCompletedTime($timestamp) {
+    $this->set('completed', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -616,6 +631,16 @@ class Order extends ContentEntityBase implements OrderInterface {
     $fields['placed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Placed'))
       ->setDescription(t('The time when the order was placed.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'timestamp',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['completed'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Completed'))
+      ->setDescription(t('The time when the order was completed.'))
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'timestamp',

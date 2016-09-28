@@ -269,4 +269,22 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    */
   public function setPlacedTime($timestamp);
 
+  /**
+   * Gets the order completed timestamp.
+   *
+   * @return int
+   *   The order completed timestamp.
+   */
+  public function getCompletedTime();
+
+  /**
+   * Sets the order completed timestamp.
+   *
+   * @param int $timestamp
+   *   The order completed timestamp.
+   *
+   * @return $this
+   */
+  public function setCompletedTime($timestamp);
+
 }
