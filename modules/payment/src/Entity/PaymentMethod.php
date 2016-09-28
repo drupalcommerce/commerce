@@ -155,21 +155,6 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
-  public function getBillingProfileId() {
-    return $this->get('billing_profile')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBillingProfileId($billing_profile_id) {
-    $this->set('billing_profile', $billing_profile_id);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isReusable() {
     return $this->get('reusable')->value;
   }
@@ -266,12 +251,12 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
       ->setSetting('max_length', 255)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
+    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
       ->setLabel(t('Billing profile'))
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['billing']])
+      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
       ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 0,

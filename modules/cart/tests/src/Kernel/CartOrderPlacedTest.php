@@ -43,6 +43,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     'path',
     'options',
     'entity',
+    'entity_reference_revisions',
     'views',
     'address',
     'profile',

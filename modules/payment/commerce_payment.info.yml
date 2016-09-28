@@ -5,6 +5,7 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce_order
+  - entity_reference_revisions
   - user
 config_devel:
   install:

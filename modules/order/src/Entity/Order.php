@@ -186,22 +186,7 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function setBillingProfile(ProfileInterface $profile) {
-    $this->set('billing_profile', $profile->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBillingProfileId() {
-    return $this->get('billing_profile')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBillingProfileId($billingProfileId) {
-    $this->set('billing_profile', $billingProfileId);
+    $this->set('billing_profile', $profile);
     return $this;
   }
 
@@ -569,12 +554,12 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference')
+    $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
       ->setLabel(t('Billing profile'))
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
-      ->setSetting('handler_settings', ['target_bundles' => ['billing']])
+      ->setSetting('handler_settings', ['target_bundles' => ['customer']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'options_select',

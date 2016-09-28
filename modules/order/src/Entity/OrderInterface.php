@@ -123,24 +123,6 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setBillingProfile(ProfileInterface $profile);
 
   /**
-   * Gets the billing profile ID.
-   *
-   * @return int
-   *   The billing profile ID.
-   */
-  public function getBillingProfileId();
-
-  /**
-   * Sets the billing profile ID.
-   *
-   * @param int $billingProfileId
-   *   The billing profile ID.
-   *
-   * @return $this
-   */
-  public function setBillingProfileId($billingProfileId);
-
-  /**
    * Gets the order items.
    *
    * @return \Drupal\commerce_order\Entity\OrderItemInterface[]

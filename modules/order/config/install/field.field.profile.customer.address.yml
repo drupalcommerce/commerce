@@ -3,13 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.profile.address
-    - profile.type.billing
+    - profile.type.customer
   module:
     - address
-id: profile.billing.address
+id: profile.customer.address
 field_name: address
 entity_type: profile
-bundle: billing
+bundle: customer
 label: Address
 description: ''
 required: true

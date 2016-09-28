@@ -20,6 +20,7 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
    */
   public static $modules = [
     'system', 'field', 'options', 'user', 'entity',
+    'entity_reference_revisions', 'path',
     'views', 'address', 'profile', 'state_machine',
     'inline_entity_form', 'commerce', 'commerce_price',
     'commerce_store', 'commerce_product',
