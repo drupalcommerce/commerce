@@ -138,6 +138,21 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRemoteState() {
+    return $this->get('remote_state')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRemoteState($remote_state) {
+    $this->set('remote_state', $remote_state);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getBalance() {
     if ($amount = $this->getAmount()) {
       $refunded_amount = $this->getRefundedAmount();
@@ -287,6 +302,12 @@ class Payment extends ContentEntityBase implements PaymentInterface {
     $fields['remote_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote ID'))
       ->setDescription(t('The remote payment ID.'))
+      ->setSetting('max_length', 255)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['remote_state'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Remote State'))
+      ->setDescription(t('The remote payment state.'))
       ->setSetting('max_length', 255)
       ->setDisplayConfigurable('view', TRUE);
 
