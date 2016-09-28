@@ -154,7 +154,7 @@ class PromotionOfferTest extends KernelTestBase {
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_product_percentage_off',
         'target_plugin_configuration' => [
-          'number' => '0.50',
+          'amount' => '0.50',
         ],
       ],
     ]);
