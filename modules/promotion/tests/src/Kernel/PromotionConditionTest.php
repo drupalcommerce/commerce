@@ -98,7 +98,7 @@ class PromotionConditionTest extends KernelTestBase {
       'type' => 'test',
       'quantity' => 2,
       'unit_price' => [
-        'amount' => '20.00',
+        'number' => '20.00',
         'currency_code' => 'USD',
       ],
     ]);

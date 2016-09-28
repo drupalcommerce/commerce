@@ -53,7 +53,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => $this->randomMachineName(),
       'price' => [
-        'amount' => '5.00',
+        'number' => '5.00',
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['cyan'],
@@ -62,7 +62,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => 'canonical-test',
       'price' => [
-        'amount' => '9.99',
+        'number' => '9.99',
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['magenta'],
@@ -141,7 +141,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
         'type' => $variation_type->id(),
         'sku' => $this->randomMachineName(),
         'price' => [
-          'amount' => 999,
+          'number' => 999,
           'currency_code' => 'USD',
         ],
         'attribute_size' => $size_attributes[$value[0]]->id(),
@@ -178,7 +178,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => $this->randomMachineName(),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['cyan'],
@@ -187,7 +187,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
       'type' => 'default',
       'sku' => $this->randomMachineName(),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $color_attribute_values['magenta'],
@@ -250,7 +250,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
         'type' => $variation_type->id(),
         'sku' => $this->randomMachineName(),
         'price' => [
-          'amount' => 999,
+          'number' => 999,
           'currency_code' => 'USD',
         ],
         'attribute_size' => $size_attributes[$value[0]]->id(),

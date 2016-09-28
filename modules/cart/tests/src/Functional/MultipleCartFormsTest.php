@@ -38,7 +38,7 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
         'type' => 'default',
         'sku' => $this->randomMachineName(),
         'price' => [
-          'amount' => (string) 3 * $i,
+          'number' => (string) 3 * $i,
           'currency_code' => 'USD',
         ],
       ]);

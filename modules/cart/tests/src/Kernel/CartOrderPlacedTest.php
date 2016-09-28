@@ -77,7 +77,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
       'type' => 'default',
       'sku' => $this->randomMachineName(),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
     ]);

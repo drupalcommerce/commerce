@@ -10,11 +10,11 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 final class Price {
 
   /**
-   * The decimal amount.
+   * The number.
    *
    * @var string
    */
-  protected $amount;
+  protected $number;
 
   /**
    * The currency code.
@@ -26,27 +26,27 @@ final class Price {
   /**
    * Constructs a new Price object.
    *
-   * @param string $amount
-   *   The decimal amount.
+   * @param string $number
+   *   The number.
    * @param string $currency_code
    *   The currency code.
    */
-  public function __construct($amount, $currency_code) {
-    Calculator::assertNumberFormat($amount);
+  public function __construct($number, $currency_code) {
+    Calculator::assertNumberFormat($number);
     $this->assertCurrencyCodeFormat($currency_code);
 
-    $this->amount = (string) $amount;
+    $this->number = (string) $number;
     $this->currencyCode = strtoupper($currency_code);
   }
 
   /**
-   * Gets the decimal amount.
+   * Gets the number.
    *
    * @return string
-   *   The decimal amount.
+   *   The number.
    */
-  public function getDecimalAmount() {
-    return $this->amount;
+  public function getNumber() {
+    return $this->number;
   }
 
   /**
@@ -66,7 +66,7 @@ final class Price {
    *   The string representation of the price.
    */
   public function __toString() {
-    return Calculator::trim($this->amount) . ' ' . $this->currencyCode;
+    return Calculator::trim($this->number) . ' ' . $this->currencyCode;
   }
 
   /**
@@ -81,8 +81,8 @@ final class Price {
    *   The resulting price.
    */
   public function convert($currency_code, $rate = '1') {
-    $new_amount = Calculator::multiply($this->amount, $rate);
-    return new static($new_amount, $currency_code);
+    $new_number = Calculator::multiply($this->number, $rate);
+    return new static($new_number, $currency_code);
   }
 
   /**
@@ -96,8 +96,8 @@ final class Price {
    */
   public function add(Price $price) {
     $this->assertSameCurrency($this, $price);
-    $new_amount = Calculator::add($this->amount, $price->getDecimalAmount());
-    return new static($new_amount, $this->currencyCode);
+    $new_number = Calculator::add($this->number, $price->getNumber());
+    return new static($new_number, $this->currencyCode);
   }
 
   /**
@@ -111,8 +111,8 @@ final class Price {
    */
   public function subtract(Price $price) {
     $this->assertSameCurrency($this, $price);
-    $new_amount = Calculator::subtract($this->amount, $price->getDecimalAmount());
-    return new static($new_amount, $this->currencyCode);
+    $new_number = Calculator::subtract($this->number, $price->getNumber());
+    return new static($new_number, $this->currencyCode);
   }
 
   /**
@@ -125,8 +125,8 @@ final class Price {
    *   The resulting price.
    */
   public function multiply($number) {
-    $new_amount = Calculator::multiply($this->amount, $number);
-    return new static($new_amount, $this->currencyCode);
+    $new_number = Calculator::multiply($this->number, $number);
+    return new static($new_number, $this->currencyCode);
   }
 
   /**
@@ -139,8 +139,8 @@ final class Price {
    *   The resulting price.
    */
   public function divide($number) {
-    $new_amount = Calculator::divide($this->amount, $number);
-    return new static($new_amount, $this->currencyCode);
+    $new_number = Calculator::divide($this->number, $number);
+    return new static($new_number, $this->currencyCode);
   }
 
   /**
@@ -154,7 +154,7 @@ final class Price {
    */
   public function compareTo(Price $price) {
     $this->assertSameCurrency($this, $price);
-    return Calculator::compare($this->amount, $price->getDecimalAmount());
+    return Calculator::compare($this->number, $price->getNumber());
   }
 
   /**
@@ -164,7 +164,7 @@ final class Price {
    *   TRUE if the price is zero, FALSE otherwise.
    */
   public function isZero() {
-    return Calculator::compare($this->amount, '0') == 0;
+    return Calculator::compare($this->number, '0') == 0;
   }
 
   /**

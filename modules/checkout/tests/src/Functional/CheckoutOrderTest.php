@@ -60,7 +60,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
       'price' => [
-        'amount' => 9.99,
+        'number' => 9.99,
         'currency_code' => 'USD',
       ],
     ]);

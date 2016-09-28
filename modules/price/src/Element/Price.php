@@ -12,9 +12,9 @@ use Drupal\Core\Render\Element\FormElement;
  *
  * Usage example:
  * @code
- * $form['amount'] = [
+ * $form['number'] = [
  *   '#type' => 'commerce_price',
- *   '#title' => $this->t('Amount'),
+ *   '#title' => $this->t('number'),
  *   '#default_value' => new Price('99.99', 'USD'),
  *   '#size' => 60,
  *   '#maxlength' => 128,
@@ -22,8 +22,8 @@ use Drupal\Core\Render\Element\FormElement;
  * ];
  * @endcode
  * Note:
- * $form_state->getValue('amount') will be an array.
- * Use $form['amount']['#value'] to get the price object.
+ * $form_state->getValue('number') will be an array.
+ * Use $form['number']['#value'] to get the price object.
  *
  * @FormElement("commerce_price")
  */
@@ -62,12 +62,12 @@ class Price extends FormElement {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     // Ensure we have all possible values before creating price object.
-    if ($input !== FALSE && $input !== NULL && isset($input['amount']) && isset($input['currency_code'])) {
+    if ($input !== FALSE && $input !== NULL && isset($input['number']) && isset($input['currency_code'])) {
       // Convert empty string value to numeric value.
-      if ($input['amount'] === '') {
-        $input['amount'] = '0';
+      if ($input['number'] === '') {
+        $input['number'] = '0';
       }
-      return new PriceValue($input['amount'], $input['currency_code']);
+      return new PriceValue($input['number'], $input['currency_code']);
     }
     return NULL;
   }
@@ -114,20 +114,20 @@ class Price extends FormElement {
     }
     $number_formatter->setMinimumFractionDigits(min($fraction_digits));
 
-    $amount = NULL;
+    $number = NULL;
     /** @var \Drupal\commerce_price\Price $default_price */
     $default_price = $element['#default_value'];
     if (!empty($default_price)) {
       // Convert the stored amount to the local format. For example, "9.99"
       // becomes "9,99" in many locales. This also strips any extra zeroes,
       // as configured via $this->numberFormatter->setMinimumFractionDigits().
-      $amount = $number_formatter->format($default_price->getDecimalAmount());
+      $number = $number_formatter->format($default_price->getNumber());
     }
 
-    $element['amount'] = [
+    $element['number'] = [
       '#type' => 'textfield',
       '#title' => $element['#title'],
-      '#default_value' => $amount,
+      '#default_value' => $number,
       '#required' => $element['#required'],
       '#size' => $element['#size'],
       '#maxlength' => $element['#maxlength'],
@@ -139,9 +139,9 @@ class Price extends FormElement {
     unset($element['#maxlength']);
 
     if (count($currency_codes) == 1) {
-      $last_visible_element = 'amount';
+      $last_visible_element = 'number';
       $currency_code = reset($currency_codes);
-      $element['amount']['#field_suffix'] = $currency_code;
+      $element['number']['#field_suffix'] = $currency_code;
       $element['currency_code'] = [
         '#type' => 'hidden',
         '#value' => $currency_code,
@@ -181,15 +181,15 @@ class Price extends FormElement {
     $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
 
     $value = $form_state->getValue($element['#parents']);
-    if (empty($value['amount'])) {
+    if (empty($value['number'])) {
       return;
     }
 
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $currency_storage->load($value['currency_code']);
-    $value['amount'] = $number_formatter->parseCurrency($value['amount'], $currency);
-    if ($value['amount'] === FALSE) {
-      $form_state->setError($element['amount'], t('%title is not numeric.', [
+    $value['number'] = $number_formatter->parseCurrency($value['number'], $currency);
+    if ($value['number'] === FALSE) {
+      $form_state->setError($element['number'], t('%title is not numeric.', [
         '%title' => $element['#title'],
       ]));
       return;

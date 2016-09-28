@@ -5,10 +5,10 @@
  *
  * Used by the 'commerce_price_plain' formatter.
  * Available variables:
- *   - amount: The decimal amount.
+ *   - number: The number.
  *   - currency: The currency entity.
  *
  * @ingroup themeable
  */
 #}
-{{ amount|number_format(2, '.', ',') }} {{ currency.currencyCode }}
+{{ number|number_format(2, '.', ',') }} {{ currency.currencyCode }}

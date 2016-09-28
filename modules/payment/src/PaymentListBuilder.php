@@ -131,10 +131,10 @@ class PaymentListBuilder extends EntityListBuilder {
     $amount = $entity->getAmount();
     // @todo Refactor the number formatter to work with just a currency code.
     $currency = Currency::load($amount->getCurrencyCode());
-    $formatted_amount = $this->numberFormatter->formatCurrency($amount->getDecimalAmount(), $currency);
+    $formatted_amount = $this->numberFormatter->formatCurrency($amount->getNumber(), $currency);
     $refunded_amount = $entity->getRefundedAmount();
     if ($refunded_amount && !$refunded_amount->isZero()) {
-      $formatted_amount .= ' Refunded: ' . $this->numberFormatter->formatCurrency($refunded_amount->getDecimalAmount(), $currency);
+      $formatted_amount .= ' Refunded: ' . $this->numberFormatter->formatCurrency($refunded_amount->getNumber(), $currency);
     }
 
     $row['label'] = $formatted_amount;

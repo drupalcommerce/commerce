@@ -102,7 +102,7 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $attribute_values['cyan'],
@@ -111,7 +111,7 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $attribute_values['yellow'],
@@ -120,7 +120,7 @@ class ProductAttributesOverviewFormatterTest extends KernelTestBase {
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
       'price' => [
-        'amount' => 999,
+        'number' => 999,
         'currency_code' => 'USD',
       ],
       'attribute_color' => $attribute_values['yellow'],

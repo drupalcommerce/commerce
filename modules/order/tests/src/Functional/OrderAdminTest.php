@@ -56,31 +56,31 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->fieldExists('billing_profile');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
-    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][amount]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][number]');
     $this->assertSession()->buttonExists('Create order item');
     $entity = $this->variation->getSku() . ' (' . $this->variation->id() . ')';
     $edit = [
       'order_items[form][inline_entity_form][purchased_entity][0][target_id]' => $entity,
       'order_items[form][inline_entity_form][quantity][0][value]' => '1',
-      'order_items[form][inline_entity_form][unit_price][0][amount]' => '9.99',
+      'order_items[form][inline_entity_form][unit_price][0][number]' => '9.99',
     ];
     $this->submitForm($edit, 'Create order item');
     $this->submitForm([], t('Edit'));
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][quantity][0][value]');
-    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]');
+    $this->assertSession()->fieldExists('order_items[form][inline_entity_form][entities][0][form][unit_price][0][number]');
     $this->assertSession()->buttonExists('Update order item');
 
     $edit = [
       'order_items[form][inline_entity_form][entities][0][form][quantity][0][value]' => 3,
-      'order_items[form][inline_entity_form][entities][0][form][unit_price][0][amount]' => '1.11',
+      'order_items[form][inline_entity_form][entities][0][form][unit_price][0][number]' => '1.11',
     ];
     $this->submitForm($edit, 'Update order item');
     $edit = [
       'billing_profile' => $this->billingProfile->id(),
       'adjustments[0][type]' => 'custom',
       'adjustments[0][definition][label]' => 'Test fee',
-      'adjustments[0][definition][amount][amount]' => '2.00',
+      'adjustments[0][definition][amount][number]' => '2.00',
     ];
     $this->submitForm($edit, 'Save');
 
@@ -89,7 +89,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $order = Order::load(1);
     $this->assertEquals(1, count($order->getItems()));
-    $this->assertEquals('5.33', $order->total_price->amount);
+    $this->assertEquals('5.33', $order->total_price->number);
   }
 
   /**
