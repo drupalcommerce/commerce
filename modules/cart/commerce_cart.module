@@ -112,7 +112,7 @@ function commerce_cart_commerce_order_presave(OrderInterface $order) {
     $from_states = $place_transition->getFromStates();
     $to_state = $place_transition->getToState()->getId();
     if (in_array($order->original->state->value, array_keys($from_states)) && $order->state->value == $to_state) {
-      \Drupal::service('commerce_cart.cart_provider')->finalizeCart($order);
+      \Drupal::service('commerce_cart.cart_provider')->finalizeCart($order, FALSE);
     }
   }
 }

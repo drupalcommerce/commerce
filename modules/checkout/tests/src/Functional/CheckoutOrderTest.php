@@ -42,6 +42,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
     'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
     'commerce_checkout', 'commerce_order', 'views_ui',
+    // @see https://www.drupal.org/node/2807567
+    'editor',
   ];
 
   /**
