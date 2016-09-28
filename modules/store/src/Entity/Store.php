@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_store\Entity;
 
-use CommerceGuys\Addressing\Enum\AddressField;
+use CommerceGuys\Addressing\AddressFormat\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
 use Drupal\user\UserInterface;
@@ -261,8 +261,13 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    // Disable the recipient and organization fields on the store address.
-    $disabled_fields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
+    // Disable the name and organization fields on the store address.
+    $disabled_fields = [
+      AddressField::GIVEN_NAME,
+      AddressField::ADDITIONAL_NAME,
+      AddressField::FAMILY_NAME,
+      AddressField::ORGANIZATION,
+    ];
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
       ->setDescription(t('The store address.'))
