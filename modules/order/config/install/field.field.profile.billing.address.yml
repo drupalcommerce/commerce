@@ -27,6 +27,8 @@ settings:
     addressLine1: addressLine1
     addressLine2: addressLine2
     organization: organization
-    recipient: recipient
+    givenName: givenName
+    additionalName: additionalName
+    familyName: familyName
   langcode_override: ''
 field_type: address

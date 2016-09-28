@@ -68,7 +68,7 @@ class StoreTest extends CommerceBrowserTestBase {
     $address = [
       'address_line1' => '1098 Alta Ave',
       'locality' => 'Mountain View',
-      'administrative_area' => 'US-CA',
+      'administrative_area' => 'CA',
       'postal_code' => '94043',
     ];
     foreach ($address as $property => $value) {

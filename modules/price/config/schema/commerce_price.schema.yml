@@ -39,6 +39,3 @@ field.formatter.settings.commerce_price_calculated:
     display_currency_code:
       type: boolean
       label: 'Display the currency code instead of the currency symbol'
-    show_original_price:
-      type: boolean
-      label: 'Display the original price, if resolved price is different'
