@@ -25,7 +25,7 @@ class OrderAccountTest extends OrderBrowserTestBase {
     ]);
     $order = Order::load($order->id());
 
-    $this->assertEmpty($order->getOwnerId(), 'The guest order has no owner account.');
+    $this->assertEquals(0, $order->getOwnerId(), 'The guest order has no owner account.');
     $user = $this->createUser([], 'guest');
     $this->assertEquals($order->getOwnerId(), $user->id(), 'New user account owns previous guest order.');
   }
