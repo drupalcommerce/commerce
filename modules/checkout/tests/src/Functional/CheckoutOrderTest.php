@@ -182,6 +182,18 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests that a guest order is associated to a Drupal user created after checkout.
+   */
+  public function testAccountOrderAfterGuestCheckout() {
+    $this->testGuestOrderCheckout();
+    $order = Order::load(1);
+    $this->assertEmpty($order->getOwnerId(), 'Guest checkout order has no owner.');
+    $user = $this->createUser([], 'guest', FALSE);
+    $order = Order::load(1);
+    $this->assertEquals($user->id(), $order->getOwnerId(), 'Guest checkout order is owned by new guest user account.');
+  }
+
+  /**
    * Tests that you can register from the checkout pane.
    */
   public function testRegisterOrderCheckout() {
