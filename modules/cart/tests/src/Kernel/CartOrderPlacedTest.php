@@ -8,6 +8,9 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.
+ *
+ * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
+ * @group commerce
  */
 class CartOrderPlacedTest extends EntityKernelTestBase {
 
