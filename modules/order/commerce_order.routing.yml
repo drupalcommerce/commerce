@@ -51,6 +51,6 @@ entity.commerce_order_item_type.collection:
   path: '/admin/commerce/config/order-item-types'
   defaults:
     _entity_list: 'commerce_order_item_type'
-    _title: 'order item types'
+    _title: 'Order item types'
   requirements:
     _permission: 'administer commerce_order_type'
