@@ -41,9 +41,10 @@ function commerce_order_local_tasks_alter(&$definitions) {
 
 /**
  * Implements hook_ENTITY_TYPE_insert() for user entities.
+ *
+ * - Assigns any previous guest orders to new user account.
  */
 function commerce_order_user_insert(AccountInterface $user) {
-  // Assigns guest orders to account if they used the account's email address.
   $order_ids = \Drupal::entityQuery('commerce_order')
     ->condition('mail', $user->getEmail())
     ->execute();
