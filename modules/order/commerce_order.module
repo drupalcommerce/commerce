@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -39,17 +40,17 @@ function commerce_order_local_tasks_alter(&$definitions) {
 }
 
 /**
- * Implements hook_user_insert().
+ * Implements hook_ENTITY_TYPE_insert() for user entities.
  */
-function commerce_order_user_insert($account) {
+function commerce_order_user_insert(AccountInterface $user) {
   // Assigns guest orders to account if they used the account's email address.
   $order_ids = \Drupal::entityQuery('commerce_order')
-    ->condition('mail', $account->getEmail())
+    ->condition('mail', $user->getEmail())
     ->execute();
   if ($order_ids) {
     $orders = Order::loadMultiple($order_ids);
     foreach ($orders as $order) {
-      $order->setOwnerId($account->id());
+      $order->setOwnerId($user->id());
       $order->save();
     }
   }
