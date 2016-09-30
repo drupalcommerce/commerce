@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\commerce_order\Functional;
 
+use Drupal\commerce_order\Entity\Order;
+
 /**
  * Tests the order account (owner) functionality.
  *
@@ -22,9 +24,9 @@ class OrderAccountTest extends OrderBrowserTestBase {
       'mail' => 'guest@example.com',
       'order_items' => [$order_item],
     ]);
-    $order->save();
     $this->assertEmpty($order->getOwnerId(), 'The guest order has no owner account.');
     $user = $this->createUser([], 'guest');
+    $order = Order::load($order->id());
     $this->assertEquals($user->id(), $order->getOwnerId(), 'New user account owns previous guest order.');
   }
 
