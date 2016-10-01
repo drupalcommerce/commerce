@@ -143,10 +143,10 @@ display:
           entity_type: null
           entity_field: title
           plugin_id: field
-        unit_price__amount:
-          id: unit_price__amount
+        unit_price__number:
+          id: unit_price__number
           table: commerce_order_item
-          field: unit_price__amount
+          field: unit_price__number
           relationship: none
           group_type: group
           admin_label: ''
@@ -191,7 +191,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: amount
+          click_sort_column: number
           type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
@@ -277,10 +277,10 @@ display:
           entity_type: commerce_order_item
           entity_field: quantity
           plugin_id: field
-        total_price__amount:
-          id: total_price__amount
+        total_price__number:
+          id: total_price__number
           table: commerce_order_item
-          field: total_price__amount
+          field: total_price__number
           relationship: none
           group_type: group
           admin_label: ''
@@ -325,7 +325,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: amount
+          click_sort_column: number
           type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
