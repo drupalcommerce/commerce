@@ -88,7 +88,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
    */
   public function testExposedOrderItemFields() {
     /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $order_item_form_display */
-    $order_item_form_display = EntityFormDisplay::load('commerce_order_item.product_variation.add_to_cart');
+    $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
     $order_item_form_display->setComponent('quantity', [
       'type' => 'number',
     ]);
