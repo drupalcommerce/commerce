@@ -42,7 +42,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $values = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
-      'orderItemType' => 'product_variation',
+      'orderItemType' => 'default',
     ];
     $this->createEntity('commerce_product_variation_type', $values);
     $variation_type = ProductVariationType::load($values['id']);
@@ -53,7 +53,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $edit = [
       'id' => strtolower($this->randomMachineName(8)),
       'label' => $this->randomMachineName(),
-      'orderItemType' => 'product_variation',
+      'orderItemType' => 'default',
     ];
     $this->submitForm($edit, t('Save'));
     $variation_type = ProductVariationType::load($edit['id']);
@@ -117,7 +117,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit');
     $edit = [
       'label' => 'Default',
-      'orderItemType' => 'product_variation',
+      'orderItemType' => 'default',
       'attributes[color]' => 'color',
     ];
     $this->submitForm($edit, t('Save'));
@@ -127,7 +127,7 @@ class ProductVariationTypeTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/config/product-variation-types/default/edit');
     $edit = [
       'label' => 'Default',
-      'orderItemType' => 'product_variation',
+      'orderItemType' => 'default',
       'attributes[color]' => FALSE,
     ];
     $this->submitForm($edit, t('Save'));
