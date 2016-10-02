@@ -64,7 +64,7 @@ class OrderAddForm extends FormBase {
     if ($store_query->count()->execute() == 0) {
       $link = Link::createFromRoute('Add a new store.', 'entity.commerce_store.add_page');
       $form['warning'] = [
-        '#markup' => t("Orders can't be created until a store has been added. @link", ['@link' => $link->toString()]),
+        '#markup' => $this->t("Orders can't be created until a store has been added. @link", ['@link' => $link->toString()]),
       ];
       return $form;
     }
@@ -108,7 +108,7 @@ class OrderAddForm extends FormBase {
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Create'),
+      '#value' => $this->t('Create'),
       '#button_type' => 'primary',
     ];
 

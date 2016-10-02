@@ -82,7 +82,7 @@ class OrderReassignForm extends FormBase {
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Reassign order'),
+      '#value' => $this->t('Reassign order'),
       '#button_type' => 'primary',
     ];
 
