@@ -112,7 +112,8 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     // Build a month select list that shows months with a leading zero.
     $months = [];
     for ($i = 1; $i < 13; $i++) {
-      $months[$i] = str_pad($i, 2, '0', STR_PAD_LEFT);
+      $month = str_pad($i, 2, '0', STR_PAD_LEFT);
+      $months[$month] = $month;
     }
     // Build a year select list that uses a 4 digit key with a 2 digit value.
     $current_year_4 = date('Y');
