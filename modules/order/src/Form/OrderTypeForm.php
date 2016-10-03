@@ -90,8 +90,15 @@ class OrderTypeForm extends BundleEntityFormBase {
     $workflow_manager = \Drupal::service('plugin.manager.workflow');
     /** @var \Drupal\state_machine\Plugin\Workflow\WorkflowInterface $workflow */
     $workflow = $workflow_manager->createInstance($form_state->getValue('workflow'));
+    // Verify "Place" transition.
     if (!$workflow->getTransition('place')) {
       $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Place" transition.', [
+        '@workflow' => $workflow->getLabel(),
+      ]));
+    }
+    // Verify "draft" state.
+    if (!$workflow->getState('draft')) {
+      $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Draft" state.', [
         '@workflow' => $workflow->getLabel(),
       ]));
     }
