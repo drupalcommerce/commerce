@@ -98,7 +98,7 @@ class OrderTypeForm extends BundleEntityFormBase {
     }
     // Verify "draft" state.
     if (!$workflow->getState('draft')) {
-      $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "draft" state.', [
+      $form_state->setError($form['workflow'], $this->t('The @workflow workflow does not have a "Draft" state.', [
         '@workflow' => $workflow->getLabel(),
       ]));
     }
