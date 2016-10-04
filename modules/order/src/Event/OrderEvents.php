@@ -5,6 +5,17 @@ namespace Drupal\commerce_order\Event;
 final class OrderEvents {
 
   /**
+   * Name of the event fired after assigning an anonymous order to a user.
+   *
+   * Fired before the order is saved.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_order\Event\OrderAssignEvent
+   */
+  const ORDER_ASSIGN = 'commerce_order.order.assign';
+
+  /**
    * Name of the event fired after loading an order.
    *
    * @Event
