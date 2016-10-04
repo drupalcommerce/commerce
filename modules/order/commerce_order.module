@@ -5,9 +5,11 @@
  * Defines the Order entity and associated features.
  */
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -35,6 +37,24 @@ function commerce_order_theme($existing, $type, $theme, $path) {
 function commerce_order_local_tasks_alter(&$definitions) {
   $id = 'entity.profile.user_profile_form:profile.type.customer';
   $definitions[$id]['title'] = t('Address book');
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for user entities.
+ *
+ * - Assigns any previous guest orders to new user account.
+ */
+function commerce_order_user_insert(AccountInterface $user) {
+  $order_ids = \Drupal::entityQuery('commerce_order')
+    ->condition('mail', $user->getEmail())
+    ->execute();
+  if ($order_ids) {
+    $orders = Order::loadMultiple($order_ids);
+    foreach ($orders as $order) {
+      $order->setOwnerId($user->id());
+      $order->save();
+    }
+  }
 }
 
 /**
