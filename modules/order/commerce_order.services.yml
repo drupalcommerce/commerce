@@ -10,6 +10,10 @@ services:
     tags:
       - { name: commerce_order.order_type_resolver, priority: -100 }
 
+  commerce_order.order_assignment:
+    class: Drupal\commerce_order\OrderAssignment
+    arguments: ['@entity_type.manager', '@event_dispatcher']
+
   commerce_order.order_refresh:
     class: Drupal\commerce_order\OrderRefresh
     arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user']

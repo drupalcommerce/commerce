@@ -38,6 +38,29 @@ class AddToCartFormTest extends CartBrowserTestBase {
   }
 
   /**
+   * Test assigning an anonymous cart to a logged in user.
+   */
+  public function testCartAssignment() {
+    $this->drupalLogout();
+    $this->postAddToCart($this->variation->getProduct());
+    // Find the newly created anonymous cart.
+    $query = \Drupal::entityQuery('commerce_order')
+      ->condition('cart', TRUE)
+      ->condition('uid', 0);
+    $result = $query->execute();
+    $cart_id = reset($result);
+    $cart = Order::load($cart_id);
+
+    $this->assertEquals(0, $cart->getOwnerId());
+    $this->assertTrue($cart->hasItems());
+
+    $this->drupalLogin($this->adminUser);
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();
+    $cart = Order::load($cart->id());
+    $this->assertEquals($this->adminUser->id(), $cart->getOwnerId());
+  }
+
+  /**
    * Test adding a product to the cart, via the variant's canonical link.
    */
   public function testVariationCanonicalLinkAddToCartForm() {

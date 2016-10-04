@@ -1,24 +1,24 @@
 <?php
 
-namespace Drupal\commerce_cart\Event;
+namespace Drupal\commerce_order\Event;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Defines the cart assign event.
+ * Defines the order assign event.
  *
- * @see \Drupal\commerce_cart\Event\CartEvents
+ * @see \Drupal\commerce_order\Event\OrderEvents
  */
-class CartAssignEvent extends Event {
+class OrderAssignEvent extends Event {
 
   /**
-   * The cart order.
+   * The order.
    *
    * @var \Drupal\commerce_order\Entity\OrderInterface
    */
-  protected $cart;
+  protected $order;
 
   /**
    * The user account.
@@ -28,26 +28,26 @@ class CartAssignEvent extends Event {
   protected $account;
 
   /**
-   * Constructs a new CartAssignEvent.
+   * Constructs a new OrderAssignEvent.
    *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
-   *   The cart order.
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
    * @param \Drupal\user\UserInterface $account
    *   The user account.
    */
-  public function __construct(OrderInterface $cart, UserInterface $account) {
-    $this->cart = $cart;
+  public function __construct(OrderInterface $order, UserInterface $account) {
+    $this->order = $order;
     $this->account = $account;
   }
 
   /**
-   * Gets the cart order.
+   * Gets the order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface
-   *   The cart order.
+   *   The order.
    */
-  public function getCart() {
-    return $this->cart;
+  public function getOrder() {
+    return $this->order;
   }
 
   /**

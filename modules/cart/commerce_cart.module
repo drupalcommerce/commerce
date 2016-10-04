@@ -9,7 +9,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\state_machine\Plugin\Workflow\WorkflowState;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Implements hook_theme().
@@ -89,7 +89,11 @@ function commerce_cart_entity_type_build(array &$entity_types) {
  * Implements hook_user_login().
  */
 function commerce_cart_user_login($account) {
-  \Drupal::service('commerce_cart.cart_assignment')->assignAll($account);
+  // Assign the anonymous user's carts to the logged-in account.
+  // This will only affect the carts that are in the user's session.
+  $anonymous = new AnonymousUserSession();
+  $carts = \Drupal::service('commerce_cart.cart_provider')->getCarts($anonymous);
+  \Drupal::service('commerce_order.order_assignment')->assignMultiple($carts, $account);
 }
 
 /**

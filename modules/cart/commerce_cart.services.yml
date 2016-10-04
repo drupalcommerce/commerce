@@ -1,8 +1,4 @@
 services:
-  commerce_cart.cart_assignment:
-    class: Drupal\commerce_cart\CartAssignment
-    arguments: ['@commerce_cart.cart_session', '@entity_type.manager', '@event_dispatcher']
-
   commerce_cart.cart_session:
     class: Drupal\commerce_cart\CartSession
     arguments: ['@session']
@@ -16,5 +12,5 @@ services:
     arguments: ['@entity_type.manager', '@commerce_cart.order_item_matcher', '@event_dispatcher']
 
   commerce_cart.order_item_matcher:
-      class: Drupal\commerce_cart\OrderItemMatcher
-      arguments: ['@event_dispatcher']
+    class: Drupal\commerce_cart\OrderItemMatcher
+    arguments: ['@event_dispatcher']
