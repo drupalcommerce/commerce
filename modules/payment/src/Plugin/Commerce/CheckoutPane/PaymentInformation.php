@@ -126,6 +126,10 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $options = [];
     $default_option = NULL;
     $owner = $this->order->getOwner();
+    $current_payment_method = $this->order->payment_method->entity;
+    if ($current_payment_method) {
+      $options[$current_payment_method->id()] = $current_payment_method->label();
+    }
     if ($owner) {
       $payment_methods = $payment_method_storage->loadReusable($owner, $payment_gateway);
       foreach ($payment_methods as $payment_method) {
@@ -140,6 +144,9 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $values = $form_state->getValue($pane_form['#parents']);
     if (!empty($values['payment_method'])) {
       $selected_option = $values['payment_method'];
+    }
+    elseif (!empty($current_payment_method)) {
+      $selected_option = $current_payment_method->id();
     }
     else {
       $default_payment_method_type = $payment_gateway_plugin->getDefaultPaymentMethodType();
