@@ -133,7 +133,7 @@ function commerce_order_add_order_items_field($order_type) {
     $field = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => $order_type->id(),
-      'label' => 'order items',
+      'label' => 'Order items',
       'required' => TRUE,
       'settings' => [
         'handler' => 'default',

@@ -5,7 +5,7 @@ dependencies:
     - commerce_order
     - commerce_price
 id: commerce_order_item_table
-label: 'order items'
+label: 'Order items'
 module: views
 description: 'Display a set of order items in a table.'
 tag: ''

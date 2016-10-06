@@ -8,7 +8,7 @@ id: commerce_order.default.order_items
 field_name: order_items
 entity_type: commerce_order
 bundle: default
-label: 'order items'
+label: 'Order items'
 description: ''
 required: true
 translatable: false
