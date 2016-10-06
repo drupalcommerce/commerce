@@ -20,7 +20,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   quantity:
-    type: number
+    type: mode_number
     weight: 1
     settings:
       placeholder: ''

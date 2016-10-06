@@ -8,6 +8,8 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Plugin\views\field\UncacheableFieldHandlerTrait;
 use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Render\Markup;
 
 /**
  * Defines a form element for editing the order item quantity.
@@ -89,17 +91,21 @@ class EditQuantity extends FieldPluginBase {
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
       $order_item = $this->getEntity($row);
-      $quantity = $order_item->getQuantity();
+      $default_value = $order_item->getQuantity();
+      $attr = $order_item->getQuantityWidgetSettings();
 
       $form[$this->options['id']][$row_index] = [
         '#type' => 'number',
         '#title' => $this->t('Quantity'),
         '#title_display' => 'invisible',
-        '#default_value' => round($quantity),
+        '#default_value' => $default_value,
         '#size' => 4,
-        '#min' => 1,
-        '#max' => 9999,
-        '#step' => 1,
+        '#min' => empty($attr['#min']) ? '1' : $attr['#min'],
+        '#max' => empty($attr['#max']) ? '9999' : $attr['#max'],
+        '#step' => empty($attr['#step']) ? '1' : $attr['#step'],
+        '#placeholder' => empty($attr['#placeholder']) ? '' : $attr['#placeholder'],
+        '#field_prefix' => empty($attr['#field_prefix']) ? '' : Markup::create($attr['#field_prefix']),
+        '#field_suffix' => empty($attr['#field_prefix']) ? '' : Markup::create($attr['#field_suffix']),
       ];
     }
     // Replace the form submit button label.

@@ -9,6 +9,8 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormState;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Defines the order item entity class.
@@ -103,6 +105,26 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   public function getQuantity() {
     return (string) $this->get('quantity')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getItemsQuantity() {
+    $settings = $this->getQuantityWidgetSettings();
+    $step = isset($settings['#step']) && is_numeric($settings['#step']) ? $settings['#step'] + 0 : 1;
+    $quantity = $this->getQuantity();
+    return (string) is_int($step) ? $quantity : (is_float($step) && $quantity > 0 ? '1' : $quantity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getQuantityWidgetSettings() {
+    $form_state = new FormState();
+    $form = [];
+    $form = $this->get('quantity')->defaultValuesForm($form, $form_state);
+    return (array) NestedArray::getValue($form, ['widget', 0, 'value']);
   }
 
   /**
@@ -245,9 +267,16 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
+      ->setSetting('precision', 12)
+      ->setSetting('scale', 3)
+      ->setSetting('max', '367384.999')
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'type' => 'mode_number',
+        'weight' => 1,
+      ])
+      ->setDisplayOptions('add_to_cart', [
+        'type' => 'mode_number',
         'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE)

@@ -85,9 +85,9 @@ class OrderItemTest extends EntityKernelTestBase {
     $order_item->setTitle('My order item');
     $this->assertEquals('My order item', $order_item->getTitle());
 
-    $this->assertEquals(1, $order_item->getQuantity());
+    $this->assertEquals(1, $order_item->getItemsQuantity());
     $order_item->setQuantity('2');
-    $this->assertEquals(2, $order_item->getQuantity());
+    $this->assertEquals(2, $order_item->getItemsQuantity());
 
     $this->assertEquals(NULL, $order_item->getUnitPrice());
     $unit_price = new Price('9.99', 'USD');

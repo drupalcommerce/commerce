@@ -71,6 +71,22 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getQuantity();
 
   /**
+   * Gets the order items quantity.
+   *
+   * @return string
+   *   The order items quantity
+   */
+  public function getItemsQuantity();
+
+  /**
+   * Gets the order item quantity field widget settings.
+   *
+   * @return array
+   *   The default form display mode field widget settings
+   */
+  public function getQuantityWidgetSettings();
+
+  /**
    * Sets the order item quantity.
    *
    * @param string $quantity
