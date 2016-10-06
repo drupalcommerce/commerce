@@ -150,30 +150,39 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
     $payment_methods = $payment_method_storage->loadReusable($this->order->getOwner(), $selected_payment_gateway);
-    $selected_payment_method = reset($payment_methods);
-    $payment_method_options = [];
-    foreach ($payment_methods as $id => $payment_method) {
-      $payment_method_options[$id] = $payment_method->label();
-      if ($payment_method->isDefault()) {
-        $selected_payment_method = $payment_method;
-      }
-    }
 
-    $form['payment_method'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Payment method'),
-      '#options' => $payment_method_options,
-      '#default_value' => $selected_payment_method->id(),
-      '#required' => TRUE,
-      '#after_build' => [
-        [get_class($this), 'clearValue'],
-      ],
-    ];
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Continue'),
-      '#button_type' => 'primary',
-    ];
+    if (!empty($payment_methods)) {
+      $selected_payment_method = reset($payment_methods);
+      $payment_method_options = [];
+      foreach ($payment_methods as $id => $payment_method) {
+        $payment_method_options[$id] = $payment_method->label();
+        if ($payment_method->isDefault()) {
+          $selected_payment_method = $payment_method;
+        }
+      }
+
+      $form['payment_method'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Payment method'),
+        '#options' => $payment_method_options,
+        '#default_value' => $selected_payment_method->id(),
+        '#required' => TRUE,
+        '#after_build' => [
+          [get_class($this), 'clearValue'],
+        ],
+      ];
+      $form['actions']['submit'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Continue'),
+        '#button_type' => 'primary',
+      ];
+    }
+    else {
+      $form['payment_method'] = [
+        '#type' => 'markup',
+        '#markup' => $this->t('There are no reusable payment methods available'),
+      ];
+    }
 
     return $form;
   }
