@@ -75,6 +75,17 @@ field.formatter.settings.commerce_product_attributes_overview:
       type: string
       label: 'View mode'
 
+field.widget.settings.commerce_product_variation_title:
+  type: mapping
+  label: 'Product variation title widget settings'
+  mapping:
+    label_display:
+      type: boolean
+      label: 'Label display'
+    label_text:
+      type: label
+      label: 'Label text'
+
 action.configuration.commerce_publish_product:
   type: action_configuration_default
   label: 'Configuration for the Publish product action'
