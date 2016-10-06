@@ -240,12 +240,14 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
         'max_length' => 512,
       ]);
 
-    $fields['quantity'] = BaseFieldDefinition::create('decimal')
+    $fields['quantity'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Quantity'))
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
       ->setDefaultValue(1)
+      ->setSetting('min', 1)
+      ->setSetting('max', 9999)
       ->setDisplayOptions('form', [
         'type' => 'number',
         'weight' => 1,
