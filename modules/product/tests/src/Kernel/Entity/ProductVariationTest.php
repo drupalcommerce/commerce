@@ -176,4 +176,5 @@ class ProductVariationTest extends EntityKernelTestBase {
 
     // @todo Create attributes, then retest attribute methods.
   }
+
 }
