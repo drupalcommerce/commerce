@@ -10,6 +10,7 @@ use Drupal\commerce_cart\Event\CartEmptyEvent;
 use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
+use Drupal\commerce_order\OrderRefreshInterface;
 use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -44,6 +45,13 @@ class CartManager implements CartManagerInterface {
   protected $eventDispatcher;
 
   /**
+   * The order refresh.
+   *
+   * @var \Drupal\commerce_order\OrderRefreshInterface
+   */
+  protected $orderRefresh;
+
+  /**
    * Constructs a new CartManager object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -52,11 +60,14 @@ class CartManager implements CartManagerInterface {
    *   The order item matcher.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\commerce_order\OrderRefreshInterface $order_refresh
+   *   The order refresh.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderItemMatcherInterface $order_item_matcher, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderItemMatcherInterface $order_item_matcher, EventDispatcherInterface $event_dispatcher, OrderRefreshInterface $order_refresh) {
     $this->orderItemStorage = $entity_type_manager->getStorage('commerce_order_item');
     $this->orderItemMatcher = $order_item_matcher;
     $this->eventDispatcher = $event_dispatcher;
+    $this->orderRefresh = $order_refresh;
   }
 
   /**
@@ -68,7 +79,6 @@ class CartManager implements CartManagerInterface {
       $order_item->delete();
     }
     $cart->setItems([]);
-
     $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
     if ($save_cart) {
       $cart->save();
@@ -119,7 +129,8 @@ class CartManager implements CartManagerInterface {
     $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
     if ($needs_cart_save && $save_cart) {
-      $cart->save();
+      // Refresh the cart, which also saves it.
+      $this->orderRefresh->refresh($cart);
     }
 
     return $order_item;
@@ -134,6 +145,7 @@ class CartManager implements CartManagerInterface {
     $order_item->save();
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    $this->orderRefresh->refresh($cart);
   }
 
   /**
@@ -144,7 +156,8 @@ class CartManager implements CartManagerInterface {
     $cart->removeItem($order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
     if ($save_cart) {
-      $cart->save();
+      // Refresh the cart, which also saves it.
+      $this->orderRefresh->refresh($cart);
     }
   }
 
