@@ -20,10 +20,10 @@ class ProductViewBuilder extends EntityViewBuilder {
    *
    * @var \Drupal\commerce_product\ProductVariationFieldRenderer
    */
-  protected $productVariationFieldRenderer;
+  protected $variationFieldRenderer;
 
   /**
-   * Constructs a new ProductViewBuilder.
+   * Constructs a new ProductViewBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -31,12 +31,12 @@ class ProductViewBuilder extends EntityViewBuilder {
    *   The entity manager service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\commerce_product\ProductVariationFieldRenderer $product_variation_field_renderer
+   * @param \Drupal\commerce_product\ProductVariationFieldRenderer $variation_field_renderer
    *   The product variation field renderer.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager, ProductVariationFieldRenderer $product_variation_field_renderer) {
+  public function __construct(EntityTypeInterface $entity_type, EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager, ProductVariationFieldRenderer $variation_field_renderer) {
     parent::__construct($entity_type, $entity_manager, $language_manager);
-    $this->productVariationFieldRenderer = $product_variation_field_renderer;
+    $this->variationFieldRenderer = $variation_field_renderer;
   }
 
   /**
@@ -62,7 +62,7 @@ class ProductViewBuilder extends EntityViewBuilder {
     $product_type = $product_type_storage->load($entity->bundle());
     if ($product_type->shouldInjectVariationFields() && $entity->getDefaultVariation()) {
       $variation = $variation_storage->loadFromContext($entity);
-      $rendered_fields = $this->productVariationFieldRenderer->renderFields($variation, $view_mode);
+      $rendered_fields = $this->variationFieldRenderer->renderFields($variation, $view_mode);
       foreach ($rendered_fields as $field_name => $rendered_field) {
         // Group attribute fields to allow them to be excluded together.
         if (strpos($field_name, 'attribute_') !== FALSE) {
