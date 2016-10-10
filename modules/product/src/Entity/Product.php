@@ -27,7 +27,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
  *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
  *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {

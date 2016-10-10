@@ -84,30 +84,6 @@ function commerce_product_theme() {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_view().
- */
-function commerce_product_commerce_product_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
-  $product_type = ProductType::load($entity->bundle());
-  if ($product_type->shouldInjectVariationFields() && $entity->getDefaultVariation()) {
-    /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
-    $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
-
-    $variation = \Drupal::entityTypeManager()->getStorage('commerce_product_variation')->loadFromContext($entity);
-    $rendered_fields = $variation_field_renderer->renderFields($variation, $view_mode);
-    foreach ($rendered_fields as $field_name => $rendered_field) {
-      // Group attribute fields to allow them to be excluded together.
-      if (strpos($field_name, 'attribute_') !== FALSE) {
-        $build['variation_attributes']['variation_' . $field_name] = $rendered_field;
-      }
-      else {
-        $build['variation_' . $field_name] = $rendered_field;
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_theme_suggestions_commerce_product().
  */
 function commerce_product_theme_suggestions_commerce_product(array $variables) {
