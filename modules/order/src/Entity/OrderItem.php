@@ -26,6 +26,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderItemEvent",
  *     "storage" = "Drupal\commerce_order\OrderItemStorage",
+ *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
  *     "views_data" = "Drupal\commerce_order\OrderItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",

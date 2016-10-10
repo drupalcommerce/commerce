@@ -38,6 +38,7 @@ class StoreTest extends CommerceBrowserTestBase {
     return array_merge([
       'administer commerce_store_type',
       'administer commerce_store',
+      'access commerce_store overview',
     ], parent::getAdministratorPermissions());
   }
 

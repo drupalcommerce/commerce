@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -56,9 +57,13 @@ class EntityPermissionProvider implements EntityPermissionProviderInterface, Ent
       'title' => $this->t('Administer @type', ['@type' => $plural_label]),
       'restrict access' => TRUE,
     ];
-    $permissions["access {$entity_type_id} overview"] = [
-      'title' => $this->t('Access the @type overview page', ['@type' => $plural_label]),
-    ];
+    // Config entity types use the administer permission for listings, while
+    // content entity types use a separate "access overview" permission.
+    if ($entity_type instanceof ContentEntityTypeInterface) {
+      $permissions["access {$entity_type_id} overview"] = [
+        'title' => $this->t('Access the @type overview page', ['@type' => $plural_label]),
+      ];
+    }
     // View permissions are the same for both granularities, for now.
     if ($has_owner) {
       $permissions["view any {$entity_type_id}"] = [
