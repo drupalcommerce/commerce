@@ -112,6 +112,9 @@ class CartProvider implements CartProviderInterface {
     if ($save_cart) {
       $cart->save();
     }
+    if ($cart->getCustomer() && $cart->getCustomer()->isAnonymous()) {
+      $this->cartSession->deleteCartId($cart->id());
+    }
     // Remove the cart order from the internal cache, if present.
     unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
   }

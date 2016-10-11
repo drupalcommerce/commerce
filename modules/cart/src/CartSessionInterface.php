@@ -41,6 +41,17 @@ interface CartSessionInterface {
   public function hasCartId($cart_id);
 
   /**
+   * Checks whether the given cart order id exists in the session's completed carts.
+   *
+   * @param int $cart_id
+   *   The cart order ID.
+   *
+   * @return bool
+   *   TRUE if the given cart order id exists in the session, FALSE otherwise.
+   */
+  public function hadCartId($cart_id);
+
+  /**
    * Deletes the given cart order id from the session.
    *
    * @param int $cart_id

@@ -105,7 +105,7 @@ class CheckoutController implements ContainerInjectionInterface {
       $customer_check = $account->id() == $order->getCustomerId();
     }
     else {
-      $customer_check = $this->cartSession->hasCartId($order->id());
+      $customer_check = $this->cartSession->hasCartId($order->id()) || $this->cartSession->hadCartId($order->id());
     }
 
     $access = AccessResult::allowedIf($customer_check)

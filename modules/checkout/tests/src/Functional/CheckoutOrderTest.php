@@ -159,6 +159,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
+    $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
     $this->submitForm([], 'Checkout');
@@ -178,6 +179,30 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
+    $this->assertSession()->pageTextContains('0 items');
+    // Test second order.
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->assertSession()->pageTextContains('1 item');
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->pageTextNotContains('Order Summary');
+    $this->submitForm([], 'Continue as Guest');
+    $this->submitForm([
+      'contact_information[email]' => 'guest@example.com',
+      'contact_information[email_confirm]' => 'guest@example.com',
+      'billing_information[address][0][given_name]' => $this->randomString(),
+      'billing_information[address][0][family_name]' => $this->randomString(),
+      'billing_information[address][0][organization]' => $this->randomString(),
+      'billing_information[address][0][address_line1]' => $this->randomString(),
+      'billing_information[address][0][locality]' => $this->randomString(),
+    ], 'Continue to review');
+    $this->assertSession()->pageTextContains('Contact information');
+    $this->assertSession()->pageTextContains('Billing information');
+    $this->assertSession()->pageTextContains('Order Summary');
+    $this->submitForm([], 'Pay and complete purchase');
+    $this->assertSession()->pageTextContains('Your order number is 2. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
   }
 
