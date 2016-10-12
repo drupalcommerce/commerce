@@ -25,8 +25,8 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_promotion\Event\PromotionEvent",
  *     "storage" = "Drupal\commerce_promotion\PromotionStorage",
- *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_promotion\PromotionListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",

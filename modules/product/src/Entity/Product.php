@@ -25,8 +25,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
- *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",

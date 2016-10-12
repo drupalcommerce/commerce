@@ -29,8 +29,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce_order\OrderStorage",
- *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
