@@ -37,3 +37,19 @@ function commerce_order_post_update_1() {
 
   return $message;
 }
+
+/**
+ * Update order types.
+ */
+function commerce_order_post_update_2() {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $order_type_storage = $entity_type_manager->getStorage('commerce_order_type');
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface[] $order_types */
+  $order_types = $order_type_storage->loadMultiple();
+  foreach ($order_types as $order_type) {
+    if ($order_type->getRefreshMode() == 'owner_only') {
+      $order_type->setRefreshMode('customer');
+      $order_type->save();
+    }
+  }
+}

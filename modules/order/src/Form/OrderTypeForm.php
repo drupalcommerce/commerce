@@ -65,7 +65,7 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Order refresh mode'),
       '#options' => [
         OrderType::REFRESH_ALWAYS => t('Refresh a draft order when it is loaded regardless of who it belongs to.'),
-        OrderType::REFRESH_OWNER => t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
+        OrderType::REFRESH_CUSTOMER => t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
       ],
       '#default_value' => ($order_type->isNew()) ? OrderType::REFRESH_ALWAYS : $order_type->getRefreshMode(),
     ];

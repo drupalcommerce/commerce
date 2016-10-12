@@ -189,12 +189,12 @@ class OrderRefreshTest extends EntityKernelTestBase {
     sleep(1);
     $this->assertTrue($this->orderRefresh->needsRefresh($this->order));
 
-    $order_type->setRefreshMode(OrderType::REFRESH_OWNER)->save();
+    $order_type->setRefreshMode(OrderType::REFRESH_CUSTOMER)->save();
     $this->container->get('current_user')->setAccount($this->user);
 
     sleep(1);
     $this->assertFalse($this->orderRefresh->needsRefresh($this->order));
-    $this->order->setOwner($this->user);
+    $this->order->setCustomer($this->user);
     $this->assertTrue($this->orderRefresh->needsRefresh($this->order));
 
     sleep(1);

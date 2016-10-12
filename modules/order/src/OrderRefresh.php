@@ -85,9 +85,11 @@ class OrderRefresh implements OrderRefreshInterface {
       return FALSE;
     }
 
-    $refresh_owner_only = ($order_type->getRefreshMode() == OrderType::REFRESH_OWNER);
-    if ($refresh_owner_only  && ($order->getOwnerId() != $this->currentUser->id())) {
-      return FALSE;
+    // The order should only be refreshed when accessed by its customer.
+    if ($order_type->getRefreshMode() == OrderType::REFRESH_CUSTOMER) {
+      if ($order->getCustomerId() != $this->currentUser->id()) {
+        return FALSE;
+      }
     }
 
     return TRUE;

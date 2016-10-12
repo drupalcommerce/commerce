@@ -6,13 +6,13 @@ use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 use Drupal\profile\Entity\ProfileInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the interface for orders.
  */
-interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface, EntityOwnerInterface {
+interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
 
   /**
    * Gets the order number.
@@ -61,12 +61,48 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Sets the store ID.
    *
-   * @param int $storeId
+   * @param int $store_id
    *   The store ID.
    *
    * @return $this
    */
-  public function setStoreId($storeId);
+  public function setStoreId($store_id);
+
+  /**
+   * Gets the customer user.
+   *
+   * @return \Drupal\user\UserInterface|null
+   *   The customer user entity, or NULL in case the order is anonymous,
+   */
+  public function getCustomer();
+
+  /**
+   * Sets the customer user.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The customer user entity.
+   *
+   * @return $this
+   */
+  public function setCustomer(UserInterface $account);
+
+  /**
+   * Gets the customer user ID.
+   *
+   * @return int|null
+   *   The customer user ID, or NULL in case the order is anonymous.
+   */
+  public function getCustomerId();
+
+  /**
+   * Sets the customer user ID.
+   *
+   * @param int $uid
+   *   The customer user ID.
+   *
+   * @return $this
+   */
+  public function setCustomerId($uid);
 
   /**
    * Gets the order email.

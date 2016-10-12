@@ -10,7 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface OrderTypeInterface extends ConfigEntityInterface {
 
   const REFRESH_ALWAYS = 'always';
-  const REFRESH_OWNER = 'owner_only';
+  const REFRESH_CUSTOMER = 'customer';
 
   /**
    * Gets the order type's workflow ID.

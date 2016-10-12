@@ -49,26 +49,26 @@ class OrderReassignForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    if (!$this->order->getOwnerId()) {
+    if (!$this->order->getCustomerId()) {
       $current_customer = $this->t('anonymous user with the email %email', [
         '%email' => $this->order->getEmail(),
       ]);
     }
     else {
-      $owner = $this->order->getOwner();
+      $customer = $this->order->getCustomer();
       // If the display name has been altered to not be the email address,
       // show the email as well.
-      if ($owner->getDisplayName() != $owner->getEmail()) {
+      if ($customer->getDisplayName() != $customer->getEmail()) {
         $customer_link_text = $this->t('@display (@email)', [
-          '@display' => $owner->getDisplayName(),
-          '@email' => $owner->getEmail(),
+          '@display' => $customer->getDisplayName(),
+          '@email' => $customer->getEmail(),
         ]);
       }
       else {
-        $customer_link_text = $owner->getDisplayName();
+        $customer_link_text = $customer->getDisplayName();
       }
 
-      $current_customer = $this->order->getOwner()->toLink($customer_link_text)->toString();
+      $current_customer = $this->order->getCustomer()->toLink($customer_link_text)->toString();
     }
 
     $form['current_customer'] = [
@@ -97,11 +97,11 @@ class OrderReassignForm extends FormBase {
 
     $values = $form_state->getValues();
     $this->order->setEmail($values['mail']);
-    $this->order->setOwnerId($values['uid']);
+    $this->order->setCustomerId($values['uid']);
     $this->order->save();
     drupal_set_message($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),
-      '%customer' => $this->order->getOwner()->label(),
+      '%customer' => $this->order->getCustomer()->label(),
     ]));
     $form_state->setRedirectUrl($this->order->toUrl('collection'));
   }

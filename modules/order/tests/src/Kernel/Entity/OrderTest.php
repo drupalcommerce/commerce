@@ -96,10 +96,10 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::setStore
    * @covers ::getStoreId
    * @covers ::setStoreId
-   * @covers ::getOwner
-   * @covers ::setOwner
-   * @covers ::getOwnerId
-   * @covers ::setOwnerId
+   * @covers ::getCustomer
+   * @covers ::setCustomer
+   * @covers ::getCustomerId
+   * @covers ::setCustomerId
    * @covers ::getEmail
    * @covers ::setEmail
    * @covers ::getIpAddress
@@ -164,14 +164,14 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals($this->store, $order->getStore());
     $this->assertEquals($this->store->id(), $order->getStoreId());
 
-    $order->setOwner($this->user);
-    $this->assertEquals($this->user, $order->getOwner());
-    $this->assertEquals($this->user->id(), $order->getOwnerId());
-    $order->setOwnerId(0);
-    $this->assertEquals(NULL, $order->getOwner());
-    $order->setOwnerId($this->user->id());
-    $this->assertEquals($this->user, $order->getOwner());
-    $this->assertEquals($this->user->id(), $order->getOwnerId());
+    $order->setCustomer($this->user);
+    $this->assertEquals($this->user, $order->getCustomer());
+    $this->assertEquals($this->user->id(), $order->getCustomerId());
+    $order->setCustomerId(0);
+    $this->assertEquals(NULL, $order->getCustomer());
+    $order->setCustomerId($this->user->id());
+    $this->assertEquals($this->user, $order->getCustomer());
+    $this->assertEquals($this->user->id(), $order->getCustomerId());
 
     $order->setEmail('commerce@example.com');
     $this->assertEquals('commerce@example.com', $order->getEmail());

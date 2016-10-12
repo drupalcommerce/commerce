@@ -95,7 +95,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       $profile_storage = $this->entityTypeManager->getStorage('profile');
       $billing_profile = $profile_storage->create([
         'type' => 'customer',
-        'uid' => $this->order->getOwnerId(),
+        'uid' => $this->order->getCustomerId(),
       ]);
     }
     $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');

@@ -113,7 +113,7 @@ class CartProvider implements CartProviderInterface {
       $cart->save();
     }
     // Remove the cart order from the internal cache, if present.
-    unset($this->cartData[$cart->getOwnerId()][$cart->id()]);
+    unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
   }
 
   /**
@@ -204,7 +204,7 @@ class CartProvider implements CartProviderInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
-      if ($cart->getOwnerId() != $uid || empty($cart->cart)) {
+      if ($cart->getCustomerId() != $uid || empty($cart->cart)) {
         // Skip orders that are no longer eligible.
         continue;
       }

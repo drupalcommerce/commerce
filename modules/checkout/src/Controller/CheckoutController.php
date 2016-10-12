@@ -102,13 +102,13 @@ class CheckoutController implements ContainerInjectionInterface {
 
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
-      $owner_check = $account->id() == $order->getOwnerId();
+      $customer_check = $account->id() == $order->getCustomerId();
     }
     else {
-      $owner_check = $this->cartSession->hasCartId($order->id());
+      $customer_check = $this->cartSession->hasCartId($order->id());
     }
 
-    $access = AccessResult::allowedIf($owner_check)
+    $access = AccessResult::allowedIf($customer_check)
       ->andIf(AccessResult::allowedIf($order->hasItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);

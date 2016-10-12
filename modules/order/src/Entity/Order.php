@@ -29,8 +29,8 @@ use Drupal\profile\Entity\ProfileInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderEvent",
  *     "storage" = "Drupal\commerce_order\OrderStorage",
- *     "access" = "Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "access" = "Drupal\commerce_order\OrderAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce_order\OrderPermissionProvider",
  *     "list_builder" = "Drupal\commerce_order\OrderListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -110,38 +110,38 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function setStoreId($storeId) {
-    $this->set('store_id', $storeId);
+  public function setStoreId($store_id) {
+    $this->set('store_id', $store_id);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOwner() {
+  public function getCustomer() {
     return $this->get('uid')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOwnerId() {
-    return $this->get('uid')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('uid', $uid);
+  public function setCustomer(UserInterface $account) {
+    $this->set('uid', $account->id());
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
+  public function getCustomerId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCustomerId($uid) {
+    $this->set('uid', $uid);
     return $this;
   }
 
@@ -382,8 +382,8 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setIpAddress(\Drupal::request()->getClientIp());
       }
 
-      if (!$this->getEmail() && $owner = $this->getOwner()) {
-        $this->setEmail($owner->getEmail());
+      if (!$this->getEmail() && $customer = $this->getCustomer()) {
+        $this->setEmail($customer->getEmail());
       }
     }
 

@@ -81,7 +81,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
     // Reload the order.
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order = Order::load($order->id());
-    $this->assertEquals($order->getOwner()->getEmail(), 'example@example.com');
+    $this->assertEquals($order->getCustomer()->getEmail(), 'example@example.com');
     $this->assertEquals($order->getEmail(), 'example@example.com');
   }
 

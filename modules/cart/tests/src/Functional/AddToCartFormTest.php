@@ -51,13 +51,13 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $cart_id = reset($result);
     $cart = Order::load($cart_id);
 
-    $this->assertEquals(0, $cart->getOwnerId());
+    $this->assertEquals(0, $cart->getCustomerId());
     $this->assertTrue($cart->hasItems());
 
     $this->drupalLogin($this->adminUser);
     \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();
     $cart = Order::load($cart->id());
-    $this->assertEquals($this->adminUser->id(), $cart->getOwnerId());
+    $this->assertEquals($this->adminUser->id(), $cart->getCustomerId());
   }
 
   /**
