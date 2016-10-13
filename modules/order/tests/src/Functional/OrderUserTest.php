@@ -12,12 +12,24 @@ use Drupal\commerce_order\Entity\Order;
 class OrderUserTest extends OrderBrowserTestBase {
 
   /**
+   * A test user with normal privileges.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
    * {@inheritdoc}
    */
-  public function getAdministratorPermissions() {
-    return array_merge([
+  public function setUp() {
+    parent::setUp();
+
+    $permissions = [
       'view own commerce_order',
-    ], parent::getAdministratorPermissions());
+    ];
+
+    $this->user = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->user);
   }
 
   /**
