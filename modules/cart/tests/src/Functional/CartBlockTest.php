@@ -42,9 +42,9 @@ class CartBlockTest extends CartBrowserTestBase {
   }
 
   /**
-   * Tests the count text (display, plurality).
+   * Tests the order items display.
    */
-  public function testOrderItemsText() {
+  public function testOrderItemsDisplay() {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('0 items');
 
