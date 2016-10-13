@@ -41,4 +41,17 @@ class CartBlockTest extends CartBrowserTestBase {
     $this->assertSession()->pageTextNotContains('3 items');
   }
 
+  /**
+   * Tests the count text (display, plurality).
+   */
+  public function testOrderItemsText() {
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextContains('0 items');
+
+    $this->cartManager->addEntity($this->cart, $this->variation);
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextContains('1 item');
+    $this->assertSession()->pageTextContains($this->variation->getOrderItemTitle());
+  }
+
 }
