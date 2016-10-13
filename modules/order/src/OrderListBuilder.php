@@ -91,7 +91,7 @@ class OrderListBuilder extends EntityListBuilder {
       'customer' => [
         'data' => [
           '#theme' => 'username',
-          '#account' => $entity->getOwner(),
+          '#account' => $entity->getCustomer(),
         ],
       ],
       'state' => $entity->getState()->getLabel(),
