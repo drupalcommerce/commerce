@@ -2,8 +2,6 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
-use Drupal\commerce_checkout\Event\CheckoutCompleteEvent;
-use Drupal\commerce_checkout\Event\CheckoutEvents;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -325,11 +323,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
 
     $this->order->save();
-    // @todo Remove this event in #2788037.
-    if ($dispatch_checkout_complete) {
-      $event = new CheckoutCompleteEvent($this->order);
-      $this->eventDispatcher->dispatch(CheckoutEvents::CHECKOUT_COMPLETE, $event);
-    }
   }
 
   /**
