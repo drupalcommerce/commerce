@@ -29,14 +29,14 @@ class CartSession implements CartSessionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCartIds() {
+  public function getActiveCartIds() {
     return $this->session->get('commerce_cart_orders', []);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addCartId($cart_id) {
+  public function addActiveCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
     $ids[] = $cart_id;
     $this->session->set('commerce_cart_orders', array_unique($ids));
@@ -45,7 +45,7 @@ class CartSession implements CartSessionInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasCartId($cart_id) {
+  public function hasActiveCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
     return in_array($cart_id, $ids);
   }
@@ -53,7 +53,7 @@ class CartSession implements CartSessionInterface {
   /**
    * {@inheritdoc}
    */
-  public function hadCartId($cart_id) {
+  public function hasCompletedCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_completed_orders', []);
     return in_array($cart_id, $ids);
   }
@@ -61,7 +61,7 @@ class CartSession implements CartSessionInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteCartId($cart_id) {
+  public function deleteActiveCartId($cart_id) {
     $ids = $this->session->get('commerce_cart_orders', []);
     $ids = array_diff($ids, [$cart_id]);
     if (!empty($ids)) {
@@ -71,6 +71,12 @@ class CartSession implements CartSessionInterface {
       // Remove the empty list to allow the system to clean up empty sessions.
       $this->session->remove('commerce_cart_orders');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCompletedCartId($cart_id) {
     // Keep a list of completed order for access checks to completed orders.
     $completed_ids = $this->session->get('commerce_cart_completed_orders', []);
     $completed_ids = array_merge($completed_ids, [$cart_id]);

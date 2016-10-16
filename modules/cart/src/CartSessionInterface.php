@@ -19,7 +19,7 @@ interface CartSessionInterface {
    * @return int[]
    *   A list of cart orders ids.
    */
-  public function getCartIds();
+  public function getActiveCartIds();
 
   /**
    * Adds the given cart order id to the session.
@@ -27,7 +27,7 @@ interface CartSessionInterface {
    * @param int $cart_id
    *   The cart order ID.
    */
-  public function addCartId($cart_id);
+  public function addActiveCartId($cart_id);
 
   /**
    * Checks whether the given cart order id exists in the session.
@@ -38,7 +38,7 @@ interface CartSessionInterface {
    * @return bool
    *   TRUE if the given cart order id exists in the session, FALSE otherwise.
    */
-  public function hasCartId($cart_id);
+  public function hasActiveCartId($cart_id);
 
   /**
    * Checks whether the given cart order id exists in the session's completed carts.
@@ -49,7 +49,7 @@ interface CartSessionInterface {
    * @return bool
    *   TRUE if the given cart order id exists in the session, FALSE otherwise.
    */
-  public function hadCartId($cart_id);
+  public function hasCompletedCartId($cart_id);
 
   /**
    * Deletes the given cart order id from the session.
@@ -57,6 +57,14 @@ interface CartSessionInterface {
    * @param int $cart_id
    *   The cart order ID.
    */
-  public function deleteCartId($cart_id);
+  public function deleteActiveCartId($cart_id);
+
+  /**
+   * Tracks the given cart order id as a completed order in the session.
+   *
+   * @param int $cart_id
+   *   The cart order ID.
+   */
+  public function addCompletedCartId($cart_id);
 
 }

@@ -91,7 +91,7 @@ class CartProvider implements CartProviderInterface {
     // Store the new cart order id in the anonymous user's session so that it
     // can be retrieved on the next page load.
     if ($account->isAnonymous()) {
-      $this->cartSession->addCartId($cart->id());
+      $this->cartSession->addActiveCartId($cart->id());
     }
     // Cart data has already been loaded, add the new cart order to the list.
     if (isset($this->cartData[$uid])) {
@@ -113,7 +113,8 @@ class CartProvider implements CartProviderInterface {
       $cart->save();
     }
     if ($cart->getCustomer() && $cart->getCustomer()->isAnonymous()) {
-      $this->cartSession->deleteCartId($cart->id());
+      $this->cartSession->deleteActiveCartId($cart->id());
+      $this->cartSession->addCompletedCartId($cart->id());
     }
     // Remove the cart order from the internal cache, if present.
     unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
@@ -194,7 +195,7 @@ class CartProvider implements CartProviderInterface {
       $cart_ids = $query->execute();
     }
     else {
-      $cart_ids = $this->cartSession->getCartIds();
+      $cart_ids = $this->cartSession->getActiveCartIds();
     }
 
     $this->cartData[$uid] = [];
