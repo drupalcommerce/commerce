@@ -1,6 +1,6 @@
 payment_default:
   id: payment_default
-  group: payment
+  group: commerce_payment
   label: 'Default'
   states:
     new:
