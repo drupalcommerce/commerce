@@ -46,8 +46,8 @@ class CartController extends ControllerBase {
    */
   public function cartPage() {
     $build = [];
-    $cachable_metadata = new CacheableMetadata();
-    $cachable_metadata->addCacheContexts(['user', 'session']);
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_metadata->addCacheContexts(['user', 'session']);
 
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
@@ -65,7 +65,7 @@ class CartController extends ControllerBase {
           '#arguments' => [$cart_id],
           '#embed' => TRUE,
         ];
-        $cachable_metadata->addCacheableDependency($cart);
+        $cacheable_metadata->addCacheableDependency($cart);
       }
     }
     else {
@@ -76,9 +76,9 @@ class CartController extends ControllerBase {
       ];
     }
     $build['#cache'] = [
-      'contexts' => $cachable_metadata->getCacheContexts(),
-      'tags' => $cachable_metadata->getCacheTags(),
-      'max-age' => $cachable_metadata->getCacheMaxAge(),
+      'contexts' => $cacheable_metadata->getCacheContexts(),
+      'tags' => $cacheable_metadata->getCacheTags(),
+      'max-age' => $cacheable_metadata->getCacheMaxAge(),
     ];
 
     return $build;
