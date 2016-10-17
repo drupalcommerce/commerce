@@ -94,6 +94,11 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getSubtotalPrice
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
+   * @covers ::getBalance
+   * @covers ::addPayment
+   * @covers ::subtractPayment
+   * @covers ::setTotalPaid
+   * @covers ::getTotalPaid
    * @covers ::getState
    * @covers ::getRefreshState
    * @covers ::setRefreshState
@@ -178,6 +183,7 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertNotEmpty($order->hasItem($another_order_item));
 
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getBalance());
     $adjustments = [];
     $adjustments[] = new Adjustment([
       'type' => 'custom',
@@ -199,6 +205,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals(new Price('18.00', 'USD'), $order->getBalance());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
@@ -215,6 +222,14 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[2]->getAmount());
+    $order->addPayment(new Price('25.00', 'USD'));
+    $this->assertEquals(new Price('25.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
+    $order->subtractPayment(new Price('5.00', 'USD'));
+    $this->assertEquals(new Price('20.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
+    $order->setTotalPaid(new Price('27.00', 'USD'));
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
     $this->assertEquals('completed', $order->getState()->value);
 
