@@ -96,6 +96,11 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getSubtotalPrice
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
+   * @covers ::getBalance
+   * @covers ::addPayment
+   * @covers ::subtractPayment
+   * @covers ::setTotalPaid
+   * @covers ::getTotalPaid
    * @covers ::getState
    * @covers ::getRefreshState
    * @covers ::setRefreshState
