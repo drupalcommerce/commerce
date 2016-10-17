@@ -208,7 +208,9 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
     $this->assertNotEmpty($order->hasItem($another_order_item));
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getBalance());
 
+    // Create Adjustments
     $adjustments = [];
     $adjustments[] = new Adjustment([
       'type' => 'custom',
@@ -224,18 +226,26 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addAdjustment($adjustments[0]);
     $order->addAdjustment($adjustments[1]);
     $this->assertEquals($adjustments, $order->getAdjustments());
+
+    // Confirm Collect Adjustments
     $collected_adjustments = $order->collectAdjustments();
     $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
     $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
+
+    // Confirm Remove Adjustment
     $order->removeAdjustment($adjustments[0]);
     $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
+    $this->assertEquals(new Price('18.00', 'USD'), $order->getBalance());
+
+    // Confirm Set Adjustment to order
     $order->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order->getAdjustments());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPrice());
+
     // Confirm that locked adjustments persist after clear.
-    // Custom adjustments are locked by default.
+    // Custom adjustments are locked by default. This adjustment clears immediately on next line
     $order->addAdjustment(new Adjustment([
       'type' => 'fee',
       'label' => 'Random fee',
@@ -243,17 +253,31 @@ class OrderTest extends CommerceKernelTestBase {
     ]));
     $order->clearAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
+    $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[1]->getAmount());
 
+    // Confirm add payment to order
+    $order->addPayment(new Price('15.00', 'USD'));
+    $this->assertEquals(new Price('15.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
+
+    // Confirm subtract payment from order
+    $order->subtractPayment(new Price('5.00', 'USD'));
+    $this->assertEquals(new Price('10.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
+
+    // Confirm that we can set total paid on order
+    $order->setTotalPaid(new Price('7.00', 'USD'));
+    $this->assertEquals(new Price('10.00', 'USD'), $order->getBalance());
     $this->assertEquals('completed', $order->getState()->value);
 
     $order->setRefreshState(Order::REFRESH_ON_SAVE);
     $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
-
     $this->assertEquals('default', $order->getData('test', 'default'));
+
     $order->setData('test', 'value');
     $this->assertEquals('value', $order->getData('test', 'default'));
-
     $this->assertFalse($order->isLocked());
+
     $order->lock();
     $this->assertTrue($order->isLocked());
     $order->unlock();
