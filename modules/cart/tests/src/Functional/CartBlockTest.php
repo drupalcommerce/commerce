@@ -18,19 +18,22 @@ class CartBlockTest extends CartBrowserTestBase {
   }
 
   /**
-   * Tests the count text (display, plurality).
+   * Tests the count text (display, plurality), Cart link and order items display.
    */
-  public function testCountText() {
+  public function testCountAndItemsDisplay() {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('0 items');
 
     $this->cartManager->addEntity($this->cart, $this->variation);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('1 item');
+    $this->assertSession()->pageTextContains($this->variation->getOrderItemTitle());
+    $this->assertSession()->pageTextContains('1 x');
 
     $this->cartManager->addEntity($this->cart, $this->variation, 2);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('3 items');
+    $this->assertSession()->pageTextContains('3 x');
 
     // If the order is no longer a draft, the block should not render.
     $workflow = $this->cart->getState()->getWorkflow();
@@ -39,19 +42,6 @@ class CartBlockTest extends CartBrowserTestBase {
 
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextNotContains('3 items');
-  }
-
-  /**
-   * Tests the order items display.
-   */
-  public function testOrderItemsDisplay() {
-    $this->drupalGet('<front>');
-    $this->assertSession()->pageTextContains('0 items');
-
-    $this->cartManager->addEntity($this->cart, $this->variation);
-    $this->drupalGet('<front>');
-    $this->assertSession()->pageTextContains('1 item');
-    $this->assertSession()->pageTextContains($this->variation->getOrderItemTitle());
   }
 
 }
