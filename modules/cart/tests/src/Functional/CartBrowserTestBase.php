@@ -45,6 +45,8 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    */
   public static $modules = [
     'commerce_cart',
+    // @see https://www.drupal.org/node/2820034
+    'editor',
     'node',
     'taxonomy',
   ];
