@@ -25,7 +25,7 @@ class PriceDefaultWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element['#type'] = 'commerce_price';
     if (!$items[$delta]->isEmpty()) {
-      $element['#default_value'] = $items[$delta]->toPrice();
+      $element['#default_value'] = $items[$delta]->toPrice()->toArray();
     }
 
     return $element;
