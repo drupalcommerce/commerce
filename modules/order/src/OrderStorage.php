@@ -24,6 +24,13 @@ class OrderStorage extends CommerceContentEntityStorage {
   protected $orderRefresh;
 
   /**
+   * Tracks ids of active loadUnchanged() calls.
+   *
+   * @var int[]
+   */
+  protected $unchangedLoadIds;
+
+  /**
    * Constructs a new OrderStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -44,6 +51,7 @@ class OrderStorage extends CommerceContentEntityStorage {
   public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, OrderRefreshInterface $order_refresh) {
     parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
     $this->orderRefresh = $order_refresh;
+    $this->unchangedLoadIds = [];
   }
 
   /**
@@ -64,14 +72,19 @@ class OrderStorage extends CommerceContentEntityStorage {
   /**
    * {@inheritdoc}
    */
+  public function loadUnchanged($id) {
+    $this->unchangedLoadIds[$id] = $id;
+    $unchanged_order = parent::loadUnchanged($id);
+    unset($this->unchangedLoadIds[$id]);
+    return $unchanged_order;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function postLoad(array &$entities) {
     foreach ($entities as $entity) {
-      // Prevent refreshing unchanged loads ($entity->original).
-      if (!$entity->isNew() && !isset($entity->original)) {
-        continue;
-      }
-
-      if ($this->orderRefresh->needsRefresh($entity)) {
+      if (!isset($this->unchangedLoadIds[$entity->id()]) && $this->orderRefresh->needsRefresh($entity)) {
         $this->orderRefresh->refresh($entity);
       }
     }
