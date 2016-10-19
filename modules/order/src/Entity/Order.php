@@ -594,8 +594,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
-        'type' => 'list_default',
-        'weight' => 0,
+        'type' => 'state_transition_form',
+        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
