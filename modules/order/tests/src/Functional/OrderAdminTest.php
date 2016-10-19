@@ -6,6 +6,7 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
+use Drupal\state_machine\Plugin\Workflow\Workflow;
 
 /**
  * Tests the commerce_order entity forms.
@@ -26,7 +27,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('module_installer')->install(['profile']);
+    \Drupal::service('module_installer')->install(['profile', 'commerce_workflow_test']);
 
     $profile_values = [
       'type' => 'customer',
@@ -173,6 +174,38 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Tests that the order workflow transition buttons appear on the order page.
+   */
+  public function testOrderWorkflowTransitionButtons() {
+    $order_item = $this->createEntity('commerce_order_item', [
+      'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'commerce_workflow_test',
+      'mail' => $this->loggedInUser->getEmail(),
+      'order_items' => [$order_item],
+      'state' => 'validation',
+    ]);
+
+    $this->drupalGet('admin/commerce/orders/' . $order->id());
+
+    $workflow = $order->getState()->getWorkflow();
+    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
+    foreach ($transitions as $transition) {
+      $this->assertSession()->buttonExists($transition->getLabel());
+    }
+
+    $this->click('input.js-form-submit#edit-validate');
+    $this->assertSession()->buttonNotExists('Validate order');
+    $this->click('input.js-form-submit#edit-cancel');
+    $this->assertSession()->buttonNotExists('Cancel order');
   }
 
 }

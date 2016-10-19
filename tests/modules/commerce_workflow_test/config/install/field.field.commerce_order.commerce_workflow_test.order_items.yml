@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_type.commerce_workflow_test
+    - field.storage.commerce_order.order_items
+id: commerce_order.commerce_workflow_test.order_items
+field_name: order_items
+entity_type: commerce_order
+bundle: commerce_workflow_test
+label: 'Order items'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:commerce_order_item'
+  handler_settings: {  }
+field_type: entity_reference

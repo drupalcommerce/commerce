@@ -1,0 +1,7 @@
+name: 'Commerce workflow test'
+type: module
+description: 'Module for testing commerce order workflow.'
+package: Testing
+core: 8.x
+dependencies:
+  - commerce_order
