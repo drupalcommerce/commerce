@@ -1,19 +1,14 @@
 <?php
 
-use Drupal\commerce_order\Entity\OrderInterface;
 use \Drupal\Core\Entity\EntityInterface;
 
 /**
- * Implements hook_entity_update().
+ * Implements hook_ENTITY_TYPE_update().
  *
  * To replicate editor.module and catch save inceptions.
  */
-function commerce_cart_test_entity_update(EntityInterface $entity) {
-  // Only act on order entities.
-  if (!($entity instanceof OrderInterface)) {
-    return;
-  }
+function commerce_cart_test_commerce_order_update(EntityInterface $entity) {
   if (!$entity->isNew() && empty($entity->original)) {
-    throw new \Exception('Found stale data! $entity->original must be present on updated entity!');
+    throw new \Exception('Found stale data! $entity->original not found on updated entity!');
   }
 }
