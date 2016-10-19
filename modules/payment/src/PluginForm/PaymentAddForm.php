@@ -22,7 +22,7 @@ class PaymentAddForm extends PaymentGatewayFormBase {
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $order->getTotalPrice(),
+      '#default_value' => $order->getTotalPrice()->toArray(),
       '#required' => TRUE,
     ];
     $form['transaction_type'] = [
