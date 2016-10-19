@@ -6,7 +6,6 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
-use Drupal\state_machine\Plugin\Workflow\Workflow;
 
 /**
  * Tests the commerce_order entity forms.
@@ -27,7 +26,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('module_installer')->install(['profile', 'commerce_workflow_test']);
+    \Drupal::service('module_installer')->install(['profile']);
 
     $profile_values = [
       'type' => 'customer',
@@ -180,6 +179,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests that the order workflow transition buttons appear on the order page.
    */
   public function testOrderWorkflowTransitionButtons() {
+    \Drupal::service('module_installer')->install(['commerce_workflow_test']);
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
       'unit_price' => [
