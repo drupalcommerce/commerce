@@ -119,6 +119,8 @@ class Price extends FormElement {
     }
 
     $element['#tree'] = TRUE;
+    $element['#attributes']['class'][] = 'form-type-commerce-price';
+
     $element['number'] = [
       '#type' => 'textfield',
       '#title' => $element['#title'],

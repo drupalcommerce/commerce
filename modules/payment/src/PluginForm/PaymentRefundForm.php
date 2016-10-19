@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 
 class PaymentRefundForm extends PaymentGatewayFormBase {
@@ -28,10 +29,10 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $values = $form_state->getValue($form['#parents']);
+    $amount = new Price($values['amount']['number'], $values['amount']['currency_code']);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
-    /** @var \Drupal\commerce_price\Price $amount */
-    $amount = $form['amount']['#value'];
     $balance = $payment->getBalance();
     if ($amount->greaterThan($balance)) {
       $form_state->setError($form['amount'], t("Can't refund more than @amount.", ['@amount' => $balance->__toString()]));
@@ -42,11 +43,13 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $values = $form_state->getValue($form['#parents']);
+    $amount = new Price($values['amount']['number'], $values['amount']['currency_code']);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
-    $payment_gateway_plugin->refundPayment($payment, $form['amount']['#value']);
+    $payment_gateway_plugin->refundPayment($payment, $amount);
   }
 
 }
