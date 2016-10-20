@@ -11,12 +11,16 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\Core\Plugin\PluginWithFormsTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the base class for payment gateways.
  */
-abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayInterface, ContainerFactoryPluginInterface {
+abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayInterface, ContainerFactoryPluginInterface, PluginWithFormsInterface {
+
+  use PluginWithFormsTrait;
 
   /**
    * The entity type manager.
