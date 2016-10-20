@@ -1,7 +1,0 @@
-langcode: en
-status: true
-label: Default
-id: commerce_workflow_test
-workflow: order_fulfillment_validation
-refresh_mode: always
-refresh_frequency: 30

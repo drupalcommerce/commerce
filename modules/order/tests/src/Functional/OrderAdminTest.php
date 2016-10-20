@@ -179,7 +179,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests that the order workflow transition buttons appear on the order page.
    */
   public function testOrderWorkflowTransitionButtons() {
-    \Drupal::service('module_installer')->install(['commerce_workflow_test']);
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
       'unit_price' => [
@@ -188,10 +187,10 @@ class OrderAdminTest extends OrderBrowserTestBase {
       ],
     ]);
     $order = $this->createEntity('commerce_order', [
-      'type' => 'commerce_workflow_test',
+      'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
-      'state' => 'validation',
+      'state' => 'draft',
     ]);
 
     $this->drupalGet('admin/commerce/orders/' . $order->id());
@@ -202,9 +201,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
       $this->assertSession()->buttonExists($transition->getLabel());
     }
 
-    $this->click('input.js-form-submit#edit-validate');
-    $this->assertSession()->buttonNotExists('Validate order');
-    $this->click('input.js-form-submit#edit-cancel');
+    $this->click('input.js-form-submit#edit-place');
+    $this->assertSession()->buttonNotExists('Place order');
     $this->assertSession()->buttonNotExists('Cancel order');
   }
 
