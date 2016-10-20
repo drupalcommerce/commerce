@@ -175,4 +175,35 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
   }
 
+  /**
+   * Tests that the order workflow transition buttons appear on the order page.
+   */
+  public function testOrderWorkflowTransitionButtons() {
+    $order_item = $this->createEntity('commerce_order_item', [
+      'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+      'order_items' => [$order_item],
+      'state' => 'draft',
+    ]);
+
+    $this->drupalGet('admin/commerce/orders/' . $order->id());
+
+    $workflow = $order->getState()->getWorkflow();
+    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
+    foreach ($transitions as $transition) {
+      $this->assertSession()->buttonExists($transition->getLabel());
+    }
+
+    $this->click('input.js-form-submit#edit-place');
+    $this->assertSession()->buttonNotExists('Place order');
+    $this->assertSession()->buttonNotExists('Cancel order');
+  }
+
 }
