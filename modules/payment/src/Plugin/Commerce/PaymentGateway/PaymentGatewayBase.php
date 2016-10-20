@@ -11,12 +11,15 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Plugin\PluginWithFormsTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the base class for payment gateways.
  */
 abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayInterface, ContainerFactoryPluginInterface {
+
+  use PluginWithFormsTrait;
 
   /**
    * The entity type manager.
@@ -255,21 +258,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormClass($operation) {
-    $forms = $this->pluginDefinition['forms'];
-    return isset($forms[$operation]) ? $forms[$operation] : NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasFormClass($operation) {
-    return isset($this->pluginDefinition['forms'][$operation]);
   }
 
   /**
