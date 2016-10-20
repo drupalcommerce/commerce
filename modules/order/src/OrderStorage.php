@@ -17,11 +17,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class OrderStorage extends CommerceContentEntityStorage {
 
   /**
-   * The order refresh process.
+   * The order refresh.
    *
    * @var \Drupal\commerce_order\OrderRefreshInterface
    */
   protected $orderRefresh;
+
+  /**
+   * Whether the order refresh should be skipped.
+   *
+   * @var bool
+   */
+  protected $skipRefresh = FALSE;
 
   /**
    * Constructs a new OrderStorage object.
@@ -64,9 +71,21 @@ class OrderStorage extends CommerceContentEntityStorage {
   /**
    * {@inheritdoc}
    */
+  public function loadUnchanged($id) {
+    // This method is used by the entity save process, triggering an order
+    // refresh would cause a save-within-a-save.
+    $this->skipRefresh = TRUE;
+    $unchanged_order = parent::loadUnchanged($id);
+    $this->skipRefresh = FALSE;
+    return $unchanged_order;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function postLoad(array &$entities) {
     foreach ($entities as $entity) {
-      if ($this->orderRefresh->needsRefresh($entity)) {
+      if (!$this->skipRefresh && $this->orderRefresh->needsRefresh($entity)) {
         $this->orderRefresh->refresh($entity);
       }
     }
