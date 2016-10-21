@@ -15,3 +15,9 @@ services:
   plugin.manager.commerce_payment_type:
     class: Drupal\commerce_payment\PaymentTypeManager
     parent: default_plugin_manager
+
+  commerce_payment.payment_listener:
+    class: Drupal\commerce_payment\EventSubscriber\PaymentListener
+    arguments: []
+    tags:
+      - { name: event_subscriber }
