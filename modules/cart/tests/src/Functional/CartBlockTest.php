@@ -18,9 +18,9 @@ class CartBlockTest extends CartBrowserTestBase {
   }
 
   /**
-   * Tests the count text (display, plurality), Cart link and order items display.
+   * Tests the count text (display, plurality), and the cart dropdown.
    */
-  public function testCountAndItemsDisplay() {
+  public function testCartBlock() {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('0 items');
 
