@@ -121,7 +121,8 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    * {@inheritdoc}
    */
   public function getRefreshFrequency() {
-    return $this->refresh_frequency;
+    // The refresh frequency must always be at least 1s.
+    return !empty($this->refresh_frequency) ? $this->refresh_frequency : 1;
   }
 
   /**

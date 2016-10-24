@@ -20,24 +20,45 @@ interface OrderRefreshInterface {
   public function addProcessor(OrderProcessorInterface $processor, $priority);
 
   /**
-   * Checks if an order needs a refresh.
+   * Checks whether the order should be refreshed.
+   *
+   * Wraps the needsRefresh() check with an additional refresh mode check,
+   * skipping the refresh for non-customers when specified.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
    *
    * @return bool
-   *   TRUE if the order needs to be refreshed.
+   *   TRUE if the order should be refreshed, FALSE otherwise.
+   */
+  public function shouldRefresh(OrderInterface $order);
+
+  /**
+   * Checks whether the given order needs to be refreshed.
+   *
+   * An order needs to be refreshed:
+   * - If a refresh was explicitly requested via $order->setNeedsRefresh() due
+   *   to the order being modified.
+   * - If it was not refreshed today (date changes can affect tax rate amounts,
+   *   promotion availability)
+   * - If it was not refreshed for longer than the refresh frequency.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if the order needs to be refreshed, FALSE otherwise.
    */
   public function needsRefresh(OrderInterface $order);
 
   /**
-   * Refreshes an order.
+   * Refreshes the given order.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
    *
    * @return \Drupal\commerce_order\Entity\OrderInterface
-   *   The order, refreshed.
+   *   The refreshed, unsaved order.
    */
   public function refresh(OrderInterface $order);
 

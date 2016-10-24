@@ -68,6 +68,7 @@ class CartManager implements CartManagerInterface {
       $order_item->delete();
     }
     $cart->setItems([]);
+    $cart->setAdjustments([]);
 
     $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
     if ($save_cart) {

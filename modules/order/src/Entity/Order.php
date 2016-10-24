@@ -314,6 +314,24 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRefreshState() {
+    $data = $this->getData();
+    return !empty($data['refresh_state']) ? $data['refresh_state'] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRefreshState($refresh_state) {
+    $data = $this->getData();
+    $data['refresh_state'] = $refresh_state;
+    $this->setData($data);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getData() {
     $data = [];
     if (!$this->get('data')->isEmpty()) {
@@ -391,6 +409,10 @@ class Order extends ContentEntityBase implements OrderInterface {
       }
     }
 
+    // Refresh draft orders on every save.
+    if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
+      $this->setRefreshState(self::REFRESH_ON_SAVE);
+    }
     $this->recalculateTotalPrice();
   }
 
@@ -458,6 +480,8 @@ class Order extends ContentEntityBase implements OrderInterface {
     // If no order number has been set explicitly, set it to the order ID.
     if (!$this->getOrderNumber()) {
       $this->setOrderNumber($this->id());
+      // Order was refreshed in the save that just occurred, don't repeat it.
+      $this->setRefreshState(self::REFRESH_SKIP);
       $this->save();
     }
 
