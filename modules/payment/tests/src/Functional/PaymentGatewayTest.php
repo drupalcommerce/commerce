@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
