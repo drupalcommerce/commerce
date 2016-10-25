@@ -28,7 +28,8 @@ interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface, Support
   /**
    * Determines if a payment should be captured by default.
    *
-   * @return bool TRUE if payments should be captured by default.
+   * @return bool
+   *   TRUE if payments should be captured by default.
    *   FALSE if payments should be authorized by default.
    */
   public function shouldCapturePaymentByDefault();
