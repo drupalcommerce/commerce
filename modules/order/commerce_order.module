@@ -34,7 +34,9 @@ function commerce_order_theme($existing, $type, $theme, $path) {
  */
 function commerce_order_local_tasks_alter(&$definitions) {
   $id = 'entity.profile.user_profile_form:profile.type.customer';
-  $definitions[$id]['title'] = t('Address book');
+  if (isset($definitions[$id])) {
+    $definitions[$id]['title'] = t('Address book');
+  }
 }
 
 /**
