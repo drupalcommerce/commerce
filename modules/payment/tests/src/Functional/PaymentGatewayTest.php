@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -60,8 +61,10 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals('Example', $payment_gateway->label());
     $this->assertEquals('example_onsite', $payment_gateway->getPluginId());
     $this->assertEquals(TRUE, $payment_gateway->status());
+    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('test', $payment_gateway_plugin->getMode());
+    $this->assertFalse($payment_gateway_plugin->shouldCapturePaymentByDefault());
     $configuration = $payment_gateway_plugin->getConfiguration();
     $this->assertEquals('bunny', $configuration['api_key']);
   }

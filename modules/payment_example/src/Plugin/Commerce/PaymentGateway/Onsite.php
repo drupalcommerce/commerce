@@ -84,6 +84,16 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
   /**
    * {@inheritdoc}
    */
+  public function shouldCapturePaymentByDefault() {
+    // Determine default capture flag from current mode (test / live).
+    // Another way for payment gateways to determine this value could be for
+    // them to evaluate the value of another field specific to this setting.
+    return ($this->configuration['mode'] === 'live');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function createPayment(PaymentInterface $payment, $capture = TRUE) {
     if ($payment->getState()->value != 'new') {
       throw new \InvalidArgumentException('The provided payment is in an invalid state.');
