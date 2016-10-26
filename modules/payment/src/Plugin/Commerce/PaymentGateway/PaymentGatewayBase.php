@@ -192,6 +192,11 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = NestedArray::mergeDeep($this->defaultConfiguration(), $configuration);
+    // Providing a default for payment_metod_types in defaultConfiguration()
+    // doesn't work because NestedArray::mergeDeep causes duplicates.
+    if (empty($this->configuration['payment_method_types'])) {
+      $this->configuration['payment_method_types'][] = 'credit_card';
+    }
   }
 
   /**
