@@ -10,10 +10,10 @@ use Drupal\commerce_order\Entity\OrderInterface;
 interface OrderRefreshInterface {
 
   /**
-   * Adds an order refresh processor.
+   * Adds an order processor.
    *
    * @param \Drupal\commerce_order\OrderProcessorInterface $processor
-   *   The order refresh processor.
+   *   The order processor.
    * @param int $priority
    *   The processor's priority.
    */

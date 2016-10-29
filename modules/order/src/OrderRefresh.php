@@ -36,7 +36,7 @@ class OrderRefresh implements OrderRefreshInterface {
   protected $currentUser;
 
   /**
-   * The order refresh processors.
+   * The order processors.
    *
    * @var \Drupal\commerce_order\OrderProcessorInterface[]
    */

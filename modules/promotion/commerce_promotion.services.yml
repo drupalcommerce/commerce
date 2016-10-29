@@ -6,8 +6,8 @@ services:
     class: Drupal\commerce_promotion\PromotionConditionManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@entity_type.manager']
 
-  commerce_promotion.promotion_order_refresh_processor:
+  commerce_promotion.promotion_order_processor:
     class: Drupal\commerce_promotion\PromotionOrderProcessor
     arguments: ['@entity_type.manager']
     tags:
-      - { name: commerce_order.order_refresh_processor, priority: 50 }
+      - { name: commerce_order.order_processor, priority: 50 }
