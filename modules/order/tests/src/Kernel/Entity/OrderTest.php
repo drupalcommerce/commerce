@@ -118,6 +118,8 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
+   * @covers ::getData
+   * @covers ::setData
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
@@ -227,6 +229,11 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
 
     $this->assertEquals('completed', $order->getState()->value);
+
+    $data = $order->getData();
+    $data['test'] = TRUE;
+    $order->setData($data);
+    $this->assertArrayHasKey('test', $order->getData());
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());

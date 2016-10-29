@@ -315,7 +315,11 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getData() {
-    return $this->get('data')->first()->getValue();
+    $data = [];
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+    }
+    return $data;
   }
 
   /**
