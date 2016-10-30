@@ -305,7 +305,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $dispatch_checkout_complete = FALSE;
     if ($next_step_id = $this->getNextStepId()) {
       $this->order->checkout_step = $next_step_id;
       $form_state->setRedirect('commerce_checkout.form', [
@@ -317,8 +316,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
         // Place the order.
         $transition = $this->order->getState()->getWorkflow()->getTransition('place');
         $this->order->getState()->applyTransition($transition);
-        // Notify other modules.
-        $dispatch_checkout_complete = TRUE;
       }
     }
 
