@@ -258,24 +258,31 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setRefreshState($refresh_state);
 
   /**
-   * Gets the order data.
+   * Gets an order data value with the given key.
    *
    * Used to store temporary data during order processing (i.e. checkout).
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $default
+   *   The default value.
    *
    * @return array
    *   The order data.
    */
-  public function getData();
+  public function getData($key, $default = NULL);
 
   /**
-   * Sets the order data.
+   * Sets an order data value with the given key.
    *
-   * @param array $data
-   *   The order data.
+   * @param string $key
+   *   The key.
+   * @param mixed $value
+   *   The value.
    *
    * @return $this
    */
-  public function setData($data);
+  public function setData($key, $value);
 
   /**
    * Gets the order creation timestamp.

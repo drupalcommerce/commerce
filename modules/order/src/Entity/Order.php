@@ -315,36 +315,32 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getRefreshState() {
-    $data = $this->getData();
-    return !empty($data['refresh_state']) ? $data['refresh_state'] : NULL;
+    return $this->getData('refresh_state');
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRefreshState($refresh_state) {
-    $data = $this->getData();
-    $data['refresh_state'] = $refresh_state;
-    $this->setData($data);
-    return $this;
+    return $this->setData('refresh_state', $refresh_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getData() {
+  public function getData($key, $default = NULL) {
     $data = [];
     if (!$this->get('data')->isEmpty()) {
       $data = $this->get('data')->first()->getValue();
     }
-    return $data;
+    return isset($data[$key]) ? $data[$key] : $default;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setData($data) {
-    $this->set('data', [$data]);
+  public function setData($key, $value) {
+    $this->get('data')->__set($key, $value);
     return $this;
   }
 

@@ -235,10 +235,9 @@ class OrderTest extends EntityKernelTestBase {
     $order->setRefreshState(Order::REFRESH_ON_SAVE);
     $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
 
-    $data = $order->getData();
-    $data['test'] = TRUE;
-    $order->setData($data);
-    $this->assertArrayHasKey('test', $order->getData());
+    $this->assertEquals('default', $order->getData('test', 'default'));
+    $order->setData('test', 'value');
+    $this->assertEquals('value', $order->getData('test', 'default'));
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());
