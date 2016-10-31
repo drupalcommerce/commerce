@@ -14,6 +14,11 @@ use Drupal\user\UserInterface;
  */
 interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
 
+  // Refresh states.
+  const REFRESH_ON_LOAD = 'refresh_on_load';
+  const REFRESH_ON_SAVE = 'refresh_on_save';
+  const REFRESH_SKIP = 'refresh_skip';
+
   /**
    * Gets the order number.
    *
@@ -230,6 +235,27 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *   The order state.
    */
   public function getState();
+
+  /**
+   * Gets the order refresh state.
+   *
+   * @return string|null
+   *   The refresh state, if set. One of the following order constants:
+   *   REFRESH_ON_LOAD: The order should be refreshed when it is next loaded.
+   *   REFRESH_ON_SAVE: The order should be refreshed before it is saved.
+   *   REFRESH_SKIP: The order should not be refreshed for now.
+   */
+  public function getRefreshState();
+
+  /**
+   * Sets the order refresh state.
+   *
+   * @param string $refresh_state
+   *   The order refresh state.
+   *
+   * @return $this
+   */
+  public function setRefreshState($refresh_state);
 
   /**
    * Gets the order data.

@@ -118,6 +118,8 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
+   * @covers ::getRefreshState
+   * @covers ::setRefreshState
    * @covers ::getData
    * @covers ::setData
    * @covers ::getCreatedTime
@@ -229,6 +231,9 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
 
     $this->assertEquals('completed', $order->getState()->value);
+
+    $order->setRefreshState(Order::REFRESH_ON_SAVE);
+    $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
 
     $data = $order->getData();
     $data['test'] = TRUE;

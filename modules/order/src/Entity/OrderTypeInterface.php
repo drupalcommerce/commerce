@@ -9,6 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface OrderTypeInterface extends ConfigEntityInterface {
 
+  // Refresh modes.
   const REFRESH_ALWAYS = 'always';
   const REFRESH_CUSTOMER = 'customer';
 
