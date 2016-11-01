@@ -40,22 +40,6 @@ function commerce_order_local_tasks_alter(&$definitions) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
- */
-function commerce_order_commerce_order_presave(OrderInterface $order) {
-  $place_transition = $order->getState()->getWorkflow()->getTransition('place');
-  if (!$order->isNew() && empty($order->getPlacedTime()) && $place_transition) {
-    $from_states = $place_transition->getFromStates();
-    $from_state = reset($from_states);
-    $from_state = $from_state->getId();
-    $to_state = $place_transition->getToState()->getId();
-    if ($order->original->state->value == $from_state && $order->state->value == $to_state) {
-      $order->setPlacedTime(REQUEST_TIME);
-    }
-  }
-}
-
-/**
  * Implements hook_field_widget_form_alter().
  *
  * - Changes the label of the purchased_entity field to the label of the

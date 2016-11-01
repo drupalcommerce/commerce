@@ -405,6 +405,15 @@ class Order extends ContentEntityBase implements OrderInterface {
       }
     }
 
+    // Maintain the completed timestamp.
+    $state = $this->getState()->value;
+    $original_state = isset($this->original) ? $this->original->getState()->value : '';
+    if ($state == 'completed' && $original_state != 'completed') {
+      if (empty($this->getCompletedTime())) {
+        $this->setCompletedTime(REQUEST_TIME);
+      }
+    }
+
     // Refresh draft orders on every save.
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);

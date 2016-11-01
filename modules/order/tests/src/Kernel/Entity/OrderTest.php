@@ -126,6 +126,8 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
    * @covers ::setPlacedTime
+   * @covers ::getCompletedTime
+   * @covers ::setCompletedTime
    */
   public function testOrder() {
     $profile = Profile::create([
@@ -244,6 +246,9 @@ class OrderTest extends EntityKernelTestBase {
 
     $order->setPlacedTime(635879800);
     $this->assertEquals(635879800, $order->getPlacedTime());
+
+    $order->setCompletedTime(635879900);
+    $this->assertEquals(635879900, $order->getCompletedTime());
   }
 
 }
