@@ -24,6 +24,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *   bundle_label = @Translation("Payment method type"),
  *   bundle_plugin_type = "commerce_payment_method_type",
  *   handlers = {
+ *     "access" = "Drupal\commerce_payment\PaymentMethodAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_payment\PaymentMethodListBuilder",
  *     "storage" = "Drupal\commerce_payment\PaymentMethodStorage",
  *     "form" = {
@@ -35,7 +36,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     },
  *   },
  *   base_table = "commerce_payment_method",
- *   admin_permission = "administer commerce_payment",
+ *   admin_permission = "administer commerce_payment_method",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "method_id",

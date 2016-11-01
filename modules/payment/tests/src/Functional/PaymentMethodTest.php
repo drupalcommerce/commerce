@@ -48,7 +48,7 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $permissions = [
-      'administer commerce_payment',
+      'manage own commerce_payment_method',
     ];
     $this->user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->user);
@@ -61,6 +61,17 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
+  }
+
+  /**
+   * Tests accessing another user's payment method pages.
+   */
+  public function testDifferentUserAccess() {
+    $this->drupalGet('user/' . $this->adminUser->id() . '/payment-methods');
+    $this->assertSession()->statusCodeEquals(403);
+
+    $this->drupalGet('user/' . $this->adminUser->id() . '/payment-methods/add');
+    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
