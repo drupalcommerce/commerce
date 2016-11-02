@@ -522,17 +522,24 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildForm($form, $form_state);
+    try {
+      $form = parent::buildForm($form, $form_state);
 
-    $panes = $this->getPanes($this->stepId);
-    foreach ($panes as $pane_id => $pane) {
-      $form[$pane_id] = [
-        '#parents' => [$pane_id],
-        '#type' => $pane->getWrapperElement(),
-        '#title' => $pane->getLabel(),
-        '#access' => $pane->isVisible(),
+      $panes = $this->getPanes($this->stepId);
+      foreach ($panes as $pane_id => $pane) {
+        $form[$pane_id] = [
+          '#parents' => [$pane_id],
+          '#type' => $pane->getWrapperElement(),
+          '#title' => $pane->getLabel(),
+          '#access' => $pane->isVisible(),
+        ];
+        $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+      }
+    }
+    catch (\Exception $e) {
+      $form = [
+        '#markup' => $e->getMessage(),
       ];
-      $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
     }
 
     return $form;
