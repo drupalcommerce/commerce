@@ -314,15 +314,33 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getData() {
-    return $this->get('data')->first()->getValue();
+  public function getRefreshState() {
+    return $this->getData('refresh_state');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setData($data) {
-    $this->set('data', [$data]);
+  public function setRefreshState($refresh_state) {
+    return $this->setData('refresh_state', $refresh_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData($key, $default = NULL) {
+    $data = [];
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+    }
+    return isset($data[$key]) ? $data[$key] : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($key, $value) {
+    $this->get('data')->__set($key, $value);
     return $this;
   }
 
@@ -387,6 +405,19 @@ class Order extends ContentEntityBase implements OrderInterface {
       }
     }
 
+    // Maintain the completed timestamp.
+    $state = $this->getState()->value;
+    $original_state = isset($this->original) ? $this->original->getState()->value : '';
+    if ($state == 'completed' && $original_state != 'completed') {
+      if (empty($this->getCompletedTime())) {
+        $this->setCompletedTime(REQUEST_TIME);
+      }
+    }
+
+    // Refresh draft orders on every save.
+    if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
+      $this->setRefreshState(self::REFRESH_ON_SAVE);
+    }
     $this->recalculateTotalPrice();
   }
 
@@ -454,6 +485,8 @@ class Order extends ContentEntityBase implements OrderInterface {
     // If no order number has been set explicitly, set it to the order ID.
     if (!$this->getOrderNumber()) {
       $this->setOrderNumber($this->id());
+      // Order was refreshed in the save that just occurred, don't repeat it.
+      $this->setRefreshState(self::REFRESH_SKIP);
       $this->save();
     }
 

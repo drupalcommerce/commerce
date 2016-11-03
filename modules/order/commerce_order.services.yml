@@ -16,12 +16,17 @@ services:
 
   commerce_order.order_refresh:
     class: Drupal\commerce_order\OrderRefresh
-    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user']
+    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user', '@commerce.time']
     tags:
-      - { name: service_collector, call: addProcessor, tag: commerce_order.order_refresh_processor }
+      - { name: service_collector, call: addProcessor, tag: commerce_order.order_processor }
 
-  commerce_order.availabitity_order_refresh_processor:
+  commerce_order.availability_order_processor:
     class: Drupal\commerce_order\AvailabilityOrderProcessor
     arguments: ['@commerce.availability_manager']
     tags:
-      - { name: commerce_order.order_refresh_processor, priority: 100 }
+      - { name: commerce_order.order_processor, priority: 100 }
+
+  commerce_order.timestamp_event_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
+    tags:
+      - { name: event_subscriber }

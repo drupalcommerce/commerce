@@ -118,10 +118,16 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
+   * @covers ::getRefreshState
+   * @covers ::setRefreshState
+   * @covers ::getData
+   * @covers ::setData
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
    * @covers ::setPlacedTime
+   * @covers ::getCompletedTime
+   * @covers ::setCompletedTime
    */
   public function testOrder() {
     $profile = Profile::create([
@@ -228,11 +234,21 @@ class OrderTest extends EntityKernelTestBase {
 
     $this->assertEquals('completed', $order->getState()->value);
 
+    $order->setRefreshState(Order::REFRESH_ON_SAVE);
+    $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
+
+    $this->assertEquals('default', $order->getData('test', 'default'));
+    $order->setData('test', 'value');
+    $this->assertEquals('value', $order->getData('test', 'default'));
+
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());
 
     $order->setPlacedTime(635879800);
     $this->assertEquals(635879800, $order->getPlacedTime());
+
+    $order->setCompletedTime(635879900);
+    $this->assertEquals(635879900, $order->getCompletedTime());
   }
 
 }

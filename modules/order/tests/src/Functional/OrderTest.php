@@ -51,9 +51,9 @@ class OrderTest extends OrderBrowserTestBase {
   }
 
   /**
-   * Tests the generation of the 'placed' timestamp.
+   * Tests the generation of the 'placed' and 'completed' timestamps.
    */
-  public function testOrderPlaced() {
+  public function testOrderTimestamps() {
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
     ]);
@@ -63,15 +63,15 @@ class OrderTest extends OrderBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
     ]);
-
-    $this->assertNull($order->getPlacedTime());
     $order->save();
     $this->assertNull($order->getPlacedTime());
-    // Transitioning the order out of the draft state should set the timestamp.
+    $this->assertNull($order->getCompletedTime());
+    // Transitioning the order out of the draft state should set the timestamps.
     $transition = $order->getState()->getWorkflow()->getTransition('place');
     $order->getState()->applyTransition($transition);
     $order->save();
     $this->assertEquals($order->getPlacedTime(), REQUEST_TIME);
+    $this->assertEquals($order->getCompletedTime(), REQUEST_TIME);
   }
 
 }

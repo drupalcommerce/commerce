@@ -3,6 +3,7 @@
 namespace Drupal\commerce_cart\Controller;
 
 use Drupal\commerce_cart\CartProviderInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -45,6 +46,9 @@ class CartController extends ControllerBase {
    */
   public function cartPage() {
     $build = [];
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_metadata->addCacheContexts(['user', 'session']);
+
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
       /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
@@ -61,6 +65,7 @@ class CartController extends ControllerBase {
           '#arguments' => [$cart_id],
           '#embed' => TRUE,
         ];
+        $cacheable_metadata->addCacheableDependency($cart);
       }
     }
     else {
@@ -70,6 +75,11 @@ class CartController extends ControllerBase {
         '#suffix' => '</div>',
       ];
     }
+    $build['#cache'] = [
+      'contexts' => $cacheable_metadata->getCacheContexts(),
+      'tags' => $cacheable_metadata->getCacheTags(),
+      'max-age' => $cacheable_metadata->getCacheMaxAge(),
+    ];
 
     return $build;
   }

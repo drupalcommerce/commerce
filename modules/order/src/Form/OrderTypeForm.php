@@ -56,9 +56,8 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#collapsible' => TRUE,
       '#tree' => FALSE,
     ];
-
     $form['refresh']['refresh_intro'] = [
-      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which order item prices are recalculated.') . '</p>',
+      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which prices are recalculated.') . '</p>',
     ];
     $form['refresh']['refresh_mode'] = [
       '#type' => 'radios',
@@ -67,14 +66,15 @@ class OrderTypeForm extends BundleEntityFormBase {
         OrderType::REFRESH_ALWAYS => t('Refresh a draft order when it is loaded regardless of who it belongs to.'),
         OrderType::REFRESH_CUSTOMER => t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
       ],
-      '#default_value' => ($order_type->isNew()) ? OrderType::REFRESH_ALWAYS : $order_type->getRefreshMode(),
+      '#default_value' => ($order_type->isNew()) ? OrderType::REFRESH_CUSTOMER : $order_type->getRefreshMode(),
     ];
     $form['refresh']['refresh_frequency'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#title' => t('Order refresh frequency'),
       '#description' => t('Draft orders will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
-      '#default_value' => ($order_type->isNew()) ? 30 : $order_type->getRefreshFrequency(),
+      '#default_value' => ($order_type->isNew()) ? 300 : $order_type->getRefreshFrequency(),
       '#required' => TRUE,
+      '#min' => 1,
       '#size' => 10,
       '#field_suffix' => t('seconds'),
     ];

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_checkout\Controller;
 
+use Drupal\commerce_cart\CartSession;
 use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\Core\Access\AccessResult;
@@ -105,7 +106,9 @@ class CheckoutController implements ContainerInjectionInterface {
       $customer_check = $account->id() == $order->getCustomerId();
     }
     else {
-      $customer_check = $this->cartSession->hasCartId($order->id());
+      $active_cart = $this->cartSession->hasCartId($order->id(), CartSession::ACTIVE);
+      $completed_cart = $this->cartSession->hasCartId($order->id(), CartSession::COMPLETED);
+      $customer_check = $active_cart || $completed_cart;
     }
 
     $access = AccessResult::allowedIf($customer_check)

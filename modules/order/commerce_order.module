@@ -34,22 +34,8 @@ function commerce_order_theme($existing, $type, $theme, $path) {
  */
 function commerce_order_local_tasks_alter(&$definitions) {
   $id = 'entity.profile.user_profile_form:profile.type.customer';
-  $definitions[$id]['title'] = t('Address book');
-}
-
-/**
- * Implements hook_ENTITY_TYPE_presave().
- */
-function commerce_order_commerce_order_presave(OrderInterface $order) {
-  $place_transition = $order->getState()->getWorkflow()->getTransition('place');
-  if (!$order->isNew() && empty($order->getPlacedTime()) && $place_transition) {
-    $from_states = $place_transition->getFromStates();
-    $from_state = reset($from_states);
-    $from_state = $from_state->getId();
-    $to_state = $place_transition->getToState()->getId();
-    if ($order->original->state->value == $from_state && $order->state->value == $to_state) {
-      $order->setPlacedTime(REQUEST_TIME);
-    }
+  if (isset($definitions[$id])) {
+    $definitions[$id]['title'] = t('Address book');
   }
 }
 

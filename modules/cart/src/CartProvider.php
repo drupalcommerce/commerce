@@ -112,6 +112,11 @@ class CartProvider implements CartProviderInterface {
     if ($save_cart) {
       $cart->save();
     }
+    // The cart is anonymous, move it to the 'completed' session.
+    if (!$cart->getCustomerId()) {
+      $this->cartSession->deleteCartId($cart->id(), CartSession::ACTIVE);
+      $this->cartSession->addCartId($cart->id(), CartSession::COMPLETED);
+    }
     // Remove the cart order from the internal cache, if present.
     unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
   }

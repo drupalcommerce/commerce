@@ -4,6 +4,7 @@ namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDefaultWidget;
 
@@ -15,8 +16,7 @@ use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeDefaultWidget;
  *   label = @Translation("Optional date"),
  *   field_types = {
  *     "datetime"
- *   },
- *   multiple_values = TRUE
+ *   }
  * )
  */
 class OptionalDateWidget extends DateTimeDefaultWidget {
@@ -52,11 +52,13 @@ class OptionalDateWidget extends DateTimeDefaultWidget {
     $element = parent::afterBuild($element, $form_state);
 
     $field_name = $element['#field_name'];
-    $element['value']['date']['#states'] = [
-      'visible' => [
-        ':input[name="' . $field_name . '[has_value]"]' => ['checked' => TRUE],
-      ],
-    ];
+    foreach (Element::children($element) as $key) {
+      $element[$key]['value']['date']['#states'] = [
+        'visible' => [
+          ':input[name="' . $field_name . '[' . $key . '][has_value]"]' => ['checked' => TRUE],
+        ],
+      ];
+    }
 
     return $element;
   }
