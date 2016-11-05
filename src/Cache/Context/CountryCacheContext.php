@@ -16,17 +16,17 @@ class CountryCacheContext implements CacheContextInterface {
   /**
    * The current country.
    *
-   * @var \Drupal\commerce\CurrentCountryInterface
+   * @var \Drupal\commerce\CurrentCountry
    */
   protected $currentCcountry;
 
   /**
    * Constructs a new CountryCacheContext object.
    *
-   * @param \Drupal\commerce\CurrentCountryInterface $country
+   * @param \Drupal\commerce\CurrentCountry $country
    *   The current country.
    */
-  public function __construct(CurrentCountryInterface $country) {
+  public function __construct(CurrentCountry $country) {
     $this->currentCountry = $country;
   }
 
