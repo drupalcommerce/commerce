@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @see \Drupal\commerce\Resolver\ChainLocaleResolver
  * @see \Drupal\commerce\Resolver\DefaultLocaleResolver
  */
-class LocaleContext implements LocaleContextInterface {
+class CurrentLocale implements CurrentLocaleInterface {
 
   /**
    * The request stack.
@@ -40,7 +40,7 @@ class LocaleContext implements LocaleContextInterface {
   protected $locales;
 
   /**
-   * Constructs a new LocaleContext object.
+   * Constructs a new CurrentLocale object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.

@@ -5,9 +5,9 @@ namespace Drupal\commerce;
 /**
  * Holds a reference to the current country, resolved on demand.
  *
- * @see \Drupal\commerce\CountryContext
+ * @see \Drupal\commerce\CurrentCountry
  */
-interface CountryContextInterface {
+interface CurrentCountryInterface {
 
   /**
    * Gets the country for the current request.

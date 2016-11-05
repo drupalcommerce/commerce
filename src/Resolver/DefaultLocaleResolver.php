@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce\Resolver;
 
-use Drupal\commerce\CountryContextInterface;
+use Drupal\commerce\CurrentCountryInterface;
 use Drupal\commerce\Locale;
 use Drupal\Core\Language\LanguageManagerInterface;
 
@@ -19,23 +19,23 @@ class DefaultLocaleResolver implements LocaleResolverInterface {
   protected $languageManager;
 
   /**
-   * The country context.
+   * The current country.
    *
-   * @var \Drupal\commerce\CountryContextInterface
+   * @var \Drupal\commerce\CurrentCountryInterface
    */
-  protected $countryContext;
+  protected $currentCountry;
 
   /**
    * Constructs a new DefaultLocaleResolver object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\commerce\CountryContextInterface $country_context
-   *   The country context.
+   * @param \Drupal\commerce\CurrentCountryInterface $current_country
+   *   The current country.
    */
-  public function __construct(LanguageManagerInterface $language_manager, CountryContextInterface $country_context) {
+  public function __construct(LanguageManagerInterface $language_manager, CurrentCountryInterface $current_country) {
     $this->languageManager = $language_manager;
-    $this->countryContext = $country_context;
+    $this->currentCountry = $current_country;
   }
 
   /**
@@ -51,7 +51,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface {
       // it qualifies as a full locale.
       $locale = $langcode;
     }
-    elseif ($country = $this->countryContext->getCountry()) {
+    elseif ($country = $this->currentCountry->getCountry()) {
       // Assemble the locale using the resolved country. This can result
       // in non-existent combinations such as 'en-RS', it's up to the locale
       // consumers (e.g. the number format repository) to perform fallback.
