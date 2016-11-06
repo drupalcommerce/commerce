@@ -225,7 +225,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
    *   The error message.
    */
   protected function noPaymentGatewayErrorMessage() {
-    return t('No payment gateways are defined, create one first.');
+    return $this->t('No payment gateways are defined, create one first.');
   }
 
 }
