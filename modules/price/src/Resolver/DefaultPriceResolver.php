@@ -12,7 +12,7 @@ class DefaultPriceResolver implements PriceResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(PurchasableEntityInterface $entity, $quantity = 1) {
+  public function resolve(PurchasableEntityInterface $entity, $quantity = 1, $context) {
     return $entity->getPrice();
   }
 

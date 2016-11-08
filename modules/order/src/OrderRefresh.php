@@ -2,10 +2,12 @@
 
 namespace Drupal\commerce_order;
 
+use Drupal\commerce\Context;
 use Drupal\commerce\TimeInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
+use Drupal\Core\Datetime\DateTime;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -134,13 +136,16 @@ class OrderRefresh implements OrderRefreshInterface {
     }
     $order->setAdjustments($adjustments);
 
+    $datetime = new DateTime($this->time->getCurrentTime());
+    $context = new Context($order->getBillingProfile(), $order->getStore(), $datetime);
+
     foreach ($order->getItems() as $order_item) {
       $order_item->setAdjustments([]);
 
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
-        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity());
+        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
         $order_item->setUnitPrice($unit_price);
       }
     }
