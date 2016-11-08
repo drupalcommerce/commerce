@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_checkout\Functional;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\profile\Entity\Profile;
-use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItemType;
@@ -79,7 +78,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests order access.
    */
   public function testOrderAccess() {
+    /** @var \Drupal\user\Entity\User */
     $user = $this->drupalCreateUser();
+    /** @var \Drupal\user\Entity\User */
     $user2 = $this->drupalCreateUser();
 
     OrderItemType::create([
@@ -103,12 +104,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'type' => 'test',
     ]);
     $order_item->save();
-    $checkout_flow = CheckoutFlow::create([
-      'label' => 'Test checkout flow',
-      'id' => 'test_checkout_flow',
-      'plugin' => 'multistep_default',
-    ]);
-    $checkout_flow->save();
     $order = Order::create([
       'type' => 'default',
       'state' => 'in_checkout',
@@ -118,10 +113,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
       'order_items' => [$order_item],
-      'checkout_flow' => $checkout_flow,
     ]);
     $order->save();
-    //$checkout_flow = \Drupal::service('commerce_checkout.checkout_order_manager')->getCheckoutFlow($order);
 
     $checkout_url = '/checkout/' . $order->id();
     $order_information_url = '/checkout/' . $order->id() . '/order_information';
@@ -176,9 +169,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
 
     // Go to review checkout step.
-    $next_step_id = $checkout_flow->getPlugin()->getNextStepId();
-/*    $order->checkout_step = $next_step_id;
-    dpm($order);
+    $order->checkout_step = 'review';
     $order->save();
 
     // Try accessing the review step.
@@ -194,8 +185,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Complete checkout.
-    $next_step_id = $checkout_flow->getPlugin()->getNextStepId();
-    $order->checkout_step = $next_step_id;
+    $order->checkout_step = 'complete';
+    $transition = $order->getState()->getWorkflow()->getTransition('place');
+    $order->getState()->applyTransition($transition);
     $order->save();
 
     // Try accessing the first step.
@@ -218,7 +210,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $order->save();
     $this->drupalGet($complete_url);
     $this->assertSession()->addressEquals($complete_url);
-    $this->assertSession()->statusCodeEquals(403);*/
+    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
@@ -234,7 +226,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   /**
    * Tests than an order can go through checkout steps.
    */
-  public function XtestGuestOrderCheckout() {
+  public function testGuestOrderCheckout() {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
@@ -288,7 +280,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   /**
    * Tests that you can register from the checkout pane.
    */
-  public function XtestRegisterOrderCheckout() {
+  public function testRegisterOrderCheckout() {
     $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
     $config->set('configuration.panes.login.allow_guest_checkout', FALSE);
     $config->set('configuration.panes.login.allow_registration', TRUE);
@@ -370,7 +362,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   /**
    * Tests the order summary.
    */
-  public function XtestOrderSummary() {
+  public function testOrderSummary() {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
 
