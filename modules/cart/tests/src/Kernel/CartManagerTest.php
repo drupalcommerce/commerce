@@ -159,17 +159,17 @@ class CartManagerTest extends EntityKernelTestBase {
     $this->assertInstanceOf(OrderInterface::class, $cart);
     $this->assertEmpty($cart->getItems());
 
-    // Tests CartManager::addEntity
+    // Tests CartManager::addEntity.
     $order_item1 = $cart_manager->addEntity($cart, $this->variation1);
     $order_item1->save();
     $order_item1 = $this->reloadEntity($order_item1);
     $this->assertEquals([$order_item1], $cart->getItems());
     $this->assertEquals(1, $order_item1->getQuantity());
 
-    // Test total
+    // Test total.
     $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::updateOrderItem
+    // Tests CartManager::updateOrderItem.
     $order_item1->setQuantity(2);
     $order_item1->save();
     $order_item1 = $this->reloadEntity($order_item1);
@@ -177,11 +177,11 @@ class CartManagerTest extends EntityKernelTestBase {
     $this->assertTrue($cart->hasItem($order_item1));
     $this->assertEquals(2, $order_item1->getQuantity());
 
-    // Test total
+    // Test total.
     $cart->save();
     $this->assertEquals(new Price('2.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::addEntity
+    // Tests CartManager::addEntity.
     $order_item2 = $cart_manager->addEntity($cart, $this->variation2, 3);
     $order_item2->save();
     $order_item2 = $this->reloadEntity($order_item2);
@@ -189,12 +189,12 @@ class CartManagerTest extends EntityKernelTestBase {
     $this->assertTrue($cart->hasItem($order_item2));
     $this->assertEquals(3, $order_item2->getQuantity());
 
-    // Tests CartManager::removeOrderItem
+    // Tests CartManager::removeOrderItem.
     $cart_manager->removeOrderItem($cart, $order_item1);
     $this->assertTrue($cart->hasItem($order_item2));
     $this->assertFalse($cart->hasItem($order_item1));
 
-    // Tests CartManager::emptyCart
+    // Tests CartManager::emptyCart.
     $cart_manager->emptyCart($cart);
     $this->assertEmpty($cart->getItems());
   }
