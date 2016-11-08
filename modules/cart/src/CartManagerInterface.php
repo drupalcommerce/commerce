@@ -77,8 +77,10 @@ interface CartManagerInterface {
    *   The cart order.
    * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
    *   The order item.
+   * @param bool $save_cart
+   *   Whether the cart should be saved after the operation.
    */
-  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item);
+  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE);
 
   /**
    * Removes the given order item from the cart order.

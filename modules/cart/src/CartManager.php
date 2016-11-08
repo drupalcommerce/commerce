@@ -129,12 +129,15 @@ class CartManager implements CartManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item) {
+  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE) {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $original_order_item */
     $original_order_item = $this->orderItemStorage->loadUnchanged($order_item->id());
     $order_item->save();
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    if ($save_cart) {
+      $cart->save();
+    }
   }
 
   /**
