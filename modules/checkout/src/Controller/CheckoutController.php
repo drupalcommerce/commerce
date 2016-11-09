@@ -5,7 +5,6 @@ namespace Drupal\commerce_checkout\Controller;
 use Drupal\commerce_cart\CartSession;
 use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
-use Drupal\commerce_checkout\Entity\CheckoutFlowInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -127,8 +126,8 @@ class CheckoutController implements ContainerInjectionInterface {
 
     // The user is attempting to access an inaccessible page for their order.
     if (!$this->checkoutPageAccess($order)) {
-      // Return a 403 response if the target page is the same from the page the user was
-      // trying to access. We redirect in formPage() otherwise.
+      // Return a 403 response if the target page is the same from the page the
+      // user was trying to access. We redirect in formPage() otherwise.
       $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
       if ($checkout_flow->getPlugin()->getStepId() === $this->getOrderCheckoutStep($order)) {
         return AccessResult::forbidden();
@@ -144,10 +143,8 @@ class CheckoutController implements ContainerInjectionInterface {
   }
 
   /**
-   * Checks access to a particular checkout page for a given order.
+   * Checks access to a particular checkout page.
    *
-   * @param \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow
-   *   The checkout flow object.
    * @param Drupal\commerce_order\Entity\OrderInterface $order
    *   The fully loaded order object represented on the checkout form.
    *
@@ -160,7 +157,7 @@ class CheckoutController implements ContainerInjectionInterface {
     $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
     $visible_step_ids = array_keys($visible_steps);
     $first_step = reset($visible_step_ids);
-    $order_step = $this->getOrderCheckoutStep($order, $checkout_flow);
+    $order_step = $this->getOrderCheckoutStep($order);
 
     // If the order is not in checkout, return FALSE for any page but the
     // completion page.
@@ -214,16 +211,14 @@ class CheckoutController implements ContainerInjectionInterface {
   }
 
   /**
-   * Get the checkout step of an order.
+   * Get the current checkout step of the order.
    *
    * @param Drupal\commerce_order\Entity\OrderInterface $order
    *   The fully loaded order object represented on the checkout form.
-   * @param \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow
-   *   The checkout flow object.
    *
    * @return string
-   *   The checkout step id of an order. If the $order->checkout_step is empty
-   *   then it returns the first visible checkout step id.
+   *   The checkout step id of the order. If the checkout_step property is
+   *   empty then it returns the first visible checkout step id.
    */
   protected function getOrderCheckoutStep(OrderInterface $order) {
     $order_step = &drupal_static(__METHOD__ . '-' . $order->id());
