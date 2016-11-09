@@ -148,7 +148,7 @@ class CheckoutController implements ContainerInjectionInterface {
    * @param Drupal\commerce_order\Entity\OrderInterface $order
    *   The fully loaded order object represented on the checkout form.
    *
-   * @return
+   * @return bool
    *   TRUE or FALSE indicating access.
    */
   protected function checkoutPageAccess(OrderInterface $order) {
@@ -235,4 +235,5 @@ class CheckoutController implements ContainerInjectionInterface {
     }
     return $order_step;
   }
+
 }

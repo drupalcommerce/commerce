@@ -78,9 +78,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests order access.
    */
   public function testOrderAccess() {
-    /** @var \Drupal\user\Entity\User */
     $user = $this->drupalCreateUser();
-    /** @var \Drupal\user\Entity\User */
     $user2 = $this->drupalCreateUser();
 
     OrderItemType::create([
@@ -150,7 +148,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     // Review page with order owner.
     $this->drupalGet($review_url);
     $this->assertSession()->addressNotEquals($review_url);
-//-
+
     // Review page with non-owner.
     $this->drupalLogin($user2);
     $this->drupalGet($review_url);
