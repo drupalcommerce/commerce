@@ -188,7 +188,6 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   }
 
   /**
-   *
    * {@inheritdoc}
    */
   public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
