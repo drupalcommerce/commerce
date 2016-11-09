@@ -121,10 +121,32 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    * {@inheritdoc}
    */
   public function getQuantityWidgetSettings() {
+  $settings = [];
+  // if 'Add to cart' form display is enabled we extract its settings as
+  // exactly these settings are exposed to a customer.
+  $form_display = entity_get_form_display($this->getEntityTypeId(), $this->bundle(), 'add_to_cart');
+  $quantity = $form_display->getComponent('quantity');
+  $settings['hidden_quantity'] = !$quantity;
+  if ($settings['hidden_quantity']) {
+    $form_display = entity_get_form_display($this->getEntityTypeId(), $this->bundle(), 'default');
+    $quantity = $form_display->getComponent('quantity');
+  }
+  if ($quantity['type'] == 'commerce_number') {
+    $mode_settings = $form_display->getRenderer('quantity')->getFormDisplayModeSettings();
+    foreach ($mode_settings as $key => $value) {
+      $settings["#{$key}"] = $value;
+    }
+  }
+  else {
+    // If quantity field is set to a 'number' type it almost has no settings
+    // so $form_display->getRenderer('quantity')->getSettings() is useless here.
     $form_state = new FormState();
     $form = [];
     $form = $this->get('quantity')->defaultValuesForm($form, $form_state);
-    return (array) NestedArray::getValue($form, ['widget', 0, 'value']);
+    $settings += (array) NestedArray::getValue($form, ['widget', 0, 'value']);
+  }
+
+    return $settings;
   }
 
   /**
@@ -272,11 +294,11 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setSetting('max', '367384.999')
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [
-        'type' => 'mode_number',
+        'type' => 'commerce_number',
         'weight' => 1,
       ])
       ->setDisplayOptions('add_to_cart', [
-        'type' => 'mode_number',
+        'type' => 'commerce_number',
         'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE)

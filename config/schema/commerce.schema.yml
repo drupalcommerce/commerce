@@ -62,3 +62,29 @@ views.filter.commerce_entity_bundle:
         hide_single_bundle:
           type: boolean
           label: 'Hide if there''s only one bundle.'
+
+field.widget.settings.commerce_number:
+  type: field.widget.settings.number
+  label: 'Number default display format settings'
+  mapping:
+    placeholder:
+      type: label
+      label: 'Placeholder'
+    min:
+      type: string
+      label: 'Minimum'
+    max:
+      type: string
+      label: 'Maximum'
+    default_value:
+      type: string
+      label: 'Default value'
+    step:
+      type: string
+      label: 'Step'
+    prefix:
+      type: string
+      label: 'Prefix'
+    suffix:
+      type: string
+      label: 'Suffix'

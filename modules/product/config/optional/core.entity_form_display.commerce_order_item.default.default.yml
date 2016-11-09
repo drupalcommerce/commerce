@@ -20,10 +20,16 @@ content:
       placeholder: ''
     third_party_settings: {  }
   quantity:
-    type: mode_number
+    type: commerce_number
     weight: 1
     settings:
       placeholder: ''
+      min: '1'
+      max: ''
+      default_value: '1'
+      step: '1'
+      prefix: ''
+      suffix: ''
     third_party_settings: {  }
   unit_price:
     type: commerce_price_default
