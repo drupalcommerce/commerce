@@ -132,7 +132,6 @@ class CheckoutController implements ContainerInjectionInterface {
       $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
       if ($checkout_flow->getPlugin()->getStepId() === $this->getOrderCheckoutStep($order)) {
         return AccessResult::forbidden();
-        $order->checkout_flow->getString();
       }
     }
 
@@ -229,12 +228,13 @@ class CheckoutController implements ContainerInjectionInterface {
   protected function getOrderCheckoutStep(OrderInterface $order) {
     $order_step = &drupal_static(__METHOD__ . '-' . $order->id());
     if (!isset($order_step)) {
-      $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-      $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
-      $visible_ste_ids = array_keys($visible_steps);
-      $first_step = reset($visible_ste_ids);
       $order_step = $order->checkout_step->getString();
+      // An empty $order_step means the checkout flow is at the first step.
       if (empty($order_step)) {
+        $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
+        $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
+        $visible_step_ids = array_keys($visible_steps);
+        $first_step = reset($visible_step_ids);
         $order_step = $first_step;
       }
     }
