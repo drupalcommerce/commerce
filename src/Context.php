@@ -32,14 +32,14 @@ final class Context {
   /**
    * Constructs a new Commerce Context object.
    *
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The user entity.
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store entity.
+   * @param \Drupal\Core\Session\AccountInterface|null $user
+   *   The user entity or NULL if anonymous.
+   * @param \Drupal\commerce_store\Entity\StoreInterface|null $store
+   *   The store entity or NULL.
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   The date.
    */
-  public function __construct(AccountInterface $user, StoreInterface $store, DrupalDateTime $date) {
+  public function __construct($user, $store, DrupalDateTime $date) {
     $this->user = $user;
     $this->store = $store;
     $this->date = $date;
@@ -48,8 +48,8 @@ final class Context {
   /**
    * Gets the user entity.
    *
-   * @return \Drupal\Core\Session\AccountInterface
-   *   The user entity.
+   * @return \Drupal\Core\Session\AccountInterface|null
+   *   The user entity or NULL if anonymous.
    */
   public function getUser() {
     return $this->user;
@@ -59,7 +59,7 @@ final class Context {
    * Gets the store entity.
    *
    * @return \Drupal\commerce_store\Entity\Store
-   *   The store entity.
+   *   The store entity or NULL.
    */
   public function getStore() {
     return $this->store;
