@@ -4,7 +4,7 @@ namespace Drupal\commerce;
 
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\user\UserInterface;
+use Drupal\Core\Session\AccountInterface;
 
 final class Context {
 
@@ -32,14 +32,14 @@ final class Context {
   /**
    * Constructs a new Commerce Context object.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param \Drupal\Core\Session\AccountInterface $user
    *   The user entity.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store entity.
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   The date.
    */
-  public function __construct(UserInterface $user, StoreInterface $store, DrupalDateTime $date) {
+  public function __construct(AccountInterface $user, StoreInterface $store, DrupalDateTime $date) {
     $this->user = $user;
     $this->store = $store;
     $this->date = $date;
@@ -48,7 +48,7 @@ final class Context {
   /**
    * Gets the user entity.
    *
-   * @return \Drupal\user\UserInterface
+   * @return \Drupal\Core\Session\AccountInterface
    *   The user entity.
    */
   public function getUser() {

@@ -9,6 +9,7 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -178,10 +179,11 @@ class AddToCartForm extends ContentEntityForm {
   public function buildEntity(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
-    $context = new Context(\Drupal::currentUser(), $entity, $this->selectStore($entity->getPurchasedEntity()));
+    $date = new DrupalDateTime();
+    $context = new Context(\Drupal::currentUser(), $this->selectStore($entity->getPurchasedEntity()), $date);
     // Now that the purchased entity is set, populate the title and price.
     $entity->setTitle($entity->getPurchasedEntity()->getOrderItemTitle());
-    $entity->setUnitPrice($this->chainPriceResolver->resolve($entity->getPurchasedEntity()), $context);
+    $entity->setUnitPrice($this->chainPriceResolver->resolve($entity->getPurchasedEntity(), $context));
 
     return $entity;
   }
