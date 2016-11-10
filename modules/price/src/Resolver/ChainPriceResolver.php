@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_price\Resolver;
 
+use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
@@ -43,9 +44,9 @@ class ChainPriceResolver implements ChainPriceResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(PurchasableEntityInterface $entity, $quantity = 1, $context) {
+  public function resolve(PurchasableEntityInterface $entity, Context $context, $quantity = 1) {
     foreach ($this->resolvers as $resolver) {
-      $result = $resolver->resolve($entity, $quantity, $context);
+      $result = $resolver->resolve($entity, $context, $quantity);
       if ($result) {
         return $result;
       }

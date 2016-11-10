@@ -2,13 +2,17 @@
 
 namespace Drupal\Tests\commerce_price\Unit;
 
+use Drupal\commerce\Context;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\Resolver\ChainPriceResolver;
 use Drupal\commerce_price\Resolver\DefaultPriceResolver;
 use Drupal\commerce_price_test\TestPriceResolver;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\user\UserInterface;
 
 /**
  * Tests price resolving.
@@ -50,16 +54,21 @@ class PriceResolvingTest extends UnitTestCase {
       $chain_resolver->addResolver($container->get($id));
     }
 
+    $mock_user = $this->getMock(UserInterface::class);
+    $mock_store = $this->getMock(StoreInterface::class);
+    $date = new DrupalDateTime('now', 'UTC', ['langcode' => 'en']);
+    $mock_context = new Context($mock_user, $mock_store, $date);
+
     $mock_variant = $this->getMock(ProductVariationInterface::class);
     $mock_variant->expects($this->once())->method('getSku')->willReturn('TEST_MOCK');
     $mock_variant->expects($this->exactly(2))->method('getPrice')->willReturn(new Price('20.00', 'USD'));
-    $resolved_price = $chain_resolver->resolve($mock_variant);
+    $resolved_price = $chain_resolver->resolve($mock_variant, $mock_context);
     $this->assertEquals($resolved_price, new Price('17.00', 'USD'));
 
     $mock_variant = $this->getMock(ProductVariationInterface::class);
     $mock_variant->expects($this->once())->method('getSku')->willReturn('MOCK');
     $mock_variant->expects($this->exactly(1))->method('getPrice')->willReturn(new Price('20.00', 'USD'));
-    $resolved_price = $chain_resolver->resolve($mock_variant);
+    $resolved_price = $chain_resolver->resolve($mock_variant, $mock_context);
     $this->assertEquals($resolved_price, new Price('20.00', 'USD'));
   }
 

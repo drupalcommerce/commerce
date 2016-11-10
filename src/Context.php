@@ -2,62 +2,60 @@
 
 namespace Drupal\commerce;
 
-use Drupal\Core\Datetime\DateTime;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\profile\Entity\Profile;
+use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\user\UserInterface;
 
 final class Context {
 
   /**
-   * The customer profile.
+   * The user entity.
    *
-   * @var \Drupal\profile\Entity\Profile
+   * @var \Drupal\user\UserInterface
    */
-  protected $customer;
+  protected $user;
 
   /**
-   * The stores.
+   * The store entity.
    *
    * @var \Drupal\commerce_store\Entity\Store
    */
   protected $store;
 
   /**
-   * The time.
+   * The date.
    *
-   * @var \Drupal\Core\Datetime\DateTime
+   * @var \Drupal\Core\Datetime\DrupalDateTime
    */
   protected $date;
 
   /**
    * Constructs a new Commerce Context object.
    *
-   * @param \Drupal\profile\Entity\Profile $customer
-   *   The customer profile.
-   *
-   * @param \Drupal\commerce_store\Entity\Store $store
-   *   The store.
-   *
-   * @param \Drupal\Core\Datetime\DateTime $date
-   *   The date and time.
+   * @param \Drupal\user\UserInterface
+   *   The user entity.
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   The store entity.
+   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   *   The date.
    */
-  public function __construct(Profile $customer, Store $store, DateTime $date) {
-    $this->customer = $customer;
+  public function __construct(UserInterface $user, StoreInterface $store, DrupalDateTime $date) {
+    $this->user = $user;
     $this->store = $store;
     $this->date = $date;
   }
 
   /**
-   * Gets the current customer.
+   * Gets the user entity.
    *
-   * @return \Drupal\profile\Entity\Profile $customer
+   * @return \Drupal\user\UserInterface
    */
-  public function getCustomer() {
-    return $this->customer;
+  public function getUser() {
+    return $this->user;
   }
 
   /**
-   * Gets the current store.
+   * Gets the store entity.
    *
    * @return \Drupal\commerce_store\Entity\Store
    */
@@ -66,9 +64,9 @@ final class Context {
   }
 
   /**
-   * Gets the current date.
+   * Gets the date.
    *
-   * @return \Drupal\Core\Datetime\DateTime
+   * @return \Drupal\Core\Datetime\DrupalDateTime
    */
   public function getDate() {
     return $this->date;
