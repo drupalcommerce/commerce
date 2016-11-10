@@ -178,7 +178,7 @@ class AddToCartForm extends ContentEntityForm {
   public function buildEntity(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
-    $context = new Context($entity, \Drupal::currentUser(), $this->selectStore($entity->getPurchasedEntity()));
+    $context = new Context(\Drupal::currentUser(), $entity, $this->selectStore($entity->getPurchasedEntity()));
     // Now that the purchased entity is set, populate the title and price.
     $entity->setTitle($entity->getPurchasedEntity()->getOrderItemTitle());
     $entity->setUnitPrice($this->chainPriceResolver->resolve($entity->getPurchasedEntity()), $context);
