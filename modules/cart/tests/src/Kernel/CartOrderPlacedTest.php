@@ -97,6 +97,8 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->reloadEntity($this->variation);
     $this->variation->save();
 
+    // Create a user to use for orders.
+    $this->user = $this->createUser();
   }
 
   /**
@@ -112,7 +114,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->container->get('entity.definition_update_manager')->applyUpdates();
 
     $this->store = $this->createStore();
-    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 

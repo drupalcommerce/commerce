@@ -18,11 +18,17 @@ class OrderTest extends OrderBrowserTestBase {
   public function testCreateOrder() {
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
     ]);
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
+      'uid' => $this->loggedInUser->id(),
+      'store_id' => $this->store->id(),
     ]);
 
     $order_exists = (bool) Order::load($order->id());
@@ -36,11 +42,17 @@ class OrderTest extends OrderBrowserTestBase {
   public function testDeleteOrder() {
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
     ]);
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
+      'uid' => $this->loggedInUser->id(),
+      'store_id' => $this->store->id(),
     ]);
     $order->delete();
 
@@ -56,12 +68,18 @@ class OrderTest extends OrderBrowserTestBase {
   public function testOrderTimestamps() {
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
+      'unit_price' => [
+        'number' => '999',
+        'currency_code' => 'USD',
+      ],
     ]);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
+      'uid' => $this->loggedInUser->id(),
+      'store_id' => $this->store->id(),
     ]);
     $order->save();
     $this->assertNull($order->getPlacedTime());
