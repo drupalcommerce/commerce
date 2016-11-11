@@ -62,17 +62,18 @@ class CartTest extends OrderBrowserTestBase {
   public function testCartPage() {
     $this->drupalLogin($this->adminUser);
 
-    $this->cartManager->addEntity($this->cart, $this->variation);
+    $order_item = $this->cartManager->addEntity($this->cart, $this->variation);
+    $quantity = $order_item->getQuantity() + 0;
 
     $this->drupalGet('cart');
     // Confirm the presence and functioning of the Quantity field.
-    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 1);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', $quantity);
     $this->assertSession()->buttonExists('Update cart');
     $values = [
-      'edit_quantity[0]' => 2,
+      'edit_quantity[0]' => $quantity * 2,
     ];
     $this->submitForm($values, t('Update cart'));
-    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', 2);
+    $this->assertSession()->fieldValueEquals('edit-edit-quantity-0', $quantity * 2);
 
     // Confirm the presence and functioning of the Remove button.
     $this->assertSession()->buttonExists('Remove');

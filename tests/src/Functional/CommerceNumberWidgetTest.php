@@ -22,6 +22,9 @@ class CommerceNumberWidgetTest extends WebTestBase {
    */
   public static $modules = array('node', 'entity_test', 'field_ui', 'commerce');
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->drupalLogin($this->drupalCreateUser(array(
@@ -38,7 +41,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
   /**
    * Test decimal field.
    */
-  function testNumberDecimalField() {
+  public function testNumberDecimalField() {
     // Create a field with settings to validate.
     $field = $this->createNumberField('decimal', ['precision' => 8, 'scale' => 4]);
     $field_name = $field->getName();
@@ -139,7 +142,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
   /**
    * Test integer field.
    */
-  function testNumberIntegerField() {
+  public function testNumberIntegerField() {
     // Create a field to validate.
     $field = $this->createNumberField('integer');
     $field_name = $field->getName();
@@ -162,17 +165,17 @@ class CommerceNumberWidgetTest extends WebTestBase {
         'value' => array(
           'type' => 'int',
           'unsigned' => '',
-          'size' => 'normal'
+          'size' => 'normal',
         ),
       ),
       'unique keys' => array(),
       'indexes' => array(),
-      'foreign keys' => array()
+      'foreign keys' => array(),
     );
     $this->assertEqual($storage->getSchema(), $expected);
     $id = $this->displaySubmitAssertForm($settings);
 
-    // Try to set a value below the minimum value
+    // Try to set a value below the minimum value.
     $this->drupalGet('entity_test/add');
     $edit = array(
       "{$field_name}[0][value]" => $min - 1,
@@ -180,7 +183,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertRaw(t('%name must be higher than or equal to %minimum.', array('%name' => $field_name, '%minimum' => $min)), 'Correctly failed to save integer value less than minimum allowed value.');
 
-    // Try to set a decimal value
+    // Try to set a decimal value.
     $this->drupalGet('entity_test/add');
     $edit = array(
       "{$field_name}[0][value]" => $min + 0.5,
@@ -188,7 +191,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertRaw(t('%name is not a valid number.', array('%name' => $field_name)), 'Correctly failed to save decimal value to integer field.');
 
-    // Try to set a value above the maximum value
+    // Try to set a value above the maximum value.
     $this->drupalGet('entity_test/add');
     $edit = array(
       "{$field_name}[0][value]" => $max + 1,
@@ -285,9 +288,9 @@ class CommerceNumberWidgetTest extends WebTestBase {
   }
 
   /**
-  * Test float field.
-  */
-  function testNumberFloatField() {
+   * Test float field.
+   */
+  public function testNumberFloatField() {
     // Create a field to validate.
     $field = $this->createNumberField('float');
     $field_name = $field->getName();
@@ -385,9 +388,9 @@ class CommerceNumberWidgetTest extends WebTestBase {
   }
 
   /**
-   * Test default formatter behavior
+   * Test default formatter behavior.
    */
-  function testNumberFormatter() {
+  public function testNumberFormatter() {
     $type = Unicode::strtolower($this->randomMachineName());
     $float_field = Unicode::strtolower($this->randomMachineName());
     $integer_field = Unicode::strtolower($this->randomMachineName());
@@ -419,7 +422,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
       'bundle' => $type,
       'settings' => array(
         'prefix' => $prefix,
-        'suffix' => $suffix
+        'suffix' => $suffix,
       ),
     ])->save();
 
@@ -429,7 +432,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
       'bundle' => $type,
       'settings' => array(
         'prefix' => $prefix,
-        'suffix' => $suffix
+        'suffix' => $suffix,
       ),
     ])->save();
 
@@ -437,13 +440,13 @@ class CommerceNumberWidgetTest extends WebTestBase {
       ->setComponent($float_field, array(
         'type' => 'number',
         'settings' => array(
-          'placeholder' => '0.00'
+          'placeholder' => '0.00',
         ),
       ))
       ->setComponent($integer_field, array(
         'type' => 'number',
         'settings' => array(
-          'placeholder' => '0.00'
+          'placeholder' => '0.00',
         ),
       ))
       ->save();
@@ -518,7 +521,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
   /**
    * Tests setting the minimum value of a float field through the interface.
    */
-  function testCreateNumberFloatField() {
+  public function testCreateNumberFloatField() {
     // Create a float field.
     $field = $this->createNumberField('float', [], ['min' => '0']);
 
@@ -531,7 +534,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
   /**
    * Tests setting the minimum value of a decimal field through the interface.
    */
-  function testCreateNumberDecimalField() {
+  public function testCreateNumberDecimalField() {
     // Create a decimal field.
     $field = $this->createNumberField('decimal', [], ['min' => '0']);
 
@@ -613,7 +616,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
 
     // We need to substract 3 from min-max range in order to have a place for a
     // value and default_value (+.decimals). For example, if happens $min = 0
-    // then $max = 3-9999 AND $default_value = 1-9998 AND $value = 2-9998
+    // then $max = 3-9999 AND $default_value = 1-9998 AND $value = 2-9998.
     $min = $no_min ? $init_min : rand($min, $no_max ? $ceil - $off : $max);
     $max = $no_max ? rand($min + $off, $ceil) : rand($min + $off, $max);
     $value = rand($min + 1, $max - 1);
@@ -697,7 +700,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
   /**
    * Helper function to get a random step.
    */
-  private function getRandomStep($scale){
+  private function getRandomStep($scale) {
     $pow = pow(0.1, $scale);
     $step = $pow * substr(mt_rand(), 0, $scale);
     return empty($step) ? $pow : $step;
@@ -710,11 +713,11 @@ class CommerceNumberWidgetTest extends WebTestBase {
     $settings = empty($test_settings) ? $this->getRandomNumberSettings($field) : $test_settings;
 
     $widget = entity_get_form_display('entity_test', 'entity_test', 'default');
-      $widget->setComponent($field_name, array(
-        'type' => 'commerce_number',
-        'settings' => $settings,
-      ))
-      ->save();
+    $widget->setComponent($field_name, array(
+      'type' => 'commerce_number',
+      'settings' => $settings,
+    ))
+    ->save();
 
     $widget_settings = $widget->getRenderer($field_name)->getFormDisplayModeSettings();
     // As only default_value is saved on the widget we need to restore a value
@@ -780,11 +783,10 @@ class CommerceNumberWidgetTest extends WebTestBase {
 
 }
 
-  /**
-   * The offset for .decimals in a min-max range to keep values not adjacent
-   * to each other.
-   *
-   */
+/**
+ * The offset for .decimals in a min-max range to keep values not adjacent
+ * to each other.
+ */
 if (!defined('COMMERCE_NUMBER_FIELD_TEST_DECIMALS_OFFSET')) {
   define('COMMERCE_NUMBER_FIELD_TEST_DECIMALS_OFFSET', 3);
 }

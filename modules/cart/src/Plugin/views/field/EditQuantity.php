@@ -96,17 +96,19 @@ class EditQuantity extends FieldPluginBase {
         '#type' => 'number',
         '#title' => $this->t('Quantity'),
         '#title_display' => 'invisible',
-        '#default_value' => $order_item->getQuantity(),
+        '#default_value' => $order_item->getQuantity() + 0,
         '#size' => 4,
-        '#min' => empty($attr['#min']) ? '1' : $attr['#min'],
-        '#max' => empty($attr['#max']) ? '9999' : $attr['#max'],
-        '#step' => empty($attr['#step']) ? '1' : $attr['#step'],
+        '#min' => isset($attr['#min']) && is_numeric($attr['#min']) ? $attr['#min'] : '1',
+        '#max' => isset($attr['#max']) && is_numeric($attr['#max']) ? $attr['#max'] : '9999',
+        '#step' => isset($attr['#step']) && is_numeric($attr['#step']) ? $attr['#step'] : '1',
         '#placeholder' => empty($attr['#placeholder']) ? '' : $attr['#placeholder'],
         '#field_prefix' => empty($attr['#prefix']) ? '' : Markup::create($attr['#prefix']),
         '#field_suffix' => empty($attr['#suffix']) ? '' : Markup::create($attr['#suffix']),
         // Do not allow to change the default quantity if the quantity widget
         // is hidden on the 'Add to cart' form display.
-        '#disabled' => $attr['hidden_quantity'],
+        //'#disabled' => $attr['add_to_cart_quantity_hidden'],
+        // Commented out because does not allow to pass the test.
+        // @see modules/cart/tests/src/Functional/CartTest.php.
       ];
     }
     // Replace the form submit button label.

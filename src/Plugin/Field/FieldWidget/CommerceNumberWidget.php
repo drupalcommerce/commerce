@@ -48,7 +48,7 @@ class CommerceNumberWidget extends NumberWidget {
     $field_settings['placeholder'] = isset($field_settings['placeholder']) ? $field_settings['placeholder'] : '';
     $field_settings['default_value'] = isset($default_value[0]) ? $default_value[0] : '';
     $field_settings['step'] = isset($field_settings['step']) ? $field_settings['step'] : '';
-    array_walk($field_settings, function(&$value) {
+    array_walk($field_settings, function (&$value) {
       if (empty($value)) {
         $value = t('None');
       }
@@ -65,7 +65,7 @@ class CommerceNumberWidget extends NumberWidget {
         $n = $nn = 'N';
         $format = ['"' . $n . '"'];
         while ($field_settings['scale']--) {
-          array_push($format, '"'. $n . '.' . $nn . '"');
+          array_push($format, '"' . $n . '.' . $nn . '"');
           $nn = "$n$nn";
         }
         $notes = t('Restricts the number of digits after decimal sign to the given step format. For this field instance format patterns are the following: @format. Note that omitting the decimal sign in this setting restricts input on the field to integer values despite the actual field type is decimal.', ['@format' => implode(', ', $format)]);
