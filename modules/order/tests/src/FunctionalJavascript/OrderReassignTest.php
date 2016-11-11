@@ -70,7 +70,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'uid' => $this->loggedInUser->id(),
       'order_items' => [$order_item],
-      'store_id' => $this->store->id()
+      'store_id' => $this->store
     ]);
 
     $this->assertTrue($order->hasLinkTemplate('reassign-form'));
