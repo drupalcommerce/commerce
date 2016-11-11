@@ -128,7 +128,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->assertFalse($cart_order->cart->value);
 
     // We should be able to create a new cart and not get an exception.
-    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->assertNotEquals($cart_order->id(), $new_cart_order->id());
   }
 
