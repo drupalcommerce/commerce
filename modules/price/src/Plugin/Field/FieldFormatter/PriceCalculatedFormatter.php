@@ -6,6 +6,7 @@ use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
+use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\StoreContextInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -91,6 +92,15 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $store = $this->storeContext->getStore();
+
+    // setting store here should be be necessary.
+    // this is only to demonstrate where tests are failing.
+    // @todo figure out how store can be null at this point.
+    // @see https://github.com/drupalcommerce/commerce/pull/549
+    if (!$store) {
+      $store = new Store([], 'commerce_store');
+    }
+
     $date = new DrupalDateTime();
     $context = new Context(\Drupal::currentUser(), $store, $date);
 
