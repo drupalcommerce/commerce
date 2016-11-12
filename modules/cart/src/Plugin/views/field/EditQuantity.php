@@ -106,7 +106,7 @@ class EditQuantity extends FieldPluginBase {
         '#field_suffix' => empty($attr['#suffix']) ? '' : Markup::create($attr['#suffix']),
         // Do not allow to change the default quantity if the quantity widget
         // is hidden on the 'Add to cart' form display.
-        //'#disabled' => $attr['add_to_cart_quantity_hidden'],
+        // '#disabled' => $attr['add_to_cart_quantity_hidden'],
         // Commented out because does not allow to pass the test.
         // @see modules/cart/tests/src/Functional/CartTest.php.
       ];

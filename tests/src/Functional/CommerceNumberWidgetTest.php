@@ -717,7 +717,7 @@ class CommerceNumberWidgetTest extends WebTestBase {
       'type' => 'commerce_number',
       'settings' => $settings,
     ))
-    ->save();
+      ->save();
 
     $widget_settings = $widget->getRenderer($field_name)->getFormDisplayModeSettings();
     // As only default_value is saved on the widget we need to restore a value

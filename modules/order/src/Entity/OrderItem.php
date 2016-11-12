@@ -131,7 +131,7 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   public function getQuantityWidgetSettings() {
     $settings = [];
-    // if 'Add to cart' form display mode is enabled we prefer its settings
+    // If 'Add to cart' form display mode is enabled we prefer its settings
     // because exactly those settings are exposed to and used by a customer.
     $form_display = entity_get_form_display($this->getEntityTypeId(), $this->bundle(), 'add_to_cart');
     $quantity = $form_display->getComponent('quantity');
