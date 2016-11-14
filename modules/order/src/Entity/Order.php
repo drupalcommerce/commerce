@@ -503,6 +503,8 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
     // Delete the order items of a deleted order.
     $order_items = [];
     /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
