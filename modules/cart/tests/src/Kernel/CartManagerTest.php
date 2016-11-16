@@ -177,8 +177,7 @@ class CartManagerTest extends EntityKernelTestBase {
     $this->assertTrue($cart->hasItem($order_item1));
     $this->assertEquals(2, $order_item1->getQuantity());
 
-    // Test total.
-    $cart->save();
+    // Test total
     $this->assertEquals(new Price('2.00', 'USD'), $cart->getTotalPrice());
 
     // Tests CartManager::addEntity.
