@@ -22,3 +22,4 @@ entity.commerce_order.canonical:
   route_name: 'entity.commerce_order.canonical'
   base_route: 'entity.commerce_order.edit_form'
   title: 'View'
+  
