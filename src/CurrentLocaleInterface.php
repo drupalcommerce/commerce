@@ -5,9 +5,9 @@ namespace Drupal\commerce;
 /**
  * Holds a reference to the current locale, resolved on demand.
  *
- * @see \Drupal\commerce\LocaleContext
+ * @see \Drupal\commerce\CurrentLocale
  */
-interface LocaleContextInterface {
+interface CurrentLocaleInterface {
 
   /**
    * Gets the locale for the current request.

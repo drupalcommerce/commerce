@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @see \Drupal\commerce\Resolver\ChainCountryResolver
  * @see \Drupal\commerce\Resolver\DefaultCountryResolver
  */
-class CountryContext implements CountryContextInterface {
+class CurrentCountry implements CurrentCountryInterface {
 
   /**
    * The request stack.
@@ -40,7 +40,7 @@ class CountryContext implements CountryContextInterface {
   protected $countries;
 
   /**
-   * Constructs a new CountryContext object.
+   * Constructs a new CurrentCountry object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
