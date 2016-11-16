@@ -81,7 +81,7 @@ class CartManager implements CartManagerInterface {
    */
   public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = 1, $combine = TRUE, $save_cart = TRUE) {
     $order_item = $this->createOrderItem($entity, $quantity);
-    return $this->addOrderItem($cart, $order_item, $combine);
+    return $this->addOrderItem($cart, $order_item, $combine, $save_cart);
   }
 
   /**
@@ -105,7 +105,6 @@ class CartManager implements CartManagerInterface {
     if ($combine) {
       $matching_order_item = $this->orderItemMatcher->match($order_item, $cart->getItems());
     }
-    $needs_cart_save = FALSE;
     if ($matching_order_item) {
       $new_quantity = Calculator::add($matching_order_item->getQuantity(), $quantity);
       $matching_order_item->setQuantity($new_quantity);
@@ -114,12 +113,11 @@ class CartManager implements CartManagerInterface {
     else {
       $order_item->save();
       $cart->addItem($order_item);
-      $needs_cart_save = TRUE;
     }
 
     $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
-    if ($needs_cart_save && $save_cart) {
+    if ($save_cart) {
       $cart->save();
     }
 
@@ -129,12 +127,15 @@ class CartManager implements CartManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item) {
+  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE) {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $original_order_item */
     $original_order_item = $this->orderItemStorage->loadUnchanged($order_item->id());
     $order_item->save();
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    if ($save_cart) {
+      $cart->save();
+    }
   }
 
   /**
