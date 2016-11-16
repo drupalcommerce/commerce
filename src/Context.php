@@ -11,7 +11,7 @@ final class Context {
   /**
    * The user entity.
    *
-   * @var \Drupal\user\UserInterface
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $user;
 
