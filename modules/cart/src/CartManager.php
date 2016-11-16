@@ -81,7 +81,6 @@ class CartManager implements CartManagerInterface {
    */
   public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = 1, $combine = TRUE, $save_cart = TRUE) {
     $order_item = $this->createOrderItem($entity, $quantity);
-
     return $this->addOrderItem($cart, $order_item, $combine, $save_cart);
   }
 
