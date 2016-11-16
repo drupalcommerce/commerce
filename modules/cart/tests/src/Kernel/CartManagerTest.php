@@ -9,10 +9,9 @@ use Drupal\commerce_store\Entity\Store;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
- * Tests the Cart Manager.
+ * Tests the cart manager.
  *
  * @coversDefaultClass \Drupal\commerce_cart\CartManager
- *
  * @group commerce
  */
 class CartManagerTest extends EntityKernelTestBase {
@@ -22,14 +21,14 @@ class CartManagerTest extends EntityKernelTestBase {
    *
    * @var \Drupal\commerce_cart\CartManager
    */
-  protected $cart_manager;
+  protected $cartManager;
 
   /**
    * The cart provider.
    *
    * @var \Drupal\commerce_cart\CartProvider
    */
-  protected $cart_provider;
+  protected $cartProvider;
 
   /**
    * The store.
@@ -134,8 +133,8 @@ class CartManagerTest extends EntityKernelTestBase {
     $this->enableModules(['commerce_cart']);
     $this->installConfig('commerce_cart');
     $this->container->get('entity.definition_update_manager')->applyUpdates();
-    $this->cart_provider = $this->container->get('commerce_cart.cart_provider');
-    $this->cart_manager = $this->container->get('commerce_cart.cart_manager');
+    $this->cartProvider = $this->container->get('commerce_cart.cart_provider');
+    $this->cartManager = $this->container->get('commerce_cart.cart_manager');
   }
 
   /**
@@ -150,52 +149,38 @@ class CartManagerTest extends EntityKernelTestBase {
    */
   public function testCartManager() {
     $this->installCommerceCart();
-    $cart_manager = $this->cart_manager;
-    $cart_provider = $this->cart_provider;
 
-    $cart_provider->createCart('default', $this->store, $this->user);
-    $cart = $cart_provider->getCart('default', $this->store, $this->user);
-
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->assertInstanceOf(OrderInterface::class, $cart);
     $this->assertEmpty($cart->getItems());
 
-    // Tests CartManager::addEntity.
-    $order_item1 = $cart_manager->addEntity($cart, $this->variation1);
-    $order_item1->save();
+    $order_item1 = $this->cartManager->addEntity($cart, $this->variation1);
     $order_item1 = $this->reloadEntity($order_item1);
     $this->assertEquals([$order_item1], $cart->getItems());
     $this->assertEquals(1, $order_item1->getQuantity());
-
-    // Test total.
     $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::updateOrderItem.
     $order_item1->setQuantity(2);
-    $order_item1->save();
-    $order_item1 = $this->reloadEntity($order_item1);
-    $cart_manager->updateOrderItem($cart, $order_item1);
+    $this->cartManager->updateOrderItem($cart, $order_item1);
     $this->assertTrue($cart->hasItem($order_item1));
     $this->assertEquals(2, $order_item1->getQuantity());
-
-    // Test total
     $this->assertEquals(new Price('2.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::addEntity.
-    $order_item2 = $cart_manager->addEntity($cart, $this->variation2, 3);
-    $order_item2->save();
+    $order_item2 = $this->cartManager->addEntity($cart, $this->variation2, 3);
     $order_item2 = $this->reloadEntity($order_item2);
     $this->assertTrue($cart->hasItem($order_item1));
     $this->assertTrue($cart->hasItem($order_item2));
     $this->assertEquals(3, $order_item2->getQuantity());
+    $this->assertEquals(new Price('4.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::removeOrderItem.
-    $cart_manager->removeOrderItem($cart, $order_item1);
+    $this->cartManager->removeOrderItem($cart, $order_item1);
     $this->assertTrue($cart->hasItem($order_item2));
     $this->assertFalse($cart->hasItem($order_item1));
+    $this->assertEquals(new Price('2.00', 'USD'), $cart->getTotalPrice());
 
-    // Tests CartManager::emptyCart.
-    $cart_manager->emptyCart($cart);
+    $this->cartManager->emptyCart($cart);
     $this->assertEmpty($cart->getItems());
+    $this->assertEquals(new Price('0.00', 'USD'), $cart->getTotalPrice());
   }
 
 }
