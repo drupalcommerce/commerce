@@ -35,7 +35,7 @@ final class Context {
    *   The user.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
    *   The store.
-   * @param int|NULL $time
+   * @param int|null $time
    *   The unix timestamp, or NULL to use the current request time.
    */
   public function __construct(AccountInterface $user, StoreInterface $store, $time = NULL) {
