@@ -646,7 +646,8 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the order was last edited.'));
+      ->setDescription(t('The time when the order was last edited.'))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['placed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Placed'))
