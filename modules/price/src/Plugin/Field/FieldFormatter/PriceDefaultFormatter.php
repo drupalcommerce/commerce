@@ -42,7 +42,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
   protected $numberFormatter;
 
   /**
-   * The store context provider.
+   * The store context.
    *
    * @var \Drupal\commerce_store\StoreContextInterface
    */
