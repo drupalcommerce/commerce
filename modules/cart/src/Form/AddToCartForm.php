@@ -105,7 +105,9 @@ class AddToCartForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    $product_id = $this->entity->getPurchasedEntity()->getProductId();
+    static $form_id_suffix = 0;
+    $form_id_suffix++;
+
     $form_id = $this->entity->getEntityTypeId();
     if ($this->entity->getEntityType()->hasKey('bundle')) {
       $form_id .= '_' . $this->entity->bundle();
@@ -113,7 +115,7 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $form_id .= '_' . $product_id;
+    $form_id .= '_' . $form_id_suffix;
 
     return $form_id . '_form';
   }
