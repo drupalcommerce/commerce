@@ -70,7 +70,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    * @param \Drupal\commerce_price\NumberFormatterFactoryInterface $number_formatter_factory
    *   The number formatter factory.
    * @param \Drupal\commerce_store\StoreContextInterface $store_context
-   *   The store context provider.
+   *   The store context.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, StoreContextInterface $store_context) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);

@@ -24,6 +24,6 @@ interface PriceResolverInterface {
    *   A price value object, if resolved. Otherwise NULL, indicating that the
    *   next resolver in the chain should be called.
    */
-  public function resolve(PurchasableEntityInterface $entity, Context $context, $quantity = 1);
+  public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context);
 
 }

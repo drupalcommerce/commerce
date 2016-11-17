@@ -7,7 +7,6 @@ use Drupal\commerce\TimeInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -136,8 +135,7 @@ class OrderRefresh implements OrderRefreshInterface {
     }
     $order->setAdjustments($adjustments);
 
-    $date = new DrupalDateTime($this->time->getCurrentTime());
-    $context = new Context($order->getCustomer(), $order->getStore(), $date);
+    $context = new Context($order->getCustomer(), $order->getStore());
 
     foreach ($order->getItems() as $order_item) {
       $order_item->setAdjustments([]);
@@ -145,7 +143,7 @@ class OrderRefresh implements OrderRefreshInterface {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
-        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $context, $order_item->getQuantity());
+        $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
         $order_item->setUnitPrice($unit_price);
       }
     }

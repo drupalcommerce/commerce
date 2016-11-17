@@ -3,76 +3,75 @@
 namespace Drupal\commerce;
 
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Session\AccountInterface;
 
 final class Context {
 
   /**
-   * The user entity.
+   * The user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $user;
 
   /**
-   * The store entity.
+   * The store.
    *
-   * @var \Drupal\commerce_store\Entity\Store
+   * @var \Drupal\commerce_store\Entity\StoreInterface
    */
   protected $store;
 
   /**
-   * The date.
+   * The time.
    *
-   * @var \Drupal\Core\Datetime\DrupalDateTime
+   * @var int
    */
-  protected $date;
+  protected $time;
 
   /**
    * Constructs a new Commerce Context object.
    *
    * @param \Drupal\Core\Session\AccountInterface $user
-   *   The user entity.
+   *   The user.
    * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store entity.
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
-   *   The date.
+   *   The store.
+   * @param int|NULL $time
+   *   The unix timestamp, or NULL to use the current request time.
    */
-  public function __construct(AccountInterface $user, StoreInterface $store, DrupalDateTime $date) {
+  public function __construct(AccountInterface $user, StoreInterface $store, $time = NULL) {
     $this->user = $user;
     $this->store = $store;
-    $this->date = $date;
+    $this->time = $time ?: time();
   }
 
   /**
-   * Gets the user entity.
+   * Gets the user.
    *
    * @return \Drupal\Core\Session\AccountInterface
-   *   The user entity.
+   *   The user.
    */
   public function getUser() {
     return $this->user;
   }
 
   /**
-   * Gets the store entity.
+   * Gets the store.
    *
    * @return \Drupal\commerce_store\Entity\Store
-   *   The store entity.
+   *   The store.
    */
   public function getStore() {
     return $this->store;
   }
 
   /**
-   * Gets the date.
+   * Gets the time.
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   The date object.
+   * @return int
+   *   The time.
    */
-  public function getDate() {
-    return $this->date;
+  public function getTime() {
+    return $this->time;
   }
 
 }

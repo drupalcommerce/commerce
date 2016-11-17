@@ -44,9 +44,9 @@ class ChainPriceResolver implements ChainPriceResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(PurchasableEntityInterface $entity, Context $context, $quantity = 1) {
+  public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
     foreach ($this->resolvers as $resolver) {
-      $result = $resolver->resolve($entity, $context, $quantity);
+      $result = $resolver->resolve($entity, $quantity, $context);
       if ($result) {
         return $result;
       }

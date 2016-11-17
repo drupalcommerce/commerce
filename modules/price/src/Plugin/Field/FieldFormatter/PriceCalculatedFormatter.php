@@ -15,6 +15,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +37,13 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * @var \Drupal\commerce_price\Resolver\ChainPriceResolverInterface
    */
   protected $chainPriceResolver;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
 
   /**
    * Constructs a new PriceCalculatedFormatter object.
@@ -61,11 +69,14 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain price resolver.
    * @param \Drupal\commerce_store\StoreContextInterface $store_context
-   *   The store context provider.
+   *   The store context.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, StoreContextInterface $store_context) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, StoreContextInterface $store_context, AccountInterface $current_user) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory, $store_context);
     $this->chainPriceResolver = $chain_price_resolver;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -83,7 +94,8 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory'),
       $container->get('commerce_price.chain_price_resolver'),
-      $container->get('commerce_store.store_context')
+      $container->get('commerce_store.store_context'),
+      $container->get('current_user')
     );
   }
 
@@ -92,9 +104,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $store = $this->storeContext->getStore();
-
-    $date = new DrupalDateTime();
-    $context = new Context(\Drupal::currentUser(), $store, $date);
+    $context = new Context($this->currentUser, $store);
 
     $currency_codes = [];
     foreach ($items as $delta => $item) {
@@ -107,7 +117,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
     foreach ($items as $delta => $item) {
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $items->getEntity();
-      $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, $context, '1');
+      $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
       $number = $resolved_price->getNumber();
       $currency = $currencies[$resolved_price->getCurrencyCode()];
 

@@ -16,7 +16,7 @@ class TestPriceResolver implements PriceResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve(PurchasableEntityInterface $entity, Context $context, $quantity = 1) {
+  public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
     if ($entity instanceof ProductVariationInterface && strpos($entity->getSku(), 'TEST_') !== FALSE) {
       return $entity->getPrice()->subtract(new Price('3', $entity->getPrice()->getCurrencyCode()));
     }
