@@ -79,7 +79,7 @@ class AddToCartForm extends ContentEntityForm {
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain base price resolver.
    * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user
+   *   The current user.
    */
   public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
     parent::__construct($entity_manager);

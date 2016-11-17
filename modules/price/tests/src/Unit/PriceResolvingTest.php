@@ -9,7 +9,6 @@ use Drupal\commerce_price\Resolver\DefaultPriceResolver;
 use Drupal\commerce_price_test\TestPriceResolver;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserInterface;
