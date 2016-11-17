@@ -20,3 +20,8 @@ services:
     class: Drupal\commerce_price\Resolver\DefaultPriceResolver
     tags:
       - { name: commerce_price.price_resolver, priority: -100 }
+
+  commerce_price.twig_extension:
+      class: Drupal\commerce_price\TwigExtension\PriceTwigExtension
+      tags:
+        - { name: twig.extension }
