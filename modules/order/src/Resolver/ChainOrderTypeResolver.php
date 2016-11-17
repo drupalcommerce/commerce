@@ -50,6 +50,7 @@ class ChainOrderTypeResolver implements ChainOrderTypeResolverInterface {
         return $result;
       }
     }
+    return NULL;
   }
 
 }
