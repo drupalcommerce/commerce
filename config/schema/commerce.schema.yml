@@ -33,6 +33,29 @@ field.field_settings.commerce_plugin_item:*:
       sequence:
         - type: string
 
+field.widget.settings.commerce_auto_sku:
+  type: mapping
+  label: 'Commerce auto SKU format settings'
+  mapping:
+    iniqid_enabled:
+      type: boolean
+      label: 'Enable unique auto SKU values generation'
+    more_entropy:
+      type: boolean
+      label: 'More unique'
+    prefix:
+      type: string
+      label: 'SKU prefix'
+    suffix:
+      type: string
+      label: 'SKU suffix'
+    size:
+      type: integer
+      label: 'Size of textfield'
+    placeholder:
+      type: label
+      label: 'Placeholder'
+
 views.argument_validator.commerce_current_user:
   type: mapping
   label: 'Current user'
