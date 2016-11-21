@@ -6,15 +6,15 @@
  */
 
 /**
-* Implements hook_requirements().
-*/
+ * Implements hook_requirements().
+ */
 function commerce_requirements($phase) {
   $requirements = [];
   if ($phase == 'install') {
     if (!extension_loaded('bcmath')) {
       $requirements['commerce'] = [
-      'description' => t("Commerce requires you to enable the following PHP extension: bcmath"),
-      'severity' => REQUIREMENT_ERROR,
+        'description' => t('Commerce requires the bcmath PHP extension.'),
+        'severity' => REQUIREMENT_ERROR,
       ];
     }
   }
