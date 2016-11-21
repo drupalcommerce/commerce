@@ -86,10 +86,13 @@ class CartManagerTest extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installSchema('system', 'router');
+    $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installConfig(['commerce_order']);
     $this->installConfig(['commerce_product']);
+
+    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     $this->variation1 = ProductVariation::create([
       'type' => 'default',

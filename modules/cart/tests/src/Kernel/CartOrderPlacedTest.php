@@ -66,6 +66,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
@@ -75,6 +76,8 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
     $this->createUser();
+
+    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     // Create a product variation.
     $this->variation = $this->createEntity('commerce_product_variation', [
