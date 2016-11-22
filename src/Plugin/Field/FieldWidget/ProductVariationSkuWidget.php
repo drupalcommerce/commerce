@@ -90,7 +90,7 @@ class ProductVariationSkuWidget extends StringTextfieldWidget {
     $summary = [];
     $none = $this->t('None');
     $settings = $this->getSettings();
-    $sku =  uniqid($settings['prefix'], $settings['more_entropy']) . $settings['suffix'];
+    $sku = uniqid($settings['prefix'], $settings['more_entropy']) . $settings['suffix'];
     $settings['auto SKU sample'] = $settings['uniqid_enabled'] ? $sku : $none;
     unset($settings['uniqid_enabled'], $settings['more_entropy']);
     foreach ($settings as $name => $value) {
