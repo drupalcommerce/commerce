@@ -180,6 +180,32 @@ final class Calculator {
   }
 
   /**
+   * Rounds the number to specified precision.
+   *
+   * @param string $number
+   *   The number to trim.
+   * @param int $precision
+   *   The number of decimal digits to round to.
+   * @param int $mode
+   *   The rounding mode.
+   *
+   * @return string
+   *   The rounded number.
+   */
+  public static function round($number, $precision = 0, $mode = PHP_ROUND_HALF_UP) {
+    if (strpos($number, '.') === FALSE) {
+      return $number;
+    }
+    $right_operand = '0.' . str_repeat('0', $precision) . '5';
+    if ($number[0] === '-') {
+      return bcsub($number, $right_operand, $precision);
+    }
+    else {
+      return bcadd($number, $right_operand, $precision);
+    }
+  }
+
+  /**
    * Assert that the given number is a numeric string value.
    *
    * @param string $number

@@ -247,6 +247,22 @@ final class Price {
   }
 
   /**
+   * Rounds the price to the specified precision.
+   *
+   * @param string $precision
+   *   The precision.
+   * @param int $mode
+   *   The rounding mode.
+   *
+   * @return static
+   *   The resulting price.
+   */
+  public function round($precision = '2', $mode = PHP_ROUND_HALF_UP) {
+    $new_number = Calculator::round($this->number, $precision, $mode);
+    return new static($new_number, $this->currencyCode);
+  }
+
+  /**
    * Asserts that the currency code is in the right format.
    *
    * Serves only as a basic sanity check.

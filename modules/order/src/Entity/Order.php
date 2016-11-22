@@ -448,7 +448,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     foreach ($this->getAdjustments() as $adjustment) {
       $total_price = $total_price->add($adjustment->getAmount());
     }
-    $this->total_price = $total_price;
+    $this->total_price = $total_price->round();
   }
 
   /**
