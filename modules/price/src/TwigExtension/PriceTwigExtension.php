@@ -44,16 +44,13 @@ class PriceTwigExtension extends \Twig_Extension {
     }
 
     if (is_array($price) && isset($price['currency_code']) && isset($price['number'])) {
-      $currency_storage = \Drupal::entityTypeManager()->getStorage('commerce_currency');
       $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
+      $currency_storage = \Drupal::entityTypeManager()->getStorage('commerce_currency');
       $currency = $currency_storage->load($price['currency_code']);
-      $amount = $price['number'];
-      $formatted_price = $number_formatter->formatCurrency($amount, $currency);
-
-      return $formatted_price;
+      return $number_formatter->formatCurrency($price['number'], $currency);
     }
     else {
-      throw new \InvalidArgumentException('"commerce_price_format" filter argument must be a price object or an array with keys "number" and "currency_code".');
+      throw new \InvalidArgumentException('The "commerce_price_format" filter must be given a price object or an array with "number" and "currency_code" keys.');
     }
   }
 
