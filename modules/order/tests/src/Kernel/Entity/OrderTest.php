@@ -62,11 +62,14 @@ class OrderTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
+
+    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([

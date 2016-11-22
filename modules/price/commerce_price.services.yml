@@ -25,3 +25,7 @@ services:
       class: Drupal\commerce_price\TwigExtension\PriceTwigExtension
       tags:
         - { name: twig.extension }
+
+  commerce_price.rounder:
+    class: Drupal\commerce_price\Rounder
+    arguments: ['@entity_type.manager']

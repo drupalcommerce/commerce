@@ -89,12 +89,15 @@ class OrderRefreshTest extends EntityKernelTestBase {
     $this->installSchema('system', 'router');
     $this->installEntitySchema('user');
     $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installConfig(['commerce_product', 'commerce_order']);
+
+    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);

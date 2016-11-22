@@ -73,10 +73,13 @@ class CartProviderTest extends EntityKernelTestBase {
     parent::setUp();
     $this->installSchema('system', 'router');
     $this->installEntitySchema('profile');
+    $this->installEntitySchema('commerce_currency');
     $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig(['commerce_order']);
+
+    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     OrderItemType::create([
       'id' => 'test',

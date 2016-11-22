@@ -200,7 +200,9 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   protected function recalculateTotalPrice() {
     if ($unit_price = $this->getUnitPrice()) {
-      $this->total_price = $unit_price->multiply($this->getQuantity());
+      $rounder = \Drupal::service('commerce_price.rounder');
+      $total_price = $unit_price->multiply($this->getQuantity());
+      $this->total_price = $rounder->round($total_price);
     }
   }
 
