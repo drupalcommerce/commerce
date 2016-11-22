@@ -37,7 +37,7 @@ field.widget.settings.commerce_auto_sku:
   type: mapping
   label: 'Commerce auto SKU format settings'
   mapping:
-    iniqid_enabled:
+    uniqid_enabled:
       type: boolean
       label: 'Enable unique auto SKU values generation'
     more_entropy:

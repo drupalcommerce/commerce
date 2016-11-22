@@ -23,63 +23,63 @@ class ProductVariationSkuWidget extends StringTextfieldWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
-      'iniqid_enabled' => TRUE,
+    return [
+      'uniqid_enabled' => TRUE,
       'more_entropy' => FALSE,
       'prefix' => 'sku-',
       'suffix' => '',
       'size' => 60,
       'placeholder' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $none = t('None');
+    $none = $this->t('None');
     $settings = $this->getSettings();
-    $element['iniqid_enabled'] = array(
+    $element['uniqid_enabled'] = [
       '#type' => 'checkbox',
-      '#title' => t('Enable unique auto SKU values generation'),
-      '#default_value' => $settings['iniqid_enabled'],
-    );
-    $element['more_entropy'] = array(
+      '#title' => $this->t('Enable unique auto SKU values generation'),
+      '#default_value' => $settings['uniqid_enabled'],
+    ];
+    $element['more_entropy'] = [
       '#type' => 'checkbox',
       '#title_display' => 'before',
-      '#title' => t('More unique'),
-      '#description' => t('If unchecked the SKU (without prefix and suffix) will look like this: <strong>@short</strong>. If checked, like this: <strong>@long</strong>. <a href=":uniqid_href" target="_blank">Read more</a>', [':uniqid_href' => 'http://php.net/manual/en/function.uniqid.php', '@short' => uniqid(), '@long' => uniqid('', TRUE)]),
+      '#title' => $this->t('More unique'),
+      '#description' => $this->t('If unchecked the SKU (without prefix and suffix) will look like this: <strong>@short</strong>. If checked, like this: <strong>@long</strong>. <a href=":uniqid_href" target="_blank">Read more</a>', [':uniqid_href' => 'http://php.net/manual/en/function.uniqid.php', '@short' => uniqid(), '@long' => uniqid('', TRUE)]),
       '#default_value' => $settings['more_entropy'],
-      '#states' => array(
-        'visible' => [':input[name*="iniqid_enabled"]' => ['checked' => TRUE]],
-      ),
-    );
-    $element['prefix'] = array(
+      '#states' => [
+        'visible' => [':input[name*="uniqid_enabled"]' => ['checked' => TRUE]],
+      ],
+    ];
+    $element['prefix'] = [
       '#type' => 'textfield',
-      '#title' => t('SKU prefix'),
+      '#title' => $this->t('SKU prefix'),
       '#default_value' => $settings['prefix'],
       '#placeholder' => $none,
-    );
-    $element['suffix'] = array(
+    ];
+    $element['suffix'] = [
       '#type' => 'textfield',
-      '#title' => t('SKU suffix'),
+      '#title' => $this->t('SKU suffix'),
       '#default_value' => $settings['suffix'],
       '#placeholder' => $none,
-    );
-    $element['size'] = array(
+    ];
+    $element['size'] = [
       '#type' => 'number',
-      '#title' => t('Size of textfield'),
+      '#title' => $this->t('Size of SKU field'),
       '#default_value' => $settings['size'],
       '#required' => TRUE,
       '#min' => 1,
-    );
-    $element['placeholder'] = array(
+    ];
+    $element['placeholder'] = [
       '#type' => 'textfield',
-      '#title' => t('Placeholder'),
+      '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],
-      '#description' => t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
+      '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
       '#placeholder' => $none,
-    );
+    ];
     return $element;
   }
 
@@ -87,11 +87,12 @@ class ProductVariationSkuWidget extends StringTextfieldWidget {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
-    $none = t('None');
+    $summary = [];
+    $none = $this->t('None');
     $settings = $this->getSettings();
-    $settings['Uniqueness sample'] = $settings['iniqid_enabled'] ? ($settings['more_entropy'] ? uniqid('', TRUE) : uniqid()) : $none;
-    unset($settings['iniqid_enabled'], $settings['more_entropy']);
+    $sku =  uniqid($settings['prefix'], $settings['more_entropy']) . $settings['suffix'];
+    $settings['auto SKU sample'] = $settings['uniqid_enabled'] ? $sku : $none;
+    unset($settings['uniqid_enabled'], $settings['more_entropy']);
     foreach ($settings as $name => $value) {
       $value = empty($settings[$name]) ? $none : $value;
       $summary[] = "{$name}: {$value}";
@@ -104,14 +105,14 @@ class ProductVariationSkuWidget extends StringTextfieldWidget {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $element['value'] = $element + array(
+    $element['value'] = $element + [
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : NULL,
       '#size' => $this->getSetting('size'),
       '#placeholder' => $this->getSetting('placeholder'),
       '#maxlength' => $this->getFieldSetting('max_length'),
-      '#attributes' => array('class' => array('js-text-full', 'text-full')),
-    );
+      '#attributes' => ['class' => ['js-text-full', 'text-full']],
+    ];
 
     return $element;
   }
