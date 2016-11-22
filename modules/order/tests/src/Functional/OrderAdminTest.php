@@ -179,6 +179,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
    * Tests that the order workflow transition buttons appear on the order page.
    */
   public function testOrderWorkflowTransitionButtons() {
+    $customer = $this->createUser();
     $order_item = $this->createEntity('commerce_order_item', [
       'type' => 'default',
       'unit_price' => [
@@ -191,6 +192,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
       'state' => 'draft',
+      'uid' => $customer,
+      'store' => $this->store->id(),
     ]);
 
     $this->drupalGet('admin/commerce/orders/' . $order->id());
