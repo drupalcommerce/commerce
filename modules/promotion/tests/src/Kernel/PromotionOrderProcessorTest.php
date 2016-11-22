@@ -63,6 +63,8 @@ class PromotionOrderProcessorTest extends EntityKernelTestBase {
     ]);
     $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
 
+    $this->user = $this->createUser();
+
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
@@ -76,6 +78,7 @@ class PromotionOrderProcessorTest extends EntityKernelTestBase {
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'store_id' => $this->store,
+      'uid' => $this->user,
       'order_items' => [],
     ]);
   }

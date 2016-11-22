@@ -100,6 +100,8 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->reloadEntity($this->variation);
     $this->variation->save();
 
+    // Create a user to use for orders.
+    $this->user = $this->createUser();
   }
 
   /**
@@ -115,7 +117,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->container->get('entity.definition_update_manager')->applyUpdates();
 
     $this->store = $this->createStore();
-    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 
@@ -129,7 +131,7 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     $this->assertFalse($cart_order->cart->value);
 
     // We should be able to create a new cart and not get an exception.
-    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store);
+    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
     $this->assertNotEquals($cart_order->id(), $new_cart_order->id());
   }
 

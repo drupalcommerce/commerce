@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_price\Kernel;
 
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -12,6 +13,8 @@ use Drupal\KernelTests\KernelTestBase;
  * @group commerce
  */
 class PriceFormattersTest extends KernelTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -59,10 +62,13 @@ class PriceFormattersTest extends KernelTestBase {
     $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_type');
+    $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_product']);
     $this->container->get('commerce_price.currency_importer')->import('USD');
     $this->productVariationDefaultDisplay = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
     $this->productVariationViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_product_variation');
+
+    $this->store = $this->createStore('Store', 'store@example.com', 'online', TRUE);
 
     $variation = ProductVariation::create([
       'type' => 'default',
