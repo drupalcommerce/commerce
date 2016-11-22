@@ -19,7 +19,7 @@ content:
     type: commerce_auto_sku
     weight: -4
     settings:
-      iniqid_enabled: true
+      uniqid_enabled: true
       more_entropy: false
       prefix: 'sku-'
       suffix: ''
