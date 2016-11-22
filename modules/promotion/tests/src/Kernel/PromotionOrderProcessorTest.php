@@ -7,26 +7,18 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the promotion order processor.
  *
  * @group commerce
  */
-class PromotionOrderProcessorTest extends EntityKernelTestBase {
-
-  use StoreCreationTrait;
+class PromotionOrderProcessorTest extends CommerceKernelTestBase {
 
   /**
-   * The default store.
+   * The test order.
    *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
-
-  /**
    * @var \Drupal\commerce_order\Entity\OrderInterface
    */
   protected $order;
@@ -37,10 +29,12 @@ class PromotionOrderProcessorTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options', 'views', 'profile', 'entity_reference_revisions', 'entity',
-    'commerce', 'commerce_price', 'address', 'commerce_order', 'commerce_store',
-    'commerce_store', 'commerce_product', 'inline_entity_form',
-    'commerce_promotion', 'state_machine', 'datetime',
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
+    'commerce_order',
+    'commerce_product',
+    'commerce_promotion',
   ];
 
   /**
@@ -49,7 +43,6 @@ class PromotionOrderProcessorTest extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
@@ -58,10 +51,8 @@ class PromotionOrderProcessorTest extends EntityKernelTestBase {
     $this->installConfig([
       'profile',
       'commerce_order',
-      'commerce_store',
       'commerce_promotion',
     ]);
-    $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
 
     OrderItemType::create([
       'id' => 'test',

@@ -4,23 +4,23 @@ namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\ProductAttribute;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the product attribute value storage.
  *
  * @group commerce
  */
-class ProductAttributeValueStorageTest extends EntityKernelTestBase {
+class ProductAttributeValueStorageTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path',
-    'text', 'entity', 'filter', 'entity_test', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product', 'views', 'address', 'inline_entity_form',
+  public static $modules = [
+    'path',
+    'commerce_product',
   ];
 
   /**

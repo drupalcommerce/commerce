@@ -5,20 +5,18 @@ namespace Drupal\Tests\commerce\Kernel;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests the 'commerce_remote_id' field type.
  *
  * @group commerce
  */
-class RemoteIdItemTest extends EntityKernelTestBase {
+class RemoteIdItemTest extends CommerceKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'commerce',
     'commerce_test',
   ];
 

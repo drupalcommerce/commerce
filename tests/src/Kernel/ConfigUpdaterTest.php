@@ -2,14 +2,12 @@
 
 namespace Drupal\Tests\commerce\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-
 /**
  * Tests the ConfigUpdater class.
  *
  * @group commerce
  */
-class ConfigUpdaterTest extends KernelTestBase {
+class ConfigUpdaterTest extends CommerceKernelTestBase {
 
   /**
    * Enable modules.
@@ -17,10 +15,11 @@ class ConfigUpdaterTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity',
-    'entity_reference_revisions', 'views', 'address', 'profile',
-    'state_machine', 'inline_entity_form', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product', 'commerce_order',
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
+    'commerce_product',
+    'commerce_order',
     'commerce_update_test',
   ];
 
@@ -37,10 +36,7 @@ class ConfigUpdaterTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_update_test');

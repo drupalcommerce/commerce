@@ -2,9 +2,8 @@
 
 namespace Drupal\Tests\commerce_cart\Kernel;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the unsetting of the cart flag when order is placed.
@@ -12,9 +11,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
  * @group commerce
  */
-class CartOrderPlacedTest extends EntityKernelTestBase {
-
-  use StoreCreationTrait;
+class CartOrderPlacedTest extends CommerceKernelTestBase {
 
   /**
    * The variation to test against.
@@ -22,13 +19,6 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
    * @var \Drupal\commerce_product\Entity\ProductVariation
    */
   protected $variation;
-
-  /**
-   * The store to test against.
-   *
-   * @var \Drupal\commerce_store\Entity\Store
-   */
-  protected $store;
 
   /**
    * The cart manager.
@@ -43,18 +33,10 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'path',
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
+    'path',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -66,18 +48,13 @@ class CartOrderPlacedTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_currency');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
     $this->createUser();
-
-    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     // Create a product variation.
     $this->variation = $this->createEntity('commerce_product_variation', [

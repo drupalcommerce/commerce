@@ -8,8 +8,8 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the Order entity.
@@ -18,7 +18,7 @@ use Drupal\profile\Entity\Profile;
  *
  * @group commerce
  */
-class OrderTest extends EntityKernelTestBase {
+class OrderTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -28,29 +28,14 @@ class OrderTest extends EntityKernelTestBase {
   protected $user;
 
   /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -62,14 +47,9 @@ class OrderTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_currency');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
-
-    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
@@ -80,14 +60,6 @@ class OrderTest extends EntityKernelTestBase {
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-      'default_currency' => 'USD',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
   }
 
   /**

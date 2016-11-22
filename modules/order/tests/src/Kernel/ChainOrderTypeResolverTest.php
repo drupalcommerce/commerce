@@ -4,14 +4,14 @@ namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the chain order type resolver.
  *
  * @group commerce
  */
-class ChainOrderTypeResolverTest extends KernelTestBase {
+class ChainOrderTypeResolverTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -19,11 +19,11 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity',
-    'entity_reference_revisions', 'path',
-    'views', 'address', 'profile', 'state_machine',
-    'inline_entity_form', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product',
+    'entity_reference_revisions',
+    'path',
+    'profile',
+    'state_machine',
+    'commerce_product',
     'commerce_order',
   ];
 
@@ -32,10 +32,8 @@ class ChainOrderTypeResolverTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
+
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');

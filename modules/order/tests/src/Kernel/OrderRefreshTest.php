@@ -10,17 +10,16 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\commerce_store\Entity\Store;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order refresh process.
  *
  * @group commerce
  */
-class OrderRefreshTest extends EntityKernelTestBase {
+class OrderRefreshTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -28,13 +27,6 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $user;
-
-  /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * A sample order.
@@ -72,12 +64,13 @@ class OrderRefreshTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'entity',
-    'entity_reference_revisions', 'path',
-    'views', 'address', 'profile', 'state_machine',
-    'inline_entity_form', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product',
-    'commerce_order', 'commerce_test',
+    'entity_reference_revisions',
+    'path',
+    'profile',
+    'state_machine',
+    'commerce_product',
+    'commerce_order',
+    'commerce_test',
   ];
 
   /**
@@ -86,31 +79,17 @@ class OrderRefreshTest extends EntityKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('user');
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_currency');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installConfig(['commerce_product', 'commerce_order']);
 
-    $this->container->get('commerce_price.currency_importer')->import('USD');
-
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
 
     $this->orderItemStorage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-      'default_currency' => 'USD',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
 
     // Turn off title generation to allow explicit values to be used.
     $variation_type = ProductVariationType::load('default');

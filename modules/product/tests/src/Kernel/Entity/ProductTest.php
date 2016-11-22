@@ -4,8 +4,7 @@ namespace Drupal\Tests\commerce_product\Kernel\Entity;
 
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\Product;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the Product entity.
@@ -14,7 +13,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  *
  * @group commerce
  */
-class ProductTest extends EntityKernelTestBase {
+class ProductTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -22,25 +21,9 @@ class ProductTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
     'path',
-    'entity',
-    'entity',
-    'address',
-    'views',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
   ];
-
-  /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * A sample user.
@@ -59,16 +42,7 @@ class ProductTest extends EntityKernelTestBase {
     $this->installEntitySchema('commerce_product_variation_type');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_type');
-    $this->installEntitySchema('commerce_store');
     $this->installConfig(['commerce_product']);
-    $this->installConfig(['commerce_store']);
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);

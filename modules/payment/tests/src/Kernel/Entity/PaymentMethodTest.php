@@ -6,8 +6,8 @@ use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\CreditCard;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the payment method entity.
@@ -16,7 +16,7 @@ use Drupal\profile\Entity\Profile;
  *
  * @group commerce
  */
-class PaymentMethodTest extends EntityKernelTestBase {
+class PaymentMethodTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -31,17 +31,9 @@ class PaymentMethodTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
     'commerce_payment',
@@ -55,11 +47,9 @@ class PaymentMethodTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_payment');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
 

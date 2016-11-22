@@ -7,7 +7,6 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -15,13 +14,12 @@ use Drupal\user\Entity\Role;
  *
  * @group commerce
  */
-class PluginItemTest extends EntityKernelTestBase {
+class PluginItemTest extends CommerceKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'commerce',
     'commerce_test',
   ];
 

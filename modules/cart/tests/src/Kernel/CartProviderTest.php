@@ -7,7 +7,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the cart provider.
@@ -15,7 +15,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_cart\CartProvider
  * @group commerce
  */
-class CartProviderTest extends EntityKernelTestBase {
+class CartProviderTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -23,27 +23,13 @@ class CartProviderTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
+    'path',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
-
-  /**
-   * The store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * Anonymous user.
@@ -71,15 +57,11 @@ class CartProviderTest extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
+
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_currency');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig(['commerce_order']);
-
-    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     OrderItemType::create([
       'id' => 'test',

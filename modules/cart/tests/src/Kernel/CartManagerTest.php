@@ -6,7 +6,7 @@ use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the cart manager.
@@ -14,7 +14,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * @coversDefaultClass \Drupal\commerce_cart\CartManager
  * @group commerce
  */
-class CartManagerTest extends EntityKernelTestBase {
+class CartManagerTest extends CommerceKernelTestBase {
 
   /**
    * The cart manager.
@@ -29,13 +29,6 @@ class CartManagerTest extends EntityKernelTestBase {
    * @var \Drupal\commerce_cart\CartProvider
    */
   protected $cartProvider;
-
-  /**
-   * The store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
 
   /**
    * A sample user.
@@ -64,18 +57,10 @@ class CartManagerTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'path',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -85,14 +70,10 @@ class CartManagerTest extends EntityKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installSchema('system', 'router');
-    $this->installEntitySchema('commerce_currency');
-    $this->installEntitySchema('commerce_store');
+
     $this->installEntitySchema('commerce_order');
     $this->installConfig(['commerce_order']);
     $this->installConfig(['commerce_product']);
-
-    $this->container->get('commerce_price.currency_importer')->import('USD');
 
     $this->variation1 = ProductVariation::create([
       'type' => 'default',
@@ -112,14 +93,6 @@ class CartManagerTest extends EntityKernelTestBase {
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-      'default_currency' => 'USD',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
   }
 
   /**
