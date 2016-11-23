@@ -51,7 +51,7 @@ field.widget.settings.commerce_auto_sku:
       label: 'SKU suffix'
     size:
       type: integer
-      label: 'Size of textfield'
+      label: 'Size of SKU field'
     placeholder:
       type: label
       label: 'Placeholder'
