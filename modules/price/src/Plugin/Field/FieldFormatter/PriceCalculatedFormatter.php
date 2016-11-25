@@ -84,11 +84,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $currency_codes = [];
-    foreach ($items as $delta => $item) {
-      $currency_codes[] = $item->currency_code;
-    }
-    $currencies = $this->currencyStorage->loadMultiple($currency_codes);
+    $currencies = $this->currencyStorage->loadMultiple();
 
     $elements = [];
     /** @var \Drupal\commerce_price\Plugin\Field\FieldType\PriceItem $item */
