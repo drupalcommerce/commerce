@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_price\Functional;
 
 use Drupal\commerce_price\Entity\Currency;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\Core\Url;
 
 /**
  * Tests the currency UI.
@@ -21,6 +22,10 @@ class CurrencyTest extends CommerceBrowserTestBase {
       'currency_codes[]' => ['CHF'],
     ];
     $this->submitForm($edit, 'Import');
+
+    $url = Url::fromRoute('entity.commerce_currency.collection');
+    $this->assertEquals($this->getUrl(), $this->getAbsoluteUrl($url->toString()));
+
     $currency = Currency::load('CHF');
     $this->assertEquals('CHF', $currency->getCurrencyCode());
     $this->assertEquals('Swiss Franc', $currency->getName());
