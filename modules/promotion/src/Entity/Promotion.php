@@ -243,6 +243,13 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public function applies(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
+
+    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
+    $offer = $this->get('offer')->first()->getTargetInstance();
+    if ($offer->getTargetEntityType() !== $entity_type_id) {
+      return FALSE;
+    }
+
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
 
