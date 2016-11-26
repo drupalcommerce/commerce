@@ -173,4 +173,59 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
   }
 
+  /**
+   * Tests offer target entity type.
+   */
+  public function testTargetType() {
+    // Use addOrderItem so the total is calculated.
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '2',
+      'unit_price' => [
+        'number' => '10.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+
+    // Starts now, enabled. No end time.
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    $result = $promotion->applies($this->order);
+
+    // Promotion target is for the order.
+    $this->assertTrue($result);
+
+    $promotion = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.50',
+        ],
+      ],
+    ]);
+    $promotion->save();
+
+    $result = $promotion->applies($this->order);
+
+    // Promotion target is for the order items. This should fail.
+    $this->assertFalse($result);
+  }
+
 }
