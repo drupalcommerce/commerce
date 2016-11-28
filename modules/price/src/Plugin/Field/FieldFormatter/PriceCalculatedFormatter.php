@@ -85,7 +85,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory'),
       $container->get('commerce_price.chain_price_resolver'),
-      $container->get('entity.manager')->getStorage('commerce_currency'),
+      $container->get('entity.manager')->getStorage('commerce_currency')
     );
   }
 
