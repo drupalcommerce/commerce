@@ -7,7 +7,6 @@ use Drupal\commerce_price\NumberFormatterFactoryInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -35,6 +34,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $chainPriceResolver;
   
   /**
+   * Currency storage interface
    *
    * @var \Drupal\commerce_price\Entity\CurrencyInterface
    */
@@ -64,10 +64,10 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
    * @param \Drupal\commerce_price\Resolver\ChainPriceResolverInterface $chain_price_resolver
    *   The chain price resolver.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, EntityStorageInterface $currency_storage) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory);
     $this->chainPriceResolver = $chain_price_resolver;
-    $this->currencyStorage = $currency_storage;
+    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
   }
 
   /**
@@ -84,8 +84,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('commerce_price.number_formatter_factory'),
-      $container->get('commerce_price.chain_price_resolver'),
-      $container->get('entity.manager')->getStorage('commerce_currency')
+      $container->get('commerce_price.chain_price_resolver')
     );
   }
 
