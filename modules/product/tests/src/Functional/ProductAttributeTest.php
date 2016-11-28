@@ -27,9 +27,11 @@ class ProductAttributeTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/product-attributes');
     $this->getSession()->getPage()->clickLink('Add product attribute');
     $this->submitForm([
-      'id' => 'size',
       'label' => 'Size',
       'elementType' => 'commerce_product_rendered_attribute',
+      // Setting the 'id' can fail if focus switches to another field.
+      // This is a bug in the machine name JS that can be reproduced manually.
+      'id' => 'size',
     ], 'Save');
     $this->assertSession()->pageTextContains('Created the Size product attribute.');
     $this->assertSession()->addressMatches('/\/admin\/commerce\/product-attributes\/manage\/size$/');
@@ -75,6 +77,33 @@ class ProductAttributeTest extends ProductBrowserTestBase {
     $this->submitForm([], 'Delete');
 
     $this->assertNull(ProductAttribute::load('size'));
+  }
+
+  /**
+   * Tests assigning an attribute to a product variation type.
+   */
+  public function testProductVariationTypes() {
+    $this->createEntity('commerce_product_attribute', [
+      'id' => 'color',
+      'label' => 'Color',
+    ]);
+
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $edit = [
+      'variation_types[default]' => 'default',
+      'values[0][entity][name][0][value]' => 'Red',
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
+    $this->assertSession()->pageTextContains('attribute_color', 'The color attribute field has been created');
+
+    $this->drupalGet('admin/commerce/product-attributes/manage/color');
+    $edit = [
+      'variation_types[default]' => FALSE,
+    ];
+    $this->submitForm($edit, t('Save'));
+    $this->drupalGet('admin/commerce/config/product-variation-types/default/edit/fields');
+    $this->assertSession()->pageTextNotContains('attribute_color', 'The color attribute field has been deleted');
   }
 
 }
