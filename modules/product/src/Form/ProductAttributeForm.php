@@ -19,7 +19,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
   protected $attributeFieldManager;
 
   /**
-   * Constructs a new ProductVariationTypeForm object.
+   * Constructs a new ProductAttributeForm object.
    *
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
@@ -74,13 +74,14 @@ class ProductAttributeForm extends BundleEntityFormBase {
       '#default_value' => $attribute->getElementType(),
     ];
 
+    // Allow the attribute to be assigned to a product variaton type.
     $form['original_variation_types'] = [
       '#type' => 'value',
       '#value' => [],
     ];
     $form['variation_types'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Variation types'),
+      '#title' => $this->t('Product variation types'),
     ];
     $attribute_field_map = $this->attributeFieldManager->getFieldMap();
     $variation_type_storage = $this->entityTypeManager->getStorage('commerce_product_variation_type');
@@ -89,17 +90,14 @@ class ProductAttributeForm extends BundleEntityFormBase {
       $variation_type_id = $variation_type->id();
       $form['variation_types']['#options'][$variation_type_id] = $variation_type->label();
 
-      // If this is not a new attribute, see if we should disable the checkbox.
-      if (!$attribute->isNew()) {
-        if (isset($attribute_field_map[$variation_type_id])) {
-          $used_attributes = array_column($attribute_field_map[$variation_type_id], 'attribute_id');
-          if (in_array($attribute->id(), $used_attributes)) {
-            $form['original_variation_types']['#value'][$variation_type_id] = $variation_type_id;
-            $form['variation_types']['#default_value'][$variation_type_id] = $variation_type_id;
-            $form['variation_types'][$variation_type_id] = [
-              '#disabled' => !$this->attributeFieldManager->canDeleteField($attribute, $variation_type_id),
-            ];
-          }
+      if (!$attribute->isNew() && isset($attribute_field_map[$variation_type_id])) {
+        $used_attributes = array_column($attribute_field_map[$variation_type_id], 'attribute_id');
+        if (in_array($attribute->id(), $used_attributes)) {
+          $form['original_variation_types']['#value'][$variation_type_id] = $variation_type_id;
+          $form['variation_types']['#default_value'][$variation_type_id] = $variation_type_id;
+          $form['variation_types'][$variation_type_id] = [
+            '#disabled' => !$this->attributeFieldManager->canDeleteField($attribute, $variation_type_id),
+          ];
         }
       }
     }
