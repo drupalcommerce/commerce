@@ -18,5 +18,24 @@
  */
 #}
 <div{{ attributes }}>
-  {{ order }}
+  {{ order.order_number }}
+  <div class="customer-information">
+    {% if shipping_information %}
+      <div class="customer-information__shipping">
+        {{ shipping_information }}
+      </div>
+    {% endif %}
+    {% if billing_information %}
+      <div class="customer-billing">
+        {{ billing_information }}
+      </div>
+    {% endif %}
+  </div>
+  <div class="order-information">
+    {{ order.completed }}
+    {{ order.placed }}
+    {{ order.state }}
+    {{ order.order_items }}
+    {{ order.total_price }}
+  </div>
 </div>
