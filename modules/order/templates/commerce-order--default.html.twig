@@ -54,23 +54,23 @@
           {% endfor %}
         </div>
       </details>
-      {% if order['billing_information'] %}
+      {% if order.billing_information %}
         <details open>
           <summary role="button">
             {{ 'Billing information'|t }}
           </summary>
           <div class="details-wrapper">
-            {{ order['billing_information'] }}
+            {{ order.billing_information }}
           </div>
         </details>
       {% endif %}
-      {% if order['shipping_information'] %}
+      {% if order.shipping_information %}
         <details open>
           <summary role="button">
             {{ 'Shipping information'|t }}
           </summary>
           <div class="details-wrapper">
-            {{ order['shipping_information'] }}
+            {{ order.shipping_information }}
           </div>
         </details>
       {% endif %}
