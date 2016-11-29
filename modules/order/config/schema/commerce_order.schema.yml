@@ -17,6 +17,12 @@ commerce_order.commerce_order_type.*:
     refresh_frequency:
         type: integer
         label: 'Order refresh frequency'
+    sendReceipt:
+        type: boolean
+        label: 'Send an email to the customer when the order is placed'
+    receiptBcc:
+        type: boolean
+        label: 'Send a copy of the customer email to the store email when the order is placed'
 
 commerce_order.commerce_order_item_type.*:
   type: config_entity

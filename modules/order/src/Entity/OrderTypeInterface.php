@@ -71,4 +71,40 @@ interface OrderTypeInterface extends ConfigEntityInterface {
    */
   public function setRefreshFrequency($refresh_frequency);
 
+  /**
+   * Whether to send the customer an email when the order is placed.
+   *
+   * @return bool
+   *   TRUE when an email should be sent, otherwise FALSE.
+   */
+  public function shouldSendReceipt();
+
+  /**
+   * Set whether to send a customer email when an order is placed.
+   *
+   * @param bool $send
+   *   TRUE when an email should be sent, or FALSE.
+   *
+   * @return $this
+   */
+  public function setSendReceipt($send);
+
+  /**
+   * Whether to send the admin an email when the order is placed.
+   *
+   * @return bool
+   *   TRUE when an email should be sent, otherwise FALSE.
+   */
+  public function shouldAddReceiptBcc();
+
+  /**
+   * Set whether to send an admin email when an order is placed.
+   *
+   * @param bool $send
+   *   TRUE when an email should be sent, or FALSE.
+   *
+   * @return $this
+   */
+  public function setReceiptBcc($send);
+
 }

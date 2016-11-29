@@ -40,7 +40,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "id",
  *     "workflow",
  *     "refresh_mode",
- *     "refresh_frequency"
+ *     "refresh_frequency",
+ *     "sendReceipt",
+ *     "receiptBcc",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -88,6 +90,20 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
   protected $refresh_frequency;
 
   /**
+   * Whether to send the customer an email when the order is placed.
+   *
+   * @var bool
+   */
+  protected $sendReceipt;
+
+  /**
+   * Whether to bcc the admin an email when the order is placed.
+   *
+   * @var bool
+   */
+  protected $receiptBcc;
+
+  /**
    * {@inheritdoc}
    */
   public function getWorkflowId() {
@@ -130,6 +146,36 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setRefreshFrequency($refresh_frequency) {
     $this->refresh_frequency = $refresh_frequency;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldSendReceipt() {
+    return $this->sendReceipt;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSendReceipt($send) {
+    $this->sendReceipt = (bool) $send;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldAddReceiptBcc() {
+    return $this->receiptBcc;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReceiptBcc($send) {
+    $this->receiptBcc = (bool) $send;
     return $this;
   }
 
