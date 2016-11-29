@@ -293,13 +293,18 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
     $form['actions'] = $this->actions($form, $form_state);
 
+    $form_state->set('commerce_checkout_form', TRUE);
+
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $form_state->set('order', $this->order);
+    $form_state->set('next_step_id', $this->getNextStepId());
+  }
 
   /**
    * {@inheritdoc}

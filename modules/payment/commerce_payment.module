@@ -5,10 +5,14 @@
  * Provides payment functionality.
  */
 
+use Drupal\commerce_payment\Entity\Payment;
+use Drupal\commerce_payment\Exception\HardDeclineException;
+use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
@@ -96,4 +100,67 @@ function template_preprocess_commerce_payment_method(array &$variables) {
   foreach (Element::children($variables['elements']) as $key) {
     $variables['payment_method'][$key] = $variables['elements'][$key];
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_payment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_state->get('commerce_checkout_form')) {
+    $form['#validate'][] = 'commerce_payment_process_checkout_payment';
+  }
+}
+
+/**
+ * Processes payments after checkout.
+ *
+ * @param $form
+ *   Checkout form.
+ *
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state object.
+ */
+function commerce_payment_process_checkout_payment(&$form, FormStateInterface $form_state) {
+  if ($form_state->get('next_step_id') == 'complete') {
+    $order = $form_state->get('order');
+    $payment_method = $order->payment_method->entity;
+    $payment_gateway = $payment_method->getPaymentGateway();
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
+    // @todo Restict payment creation by gateway type / configuration?
+    // if (get_class($payment_gateway_plugin) instanceof OnsitePaymentGatewayInterface == FALSE) {
+    //  return;
+    // }
+    /** @var \Drupal\commerce_price\Price $amount */
+    // @todo Get orderBalance()?
+    // @see https://github.com/drupalcommerce/commerce/pull/508
+    $amount = $order->getTotalPrice();
+    try {
+      $payment = Payment::create([
+        'state' => 'new',
+        'amount' => $amount,
+        'payment_gateway' => $payment_gateway->id(),
+        'payment_method' => $payment_method,
+        'order_id' => $order->getOrderNumber(),
+      ]);
+      // @todo Determine capture somehow?
+      // transaction_type currently does not exist in the payment gateway config.
+      // transaction_type comes from the payment capture form submit handler.
+      // @see https://github.com/drupalcommerce/commerce/pull/542
+      $capture = TRUE;
+      $payment_gateway_plugin->createPayment($payment, $capture);
+    }
+    catch (HardDeclineException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      $form_state->setErrorByName('payment_method', 'Payment declined, please try another form of payment');
+    }
+    catch (PaymentGatewayException $e) {
+      drupal_set_message('Problem communicating with payment gateway, please try again later', 'error');
+      $form_state->setErrorByName('payment_method');
+    }
+    catch (\Exception $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      $form_state->setErrorByName('payment_method');
+    }
+  }
+
 }
