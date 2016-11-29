@@ -34,12 +34,12 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $chainPriceResolver;
   
   /**
-   * Currency storage interface
+   * Currency storage interface.
    *
    * @var \Drupal\commerce_price\Entity\CurrencyInterface
    */
   protected $currencyStorage;
-  
+
   /**
    * Constructs a new PriceCalculatedFormatter object.
    *
