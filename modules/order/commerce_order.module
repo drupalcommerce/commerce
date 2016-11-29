@@ -19,6 +19,10 @@ function commerce_order_theme($existing, $type, $theme, $path) {
     'commerce_order' => [
       'render element' => 'elements',
     ],
+    'commerce_order__admin' => [
+      'base hook' => 'commerce_order',
+      'render element' => 'elements',
+    ],
     'commerce_order__user' => [
       'base hook' => 'commerce_order',
       'render element' => 'elements',
@@ -79,6 +83,11 @@ function template_preprocess_commerce_order(&$variables) {
   $variables['order'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['order'][$key] = $variables['elements'][$key];
+  }
+
+  if ($order->getBillingProfile()) {
+    $profile_view_bulder = \Drupal::entityTypeManager()->getViewBuilder('profile');
+    $variables['order']['billing_information'] = $profile_view_bulder->view($order->getBillingProfile());
   }
 }
 

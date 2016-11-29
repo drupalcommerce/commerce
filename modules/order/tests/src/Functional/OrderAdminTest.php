@@ -158,14 +158,23 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
+      'status' => 'draft',
     ]);
 
     // First test that the current admin user can see the order.
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(200);
-
-    // Order displays email address.
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
+
+    // Confirm that the transition buttons are visible and functional.
+    $workflow = $order->getState()->getWorkflow();
+    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
+    foreach ($transitions as $transition) {
+      $this->assertSession()->buttonExists($transition->getLabel());
+    }
+    $this->click('input.js-form-submit#edit-place');
+    $this->assertSession()->buttonNotExists('Place order');
+    $this->assertSession()->buttonNotExists('Cancel order');
 
     // Logout and check that anonymous users cannot see the order admin screen
     // and receive a 403 error code.
@@ -173,37 +182,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(403);
-  }
-
-  /**
-   * Tests that the order workflow transition buttons appear on the order page.
-   */
-  public function testOrderWorkflowTransitionButtons() {
-    $order_item = $this->createEntity('commerce_order_item', [
-      'type' => 'default',
-      'unit_price' => [
-        'number' => '999',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order = $this->createEntity('commerce_order', [
-      'type' => 'default',
-      'mail' => $this->loggedInUser->getEmail(),
-      'order_items' => [$order_item],
-      'state' => 'draft',
-    ]);
-
-    $this->drupalGet('admin/commerce/orders/' . $order->id());
-
-    $workflow = $order->getState()->getWorkflow();
-    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
-    foreach ($transitions as $transition) {
-      $this->assertSession()->buttonExists($transition->getLabel());
-    }
-
-    $this->click('input.js-form-submit#edit-place');
-    $this->assertSession()->buttonNotExists('Place order');
-    $this->assertSession()->buttonNotExists('Cancel order');
   }
 
 }
