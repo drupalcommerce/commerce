@@ -190,7 +190,13 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addAdjustment($adjustments[1]);
     $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
-    $order->removeAdjustment($adjustments[0]);
+    // Create new adjustment object, matching existing. Ensure it gets removed.
+    $adjustment = new Adjustment([
+      'type' => 'custom',
+      'label' => '10% off',
+      'amount' => new Price('-1.00', 'USD'),
+    ]);
+    $order->removeAdjustment($adjustment);
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
