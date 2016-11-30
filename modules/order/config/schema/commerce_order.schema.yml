@@ -12,11 +12,17 @@ commerce_order.commerce_order_type.*:
       type: string
       label: 'Workflow'
     refresh_mode:
-        type: string
-        label: 'Order refresh mode'
+      type: string
+      label: 'Order refresh mode'
     refresh_frequency:
-        type: integer
-        label: 'Order refresh frequency'
+      type: integer
+      label: 'Order refresh frequency'
+    sendReceipt:
+      type: boolean
+      label: 'Email the customer a receipt when an order is placed'
+    receiptBcc:
+      type: string
+      label: 'The receipt BCC email'
 
 commerce_order.commerce_order_item_type.*:
   type: config_entity

@@ -110,3 +110,16 @@ function commerce_payment_preprocess_commerce_order(&$variables) {
     ];
   }
 }
+
+/**
+ * Implements hook_preprocess_commerce_order_receipt().
+ */
+function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['elements']['#commerce_order'];
+  if (!$order->get('payment_method')->isEmpty()) {
+    $variables['payment_method'] = [
+      '#markup' => $order->get('payment_method')->first()->entity->label(),
+    ];
+  }
+}
