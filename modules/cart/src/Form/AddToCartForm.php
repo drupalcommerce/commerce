@@ -57,7 +57,7 @@ class AddToCartForm extends ContentEntityForm {
   /**
    * The form instance ID.
    *
-   * Numeric counter used to ensure form ID uniqueness. 
+   * Numeric counter used to ensure form ID uniqueness.
    *
    * @var int
    */
