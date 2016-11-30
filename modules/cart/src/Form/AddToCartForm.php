@@ -55,11 +55,13 @@ class AddToCartForm extends ContentEntityForm {
   protected $chainPriceResolver;
 
   /**
-   * A unique id to use for each instance of this form.
+   * The form instance ID.
+   *
+   * Numeric counter used to ensure form ID uniqueness. 
    *
    * @var int
    */
-  protected static $formUniqueId = 0;
+  protected static $formInstanceId = 0;
 
   /**
    * Constructs a new AddToCartForm object.
@@ -86,7 +88,7 @@ class AddToCartForm extends ContentEntityForm {
     $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
 
-    self::$formUniqueId++;
+    self::$formInstanceId++;
   }
 
   /**
@@ -121,7 +123,7 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $form_id .= '_' . self::$formUniqueId;
+    $form_id .= '_' . self::$formInstanceId;
 
     return $form_id . '_form';
   }
