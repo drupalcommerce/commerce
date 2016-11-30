@@ -84,6 +84,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
     $order = $this->createEntity('commerce_order', [
       'type' => $type->id(),
       'mail' => $this->loggedInUser->getEmail(),
+      'store_id' => $this->store,
     ]);
 
     // Try to delete the order type.

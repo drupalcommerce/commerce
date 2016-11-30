@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_price\Kernel;
 
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
@@ -12,6 +13,8 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @group commerce
  */
 class PriceFormattersTest extends CommerceKernelTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * Modules to enable.
