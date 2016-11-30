@@ -85,7 +85,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    $product = $form_state->get('product');
+    $product = $form_state->get('purchasable_entity');
     $variations = $this->variationStorage->loadEnabled($product);
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
