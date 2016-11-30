@@ -30,3 +30,9 @@ services:
     class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
     tags:
       - { name: event_subscriber }
+
+  commerce_order.order_receipt_subscriber:
+    class: Drupal\commerce_order\EventSubscriber\OrderReceiptSubscriber
+    arguments: ['@entity_type.manager', '@plugin.manager.mail', '@renderer']
+    tags:
+      - { name: 'event_subscriber' }

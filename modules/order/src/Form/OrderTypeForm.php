@@ -42,7 +42,7 @@ class OrderTypeForm extends BundleEntityFormBase {
     ];
     $form['workflow'] = [
       '#type' => 'select',
-      '#title' => t('Workflow'),
+      '#title' => $this->t('Workflow'),
       '#options' => $workflows,
       '#default_value' => $order_type->getWorkflowId(),
       '#description' => $this->t('Used by all orders of this type.'),
@@ -50,21 +50,21 @@ class OrderTypeForm extends BundleEntityFormBase {
 
     $form['refresh'] = [
       '#type' => 'details',
-      '#title' => t('Order refresh'),
+      '#title' => $this->t('Order refresh'),
       '#weight' => 5,
       '#open' => TRUE,
       '#collapsible' => TRUE,
       '#tree' => FALSE,
     ];
     $form['refresh']['refresh_intro'] = [
-      '#markup' => '<p>' . t('These settings let you control how draft orders are refreshed, the process during which prices are recalculated.') . '</p>',
+      '#markup' => '<p>' . $this->t('These settings let you control how draft orders are refreshed, the process during which prices are recalculated.') . '</p>',
     ];
     $form['refresh']['refresh_mode'] = [
       '#type' => 'radios',
       '#title' => $this->t('Order refresh mode'),
       '#options' => [
-        OrderType::REFRESH_ALWAYS => t('Refresh a draft order when it is loaded regardless of who it belongs to.'),
-        OrderType::REFRESH_CUSTOMER => t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
+        OrderType::REFRESH_ALWAYS => $this->t('Refresh a draft order when it is loaded regardless of who it belongs to.'),
+        OrderType::REFRESH_CUSTOMER => $this->t('Only refresh a draft order when it is loaded if it belongs to the current user.'),
       ],
       '#default_value' => ($order_type->isNew()) ? OrderType::REFRESH_CUSTOMER : $order_type->getRefreshMode(),
     ];
@@ -77,6 +77,33 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#min' => 1,
       '#size' => 10,
       '#field_suffix' => t('seconds'),
+    ];
+
+    $form['emails'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Emails'),
+      '#weight' => 5,
+      '#open' => TRUE,
+      '#collapsible' => TRUE,
+      '#tree' => FALSE,
+    ];
+    $form['emails']['notice'] = [
+      '#markup' => '<p>' . $this->t('Emails are sent in the HTML format. You will need a module such as <a href="https://www.drupal.org/project/swiftmailer">Swiftmailer</a> to send HTML emails.') . '</p>',
+    ];
+    $form['emails']['sendReceipt'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Email the customer a receipt when an order is placed'),
+      '#default_value' => ($order_type->isNew()) ? TRUE : $order_type->shouldSendReceipt(),
+    ];
+    $form['emails']['receiptBcc'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Send a copy of the receipt to this email:'),
+      '#default_value' => ($order_type->isNew()) ? '' : $order_type->getReceiptBcc(),
+      '#states' => [
+        'visible' => [
+          ':input[name="sendReceipt"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     return $this->protectBundleIdElement($form);
