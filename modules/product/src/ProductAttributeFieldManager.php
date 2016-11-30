@@ -143,11 +143,13 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
         $handler_settings = $definition->getSetting('handler_settings');
         $component = $form_display->getComponent($field_name);
 
-        $field_map[$bundle][] = [
-          'attribute_id' => reset($handler_settings['target_bundles']),
-          'field_name' => $field_name,
-          'weight' => $component ? $component['weight'] : 0,
-        ];
+        foreach ($handler_settings['target_bundles'] as $id => $target_bundle) {
+          $field_map[$bundle][] = [
+            'attribute_id' => $target_bundle,
+            'field_name' => $field_name,
+            'weight' => $component ? $component['weight'] : 0,
+          ];
+        }
       }
 
       if (!empty($field_map[$bundle])) {
@@ -215,18 +217,16 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    // Prevent an EntityQuery crash by first confirming the field exists.
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if (!$field) {
-      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
+    if (FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name)) {
+      $query = $this->queryFactory->get('commerce_product_variation')
+        ->condition('type', $variation_type_id)
+        ->exists($field_name)
+        ->range(0, 1);
+      $result = $query->execute();
     }
-    $query = $this->queryFactory->get('commerce_product_variation')
-      ->condition('type', $variation_type_id)
-      ->exists($field_name)
-      ->range(0, 1);
-    $result = $query->execute();
 
-    return empty($result);
+    // To prevent crashes just do not confirm deletion if field does not exist.
+    return isset($result) ? empty($result) : FALSE;
   }
 
   /**

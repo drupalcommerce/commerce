@@ -196,24 +196,27 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The selected variation.
    */
   protected function selectVariationFromUserInput(array $variations, array $user_input) {
-    $current_variation = reset($variations);
+    $selected_variation = NULL;
     if (!empty($user_input)) {
       $attributes = $user_input['attributes'];
+      $first_value = current($attributes);
+      $first_key = current(array_keys($attributes));
       foreach ($variations as $variation) {
-        $match = TRUE;
+        $values = [];
         foreach ($attributes as $field_name => $value) {
-          if ($variation->getAttributeValueId($field_name) != $value) {
-            $match = FALSE;
+          $values[$field_name] = $variation->getAttributeValueId($field_name);
+          if ($first_key == $field_name && $values[$field_name] === $first_value) {
+            $selected_variation = $selected_variation ?: $variation;
           }
         }
-        if ($match) {
-          $current_variation = $variation;
+        if ($attributes === $values) {
+          $selected_variation = $variation;
           break;
         }
       }
     }
 
-    return $current_variation;
+    return $selected_variation ?: reset($variations);
   }
 
   /**
@@ -228,14 +231,14 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    *   The attribute information, keyed by field name.
    */
   protected function getAttributeInfo(ProductVariationInterface $selected_variation, array $variations) {
-    $attributes = [];
+    $attributes = $values = [];
     $field_definitions = $this->attributeFieldManager->getFieldDefinitions($selected_variation->bundle());
     $field_map = $this->attributeFieldManager->getFieldMap($selected_variation->bundle());
     $field_names = array_column($field_map, 'field_name');
     $index = 0;
     foreach ($field_names as $field_name) {
       /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute_type */
-      $attribute_type = $this->attributeStorage->load(substr($field_name, 10));
+      $attribute_type = $this->attributeStorage->load($field_map[$index]['attribute_id']);
       $field = $field_definitions[$field_name];
       $attributes[$field_name] = [
         'field_name' => $field_name,
@@ -257,9 +260,17 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
         };
       }
 
-      $attributes[$field_name]['values'] = $this->getAttributeValues($variations, $field_name, $callback);
+      $value = $this->getAttributeValues($variations, $field_name, $callback);
+      if (!isset($values[$field_name])) {
+        $values[$field_name] = $value;
+      }
+      elseif (!in_array($values[$field_name], $value)) {
+        $values[$field_name] += $value;
+      }
+      $attributes[$field_name]['values'] = $values[$field_name];
       $index++;
     }
+
     // Filter out attributes with no values.
     $attributes = array_filter($attributes, function ($attribute) {
       return !empty($attribute['values']);
