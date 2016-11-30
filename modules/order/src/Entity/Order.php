@@ -40,7 +40,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_order\OrderRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
@@ -545,8 +545,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Owner'))
-      ->setDescription(t('The order owner.'))
+      ->setLabel(t('Customer'))
+      ->setDescription(t('The customer.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\Order::getCurrentUserId')
@@ -646,7 +646,8 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the order was last edited.'));
+      ->setDescription(t('The time when the order was last edited.'))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['placed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Placed'))
