@@ -58,7 +58,7 @@ class ProductLazyBuilders {
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
     $order_item = $order_item_storage->createFromPurchasableEntity($product->getDefaultVariation());
     $form_state_additions = [
-      'purchasable_entity' => $product,
+      'product' => $product,
       'view_mode' => $view_mode,
       'settings' => [
         'combine' => $combine,

@@ -70,7 +70,7 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    $product = $form_state->get('purchasable_entity');
+    $product = $form_state->get('product');
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations */
     $variations = $this->variationStorage->loadEnabled($product);
     if (count($variations) === 0) {

@@ -8,8 +8,8 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
-use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -138,7 +138,6 @@ class AddToCartForm extends ContentEntityForm {
     if ($form_state->get('hide_form')) {
       $form['#access'] = FALSE;
     }
-    $form['#action'] = $form_state->get('purchasable_entity')->toUrl()->toString();
 
     return $form;
   }
