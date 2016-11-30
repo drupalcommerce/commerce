@@ -8,15 +8,13 @@ use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
- * Provides the payment information pane.
+ * Provides the payment process pane.
  *
  * @CommerceCheckoutPane(
  *   id = "payment_process",
@@ -35,7 +33,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
   protected $entityTypeManager;
 
   /**
-   * Constructs a new PaymentCollection object.
+   * Constructs a new PaymentProcess object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -81,7 +79,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
    */
   public function buildConfigurationSummary() {
     if (!empty($this->configuration['capture'])) {
-      $summary = $this->t('Transaction mode: Authorization and capture');
+      $summary = $this->t('Transaction mode: Authorize and capture');
     }
     else {
       $summary = $this->t('Transaction mode: Authorize only');
@@ -98,10 +96,10 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
     $form['capture'] = [
       '#type' => 'radios',
       '#title' => $this->t('Transaction mode'),
-      '#description' => $this->t('This setting is only respected if the chosen payment gateway supports authorizations only.'),
+      '#description' => $this->t('This setting is only respected if the chosen payment gateway supports authorizations.'),
       '#options' => [
-        TRUE => $this->t('Authorization and capture'),
-        FALSE => $this->t('Authorization only (requires manual or automated capture after checkout)'),
+        TRUE => $this->t('Authorize and capture'),
+        FALSE => $this->t('Authorize only (requires manual capture after checkout)'),
       ],
       '#default_value' => $this->configuration['capture'],
     ];
@@ -125,9 +123,9 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
-    // Verify order has a payment gateway chosen. If not, go to previous step.
+    // The payment gateway is currently always required to be set.
     if ($this->order->get('payment_gateway')->isEmpty()) {
-      drupal_set_message($this->t('Sorry, there was an error determining the payment gateway.'), 'error');
+      drupal_set_message($this->t('No payment gateway selected.'), 'error');
       $this->redirectToPreviousStep();
     }
 
@@ -147,22 +145,19 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         ]);
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
 
-        // When the payment has been created, redirect to the next step.
         $next_step_id = $this->checkoutFlow->getNextStepId();
-
-        // @todo Revisit: copy paste of CheckoutFlowBase::submitForm parts.
+        // @todo Add a checkout flow method for completing checkout.
         if ($next_step_id == 'complete') {
-          // Place the order.
           $transition = $this->order->getState()->getWorkflow()->getTransition('place');
           $this->order->getState()->applyTransition($transition);
         }
         $this->order->checkout_step = $next_step_id;
         $this->order->save();
 
-        throw new EnforcedResponseException(new RedirectResponse(Url::fromRoute('commerce_checkout.form', [
+        throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
           'commerce_order' => $this->order->id(),
           'step' => $next_step_id,
-        ])->toString()));
+        ])->toString());
 
       }
       catch (PaymentGatewayException $e) {
@@ -177,7 +172,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Helper method to redirect on process failure.
+   * Redirects to a previous checkout step on error.
    *
    * @throws \Drupal\Core\Form\EnforcedResponseException
    */
