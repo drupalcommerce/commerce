@@ -55,6 +55,15 @@ class AddToCartForm extends ContentEntityForm {
   protected $chainPriceResolver;
 
   /**
+   * The form instance ID.
+   *
+   * Numeric counter used to ensure form ID uniqueness.
+   *
+   * @var int
+   */
+  protected static $formInstanceId = 0;
+
+  /**
    * Constructs a new AddToCartForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -78,6 +87,8 @@ class AddToCartForm extends ContentEntityForm {
     $this->orderTypeResolver = $order_type_resolver;
     $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
+
+    self::$formInstanceId++;
   }
 
   /**
@@ -105,7 +116,6 @@ class AddToCartForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    $product_id = $this->entity->getPurchasedEntity()->getProductId();
     $form_id = $this->entity->getEntityTypeId();
     if ($this->entity->getEntityType()->hasKey('bundle')) {
       $form_id .= '_' . $this->entity->bundle();
@@ -113,7 +123,7 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $form_id .= '_' . $product_id;
+    $form_id .= '_' . self::$formInstanceId;
 
     return $form_id . '_form';
   }
