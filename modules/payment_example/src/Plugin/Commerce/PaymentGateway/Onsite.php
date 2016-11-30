@@ -96,6 +96,15 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
       throw new HardDeclineException('The provided payment method has expired');
     }
 
+    // Add a built in test for testing decline exceptions.
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
+    if ($billing_address = $payment_method->getBillingProfile()) {
+      $billing_address = $payment_method->getBillingProfile()->get('address')->first();
+      if ($billing_address->getPostalCode() == '53140') {
+        throw new HardDeclineException('The payment was declined');
+      }
+    }
+
     // Perform the create payment request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     // Remember to take into account $capture when performing the request.
