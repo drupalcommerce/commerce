@@ -39,7 +39,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
    * @var array
    */
   public static $modules = [
-    'commerce_product', 
+    'commerce_product',
     'commerce_cart',
     'commerce_checkout',
     'commerce_payment',
