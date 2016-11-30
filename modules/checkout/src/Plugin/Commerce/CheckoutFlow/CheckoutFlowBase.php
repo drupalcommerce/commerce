@@ -156,7 +156,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     return [
       'payment' => [
         'label' => $this->t('Payment'),
-        'next_label' => $this->t('Continue to payment'),
+        'next_label' => $this->t('Pay and complete purchase'),
         'has_order_summary' => FALSE,
       ],
       'complete' => [
