@@ -11,7 +11,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
- * Tests the Authorize.net payment configurationf orm.
+ * Tests the integration between payments and checkout.
  *
  * @group commerce
  */
@@ -38,10 +38,11 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'user', 'text',
-    'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
-    'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
-    'commerce_payment', 'commerce_checkout', 'commerce_order', 'views_ui',
+  public static $modules = [
+    'commerce_product', 
+    'commerce_cart',
+    'commerce_checkout',
+    'commerce_payment',
     'commerce_payment_example',
   ];
 
@@ -132,7 +133,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment_method = $order->payment_method->entity;
     $this->assertEquals('1111', $payment_method->card_number->value);
 
-    // Verify a payment was created.
+    // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
@@ -227,7 +228,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $payment_method = $order->payment_method->entity;
     $this->assertEquals('1111', $payment_method->card_number->value);
 
-    // Verify a payment was created.
+    // Verify that a payment was created.
     $payment = Payment::load(1);
     $this->assertNotNull($payment);
     $this->assertEquals($payment->getAmount(), $order->getTotalPrice());
