@@ -127,7 +127,6 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
    */
   public function settingsSummary() {
     $summary = [];
-
     if ($this->getSetting('strip_trailing_zeroes')) {
       $summary[] = $this->t('Strip trailing zeroes after the decimal point.');
     }
