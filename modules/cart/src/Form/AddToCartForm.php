@@ -88,7 +88,6 @@ class AddToCartForm extends ContentEntityForm {
     $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
 
-    self::$formInstanceId++;
   }
 
   /**
@@ -123,7 +122,7 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $form_id .= '_' . self::$formInstanceId;
+    $form_id .= '_' . $this->entity->getPurchasedEntity()->id();
 
     return $form_id . '_form';
   }
