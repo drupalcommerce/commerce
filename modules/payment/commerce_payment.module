@@ -116,7 +116,7 @@ function commerce_payment_preprocess_commerce_order(&$variables) {
  */
 function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
-  $order = $variables['elements']['#commerce_order'];
+  $order = $variables['order_entity'];
   if (!$order->get('payment_method')->isEmpty()) {
     $variables['payment_method'] = [
       '#markup' => $order->get('payment_method')->first()->entity->label(),

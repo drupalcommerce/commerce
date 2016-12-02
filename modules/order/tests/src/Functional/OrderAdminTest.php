@@ -99,6 +99,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = Order::create([
       'type' => 'default',
       'state' => 'completed',
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
     ]);
     $order->save();
 
@@ -129,6 +131,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
     ]);
     $this->drupalGet($order->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals(200);
@@ -162,6 +166,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
       'state' => 'draft',
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
     ]);
 
     // First test that the current admin user can see the order.
