@@ -55,15 +55,6 @@ class AddToCartForm extends ContentEntityForm {
   protected $chainPriceResolver;
 
   /**
-   * The form instance ID.
-   *
-   * Numeric counter used to ensure form ID uniqueness.
-   *
-   * @var int
-   */
-  protected static $formInstanceId = 0;
-
-  /**
    * Constructs a new AddToCartForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
