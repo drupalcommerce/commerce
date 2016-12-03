@@ -2,12 +2,14 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -145,6 +147,22 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $step_ids = array_keys($this->getVisibleSteps());
     $current_index = array_search($this->stepId, $step_ids);
     return isset($step_ids[$current_index + 1]) ? $step_ids[$current_index + 1] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function redirectToStep($step_id) {
+    $this->order->checkout_step = $step_id;
+    if ($step_id == 'complete') {
+      $transition = $this->order->getState()->getWorkflow()->getTransition('place');
+      $this->order->getState()->applyTransition($transition);
+    }
+    $this->order->save();
+    throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->order->id(),
+      'step' => $step_id,
+    ])->toString());
   }
 
   /**
@@ -373,11 +391,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
     // Hide the actions element if it has no buttons.
     $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
-    // Once these two steps are reached, the user can't go back.
-    if (in_array($this->stepId, ['offsite_payment', 'complete'])) {
-      $actions['#access'] = FALSE;
-    }
-
     return $actions;
   }
 

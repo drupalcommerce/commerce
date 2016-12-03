@@ -2,15 +2,15 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsiteRedirectPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -133,37 +133,41 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
     $payment_gateway = $this->order->payment_gateway->entity;
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
+    $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    $payment = $payment_storage->create([
+      'state' => 'new',
+      'amount' => $this->order->getTotalPrice(),
+      'payment_gateway' => $payment_gateway->id(),
+      'order_id' => $this->order->id(),
+    ]);
+
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
       try {
-        $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
-        $payment = $payment_storage->create([
-          'state' => 'new',
-          'amount' => $this->order->getTotalPrice(),
-          'payment_gateway' => $payment_gateway->id(),
-          'payment_method' => $this->order->payment_method->entity,
-          'order_id' => $this->order->id(),
-        ]);
+        $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-
-        $next_step_id = $this->checkoutFlow->getNextStepId();
-        // @todo Add a checkout flow method for completing checkout.
-        if ($next_step_id == 'complete') {
-          $transition = $this->order->getState()->getWorkflow()->getTransition('place');
-          $this->order->getState()->applyTransition($transition);
-        }
-        $this->order->checkout_step = $next_step_id;
-        $this->order->save();
-
-        throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
-          'commerce_order' => $this->order->id(),
-          'step' => $next_step_id,
-        ])->toString());
+        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
 
       }
       catch (PaymentGatewayException $e) {
         drupal_set_message($e->getMessage(), 'error');
         $this->redirectToPreviousStep();
       }
+    }
+    elseif ($payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
+      $pane_form['offsite_payment'] = [
+        '#type' => 'commerce_payment_gateway_form',
+        '#operation' => 'offsite-payment',
+        '#default_value' => $payment,
+      ];
+
+      if ($payment_gateway_plugin instanceof OffsiteRedirectPaymentGatewayInterface) {
+        $redirect_url = $payment_gateway_plugin->getRedirectUrl();
+        // Make sure the redirect URL is the root form's action.
+        $complete_form['#action'] = $redirect_url;
+        $complete_form['#attributes']['class'][] = 'payment-redirect-form';
+      }
+
+      return $pane_form;
     }
     else {
       drupal_set_message($this->t('Sorry, we can currently only support on site payment gateways.'), 'error');
@@ -183,13 +187,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         $previous_step_id = $pane->getStepId();
       }
     }
-
-    $this->order->checkout_step = $previous_step_id;
-    $this->order->save();
-    throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
-      'commerce_order' => $this->order->id(),
-      'step' => $previous_step_id,
-    ])->toString());
+    $this->checkoutFlow->redirectToStep($previous_step_id);
   }
 
 }

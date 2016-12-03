@@ -62,3 +62,26 @@ entity.commerce_payment_method.collection:
     parameters:
       user:
         type: entity:user
+
+commerce_payment.checkout.cancel:
+  path: '/checkout/{commerce_order}/{step}/cancel'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\PaymentCheckoutController::cancelPaymentPage'
+  requirements:
+    _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
+    _module_dependencies: commerce_checkout
+  options:
+    parameters:
+      commerce_order:
+        type: entity:commerce_order
+commerce_payment.checkout.return:
+  path: '/checkout/{commerce_order}/{step}/return'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\PaymentCheckoutController::returnPaymentPage'
+  requirements:
+    _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
+    _module_dependencies: commerce_checkout
+  options:
+    parameters:
+      commerce_order:
+        type: entity:commerce_order

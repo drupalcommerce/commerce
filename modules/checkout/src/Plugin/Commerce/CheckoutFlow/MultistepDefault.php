@@ -29,6 +29,7 @@ class MultistepDefault extends CheckoutFlowWithPanesBase {
       'review' => [
         'label' => $this->t('Review'),
         'next_label' => $this->t('Continue to review'),
+        'previous_label' => $this->t('Cancel payment'),
         'has_order_summary' => TRUE,
       ],
     ] + parent::getSteps();
