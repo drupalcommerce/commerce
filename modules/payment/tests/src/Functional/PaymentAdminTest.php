@@ -123,6 +123,15 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   }
 
   /**
+   * Tests that a Payments task link exists on the order page.
+   */
+  public function testPaymentTask() {
+    $this->drupalGet('admin/commerce/orders/' . $this->order->id());
+    $this->assertSession()->linkExists('Payments');
+    $this->assertSession()->linkByHrefExists($this->paymentUri);
+  }
+
+  /**
    * Tests creating a payment for an order.
    */
   public function testPaymentCreation() {
