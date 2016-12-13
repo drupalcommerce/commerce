@@ -13,7 +13,7 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for editing the order item quantity.
+ * Defines a form element for adding a produtr variation to a cart.
  *
  * @ViewsField("commerce_cart_add_to_cart")
  */
