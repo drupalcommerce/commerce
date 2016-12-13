@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\uct_commerce\Plugin\views\field;
+namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines a form element for editing the order item quantity.
  *
- * @ViewsField("uct_commerce_add_to_cart")
+ * @ViewsField("commerce_cart_add_to_cart")
  */
 class AddToCart extends FieldPluginBase {
 
