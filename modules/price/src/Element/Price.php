@@ -37,9 +37,6 @@ class Price extends FormElement {
       '#attached' => [
         'library' => ['commerce_price/admin'],
       ],
-      '#element_validate' => [
-        [$class, 'validateElement'],
-      ],
       '#process' => [
         [$class, 'processElement'],
         [$class, 'processAjaxForm'],
@@ -51,20 +48,6 @@ class Price extends FormElement {
       '#input' => TRUE,
       '#theme_wrappers' => ['container'],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if (is_array($input) && isset($input['number'])) {
-      // Convert an empty string value to a numeric value.
-      if ($input['number'] === '') {
-        $input['number'] = '0';
-      }
-      return $input;
-    }
-    return NULL;
   }
 
   /**
@@ -92,11 +75,6 @@ class Price extends FormElement {
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $currency_storage */
     $currency_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_currency');
-    /** @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface $number_formatter */
-    $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance(NumberFormatterInterface::DECIMAL);
-    $number_formatter->setMaximumFractionDigits(6);
-    $number_formatter->setGroupingUsed(FALSE);
-
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
     $currencies = $currency_storage->loadMultiple();
     $currency_codes = array_keys($currencies);
@@ -108,29 +86,19 @@ class Price extends FormElement {
     foreach ($currencies as $currency) {
       $fraction_digits[] = $currency->getFractionDigits();
     }
-    $number_formatter->setMinimumFractionDigits(min($fraction_digits));
-
-    $number = NULL;
-    if (isset($default_value)) {
-      // Convert the stored amount to the local format. For example, "9.99"
-      // becomes "9,99" in many locales. This also strips any extra zeroes,
-      // as configured via $this->numberFormatter->setMinimumFractionDigits().
-      $number = $number_formatter->format($default_value['number']);
-    }
 
     $element['#tree'] = TRUE;
     $element['#attributes']['class'][] = 'form-type-commerce-price';
 
     $element['number'] = [
-      '#type' => 'textfield',
+      '#type' => 'commerce_number',
       '#title' => $element['#title'],
-      '#default_value' => $number,
+      '#default_value' => $default_value ? $default_value['number'] : NULL,
       '#required' => $element['#required'],
       '#size' => $element['#size'],
       '#maxlength' => $element['#maxlength'],
-      // Provide an example to the end user so that they know which decimal
-      // separator to use. This is the same pattern Drupal core uses.
-      '#placeholder' => $number_formatter->format('9.99'),
+      '#min_fraction_digits' => min($fraction_digits),
+      '#max_fraction_digits' => 6, // Field storage maximum.
     ];
     unset($element['#size']);
     unset($element['#maxlength']);
@@ -180,40 +148,6 @@ class Price extends FormElement {
       return FALSE;
     }
     return TRUE;
-  }
-
-  /**
-   * Validates the price element.
-   *
-   * Converts the number back to the standard format (e.g. "9,99" -> "9.99").
-   *
-   * @param array $element
-   *   The commerce_price form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   */
-  public static function validateElement(array $element, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $currency_storage */
-    $currency_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_currency');
-    /** @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface $number_formatter */
-    $number_formatter = \Drupal::service('commerce_price.number_formatter_factory')->createInstance();
-
-    $value = $form_state->getValue($element['#parents']);
-    if (empty($value['number'])) {
-      return;
-    }
-
-    /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
-    $currency = $currency_storage->load($value['currency_code']);
-    $value['number'] = $number_formatter->parseCurrency($value['number'], $currency);
-    if ($value['number'] === FALSE) {
-      $form_state->setError($element['number'], t('%title is not numeric.', [
-        '%title' => $element['#title'],
-      ]));
-      return;
-    }
-
-    $form_state->setValueForElement($element, $value);
   }
 
 }
