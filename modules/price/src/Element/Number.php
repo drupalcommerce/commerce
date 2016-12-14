@@ -97,7 +97,7 @@ class Number extends FormElement {
    * @return array
    *   The built commerce_number form element.
    */
-  public static function processElement(array $element, FormStateInterface $form_state, &$complete_form) {
+  public static function processElement(array $element, FormStateInterface $form_state, array &$complete_form) {
     // Provide an example to the end user so that they know which decimal
     // separator to use. This is the same pattern Drupal core uses.
     $number_formatter = self::getNumberFormatter($element);
@@ -157,7 +157,7 @@ class Number extends FormElement {
    * @return array
    *   The $element with prepared variables ready for input.html.twig.
    */
-  public static function preRenderNumber($element) {
+  public static function preRenderNumber(array $element) {
     // We're not using the "number" type because it won't accept
     // language-specific input, such as commas.
     $element['#attributes']['type'] = 'text';
@@ -176,7 +176,7 @@ class Number extends FormElement {
    * @return \CommerceGuys\Intl\Formatter\NumberFormatterInterface
    *   The number formatter instance.
    */
-  protected static function getNumberFormatter($element) {
+  protected static function getNumberFormatter(array $element) {
     $number_formatter_factory = \Drupal::service('commerce_price.number_formatter_factory');
     /** @var \CommerceGuys\Intl\Formatter\NumberFormatterInterface $number_formatter */
     $number_formatter = $number_formatter_factory->createInstance(NumberFormatterInterface::DECIMAL);

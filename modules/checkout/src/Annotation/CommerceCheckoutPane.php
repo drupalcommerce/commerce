@@ -66,7 +66,7 @@ class CommerceCheckoutPane extends Plugin {
    * @param array $values
    *   The annotation values.
    */
-  public function __construct($values) {
+  public function __construct(array $values) {
     if (empty($values['admin_label'])) {
       $values['admin_label'] = $values['label'];
     }

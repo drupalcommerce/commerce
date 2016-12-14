@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_price\Element;
 
-use CommerceGuys\Intl\Formatter\NumberFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
 
@@ -67,7 +66,7 @@ class Price extends FormElement {
    *   Thrown when #default_value is not an instance of
    *   \Drupal\commerce_price\Price.
    */
-  public static function processElement(array $element, FormStateInterface $form_state, &$complete_form) {
+  public static function processElement(array $element, FormStateInterface $form_state, array &$complete_form) {
     $default_value = $element['#default_value'];
     if (isset($default_value) && !self::validateDefaultValue($default_value)) {
       throw new \InvalidArgumentException('The #default_value for a commerce_price element must be an array with "number" and "currency_code" keys.');
@@ -98,7 +97,8 @@ class Price extends FormElement {
       '#size' => $element['#size'],
       '#maxlength' => $element['#maxlength'],
       '#min_fraction_digits' => min($fraction_digits),
-      '#max_fraction_digits' => 6, // Field storage maximum.
+      // '6' is the field storage maximum.
+      '#max_fraction_digits' => 6,
     ];
     unset($element['#size']);
     unset($element['#maxlength']);
