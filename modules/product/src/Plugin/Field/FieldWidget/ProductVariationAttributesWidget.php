@@ -147,9 +147,8 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       ],
     ];
     foreach ($this->getAttributeInfo($selected_variation, $variations) as $field_name => $attribute) {
-      $id = 'edit-purchased-entity-0-attributes-attribute-' . str_replace('_', '-', $field_name) . '-' . $id;
       $element['attributes'][$field_name] = [
-        '#id' => Html::getUniqueId($id),
+        '#id' => Html::getUniqueId('edit-purchased-entity-0-attributes-' . $field_name . '-' . $id),
         '#type' => $attribute['element_type'],
         '#title' => $attribute['title'],
         '#options' => $attribute['values'],

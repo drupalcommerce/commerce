@@ -174,9 +174,13 @@ class AddToCartFormTest extends CartBrowserTestBase {
       $product->variations->appendItem($variation);
     }
     $product->save();
+    $product_variations = $product->getVariations();
+    $current_variation = current($product_variations);
+    $str = $product->id() . serialize($current_variation->toArray());
+    $id = sha1($str);
 
     $this->drupalGet($product->toUrl());
-    $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color" and @disabled]');
+    $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color-' . $id . '" and @disabled]');
   }
 
   /**
@@ -283,11 +287,15 @@ class AddToCartFormTest extends CartBrowserTestBase {
       $product->variations->appendItem($variation);
     }
     $product->save();
+    $product_variations = $product->getVariations();
+    $current_variation = current($product_variations);
+    $str = $product->id() . serialize($current_variation->toArray());
+    $id = sha1($str);
 
     // The color element should be required because each variation has a color.
     $this->drupalGet($product->toUrl());
     $this->assertSession()->fieldExists('purchased_entity[0][attributes][attribute_size]');
-    $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color" and @required]');
+    $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color-' . $id . '" and @required]');
 
     // Remove the color value from all variations.
     // The color element should now be hidden.
