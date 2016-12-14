@@ -167,7 +167,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getCurrentUsage() {
-    return $this->get('current_usage')->date;
+    return $this->get('current_usage')->value;
   }
 
   /**
@@ -182,7 +182,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getUsageLimit() {
-    return $this->get('usage_limit')->date;
+    return $this->get('usage_limit')->value;
   }
 
   /**
