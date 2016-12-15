@@ -88,6 +88,7 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
       ],
       'from' => $order->getStore()->getEmail(),
       'subject' => $this->t('Order #@number confirmed', ['@number' => $order->getOrderNumber()]),
+      'order' => $order,
     ];
     if ($receipt_bcc = $order_type->getReceiptBcc()) {
       $params['headers']['Bcc'] = $receipt_bcc;
