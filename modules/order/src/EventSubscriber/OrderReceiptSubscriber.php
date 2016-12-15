@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Renderer;
@@ -32,6 +33,13 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
   protected $profileViewBuilder;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * The mail manager.
    *
    * @var \Drupal\Core\Mail\MailManagerInterface
@@ -50,14 +58,17 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, Renderer $renderer) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager, Renderer $renderer) {
     $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
     $this->profileViewBuilder = $entity_type_manager->getViewBuilder('profile');
+    $this->languageManager = $language_manager;
     $this->mailManager = $mail_manager;
     $this->renderer = $renderer;
   }
@@ -76,9 +87,9 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
     if (!$order_type->shouldSendReceipt()) {
       return;
     }
-    $customer = $order->getCustomer();
-    if (!$customer) {
-      // Anonymous orders have no customer attached, therefore nobody to email.
+    $to = $order->getEmail();
+    if (!$to) {
+      // The email should not be empty, unless the order is malformed.
       return;
     }
 
@@ -105,7 +116,15 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
       return $this->renderer->render($build);
     });
 
-    $this->mailManager->mail('commerce_order', 'receipt', $customer->getEmail(), $customer->getPreferredLangcode(), $params);
+    // Replicated logic from EmailAction and contact's MailHandler.
+    if ($customer = $order->getCustomer()) {
+      $langcode = $customer->getPreferredLangcode();
+    }
+    else {
+      $langcode = $this->languageManager->getDefaultLanguage()->getId();
+    }
+
+    $this->mailManager->mail('commerce_order', 'receipt', $to, $langcode, $params);
   }
 
   /**
