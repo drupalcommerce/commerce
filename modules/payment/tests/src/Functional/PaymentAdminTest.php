@@ -66,6 +66,7 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
+      'administer commerce_order',
       'administer commerce_payment_gateway',
       'administer commerce_payment',
     ], parent::getAdministratorPermissions());
@@ -120,6 +121,15 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
     ]);
 
     $this->paymentUri = 'admin/commerce/orders/' . $this->order->id() . '/payments';
+  }
+
+  /**
+   * Tests that a Payments tab is visible on the order page.
+   */
+  public function testPaymentTab() {
+    $this->drupalGet('admin/commerce/orders/' . $this->order->id());
+    $this->assertSession()->linkExists('Payments');
+    $this->assertSession()->linkByHrefExists($this->paymentUri);
   }
 
   /**
