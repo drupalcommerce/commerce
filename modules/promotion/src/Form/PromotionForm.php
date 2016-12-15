@@ -32,8 +32,6 @@ class PromotionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /* @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = $this->entity;
     $form = parent::form($form, $form_state);
 
     $form['#tree'] = TRUE;
@@ -46,11 +44,9 @@ class PromotionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    /* @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = $this->getEntity();
-    $promotion->save();
-    drupal_set_message($this->t('The promotion %label has been successfully saved.', ['%label' => $promotion->label()]));
-    $form_state->setRedirect('entity.commerce_promotion.collection', ['commerce_promotion' => $promotion->id()]);
+    $this->entity->save();
+    drupal_set_message($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));
+    $form_state->setRedirect('entity.commerce_promotion.collection');
   }
 
 }
