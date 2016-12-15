@@ -37,7 +37,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_promotion\PromotionRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -56,6 +56,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   },
  *   links = {
  *     "add-form" = "/promotion/add",
+ *     "canonical" = "/promotion/{commerce_promotion}/edit",
  *     "edit-form" = "/promotion/{commerce_promotion}/edit",
  *     "delete-form" = "/promotion/{commerce_promotion}/delete",
  *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
