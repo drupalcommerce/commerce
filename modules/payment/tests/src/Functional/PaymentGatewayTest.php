@@ -37,18 +37,14 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/add');
 
     $values = [
-      'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
-    ];
-    $this->submitForm($values, 'Save');
-    $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways/manage/example');
-    $this->assertSession()->responseContains('Saved');
-
-    $values += [
       'configuration[api_key]' => 'bunny',
       'configuration[mode]' => 'test',
       'status' => '1',
+      // Setting the 'id' can fail if focus switches to another field.
+      // This is a bug in the machine name JS that can be reproduced manually.
+      'id' => 'example',
     ];
     $this->submitForm($values, 'Save');
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
