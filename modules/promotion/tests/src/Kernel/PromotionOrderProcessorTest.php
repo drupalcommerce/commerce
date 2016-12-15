@@ -107,7 +107,10 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
         [
           'target_plugin_id' => 'commerce_promotion_order_total_price',
           'target_plugin_configuration' => [
-            'amount' => new Price('20.00', 'USD'),
+            'amount' => [
+              'number' => '20.00',
+              'currency_code' => 'USD',
+            ],
           ],
         ],
       ],
