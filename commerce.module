@@ -11,20 +11,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
 /**
- * Implements hook_toolbar().
+ * Implements hook_toolbar_alter().
  */
-function commerce_toolbar() {
-  $items = [];
-  $items['commerce'] = [
-    '#type' => 'toolbar_item',
-    '#attached' => [
-      'library' => [
-        'commerce/drupal.commerce.toolbar',
-      ],
-    ],
-  ];
-
-  return $items;
+function commerce_toolbar_alter(&$items) {
+  $items['administration']['#attached']['library'][] = 'commerce/toolbar';
 }
 
 /**
