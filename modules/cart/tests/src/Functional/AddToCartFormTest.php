@@ -176,8 +176,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $product->save();
     $product_variations = $product->getVariations();
     $current_variation = current($product_variations);
-    $str = $product->id() . serialize($current_variation->toArray());
-    $id = sha1($str);
+    $id = sha1(serialize($current_variation->toArray()));
 
     $this->drupalGet($product->toUrl());
     $this->assertSession()->elementExists('xpath', '//select[@id="edit-purchased-entity-0-attributes-attribute-color-' . $id . '" and @disabled]');
@@ -289,8 +288,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $product->save();
     $product_variations = $product->getVariations();
     $current_variation = current($product_variations);
-    $str = $product->id() . serialize($current_variation->toArray());
-    $id = sha1($str);
+    $id = sha1(serialize($current_variation->toArray()));
 
     // The color element should be required because each variation has a color.
     $this->drupalGet($product->toUrl());

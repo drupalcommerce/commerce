@@ -140,10 +140,8 @@ class AddToCartForm extends ContentEntityForm {
     if ($this->operation != 'default') {
       $form_id = $form_id . '_' . $this->operation;
     }
-    $product_id = $this->entity->getPurchasedEntity()->getProductId();
-    $str = $product_id . serialize($this->entity->getPurchasedEntity()->toArray());
-    $id = sha1($str);
-    // For the case when on a page 2+ exactly the same add_to_cart forms.
+    $id = sha1(serialize($this->entity->getPurchasedEntity()->toArray()));
+    // For the case when on a page 2+ exactly the same purchased entities.
     while (in_array($id, static::$FormInstanceIds)) {
       $id = sha1($id . $id);
     }
