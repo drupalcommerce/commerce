@@ -37,6 +37,13 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   protected $chainPriceResolver;
 
   /**
+   * Currency storage interface.
+   *
+   * @var \Drupal\commerce_price\Entity\CurrencyInterface
+   */
+  protected $currencyStorage;
+
+  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -74,6 +81,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, NumberFormatterFactoryInterface $number_formatter_factory, ChainPriceResolverInterface $chain_price_resolver, StoreContextInterface $store_context, AccountInterface $current_user) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $entity_type_manager, $number_formatter_factory, $store_context);
     $this->chainPriceResolver = $chain_price_resolver;
+    $this->currencyStorage = $entity_type_manager->getStorage('commerce_currency');
     $this->currentUser = $current_user;
   }
 
@@ -116,7 +124,7 @@ class PriceCalculatedFormatter extends PriceDefaultFormatter implements Containe
       $purchasable_entity = $items->getEntity();
       $resolved_price = $this->chainPriceResolver->resolve($purchasable_entity, 1, $context);
       $number = $resolved_price->getNumber();
-      $currency = $currencies[$resolved_price->getCurrencyCode()];
+      $currency = $this->currencyStorage->load($resolved_price->getCurrencyCode());
 
       $elements[$delta] = [
         '#markup' => $this->numberFormatter->formatCurrency($number, $currency),
