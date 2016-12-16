@@ -1,4 +1,4 @@
-drupal.commerce.toolbar:
+toolbar:
   version: VERSION
   css:
     theme:

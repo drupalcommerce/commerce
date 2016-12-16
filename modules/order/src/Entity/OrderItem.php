@@ -42,12 +42,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "bundle" = "type",
  *     "label" = "title",
  *   },
- *   links = {
- *     "canonical" = "/admin/commerce/config/order-item/{commerce_order_item}",
- *     "edit-form" = "/admin/commerce/config/order-item/{commerce_order_item}/edit",
- *     "delete-form" = "/admin/commerce/config/order-item/{commerce_order_item}/delete",
- *     "collection" = "/admin/commerce/config/order-item"
- *   },
  *   bundle_entity_type = "commerce_order_item_type",
  *   field_ui_base_route = "entity.commerce_order_item_type.edit_form",
  * )

@@ -186,7 +186,7 @@ class ProductForm extends ContentEntityForm {
    * @return array
    *   The modified visibility_settings element.
    */
-  public static function hideEmptyVisibilitySettings($form) {
+  public static function hideEmptyVisibilitySettings(array $form) {
     if (isset($form['stores']['widget']['target_id'])) {
       $stores_element = $form['stores']['widget']['target_id'];
       if (!Element::getVisibleChildren($stores_element)) {

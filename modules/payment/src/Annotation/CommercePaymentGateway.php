@@ -100,7 +100,7 @@ class CommercePaymentGateway extends Plugin {
    * @param array $values
    *   The annotation values.
    */
-  public function __construct($values) {
+  public function __construct(array $values) {
     if (empty($values['modes'])) {
       $values['modes'] = [
         'test' => t('Test'),

@@ -66,7 +66,7 @@ class PaymentGatewayForm extends RenderElement {
    * @return array
    *   The processed form element.
    */
-  public static function processForm($element, FormStateInterface $form_state, &$complete_form) {
+  public static function processForm(array $element, FormStateInterface $form_state, array &$complete_form) {
     if (empty($element['#operation'])) {
       throw new \InvalidArgumentException('The commerce_payment_gateway_form element requires the #operation property.');
     }
@@ -102,7 +102,7 @@ class PaymentGatewayForm extends RenderElement {
    *   Thrown if button-level #validate handlers are detected on the parent
    *   form, as a protection against buggy behavior.
    */
-  public static function validateForm(&$element, FormStateInterface $form_state) {
+  public static function validateForm(array &$element, FormStateInterface $form_state) {
     // Button-level #validate handlers replace the form-level ones, which means
     // that executeElementSubmitHandlers() won't be triggered.
     if ($handlers = $form_state->getValidateHandlers()) {
@@ -121,7 +121,7 @@ class PaymentGatewayForm extends RenderElement {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function submitForm(&$element, FormStateInterface $form_state) {
+  public static function submitForm(array &$element, FormStateInterface $form_state) {
     $plugin_form = self::createPluginForm($element);
 
     try {
@@ -143,7 +143,7 @@ class PaymentGatewayForm extends RenderElement {
    * @return \Drupal\commerce_payment\PluginForm\PaymentGatewayFormInterface
    *   The plugin form.
    */
-  public static function createPluginForm($element) {
+  public static function createPluginForm(array $element) {
     /** @var \Drupal\commerce\PluginForm\PluginFormFactoryInterface $plugin_form_factory */
     $plugin_form_factory = \Drupal::service('plugin_form.factory');
     /** @var \Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface $entity */
@@ -169,7 +169,7 @@ class PaymentGatewayForm extends RenderElement {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function executeElementSubmitHandlers(&$element, FormStateInterface $form_state) {
+  public static function executeElementSubmitHandlers(array &$element, FormStateInterface $form_state) {
     if (!$form_state->isSubmitted() || $form_state->hasAnyErrors()) {
       // The form wasn't submitted (#ajax in progress) or failed validation.
       return;

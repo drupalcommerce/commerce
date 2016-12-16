@@ -5,7 +5,6 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\field\Entity\FieldConfig;
@@ -19,12 +18,24 @@ function commerce_order_theme($existing, $type, $theme, $path) {
     'commerce_order' => [
       'render element' => 'elements',
     ],
+    'commerce_order__admin' => [
+      'base hook' => 'commerce_order',
+      'render element' => 'elements',
+    ],
     'commerce_order__user' => [
       'base hook' => 'commerce_order',
       'render element' => 'elements',
     ],
     'commerce_order_edit_form' => [
       'render element' => 'form',
+    ],
+    'commerce_order_receipt' => [
+      'variables' => [
+        'order_entity' => NULL,
+        'billing_information' => NULL,
+        'shipping_information' => NULL,
+        'payment_method' => NULL,
+      ],
     ],
   ];
 }
@@ -79,6 +90,11 @@ function template_preprocess_commerce_order(&$variables) {
   $variables['order'] = [];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['order'][$key] = $variables['elements'][$key];
+  }
+
+  if ($order->getBillingProfile()) {
+    $profile_view_bulder = \Drupal::entityTypeManager()->getViewBuilder('profile');
+    $variables['order']['billing_information'] = $profile_view_bulder->view($order->getBillingProfile());
   }
 }
 
@@ -156,4 +172,19 @@ function commerce_order_add_order_items_field($order_type) {
 function commerce_order_views_data_alter(array &$data) {
   $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
   $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
+}
+
+/**
+ * Implements hook_mail().
+ *
+ * Captures the outgoing mail and sets appropriate message body and headers.
+ */
+function commerce_order_mail($key, &$message, $params) {
+  if (isset($params['headers'])) {
+    $message['headers'] = array_merge($message['headers'], $params['headers']);
+  }
+
+  $message['from'] = $params['from'];
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
 }

@@ -37,7 +37,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_promotion\PromotionRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
@@ -56,6 +56,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   },
  *   links = {
  *     "add-form" = "/promotion/add",
+ *     "canonical" = "/promotion/{commerce_promotion}/edit",
  *     "edit-form" = "/promotion/{commerce_promotion}/edit",
  *     "delete-form" = "/promotion/{commerce_promotion}/delete",
  *     "delete-multiple-form" = "/admin/commerce/promotions/delete",
@@ -167,7 +168,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getCurrentUsage() {
-    return $this->get('current_usage')->date;
+    return $this->get('current_usage')->value;
   }
 
   /**
@@ -182,7 +183,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getUsageLimit() {
-    return $this->get('usage_limit')->date;
+    return $this->get('usage_limit')->value;
   }
 
   /**
@@ -243,6 +244,13 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public function applies(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
+
+    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
+    $offer = $this->get('offer')->first()->getTargetInstance();
+    if ($offer->getTargetEntityType() !== $entity_type_id) {
+      return FALSE;
+    }
+
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
 

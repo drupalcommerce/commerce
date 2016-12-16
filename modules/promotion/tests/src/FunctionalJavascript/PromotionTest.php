@@ -63,7 +63,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
     $this->submitForm($edit, t('Save'));
-    $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 

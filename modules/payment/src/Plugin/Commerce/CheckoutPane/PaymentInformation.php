@@ -116,7 +116,8 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
     // When no payment gateways are defined, throw an error and fail reliably.
     if (empty($payment_gateways)) {
-      throw new \Exception('No payment gateways are defined, create one first.');
+      drupal_set_message($this->noPaymentGatewayErrorMessage(), 'error');
+      return [];
     }
     // @todo Support multiple gateways.
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
@@ -189,6 +190,16 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $values = $form_state->getValue($pane_form['#parents']);
+    if (!isset($values['payment_method'])) {
+      $form_state->setError($complete_form, $this->noPaymentGatewayErrorMessage());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
     if (is_numeric($values['payment_method'])) {
@@ -204,6 +215,16 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $this->order->payment_gateway = $payment_method->getPaymentGateway();
     $this->order->payment_method = $payment_method;
     $this->order->setBillingProfile($payment_method->getBillingProfile());
+  }
+
+  /**
+   * Returns an error message in case there are no payment gateways.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The error message.
+   */
+  protected function noPaymentGatewayErrorMessage() {
+    return $this->t('No payment gateways are defined, create one first.');
   }
 
 }

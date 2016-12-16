@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
+use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -12,6 +13,8 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  * @group commerce
  */
 class PaymentAdminTest extends CommerceBrowserTestBase {
+
+  use StoreCreationTrait;
 
   /**
    * An onsite payment gateway.
@@ -42,6 +45,13 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   protected $order;
 
   /**
+   * The store entity.
+   *
+   * @var \Drupal\commerce_store\Entity\Store
+   */
+  protected $store;
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = [
@@ -56,6 +66,7 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
+      'administer commerce_order',
       'administer commerce_payment_gateway',
       'administer commerce_payment',
     ], parent::getAdministratorPermissions());
@@ -66,6 +77,8 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->store = $this->createStore();
 
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
@@ -104,9 +117,19 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'state' => 'draft',
       'order_items' => [$order_item],
+      'store_id' => $this->store,
     ]);
 
     $this->paymentUri = 'admin/commerce/orders/' . $this->order->id() . '/payments';
+  }
+
+  /**
+   * Tests that a Payments tab is visible on the order page.
+   */
+  public function testPaymentTab() {
+    $this->drupalGet('admin/commerce/orders/' . $this->order->id());
+    $this->assertSession()->linkExists('Payments');
+    $this->assertSession()->linkByHrefExists($this->paymentUri);
   }
 
   /**
