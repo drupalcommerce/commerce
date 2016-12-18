@@ -27,8 +27,8 @@ class ChainLocaleResolver implements ChainLocaleResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function addResolver(LocaleResolverInterface $resolver, $priority) {
-    $this->resolvers[$priority] = $resolver;
+  public function addResolver(LocaleResolverInterface $resolver) {
+    $this->resolvers[] = $resolver;
   }
 
   /**

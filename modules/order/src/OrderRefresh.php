@@ -72,8 +72,8 @@ class OrderRefresh implements OrderRefreshInterface {
   /**
    * {@inheritdoc}
    */
-  public function addProcessor(OrderProcessorInterface $processor, $priority) {
-    $this->processors[$priority] = $processor;
+  public function addProcessor(OrderProcessorInterface $processor) {
+    $this->processors[] = $processor;
   }
 
   /**

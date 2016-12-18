@@ -289,7 +289,7 @@ class OrderRefreshTest extends CommerceKernelTestBase {
     $time->getCurrentTime()->willReturn($current_time);
     $time = $time->reveal();
     $order_refresh = new OrderRefresh($entity_type_manager, $chain_price_resolver, $user, $time);
-    $order_refresh->addProcessor($this->container->get('commerce_order.availability_order_processor'), 0);
+    $order_refresh->addProcessor($this->container->get('commerce_order.availability_order_processor'));
 
     return $order_refresh;
   }
