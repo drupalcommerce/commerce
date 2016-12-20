@@ -78,7 +78,7 @@ class CheckoutController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return array
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
    *   The render form.
    */
   public function formPage(RouteMatchInterface $route_match) {
@@ -114,6 +114,11 @@ class CheckoutController implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
 
+    // Check if the order has been canceled.
+    if ($order->getState()->value == 'canceled') {
+      return AccessResult::forbidden();
+    }
+
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
       $customer_check = $account->id() == $order->getCustomerId();
@@ -145,8 +150,8 @@ class CheckoutController implements ContainerInjectionInterface {
   /**
    * Checks access to a particular checkout page.
    *
-   * @param Drupal\commerce_order\Entity\OrderInterface $order
-   *   The fully loaded order object represented on the checkout form.
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
    *
    * @return bool
    *   TRUE or FALSE indicating access.
@@ -154,66 +159,33 @@ class CheckoutController implements ContainerInjectionInterface {
   protected function checkoutPageAccess(OrderInterface $order) {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $requested_step = $checkout_flow->getPlugin()->getStepId();
-    $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
-    $visible_step_ids = array_keys($visible_steps);
-    $first_step = reset($visible_step_ids);
     $order_step = $this->getOrderCheckoutStep($order);
+    $order_state = $order->getState()->value;
 
-    // If the order is not in checkout, return FALSE for any page but the
-    // completion page.
-    if ($order_step === 'complete' && $requested_step !== 'complete') {
-      return FALSE;
+    // An order is expected to be a draft throughout checkout, unless it has
+    // been placed, in which it can view the complete step.
+    if ($order_state != 'draft') {
+      return $requested_step == 'complete';
     }
-
-    // If the order is still in checkout, only allow access to pages that it is
-    // currently on or has previously completed.
-    if ($order_step !== 'complete') {
+    // The order is a draft, continue other logic checks.
+    else {
+      // Draft orders cannot reach the complete step.
+      if ($requested_step == 'complete') {
+        return FALSE;
+      }
 
       // This is the page the user is currently on.
       if ($requested_step == $order_step) {
         return TRUE;
       }
-
-      foreach ($visible_steps as $step_id => $step) {
-        // Prevent access to later steps of the checkout process.
-        if ($step_id === $order_step) {
-          return FALSE;
-        }
-
-        // Check that there are back buttons in every pages between the current
-        // page and the page the user wants to access.
-        if (!isset($step['previous_label'])) {
-          return FALSE;
-        }
-
-        // If this is the requested step and nothing intervened so far, give a
-        // green light.
-        if ($step_id == $requested_step) {
-          return TRUE;
-        }
-      }
     }
-
-    // We've now handled above cases where the user is trying to access a
-    // checkout page other than the completion page for an order that is not in
-    // a checkout status.  We then handled cases where the user is trying to
-    // access any checkout page for orders in a checkout status.  We now turn
-    // to cases where the user is accessing the complete page for any other
-    // order state.
-    elseif ($requested_step == 'complete') {
-      // Don't allow completion page access for orders in the cart or canceled states.
-      if ($order->cart->getString() || $order->getState()->getString() === 'canceled') {
-        return FALSE;
-      }
-    }
-
-    return TRUE;
+    return FALSE;
   }
 
   /**
    * Get the current checkout step of the order.
    *
-   * @param Drupal\commerce_order\Entity\OrderInterface $order
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The fully loaded order object represented on the checkout form.
    *
    * @return string
