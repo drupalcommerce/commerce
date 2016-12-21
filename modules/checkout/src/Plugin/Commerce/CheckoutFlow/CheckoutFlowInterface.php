@@ -57,6 +57,16 @@ interface CheckoutFlowInterface extends FormInterface, ConfigurablePluginInterfa
   public function getNextStepId();
 
   /**
+   * Redirects an order to a specific step in the checkout.
+   *
+   * @param string $step_id
+   *   The step ID to redirect to.
+   *
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   */
+  public function redirectToStep($step_id);
+
+  /**
    * Gets the defined steps.
    *
    * @return array
