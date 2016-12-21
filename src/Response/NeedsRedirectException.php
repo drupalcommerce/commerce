@@ -3,6 +3,7 @@
 namespace Drupal\commerce\Response;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 
