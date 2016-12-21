@@ -17,7 +17,7 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   use StoreCreationTrait;
 
   /**
-   * An onsite payment gateway.
+   * An on-site payment gateway.
    *
    * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface
    */

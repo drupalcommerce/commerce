@@ -15,11 +15,11 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the Onsite payment gateway.
+ * Provides the On-site payment gateway.
  *
  * @CommercePaymentGateway(
  *   id = "example_onsite",
- *   label = "Example (Onsite)",
+ *   label = "Example (On-site)",
  *   display_label = "Example",
  *    forms = {
  *     "add-payment-method" = "Drupal\commerce_payment_example\PluginForm\Onsite\PaymentMethodAddForm",

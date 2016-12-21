@@ -27,7 +27,7 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
   protected $collectionUrl;
 
   /**
-   * An onsite payment gateway.
+   * An on-site payment gateway.
    *
    * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface
    */

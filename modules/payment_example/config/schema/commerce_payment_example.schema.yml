@@ -10,4 +10,4 @@ commerce_payment.commerce_payment_gateway.plugin.example_offsite_redirect:
   mapping:
     redirect_method:
       type: string
-      label: 'Whether to use POST or 302 Redirect'
+      label: 'Redirect method'
