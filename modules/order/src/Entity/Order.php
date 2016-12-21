@@ -612,7 +612,7 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'commerce_adjustment_default',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', FALSE);
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
