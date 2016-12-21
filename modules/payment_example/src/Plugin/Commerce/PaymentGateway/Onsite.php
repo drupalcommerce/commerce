@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @CommercePaymentGateway(
  *   id = "example_onsite",
  *   label = "Example (Onsite)",
- *   display_label = "Example (Onsite)",
+ *   display_label = "Example",
  *    forms = {
  *     "add-payment-method" = "Drupal\commerce_payment_example\PluginForm\Onsite\PaymentMethodAddForm",
  *   },

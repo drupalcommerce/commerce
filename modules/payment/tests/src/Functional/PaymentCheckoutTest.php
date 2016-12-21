@@ -170,7 +170,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextNotContains('Your order number is 1. You can view your order on your account page when logged in.');
-    $this->assertSession()->pageTextContains('The payment was declined');
+    $this->assertSession()->pageTextContains('We encountered an error processing your payment method. Please verify your details and try again.');
     $this->assertSession()->addressEquals('checkout/1/order_information');
 
     // Verify a payment was not created.

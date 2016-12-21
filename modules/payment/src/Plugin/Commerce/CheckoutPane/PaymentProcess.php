@@ -4,9 +4,9 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsiteRedirectPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -146,10 +146,16 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
         $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
-
+      }
+      catch (DeclineException $e) {
+        $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
       }
       catch (PaymentGatewayException $e) {
-        drupal_set_message($e->getMessage(), 'error');
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment method. Please try again later.');
+        drupal_set_message($message, 'error');
         $this->redirectToPreviousStep();
       }
     }
@@ -160,18 +166,11 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#default_value' => $payment,
       ];
 
-      if ($payment_gateway_plugin instanceof OffsiteRedirectPaymentGatewayInterface) {
-        $redirect_url = $payment_gateway_plugin->getRedirectUrl();
-        // Make sure the redirect URL is the root form's action.
-        $complete_form['#action'] = $redirect_url;
-        $complete_form['#attributes']['class'][] = 'payment-redirect-form';
-      }
+      $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
+        '@gateway' => $payment_gateway_plugin->getDisplayLabel(),
+      ]);
 
       return $pane_form;
-    }
-    else {
-      drupal_set_message($this->t('Sorry, we can currently only support on site payment gateways.'), 'error');
-      $this->redirectToPreviousStep();
     }
   }
 

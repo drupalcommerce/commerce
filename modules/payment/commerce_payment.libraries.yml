@@ -13,7 +13,7 @@ payment_method_icons:
 offsite_redirect:
   version: VERSION
   js:
-    js/offiste-redirect.js: {}
+    js/offsite-redirect.js: {}
   dependencies:
     - core/jquery
     - core/drupal

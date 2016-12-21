@@ -117,9 +117,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     if ($this instanceof SupportsRefundsInterface) {
       $default_forms['refund-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentRefundForm';
     }
-    if ($this instanceof OffsitePaymentGatewayInterface) {
-      $default_forms['offsite-payment'] = 'Drupal\commerce_payment\PluginForm\OffsitePaymentForm';
-    }
 
     return $default_forms;
   }

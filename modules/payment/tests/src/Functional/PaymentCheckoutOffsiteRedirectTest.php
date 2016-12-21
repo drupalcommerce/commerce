@@ -10,7 +10,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
- * Tests the integration between payments and checkout.
+ * Tests the integration between off-site payments and checkout.
  *
  * @group commerce
  */
@@ -77,7 +77,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
       'plugin' => 'example_offsite_redirect',
     ]);
     $gateway->getPlugin()->setConfiguration([
-      'method' => 'redirect_post',
+      'redirect_method' => 'post',
       'payment_method_types' => ['credit_card'],
     ]);
     $gateway->save();
@@ -93,7 +93,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests than an order can go through checkout steps.
+   * Tests the off-site redirect using the POST redirect method.
    */
   public function testCheckoutWithOffsiteRedirectPost() {
     $this->drupalGet($this->product->toUrl()->toString());
@@ -116,7 +116,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([], 'Pay and complete purchase');
     // No JS so we need to manually click the button to submit payment.
-    $this->submitForm([], 'Pay and complete purchase');
+    $this->submitForm([], 'Proceed to Example');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $order = Order::load(1);
     $payment_gateway = $order->payment_gateway->entity;
@@ -129,13 +129,12 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests the transaction mode in Authorize Only.
+   * Tests the off-site redirect using the GET redirect method.
    */
-  public function testCheckoutWithOffsiteRedirect302() {
-    // Set checkout flow to authorize only.
+  public function testCheckoutWithOffsiteRedirectGet() {
     $payment_gateway = PaymentGateway::load('example_offsite_redirect');
     $payment_gateway->getPlugin()->setConfiguration([
-      'method' => 'redirect_302',
+      'redirect_method' => 'get',
       'payment_method_types' => ['credit_card'],
     ]);
     $payment_gateway->save();
