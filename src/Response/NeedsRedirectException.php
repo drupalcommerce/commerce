@@ -27,8 +27,12 @@ class NeedsRedirectException extends EnforcedResponseException {
     if (!UrlHelper::isValid($url)) {
       throw new \InvalidArgumentException('Invalid URL provided.');
     }
-
-    parent::__construct(new TrustedRedirectResponse($url, $status_code, $headers));
+    
+    $response = new TrustedRedirectResponse($url, $status_code, $headers);
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_metadata->setCacheMaxAge(0);
+    $response->addCacheableDependency($cacheable_metadata);
+    parent::__construct($response);
   }
 
 }
