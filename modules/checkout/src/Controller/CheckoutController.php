@@ -84,12 +84,13 @@ class CheckoutController implements ContainerInjectionInterface {
   public function formPage(RouteMatchInterface $route_match) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
+    $requested_step = $route_match->getParameter('step');
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
 
     // Determine the order's step. If the order does not have access to the
     // requested step, it will be redirected appropriately.
-    $order_step = $this->selectCheckoutStep($order);
-    if ($checkout_flow->getPlugin()->getStepId() !== $order_step) {
+    $order_step = $this->selectCheckoutStep($order, $requested_step);
+    if ($requested_step !== $order_step) {
       $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $order_step]);
       return new RedirectResponse($url->toString());
     }
@@ -140,13 +141,14 @@ class CheckoutController implements ContainerInjectionInterface {
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
    *   The order.
+   * @param string $requested_step
+   *   The requested step.
    *
    * @return bool
    *   TRUE or FALSE indicating access.
    */
-  protected function selectCheckoutStep(OrderInterface $order) {
+  protected function selectCheckoutStep(OrderInterface $order, $requested_step) {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-    $requested_step = $checkout_flow->getPlugin()->getStepId();
     $order_step = $order->checkout_step->value;
     // An empty $order_step means the checkout flow is at the first step.
     if (empty($order_step)) {
