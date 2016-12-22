@@ -5,7 +5,6 @@ namespace Drupal\commerce_payment\Form;
 use Drupal\commerce\Form\CommercePluginEntityFormBase;
 use Drupal\commerce_payment\PaymentGatewayManager;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -47,7 +46,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     $plugins = array_map(function ($definition) {
       return $definition['label'];
     }, $this->pluginManager->getDefinitions());
-    uasort($plugins, [SortArray::class, 'sortByTitleElement']);
+    asort($plugins);
 
     // Use the first available plugin as the default value.
     if (!$gateway->getPluginId()) {
