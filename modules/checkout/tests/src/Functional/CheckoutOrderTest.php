@@ -114,31 +114,100 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ]);
     $order->save();
 
+    $checkout_url = '/checkout/' . $order->id();
+    $order_information_url = '/checkout/' . $order->id() . '/order_information';
+    $review_url = '/checkout/' . $order->id() . '/review';
+    $complete_url = '/checkout/' . $order->id() . '/complete';
+
     // Anonymous user with no session.
     $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
 
     // Authenticated order owner.
     $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(200);
 
     // Authenticated user who does not own the order.
     $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
+
+    // Trying to access the checkout completion page with an authenticated
+    // user not owning the order.
+    $this->drupalGet($complete_url);
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Cart owner trying to access the checkout completion page should
+    // redirect.
     $this->drupalLogin($user);
+    $this->drupalGet($complete_url);
+    $this->assertSession()->addressNotEquals($complete_url);
+
+    // Review page with order owner.
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressNotEquals($review_url);
+
+    // Review page with non-owner.
+    $this->drupalLogin($user2);
+    $this->drupalGet($review_url);
+    $this->assertSession()->statusCodeEquals(403);
 
     // Order with no order items.
+    $this->drupalLogin($user);
     $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
 
     // Authenticated order owner without the 'access checkout' permission.
     $order->addItem($order_item)->save();
     user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Go to review checkout step.
+    $order->checkout_step = 'review';
+    $order->save();
+
+    // Try accessing the review step.
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressEquals($review_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Try accessing the previous step that has no previous_label.
+    $this->drupalGet($order_information_url);
+    // We get redirected to the review step.
+    $this->assertSession()->addressEquals($review_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Complete checkout.
+    $order->checkout_step = 'complete';
+    $transition = $order->getState()->getWorkflow()->getTransition('place');
+    $order->getState()->applyTransition($transition);
+    $order->save();
+
+    // Try accessing the first step.
+    $this->drupalGet($order_information_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Try accessing the review step.
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Try accessing the complete step.
+    $this->drupalGet($complete_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Cancel the order.
+    $order->state = 'canceled';
+    $order->save();
+    $this->drupalGet($complete_url);
+    $this->assertSession()->addressEquals($complete_url);
     $this->assertSession()->statusCodeEquals(403);
   }
 
