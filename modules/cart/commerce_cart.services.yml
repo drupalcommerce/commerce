@@ -23,5 +23,6 @@ services:
 
   commerce_cart.event_subscriber:
     class: Drupal\commerce_cart\EventSubscriber\CartEventSubscriber
+    arguments: ['@commerce_cart.cart_provider']
     tags:
       - { name: event_subscriber }
