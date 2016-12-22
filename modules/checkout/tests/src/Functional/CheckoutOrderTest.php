@@ -129,26 +129,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'cart' => TRUE,
     ]);
     $order->save();
-
-    $checkout_url = '/checkout/' . $order->id();
     $order_information_url = '/checkout/' . $order->id() . '/order_information';
     $review_url = '/checkout/' . $order->id() . '/review';
     $complete_url = '/checkout/' . $order->id() . '/complete';
-
-    // Anonymous user with no session.
-    $this->drupalLogout();
-    $this->drupalGet($checkout_url);
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner (re-login.)
-    $this->drupalLogin($user);
-    $this->drupalGet($checkout_url);
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Authenticated user who does not own the order.
-    $this->drupalLogin($user2);
-    $this->drupalGet($checkout_url);
-    $this->assertSession()->statusCodeEquals(403);
 
     // Trying to access the checkout completion page with an authenticated
     // user not owning the order.
@@ -164,17 +147,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     // Review page with order owner.
     $this->drupalGet($review_url);
     $this->assertSession()->addressNotEquals($review_url);
-
-    // Review page with non-owner.
-    $this->drupalLogin($user2);
-    $this->drupalGet($review_url);
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Order with no order items.
-    $this->drupalLogin($user);
-    $order->removeItem($order_item)->save();
-    $this->drupalGet($checkout_url);
-    $this->assertSession()->statusCodeEquals(403);
 
     // Go to review checkout step.
     $order->addItem($order_item)->save();
@@ -212,13 +184,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalGet($complete_url);
     $this->assertSession()->addressEquals($complete_url);
     $this->assertSession()->statusCodeEquals(200);
-
-    // Cancel the order.
-    // $order->state = 'canceled';
-    // $order->save();
-    // $this->drupalGet($complete_url);
-    // $this->assertSession()->addressEquals($complete_url);
-    // $this->assertSession()->statusCodeEquals(403);
   }
 
   /**

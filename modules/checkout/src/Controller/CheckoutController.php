@@ -144,6 +144,12 @@ class CheckoutController implements ContainerInjectionInterface {
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
 
+    if (!$access->isAllowed()) {
+//      print_r(__FILE__ . __LINE__ . PHP_EOL);
+//      var_dump($customer_check);
+//      var_dump($order->hasItems());
+//      var_dump($account->hasPermission('access checkout'));
+    }
     return $access;
   }
 
