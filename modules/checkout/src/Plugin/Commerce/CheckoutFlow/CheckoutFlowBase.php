@@ -391,6 +391,11 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
     // Hide the actions element if it has no buttons.
     $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
+    // The "complete" step should never have buttons.
+    if ($this->stepId == 'complete') {
+      $actions['#access'] = FALSE;
+    }
+
     return $actions;
   }
 
