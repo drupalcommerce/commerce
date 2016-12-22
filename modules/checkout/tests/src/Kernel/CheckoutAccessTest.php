@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce_checkout\Kernel;
 
-use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Component\Render\FormattableMarkup;
@@ -122,7 +121,7 @@ class CheckoutAccessTest extends EntityKernelTestBase {
     $this->assertTrue($this->container->get('access_manager')->checkRequest($request, $user_with_access));
 
     /** @var \Drupal\commerce_order\Entity\Order $order */
-    $order =$this->createSampleOrder($user_without_access);
+    $order = $this->createSampleOrder($user_without_access);
     $request = $this->createCheckoutRequest($order);
     $this->assertFalse($this->container->get('access_manager')->checkRequest($request, $user_without_access));
   }
@@ -165,9 +164,14 @@ class CheckoutAccessTest extends EntityKernelTestBase {
     $order = $this->createSampleOrder($user1);
     $order->getState()->applyTransition($order->getState()->getTransitions()['place']);
     $request = $this->createCheckoutRequest($order);
-    $this->assertFalse($this->container->get('access_manager')->checkRequest($request, $user1));
+    // Technically a placed order can reach checkout, so it can review the last
+    // steps after being placed.
+    $this->assertTrue($this->container->get('access_manager')->checkRequest($request, $user1));
   }
 
+  /**
+   * Tests that an order must have items in order to reach checkout.
+   */
   public function testOrderMustHaveitems() {
     $this->enableCommerceCart();
     $user1 = $this->createUser([], ['access checkout']);
@@ -201,7 +205,7 @@ class CheckoutAccessTest extends EntityKernelTestBase {
     $request = Request::create($url->toString());
     $request->attributes->add([
       RouteObjectInterface::ROUTE_OBJECT => $this->container->get('router.route_provider')->getRouteByName($url->getRouteName()),
-      'commerce_order' => $order
+      'commerce_order' => $order,
     ]);
     $this->container->get('request_stack')->push($request);
     return $request;
@@ -235,9 +239,13 @@ class CheckoutAccessTest extends EntityKernelTestBase {
   }
 
   /**
+   * Enables commerce_cart for tests.
+   *
    * Due to issues with hook_entity_bundle_create, we need to run this here
    * and can't put commerce_cart in $modules.
+   *
    * See https://www.drupal.org/node/2711645
+   *
    * @todo patch core so it doesn't explode in Kernel tests.
    * @todo remove Cart dependency in Checkout
    */

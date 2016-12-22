@@ -85,16 +85,15 @@ class CheckoutController implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-    // The user is attempting to access an inaccessible page for their order.
-    if (!$this->checkoutPageAccess($order)) {
-      // Redirect if the target page is different from the page the user was
-      // trying to access.
-      $order_step = $this->getOrderCheckoutStep($order);
-      if ($checkout_flow->getPlugin()->getStepId() !== $order_step) {
-        $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $order_step]);
-        return new RedirectResponse($url->toString());
-      }
+
+    // Determine the order's step. If the order does not have access to the
+    // requested step, it will be redirected appropriately.
+    $order_step = $this->selectCheckoutStep($order);
+    if ($checkout_flow->getPlugin()->getStepId() !== $order_step) {
+      $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $order_step]);
+      return new RedirectResponse($url->toString());
     }
+
     $form_state = new FormState();
     return $this->formBuilder->buildForm($checkout_flow->getPlugin(), $form_state);
   }
@@ -116,7 +115,7 @@ class CheckoutController implements ContainerInjectionInterface {
 
     // Check if the order has been canceled.
     if ($order->getState()->value == 'canceled') {
-      return AccessResult::forbidden();
+      return AccessResult::forbidden()->addCacheableDependency($order);
     }
 
     // The user can checkout only their own non-empty orders.
@@ -129,27 +128,10 @@ class CheckoutController implements ContainerInjectionInterface {
       $customer_check = $active_cart || $completed_cart;
     }
 
-    // The user is attempting to access an inaccessible page for their order.
-    if (!$this->checkoutPageAccess($order)) {
-      // Return a 403 response if the target page is the same from the page the
-      // user was trying to access. We redirect in formPage() otherwise.
-      $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-      if ($checkout_flow->getPlugin()->getStepId() === $this->getOrderCheckoutStep($order)) {
-        return AccessResult::forbidden();
-      }
-    }
-
     $access = AccessResult::allowedIf($customer_check)
       ->andIf(AccessResult::allowedIf($order->hasItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
-
-    if (!$access->isAllowed()) {
-//      print_r(__FILE__ . __LINE__ . PHP_EOL);
-//      var_dump($customer_check);
-//      var_dump($order->hasItems());
-//      var_dump($account->hasPermission('access checkout'));
-    }
     return $access;
   }
 
@@ -162,53 +144,29 @@ class CheckoutController implements ContainerInjectionInterface {
    * @return bool
    *   TRUE or FALSE indicating access.
    */
-  protected function checkoutPageAccess(OrderInterface $order) {
+  protected function selectCheckoutStep(OrderInterface $order) {
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
     $requested_step = $checkout_flow->getPlugin()->getStepId();
-    $order_step = $this->getOrderCheckoutStep($order);
+    $order_step = $order->checkout_step->value;
+    // An empty $order_step means the checkout flow is at the first step.
+    if (empty($order_step)) {
+      $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
+      $visible_step_ids = array_keys($visible_steps);
+      $order_step = reset($visible_step_ids);
+    }
+
     $order_state = $order->getState()->value;
 
     // An order is expected to be a draft throughout checkout, unless it has
     // been placed, in which it can view the complete step.
-    if ($order_state != 'draft') {
-      return $requested_step == 'complete';
+    if ($order_state != 'draft' && $requested_step == 'complete') {
+      return $requested_step;
     }
     // The order is a draft, continue other logic checks.
     else {
       // Draft orders cannot reach the complete step.
       if ($requested_step == 'complete') {
-        return FALSE;
-      }
-
-      // This is the page the user is currently on.
-      if ($requested_step == $order_step) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
-   * Get the current checkout step of the order.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The fully loaded order object represented on the checkout form.
-   *
-   * @return string
-   *   The checkout step id of the order. If the checkout_step property is
-   *   empty then it returns the first visible checkout step id.
-   */
-  protected function getOrderCheckoutStep(OrderInterface $order) {
-    $order_step = &drupal_static(__METHOD__ . '-' . $order->id());
-    if (!isset($order_step)) {
-      $order_step = $order->checkout_step->getString();
-      // An empty $order_step means the checkout flow is at the first step.
-      if (empty($order_step)) {
-        $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
-        $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
-        $visible_step_ids = array_keys($visible_steps);
-        $first_step = reset($visible_step_ids);
-        $order_step = $first_step;
+        return $order_step;
       }
     }
     return $order_step;
