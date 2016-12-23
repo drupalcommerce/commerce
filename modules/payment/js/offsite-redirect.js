@@ -16,7 +16,7 @@
    */
   Drupal.behaviors.commercePaymentRedirect = {
     attach: function (context) {
-      $('.payment-redirect-form', context).find('input[type="submit"]').trigger('click');
+      $('.payment-redirect-form', context).submit();
     }
   };
 
