@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
 use Drupal\commerce_order\Entity\OrderType;
-use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -47,7 +46,6 @@ class PromotionTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
-
   }
 
   /**
