@@ -20,3 +20,9 @@ services:
   commerce_cart.order_item_matcher:
     class: Drupal\commerce_cart\OrderItemMatcher
     arguments: ['@event_dispatcher']
+
+  commerce_cart.order_subscriber:
+    class: Drupal\commerce_cart\EventSubscriber\OrderEventSubscriber
+    arguments: ['@commerce_cart.cart_provider']
+    tags:
+      - { name: event_subscriber }
