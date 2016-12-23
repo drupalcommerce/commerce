@@ -37,9 +37,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Finalizes cart.
-   *
-   * Reacts to order "place" transition event.
+   * Finalizes the cart when the order is placed.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The workflow transition event.
