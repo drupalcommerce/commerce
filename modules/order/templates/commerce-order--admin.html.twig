@@ -25,6 +25,11 @@
   <div class="layout-region layout-region-order-main">
     {{ order.order_items }}
     {{ order.total_price }}
+
+    {% if order.activity %}
+      <h2>{% trans %}Order activity{% endtrans %}</h2>
+      {{ order.activity }}
+    {% endif %}
   </div>
   <div class="layout-region layout-region-order-secondary">
     <div class="entity-meta">
