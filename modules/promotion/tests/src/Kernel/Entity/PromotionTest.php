@@ -74,11 +74,9 @@ class PromotionTest extends CommerceKernelTestBase {
    */
   public function testPromotion() {
     $order_type = OrderType::load('default');
-
     $promotion = Promotion::create([
       'status' => FALSE,
     ]);
-    $promotion->save();
 
     $promotion->setName('My Promotion');
     $this->assertEquals('My Promotion', $promotion->getName());
