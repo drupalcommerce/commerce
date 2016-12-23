@@ -1,0 +1,5 @@
+entity_test_created:
+  id: entity_test_created
+  category: entity_test
+  label: 'Test entity created'
+  template: '<p><em>{{ entity_label }}</em> was created.</p>'
