@@ -27,28 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 interface OffsitePaymentGatewayInterface extends PaymentGatewayInterface {
 
   /**
-   * Gets the URL to the "return" page.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return \Drupal\Core\Url
-   *   The "return" page url.
-   */
-  public function getReturnUrl(OrderInterface $order);
-
-  /**
-   * Gets the URL to the "cancel" page.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   *
-   * @return \Drupal\Core\Url
-   *   The "cancel" page url.
-   */
-  public function getCancelUrl(OrderInterface $order);
-
-  /**
    * Gets the URL to the "notify" page.
    *
    * When supported, this page is called asynchronously to notify the site of

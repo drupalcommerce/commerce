@@ -12,9 +12,10 @@ class PaymentOffsiteForm extends BasePaymentOffsiteForm {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
+
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
-    $order = $payment->getOrder();
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $payment->getPaymentGateway()->getPlugin();
     $redirect_method = $payment_gateway_plugin->getConfiguration()['redirect_method'];
@@ -22,6 +23,7 @@ class PaymentOffsiteForm extends BasePaymentOffsiteForm {
       $redirect_url = Url::fromRoute('commerce_payment_example.dummy_redirect_post')->toString();
     }
     else {
+      $order = $payment->getOrder();
       // Gateways that use the GET redirect method usually perform an API call
       // that prepares the remote payment and provides the actual url to
       // redirect to. Any params received from that API call that need to be
@@ -31,8 +33,8 @@ class PaymentOffsiteForm extends BasePaymentOffsiteForm {
       $redirect_url = Url::fromRoute('commerce_payment_example.dummy_redirect_302', [], ['absolute' => TRUE])->toString();
     }
     $data = [
-      'return' => $payment_gateway_plugin->getReturnUrl($order)->toString(),
-      'cancel' => $payment_gateway_plugin->getCancelUrl($order)->toString(),
+      'return' => $form['#return_url'],
+      'cancel' => $form['#cancel_url'],
       'total' => $payment->getAmount()->getNumber(),
     ];
 
