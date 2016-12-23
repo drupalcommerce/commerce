@@ -4,6 +4,7 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
@@ -11,6 +12,7 @@ use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayI
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -164,6 +166,8 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#type' => 'commerce_payment_gateway_form',
         '#operation' => 'offsite-payment',
         '#default_value' => $payment,
+        '#return_url' => $this->getReturnUrl($this->order),
+        '#cancel_url' => $this->getCancelUrl($this->order),
       ];
 
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
@@ -187,6 +191,38 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       }
     }
     $this->checkoutFlow->redirectToStep($previous_step_id);
+  }
+
+  /**
+   * Gets the URL to the "return" page.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return string
+   *   The "return" page url.
+   */
+  protected function getReturnUrl(OrderInterface $order) {
+    return Url::fromRoute('commerce_payment.checkout.return', [
+      'commerce_order' => $order->id(),
+      'step' => 'payment',
+    ], ['absolute' => TRUE])->toString();
+  }
+
+  /**
+   * Gets the URL to the "cancel" page.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return string
+   *   The "cancel" page url.
+   */
+  protected function getCancelUrl(OrderInterface $order) {
+    return Url::fromRoute('commerce_payment.checkout.cancel', [
+      'commerce_order' => $order->id(),
+      'step' => 'payment',
+    ], ['absolute' => TRUE])->toString();
   }
 
 }

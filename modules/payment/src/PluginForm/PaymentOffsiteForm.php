@@ -20,6 +20,20 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
   const REDIRECT_POST = 'post';
 
   /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    if (empty($form['#redirect_url'])) {
+      throw new \InvalidArgumentException('The offsite-payment form requires the #redirect_url property.');
+    }
+    if (empty($form['#cancel_url'])) {
+      throw new \InvalidArgumentException('The offsite-payment form requires the #cancel_url property.');
+    }
+
+    return $form;
+  }
+
+  /**
    * Builds the redirect form.
    *
    * @param array $form

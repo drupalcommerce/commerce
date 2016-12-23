@@ -14,26 +14,6 @@ abstract class OffsitePaymentGatewayBase extends PaymentGatewayBase implements O
   /**
    * {@inheritdoc}
    */
-  public function getReturnUrl(OrderInterface $order) {
-    return Url::fromRoute('commerce_payment.checkout.return', [
-      'commerce_order' => $order->id(),
-      'step' => 'payment',
-    ], ['absolute' => TRUE]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl(OrderInterface $order) {
-    return Url::fromRoute('commerce_payment.checkout.cancel', [
-      'commerce_order' => $order->id(),
-      'step' => 'payment',
-    ], ['absolute' => TRUE]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getNotifyUrl() {
     return Url::fromRoute('commerce_payment.notify', [
       'commerce_payment_gateway' => $this->entityId,
