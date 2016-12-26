@@ -1,0 +1,20 @@
+services:
+  plugin.manager.commerce_log_template:
+    class: Drupal\commerce_log\LogTemplateManager
+    arguments: ['@module_handler', '@cache.discovery', '@plugin.manager.commerce_log_category']
+
+  plugin.manager.commerce_log_category:
+    class: Drupal\commerce_log\LogCategoryManager
+    arguments: ['@module_handler', '@cache.discovery']
+
+  commerce_log.cart_event_subscriber:
+    class: Drupal\commerce_log\EventSubscriber\CartEventSubscriber
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+
+  commerce_log.order_event_subscriber:
+    class: Drupal\commerce_log\EventSubscriber\OrderEventSubscriber
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: event_subscriber }

@@ -1,0 +1,16 @@
+added_to_cart:
+  id: added_to_cart
+  category: commerce_cart
+  label: 'Added to cart'
+  template: '<p><em>{{ purchased_entity_label }}</em> added to the cart.</p>'
+removed_from_cart:
+  id: removed_from_cart
+  category: commerce_cart
+  label: 'Removed from cart'
+  template: '<p><em>{{ purchased_entity_label }}</em> removed from the cart.</p>'
+
+order_placed:
+  id: order_placed
+  category: commerce_order
+  label: 'Order placed'
+  template: '<p>The order was placed.</p>'

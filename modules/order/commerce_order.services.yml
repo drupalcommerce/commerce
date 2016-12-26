@@ -28,6 +28,7 @@ services:
 
   commerce_order.timestamp_event_subscriber:
     class: Drupal\commerce_order\EventSubscriber\TimestampEventSubscriber
+    arguments: ['@entity_type.manager']
     tags:
       - { name: event_subscriber }
 
