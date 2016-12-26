@@ -5,10 +5,10 @@ namespace Drupal\commerce_log\Plugin\LogTemplate;
 interface LogTemplateInterface {
 
   /**
-   * Gets the log template ID.
+   * Gets the template ID.
    *
    * @return string
-   *   The log template ID.
+   *   The template ID.
    */
   public function getId();
 
@@ -21,10 +21,10 @@ interface LogTemplateInterface {
   public function getLabel();
 
   /**
-   * Gets the log template category.
+   * Gets the template category.
    *
    * @return string
-   *   The log template category.
+   *   The template category.
    */
   public function getCategory();
 

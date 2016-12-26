@@ -18,10 +18,9 @@ class LogViewBuilder extends EntityViewBuilder {
     $weight = 0;
     /** @var \Drupal\commerce_log\Entity\LogInterface $entity */
     foreach ($entities as $key => $entity) {
-      // Set build defaults.
       $build_list[$key] = [
         '#type' => 'inline_template',
-        '#template' => $entity->getTemplatePlugin()->getTemplate(),
+        '#template' => $entity->getTemplate()->getTemplate(),
         '#context' => $entity->getParams(),
         // Collect cache defaults for this entity.
         '#cache' => [

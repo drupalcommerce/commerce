@@ -3,8 +3,8 @@
 namespace Drupal\commerce_log;
 
 use Drupal\commerce\CommerceContentEntityStorage;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -55,14 +55,14 @@ class LogStorage extends CommerceContentEntityStorage implements LogStorageInter
       $container->get('cache.entity'),
       $container->get('language_manager'),
       $container->get('event_dispatcher'),
-      $container->get('plugin.manager.log_template')
+      $container->get('plugin.manager.commerce_log_template')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function generate(EntityInterface $source, $log_template_id, array $params) {
+  public function generate(ContentEntityInterface $source, $log_template_id, array $params = []) {
     $template_plugin = $this->logTemplateManager->getDefinition($log_template_id);
     $log = $this->create([
       'log_category_id' => $template_plugin['category'],
@@ -77,7 +77,7 @@ class LogStorage extends CommerceContentEntityStorage implements LogStorageInter
   /**
    * {@inheritdoc}
    */
-  public function loadByEntity(EntityInterface $entity) {
+  public function loadByEntity(ContentEntityInterface $entity) {
     return $this->loadByProperties([
       'source_entity_id' => $entity->id(),
       'source_entity_type' => $entity->getEntityTypeId(),

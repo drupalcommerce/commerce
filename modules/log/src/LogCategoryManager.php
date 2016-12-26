@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_log;
 
+use Drupal\commerce_log\Plugin\LogCategory\LogCategory;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -25,7 +26,7 @@ class LogCategoryManager extends DefaultPluginManager implements LogCategoryMana
     'id' => '',
     'label' => '',
     'entity_type' => '',
-    'class' => 'Drupal\commerce_log\Plugin\LogCategory\LogCategory',
+    'class' => LogCategory::class,
   ];
 
   /**

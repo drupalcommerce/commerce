@@ -8,10 +8,10 @@ namespace Drupal\commerce_log\Plugin\LogCategory;
 interface LogCategoryInterface {
 
   /**
-   * Gets the log category ID.
+   * Gets the category ID.
    *
    * @return string
-   *   The log category ID.
+   *   The category ID.
    */
   public function getId();
 
@@ -24,9 +24,9 @@ interface LogCategoryInterface {
   public function getLabel();
 
   /**
-   * Gets the entity type id.
+   * Gets the entity type ID.
    *
-   * For example, "node" if all log category in the group are used on content.
+   * For example, "node" if all log templates in the category are used on content.
    *
    * @return string
    *   The entity type id.

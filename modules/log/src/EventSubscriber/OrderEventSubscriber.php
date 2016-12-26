@@ -16,7 +16,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   protected $logStorage;
 
   /**
-   * Constructs a new CartEventSubscriber object.
+   * Constructs a new OrderEventSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
@@ -36,7 +36,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Logs an order as having been placed.
+   * Creates a log when an order is placed.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The transition event.
@@ -44,7 +44,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onPlaceTransition(WorkflowTransitionEvent $event) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
-    $this->logStorage->generate($order, 'order_placed', [])->save();
+    $this->logStorage->generate($order, 'order_placed')->save();
   }
 
 }

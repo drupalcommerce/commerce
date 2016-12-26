@@ -24,20 +24,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "storage" = "Drupal\commerce_log\LogStorage",
  *     "view_builder" = "Drupal\commerce_log\LogViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
- *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *     },
  *   },
  *   base_table = "commerce_log",
- *   admin_permission = "administer commerce_log",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "log_id",
  *     "uuid" = "uuid",
- *   },
- *   links = {
- *     "collection" = "/admin/commerce/logs",
- *     "canonical" = "/admin/commerce/logs/{commerce_log}",
  *   },
  * )
  */
@@ -61,7 +53,7 @@ class Log extends ContentEntityBase implements LogInterface {
    * {@inheritdoc}
    */
   public function label() {
-    return $this->getCategoryPlugin()->getLabel() . ': ' . $this->getTemplatePlugin()->getLabel();
+    return $this->getCategory()->getLabel() . ': ' . $this->getTemplate()->getLabel();
   }
 
   /**
@@ -74,8 +66,8 @@ class Log extends ContentEntityBase implements LogInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCategoryPlugin() {
-    $log_category_manager = \Drupal::service('plugin.manager.log_category');
+  public function getCategory() {
+    $log_category_manager = \Drupal::service('plugin.manager.commerce_log_category');
     return $log_category_manager->createInstance($this->getCategoryId());
   }
 
@@ -89,8 +81,8 @@ class Log extends ContentEntityBase implements LogInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTemplatePlugin() {
-    $log_template_manager = \Drupal::service('plugin.manager.log_template');
+  public function getTemplate() {
+    $log_template_manager = \Drupal::service('plugin.manager.commerce_log_template');
     return $log_template_manager->createInstance($this->getTemplateId());
   }
 
@@ -104,7 +96,7 @@ class Log extends ContentEntityBase implements LogInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSourceEntityType() {
+  public function getSourceEntityTypeId() {
     return $this->get('source_entity_type')->value;
   }
 
@@ -113,7 +105,7 @@ class Log extends ContentEntityBase implements LogInterface {
    */
   public function getSourceEntity() {
     return \Drupal::entityTypeManager()
-      ->getStorage($this->getSourceEntityType())
+      ->getStorage($this->getSourceEntityTypeId())
       ->load($this->getSourceEntityId());
   }
 
@@ -182,7 +174,7 @@ class Log extends ContentEntityBase implements LogInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time when the payment method was created.'));
+      ->setDescription(t('The time when the log was created.'));
 
     return $fields;
   }

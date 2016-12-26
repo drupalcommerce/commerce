@@ -23,7 +23,7 @@ interface LogInterface extends ContentEntityInterface {
   public function getUser();
 
   /**
-   * Get the category ID.
+   * Gets the category ID.
    *
    * @return string
    *   The log category ID.
@@ -31,15 +31,15 @@ interface LogInterface extends ContentEntityInterface {
   public function getCategoryId();
 
   /**
-   * Get the category plugin.
+   * Gets the category plugin.
    *
    * @return \Drupal\commerce_log\Plugin\LogCategory\LogCategoryInterface
    *   The category plugin.
    */
-  public function getCategoryPlugin();
+  public function getCategory();
 
   /**
-   * Get the template ID.
+   * Gets the template ID.
    *
    * @return string
    *   The template ID.
@@ -47,15 +47,15 @@ interface LogInterface extends ContentEntityInterface {
   public function getTemplateId();
 
   /**
-   * Get the template plugin.
+   * Gets the template plugin.
    *
    * @return \Drupal\commerce_log\Plugin\LogTemplate\LogTemplateInterface
    *   The template plugin.
    */
-  public function getTemplatePlugin();
+  public function getTemplate();
 
   /**
-   * Get the source entity ID.
+   * Gets the source entity ID.
    *
    * @return mixed
    *   The entity ID.
@@ -63,23 +63,23 @@ interface LogInterface extends ContentEntityInterface {
   public function getSourceEntityId();
 
   /**
-   * Get the source entity type.
+   * Gets the source entity type ID.
    *
    * @return string
-   *   The entity type.
+   *   The entity type ID.
    */
-  public function getSourceEntityType();
+  public function getSourceEntityTypeId();
 
   /**
-   * Get the source entity.
+   * Gets the source entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\Core\Entity\ContentEntityInterface
    *   The source entity.
    */
   public function getSourceEntity();
 
   /**
-   * Get the template parameters.
+   * Gets the template parameters.
    *
    * @return array
    *   The parameters.

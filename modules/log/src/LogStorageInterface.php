@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_log;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 
 interface LogStorageInterface extends SqlEntityStorageInterface {
@@ -10,7 +10,7 @@ interface LogStorageInterface extends SqlEntityStorageInterface {
   /**
    * Generates a log.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $source
+   * @param \Drupal\Core\Entity\ContentEntityInterface $source
    *   The source entity.
    * @param string $log_template_id
    *   The template ID.
@@ -18,19 +18,19 @@ interface LogStorageInterface extends SqlEntityStorageInterface {
    *   An array of params for the log.
    *
    * @return \Drupal\commerce_log\Entity\LogInterface
-   *   The generated, unsaved, log.
+   *   The generated log, unsaved.
    */
-  public function generate(EntityInterface $source, $log_template_id, array $params);
+  public function generate(ContentEntityInterface $source, $log_template_id, array $params = []);
 
   /**
    * Loads all logs for an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity.
    *
    * @return \Drupal\commerce_log\Entity\LogInterface[]
-   *   An array of log entities.
+   *   The logs.
    */
-  public function loadByEntity(EntityInterface $entity);
+  public function loadByEntity(ContentEntityInterface $entity);
 
 }

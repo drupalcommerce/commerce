@@ -13,7 +13,7 @@ interface LogCategoryManagerInterface extends PluginManagerInterface {
    * Gets the definitions filtered by entity type.
    *
    * @param string $entity_type_id
-   *   The entity type id.
+   *   The entity type ID.
    *
    * @return array
    *   The definitions.

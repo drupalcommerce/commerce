@@ -27,7 +27,7 @@ class LogTemplateTest extends UnitTestCase {
     'id' => 'entity_test',
     'label' => 'Entity Test Template',
     'category' => 'entity_test_group',
-    'template' => 'Hello {{ message }}',
+    'template' => '<p>Hello {{ message }}</p>',
   ];
 
   /**

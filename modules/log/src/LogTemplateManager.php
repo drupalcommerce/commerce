@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_log;
 
+use Drupal\commerce_log\Plugin\LogTemplate\LogTemplate;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
@@ -19,7 +20,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 class LogTemplateManager extends DefaultPluginManager implements LogTemplateManagerInterface {
 
   /**
-   * The commerce_log_category group manager.
+   * The commerce_log_category category manager.
    *
    * @var \Drupal\commerce_log\LogCategoryManagerInterface
    */
@@ -35,7 +36,7 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
     'label' => '',
     'template' => '',
     'category' => '',
-    'class' => 'Drupal\commerce_log\Plugin\LogTemplate\LogTemplate',
+    'class' => LogTemplate::class,
   ];
 
   /**
@@ -46,10 +47,10 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LogCategoryManagerInterface $group_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LogCategoryManagerInterface $category_manager) {
     $this->moduleHandler = $module_handler;
     $this->setCacheBackend($cache_backend, 'commerce_log_template', ['commerce_log_template']);
-    $this->categoryManager = $group_manager;
+    $this->categoryManager = $category_manager;
   }
 
   /**
@@ -77,26 +78,26 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
       }
     }
 
-    if (!$this->templateStringIsSafe($definition['template'])) {
-      throw new PluginException(sprintf('The log template %s does not have a valid template string', $plugin_id));
+    if (!$this->isStringSafe($definition['template'])) {
+      throw new PluginException(sprintf('The commerce_log_template %s does not have a valid template string.', $plugin_id));
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGroupedLabels($entity_type_id = NULL) {
+  public function getLabelsByCategory($entity_type_id = NULL) {
     $definitions = $this->getSortedDefinitions();
-    $group_labels = $this->getGroupLabels($entity_type_id);
+    $category_labels = $this->getCategoryLabels($entity_type_id);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {
-      $group_id = $definition['category'];
-      if (!isset($group_labels[$group_id])) {
-        // Don't return log templates for groups ignored due to their entity type.
+      $category_id = $definition['category'];
+      if (!isset($category_labels[$category_id])) {
+        // Don't return log templates for categories ignored due to their entity type.
         continue;
       }
-      $group_label = $group_labels[$group_id];
-      $grouped_definitions[$group_label][$id] = $definition['label'];
+      $category_label = $category_labels[$category_id];
+      $grouped_definitions[$category_label][$id] = $definition['label'];
     }
 
     return $grouped_definitions;
@@ -106,10 +107,10 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
    * Gets the sorted commerce_log_template plugin definitions.
    *
    * @return array
-   *   The commerce_log_template plugin definitions, sorted by group and label.
+   *   The commerce_log_template plugin definitions, sorted by category and label.
    */
   protected function getSortedDefinitions() {
-    // Sort the plugins first by group, then by label.
+    // Sort the plugins first by category, then by label.
     $definitions = $this->getDefinitions();
     uasort($definitions, function ($a, $b) {
       if ($a['category'] != $b['category']) {
@@ -122,42 +123,40 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
   }
 
   /**
-   * Gets a list of category labels for the given entity type id.
+   * Gets a list of category labels for the given entity type ID.
    *
    * @param string $entity_type_id
-   *   The entity type id.
+   *   The entity type ID.
    *
    * @return array
-   *   A list of categories labels keyed by id.
+   *   A list of categories labels keyed by ID.
    */
-  protected function getGroupLabels($entity_type_id = NULL) {
-    $group_definitions = $this->categoryManager->getDefinitionsByEntityType($entity_type_id);
-    $group_labels = array_map(function ($group_definition) {
-      return (string) $group_definition['label'];
-    }, $group_definitions);
-    natcasesort($group_labels);
+  protected function getCategoryLabels($entity_type_id = NULL) {
+    $category_definitions = $this->categoryManager->getDefinitionsByEntityType($entity_type_id);
+    $category_labels = array_map(function ($category_definition) {
+      return (string) $category_definition['label'];
+    }, $category_definitions);
+    natcasesort($category_labels);
 
-    return $group_labels;
+    return $category_labels;
   }
 
   /**
-   * Check that a string is safe to be used as log template.
+   * Checks whether a string is safe for translation.
    *
-   * This is a direct copy of locale_string_is_safe to determine if the
-   * template is XSS filter safe and able to be translated without directly
-   * depending on the locale module.
+   * A copy of locale_string_is_safe, made to avoid a dependency on Locale.
    *
    * @param string $string
-   *   The template.
+   *   The string.
    *
    * @return bool
    *   TRUE if the string is safe, FALSE otherwise.
    *
    * @see locale_string_is_safe()
    */
-  protected function templateStringIsSafe($string) {
+  protected function isStringSafe($string) {
     $string = preg_replace('/\[[a-z0-9_-]+(:[a-z0-9_-]+)+\]/i', '', $string);
-    return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, ['a', 'abbr', 'acronym', 'address', 'b', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'ins', 'kbd', 'li', 'ol', 'p', 'pre', 'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'tt', 'ul', 'var']));
+    return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, ['a', 'abbr', 'acronym', 'address', 'b', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colcategory', 'dd', 'del', 'dfn', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'ins', 'kbd', 'li', 'ol', 'p', 'pre', 'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'tt', 'ul', 'var']));
   }
 
 }
