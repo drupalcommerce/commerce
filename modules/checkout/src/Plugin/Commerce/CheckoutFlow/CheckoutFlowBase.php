@@ -6,6 +6,7 @@ use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -341,20 +342,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function previousForm(array &$form, FormStateInterface $form_state) {
-    $previous_step_id = $this->getPreviousStepId();
-    $this->order->checkout_step = $previous_step_id;
-    $this->order->save();
-
-    $form_state->setRedirect('commerce_checkout.form', [
-      'commerce_order' => $this->order->id(),
-      'step' => $previous_step_id,
-    ]);
-  }
-
-  /**
    * Builds the actions element for the current form.
    *
    * @param array $form
@@ -366,34 +353,30 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    *   The actions element.
    */
   protected function actions(array $form, FormStateInterface $form_state) {
+    $steps = $this->getVisibleSteps();
+    $next_step_id = $this->getNextStepId();
+    $previous_step_id = $this->getPreviousStepId();
+    $has_next_step = $next_step_id && isset($steps[$next_step_id]['next_label']);
+    $has_previous_step = $previous_step_id && isset($steps[$previous_step_id]['previous_label']);
+
     $actions = [
       '#type' => 'actions',
+      '#access' => $has_next_step,
     ];
-    $steps = $this->getVisibleSteps();
-    $previous_step_id = $this->getPreviousStepId();
-    if ($previous_step_id && isset($steps[$previous_step_id]['previous_label'])) {
-      $actions['previous'] = [
-        '#type' => 'submit',
-        '#value' => $steps[$previous_step_id]['previous_label'],
-        '#submit' => [
-          '::previousForm',
-        ],
-      ];
-    }
-    $next_step_id = $this->getNextStepId();
-    if ($next_step_id && isset($steps[$next_step_id]['next_label'])) {
-      $actions['next'] = [
+    if ($has_next_step) {
+      $actions['submit'] = [
         '#type' => 'submit',
         '#value' => $steps[$next_step_id]['next_label'],
         '#button_type' => 'primary',
         '#submit' => ['::submitForm'],
       ];
-    }
-    // Hide the actions element if it has no buttons.
-    $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
-    // The "complete" step should never have buttons.
-    if ($this->stepId == 'complete') {
-      $actions['#access'] = FALSE;
+      if ($has_previous_step) {
+        $label = $steps[$previous_step_id]['previous_label'];
+        $actions['submit']['#suffix'] = Link::createFromRoute($label, 'commerce_checkout.form', [
+          'commerce_order' => $this->order->id(),
+          'step' => $previous_step_id,
+        ])->toString();
+      }
     }
 
     return $actions;
