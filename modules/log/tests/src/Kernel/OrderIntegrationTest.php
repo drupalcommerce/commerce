@@ -120,6 +120,8 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $order->addItem($order_item1);
     $order->save();
     $this->order = $this->reloadEntity($order);
+
+    
   }
 
   /**
