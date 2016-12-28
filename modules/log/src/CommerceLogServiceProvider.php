@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers event subscribers for enabled Commerce modules.
+ * Registers event subscribers for installed Commerce modules.
  */
 class CommerceLogServiceProvider extends ServiceProviderBase {
 
