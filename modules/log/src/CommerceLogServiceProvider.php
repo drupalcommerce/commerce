@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Provides event listeners whether a module is installed.
+ * Registers event subscribers for enabled Commerce modules.
  */
 class CommerceLogServiceProvider extends ServiceProviderBase {
 
@@ -15,23 +15,20 @@ class CommerceLogServiceProvider extends ServiceProviderBase {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    // We cannot use the module handler as the container is not yet compiled,
-    // so we have to check the `container.modules` parameter.
+    // We cannot use the module handler as the container is not yet compiled.
     // @see \Drupal\Core\DrupalKernel::compileContainer()
     $modules = $container->getParameter('container.modules');
 
-    if (isset($modules['commerce_order'])) {
-      $container->register('commerce_log.order_event_subscriber', 'Drupal\commerce_log\EventSubscriber\OrderEventSubscriber')
-        ->addTag('event_subscriber')
-        ->addArgument(new Reference('entity_type.manager'));
-    }
-
     if (isset($modules['commerce_cart'])) {
-      $container->register('commerce_log.cart_event_subscriber', 'Drupal\commerce_log\EventSubscriber\CartEventSubscriber')
+      $container->register('commerce_log.cart_subscriber', 'Drupal\commerce_log\EventSubscriber\CartEventSubscriber')
         ->addTag('event_subscriber')
         ->addArgument(new Reference('entity_type.manager'));
     }
-
+    if (isset($modules['commerce_order'])) {
+      $container->register('commerce_log.order_subscriber', 'Drupal\commerce_log\EventSubscriber\OrderEventSubscriber')
+        ->addTag('event_subscriber')
+        ->addArgument(new Reference('entity_type.manager'));
+    }
   }
 
 }
