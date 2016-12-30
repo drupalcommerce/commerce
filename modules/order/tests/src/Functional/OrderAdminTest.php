@@ -122,6 +122,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->drupalGet($order->toUrl('edit-form'));
     $this->assertSession()->fieldValueEquals('adjustments[0][definition][label]', '10% off');
     $this->assertSession()->fieldValueEquals('adjustments[1][definition][label]', 'Handling fee');
+    $this->assertSession()->optionExists('adjustments[2][type]', 'Custom');
+    $this->assertSession()->optionNotExists('adjustments[2][type]', 'Test order adjustment type');
   }
 
   /**
