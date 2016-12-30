@@ -22,6 +22,11 @@ branches:
 matrix:
   fast_finish: true
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/travis-phantomjs
+
 env:
   global:
     - PHANTOMJS2_VERSION="2.0.0"
@@ -103,19 +108,14 @@ before_install:
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
   - composer self-update
-  - composer global require "hirak/prestissimo:^0.3"
-  - composer global require "lionsad/drupal_ti:dev-master"
-  - composer global require "squizlabs/php_codesniffer:2.*"
-  - composer global require "drupal/coder:8.2.*"
+  - composer global require "hirak/prestissimo:^0.3" "lionsad/drupal_ti:dev-master" "drupal/coder:8.2.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
   - drupal-ti before_install
 
 install:
   - drupal-ti install
-  - mkdir travis-phantomjs
-  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
-  - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
-  - export PATH=$PWD/travis-phantomjs:$PATH
+  - if [[ $(phantomjs --version) != '2.0.0' ]]; then rm -rf $HOME/travis-phantomjs; mkdir -p $HOME/travis-phantomjs; wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $HOME/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2; tar -xvf $HOME/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $HOME/travis-phantomjs; fi
+  - export PATH=$HOME/travis-phantomjs:$PATH
   - phantomjs --version
 
 before_script:
@@ -123,10 +123,7 @@ before_script:
   - drupal-ti before_script
 
 script:
-  - phpcs --standard=phpcs.xml src -s
-  - phpcs --standard=phpcs.xml modules -s
-  - phpcs --standard=phpcs.xml tests -s
-  - phpcs --standard=phpcs.xml commerce.module
+  - phpcs --standard=phpcs.xml . -s
   - drupal-ti script
 
 after_script:
