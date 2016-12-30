@@ -31,7 +31,7 @@ interface AvailabilityManagerInterface {
   public function getCheckers();
 
   /**
-   * Checks the availability of the given purchasable entity.
+   * Gets an availability response from the aggregate of all checkers.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
@@ -40,9 +40,9 @@ interface AvailabilityManagerInterface {
    * @param \Drupal\commerce\Context $context
    *   The context.
    *
-   * @return bool
-   *   TRUE if the purchasable entity is available, FALSE otherwise.
+   * @return \Drupal\commerce\AvailabilityResponseInterface
+   *   The availability response.
    */
-  public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
+  public function getAvailability(PurchasableEntityInterface $entity, $quantity, Context $context);
 
 }
