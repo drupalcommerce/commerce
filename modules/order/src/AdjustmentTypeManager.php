@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order;
 
+use Drupal\commerce_order\Plugin\Commerce\AdjustmentType\AdjustmentType;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -10,7 +11,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 
 /**
- * Manages discovery and instantiation of adjustment_type plugins.
+ * Manages discovery and instantiation of commerce_adjustment_type plugins.
  *
  * @see \Drupal\commerce_order\Plugin\Commerce\AdjustmentType\AdjustmentTypeInterface
  * @see plugin_api
@@ -18,7 +19,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 class AdjustmentTypeManager extends DefaultPluginManager {
 
   /**
-   * Default values for each adjustment_type plugin.
+   * Default values for each plugin.
    *
    * @var array
    */
@@ -27,7 +28,7 @@ class AdjustmentTypeManager extends DefaultPluginManager {
     'label' => '',
     'has_ui' => TRUE,
     'weight' => 0,
-    'class' => 'Drupal\commerce_order\Plugin\Commerce\AdjustmentType\AdjustmentType',
+    'class' => AdjustmentType::class,
   ];
 
   /**
