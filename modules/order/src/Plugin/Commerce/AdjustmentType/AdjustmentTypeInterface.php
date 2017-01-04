@@ -24,18 +24,18 @@ interface AdjustmentTypeInterface {
   public function getLabel();
 
   /**
-   * Gets the weight of the adjustment type.
+   * Gets the adjustment type weight.
    *
    * @return int
-   *   The weight of the adjustment type.
+   *   The adjustment type weight.
    */
   public function getWeight();
 
   /**
-   * Gets whether or not the adjustment type can be created from the UI.
+   * Gets whether the adjustment type can be created from the UI.
    *
    * @return bool
-   *   TRUE if the adjustment type can be created from the UI.
+   *   TRUE if the adjustment type can be created from the UI, FALSE otherwise.
    */
   public function hasUi();
 
