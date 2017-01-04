@@ -34,6 +34,12 @@ function commerce_order_theme($existing, $type, $theme, $path) {
         'billing_information' => NULL,
         'shipping_information' => NULL,
         'payment_method' => NULL,
+        'totals' => NULL,
+      ],
+    ],
+    'commerce_order_total_summary' => [
+      'variables' => [
+        'totals' => NULL,
       ],
     ],
   ];
