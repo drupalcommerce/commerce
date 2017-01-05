@@ -29,6 +29,9 @@ abstract class PaymentOffsiteForm extends PaymentGatewayFormBase {
     if (empty($form['#cancel_url'])) {
       throw new \InvalidArgumentException('The offsite-payment form requires the #cancel_url property.');
     }
+    if (!isset($form['#capture'])) {
+      $form['#capture'] = TRUE;
+    }
 
     return $form;
   }

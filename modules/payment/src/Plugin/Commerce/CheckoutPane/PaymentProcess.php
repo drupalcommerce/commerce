@@ -166,6 +166,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#type' => 'commerce_payment_gateway_form',
         '#operation' => 'offsite-payment',
         '#default_value' => $payment,
+        '#capture' => $this->configuration['capture'],
         '#return_url' => $this->buildReturnUrl($this->order),
         '#cancel_url' => $this->buildCancelUrl($this->order),
       ];
