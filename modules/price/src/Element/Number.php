@@ -67,12 +67,9 @@ class Number extends FormElement {
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if ($input !== FALSE && $input !== NULL) {
       if (!is_scalar($input)) {
-        $input = '0';
+        $input = '';
       }
-      if ($input === '') {
-        $input = '0';
-      }
-      return $input;
+      return trim($input);
     }
     elseif (!empty($element['#default_value'])) {
       // Convert the stored number to the local format. For example, "9.99"
@@ -118,6 +115,9 @@ class Number extends FormElement {
    */
   public static function validateNumber(array $element, FormStateInterface $form_state) {
     $value = $form_state->getValue($element['#parents']);
+    if ($value === '') {
+      return;
+    }
     $title = empty($element['#title']) ? $element['#parents'][0] : $element['#title'];
     $number_formatter = self::getNumberFormatter($element);
 

@@ -50,9 +50,9 @@ class NumberElementTest extends CommerceBrowserTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->pageTextContains('Amount must be lower than or equal to 100.');
 
-    // Valid submit.
+    // Valid submit. Ensure that the value is trimmed.
     $edit = [
-      'number' => '10.99',
+      'number' => '10.99 ',
     ];
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->pageTextContains('The number is "10.99".');
