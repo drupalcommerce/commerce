@@ -18,6 +18,25 @@ function commerce_toolbar_alter(&$items) {
 }
 
 /**
+ * Implements hook_field_widget_info_alter().
+ *
+ * Exposes the commerce_plugin_item widgets for each of the field type's
+ * derivatives, since core does not do it automatically.
+ */
+function commerce_field_widget_info_alter(array &$info) {
+  foreach (['commerce_plugin_select', 'commerce_plugin_radios'] as $widget) {
+    if (isset($info[$widget])) {
+      $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+      foreach ($field_type_manager->getDefinitions() as $key => $definition) {
+        if ($definition['id'] == 'commerce_plugin_item') {
+          $info[$widget]['field_types'][] = $key;
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  *
  * Base fields have a description that's used for two very different purposes:
