@@ -39,6 +39,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "workflow",
+ *     "cart_disabled",
  *     "refresh_mode",
  *     "refresh_frequency",
  *     "sendReceipt",
@@ -74,6 +75,13 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    * @var string
    */
   protected $workflow;
+
+  /**
+   * Whether the cart is disabled.
+   *
+   * @var bool
+   */
+  protected $cart_disabled;
 
   /**
    * The order type refresh mode.
@@ -130,6 +138,21 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setRefreshMode($refresh_mode) {
     $this->refresh_mode = $refresh_mode;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCartMode() {
+    return $this->cart_disabled;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCartMode($cart_disabled) {
+    $this->cart_disabled = $cart_disabled;
     return $this;
   }
 

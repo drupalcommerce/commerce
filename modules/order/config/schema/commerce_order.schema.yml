@@ -14,6 +14,9 @@ commerce_order.commerce_order_type.*:
     refresh_mode:
       type: string
       label: 'Order refresh mode'
+    cart_disabled:
+      type: boolean
+      label: 'Disable the cart for this order type'
     refresh_frequency:
       type: integer
       label: 'Order refresh frequency'

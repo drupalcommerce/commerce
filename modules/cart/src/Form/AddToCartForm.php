@@ -13,6 +13,8 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -178,20 +180,45 @@ class AddToCartForm extends ContentEntityForm {
     $order_item = $this->entity;
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = $order_item->getPurchasedEntity();
-
-    $order_type = $this->orderTypeResolver->resolve($order_item);
-
+    $order_type_id = $this->orderTypeResolver->resolve($order_item);
+    $storage = \Drupal::entityManager()->getStorage('commerce_order_type');
+    $order_type = $storage->load($order_type_id);
+    $cart_disabled = $order_type->getCartMode();
     $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($order_type, $store);
+    $cart = $this->cartProvider->getCart($order_type_id, $store);
     if (!$cart) {
-      $cart = $this->cartProvider->createCart($order_type, $store);
+      $cart = $this->cartProvider->createCart($order_type_id, $store);
     }
     $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
 
-    drupal_set_message($this->t('@entity added to @cart-link.', [
-      '@entity' => $purchased_entity->label(),
-      '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
-    ]));
+    if (!$cart_disabled) {
+      drupal_set_message($this->t('@entity added to @cart-link.', [
+        '@entity' => $purchased_entity->label(),
+        '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')
+          ->toString(),
+      ]));
+    }
+    else {
+      $item_added_sku = $purchased_entity->getSku();
+      $cart_items = $cart->getItems();
+      foreach ($cart_items as $cart_item) {
+        $item_sku = $cart_item->getPurchasedEntity()->getSku();
+        if ($item_sku != $item_added_sku) {
+          $cart->removeItem($cart_item);
+        }
+      }
+      $quantity = $cart_items[0]->getQuantity();
+      if ($quantity > 1) {
+        $cart_items[0]->setQuantity(1);
+        $cart->save();
+      }
+      // Redirect the user straight to the checkout if the order type is cart disabled.
+      $redirect_url = Url::fromRoute('commerce_checkout.form', [
+        'commerce_order' => $cart->id(),
+      ])->toString();
+      $response = new RedirectResponse($redirect_url);
+      $response->send();
+    }
   }
 
   /**

@@ -34,6 +34,27 @@ interface OrderTypeInterface extends ConfigEntityInterface {
   public function setWorkflowId($workflow_id);
 
   /**
+   * Gets the order type's cart mode.
+   *
+   * Used by the checkout process to optionally skip the cart.
+   *
+   * @return boolean
+   *   Is the cart disabled.
+   */
+  public function getCartMode();
+
+  /**
+   * Sets whether the cart is disabled for the order type.
+   *
+   * Used by the checkout process to optionally skip the cart.
+   *
+   * @param boolean $cart_disabled
+   *    Is the cart disabled.
+   * @return $this
+   */
+  public function setCartMode($cart_disabled);
+
+  /**
    * Gets the order type's refresh mode.
    *
    * Used by the order refresh process.

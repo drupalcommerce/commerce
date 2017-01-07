@@ -48,6 +48,23 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#description' => $this->t('Used by all orders of this type.'),
     ];
 
+    $form['cart'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Checkout Mode'),
+      '#weight' => 5,
+      '#open' => TRUE,
+      '#collapsible' => TRUE,
+      '#tree' => FALSE,
+    ];
+    $form['cart']['cart_disabled'] = [
+      '#markup' => '<p>' . $this->t('These settings let you control whether to disable the cart for this specific order type.') . '</p>',
+    ];
+    $form['cart']['cart_disabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Disable the cart for this order'),
+      '#default_value' => ($order_type->isNew()) ? FALSE : $order_type->getCartMode(),
+    ];
+
     $form['refresh'] = [
       '#type' => 'details',
       '#title' => $this->t('Order refresh'),
