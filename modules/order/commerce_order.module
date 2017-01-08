@@ -5,10 +5,9 @@
  * Defines the Order entity and associated features.
  */
 
+use Drupal\commerce\BundleFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Implements hook_theme().
@@ -108,52 +107,23 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
 /**
  * Adds the default order_items field to an order type.
  *
- * order items can't be a base field because the Views integration is broken.
+ * Order items can't be a base field because the Views integration is broken.
  * Instead, it is created as a configurable field for each order type.
  *
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
  */
 function commerce_order_add_order_items_field($order_type) {
-  $field_storage = FieldStorageConfig::loadByName('commerce_order', 'order_items');
-  $field = FieldConfig::loadByName('commerce_order', $order_type->id(), 'order_items');
-  if (empty($field_storage)) {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'order_items',
-      'entity_type' => 'commerce_order',
-      'type' => 'entity_reference',
-      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => [
-        'target_type' => 'commerce_order_item',
-      ],
-      'locked' => TRUE,
-      'translatable' => FALSE,
-    ]);
-    $field_storage->save();
-  }
-  if (empty($field)) {
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => $order_type->id(),
-      'label' => 'Order items',
-      'required' => TRUE,
-      'settings' => [
-        'handler' => 'default',
-        'handler_settings' => [],
-      ],
-      'translatable' => FALSE,
-    ]);
-    $field->save();
-
-    $view_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'view');
-    $view_display->setComponent('order_items', [
-      'type' => 'commerce_order_item_table',
-      'weight' => 0,
-    ]);
-    $view_display->save();
-
-    $form_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'form');
-    $form_display->setComponent('order_items', [
+  $field_definition = BundleFieldDefinition::create('entity_reference')
+    ->setTargetEntityTypeId('commerce_order')
+    ->setTargetBundle($order_type->id())
+    ->setName('order_items')
+    ->setLabel('Order items')
+    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
+    ->setRequired(TRUE)
+    ->setSetting('target_type', 'commerce_order_type')
+    ->setSetting('handler', 'default')
+    ->setDisplayOptions('form', [
       'type' => 'inline_entity_form_complex',
       'weight' => 0,
       'settings' => [
@@ -161,9 +131,14 @@ function commerce_order_add_order_items_field($order_type) {
         'label_singular' => 'order item',
         'label_plural' => 'order items',
       ],
+    ])
+    ->setDisplayOptions('view', [
+      'type' => 'commerce_order_item_table',
+      'weight' => 0,
     ]);
-    $form_display->save();
-  }
+
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $configurable_field_manager->createField($field_definition);
 }
 
 /**
