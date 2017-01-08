@@ -126,7 +126,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = \Drupal::entityTypeManager()->getStorage('commerce_store_type')->load('testing');
-    $this->assertNull($store_type->getDescription());
+    $this->assertEmpty($store_type->getDescription());
   }
 
   /**

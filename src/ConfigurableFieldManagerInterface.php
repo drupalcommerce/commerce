@@ -39,4 +39,21 @@ interface ConfigurableFieldManagerInterface {
    */
   public function deleteField(BundleFieldDefinition $field_definition);
 
+  /**
+   * Checks whether the configurable field has data.
+   *
+   * @param \Drupal\commerce\BundleFieldDefinition $field_definition
+   *   The field definition.
+   *
+   * @return bool
+   *   TRUE if data was found, FALSE otherwise.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when given an incomplete field definition (missing name,
+   *   target entity type ID, or target bundle).
+   * @throws \RuntimeException
+   *   Thrown when no matching field was found.
+   */
+  public function hasData(BundleFieldDefinition $field_definition);
+
 }

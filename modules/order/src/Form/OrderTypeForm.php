@@ -3,14 +3,14 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\commerce_order\Entity\OrderType;
-use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Provides an order type form.
  */
-class OrderTypeForm extends BundleEntityFormBase {
+class OrderTypeForm extends CommerceBundleEntityFormBase {
 
   /**
    * {@inheritdoc}
@@ -28,7 +28,6 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $order_type->label(),
-      '#description' => $this->t('Label for the order type.'),
       '#required' => TRUE,
     ];
     $form['id'] = [
@@ -47,6 +46,7 @@ class OrderTypeForm extends BundleEntityFormBase {
       '#default_value' => $order_type->getWorkflowId(),
       '#description' => $this->t('Used by all orders of this type.'),
     ];
+    $form = $this->buildTraitForm($form, $form_state);
 
     $form['refresh'] = [
       '#type' => 'details',
@@ -129,6 +129,7 @@ class OrderTypeForm extends BundleEntityFormBase {
         '@workflow' => $workflow->getLabel(),
       ]));
     }
+    $this->validateTraitForm($form, $form_state);
   }
 
   /**
@@ -136,6 +137,8 @@ class OrderTypeForm extends BundleEntityFormBase {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = $this->entity->save();
+    $this->submitTraitForm($form, $form_state);
+
     drupal_set_message($this->t('Saved the %label order type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_order_type.collection');
 

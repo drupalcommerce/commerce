@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\Entity\CommerceBundleEntityInterface;
 
 /**
  * Defines the interface for order item types.
  */
-interface OrderItemTypeInterface extends ConfigEntityInterface {
+interface OrderItemTypeInterface extends CommerceBundleEntityInterface {
 
   /**
    * Gets the order item type's purchasable entity type ID.

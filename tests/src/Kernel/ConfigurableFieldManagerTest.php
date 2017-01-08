@@ -9,6 +9,8 @@ use Drupal\field\Entity\FieldConfig;
 /**
  * Tests the ConfigurableFieldManager class.
  *
+ * @coversDefaultClass \Drupal\commerce\ConfigurableFieldManager
+ *
  * @group commerce
  */
 class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
@@ -30,7 +32,9 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests creating and deleting a field.
+   * @covers ::createField
+   * @covers ::deleteField
+   * @covers ::hasData
    */
   public function testManager() {
     $field_definition = BundleFieldDefinition::create('entity_reference')
@@ -49,7 +53,7 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
       ]);
     $this->configurableFieldManager->createField($field_definition);
 
-    // Confirm that the field was created with the specifid options.
+    // Confirm that the field was created with the specified options.
     $entity_test = EntityTest::create();
     $this->assertTrue($entity_test->hasField('stores'));
     $created_definition = $entity_test->getFieldDefinition('stores');
@@ -61,17 +65,20 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
     $created_storage_definition = $created_definition->getFieldStorageDefinition();
     $this->assertEquals($created_storage_definition->getCardinality(), $field_definition->getCardinality());
 
-    // Confirm that the field is functional.
-    $entity_test->get('stores')->appendItem($this->store);
-    $entity_test->save();
-    $entity_test = $this->reloadEntity($entity_test);
-    $this->assertEquals($this->store->id(), $entity_test->stores->target_id);
-
     // Confirm that a form display was created and populated with the options.
     $form_display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
     $component = $form_display->getComponent('stores');
     $this->assertEquals('commerce_entity_select', $component['type']);
     $this->assertEquals('-10', $component['weight']);
+
+    // Confirm that the field is functional.
+    $entity_test->get('stores')->appendItem($this->store);
+    $entity_test->save();
+    $entity_test = $this->reloadEntity($entity_test);
+    $this->assertEquals($this->store->id(), $entity_test->stores->target_id);
+    $this->assertTrue($this->configurableFieldManager->hasData($field_definition));
+    $entity_test->delete();
+    $this->assertFalse($this->configurableFieldManager->hasData($field_definition));
 
     // Delete the field.
     $this->configurableFieldManager->deleteField($field_definition);

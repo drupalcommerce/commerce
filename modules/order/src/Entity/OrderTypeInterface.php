@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\Entity\CommerceBundleEntityInterface;
 
 /**
  * Defines the interface for order types.
  */
-interface OrderTypeInterface extends ConfigEntityInterface {
+interface OrderTypeInterface extends CommerceBundleEntityInterface {
 
   // Refresh modes.
   const REFRESH_ALWAYS = 'always';

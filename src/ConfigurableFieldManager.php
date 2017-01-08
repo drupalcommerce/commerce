@@ -2,10 +2,28 @@
 
 namespace Drupal\commerce;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
 class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  public $entityTypeManager;
+
+  /**
+   * Constructs a new ConfigurableFieldManager object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity query factory.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+  }
 
   /**
    * {@inheritdoc}
@@ -80,7 +98,34 @@ class ConfigurableFieldManager implements ConfigurableFieldManagerInterface {
       throw new \RuntimeException(sprintf('The field "%s" does not exist on bundle "%s" of entity type "%s".', $field_name, $bundle, $entity_type_id));
     }
 
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
     $field->delete();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasData(BundleFieldDefinition $field_definition) {
+    $field_name = $field_definition->getName();
+    $entity_type_id = $field_definition->getTargetEntityTypeId();
+    $bundle = $field_definition->getTargetBundle();
+    if (empty($field_name) || empty($entity_type_id) || empty($bundle)) {
+      throw new \InvalidArgumentException('The passed $field_definition is incomplete.');
+    }
+    // Prevent an EntityQuery crash by first confirming the field exists.
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+    if (empty($field)) {
+      throw new \RuntimeException(sprintf('The field "%s" does not exist on bundle "%s" of entity type "%s".', $field_name, $bundle, $entity_type_id));
+    }
+
+    $query = $this->entityTypeManager->getStorage($entity_type_id)->getQuery();
+    $query
+      ->condition('type', $bundle)
+      ->exists($field_name)
+      ->range(0, 1);
+    $result = $query->execute();
+
+    return !empty($result);
   }
 
 }

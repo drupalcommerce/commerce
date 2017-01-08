@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product type entity class.
@@ -41,6 +41,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "description",
  *     "variationType",
  *     "injectVariationFields",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",
@@ -50,21 +51,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface {
-
-  /**
-   * The product type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The product type label.
-   *
-   * @var string
-   */
-  protected $label;
+class ProductType extends CommerceBundleEntityBase implements ProductTypeInterface {
 
   /**
    * The product type description.

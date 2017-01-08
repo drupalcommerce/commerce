@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product variation type entity class.
@@ -40,6 +40,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "orderItemType",
  *     "generateTitle",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-variation-types/add",
@@ -49,14 +50,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductVariationType extends ConfigEntityBundleBase implements ProductVariationTypeInterface {
-
-  /**
-   * The product variation type ID.
-   *
-   * @var string
-   */
-  protected $id;
+class ProductVariationType extends CommerceBundleEntityBase implements ProductVariationTypeInterface {
 
   /**
    * The order item type ID.

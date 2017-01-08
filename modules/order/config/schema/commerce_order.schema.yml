@@ -1,13 +1,7 @@
 commerce_order.commerce_order_type.*:
-  type: config_entity
+  type: commerce_config_entity_bundle
   label: 'Order type'
   mapping:
-    label:
-      type: label
-      label: 'Label'
-    id:
-      type: string
-      label: 'Machine-readable name'
     workflow:
       type: string
       label: 'Workflow'
@@ -25,15 +19,9 @@ commerce_order.commerce_order_type.*:
       label: 'The receipt BCC email'
 
 commerce_order.commerce_order_item_type.*:
-  type: config_entity
-  label: 'order item type'
+  type: commerce_config_entity_bundle
+  label: 'Order item type'
   mapping:
-    label:
-      type: label
-      label: 'Label'
-    id:
-      type: string
-      label: 'Machine-readable name'
     purchasableEntityType:
       type: string
       label: 'Purchasable entity type'

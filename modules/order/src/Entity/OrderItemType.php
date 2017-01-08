@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the order item type entity class.
@@ -39,7 +39,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "purchasableEntityType",
- *     "orderType"
+ *     "orderType",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-item-types/add",
@@ -49,21 +50,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class OrderItemType extends ConfigEntityBundleBase implements OrderItemTypeInterface {
-
-  /**
-   * The order item type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The order item type label.
-   *
-   * @var string
-   */
-  protected $label;
+class OrderItemType extends CommerceBundleEntityBase implements OrderItemTypeInterface {
 
   /**
    * The purchasable entity type ID.
