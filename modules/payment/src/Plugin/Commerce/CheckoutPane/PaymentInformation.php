@@ -149,18 +149,38 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
         $billing_profile = $billing_profile ?: ($storage->loadDefaultByUser($customer, 'customer') ?: $storage->loadByUser($customer, 'customer'));
         $profile_id = $billing_profile ? $billing_profile->id() : 0;
         if (($trigger = $form_state->getTriggeringElement()) && array_pop($trigger['#parents']) == 'billing_profile_id') {
-          $trigger_id = $trigger['#value'] != $profile_id ? $trigger['#value'] : 0;
-          $profile_id = $trigger['#value'];
+          $trigger_value = explode('.', $trigger['#value']);
+          $trigger_id = $trigger_value[0] != $profile_id ? $trigger_value[0] : 0;
+          $profile_id = $trigger_value[0];
         }
-        $info = $this->t('info id: ');
+        $info = $this->t('info id:');
+        $countries = \Drupal::service('address.country_repository');
+        $locale = $countries->getDefaultLocale();
+        $fallbackLocale = $countries->getFallbackLocale();
         foreach ($storage->loadMultipleByUser($customer, 'customer') as $profile) {
           $id = $profile->id();
-          $billing_profiles[$id] = $profile->get('address')->getValue()[0]['address_line1'] . ' (' . $info . $id . ')';
+          $address = $address_0 = $profile->get('address')->getValue()[0];
+          $lines = [];
+          $address[1] = $countries->get($address['country_code'], $locale, $fallbackLocale)->getName();
+          $address[2] = implode(' ', [$address['postal_code'], $address['locality'], $address['dependent_locality'], $address['administrative_area']]);
+          $address['zzz'] = implode(' ', [$address['given_name'], $address['additional_name'], $address['family_name']]);
+          unset($address['country_code'], $address['given_name'], $address['additional_name'], $address['family_name'], $address['postal_code'], $address['locality'], $address['dependent_locality'], $address['administrative_area']); 
+          foreach ($address as $key => $value) {
+            if (empty($value)) {
+              unset($address[$key]);
+            }
+            else {
+              $lines["{$id}.{$key}"] = $value;
+            }
+          }
+          krsort($lines, SORT_NATURAL);
+          // Set the profile option for select element as a multiline optgroup.
+          $billing_profiles[$address_0['address_line1'] . " ({$info} {$id})"] = $lines;
           if (!empty($trigger_id) && $trigger_id == $id) {
             $billing_profile = $profile;
             $this->order->setBillingProfile($billing_profile);
             $input = $form_state->getUserInput();
-            $input['payment_information']['address'][0] = $billing_profile->get('address')->getValue()[0];
+            $input['payment_information']['address'][0] = $address_0;
             $form_state->setUserInput($input);
           }
         }
@@ -188,7 +208,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
             '#type' => "select",
             '#title' => $this->t('Choose from earlier saved information'),
             '#options' => $billing_profiles,
-            '#default_value' => $billing_profile->id(),
+            '#default_value' =>  $billing_profile->id() . '.address_line1',
             '#limit_validation_errors' => [],
             '#ajax' => $country_code['#ajax'],
             '#attributes' => $country_code['#attributes'],
