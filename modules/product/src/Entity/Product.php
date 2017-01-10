@@ -264,7 +264,7 @@ class Product extends ContentEntityBase implements ProductInterface {
   public function getDefaultVariation() {
     foreach ($this->getVariations() as $variation) {
       // Return the first active variation.
-      if ($variation->isActive()) {
+      if ($variation->isActive() && $variation->access('view')) {
         return $variation;
       }
     }
