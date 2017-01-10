@@ -66,6 +66,7 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::getTotalPrice
    * @covers ::getData
    * @covers ::setData
+   * @covers ::getTotalAdjustedPrice
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    */
@@ -105,8 +106,10 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals($adjustments, $order_item->getAdjustments());
     $order_item->removeAdjustment($adjustments[0]);
     $this->assertEquals([$adjustments[1]], $order_item->getAdjustments());
+    $this->assertEquals(new Price('11.99', 'USD'), $order_item->getAdjustedTotalPrice());
     $order_item->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order_item->getAdjustments());
+    $this->assertEquals(new Price('10.99', 'USD'), $order_item->getAdjustedTotalPrice());
 
     $this->assertEquals('default', $order_item->getData('test', 'default'));
     $order_item->setData('test', 'value');

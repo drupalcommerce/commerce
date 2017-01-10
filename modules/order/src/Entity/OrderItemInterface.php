@@ -134,6 +134,17 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function setData($key, $value);
 
   /**
+   * Gets the order item total price, with all order item adjustments applied.
+   *
+   * Useful for situations when the order item price needs to be calculated
+   * on its own, e.g. in order item sales tax calculation.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order item adjusted total price, or NULL.
+   */
+  public function getAdjustedTotalPrice();
+
+  /**
    * Gets the order item creation timestamp.
    *
    * @return int
