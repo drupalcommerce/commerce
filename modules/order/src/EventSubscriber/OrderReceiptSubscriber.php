@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\EventSubscriber;
 
+use Drupal\commerce_order\OrderTotalSummaryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
@@ -24,6 +25,13 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $orderTypeStorage;
+
+  /**
+   * The order total summary.
+   *
+   * @var \Drupal\commerce_order\OrderTotalSummaryInterface
+   */
+  protected $orderTotalSummary;
 
   /**
    * The entity view builder for profiles.
@@ -62,11 +70,14 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
    *   The language manager.
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager.
+   * @param \Drupal\commerce_order\OrderTotalSummaryInterface $order_total_summary
+   *   The order total summary.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager, Renderer $renderer) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MailManagerInterface $mail_manager, OrderTotalSummaryInterface $order_total_summary, Renderer $renderer) {
     $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
+    $this->orderTotalSummary = $order_total_summary;
     $this->profileViewBuilder = $entity_type_manager->getViewBuilder('profile');
     $this->languageManager = $language_manager;
     $this->mailManager = $mail_manager;
@@ -108,6 +119,7 @@ class OrderReceiptSubscriber implements EventSubscriberInterface {
     $build = [
       '#theme' => 'commerce_order_receipt',
       '#order_entity' => $order,
+      '#totals' => $this->orderTotalSummary->buildTotals($order),
     ];
     if ($billing_profile = $order->getBillingProfile()) {
       $build['#billing_information'] = $this->profileViewBuilder->view($billing_profile);

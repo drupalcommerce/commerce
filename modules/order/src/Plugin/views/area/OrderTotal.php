@@ -42,7 +42,7 @@ class OrderTotal extends AreaPluginBase {
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');;
+    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
   }
 
   /**
@@ -80,7 +80,7 @@ class OrderTotal extends AreaPluginBase {
           continue;
         }
         if ($order = $this->orderStorage->load($argument->getValue())) {
-          return $order->get('total_price')->view(['label' => 'inline']);
+          return $order->get('total_price')->view(['label' => 'hidden', 'type' => 'commerce_order_total_summary']);
         }
       }
     }

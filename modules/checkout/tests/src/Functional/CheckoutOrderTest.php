@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\profile\Entity\Profile;
@@ -45,6 +46,16 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     // @see https://www.drupal.org/node/2807567
     'editor',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer commerce_checkout_flow',
+      'administer views',
+    ], parent::getAdministratorPermissions());
+  }
 
   /**
    * {@inheritdoc}
@@ -99,7 +110,9 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ]);
     $profile->save();
     $order_item = OrderItem::create([
-      'type' => 'test',
+      'type' => 'default',
+      'quantity' => 2,
+      'unit_price' => new Price('12.00', 'USD'),
     ]);
     $order_item->save();
     $order = Order::create([
@@ -140,16 +153,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getAdministratorPermissions() {
-    return array_merge([
-      'administer commerce_checkout_flow',
-      'administer views',
-    ], parent::getAdministratorPermissions());
   }
 
   /**

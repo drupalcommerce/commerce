@@ -65,7 +65,7 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
     /** @var \Drupal\Core\Field\FieldItemListInterface $adjustment_item_list */
     $adjustment_item_list = $this->testEntity->test_adjustments;
     $adjustment_item_list->appendItem(new Adjustment([
-      'type' => 'discount',
+      'type' => 'custom',
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
@@ -73,7 +73,7 @@ class AdjustmentItemTest extends CommerceKernelTestBase {
 
     /** @var \Drupal\commerce_order\Adjustment $adjustment */
     $adjustment = $adjustment_item_list->first()->value;
-    $this->assertEquals('discount', $adjustment->getType());
+    $this->assertEquals('custom', $adjustment->getType());
     $this->assertEquals('10% off', $adjustment->getLabel());
     $this->assertEquals('-1.00', $adjustment->getAmount()->getNumber());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());
