@@ -298,6 +298,29 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSubtotalPrice() {
+    $total_price = $this->getTotalPrice();
+    if ($total_price) {
+      $currency_code = $total_price->getCurrencyCode();
+    }
+    else {
+      $currency_code = $this->initializeCurrencyCode();
+      if (!$currency_code) {
+        // The order object is not complete enough to have a subtotal price yet.
+        return NULL;
+      }
+    }
+
+    $total_price = new Price('0', $currency_code);
+    foreach ($this->getItems() as $order_item) {
+      $total_price = $total_price->add($order_item->getTotalPrice());
+    }
+    return $total_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTotalPrice() {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
@@ -422,6 +445,34 @@ class Order extends ContentEntityBase implements OrderInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function collectAdjustments() {
+    $adjustments = [];
+
+    foreach ($this->getItems() as $order_item) {
+      foreach ($order_item->getAdjustments() as $adjustment) {
+        $adjustments[] = [
+          'type' => $adjustment->getType(),
+          'label' => $adjustment->getLabel(),
+          'source_id' => $adjustment->getSourceId(),
+          'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+        ];
+      }
+    }
+    foreach ($this->getAdjustments() as $adjustment) {
+      $adjustments[] = [
+        'type' => $adjustment->getType(),
+        'label' => $adjustment->getLabel(),
+        'source_id' => $adjustment->getSourceId(),
+        'amount' => $adjustment->getAmount(),
+      ];
+    }
+
+    return $adjustments;
+  }
+
+  /**
    * Recalculates the order item total price.
    */
   protected function recalculateTotalPrice() {
@@ -440,13 +491,9 @@ class Order extends ContentEntityBase implements OrderInterface {
     $total_price = new Price('0', $currency_code);
     foreach ($this->getItems() as $order_item) {
       $total_price = $total_price->add($order_item->getTotalPrice());
-      foreach ($order_item->getAdjustments() as $adjustment) {
-        $adjustment_total = $adjustment->getAmount()->multiply($order_item->getQuantity());
-        $total_price = $total_price->add($adjustment_total);
-      }
     }
-    foreach ($this->getAdjustments() as $adjustment) {
-      $total_price = $total_price->add($adjustment->getAmount());
+    foreach ($this->collectAdjustments() as $adjustment) {
+      $total_price = $total_price->add($adjustment['amount']);
     }
     $this->total_price = $total_price;
   }
@@ -619,6 +666,10 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'commerce_order_total_summary'
+      ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 

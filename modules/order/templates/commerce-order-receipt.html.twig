@@ -8,6 +8,10 @@
  * - billing_information: The rendered billing information.
  * - shipping_information: The rendered shipping information.
  * - payment_method: The rendered payment method.
+ * - totals: The order total summaries, including:
+ *   - subtotal: The order subtotal price.
+ *   - adjustments: An array of all adjustments grouped by type.
+ *   - total: The order total price.
  *
  * @ingroup themeable
  */
@@ -102,6 +106,24 @@
             {% endif %}
           </td>
         </tr>
+        <tr>
+          <td>
+            <p style="margin-bottom: 0;">
+              {{ 'Subtotal: @subtotal'|t({'@subtotal': totals.subtotal|commerce_price_format}) }}
+            </p>
+          </td>
+        </tr>
+        {% for group in totals.adjustments %}
+          {% for item in group.items %}
+        <tr>
+          <td>
+            <p style="margin-bottom: 0;">
+              {{ item.label }}: {{ item.amount|commerce_price_format }}
+            </p>
+          </td>
+        </tr>
+          {% endfor %}
+        {% endfor %}
         <tr>
           <td>
             <p style="font-size: 24px; padding-top: 15px; padding-bottom: 5px;">

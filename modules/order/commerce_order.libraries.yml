@@ -3,3 +3,9 @@ form:
   css:
     layout:
       css/commerce_order.module.css: {}
+
+order_total_summary:
+  version: VERSION
+  css:
+    layout:
+      css/commerce_order.order_total_summary.css: {}

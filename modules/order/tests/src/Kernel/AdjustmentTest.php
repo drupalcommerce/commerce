@@ -1,16 +1,24 @@
 <?php
 
-namespace Drupal\Tests\commerce_order\Unit;
+namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_price\Price;
-use Drupal\Tests\UnitTestCase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * @coversDefaultClass Drupal\commerce_order\Adjustment
  * @group commerce
  */
-class AdjustmentTest extends UnitTestCase {
+class AdjustmentTest extends CommerceKernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'commerce_order',
+    'commerce_order_test',
+  ];
 
   /**
    * Tests the constructor and definition checks.
@@ -48,6 +56,14 @@ class AdjustmentTest extends UnitTestCase {
           'amount' => '10 USD',
         ],
         sprintf('Property "amount" should be an instance of %s.', Price::class),
+      ],
+      [
+        [
+          'type' => 'foo',
+          'label' => 'Foo',
+          'amount' => new Price('1.00', 'USD'),
+        ],
+        'foo is an invalid adjustment type.',
       ],
     ];
   }

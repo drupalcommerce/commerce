@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Default order total summary template.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - totals: An array of order totals values with the following keys:
+ *   - subtotal: \Drupal\commerce_price\Price|null The order subtotal amount.
+ *   - adjustments: array Adjustments groups with the following structure:
+ *     - <type>: An array keyed by adjustment type id.
+ *       - 'label': string The adjustment type label.
+ *       - 'items': An associative array of items, grouped by type and source id
+ *         if a source id exists, otherwise a numerically indexed item, each
+ *         with the following keys:
+ *         - 'amount': \Drupal\commerce_price\Price The total
+ *         - 'label': string The label of the adjustment or adjustment type.
+ *   - total: \Drupal\commerce_price\Price|null The order total amount.
+ *
+ * @ingroup themeable
+ */
+#}
+{{ attach_library('commerce_order/order_total_summary') }}
+<div{{ attributes }}>
+  <div class="order-total-line order-total-line__subtotal">
+    <span class="order-total-line-label">{{ 'Subtotal'|t }} </span><span class="order-total-line-value">{{ totals.subtotal|commerce_price_format }}</span>
+  </div>
+  {% for group in totals.adjustments %}
+    {% for item in group.items %}
+      <div class="order-total-line order-total-line__adjustment">
+        <span class="order-total-line-label">{{ item.label }} </span><span class="order-total-line-value">{{ item.amount|commerce_price_format }}</span>
+      </div>
+    {% endfor %}
+  {% endfor %}
+  <div class="order-total-line order-total-line__total">
+    <span class="order-total-line-label">{{ 'Total'|t }} </span><span class="order-total-line-value">{{ totals.total|commerce_price_format }}</span>
+  </div>
+</div>
