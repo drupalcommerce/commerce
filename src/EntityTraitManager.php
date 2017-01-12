@@ -81,7 +81,7 @@ class EntityTraitManager extends DefaultPluginManager implements EntityTraitMana
     $conflicting_traits = [];
     foreach ($installed_traits as $installed_trait) {
       $installed_field_names = array_keys($installed_trait->buildFieldDefinitions());
-      if (array_intersect_key($field_names, $installed_field_names)) {
+      if (array_intersect($field_names, $installed_field_names)) {
         $conflicting_traits[] = $installed_trait;
       }
     }
