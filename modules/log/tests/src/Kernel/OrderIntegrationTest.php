@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_log\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
@@ -71,6 +72,11 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->logStorage = $this->container->get('entity_type.manager')->getStorage('commerce_log');
     $this->logViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_log');
 
+    // Change the workflow of the default order type.
+    $order_type = OrderType::load('default');
+    $order_type->setWorkflowId('order_fulfillment_validation');
+    $order_type->save();
+
     // Turn off title generation to allow explicit values to be used.
     $variation_type = ProductVariationType::load('default');
     $variation_type->setGenerateTitle(FALSE);
@@ -123,9 +129,28 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests that a log is generated when an order is placed.
+   * Tests that a log is generated for the cancel transition.
    */
-  public function testPlacedLog() {
+  public function testCancelLog() {
+    // Draft -> Canceled.
+    $transition = $this->order->getState()->getTransitions();
+    $this->order->getState()->applyTransition($transition['cancel']);
+    $this->order->save();
+
+    $logs = $this->logStorage->loadByEntity($this->order);
+    $this->assertEquals(1, count($logs));
+    $log = reset($logs);
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+
+    $this->assertText('The order was canceled.');
+  }
+
+  /**
+   * Tests that a log is generated for place, validate, and fulfill transitions.
+   */
+  public function testPlaceValidateFulfillLogs() {
+    // Draft -> Placed.
     $transition = $this->order->getState()->getTransitions();
     $this->order->getState()->applyTransition($transition['place']);
     $this->order->save();
@@ -137,6 +162,32 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $this->render($build);
 
     $this->assertText('The order was placed.');
+
+    // Placed -> Validated.
+    $transition = $this->order->getState()->getTransitions();
+    $this->order->getState()->applyTransition($transition['validate']);
+    $this->order->save();
+
+    $logs = $this->logStorage->loadByEntity($this->order);
+    $this->assertEquals(2, count($logs));
+    $log = $logs[2];
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+
+    $this->assertText('The order was validated.');
+
+    // Validated -> Fulfilled.
+    $transition = $this->order->getState()->getTransitions();
+    $this->order->getState()->applyTransition($transition['fulfill']);
+    $this->order->save();
+
+    $logs = $this->logStorage->loadByEntity($this->order);
+    $this->assertEquals(3, count($logs));
+    $log = $logs[3];
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+
+    $this->assertText('The order was fulfilled.');
   }
 
 }
