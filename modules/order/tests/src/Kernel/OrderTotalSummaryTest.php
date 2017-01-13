@@ -164,19 +164,19 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('test_adjustment_type', $first['type']);
     $this->assertEquals('50 cent item fee', $first['label']);
-    $this->assertEquals(new Price('1', 'USD'), $first['amount']);
+    $this->assertEquals(new Price('1', 'USD'), $first['total']);
     $this->assertEquals(-1, $first['weight']);
 
     $second = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $second['type']);
     $this->assertEquals('Back to school discount', $second['label']);
-    $this->assertEquals(new Price('-7', 'USD'), $second['amount']);
+    $this->assertEquals(new Price('-7', 'USD'), $second['total']);
     $this->assertEquals(0, $second['weight']);
 
     $third = array_shift($totals['adjustments']);
     $this->assertEquals('custom', $third['type']);
     $this->assertEquals('Handling fee', $third['label']);
-    $this->assertEquals(new Price('10', 'USD'), $third['amount']);
+    $this->assertEquals(new Price('10', 'USD'), $third['total']);
     $this->assertEquals(10, $third['weight']);
   }
 

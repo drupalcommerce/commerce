@@ -43,12 +43,12 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
         $adjustments[$key] = [
           'type' => $type,
           'label' => $adjustment->getLabel(),
-          'amount' => $adjustment->getAmount(),
+          'total' => $adjustment->getAmount(),
           'weight' => $types[$type]['weight'],
         ];
       }
       else {
-        $adjustments[$key]['amount'] = $adjustments[$key]['amount']->add($adjustment->getAmount());
+        $adjustments[$key]['total'] = $adjustments[$key]['total']->add($adjustment->getAmount());
       }
     }
     // Sort the adjustments by weight.
