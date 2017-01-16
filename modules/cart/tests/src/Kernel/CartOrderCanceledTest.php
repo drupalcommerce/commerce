@@ -6,12 +6,12 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests the unsetting of the cart flag when order is placed.
+ * Tests the unsetting of the cart flag when the order is canceled.
  *
  * @covers \Drupal\commerce_cart\CartProvider::finalizeCart()
  * @group commerce
  */
-class CartOrderPlacedTest extends CommerceKernelTestBase {
+class CartOrderCanceledTest extends CommerceKernelTestBase {
 
   use CartManagerTestTrait;
 
@@ -84,9 +84,9 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests that a draft order is no longer a cart once placed.
+   * Tests that an order is no longer a cart once canceled.
    */
-  public function testCartOrderPlaced() {
+  public function testCartOrderCanceled() {
     $this->installCommerceCart();
 
     $this->store = $this->createStore();
@@ -98,15 +98,14 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
     $this->assertNotEmpty($cart_order->cart->value);
 
     $workflow = $cart_order->getState()->getWorkflow();
-    $cart_order->getState()->applyTransition($workflow->getTransition('place'));
+    $cart_order->getState()->applyTransition($workflow->getTransition('cancel'));
     $cart_order->save();
 
     $cart_order = $this->reloadEntity($cart_order);
     $this->assertEmpty($cart_order->cart->value);
 
-    // We should be able to create a new cart and not get an exception.
-    $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);
-    $this->assertNotEquals($cart_order->id(), $new_cart_order->id());
+    $carts = $this->container->get('commerce_cart.cart_provider')->getCartIds($customer);
+    $this->assertEmpty($carts);
   }
 
   /**
