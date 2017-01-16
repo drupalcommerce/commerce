@@ -59,7 +59,11 @@ class CartCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return new CacheableMetadata();
+    $metadata = new CacheableMetadata();
+    foreach ($this->cartProvider->getCarts($this->account) as $cart) {
+      $metadata->addCacheableDependency($cart);
+    }
+    return $metadata;
   }
 
 }
