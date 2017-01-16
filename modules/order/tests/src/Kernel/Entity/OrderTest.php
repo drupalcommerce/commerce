@@ -166,14 +166,14 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setItems([$order_item, $another_order_item]);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItems());
+    $this->assertNotEmpty($order->hasItems());
     $order->removeItem($another_order_item);
     $this->assertEquals([$order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($order_item));
-    $this->assertFalse($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($order_item));
+    $this->assertEmpty($order->hasItem($another_order_item));
     $order->addItem($another_order_item);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($another_order_item));
 
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
     $adjustments = [];

@@ -50,7 +50,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
   public function testDefaultStoreType() {
     $this->drupalGet('admin/commerce/config/store-types');
     $store_types = StoreType::loadMultiple();
-    $this->assertTrue(isset($store_types['online']), 'The online store type is available');
+    $this->assertNotEmpty(isset($store_types['online']), 'The online store type is available');
 
     $store_type = StoreType::load('online');
     $this->assertEquals($store_type, $store_types['online'], 'The correct store type is loaded');
@@ -92,7 +92,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
       'label' => $title,
     ]);
     $type_exists = (bool) StoreType::load($type->id());
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $this->assertNotEmpty($type_exists, 'The new store type has been created in the database.');
 
     // Create a store type through the form.
     $this->drupalGet('admin/commerce/config/store-types/add');
@@ -102,7 +102,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $type_exists = (bool) StoreType::load($edit['id']);
-    $this->assertTrue($type_exists, 'The new store type has been created in the database.');
+    $this->assertNotEmpty($type_exists, 'The new store type has been created in the database.');
   }
 
   /**
@@ -152,7 +152,7 @@ class StoreTypeTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], 'Delete');
     $type_exists = (bool) StoreType::load($type->id());
-    $this->assertFalse($type_exists, 'The new store type has been deleted from the database.');
+    $this->assertEmpty($type_exists, 'The new store type has been deleted from the database.');
   }
 
 }

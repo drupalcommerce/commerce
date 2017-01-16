@@ -92,11 +92,11 @@ class PluginItemTest extends CommerceKernelTestBase {
 
     // Executes and returns TRUE that user1 has role.
     $user1_context = new Context(new ContextDefinition('entity:user'), $test_user1);
-    $this->assertTrue($condition_field->getTargetInstance(['user' => $user1_context])->execute());
+    $this->assertNotEmpty($condition_field->getTargetInstance(['user' => $user1_context])->execute());
 
     // Execute and returns FALSE that user2 does not have the role.
     $user2_context = new Context(new ContextDefinition('entity:user'), $test_user2);
-    $this->assertFalse($condition_field->getTargetInstance(['user' => $user2_context])->execute());
+    $this->assertEmpty($condition_field->getTargetInstance(['user' => $user2_context])->execute());
   }
 
   /**

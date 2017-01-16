@@ -55,7 +55,7 @@ class RemoteIdItemTest extends CommerceKernelTestBase {
     $entity = $this->reloadEntity($entity);
 
     $this->assertEquals('123', $entity->test_remote_id->getByProvider('braintree'));
-    $this->assertEquals(NULL, $entity->test_remote_id->getByProvider('stripe'));
+    $this->assertNull($entity->test_remote_id->getByProvider('stripe'));
 
     $entity->test_remote_id->setByProvider('braintree', '456');
     $entity->test_remote_id->setByProvider('stripe', '789');
@@ -63,7 +63,7 @@ class RemoteIdItemTest extends CommerceKernelTestBase {
     $entity = $this->reloadEntity($entity);
 
     $this->assertEquals('456', $entity->test_remote_id->getByProvider('braintree'));
-    $this->assertEquals(NULL, $entity->test_remote_id->getByProvider('stripe'));
+    $this->assertNull($entity->test_remote_id->getByProvider('stripe'));
   }
 
 }

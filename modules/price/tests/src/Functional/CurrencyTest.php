@@ -99,7 +99,7 @@ class CurrencyTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Delete');
 
     $currency_exists = (bool) Currency::load($currency->id());
-    $this->assertFalse($currency_exists, 'The currency has been deleted from the database.');
+    $this->assertEmpty($currency_exists, 'The currency has been deleted from the database.');
   }
 
 }

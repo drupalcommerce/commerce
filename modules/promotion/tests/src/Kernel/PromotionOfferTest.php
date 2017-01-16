@@ -206,7 +206,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $result = $promotion->applies($this->order);
 
     // Promotion target is for the order.
-    $this->assertTrue($result);
+    $this->assertNotEmpty($result);
 
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -225,7 +225,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $result = $promotion->applies($this->order);
 
     // Promotion target is for the order items. This should fail.
-    $this->assertFalse($result);
+    $this->assertEmpty($result);
   }
 
 }

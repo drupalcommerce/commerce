@@ -139,7 +139,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_product')->resetCache();
     $product_exists = (bool) Product::load($product->id());
-    $this->assertFalse($product_exists, 'The new product has been deleted from the database.');
+    $this->assertEmpty($product_exists, 'The new product has been deleted from the database.');
   }
 
   /**
@@ -149,7 +149,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/products');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains('You are not authorized to access this page.');
-    $this->assertTrue($this->getSession()->getPage()->hasLink('Add product'));
+    $this->assertNotEmpty($this->getSession()->getPage()->hasLink('Add product'));
 
     // Logout and check that anonymous users cannot see the products page
     // and receive a 403 error code.
@@ -157,7 +157,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
     $this->drupalGet('admin/commerce/products');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->pageTextContains('You are not authorized to access this page.');
-    $this->assertTrue(!$this->getSession()->getPage()->hasLink('Add product'));
+    $this->assertNotEmpty(!$this->getSession()->getPage()->hasLink('Add product'));
   }
 
 }

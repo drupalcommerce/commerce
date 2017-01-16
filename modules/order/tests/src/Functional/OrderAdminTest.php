@@ -146,7 +146,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order_exists = (bool) Order::load($order->id());
-    $this->assertFalse($order_exists, 'The order has been deleted from the database.');
+    $this->assertEmpty($order_exists, 'The order has been deleted from the database.');
   }
 
   /**

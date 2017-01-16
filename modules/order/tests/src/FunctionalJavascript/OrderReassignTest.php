@@ -73,7 +73,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
       'store_id' => $this->store,
     ]);
 
-    $this->assertTrue($order->hasLinkTemplate('reassign-form'));
+    $this->assertNotEmpty($order->hasLinkTemplate('reassign-form'));
 
     $this->drupalGet($order->toUrl('reassign-form'));
     $this->getSession()->getPage()->fillField('customer_type', 'new');

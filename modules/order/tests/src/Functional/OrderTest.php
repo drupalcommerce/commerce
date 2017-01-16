@@ -33,7 +33,7 @@ class OrderTest extends OrderBrowserTestBase {
     ]);
 
     $order_exists = (bool) Order::load($order->id());
-    $this->assertTrue($order_exists, 'The new order has been created in the database.');
+    $this->assertNotEmpty($order_exists, 'The new order has been created in the database.');
     $this->assertEquals($order->id(), $order->getOrderNumber(), 'The order number matches the order ID');
   }
 
@@ -59,8 +59,8 @@ class OrderTest extends OrderBrowserTestBase {
 
     $order_exists = (bool) Order::load($order->id());
     $order_item_exists = (bool) OrderItem::load($order_item->id());
-    $this->assertFalse($order_exists, 'The new order has been deleted from the database.');
-    $this->assertFalse($order_item_exists, 'The matching order item has been deleted from the database.');
+    $this->assertEmpty($order_exists, 'The new order has been deleted from the database.');
+    $this->assertEmpty($order_item_exists, 'The matching order item has been deleted from the database.');
   }
 
   /**

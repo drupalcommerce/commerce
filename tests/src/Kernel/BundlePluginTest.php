@@ -36,26 +36,26 @@ class BundlePluginTest extends KernelTestBase {
     /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
     $entity_type = reset($bundled_entity_types);
     $this->assertEquals('entity_test_bundle_plugin', $entity_type->id());
-    $this->assertTrue($entity_type->hasHandlerClass('bundle_plugin'));
+    $this->assertNotEmpty($entity_type->hasHandlerClass('bundle_plugin'));
 
     /** @var \Drupal\Core\Entity\EntityTypeBundleInfo $entity_type_bundle_info */
     $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
     $bundle_info = $entity_type_bundle_info->getBundleInfo('entity_test_bundle_plugin');
     $this->assertEquals(2, count($bundle_info));
-    $this->assertTrue(isset($bundle_info['first']));
-    $this->assertTrue(isset($bundle_info['second']));
+    $this->assertNotEmpty(isset($bundle_info['first']));
+    $this->assertNotEmpty(isset($bundle_info['second']));
 
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
     $entity_field_manager = \Drupal::service('entity_field.manager');
     $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions('entity_test_bundle_plugin');
-    $this->assertTrue(isset($field_storage_definitions['first_mail']));
-    $this->assertTrue(isset($field_storage_definitions['second_mail']));
+    $this->assertNotEmpty(isset($field_storage_definitions['first_mail']));
+    $this->assertNotEmpty(isset($field_storage_definitions['second_mail']));
     $first_field_definitions = $entity_field_manager->getFieldDefinitions('entity_test_bundle_plugin', 'first');
-    $this->assertTrue(isset($first_field_definitions['first_mail']));
-    $this->assertFalse(isset($first_field_definitions['second_mail']));
+    $this->assertNotEmpty(isset($first_field_definitions['first_mail']));
+    $this->assertEmpty(isset($first_field_definitions['second_mail']));
     $second_field_definitions = $entity_field_manager->getFieldDefinitions('entity_test_bundle_plugin', 'second');
-    $this->assertFalse(isset($second_field_definitions['first_mail']));
-    $this->assertTrue(isset($second_field_definitions['second_mail']));
+    $this->assertEmpty(isset($second_field_definitions['first_mail']));
+    $this->assertNotEmpty(isset($second_field_definitions['second_mail']));
 
     $first_entity = EntityTestBundlePlugin::create([
       'type' => 'first',
