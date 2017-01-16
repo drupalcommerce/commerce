@@ -138,20 +138,20 @@ class CartManagerTest extends CommerceKernelTestBase {
 
     $order_item1->setQuantity(2);
     $this->cartManager->updateOrderItem($cart, $order_item1);
-    $this->assertTrue($cart->hasItem($order_item1));
+    $this->assertNotEmpty($cart->hasItem($order_item1));
     $this->assertEquals(2, $order_item1->getQuantity());
     $this->assertEquals(new Price('2.00', 'USD'), $cart->getTotalPrice());
 
     $order_item2 = $this->cartManager->addEntity($cart, $this->variation2, 3);
     $order_item2 = $this->reloadEntity($order_item2);
-    $this->assertTrue($cart->hasItem($order_item1));
-    $this->assertTrue($cart->hasItem($order_item2));
+    $this->assertNotEmpty($cart->hasItem($order_item1));
+    $this->assertNotEmpty($cart->hasItem($order_item2));
     $this->assertEquals(3, $order_item2->getQuantity());
     $this->assertEquals(new Price('8.00', 'USD'), $cart->getTotalPrice());
 
     $this->cartManager->removeOrderItem($cart, $order_item1);
-    $this->assertTrue($cart->hasItem($order_item2));
-    $this->assertFalse($cart->hasItem($order_item1));
+    $this->assertNotEmpty($cart->hasItem($order_item2));
+    $this->assertEmpty($cart->hasItem($order_item1));
     $this->assertEquals(new Price('6.00', 'USD'), $cart->getTotalPrice());
 
     $this->cartManager->emptyCart($cart);

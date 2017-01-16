@@ -55,7 +55,7 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
 
     // Confirm that the field was created with the specified options.
     $entity_test = EntityTest::create();
-    $this->assertTrue($entity_test->hasField('stores'));
+    $this->assertNotEmpty($entity_test->hasField('stores'));
     $created_definition = $entity_test->getFieldDefinition('stores');
     $this->assertInstanceOf(FieldConfig::class, $created_definition);
     $this->assertEquals($created_definition->getLabel(), $field_definition->getLabel());
@@ -76,14 +76,14 @@ class ConfigurableFieldManagerTest extends CommerceKernelTestBase {
     $entity_test->save();
     $entity_test = $this->reloadEntity($entity_test);
     $this->assertEquals($this->store->id(), $entity_test->stores->target_id);
-    $this->assertTrue($this->configurableFieldManager->hasData($field_definition));
+    $this->assertNotEmpty($this->configurableFieldManager->hasData($field_definition));
     $entity_test->delete();
-    $this->assertFalse($this->configurableFieldManager->hasData($field_definition));
+    $this->assertEmpty($this->configurableFieldManager->hasData($field_definition));
 
     // Delete the field.
     $this->configurableFieldManager->deleteField($field_definition);
     $entity_test = EntityTest::create();
-    $this->assertFalse($entity_test->hasField('stores'));
+    $this->assertEmpty($entity_test->hasField('stores'));
   }
 
   /**

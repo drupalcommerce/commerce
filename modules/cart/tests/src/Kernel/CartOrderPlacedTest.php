@@ -99,14 +99,14 @@ class CartOrderPlacedTest extends CommerceKernelTestBase {
     $this->cartManager = $this->container->get('commerce_cart.cart_manager');
     $this->cartManager->addEntity($cart_order, $this->variation);
 
-    $this->assertTrue($cart_order->cart->value);
+    $this->assertNotEmpty($cart_order->cart->value);
 
     $workflow = $cart_order->getState()->getWorkflow();
     $cart_order->getState()->applyTransition($workflow->getTransition('place'));
     $cart_order->save();
 
     $cart_order = $this->reloadEntity($cart_order);
-    $this->assertFalse($cart_order->cart->value);
+    $this->assertEmpty($cart_order->cart->value);
 
     // We should be able to create a new cart and not get an exception.
     $new_cart_order = $this->container->get('commerce_cart.cart_provider')->createCart('default', $this->store, $this->user);

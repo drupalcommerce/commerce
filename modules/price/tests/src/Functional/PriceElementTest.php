@@ -58,7 +58,7 @@ class PriceElementTest extends CommerceBrowserTestBase {
     $this->assertSession()->fieldValueEquals('amount[number]', '99.99');
     $this->assertSession()->optionExists('amount[currency_code]', 'EUR');
     $element = $this->assertSession()->optionExists('amount[currency_code]', 'USD');
-    $this->assertTrue($element->isSelected());
+    $this->assertNotEmpty($element->isSelected());
 
     // Invalid submit.
     $edit = [

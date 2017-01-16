@@ -124,7 +124,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_exists = (bool) Promotion::load($promotion->id());
-    $this->assertFalse($promotion_exists, 'The new promotion has been deleted from the database using UI.');
+    $this->assertEmpty($promotion_exists, 'The new promotion has been deleted from the database using UI.');
   }
 
 }

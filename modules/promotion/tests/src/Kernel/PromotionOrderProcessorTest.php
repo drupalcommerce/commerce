@@ -117,7 +117,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     ]);
     $promotion->save();
 
-    $this->assertTrue($promotion->applies($this->order));
+    $this->assertNotEmpty($promotion->applies($this->order));
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
 
     $this->assertEquals(1, count($this->order->getAdjustments()));

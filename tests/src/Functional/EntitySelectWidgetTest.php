@@ -94,7 +94,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     $store_id = $this->stores[0]->id();
     $this->drupalGet($form_url);
     $field = $this->getSession()->getPage()->find('xpath', '//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $store_id . '"]');
-    $this->assertTrue(!empty($field));
+    $this->assertNotEmpty($field);
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
@@ -102,7 +102,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
       return $store->id();
     }, $this->stores);
     $this->drupalGet($form_url);
-    $this->assertTrue((bool) $this->getSession()->getPage()->find('xpath', '//input[@type="checkbox" and starts-with(@name,"stores")]'));
+    $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@type="checkbox" and starts-with(@name,"stores")]'));
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-1');
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-2');
     // Check store 1.
@@ -120,7 +120,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     // Reduce the cardinality to 1. Checkboxes should now be radios.
     $this->referenceField->setCardinality(1)->save();
     $this->drupalGet($form_url);
-    $this->assertTrue((bool) $this->getSession()->getPage()->find('xpath', '//input[@type="radio" and @name="stores[target_id][value]"]'));
+    $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@type="radio" and @name="stores[target_id][value]"]'));
     $this->assertSession()->checkboxChecked('edit-stores-target-id-value-' . $store_ids[0]);
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-' . $store_ids[1]);
 
@@ -131,7 +131,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
     }, $this->stores);
     $this->referenceField->setCardinality(FieldStorageConfig::CARDINALITY_UNLIMITED)->save();
     $this->drupalGet($form_url);
-    $this->assertTrue((bool) $this->getSession()->getPage()->find('xpath', '//input[@id="edit-stores-target-id-value" and starts-with(@class, "form-autocomplete")]'));
+    $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@id="edit-stores-target-id-value" and starts-with(@class, "form-autocomplete")]'));
     $this->assertSession()->fieldValueEquals('stores[target_id][value]', $store_labels[0]);
     // Reference both stores 1 and 2.
     $edit = [];

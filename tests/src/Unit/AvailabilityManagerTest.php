@@ -83,19 +83,19 @@ class AvailabilityManagerTest extends UnitTestCase {
 
     $this->availabilityManager->addChecker($first_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertTrue($result, 'The checked entity is available when a checker returns NULL.');
+    $this->assertNotEmpty($result, 'The checked entity is available when a checker returns NULL.');
 
     $this->availabilityManager->addChecker($second_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertTrue($result, 'The checked entity is available when no checkers return FALSE.');
+    $this->assertNotEmpty($result, 'The checked entity is available when no checkers return FALSE.');
 
     $this->availabilityManager->addChecker($third_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertTrue($result, 'The checked entity is available when a checker that would return FALSE does not apply.');
+    $this->assertNotEmpty($result, 'The checked entity is available when a checker that would return FALSE does not apply.');
 
     $this->availabilityManager->addChecker($fourth_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertFalse($result, 'The checked entity is not available when a checker that returns FALSE applies');
+    $this->assertEmpty($result, 'The checked entity is not available when a checker that returns FALSE applies');
 
     $expectedCheckers = [$first_checker, $second_checker, $third_checker, $fourth_checker];
     $checkers = $this->availabilityManager->getCheckers();

@@ -107,7 +107,7 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals('admin/commerce/config/payment-gateways');
 
     $payment_gateway_exists = (bool) PaymentGateway::load('for_deletion');
-    $this->assertFalse($payment_gateway_exists, 'The payment gateway has been deleted from the database.');
+    $this->assertEmpty($payment_gateway_exists, 'The payment gateway has been deleted from the database.');
   }
 
 }

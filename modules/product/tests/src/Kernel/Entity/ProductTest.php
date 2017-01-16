@@ -136,20 +136,20 @@ class ProductTest extends CommerceKernelTestBase {
     $variation2 = ProductVariation::load($variation2->id());
 
     $variations = [$variation1, $variation2];
-    $this->assertFalse($product->hasVariations());
+    $this->assertEmpty($product->hasVariations());
     $product->setVariations($variations);
-    $this->assertTrue($product->hasVariations());
+    $this->assertNotEmpty($product->hasVariations());
     $variations_match = $variations == $product->getVariations();
-    $this->assertTrue($variations_match);
+    $this->assertNotEmpty($variations_match);
     $variation_ids = [$variation1->id(), $variation2->id()];
     $variation_ids_match = $variation_ids == $product->getVariationIds();
-    $this->assertTrue($variation_ids_match);
+    $this->assertNotEmpty($variation_ids_match);
 
-    $this->assertTrue($product->hasVariation($variation1));
+    $this->assertNotEmpty($product->hasVariation($variation1));
     $product->removeVariation($variation1);
-    $this->assertFalse($product->hasVariation($variation1));
+    $this->assertEmpty($product->hasVariation($variation1));
     $product->addVariation($variation1);
-    $this->assertTrue($product->hasVariation($variation1));
+    $this->assertNotEmpty($product->hasVariation($variation1));
 
     $this->assertEquals($product->getDefaultVariation(), $variation2);
     $this->assertNotEquals($product->getDefaultVariation(), $variation1);

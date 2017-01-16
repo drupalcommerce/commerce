@@ -202,7 +202,7 @@ class CartProviderTest extends CommerceKernelTestBase {
 
     $cart_provider->finalizeCart($cart);
     $cart = $this->reloadEntity($cart);
-    $this->assertFalse($cart->cart->value);
+    $this->assertEmpty($cart->cart->value);
 
     $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
     $this->assertNull($cart);

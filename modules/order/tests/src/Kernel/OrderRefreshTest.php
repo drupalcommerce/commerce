@@ -155,16 +155,16 @@ class OrderRefreshTest extends CommerceKernelTestBase {
     $order_type->setRefreshMode(OrderType::REFRESH_CUSTOMER)->save();
     // Order does not belong to the current user.
     $this->container->get('current_user')->setAccount(new AnonymousUserSession());
-    $this->assertFalse($order_refresh->shouldRefresh($this->order));
+    $this->assertEmpty($order_refresh->shouldRefresh($this->order));
     // Order belongs to the current user.
     $this->container->get('current_user')->setAccount($this->user);
-    $this->assertTrue($order_refresh->shouldRefresh($this->order));
+    $this->assertNotEmpty($order_refresh->shouldRefresh($this->order));
 
     // Order should be refreshed for any user.
     $this->container->get('current_user')->setAccount(new AnonymousUserSession());
     $order_type = OrderType::load($this->order->bundle());
     $order_type->setRefreshMode(OrderType::REFRESH_ALWAYS)->save();
-    $this->assertTrue($order_refresh->shouldRefresh($this->order));
+    $this->assertNotEmpty($order_refresh->shouldRefresh($this->order));
   }
 
   /**
@@ -174,23 +174,23 @@ class OrderRefreshTest extends CommerceKernelTestBase {
     $order_refresh = $this->createOrderRefresh();
     // Non-draft order.
     $this->order->state = 'completed';
-    $this->assertFalse($order_refresh->needsRefresh($this->order));
+    $this->assertEmpty($order_refresh->needsRefresh($this->order));
     $this->order->state = 'draft';
 
     // Day-change, under refresh frequency.
     $order_refresh = $this->createOrderRefresh(mktime(0, 1, 0, 2, 24, 2016));
     $this->order->setChangedTime(mktime(23, 59, 59, 2, 23, 2016));
-    $this->assertTrue($order_refresh->needsRefresh($this->order));
+    $this->assertNotEmpty($order_refresh->needsRefresh($this->order));
 
     // Under refresh frequency.
     $order_refresh = $this->createOrderRefresh(mktime(23, 12, 0, 2, 24, 2016));
     $this->order->setChangedTime(mktime(23, 11, 0, 2, 24, 2016));
-    $this->assertFalse($order_refresh->needsRefresh($this->order));
+    $this->assertEmpty($order_refresh->needsRefresh($this->order));
 
     // Over refresh frequency.
     $order_refresh = $this->createOrderRefresh(mktime(23, 10, 0, 2, 24, 2016));
     $this->order->setChangedTime(mktime(23, 0, 0, 2, 24, 2016));
-    $this->assertTrue($order_refresh->needsRefresh($this->order));
+    $this->assertNotEmpty($order_refresh->needsRefresh($this->order));
   }
 
   /**

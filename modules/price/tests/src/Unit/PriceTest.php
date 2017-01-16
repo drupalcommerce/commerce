@@ -98,28 +98,28 @@ class PriceTest extends UnitTestCase {
    * ::covers compareTo.
    */
   public function testComparison() {
-    $this->assertFalse($this->price->isZero());
+    $this->assertEmpty($this->price->isZero());
     $zero_price = new Price('0', 'USD');
-    $this->assertTrue($zero_price->isZero());
+    $this->assertNotEmpty($zero_price->isZero());
 
-    $this->assertTrue($this->price->equals(new Price('10', 'USD')));
-    $this->assertFalse($this->price->equals(new Price('15', 'USD')));
+    $this->assertNotEmpty($this->price->equals(new Price('10', 'USD')));
+    $this->assertEmpty($this->price->equals(new Price('15', 'USD')));
 
-    $this->assertTrue($this->price->greaterThan(new Price('5', 'USD')));
-    $this->assertFalse($this->price->greaterThan(new Price('10', 'USD')));
-    $this->assertFalse($this->price->greaterThan(new Price('15', 'USD')));
+    $this->assertNotEmpty($this->price->greaterThan(new Price('5', 'USD')));
+    $this->assertEmpty($this->price->greaterThan(new Price('10', 'USD')));
+    $this->assertEmpty($this->price->greaterThan(new Price('15', 'USD')));
 
-    $this->assertTrue($this->price->greaterThanOrEqual(new Price('5', 'USD')));
-    $this->assertTrue($this->price->greaterThanOrEqual(new Price('10', 'USD')));
-    $this->assertFalse($this->price->greaterThanOrEqual(new Price('15', 'USD')));
+    $this->assertNotEmpty($this->price->greaterThanOrEqual(new Price('5', 'USD')));
+    $this->assertNotEmpty($this->price->greaterThanOrEqual(new Price('10', 'USD')));
+    $this->assertEmpty($this->price->greaterThanOrEqual(new Price('15', 'USD')));
 
-    $this->assertTrue($this->price->lessThan(new Price('15', 'USD')));
-    $this->assertFalse($this->price->lessThan(new Price('10', 'USD')));
-    $this->assertFalse($this->price->lessThan(new Price('5', 'USD')));
+    $this->assertNotEmpty($this->price->lessThan(new Price('15', 'USD')));
+    $this->assertEmpty($this->price->lessThan(new Price('10', 'USD')));
+    $this->assertEmpty($this->price->lessThan(new Price('5', 'USD')));
 
-    $this->assertTrue($this->price->lessThanOrEqual(new Price('15', 'USD')));
-    $this->assertTrue($this->price->lessThanOrEqual(new Price('10', 'USD')));
-    $this->assertFalse($this->price->lessThanOrEqual(new Price('5', 'USD')));
+    $this->assertNotEmpty($this->price->lessThanOrEqual(new Price('15', 'USD')));
+    $this->assertNotEmpty($this->price->lessThanOrEqual(new Price('10', 'USD')));
+    $this->assertEmpty($this->price->lessThanOrEqual(new Price('5', 'USD')));
   }
 
 }

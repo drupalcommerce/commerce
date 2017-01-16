@@ -121,7 +121,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     $promotion->save();
 
     $result = $promotion->applies($this->order);
-    $this->assertTrue($result);
+    $this->assertNotEmpty($result);
 
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -150,7 +150,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
 
     $result = $promotion->applies($this->order);
 
-    $this->assertFalse($result);
+    $this->assertEmpty($result);
   }
 
 }
