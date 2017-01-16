@@ -39,6 +39,21 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    // Skip building the form if there are no available gateway plugins.
+    if (empty($this->pluginManager->getDefinitions())) {
+      $form['warning'] = [
+        '#markup' => $this->t('No payment gateway plugins found. Please install a module which provides one.'),
+      ];
+      return $form;
+    }
+
+    return parent::buildForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
