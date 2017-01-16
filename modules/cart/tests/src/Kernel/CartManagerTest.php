@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\commerce_cart\Kernel;
 
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
@@ -157,6 +158,23 @@ class CartManagerTest extends CommerceKernelTestBase {
     $this->cartManager->emptyCart($cart);
     $this->assertEmpty($cart->getItems());
     $this->assertEquals(new Price('0.00', 'USD'), $cart->getTotalPrice());
+  }
+
+  /**
+   * Tests that order items without purchaseable entity do not cause crashes.
+   */
+  public function testAddOrderItem() {
+    $this->installCommerceCart();
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
+
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 2,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $this->cartManager->addOrderItem($cart, $order_item);
+    $this->assertEquals(1, count($cart->getItems()));
   }
 
 }
