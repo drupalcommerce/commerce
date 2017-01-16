@@ -181,7 +181,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $default_option = NULL;
     $customer = $this->order->getCustomer();
     if ($customer) {
-      $payment_methods = $payment_method_storage->loadReusable($customer, $payment_gateway);
+      $payment_methods = $payment_method_storage->loadReusable($customer, $payment_gateway, $this->order->getStore());
       foreach ($payment_methods as $payment_method) {
         $options[$payment_method->id()] = $payment_method->label();
       }
