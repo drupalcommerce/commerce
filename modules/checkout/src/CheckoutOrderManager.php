@@ -32,8 +32,7 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
    */
   public function getCheckoutFlow(OrderInterface $order) {
     if ($order->checkout_flow->isEmpty()) {
-      $checkout_flow = $this->chainCheckoutFlowResolver->resolve($order);
-      $order->checkout_flow->target_id = $checkout_flow;
+      $order->checkout_flow = $this->chainCheckoutFlowResolver->resolve($order);
       $order->save();
     }
 
