@@ -50,7 +50,6 @@ class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
    * Tests resolving the checkout flow.
    */
   public function testCheckoutFlowResolution() {
-
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
     $order = Order::create([
       'type' => 'default',
@@ -61,7 +60,6 @@ class ChainCheckoutFlowResolverTest extends CommerceKernelTestBase {
     $order->save();
 
     $resolver = $this->container->get('commerce_checkout.chain_checkout_flow_resolver');
-
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
     $checkout_flow = $resolver->resolve($order);
 
