@@ -221,7 +221,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    */
   protected function assertOrderItemInOrder(ProductVariationInterface $variation, OrderItemInterface $order_item, $quantity = 1) {
     $this->assertEquals($order_item->getTitle(), $variation->getOrderItemTitle());
-    $this->assertTrue(($order_item->getItemsQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
+    $this->assertNotEmpty(($order_item->getItemsQuantity() == $quantity), t('The product @product has been added to cart with quantity of @quantity.', [
       '@product' => $order_item->getTitle(),
       '@quantity' => $order_item->getItemsQuantity(),
     ]));
