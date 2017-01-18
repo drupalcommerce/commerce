@@ -40,7 +40,6 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Skip building the form if there are no available gateway plugins.
     if (empty($this->pluginManager->getDefinitions())) {
       $form['warning'] = [
         '#markup' => $this->t('No payment gateway plugins found. Please install a module which provides one.'),
