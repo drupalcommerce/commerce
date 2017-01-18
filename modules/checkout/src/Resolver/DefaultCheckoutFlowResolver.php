@@ -6,7 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Returns the default checkout flow, if known.
+ * Returns the order type's default checkout flow.
  */
 class DefaultCheckoutFlowResolver implements CheckoutFlowResolverInterface {
 
