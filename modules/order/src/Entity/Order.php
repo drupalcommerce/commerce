@@ -522,14 +522,6 @@ class Order extends ContentEntityBase implements OrderInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
-    // If no order number has been set explicitly, set it to the order ID.
-    if (!$this->getOrderNumber()) {
-      $this->setOrderNumber($this->id());
-      // Order was refreshed in the save that just occurred, don't repeat it.
-      $this->setRefreshState(self::REFRESH_SKIP);
-      $this->save();
-    }
-
     // Ensure there's a back-reference on each order item.
     foreach ($this->getItems() as $order_item) {
       if ($order_item->order_id->isEmpty()) {
