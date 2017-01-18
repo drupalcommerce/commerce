@@ -115,8 +115,11 @@ class CartManager implements CartManagerInterface {
       $cart->addItem($order_item);
     }
 
-    $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $order_item);
-    $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
+    if ($purchased_entity) {
+      $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $order_item);
+      $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
+    }
+
     if ($save_cart) {
       $cart->save();
     }
