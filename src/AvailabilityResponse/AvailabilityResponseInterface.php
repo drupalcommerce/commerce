@@ -30,6 +30,7 @@ interface AvailabilityResponseInterface {
    *   When TRUE then isAvailable() and isUnavailable() are FALSE.
    */
   public function isNeutral();
+
   /**
    * Gets the minimum quantity available.
    *

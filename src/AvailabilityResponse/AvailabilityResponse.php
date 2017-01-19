@@ -2,9 +2,6 @@
 
 namespace Drupal\commerce\AvailabilityResponse;
 
-use Drupal\commerce\Context;
-use Drupal\commerce\PurchasableEntityInterface;
-
 /**
  * An object representing a response to an availability request.
  */
