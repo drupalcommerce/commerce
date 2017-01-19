@@ -37,15 +37,16 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
     foreach ($order->getItems() as $order_item) {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
+        /** @var \Drupal\commerce\AvailabilityResponse\AvailabilityResponseInterface $response */
         $response = $this->availabilityManager->check($purchased_entity, $order_item->getQuantity(), $context);
-        if ($response->getMax() == 0) {
+        if (!$response->isNeutral() && $response->getMax() == 0) {
           $order->removeItem($order_item);
           $order_item->delete();
           drupal_set_message(t('The item %item is no longer available and has been removed from your order.', [
             '%item' => $order_item->getTitle(),
           ]));
         }
-        elseif ($response->getMax() < $order_item->getQuantity()) {
+        elseif (!$response->isNeutral() && $response->getMax() < $order_item->getQuantity()) {
           $order_item->setQuantity($response->getMax());
           $order_item->save();
           drupal_set_message(t('The item %item is no longer available in the quantity you selected. Your order has been updated to reflect the new availability level.', [
