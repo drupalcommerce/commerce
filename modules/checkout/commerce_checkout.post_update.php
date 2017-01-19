@@ -9,6 +9,7 @@
  * Revert Checkout views to fix broken Price fields.
  */
 function commerce_checkout_post_update_1() {
+  /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
   $config_updater = \Drupal::service('commerce.config_updater');
 
   $views = [

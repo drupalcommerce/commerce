@@ -6,7 +6,7 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the order item entity.
@@ -15,7 +15,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  *
  * @group commerce
  */
-class OrderItemTest extends EntityKernelTestBase {
+class OrderItemTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -23,17 +23,9 @@ class OrderItemTest extends EntityKernelTestBase {
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -45,7 +37,6 @@ class OrderItemTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig('commerce_order');

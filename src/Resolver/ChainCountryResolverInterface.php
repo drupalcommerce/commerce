@@ -15,10 +15,8 @@ interface ChainCountryResolverInterface extends CountryResolverInterface {
    *
    * @param \Drupal\commerce\Resolver\CountryResolverInterface $resolver
    *   The resolver.
-   * @param int $priority
-   *   The priority.
    */
-  public function addResolver(CountryResolverInterface $resolver, $priority);
+  public function addResolver(CountryResolverInterface $resolver);
 
   /**
    * Gets all added resolvers.

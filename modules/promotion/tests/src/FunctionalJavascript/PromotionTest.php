@@ -63,7 +63,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
     $this->submitForm($edit, t('Save'));
-    $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
@@ -124,7 +124,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_exists = (bool) Promotion::load($promotion->id());
-    $this->assertFalse($promotion_exists, 'The new promotion has been deleted from the database using UI.');
+    $this->assertEmpty($promotion_exists, 'The new promotion has been deleted from the database using UI.');
   }
 
 }

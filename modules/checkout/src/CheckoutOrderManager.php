@@ -2,26 +2,29 @@
 
 namespace Drupal\commerce_checkout;
 
+use Drupal\commerce_checkout\Resolver\ChainCheckoutFlowResolverInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
+/**
+ * Manages checkout flows for orders.
+ */
 class CheckoutOrderManager implements CheckoutOrderManagerInterface {
 
   /**
-   * The entity type manager.
+   * The chain checkout flow resolver.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\commerce_checkout\Resolver\ChainCheckoutFlowResolverInterface
    */
-  protected $entityTypeManager;
+  protected $chainCheckoutFlowResolver;
 
   /**
    * Constructs a new CheckoutOrderManager object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
+   * @param \Drupal\commerce_checkout\Resolver\ChainCheckoutFlowResolverInterface $chain_checkout_flow_resolver
+   *   The chain checkout flow resolver.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(ChainCheckoutFlowResolverInterface $chain_checkout_flow_resolver) {
+    $this->chainCheckoutFlowResolver = $chain_checkout_flow_resolver;
   }
 
   /**
@@ -29,11 +32,7 @@ class CheckoutOrderManager implements CheckoutOrderManagerInterface {
    */
   public function getCheckoutFlow(OrderInterface $order) {
     if ($order->checkout_flow->isEmpty()) {
-      /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
-      $order_type = $this->entityTypeManager->getStorage('commerce_order_type')->load($order->bundle());
-      $checkout_flow = $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default');
-      // @todo Allow other modules to add their own resolving logic.
-      $order->checkout_flow->target_id = $checkout_flow;
+      $order->checkout_flow = $this->chainCheckoutFlowResolver->resolve($order);
       $order->save();
     }
 

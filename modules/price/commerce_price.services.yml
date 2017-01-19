@@ -9,7 +9,7 @@ services:
 
   commerce_price.number_formatter_factory:
     class: Drupal\commerce_price\NumberFormatterFactory
-    arguments: ['@commerce.locale_context', '@commerce_price.number_format_repository']
+    arguments: ['@commerce.current_locale', '@commerce_price.number_format_repository']
 
   commerce_price.chain_price_resolver:
     class: Drupal\commerce_price\Resolver\ChainPriceResolver
@@ -20,3 +20,12 @@ services:
     class: Drupal\commerce_price\Resolver\DefaultPriceResolver
     tags:
       - { name: commerce_price.price_resolver, priority: -100 }
+
+  commerce_price.twig_extension:
+      class: Drupal\commerce_price\TwigExtension\PriceTwigExtension
+      tags:
+        - { name: twig.extension }
+
+  commerce_price.rounder:
+    class: Drupal\commerce_price\Rounder
+    arguments: ['@entity_type.manager']

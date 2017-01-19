@@ -28,6 +28,7 @@ use Drupal\Component\Utility\NestedArray;
  *   handlers = {
  *     "event" = "Drupal\commerce_order\Event\OrderItemEvent",
  *     "storage" = "Drupal\commerce_order\OrderItemStorage",
+ *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
  *     "views_data" = "Drupal\commerce_order\OrderItemViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
@@ -42,12 +43,6 @@ use Drupal\Component\Utility\NestedArray;
  *     "uuid" = "uuid",
  *     "bundle" = "type",
  *     "label" = "title",
- *   },
- *   links = {
- *     "canonical" = "/admin/commerce/config/order-item/{commerce_order_item}",
- *     "edit-form" = "/admin/commerce/config/order-item/{commerce_order_item}/edit",
- *     "delete-form" = "/admin/commerce/config/order-item/{commerce_order_item}/delete",
- *     "collection" = "/admin/commerce/config/order-item"
  *   },
  *   bundle_entity_type = "commerce_order_item_type",
  *   field_ui_base_route = "entity.commerce_order_item_type.edit_form",
@@ -253,7 +248,9 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
    */
   protected function recalculateTotalPrice() {
     if ($unit_price = $this->getUnitPrice()) {
-      $this->total_price = $unit_price->multiply($this->getQuantity());
+      $rounder = \Drupal::service('commerce_price.rounder');
+      $total_price = $unit_price->multiply($this->getQuantity());
+      $this->total_price = $rounder->round($total_price);
     }
   }
 

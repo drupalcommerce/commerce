@@ -26,12 +26,13 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
- *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default" = "Drupal\commerce_store\Form\StoreForm",
  *       "add" = "Drupal\commerce_store\Form\StoreForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"

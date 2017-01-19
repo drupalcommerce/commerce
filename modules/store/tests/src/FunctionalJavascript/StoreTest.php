@@ -38,6 +38,7 @@ class StoreTest extends CommerceBrowserTestBase {
     return array_merge([
       'administer commerce_store_type',
       'administer commerce_store',
+      'access commerce_store overview',
     ], parent::getAdministratorPermissions());
   }
 
@@ -111,7 +112,7 @@ class StoreTest extends CommerceBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_store')->resetCache([$store->id()]);
     $store_exists = (bool) Store::load($store->id());
-    $this->assertFalse($store_exists, 'The new store has been deleted from the database using UI.');
+    $this->assertEmpty($store_exists, 'The new store has been deleted from the database using UI.');
   }
 
 }

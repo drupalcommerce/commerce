@@ -78,7 +78,7 @@ class EditQuantity extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsForm(&$form, FormStateInterface $form_state) {
+  public function viewsForm(array &$form, FormStateInterface $form_state) {
     // Make sure we do not accidentally cache this form.
     $form['#cache']['max-age'] = 0;
     // The view is empty, abort.
@@ -123,7 +123,7 @@ class EditQuantity extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+  public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $quantities = $form_state->getValue($this->options['id']);
     foreach ($quantities as $row_index => $quantity) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */

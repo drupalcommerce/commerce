@@ -7,9 +7,8 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
-use Drupal\commerce_store\Entity\Store;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\profile\Entity\Profile;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the Order entity.
@@ -18,7 +17,7 @@ use Drupal\profile\Entity\Profile;
  *
  * @group commerce
  */
-class OrderTest extends EntityKernelTestBase {
+class OrderTest extends CommerceKernelTestBase {
 
   /**
    * A sample user.
@@ -28,29 +27,14 @@ class OrderTest extends EntityKernelTestBase {
   protected $user;
 
   /**
-   * A sample store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = [
-    'options',
-    'entity',
     'entity_reference_revisions',
-    'views',
-    'address',
     'profile',
     'state_machine',
-    'inline_entity_form',
-    'commerce',
-    'commerce_price',
-    'commerce_store',
     'commerce_product',
     'commerce_order',
   ];
@@ -62,10 +46,8 @@ class OrderTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('profile');
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
-    $this->installConfig('commerce_store');
     $this->installConfig('commerce_order');
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
@@ -77,14 +59,6 @@ class OrderTest extends EntityKernelTestBase {
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
-
-    $store = Store::create([
-      'type' => 'default',
-      'name' => 'Sample store',
-      'default_currency' => 'USD',
-    ]);
-    $store->save();
-    $this->store = $this->reloadEntity($store);
   }
 
   /**
@@ -96,10 +70,10 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::setStore
    * @covers ::getStoreId
    * @covers ::setStoreId
-   * @covers ::getOwner
-   * @covers ::setOwner
-   * @covers ::getOwnerId
-   * @covers ::setOwnerId
+   * @covers ::getCustomer
+   * @covers ::setCustomer
+   * @covers ::getCustomerId
+   * @covers ::setCustomerId
    * @covers ::getEmail
    * @covers ::setEmail
    * @covers ::getIpAddress
@@ -115,13 +89,21 @@ class OrderTest extends EntityKernelTestBase {
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
+   * @covers ::collectAdjustments
    * @covers ::recalculateTotalPrice
+   * @covers ::getSubtotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
+   * @covers ::getRefreshState
+   * @covers ::setRefreshState
+   * @covers ::getData
+   * @covers ::setData
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getPlacedTime
    * @covers ::setPlacedTime
+   * @covers ::getCompletedTime
+   * @covers ::setCompletedTime
    */
   public function testOrder() {
     $profile = Profile::create([
@@ -164,14 +146,14 @@ class OrderTest extends EntityKernelTestBase {
     $this->assertEquals($this->store, $order->getStore());
     $this->assertEquals($this->store->id(), $order->getStoreId());
 
-    $order->setOwner($this->user);
-    $this->assertEquals($this->user, $order->getOwner());
-    $this->assertEquals($this->user->id(), $order->getOwnerId());
-    $order->setOwnerId(0);
-    $this->assertEquals(NULL, $order->getOwner());
-    $order->setOwnerId($this->user->id());
-    $this->assertEquals($this->user, $order->getOwner());
-    $this->assertEquals($this->user->id(), $order->getOwnerId());
+    $order->setCustomer($this->user);
+    $this->assertEquals($this->user, $order->getCustomer());
+    $this->assertEquals($this->user->id(), $order->getCustomerId());
+    $order->setCustomerId(0);
+    $this->assertEquals(NULL, $order->getCustomer());
+    $order->setCustomerId($this->user->id());
+    $this->assertEquals($this->user, $order->getCustomer());
+    $this->assertEquals($this->user->id(), $order->getCustomerId());
 
     $order->setEmail('commerce@example.com');
     $this->assertEquals('commerce@example.com', $order->getEmail());
@@ -184,14 +166,14 @@ class OrderTest extends EntityKernelTestBase {
 
     $order->setItems([$order_item, $another_order_item]);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItems());
+    $this->assertNotEmpty($order->hasItems());
     $order->removeItem($another_order_item);
     $this->assertEquals([$order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($order_item));
-    $this->assertFalse($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($order_item));
+    $this->assertEmpty($order->hasItem($another_order_item));
     $order->addItem($another_order_item);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($another_order_item));
 
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
     $adjustments = [];
@@ -209,7 +191,11 @@ class OrderTest extends EntityKernelTestBase {
     $order->addAdjustment($adjustments[1]);
     $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
+    $collected_adjustments = $order->collectAdjustments();
+    $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
+    $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
     $order->removeAdjustment($adjustments[0]);
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
@@ -225,14 +211,26 @@ class OrderTest extends EntityKernelTestBase {
     ]));
     $order->addItem($another_order_item);
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
+    $collected_adjustments = $order->collectAdjustments();
+    $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[2]->getAmount());
 
     $this->assertEquals('completed', $order->getState()->value);
+
+    $order->setRefreshState(Order::REFRESH_ON_SAVE);
+    $this->assertEquals(Order::REFRESH_ON_SAVE, $order->getRefreshState());
+
+    $this->assertEquals('default', $order->getData('test', 'default'));
+    $order->setData('test', 'value');
+    $this->assertEquals('value', $order->getData('test', 'default'));
 
     $order->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order->getCreatedTime());
 
     $order->setPlacedTime(635879800);
     $this->assertEquals(635879800, $order->getPlacedTime());
+
+    $order->setCompletedTime(635879900);
+    $this->assertEquals(635879900, $order->getCompletedTime());
   }
 
 }

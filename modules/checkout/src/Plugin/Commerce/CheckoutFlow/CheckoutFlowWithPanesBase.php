@@ -426,7 +426,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The complete form state.
    */
-  public static function validatePaneConfigurationForm(&$pane_configuration_form, FormStateInterface $form_state) {
+  public static function validatePaneConfigurationForm(array &$pane_configuration_form, FormStateInterface $form_state) {
     $pane_id = $pane_configuration_form['#pane_id'];
     /** @var \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface[] $panes */
     $panes = $form_state->get('panes');
@@ -443,7 +443,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The complete form state.
    */
-  public static function multistepSubmit($form, FormStateInterface $form_state) {
+  public static function multistepSubmit(array $form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
     switch ($triggering_element['#op']) {
       case 'edit':

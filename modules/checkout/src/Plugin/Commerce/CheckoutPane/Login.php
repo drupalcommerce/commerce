@@ -393,7 +393,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
         /** @var \Drupal\user\UserInterface $account */
         $account = $storage->load($form_state->get('logged_in_uid'));
         user_login_finalize($account);
-        $this->order->setOwner($account);
+        $this->order->setCustomer($account);
         $this->credentialsCheckFlood->clearAccount($this->clientIp, $account->getAccountName());
         break;
     }

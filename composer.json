@@ -9,10 +9,11 @@
         "drupal/address": "~1.0",
         "drupal/entity": "1.x-dev",
         "drupal/entity_reference_revisions": "~1.0",
-        "drupal/inline_entity_form": "1.x-dev",
+        "drupal/inline_entity_form": "~1.0",
         "drupal/profile": "1.x-dev",
-        "drupal/state_machine": "1.x-dev",
-        "commerceguys/intl": "~0.7"
+        "drupal/state_machine": "~1.0",
+        "commerceguys/intl": "~0.7",
+        "ext-bcmath": "*"
     },
     "minimum-stability": "dev"
 }

@@ -1,3 +1,17 @@
+commerce_config_entity_bundle:
+  type: config_entity
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    traits:
+      type: sequence
+      sequence:
+        type: string
+
 field.value.commerce_remote_id:
  type: mapping
  label: 'Default value'

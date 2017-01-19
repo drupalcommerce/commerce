@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_order\Form;
 
-use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 
-class OrderItemTypeForm extends BundleEntityFormBase {
+class OrderItemTypeForm extends CommerceBundleEntityFormBase {
 
   /**
    * {@inheritdoc}
@@ -35,7 +35,6 @@ class OrderItemTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $order_item_type->label(),
-      '#description' => $this->t('Label for the order item type.'),
       '#required' => TRUE,
     ];
     $form['id'] = [
@@ -62,6 +61,7 @@ class OrderItemTypeForm extends BundleEntityFormBase {
       '#options' => $order_types,
       '#required' => TRUE,
     ];
+    $form = $this->buildTraitForm($form, $form_state);
 
     return $this->protectBundleIdElement($form);
   }
@@ -69,8 +69,17 @@ class OrderItemTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->validateTraitForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->submitTraitForm($form, $form_state);
+
     drupal_set_message($this->t('Saved the %label order item type.', [
       '%label' => $this->entity->label(),
     ]));

@@ -3,5 +3,8 @@ status: true
 label: Default
 id: default
 workflow: order_default
-refresh_mode: always
-refresh_frequency: 30
+traits: {  }
+refresh_mode: customer
+refresh_frequency: 300
+sendReceipt: true
+receiptBcc: ''

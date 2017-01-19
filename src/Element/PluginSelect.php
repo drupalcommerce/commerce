@@ -36,6 +36,7 @@ class PluginSelect extends FormElement {
     return [
       '#input' => TRUE,
       '#plugin_type' => NULL,
+      '#plugin_element_type' => 'select',
       '#categories' => [],
       '#title' => $this->t('Select plugin'),
       '#process' => [
@@ -56,6 +57,9 @@ class PluginSelect extends FormElement {
     if (!$element['#plugin_type']) {
       throw new \InvalidArgumentException('You must specify the plugin type ID.');
     }
+    if (!in_array($element['#plugin_element_type'], ['radios', 'select'])) {
+      throw new \InvalidArgumentException('The commerce_plugin_select element only supports select/radios.');
+    }
 
     $element['#tree'] = TRUE;
 
@@ -63,21 +67,15 @@ class PluginSelect extends FormElement {
     $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
 
     $values = $element['#value'];
-
     $target_plugin_id = !empty($values['target_plugin_id']) ? $values['target_plugin_id'] : '_none';
 
     $ajax_wrapper_id = Html::getUniqueId('ajax-wrapper');
-    $ajax_settings = [
-      'callback' => [get_called_class(), 'pluginFormAjax'],
-      'wrapper' => $ajax_wrapper_id,
-    ];
-
     // Prefix and suffix used for Ajax replacement.
     $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
 
     // Store #array_parents in the form state, so we can get the elements from
-    // the complete form array by using only thes form state.
+    // the complete form array by using only the form state.
     $element['array_parents'] = [
       '#type' => 'value',
       '#value' => $element['#array_parents'],
@@ -87,21 +85,27 @@ class PluginSelect extends FormElement {
       '#type' => 'value',
       '#value' => $element['#plugin_type'],
     ];
-
     $element['target_plugin_id'] = [
-      '#type' => 'select',
+      '#type' => $element['#plugin_element_type'],
       '#title' => $element['#title'],
       '#multiple' => FALSE,
-      '#options' => [
-        '_none' => t('None'),
+      '#ajax' => [
+        'callback' => [get_called_class(), 'pluginFormAjax'],
+        'wrapper' => $ajax_wrapper_id,
       ],
-      '#ajax' => $ajax_settings,
       '#default_value' => $target_plugin_id,
       '#ajax_array_parents' => $element['#array_parents'],
+      '#required' => $element['#required'],
     ];
+
+    // Add a "_none" option if the element is not required.
+    if (!$element['#required']) {
+      $element['target_plugin_id']['#options']['_none'] = t('None');
+    }
 
     $categories = array_combine($element['#categories'], $element['#categories']);
     $has_categories = !empty($categories);
+    $definitions = [];
     foreach ($plugin_manager->getDefinitions() as $definition) {
       // If categories have been specified, limit definitions based on them.
       if ($has_categories && !isset($categories[$definition['category']])) {
@@ -115,12 +119,23 @@ class PluginSelect extends FormElement {
       else {
         $element['target_plugin_id']['#options'][$definition['id']] = $definition['label'];
       }
+      $definitions[] = $definition['id'];
+    }
+
+    // If the element is required, set the default value to the first plugin.
+    // definition available in the options array.
+    if ($element['#required']) {
+      if ($target_plugin_id == '_none' && !empty($element['target_plugin_id']['#options'])) {
+        $target_plugin_id = reset($definitions);
+        $values['target_plugin_configuration'] = [];
+        $element['target_plugin_id']['#default_value'] = $target_plugin_id;
+      }
     }
 
     if ($target_plugin_id != '_none') {
       /** @var \Drupal\Core\Executable\ExecutableInterface $plugin */
       $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
-      if ($plugin instanceof  PluginFormInterface) {
+      if ($plugin instanceof PluginFormInterface) {
         $element['target_plugin_configuration'] = [
           '#tree' => TRUE,
         ];
@@ -135,9 +150,13 @@ class PluginSelect extends FormElement {
    * Ajax callback.
    */
   public static function pluginFormAjax(&$form, FormStateInterface &$form_state, Request $request) {
-    // Retrieve the element to be rendered.
     $triggering_element = $form_state->getTriggeringElement();
+    while (!isset($triggering_element['#ajax_array_parents'])) {
+      array_pop($triggering_element['#array_parents']);
+      $triggering_element = NestedArray::getValue($form, $triggering_element['#array_parents']);
+    }
     $form_element = NestedArray::getValue($form, $triggering_element['#ajax_array_parents']);
+
     return $form_element;
   }
 

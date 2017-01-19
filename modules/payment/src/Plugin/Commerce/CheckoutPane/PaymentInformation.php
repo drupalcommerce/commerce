@@ -4,13 +4,16 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_payment\Entity\PaymentGatewayInterface as EntityPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\profile\Entity\Profile;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -80,10 +83,11 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
+    $summary = '';
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $this->order->payment_gateway->entity;
     if (!$payment_gateway) {
-      return '';
+      return $summary;
     }
 
     $payment_gateway_plugin = $payment_gateway->getPlugin();
@@ -95,10 +99,12 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     }
     else {
       $billing_profile = $this->order->getBillingProfile();
-      $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
-      $profile_view = $profile_view_builder->view($billing_profile, 'default');
-      $summary = $payment_gateway->getPlugin()->getDisplayLabel();
-      $summary .= $this->renderer->render($profile_view);
+      if ($billing_profile) {
+        $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
+        $profile_view = $profile_view_builder->view($billing_profile, 'default');
+        $summary = $payment_gateway->getPlugin()->getDisplayLabel();
+        $summary .= $this->renderer->render($profile_view);
+      }
     }
 
     return $summary;
@@ -110,24 +116,72 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
     $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
-    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
-    $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface[] $payment_gateways */
     $payment_gateways = $payment_gateway_storage->loadMultipleForOrder($this->order);
     // When no payment gateways are defined, throw an error and fail reliably.
     if (empty($payment_gateways)) {
-      throw new \Exception('No payment gateways are defined, create one first.');
+      drupal_set_message($this->noPaymentGatewayErrorMessage(), 'error');
+      return [];
     }
     // @todo Support multiple gateways.
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = reset($payment_gateways);
+
+    $pane_form['payment_gateway'] = [
+      '#type' => 'value',
+      '#value' => $payment_gateway->id(),
+    ];
+
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
+    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface) {
+      $this->attachPaymentMethodForm($payment_gateway, $pane_form, $form_state);
+    }
+    else {
+      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+      $billing_profile = $this->order->getBillingProfile();
+      if (!$billing_profile) {
+        $billing_profile = Profile::create([
+          'uid' => $this->order->getCustomerId(),
+          'type' => 'customer',
+        ]);
+      }
+
+      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
+      $form_display->buildForm($billing_profile, $pane_form, $form_state);
+      // Remove the details wrapper from the address field.
+      if (!empty($pane_form['address']['widget'][0])) {
+        $pane_form['address']['widget'][0]['#type'] = 'container';
+      }
+      // Store the billing profile for the validate/submit methods.
+      $pane_form['#entity'] = $billing_profile;
+    }
+
+    return $pane_form;
+  }
+
+  /**
+   * Creates the payment method selection form for supported gateways.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
+   *   The payment gateway.
+   * @param array $pane_form
+   *   The pane form, containing the following basic properties:
+   *   - #parents: Identifies the position of the pane form in the overall
+   *     parent form, and identifies the location where the field values are
+   *     placed within $form_state->getValues().
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the parent form.
+   */
+  protected function attachPaymentMethodForm(EntityPaymentGatewayInterface $payment_gateway, array &$pane_form, FormStateInterface $form_state) {
+    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
+    $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+    $payment_gateway_plugin = $payment_gateway->getPlugin();
     $options = [];
     $default_option = NULL;
-    $owner = $this->order->getOwner();
-    if ($owner) {
-      $payment_methods = $payment_method_storage->loadReusable($owner, $payment_gateway);
+    $customer = $this->order->getCustomer();
+    if ($customer) {
+      $payment_methods = $payment_method_storage->loadReusable($customer, $payment_gateway);
       foreach ($payment_methods as $payment_method) {
         $options[$payment_method->id()] = $payment_method->label();
       }
@@ -165,7 +219,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $payment_method = $payment_method_storage->create([
         'type' => substr($selected_option, 4),
         'payment_gateway' => $payment_gateway->id(),
-        'uid' => $this->order->getOwnerId(),
+        'uid' => $this->order->getCustomerId(),
       ]);
       $pane_form['add_payment_method'] = [
         '#type' => 'commerce_payment_gateway_form',
@@ -173,8 +227,6 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
         '#default_value' => $payment_method,
       ];
     }
-
-    return $pane_form;
   }
 
   /**
@@ -189,21 +241,74 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
-    if (is_numeric($values['payment_method'])) {
-      /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
-      $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-      $payment_method = $payment_method_storage->load($values['payment_method']);
+
+    /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
+    $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $payment_gateway_storage->load($values['payment_gateway']);
+
+    if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+      if (!isset($values['payment_method'])) {
+        $form_state->setError($complete_form, $this->noPaymentGatewayErrorMessage());
+      }
     }
     else {
-      $payment_method = $values['add_payment_method'];
+      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+      $billing_profile = $pane_form['#entity'];
+      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
+      $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
+      $form_display->validateFormValues($billing_profile, $pane_form, $form_state);
     }
+  }
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $this->order->payment_gateway = $payment_method->getPaymentGateway();
-    $this->order->payment_method = $payment_method;
-    $this->order->setBillingProfile($payment_method->getBillingProfile());
+  /**
+   * {@inheritdoc}
+   */
+  public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $values = $form_state->getValue($pane_form['#parents']);
+
+    /** @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $payment_gateway_storage */
+    $payment_gateway_storage = $this->entityTypeManager->getStorage('commerce_payment_gateway');
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
+    $payment_gateway = $payment_gateway_storage->load($values['payment_gateway']);
+
+    if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
+      if (is_numeric($values['payment_method'])) {
+        /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
+        $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+        $payment_method = $payment_method_storage->load($values['payment_method']);
+      }
+      else {
+        $payment_method = $values['add_payment_method'];
+      }
+
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $this->order->payment_gateway = $payment_method->getPaymentGateway();
+      $this->order->payment_method = $payment_method;
+      $this->order->setBillingProfile($payment_method->getBillingProfile());
+    }
+    else {
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $this->order->payment_gateway = $payment_gateway;
+      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+      $billing_profile = $pane_form['#entity'];
+      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
+      $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
+      $billing_profile->save();
+      $this->order->setBillingProfile($billing_profile);
+    }
+  }
+
+  /**
+   * Returns an error message in case there are no payment gateways.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The error message.
+   */
+  protected function noPaymentGatewayErrorMessage() {
+    return $this->t('No payment gateways are defined, create one first.');
   }
 
 }

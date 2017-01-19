@@ -5,26 +5,15 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests promotion conditions.
  *
  * @group commerce
  */
-class PromotionConditionTest extends KernelTestBase {
-
-  use StoreCreationTrait;
-
-  /**
-   * The default store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
+class PromotionConditionTest extends CommerceKernelTestBase {
 
   /**
    * The condition manager.
@@ -46,10 +35,12 @@ class PromotionConditionTest extends KernelTestBase {
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'views', 'profile', 'text', 'entity',
-    'entity_reference_revisions', 'commerce', 'commerce_price', 'address',
-    'commerce_order', 'commerce_store', 'commerce_product', 'inline_entity_form',
-    'commerce_promotion', 'state_machine', 'datetime',
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
+    'commerce_order',
+    'commerce_product',
+    'commerce_promotion',
   ];
 
   /**
@@ -58,7 +49,6 @@ class PromotionConditionTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
@@ -67,10 +57,8 @@ class PromotionConditionTest extends KernelTestBase {
     $this->installConfig([
       'profile',
       'commerce_order',
-      'commerce_store',
       'commerce_promotion',
     ]);
-    $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
@@ -91,7 +79,7 @@ class PromotionConditionTest extends KernelTestBase {
   }
 
   /**
-   * Tests the order amount condition.
+   * Tests the order total condition.
    */
   public function testOrderTotal() {
     // Use addOrderItem so the total is calculated.
@@ -122,7 +110,10 @@ class PromotionConditionTest extends KernelTestBase {
         [
           'target_plugin_id' => 'commerce_promotion_order_total_price',
           'target_plugin_configuration' => [
-            'amount' => new Price('20.00', 'USD'),
+            'amount' => [
+              'number' => '20.00',
+              'currency_code' => 'USD',
+            ],
           ],
         ],
       ],
@@ -130,8 +121,7 @@ class PromotionConditionTest extends KernelTestBase {
     $promotion->save();
 
     $result = $promotion->applies($this->order);
-
-    $this->assertTrue($result);
+    $this->assertNotEmpty($result);
 
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -148,7 +138,10 @@ class PromotionConditionTest extends KernelTestBase {
         [
           'target_plugin_id' => 'commerce_promotion_order_total_price',
           'target_plugin_configuration' => [
-            'amount' => new Price('50.00', 'USD'),
+            'amount' => [
+              'number' => '50.00',
+              'currency_code' => 'USD',
+            ],
           ],
         ],
       ],
@@ -157,7 +150,7 @@ class PromotionConditionTest extends KernelTestBase {
 
     $result = $promotion->applies($this->order);
 
-    $this->assertFalse($result);
+    $this->assertEmpty($result);
   }
 
 }

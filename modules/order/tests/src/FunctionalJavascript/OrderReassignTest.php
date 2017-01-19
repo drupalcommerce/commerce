@@ -18,6 +18,13 @@ class OrderReassignTest extends CommerceBrowserTestBase {
   use JavascriptTestTrait;
 
   /**
+   * The store entity.
+   *
+   * @var \Drupal\commerce_store\Entity\Store
+   */
+  protected $store;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -43,7 +50,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->createStore();
+    $this->store = $this->createStore();
   }
 
   /**
@@ -63,9 +70,10 @@ class OrderReassignTest extends CommerceBrowserTestBase {
       'mail' => $this->loggedInUser->getEmail(),
       'uid' => $this->loggedInUser->id(),
       'order_items' => [$order_item],
+      'store_id' => $this->store,
     ]);
 
-    $this->assertTrue($order->hasLinkTemplate('reassign-form'));
+    $this->assertNotEmpty($order->hasLinkTemplate('reassign-form'));
 
     $this->drupalGet($order->toUrl('reassign-form'));
     $this->getSession()->getPage()->fillField('customer_type', 'new');
@@ -81,7 +89,7 @@ class OrderReassignTest extends CommerceBrowserTestBase {
     // Reload the order.
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order = Order::load($order->id());
-    $this->assertEquals($order->getOwner()->getEmail(), 'example@example.com');
+    $this->assertEquals($order->getCustomer()->getEmail(), 'example@example.com');
     $this->assertEquals($order->getEmail(), 'example@example.com');
   }
 

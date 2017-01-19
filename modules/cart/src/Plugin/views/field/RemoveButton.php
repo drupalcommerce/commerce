@@ -77,7 +77,7 @@ class RemoveButton extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsForm(&$form, FormStateInterface $form_state) {
+  public function viewsForm(array &$form, FormStateInterface $form_state) {
     // Make sure we do not accidentally cache this form.
     $form['#cache']['max-age'] = 0;
     // The view is empty, abort.
@@ -107,7 +107,7 @@ class RemoveButton extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+  public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element['#remove_order_item'])) {
       $row_index = $triggering_element['#row_index'];

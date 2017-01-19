@@ -6,13 +6,18 @@ use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 use Drupal\profile\Entity\ProfileInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the interface for orders.
  */
-interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface, EntityOwnerInterface {
+interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterface, EntityChangedInterface {
+
+  // Refresh states.
+  const REFRESH_ON_LOAD = 'refresh_on_load';
+  const REFRESH_ON_SAVE = 'refresh_on_save';
+  const REFRESH_SKIP = 'refresh_skip';
 
   /**
    * Gets the order number.
@@ -61,12 +66,48 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Sets the store ID.
    *
-   * @param int $storeId
+   * @param int $store_id
    *   The store ID.
    *
    * @return $this
    */
-  public function setStoreId($storeId);
+  public function setStoreId($store_id);
+
+  /**
+   * Gets the customer user.
+   *
+   * @return \Drupal\user\UserInterface|null
+   *   The customer user entity, or NULL in case the order is anonymous,
+   */
+  public function getCustomer();
+
+  /**
+   * Sets the customer user.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The customer user entity.
+   *
+   * @return $this
+   */
+  public function setCustomer(UserInterface $account);
+
+  /**
+   * Gets the customer user ID.
+   *
+   * @return int|null
+   *   The customer user ID, or NULL in case the order is anonymous.
+   */
+  public function getCustomerId();
+
+  /**
+   * Sets the customer user ID.
+   *
+   * @param int $uid
+   *   The customer user ID.
+   *
+   * @return $this
+   */
+  public function setCustomerId($uid);
 
   /**
    * Gets the order email.
@@ -180,7 +221,34 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function hasItem(OrderItemInterface $order_item);
 
   /**
+   * Collects all adjustments that belong to the order.
+   *
+   * Unlike getAdjustments() which returns only order adjustments,
+   * this method returns both order and order item adjustments.
+   *
+   * Important:
+   * The returned order item adjustments are multiplied by quantity,
+   * so that they can be safely added to the order adjustments.
+   *
+   * @return \Drupal\commerce_order\Adjustment[]
+   *   The adjustments.
+   */
+  public function collectAdjustments();
+
+  /**
+   * Gets the order subtotal price.
+   *
+   * Represents a sum of all order item totals.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order subtotal price, or NULL.
+   */
+  public function getSubtotalPrice();
+
+  /**
    * Gets the order total price.
+   *
+   * Represents a sum of all order item totals along with adjustments.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The order total price, or NULL.
@@ -196,24 +264,52 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function getState();
 
   /**
-   * Gets the order data.
+   * Gets the order refresh state.
+   *
+   * @return string|null
+   *   The refresh state, if set. One of the following order constants:
+   *   REFRESH_ON_LOAD: The order should be refreshed when it is next loaded.
+   *   REFRESH_ON_SAVE: The order should be refreshed before it is saved.
+   *   REFRESH_SKIP: The order should not be refreshed for now.
+   */
+  public function getRefreshState();
+
+  /**
+   * Sets the order refresh state.
+   *
+   * @param string $refresh_state
+   *   The order refresh state.
+   *
+   * @return $this
+   */
+  public function setRefreshState($refresh_state);
+
+  /**
+   * Gets an order data value with the given key.
    *
    * Used to store temporary data during order processing (i.e. checkout).
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $default
+   *   The default value.
    *
    * @return array
    *   The order data.
    */
-  public function getData();
+  public function getData($key, $default = NULL);
 
   /**
-   * Sets the order data.
+   * Sets an order data value with the given key.
    *
-   * @param array $data
-   *   The order data.
+   * @param string $key
+   *   The key.
+   * @param mixed $value
+   *   The value.
    *
    * @return $this
    */
-  public function setData($data);
+  public function setData($key, $value);
 
   /**
    * Gets the order creation timestamp.

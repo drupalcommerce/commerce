@@ -89,7 +89,7 @@ class CheckoutFlowTest extends CommerceBrowserTestBase {
     $this->submitForm([], 'Delete');
 
     $checkout_flow_exists = (bool) CheckoutFlow::load($checkout_flow->id());
-    $this->assertFalse($checkout_flow_exists, 'The checkout flow has been deleted from the database.');
+    $this->assertEmpty($checkout_flow_exists, 'The checkout flow has been deleted from the database.');
   }
 
   /**

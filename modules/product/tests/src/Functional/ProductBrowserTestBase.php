@@ -52,6 +52,7 @@ abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
       'administer commerce_product fields',
       'administer commerce_product_variation fields',
       'administer commerce_product_variation display',
+      'access commerce_product overview',
     ], parent::getAdministratorPermissions());
   }
 

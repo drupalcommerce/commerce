@@ -5,11 +5,12 @@ namespace Drupal\commerce_promotion;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
  * Defines the interface for promotion storage.
  */
-interface PromotionStorageInterface {
+interface PromotionStorageInterface extends ContentEntityStorageInterface {
 
   /**
    * Loads the valid promotions for the given order type and store.

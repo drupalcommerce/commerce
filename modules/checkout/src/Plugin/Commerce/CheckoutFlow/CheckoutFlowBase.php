@@ -2,14 +2,15 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
-use Drupal\commerce_checkout\Event\CheckoutCompleteEvent;
-use Drupal\commerce_checkout\Event\CheckoutEvents;
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -152,13 +153,29 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
+  public function redirectToStep($step_id) {
+    $this->order->checkout_step = $step_id;
+    if ($step_id == 'complete') {
+      $transition = $this->order->getState()->getWorkflow()->getTransition('place');
+      $this->order->getState()->applyTransition($transition);
+    }
+    $this->order->save();
+    throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->order->id(),
+      'step' => $step_id,
+    ])->toString());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getSteps() {
     // Each checkout flow plugin defines its own steps.
     // These two steps are always expected to be present.
     return [
-      'offsite_payment' => [
+      'payment' => [
         'label' => $this->t('Payment'),
-        'next_label' => $this->t('Continue to payment'),
+        'next_label' => $this->t('Pay and complete purchase'),
         'has_order_summary' => FALSE,
       ],
       'complete' => [
@@ -307,7 +324,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $dispatch_checkout_complete = FALSE;
     if ($next_step_id = $this->getNextStepId()) {
       $this->order->checkout_step = $next_step_id;
       $form_state->setRedirect('commerce_checkout.form', [
@@ -319,31 +335,10 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
         // Place the order.
         $transition = $this->order->getState()->getWorkflow()->getTransition('place');
         $this->order->getState()->applyTransition($transition);
-        // Notify other modules.
-        $dispatch_checkout_complete = TRUE;
       }
     }
 
     $this->order->save();
-    // @todo Remove this event in #2788037.
-    if ($dispatch_checkout_complete) {
-      $event = new CheckoutCompleteEvent($this->order);
-      $this->eventDispatcher->dispatch(CheckoutEvents::CHECKOUT_COMPLETE, $event);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function previousForm(array &$form, FormStateInterface $form_state) {
-    $previous_step_id = $this->getPreviousStepId();
-    $this->order->checkout_step = $previous_step_id;
-    $this->order->save();
-
-    $form_state->setRedirect('commerce_checkout.form', [
-      'commerce_order' => $this->order->id(),
-      'step' => $previous_step_id,
-    ]);
   }
 
   /**
@@ -358,34 +353,30 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    *   The actions element.
    */
   protected function actions(array $form, FormStateInterface $form_state) {
+    $steps = $this->getVisibleSteps();
+    $next_step_id = $this->getNextStepId();
+    $previous_step_id = $this->getPreviousStepId();
+    $has_next_step = $next_step_id && isset($steps[$next_step_id]['next_label']);
+    $has_previous_step = $previous_step_id && isset($steps[$previous_step_id]['previous_label']);
+
     $actions = [
       '#type' => 'actions',
+      '#access' => $has_next_step,
     ];
-    $steps = $this->getVisibleSteps();
-    $previous_step_id = $this->getPreviousStepId();
-    if ($previous_step_id && isset($steps[$previous_step_id]['previous_label'])) {
-      $actions['previous'] = [
-        '#type' => 'submit',
-        '#value' => $steps[$previous_step_id]['previous_label'],
-        '#submit' => [
-          '::previousForm',
-        ],
-      ];
-    }
-    $next_step_id = $this->getNextStepId();
-    if ($next_step_id && isset($steps[$next_step_id]['next_label'])) {
+    if ($has_next_step) {
       $actions['next'] = [
         '#type' => 'submit',
         '#value' => $steps[$next_step_id]['next_label'],
         '#button_type' => 'primary',
         '#submit' => ['::submitForm'],
       ];
-    }
-    // Hide the actions element if it has no buttons.
-    $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
-    // Once these two steps are reached, the user can't go back.
-    if (in_array($this->stepId, ['offsite_payment', 'complete'])) {
-      $actions['#access'] = FALSE;
+      if ($has_previous_step) {
+        $label = $steps[$previous_step_id]['previous_label'];
+        $actions['next']['#suffix'] = Link::createFromRoute($label, 'commerce_checkout.form', [
+          'commerce_order' => $this->order->id(),
+          'step' => $previous_step_id,
+        ])->toString();
+      }
     }
 
     return $actions;

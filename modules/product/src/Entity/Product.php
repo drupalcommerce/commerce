@@ -25,9 +25,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
- *     "access" = "\Drupal\commerce\EntityAccessControlHandler",
- *     "permission_provider" = "\Drupal\commerce\EntityPermissionProvider",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -264,7 +264,7 @@ class Product extends ContentEntityBase implements ProductInterface {
   public function getDefaultVariation() {
     foreach ($this->getVariations() as $variation) {
       // Return the first active variation.
-      if ($variation->isActive()) {
+      if ($variation->isActive() && $variation->access('view')) {
         return $variation;
       }
     }

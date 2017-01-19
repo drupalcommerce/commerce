@@ -71,7 +71,7 @@ class ContactInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    */
   public function isVisible() {
     // Show the pane only for guest checkout.
-    return empty($this->order->getOwnerId());
+    return empty($this->order->getCustomerId());
   }
 
   /**

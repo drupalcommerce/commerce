@@ -4,14 +4,14 @@ namespace Drupal\Tests\commerce_product\Kernel;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests the product variation storage.
  *
  * @group commerce
  */
-class ProductVariationStorageTest extends EntityKernelTestBase {
+class ProductVariationStorageTest extends CommerceKernelTestBase {
 
   /**
    * The product variation storage.
@@ -25,9 +25,9 @@ class ProductVariationStorageTest extends EntityKernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'options', 'user', 'path',
-    'text', 'entity', 'filter', 'entity_test', 'commerce', 'commerce_price',
-    'commerce_store', 'commerce_product', 'views', 'address', 'inline_entity_form',
+  public static $modules = [
+    'path',
+    'commerce_product',
   ];
 
   /**

@@ -3,6 +3,7 @@
 namespace Drupal\commerce\Response;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 
@@ -28,7 +29,11 @@ class NeedsRedirectException extends EnforcedResponseException {
       throw new \InvalidArgumentException('Invalid URL provided.');
     }
 
-    parent::__construct(new TrustedRedirectResponse($url, $status_code, $headers));
+    $response = new TrustedRedirectResponse($url, $status_code, $headers);
+    $cacheable_metadata = new CacheableMetadata();
+    $cacheable_metadata->setCacheMaxAge(0);
+    $response->addCacheableDependency($cacheable_metadata);
+    parent::__construct($response);
   }
 
 }

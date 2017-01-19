@@ -27,8 +27,8 @@ class ChainCountryResolver implements ChainCountryResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function addResolver(CountryResolverInterface $resolver, $priority) {
-    $this->resolvers[$priority] = $resolver;
+  public function addResolver(CountryResolverInterface $resolver) {
+    $this->resolvers[] = $resolver;
   }
 
   /**

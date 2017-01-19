@@ -35,7 +35,7 @@ class CartProvider implements CartProviderInterface {
   protected $cartSession;
 
   /**
-   * The loaded cart data, keyed by cart order ID, then grouped by uid.
+   * The loaded cart data, grouped by uid, then keyed by cart order ID.
    *
    * Each data item is an array with the following keys:
    * - type: The order type.
@@ -112,8 +112,13 @@ class CartProvider implements CartProviderInterface {
     if ($save_cart) {
       $cart->save();
     }
+    // The cart is anonymous, move it to the 'completed' session.
+    if (!$cart->getCustomerId()) {
+      $this->cartSession->deleteCartId($cart->id(), CartSession::ACTIVE);
+      $this->cartSession->addCartId($cart->id(), CartSession::COMPLETED);
+    }
     // Remove the cart order from the internal cache, if present.
-    unset($this->cartData[$cart->getOwnerId()][$cart->id()]);
+    unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
   }
 
   /**
@@ -204,7 +209,7 @@ class CartProvider implements CartProviderInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
-      if ($cart->getOwnerId() != $uid || empty($cart->cart)) {
+      if ($cart->getCustomerId() != $uid || empty($cart->cart)) {
         // Skip orders that are no longer eligible.
         continue;
       }

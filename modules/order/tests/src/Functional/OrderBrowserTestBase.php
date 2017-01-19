@@ -34,6 +34,7 @@ abstract class OrderBrowserTestBase extends CommerceBrowserTestBase {
   public static $modules = [
     'commerce_product',
     'commerce_order',
+    'commerce_order_test',
     'inline_entity_form',
   ];
 

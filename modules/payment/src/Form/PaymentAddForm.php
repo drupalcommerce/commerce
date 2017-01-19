@@ -99,7 +99,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     // @todo
     // Support adding payments to anonymous orders, by adding support for
     // creating payment methods directly on this form.
-    if (!$this->order->getOwnerId()) {
+    if (!$this->order->getCustomerId()) {
       throw new AccessDeniedHttpException();
     }
 
@@ -149,7 +149,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
 
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-    $payment_methods = $payment_method_storage->loadReusable($this->order->getOwner(), $selected_payment_gateway);
+    $payment_methods = $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway);
 
     if (!empty($payment_methods)) {
       $selected_payment_method = reset($payment_methods);

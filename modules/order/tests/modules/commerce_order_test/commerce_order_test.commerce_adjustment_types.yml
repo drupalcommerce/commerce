@@ -1,0 +1,4 @@
+test_adjustment_type:
+  label: Test order adjustment type
+  has_ui: false
+  weight: -1

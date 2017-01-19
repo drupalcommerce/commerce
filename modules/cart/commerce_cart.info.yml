@@ -5,9 +5,9 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce
-  - commerce_order
-  - commerce_price
-  - commerce_product
+  - commerce:commerce_order
+  - commerce:commerce_price
+  - commerce:commerce_product
   - views
 config_devel:
   install:

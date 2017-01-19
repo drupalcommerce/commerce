@@ -15,12 +15,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides the Onsite payment gateway.
+ * Provides the On-site payment gateway.
  *
  * @CommercePaymentGateway(
  *   id = "example_onsite",
- *   label = "Example (Onsite)",
- *   display_label = "Example (Onsite)",
+ *   label = "Example (On-site)",
+ *   display_label = "Example",
  *    forms = {
  *     "add-payment-method" = "Drupal\commerce_payment_example\PluginForm\Onsite\PaymentMethodAddForm",
  *   },
@@ -94,6 +94,15 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     }
     if (REQUEST_TIME >= $payment_method->getExpiresTime()) {
       throw new HardDeclineException('The provided payment method has expired');
+    }
+
+    // Add a built in test for testing decline exceptions.
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $billing_address */
+    if ($billing_address = $payment_method->getBillingProfile()) {
+      $billing_address = $payment_method->getBillingProfile()->get('address')->first();
+      if ($billing_address->getPostalCode() == '53140') {
+        throw new HardDeclineException('The payment was declined');
+      }
     }
 
     // Perform the create payment request here, throw an exception if it fails.

@@ -19,8 +19,9 @@ class ProductPercentageOff extends PercentageOffBase {
   public function execute() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $this->getTargetEntity();
-    $price_amount = $order_item->getUnitPrice()->multiply($this->getAmount());
-    $this->applyAdjustment($order_item, $price_amount);
+    $adjustment_amount = $order_item->getUnitPrice()->multiply($this->getAmount());
+    $adjustment_amount = $this->rounder->round($adjustment_amount);
+    $this->applyAdjustment($order_item, $adjustment_amount);
   }
 
 }

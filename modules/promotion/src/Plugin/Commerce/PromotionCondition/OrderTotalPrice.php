@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition;
 
-use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\commerce_price\Price;
 
 /**
  * Provides an 'Order: Total amount comparison' condition.
@@ -33,15 +33,16 @@ class OrderTotalPrice extends PromotionConditionBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form += parent::buildConfigurationForm($form, $form_state);
 
-    $default_price = NULL;
-    if (!empty($this->configuration['amount']['amount'])) {
-      $default_price = new Price($this->configuration['amount']['amount'], $this->configuration['amount']['currency_code']);
+    $amount = $this->configuration['amount'];
+    // A bug in the plugin_select form element causes $amount to be incomplete.
+    if (isset($amount) && !isset($amount['number'], $amount['currency_code'])) {
+      $amount = NULL;
     }
 
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
-      '#default_value' => $default_price,
+      '#default_value' => $amount,
       '#required' => TRUE,
     ];
 
@@ -52,12 +53,16 @@ class OrderTotalPrice extends PromotionConditionBase {
    * {@inheritdoc}
    */
   public function evaluate() {
+    $amount = $this->configuration['amount'];
+    if (empty($amount)) {
+      return FALSE;
+    }
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->getTargetEntity();
     /** @var \Drupal\commerce_price\Price $total_price */
     $total_price = $order->getTotalPrice();
     /** @var \Drupal\commerce_price\Price $comparison_price */
-    $comparison_price = $this->configuration['amount'];
+    $comparison_price = new Price($amount['number'], $amount['currency_code']);
 
     switch ($this->configuration['operator']) {
       case '==':

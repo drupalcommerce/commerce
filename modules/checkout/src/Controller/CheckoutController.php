@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_checkout\Controller;
 
+use Drupal\commerce_cart\CartSession;
 use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
 use Drupal\Core\Access\AccessResult;
@@ -102,13 +103,15 @@ class CheckoutController implements ContainerInjectionInterface {
 
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
-      $owner_check = $account->id() == $order->getOwnerId();
+      $customer_check = $account->id() == $order->getCustomerId();
     }
     else {
-      $owner_check = $this->cartSession->hasCartId($order->id());
+      $active_cart = $this->cartSession->hasCartId($order->id(), CartSession::ACTIVE);
+      $completed_cart = $this->cartSession->hasCartId($order->id(), CartSession::COMPLETED);
+      $customer_check = $active_cart || $completed_cart;
     }
 
-    $access = AccessResult::allowedIf($owner_check)
+    $access = AccessResult::allowedIf($customer_check)
       ->andIf(AccessResult::allowedIf($order->hasItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);

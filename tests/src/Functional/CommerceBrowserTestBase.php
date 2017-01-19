@@ -150,7 +150,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
       $valid = FALSE;
     }
 
-    $this->assertTrue($valid, $message);
+    $this->assertNotEmpty($valid, $message);
   }
 
 }

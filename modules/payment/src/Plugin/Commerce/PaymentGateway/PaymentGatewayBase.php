@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Plugin\PluginWithFormsTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,12 +19,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayInterface, ContainerFactoryPluginInterface {
 
+  use PluginWithFormsTrait;
+
   /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
+
+  /**
+   * The ID of the parent config entity.
+   *
+   * @var string
+   */
+  protected $entityId;
 
   /**
    * The payment type used by the gateway.
@@ -59,6 +69,9 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
+    // The plugin most know the ID of its parent config entity.
+    $this->entityId = $configuration['_entity_id'];
+    unset($configuration['_entity_id']);
     // Instantiate the types right away to ensure that their IDs are valid.
     $this->paymentType = $payment_type_manager->createInstance($this->pluginDefinition['payment_type']);
     foreach ($this->pluginDefinition['payment_method_types'] as $plugin_id) {
@@ -189,6 +202,11 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = NestedArray::mergeDeep($this->defaultConfiguration(), $configuration);
+    // Providing a default for payment_metod_types in defaultConfiguration()
+    // doesn't work because NestedArray::mergeDeep causes duplicates.
+    if (empty($this->configuration['payment_method_types'])) {
+      $this->configuration['payment_method_types'][] = 'credit_card';
+    }
   }
 
   /**
@@ -255,21 +273,6 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $this->configuration['mode'] = $values['mode'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormClass($operation) {
-    $forms = $this->pluginDefinition['forms'];
-    return isset($forms[$operation]) ? $forms[$operation] : NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasFormClass($operation) {
-    return isset($this->pluginDefinition['forms'][$operation]);
   }
 
   /**

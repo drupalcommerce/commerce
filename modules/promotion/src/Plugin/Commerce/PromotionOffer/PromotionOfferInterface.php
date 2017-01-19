@@ -5,15 +5,15 @@ namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
-use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Executable\ExecutableInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
  * Defines an interface for Offer plugins.
  */
-interface PromotionOfferInterface extends ExecutableInterface, PluginFormInterface, ConfigurablePluginInterface, PluginInspectionInterface, ContextAwarePluginInterface {
+interface PromotionOfferInterface extends ConfigurablePluginInterface, ContainerFactoryPluginInterface, ContextAwarePluginInterface, ExecutableInterface, PluginFormInterface {
 
   const ORDER = 'commerce_order';
   const ORDER_ITEM = 'commerce_order_item';

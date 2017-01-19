@@ -5,3 +5,4 @@ id: default
 label: Default
 orderItemType: default
 generateTitle: true
+traits: {  }

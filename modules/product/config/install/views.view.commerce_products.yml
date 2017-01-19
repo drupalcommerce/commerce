@@ -24,7 +24,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'administer commerce_product'
+          perm: 'access commerce_product overview'
       cache:
         type: none
         options: {  }

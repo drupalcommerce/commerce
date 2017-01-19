@@ -1,15 +1,7 @@
 commerce_store.commerce_store_type.*:
-  type: config_entity
-  label: 'Store type config'
+  type: commerce_config_entity_bundle
+  label: 'Store type'
   mapping:
-    id:
-      type: string
-      label: 'Type'
-    label:
-      type: label
-      label: 'Label'
-    uuid:
-      type: string
     description:
       type: text
       label: 'Description'

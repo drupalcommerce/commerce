@@ -5,18 +5,15 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
  * Tests promotion storage.
  *
  * @group commerce
  */
-class PromotionStorageTest extends KernelTestBase {
-
-  use StoreCreationTrait;
+class PromotionStorageTest extends CommerceKernelTestBase {
 
   /**
    * The promotion storage.
@@ -26,22 +23,17 @@ class PromotionStorageTest extends KernelTestBase {
   protected $promotionStorage;
 
   /**
-   * The default store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = [
-    'system', 'field', 'options', 'user', 'views', 'profile', 'text', 'entity',
-    'entity_reference_revisions', 'commerce', 'commerce_price', 'address',
-    'commerce_order', 'commerce_store', 'commerce_product', 'inline_entity_form',
-    'commerce_promotion', 'state_machine', 'datetime',
+    'entity_reference_revisions',
+    'profile',
+    'state_machine',
+    'commerce_order',
+    'commerce_product',
+    'commerce_promotion',
   ];
 
   /**
@@ -50,7 +42,6 @@ class PromotionStorageTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('commerce_store');
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
@@ -59,11 +50,9 @@ class PromotionStorageTest extends KernelTestBase {
     $this->installConfig([
       'profile',
       'commerce_order',
-      'commerce_store',
       'commerce_promotion',
     ]);
 
-    $this->store = $this->createStore(NULL, NULL, 'default', TRUE);
     $this->promotionStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion');
   }
 

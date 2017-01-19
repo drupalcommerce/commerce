@@ -1,5 +1,2 @@
 'access commerce administration pages':
   title: 'Use the commerce administration pages'
-
-permission_callbacks:
-  - \Drupal\commerce\EntityPermissions::buildPermissions

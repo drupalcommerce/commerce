@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce\Unit;
 
 use Drupal\commerce\AvailabilityManager;
+use Drupal\commerce\Context;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -76,21 +77,25 @@ class AvailabilityManagerTest extends UnitTestCase {
       ->with($entity, 1)
       ->willReturn(FALSE);
 
+    $user = $this->getMock('\Drupal\Core\Session\AccountInterface');
+    $store = $this->getMock('Drupal\commerce_store\Entity\StoreInterface');
+    $context = new Context($user, $store);
+
     $this->availabilityManager->addChecker($first_checker);
-    $result = $this->availabilityManager->check($entity, 1);
-    $this->assertTrue($result, 'The checked entity is available when a checker returns NULL.');
+    $result = $this->availabilityManager->check($entity, 1, $context);
+    $this->assertNotEmpty($result, 'The checked entity is available when a checker returns NULL.');
 
     $this->availabilityManager->addChecker($second_checker);
-    $result = $this->availabilityManager->check($entity, 1);
-    $this->assertTrue($result, 'The checked entity is available when no checkers return FALSE.');
+    $result = $this->availabilityManager->check($entity, 1, $context);
+    $this->assertNotEmpty($result, 'The checked entity is available when no checkers return FALSE.');
 
     $this->availabilityManager->addChecker($third_checker);
-    $result = $this->availabilityManager->check($entity, 1);
-    $this->assertTrue($result, 'The checked entity is available when a checker that would return FALSE does not apply.');
+    $result = $this->availabilityManager->check($entity, 1, $context);
+    $this->assertNotEmpty($result, 'The checked entity is available when a checker that would return FALSE does not apply.');
 
     $this->availabilityManager->addChecker($fourth_checker);
-    $result = $this->availabilityManager->check($entity, 1);
-    $this->assertFalse($result, 'The checked entity is not available when a checker that returns FALSE applies');
+    $result = $this->availabilityManager->check($entity, 1, $context);
+    $this->assertEmpty($result, 'The checked entity is not available when a checker that returns FALSE applies');
 
     $expectedCheckers = [$first_checker, $second_checker, $third_checker, $fourth_checker];
     $checkers = $this->availabilityManager->getCheckers();

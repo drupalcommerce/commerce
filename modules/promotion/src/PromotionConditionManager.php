@@ -48,8 +48,8 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct('Plugin/Commerce/PromotionCondition', $namespaces, $module_handler, 'Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface', 'Drupal\commerce_promotion\Annotation\CommercePromotionCondition');
 
-    $this->alterInfo('condition_info');
-    $this->setCacheBackend($cache_backend, 'condition_plugins');
+    $this->alterInfo('commerce_promotion_condition_info');
+    $this->setCacheBackend($cache_backend, 'commerce_promotion_condition_plugins');
     $this->entityTypeManager = $entity_type_manager;
   }
 
