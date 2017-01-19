@@ -168,6 +168,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#default_value' => $payment,
         '#return_url' => $this->buildReturnUrl($this->order),
         '#cancel_url' => $this->buildCancelUrl($this->order),
+        '#capture' => $this->configuration['capture'],
       ];
 
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
