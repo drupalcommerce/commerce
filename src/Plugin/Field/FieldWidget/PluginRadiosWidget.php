@@ -3,6 +3,7 @@
 namespace Drupal\commerce\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -16,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   },
  *  )
  */
-class PluginRadiosWidget extends PluginSelectWidget {
+class PluginRadiosWidget extends WidgetBase {
 
   /**
    * {@inheritdoc}

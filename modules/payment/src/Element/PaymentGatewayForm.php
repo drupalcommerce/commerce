@@ -2,11 +2,10 @@
 
 namespace Drupal\commerce_payment\Element;
 
+use Drupal\commerce\Element\CommerceElementBase;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\RenderElement;
 
 /**
  * Provides a form element for embedding the payment gateway forms.
@@ -25,7 +24,7 @@ use Drupal\Core\Render\Element\RenderElement;
  *
  * @RenderElement("commerce_payment_gateway_form")
  */
-class PaymentGatewayForm extends RenderElement {
+class PaymentGatewayForm extends CommerceElementBase {
 
   /**
    * {@inheritdoc}
@@ -37,12 +36,14 @@ class PaymentGatewayForm extends RenderElement {
       // The entity operated on. Instance of EntityWithPaymentGatewayInterface.
       '#default_value' => NULL,
       '#process' => [
+        [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
       ],
       '#element_validate' => [
+        [$class, 'validateElementSubmit'],
         [$class, 'validateForm'],
       ],
-      '#element_submit' => [
+      '#commerce_element_submit' => [
         [$class, 'submitForm'],
       ],
       '#theme_wrappers' => ['container'],
@@ -82,10 +83,6 @@ class PaymentGatewayForm extends RenderElement {
     if (isset($element['#page_title'])) {
       $complete_form['#title'] = $element['#page_title'];
     }
-    // The #validate callbacks of the complete form run last.
-    // That allows executeElementSubmitHandlers() to be completely certain that
-    // the form has passed validation before proceeding.
-    $complete_form['#validate'][] = [get_class(), 'executeElementSubmitHandlers'];
 
     return $element;
   }
@@ -97,18 +94,8 @@ class PaymentGatewayForm extends RenderElement {
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   *
-   * @throws \Exception
-   *   Thrown if button-level #validate handlers are detected on the parent
-   *   form, as a protection against buggy behavior.
    */
   public static function validateForm(array &$element, FormStateInterface $form_state) {
-    // Button-level #validate handlers replace the form-level ones, which means
-    // that executeElementSubmitHandlers() won't be triggered.
-    if ($handlers = $form_state->getValidateHandlers()) {
-      throw new \Exception('The commerce_payment_gateway_form element is not compatible with submit buttons that set #validate handlers');
-    }
-
     $plugin_form = self::createPluginForm($element);
     $plugin_form->validateConfigurationForm($element, $form_state);
   }
@@ -144,7 +131,7 @@ class PaymentGatewayForm extends RenderElement {
    *   The plugin form.
    */
   public static function createPluginForm(array $element) {
-    /** @var \Drupal\commerce\PluginForm\PluginFormFactoryInterface $plugin_form_factory */
+    /** @var \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_factory */
     $plugin_form_factory = \Drupal::service('plugin_form.factory');
     /** @var \Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface $entity */
     $entity = $element['#default_value'];
@@ -154,40 +141,6 @@ class PaymentGatewayForm extends RenderElement {
     $plugin_form->setEntity($entity);
 
     return $plugin_form;
-  }
-
-  /**
-   * Submits elements by calling their #element_submit callbacks.
-   *
-   * Form API has no #element_submit, requiring us to simulate it by running
-   * our #element_submit handlers either in the last step of validation, or the
-   * first step of submission. In this case it's the last step of validation,
-   * allowing exceptions thrown by the plugin to be converted into form errors.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   */
-  public static function executeElementSubmitHandlers(array &$element, FormStateInterface $form_state) {
-    if (!$form_state->isSubmitted() || $form_state->hasAnyErrors()) {
-      // The form wasn't submitted (#ajax in progress) or failed validation.
-      return;
-    }
-
-    // Recurse through all children.
-    foreach (Element::children($element) as $key) {
-      if (!empty($element[$key])) {
-        static::executeElementSubmitHandlers($element[$key], $form_state);
-      }
-    }
-
-    // If there are callbacks on this level, run them.
-    if (!empty($element['#element_submit'])) {
-      foreach ($element['#element_submit'] as $callback) {
-        call_user_func_array($callback, [&$element, &$form_state]);
-      }
-    }
   }
 
 }

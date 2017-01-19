@@ -54,7 +54,7 @@ abstract class PercentageOffBase extends PromotionOfferBase {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue($form['#parents']);
-    if (empty($values['target_plugin_configuration']['amount'])) {
+    if (empty($values['amount'])) {
       $form_state->setError($form, $this->t('Percentage amount cannot be empty.'));
     }
   }
