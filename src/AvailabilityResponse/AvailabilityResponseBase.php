@@ -1,11 +1,14 @@
 <?php
 
-namespace Drupal\commerce;
+namespace Drupal\commerce\AvailabilityResponse;
+
+use Drupal\commerce\Context;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * An object representing a response to an availability request.
  */
-class AvailabilityResponse implements AvailabilityResponseInterface {
+abstract class AvailabilityResponseBase implements AvailabilityResponseInterface {
 
   /**
    * The purchasable entity.

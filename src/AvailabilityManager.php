@@ -2,6 +2,11 @@
 
 namespace Drupal\commerce;
 
+use Drupal\commerce\AvailabilityResponse\NegativeResponse;
+use Drupal\commerce\AvailabilityResponse\NeutralResponse;
+use Drupal\commerce\AvailabilityResponse\PositiveResponse;
+
+
 /**
  * Default implementation of the availability manager.
  */
@@ -38,18 +43,21 @@ class AvailabilityManager implements AvailabilityManagerInterface {
     foreach ($this->checkers as $checker) {
       if ($checker->applies($entity)) {
         $has_applicable_checkers = TRUE;
-        $available = $checker->getAvailability($entity, $context);
-        $min = min($min, $available->getMin());
-        $max = max($max, $available->getMax());
+        $response = $checker->getAvailability($entity, $context);
+        $min = min($min, $response->getMin());
+        $max = max($max, $response->getMax());
       }
     }
 
-    // @todo Find a cleaner way to deal with 'no opinion' / 'not stocked', i.e. NULL.
     if (!$has_applicable_checkers) {
-      return new AvailabilityResponse($entity, $context, 0, 9999999999999999);
+      return new NeutralResponse($entity, $context);
     }
 
-    return new AvailabilityResponse($entity, $context, $min, $max);
+    if ($min < $quantity) {
+      return new NegativeResponse($entity, $context, $min, $max);
+    }
+
+    return new PositiveResponse($entity, $context, $min, $max);
   }
 
 }
