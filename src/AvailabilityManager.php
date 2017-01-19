@@ -2,10 +2,7 @@
 
 namespace Drupal\commerce;
 
-use Drupal\commerce\AvailabilityResponse\NegativeResponse;
-use Drupal\commerce\AvailabilityResponse\NeutralResponse;
-use Drupal\commerce\AvailabilityResponse\PositiveResponse;
-
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
 
 /**
  * Default implementation of the availability manager.
@@ -36,28 +33,35 @@ class AvailabilityManager implements AvailabilityManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailability(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    $min = 0;
-    $max = 0;
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
+    $min = $max = 0;
+
     $has_applicable_checkers = FALSE;
     foreach ($this->checkers as $checker) {
       if ($checker->applies($entity)) {
         $has_applicable_checkers = TRUE;
-        $response = $checker->getAvailability($entity, $context);
+        $response = $checker->check($entity, $quantity, $context);
         $min = min($min, $response->getMin());
         $max = max($max, $response->getMax());
       }
     }
-
     if (!$has_applicable_checkers) {
-      return new NeutralResponse($entity, $context);
+      return AvailabilityResponse::neutral();
     }
 
-    if ($min < $quantity) {
-      return new NegativeResponse($entity, $context, $min, $max);
+    if ($min <= $quantity && $quantity <= $max) {
+      return AvailabilityResponse::available($min, $max);
+    }
+    elseif ($min > $quantity || $quantity > $max) {
+      if ($min > $quantity) {
+        return AvailabilityResponse::unavailable($min, $max, 'minimum not met');
+      }
+      elseif ($quantity > $max) {
+        return AvailabilityResponse::unavailable($min, $max, 'maximum exceeded');
+      }
     }
 
-    return new PositiveResponse($entity, $context, $min, $max);
+    return AvailabilityResponse::neutral();
   }
 
 }

@@ -43,6 +43,6 @@ interface AvailabilityManagerInterface {
    * @return \Drupal\commerce\AvailabilityResponseInterface
    *   The availability response.
    */
-  public function getAvailability(PurchasableEntityInterface $entity, $quantity, Context $context);
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
 
 }

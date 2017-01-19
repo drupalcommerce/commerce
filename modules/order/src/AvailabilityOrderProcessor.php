@@ -37,7 +37,7 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
     foreach ($order->getItems() as $order_item) {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
-        $response = $this->availabilityManager->getAvailability($purchased_entity, $order_item->getQuantity(), $context);
+        $response = $this->availabilityManager->check($purchased_entity, $order_item->getQuantity(), $context);
         if ($response->getMax() == 0) {
           $order->removeItem($order_item);
           $order_item->delete();

@@ -24,12 +24,14 @@ interface AvailabilityCheckerInterface {
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
+   * @param int
+   *   The quantity.
    * @param \Drupal\commerce\Context $context
    *   The context.
    *
    * @return \Drupal\commerce\AvailabilityResponseInterface
    *   An AvailabilityResponse object.
    */
-  public function getAvailability(PurchasableEntityInterface $entity, Context $context);
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context);
 
 }
