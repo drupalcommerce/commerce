@@ -40,10 +40,14 @@ payment_authorized_captured:
   category: commerce_payment
   label: 'Payment authorized and captured'
   template: '<p>Payment <em>{{ payment_remote_id }}</em> was authorized and captured.</p>'
+payment_partially_captured:
+  category: commerce_payment
+  label: 'Payment partially captured'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was partially captured.</p>'
 payment_captured:
   category: commerce_payment
   label: 'Payment captured'
-  template: '<p>Payment <em>{{ payment_remote_id }}</em> was captured.</p>'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was fully captured.</p>'
 payment_partially_refunded:
   category: commerce_payment
   label: 'Payment partially refunded'
@@ -51,4 +55,4 @@ payment_partially_refunded:
 payment_refunded:
   category: commerce_payment
   label: 'Payment refunded'
-  template: '<p>Payment <em>{{ payment_remote_id }}</em> was refunded.</p>'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was fully refunded.</p>'

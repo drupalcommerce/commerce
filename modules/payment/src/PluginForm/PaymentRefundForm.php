@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
+use Drupal\commerce_payment\Event\PaymentEvent;
+use Drupal\commerce_payment\Event\PaymentEvents;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -50,6 +52,13 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
     $payment_gateway_plugin->refundPayment($payment, $amount);
+
+    /** @var \Drupal\commerce_payment\Event\PaymentEvent $event */
+    $event = new PaymentEvent($payment);
+    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event_name = ($payment->getBalance()->isZero()) ? PaymentEvents::PAYMENT_REFUNDED : PaymentEvents::PAYMENT_PARTIALLY_REFUNDED;
+    $event_dispatcher->dispatch($event_name, $event);
   }
 
 }

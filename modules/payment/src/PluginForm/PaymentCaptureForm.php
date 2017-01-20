@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_payment\PluginForm;
 
+use Drupal\commerce_payment\Event\PaymentEvent;
+use Drupal\commerce_payment\Event\PaymentEvents;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -36,6 +38,13 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsAuthorizationsInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $this->plugin;
     $payment_gateway_plugin->capturePayment($payment, $amount);
+
+    /** @var \Drupal\commerce_payment\Event\PaymentEvent $event */
+    $event = new PaymentEvent($payment);
+    /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event_name = ($payment->getOrder()->getTotalPrice()->greaterThan($payment->getAmount())) ? PaymentEvents::PAYMENT_PARTIALLY_CAPTURED : PaymentEvents::PAYMENT_CAPTURED;
+    $event_dispatcher->dispatch($event_name, $event);
   }
 
 }
