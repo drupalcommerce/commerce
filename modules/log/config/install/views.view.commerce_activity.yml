@@ -44,9 +44,8 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: some
+        type: none
         options:
-          items_per_page: 5
           offset: 0
       style:
         type: table
@@ -316,7 +315,7 @@ display:
             type: none
             fail: 'not found'
           validate_options: {  }
-          break_phrase: false
+          break_phrase: true
           not: false
           entity_type: commerce_log
           entity_field: source_entity_id
@@ -358,7 +357,7 @@ display:
           case: none
           path_case: none
           transform_dash: false
-          break_phrase: false
+          break_phrase: true
           entity_type: commerce_log
           entity_field: source_entity_type
           plugin_id: string
