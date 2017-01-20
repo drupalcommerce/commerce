@@ -23,3 +23,32 @@ order_canceled:
   category: commerce_order
   label: 'Order canceled'
   template: '<p>The order was canceled.</p>'
+
+payment_authorized:
+  category: commerce_payment
+  label: 'Payment authorized'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was authorized.</p>'
+payment_voided:
+  category: commerce_payment
+  label: 'Payment voided'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was voided.</p>'
+payment_expired:
+  category: commerce_payment
+  label: 'Payment expired'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was expired.</p>'
+payment_authorized_captured:
+  category: commerce_payment
+  label: 'Payment authorized and captured'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was authorized and captured.</p>'
+payment_captured:
+  category: commerce_payment
+  label: 'Payment captured'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was captured.</p>'
+payment_partially_refunded:
+  category: commerce_payment
+  label: 'Payment partially refunded'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was partially refunded.</p>'
+payment_refunded:
+  category: commerce_payment
+  label: 'Payment refunded'
+  template: '<p>Payment <em>{{ payment_remote_id }}</em> was refunded.</p>'
