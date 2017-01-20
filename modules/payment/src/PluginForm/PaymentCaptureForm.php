@@ -41,6 +41,7 @@ class PaymentCaptureForm extends PaymentGatewayFormBase {
 
     /** @var \Drupal\commerce_payment\Event\PaymentEvent $event */
     $event = new PaymentEvent($payment);
+    $event->setAmount($amount);
     /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher */
     $event_dispatcher = \Drupal::service('event_dispatcher');
     $event_name = ($payment->getOrder()->getTotalPrice()->greaterThan($payment->getAmount())) ? PaymentEvents::PAYMENT_PARTIALLY_CAPTURED : PaymentEvents::PAYMENT_CAPTURED;

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment\Event;
 
 use Drupal\commerce_payment\Entity\PaymentInterface;
+use Drupal\commerce_price\Price;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,6 +21,13 @@ class PaymentEvent extends Event {
   protected $payment;
 
   /**
+   * The payment operation amount.
+   *
+   * @var \Drupal\commerce_price\Price
+   */
+  protected $amount;
+
+  /**
    * Constructs a new PaymentEvent.
    *
    * @param \Drupal\commerce_payment\Entity\PaymentInterface $payment
@@ -27,6 +35,24 @@ class PaymentEvent extends Event {
    */
   public function __construct(PaymentInterface $payment) {
     $this->payment = $payment;
+  }
+
+  /**
+   * @param \Drupal\commerce_price\Price $amount
+   *   The payment operation amount.
+   */
+  public function setAmount(Price $amount) {
+    $this->amount = $amount;
+  }
+
+  /**
+   * Gets the payment operation amount.
+   *
+   * @return \Drupal\commerce_price\Price
+   *   The payment operation amount.
+   */
+  public function getAmount() {
+    return $this->amount;
   }
 
   /**

@@ -55,6 +55,7 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
 
     /** @var \Drupal\commerce_payment\Event\PaymentEvent $event */
     $event = new PaymentEvent($payment);
+    $event->setAmount($amount);
     /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher */
     $event_dispatcher = \Drupal::service('event_dispatcher');
     $event_name = ($payment->getBalance()->isZero()) ? PaymentEvents::PAYMENT_REFUNDED : PaymentEvents::PAYMENT_PARTIALLY_REFUNDED;

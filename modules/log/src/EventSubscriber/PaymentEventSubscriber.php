@@ -167,6 +167,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
     $payment = $event->getPayment();
     $this->logStorage->generate($payment, 'payment_partially_captured', [
       'payment_remote_id' => $payment->getRemoteId(),
+      'captured_amount' => $event->getAmount(),
     ])->save();
   }
 
@@ -193,6 +194,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
     $payment = $event->getPayment();
     $this->logStorage->generate($payment, 'payment_partially_refunded', [
       'payment_remote_id' => $payment->getRemoteId(),
+      'refunded_amount' => $event->getAmount(),
     ])->save();
   }
 
