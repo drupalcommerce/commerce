@@ -140,18 +140,82 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     else {
       /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
       $billing_profile = $this->order->getBillingProfile();
-      if (!$billing_profile) {
-        $billing_profile = Profile::create([
-          'uid' => $this->order->getCustomerId(),
+      $billing_profiles = [0 => $this->t('- New Information -')];
+      $profile_id = $billing_profile ? $billing_profile->id() : 0;
+      if ($customer_id = $this->order->getCustomerId()) {
+        $storage = $this->entityTypeManager->getHandler('profile', 'storage');
+        $customer = $this->order->getCustomer();
+        // Pick up profile based on priority: 1 - order, 2 - default, 3 - first.
+        $billing_profile = $billing_profile ?: ($storage->loadDefaultByUser($customer, 'customer') ?: $storage->loadByUser($customer, 'customer'));
+        $profile_id = $billing_profile ? $billing_profile->id() : 0;
+        if (($trigger = $form_state->getTriggeringElement()) && array_pop($trigger['#parents']) == 'billing_profile_id') {
+          $trigger_value = explode('.', $trigger['#value']);
+          $trigger_id = $trigger_value[0] != $profile_id ? $trigger_value[0] : 0;
+          $profile_id = $trigger_value[0];
+        }
+        $info = $this->t('info id:');
+        $countries = \Drupal::service('address.country_repository');
+        $locale = $countries->getDefaultLocale();
+        $fallbackLocale = $countries->getFallbackLocale();
+        foreach ($storage->loadMultipleByUser($customer, 'customer') as $profile) {
+          $id = $profile->id();
+          $address = $address_0 = $profile->get('address')->getValue()[0];
+          $lines = [];
+          $address[1] = $countries->get($address['country_code'], $locale, $fallbackLocale)->getName();
+          $address[2] = implode(' ', [$address['postal_code'], $address['locality'], $address['dependent_locality'], $address['administrative_area']]);
+          $address['zzz'] = implode(' ', [$address['given_name'], $address['additional_name'], $address['family_name']]);
+          unset($address['country_code'], $address['given_name'], $address['additional_name'], $address['family_name'], $address['postal_code'], $address['locality'], $address['dependent_locality'], $address['administrative_area']); 
+          foreach ($address as $key => $value) {
+            if (empty($value)) {
+              unset($address[$key]);
+            }
+            else {
+              $lines["{$id}.{$key}"] = $value;
+            }
+          }
+          krsort($lines, SORT_NATURAL);
+          // Set the profile option for select element as a multiline optgroup.
+          $billing_profiles[$address_0['address_line1'] . " ({$info} {$id})"] = $lines;
+          if (!empty($trigger_id) && $trigger_id == $id) {
+            $billing_profile = $profile;
+            $this->order->setBillingProfile($billing_profile);
+            $input = $form_state->getUserInput();
+            $input['payment_information']['address'][0] = $address_0;
+            $form_state->setUserInput($input);
+          }
+        }
+      }
+      if (empty($profile_id)) {
+        $profile = Profile::create([
+          'uid' => $customer_id,
           'type' => 'customer',
         ]);
+        // Prevent overwriting existing billing profile.
+        $billing_profile ? $this->order->setBillingProfile($profile) : NULL;
+        $billing_profile = $profile;
       }
 
       $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
       $form_display->buildForm($billing_profile, $pane_form, $form_state);
-      // Remove the details wrapper from the address field.
       if (!empty($pane_form['address']['widget'][0])) {
+        // Remove the details wrapper from the address field.
         $pane_form['address']['widget'][0]['#type'] = 'container';
+
+        // Show only for authenticated user who has at least 1 profile saved.
+        if ($customer_id && count($billing_profiles) > 1) {
+          $country_code = $pane_form['address']['widget'][0]['country_code'];
+          $pane_form['address']['widget'][0]['billing_profile_id'] = [
+            '#type' => "select",
+            '#title' => $this->t('Choose from earlier saved information'),
+            '#options' => $billing_profiles,
+            '#default_value' =>  $billing_profile->id() . '.address_line1',
+            '#limit_validation_errors' => [],
+            '#ajax' => $country_code['#ajax'],
+            '#attributes' => $country_code['#attributes'],
+            // Place it exactly above the country code select list.
+            '#weight' => --$country_code['#weight'],
+          ];
+        }
       }
       // Store the billing profile for the validate/submit methods.
       $pane_form['#entity'] = $billing_profile;
