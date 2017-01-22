@@ -20,10 +20,15 @@ class PayPal extends PaymentMethodTypeBase {
    * {@inheritdoc}
    */
   public function buildLabel(PaymentMethodInterface $payment_method) {
-    $args = [
-      '@paypal_mail' => $payment_method->paypal_mail->value,
-    ];
-    return $this->t('PayPal account (@paypal_mail)', $args);
+    if ($payment_method->paypal_mail->value) {
+      $args = [
+        '@paypal_mail' => $payment_method->paypal_mail->value,
+      ];
+      return $this->t('PayPal account (@paypal_mail)', $args);
+    }
+    else {
+      return $this->t('New PayPal account');
+    }
   }
 
   /**
