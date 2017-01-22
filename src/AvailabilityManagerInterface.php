@@ -33,6 +33,11 @@ interface AvailabilityManagerInterface {
   /**
    * Gets an availability response from the aggregate of all checkers.
    *
+   * Possible \Drupal\commerce\AvailabilityResponseInterface classes:
+   * - Neutral: when no checker has an opinion about availability.
+   * - Available: when at lease one checker responds with availability.
+   * - Unavailable: when one of the checkers responds with unavailability.
+   *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    * @param int $quantity
