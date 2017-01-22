@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   },
  * )
  */
-class OffsiteRedirect extends OffsitePaymentGatewayBase {
+class OffsiteRedirect extends OffsitePaymentGatewayBase implements OffsiteInterface {
 
   /**
    * {@inheritdoc}
@@ -70,6 +70,21 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
    * {@inheritdoc}
    */
   public function onReturn(OrderInterface $order, Request $request) {
+    // For payment gateways implementing SupportsStoredPaymentMethodsInterface,
+    // we should update the stored payment method with details received
+    // from the offsite redirect.
+    if ($this instanceof SupportsStoredPaymentMethodsInterface) {
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      $payment_method = $order->payment_method->entity;
+      $payment_method->card_type = strtolower($request->query->get('CARD_BRAND'));
+      $payment_method->card_number = substr($request->query->get('CARD_NUMBER'), -4);
+      $payment_method->card_exp_month = $request->query->get('CARD_EXPIRY_MONTH');
+      $payment_method->card_exp_year = $request->query->get('CARD_EXPIRY_YEAR');
+      $expires = CreditCard::calculateExpirationTimestamp($request->query->get('CARD_EXPIRY_MONTH'), $request->query->get('CARD_EXPIRY_YEAR'));
+      $payment_method->setExpiresTime($expires);
+      $payment_method->save();
+    }
+
     // @todo Add examples of request validation.
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
     $payment = $payment_storage->create([
@@ -83,6 +98,7 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       'authorized' => REQUEST_TIME,
     ]);
     $payment->save();
+
     drupal_set_message('Payment was processed');
   }
 
