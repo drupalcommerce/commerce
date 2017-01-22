@@ -9,6 +9,7 @@ use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -143,9 +144,12 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       'order_id' => $this->order->id(),
     ]);
 
+    if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface) {
+      $payment->payment_method = $this->order->payment_method->entity;
+    }
+
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
       try {
-        $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
         $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
       }

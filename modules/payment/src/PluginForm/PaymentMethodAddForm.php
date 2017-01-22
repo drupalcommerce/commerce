@@ -5,6 +5,8 @@ namespace Drupal\commerce_payment\PluginForm;
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsCreatingStoredPaymentMethodsInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\Profile;
 
@@ -31,7 +33,12 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#type' => 'container',
       '#payment_method_type' => $payment_method->bundle(),
     ];
-    if ($payment_method->bundle() == 'credit_card') {
+    if ($payment_method->getPaymentGateway()->getPlugin() instanceof OffsitePaymentGatewayInterface) {
+      if ($payment_method->getPaymentGateway()->getPlugin() instanceof SupportsCreatingStoredPaymentMethodsInterface) {
+        $form['payment_details'] = $this->buildOffsiteStoredPaymentMethodForm($form['payment_details'], $form_state);
+      }
+    }
+    elseif ($payment_method->bundle() == 'credit_card') {
       $form['payment_details'] = $this->buildCreditCardForm($form['payment_details'], $form_state);
     }
     elseif ($payment_method->bundle() == 'paypal') {
@@ -62,7 +69,12 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
 
-    if ($payment_method->bundle() == 'credit_card') {
+    if ($payment_method->getPaymentGateway()->getPlugin() instanceof OffsitePaymentGatewayInterface) {
+      if ($payment_method->getPaymentGateway()->getPlugin() instanceof SupportsCreatingStoredPaymentMethodsInterface) {
+        $this->validateOffsiteStoredPaymentMethodForm($form['payment_details'], $form_state);
+      }
+    }
+    elseif ($payment_method->bundle() == 'credit_card') {
       $this->validateCreditCardForm($form['payment_details'], $form_state);
     }
     elseif ($payment_method->bundle() == 'paypal') {
@@ -77,7 +89,12 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
     $payment_method = $this->entity;
 
-    if ($payment_method->bundle() == 'credit_card') {
+    if ($payment_method->getPaymentGateway()->getPlugin() instanceof OffsitePaymentGatewayInterface) {
+      if ($payment_method->getPaymentGateway()->getPlugin() instanceof SupportsCreatingStoredPaymentMethodsInterface) {
+        $this->submitOffsiteStoredPaymentMethodForm($form['payment_details'], $form_state);
+      }
+    }
+    elseif ($payment_method->bundle() == 'credit_card') {
       $this->submitCreditCardForm($form['payment_details'], $form_state);
     }
     elseif ($payment_method->bundle() == 'paypal') {
@@ -93,7 +110,9 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     // The payment method form is customer facing. For security reasons
     // the returned errors need to be more generic.
     try {
-      $payment_gateway_plugin->createPaymentMethod($payment_method, $values['payment_details']);
+      if ($payment_method->getPaymentGateway()->getPlugin() instanceof SupportsCreatingStoredPaymentMethodsInterface) {
+        $payment_gateway_plugin->createPaymentMethod($payment_method, $values['payment_details']);
+      }
     }
     catch (DeclineException $e) {
       \Drupal::logger('commerce_payment')->warning($e->getMessage());
@@ -103,6 +122,49 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       \Drupal::logger('commerce_payment')->error($e->getMessage());
       throw new PaymentGatewayException('We encountered an unexpected error processing your payment method. Please try again later.');
     }
+  }
+
+  /**
+   * Builds the offsite form.
+   *
+   * @param array $element
+   *   The target element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   *
+   * @return array
+   *   The built offsite form.
+   */
+  protected function buildOffsiteStoredPaymentMethodForm(array $element, FormStateInterface $form_state) {
+    $element['token'] = [
+      '#type' => 'value',
+      '#value' => sha1(REQUEST_TIME),
+    ];
+
+    return $element;
+  }
+
+  /**
+   * Validates the offsite form.
+   *
+   * @param array $element
+   *   The offsite form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   */
+  protected function validateOffsiteStoredPaymentMethodForm(array &$element, FormStateInterface $form_state) {}
+
+  /**
+   * Handles the submission of the offsite form.
+   *
+   * @param array $element
+   *   The offsite form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   */
+  protected function submitOffsiteStoredPaymentMethodForm(array $element, FormStateInterface $form_state) {
+    $values = $form_state->getValue($element['#parents']);
+    $this->entity->remote_id = $values['token'];
   }
 
   /**

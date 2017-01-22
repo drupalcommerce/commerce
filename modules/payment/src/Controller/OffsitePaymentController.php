@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\Access\AccessException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +40,15 @@ class OffsitePaymentController {
     try {
       $payment_gateway_plugin->onReturn($commerce_order, $request);
       $redirect_step = $checkout_flow_plugin->getNextStepId();
+
+      // Once the payment method has been updated with real payment details
+      // in payment gateway's onReturn implementation, we can mark it as
+      // reusable to be shown in the UI.
+      if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface) {
+        $payment_method = $commerce_order->payment_method->entity;
+        $payment_method->setReusable(TRUE);
+        $payment_method->save();
+      }
     }
     catch (PaymentGatewayException $e) {
       \Drupal::logger('commerce_payment')->error($e->getMessage());

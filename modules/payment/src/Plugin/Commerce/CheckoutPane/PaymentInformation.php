@@ -5,6 +5,7 @@ namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface as EntityPaymentGatewayInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
@@ -268,13 +269,20 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       if (is_numeric($values['payment_method'])) {
         /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
         $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+        /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
         $payment_method = $payment_method_storage->load($values['payment_method']);
       }
       else {
         $payment_method = $values['add_payment_method'];
       }
 
-      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+      // For offsite payment gateways set the payment method to non-reusable,
+      // so that it is not shown in the UI until return from offsite redirect,
+      // after which it will be updated with real data.
+      if ($payment_gateway->getPlugin() instanceof OffsitePaymentGatewayInterface) {
+        $payment_method->setReusable(FALSE);
+      }
+
       $this->order->payment_gateway = $payment_method->getPaymentGateway();
       $this->order->payment_method = $payment_method;
       $this->order->setBillingProfile($payment_method->getBillingProfile());
