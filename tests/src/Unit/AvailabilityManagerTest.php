@@ -3,6 +3,9 @@
 namespace Drupal\Tests\commerce\Unit;
 
 use Drupal\commerce\AvailabilityManager;
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable;
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable;
 use Drupal\commerce\Context;
 use Drupal\Tests\UnitTestCase;
 
@@ -45,7 +48,7 @@ class AvailabilityManagerTest extends UnitTestCase {
     $first_checker->expects($this->any())
       ->method('check')
       ->with($entity, 1)
-      ->willReturn(NULL);
+      ->willReturn(AvailabilityResponse::neutral());
 
     $second_checker = $mock_builder->getMock();
     $second_checker->expects($this->any())
@@ -55,7 +58,7 @@ class AvailabilityManagerTest extends UnitTestCase {
     $second_checker->expects($this->any())
       ->method('check')
       ->with($entity, 1)
-      ->willReturn(TRUE);
+      ->willReturn(AvailabilityResponse::available(0, 1));
 
     $third_checker = $mock_builder->getMock();
     $third_checker->expects($this->any())
@@ -65,7 +68,7 @@ class AvailabilityManagerTest extends UnitTestCase {
     $third_checker->expects($this->any())
       ->method('check')
       ->with($entity, 1)
-      ->willReturn(FALSE);
+      ->willReturn(AvailabilityResponse::unavailable(0, 0));
 
     $fourth_checker = $mock_builder->getMock();
     $fourth_checker->expects($this->any())
@@ -75,7 +78,7 @@ class AvailabilityManagerTest extends UnitTestCase {
     $fourth_checker->expects($this->any())
       ->method('check')
       ->with($entity, 1)
-      ->willReturn(FALSE);
+      ->willReturn(AvailabilityResponse::unavailable(0, 0));
 
     $user = $this->getMock('\Drupal\Core\Session\AccountInterface');
     $store = $this->getMock('Drupal\commerce_store\Entity\StoreInterface');
@@ -83,19 +86,19 @@ class AvailabilityManagerTest extends UnitTestCase {
 
     $this->availabilityManager->addChecker($first_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertNotEmpty($result, 'The checked entity is available when a checker returns NULL.');
+    $this->assertInstanceOf(AvailabilityResponseAvailable::class, $result, 'The checked entity is available when the only checker returns neutral.');
 
     $this->availabilityManager->addChecker($second_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertNotEmpty($result, 'The checked entity is available when no checkers return FALSE.');
+    $this->assertInstanceOf(AvailabilityResponseAvailable::class, $result, 'The checked entity is available when no checkers return unavailable.');
 
     $this->availabilityManager->addChecker($third_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertNotEmpty($result, 'The checked entity is available when a checker that would return FALSE does not apply.');
+    $this->assertInstanceOf(AvailabilityResponseAvailable::class, $result, 'The checked entity is available when a checker that would return unavailable does not apply.');
 
     $this->availabilityManager->addChecker($fourth_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertEmpty($result, 'The checked entity is not available when a checker that returns FALSE applies');
+    $this->assertInstanceOf(AvailabilityResponseUnavailable::class, $result, 'The checked entity is not available when a checker that returns unavailable applies');
 
     $expectedCheckers = [$first_checker, $second_checker, $third_checker, $fourth_checker];
     $checkers = $this->availabilityManager->getCheckers();

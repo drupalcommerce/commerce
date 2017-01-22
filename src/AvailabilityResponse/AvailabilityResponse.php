@@ -61,6 +61,11 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
   /**
    * Creates an AvailabilityResponseInterface object with isAvailable() === TRUE.
    *
+   * @param int $min
+   *   The minimum amount available.
+   * @param int $max
+   *   The maximum amount available.
+   *
    * @return \Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable
    *   isAvailable() will be TRUE.
    */
@@ -71,6 +76,10 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
   /**
    * Creates an AvailabilityResponseInterface object with isUnavailable() === TRUE.
    *
+   * @param int $min
+   *   The minimum amount available.
+   * @param int $max
+   *   The maximum amount available.
    * @param string|null $reason
    *   (optional) The reason why availability is unavailable.
    *   Intended for developers, hence not translatable.
