@@ -27,7 +27,7 @@ use Drupal\commerce_payment\Entity\PaymentInterface;
  * checkout step that contains the PaymentInformation checkout pane, to provide
  * a different payment method.
  */
-interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface, SupportsStoredPaymentMethodsInterface {
+interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface {
 
   /**
    * Creates a payment.
