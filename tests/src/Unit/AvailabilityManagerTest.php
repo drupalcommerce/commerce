@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce\Unit;
 use Drupal\commerce\AvailabilityManager;
 use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
 use Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable;
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponseNeutral;
 use Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable;
 use Drupal\commerce\Context;
 use Drupal\Tests\UnitTestCase;
@@ -86,7 +87,7 @@ class AvailabilityManagerTest extends UnitTestCase {
 
     $this->availabilityManager->addChecker($first_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertInstanceOf(AvailabilityResponseAvailable::class, $result, 'The checked entity is available when the only checker returns neutral.');
+    $this->assertInstanceOf(AvailabilityResponseNeutral::class, $result, 'The checked entity is available when the only checker returns neutral.');
 
     $this->availabilityManager->addChecker($second_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);

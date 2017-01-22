@@ -53,7 +53,10 @@ class AvailabilityManager implements AvailabilityManagerInterface {
         $max = max($max, $response->getMax());
       }
     }
-    if (!$has_opinion || $min <= $quantity && $quantity <= $max) {
+    if (!$has_opinion) {
+      return AvailabilityResponse::neutral();
+    }
+    elseif ($min <= $quantity && $quantity <= $max) {
       return AvailabilityResponse::available($min, $max);
     }
     elseif ($min > $quantity || $quantity > $max) {
