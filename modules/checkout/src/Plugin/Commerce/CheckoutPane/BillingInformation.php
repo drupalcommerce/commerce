@@ -3,7 +3,6 @@
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -90,6 +89,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
+    $store = $this->order->getStore();
     $billing_profile = $this->order->getBillingProfile();
     if (!$billing_profile) {
       $profile_storage = $this->entityTypeManager->getStorage('profile');
@@ -98,14 +98,13 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
         'uid' => $this->order->getCustomerId(),
       ]);
     }
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->buildForm($billing_profile, $pane_form, $form_state);
-    // Remove the details wrapper from the address field.
-    if (!empty($pane_form['address']['widget'][0])) {
-      $pane_form['address']['widget'][0]['#type'] = 'container';
-    }
-    // Store the billing profile for the validate/submit methods.
-    $pane_form['#billing_profile'] = $billing_profile;
+
+    $pane_form['profile'] = [
+      '#type' => 'commerce_profile_select',
+      '#default_value' => $billing_profile,
+      '#default_country' => $store->getAddress()->getCountryCode(),
+      '#available_countries' => $store->getBillingCountries(),
+    ];
 
     return $pane_form;
   }
@@ -113,22 +112,8 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   /**
    * {@inheritdoc}
    */
-  public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $billing_profile = clone $pane_form['#billing_profile'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
-    $form_display->validateFormValues($billing_profile, $pane_form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
-    $billing_profile = clone $pane_form['#billing_profile'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
-    $billing_profile->save();
-    $this->order->setBillingProfile($billing_profile);
+    $this->order->setBillingProfile($pane_form['profile']['#profile']);
   }
 
 }

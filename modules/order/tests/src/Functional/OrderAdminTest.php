@@ -53,7 +53,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     // Check the integrity of the edit form.
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('billing_profile');
+    $this->assertSession()->fieldExists('billing_profile[0][profile][address][0][address][given_name]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][number]');
@@ -77,7 +77,12 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ];
     $this->submitForm($edit, 'Update order item');
     $edit = [
-      'billing_profile' => $this->billingProfile->id(),
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 street',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
       'adjustments[0][type]' => 'custom',
       'adjustments[0][definition][label]' => 'Test fee',
       'adjustments[0][definition][amount][number]' => '2.00',

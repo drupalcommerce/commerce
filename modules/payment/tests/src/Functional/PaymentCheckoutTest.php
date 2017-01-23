@@ -107,12 +107,12 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
       'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
-      'payment_information[add_payment_method][billing_information][address][0][given_name]' => 'Johnny',
-      'payment_information[add_payment_method][billing_information][address][0][family_name]' => 'Appleseed',
-      'payment_information[add_payment_method][billing_information][address][0][address_line1]' => '123 New York Drive',
-      'payment_information[add_payment_method][billing_information][address][0][locality]' => 'New York City',
-      'payment_information[add_payment_method][billing_information][address][0][administrative_area]' => 'NY',
-      'payment_information[add_payment_method][billing_information][address][0][postal_code]' => '10001',
+      'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[add_payment_method][billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[add_payment_method][billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[add_payment_method][billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[add_payment_method][billing_information][address][0][address][postal_code]' => '10001',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
@@ -155,12 +155,12 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
       'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
-      'payment_information[add_payment_method][billing_information][address][0][given_name]' => 'Johnny',
-      'payment_information[add_payment_method][billing_information][address][0][family_name]' => 'Appleseed',
-      'payment_information[add_payment_method][billing_information][address][0][address_line1]' => '123 New York Drive',
-      'payment_information[add_payment_method][billing_information][address][0][locality]' => 'Somewhere',
-      'payment_information[add_payment_method][billing_information][address][0][administrative_area]' => 'WI',
-      'payment_information[add_payment_method][billing_information][address][0][postal_code]' => '53140',
+      'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[add_payment_method][billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[add_payment_method][billing_information][address][0][address][locality]' => 'Somewhere',
+      'payment_information[add_payment_method][billing_information][address][0][address][administrative_area]' => 'WI',
+      'payment_information[add_payment_method][billing_information][address][0][address][postal_code]' => '53140',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
@@ -202,12 +202,12 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
       'payment_information[add_payment_method][payment_details][expiration][year]' => '2020',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
-      'payment_information[add_payment_method][billing_information][address][0][given_name]' => 'Johnny',
-      'payment_information[add_payment_method][billing_information][address][0][family_name]' => 'Appleseed',
-      'payment_information[add_payment_method][billing_information][address][0][address_line1]' => '123 New York Drive',
-      'payment_information[add_payment_method][billing_information][address][0][locality]' => 'New York City',
-      'payment_information[add_payment_method][billing_information][address][0][administrative_area]' => 'NY',
-      'payment_information[add_payment_method][billing_information][address][0][postal_code]' => '10001',
+      'payment_information[add_payment_method][billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_information[add_payment_method][billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_information[add_payment_method][billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_information[add_payment_method][billing_information][address][0][address][locality]' => 'New York City',
+      'payment_information[add_payment_method][billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_information[add_payment_method][billing_information][address][0][address][postal_code]' => '10001',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());

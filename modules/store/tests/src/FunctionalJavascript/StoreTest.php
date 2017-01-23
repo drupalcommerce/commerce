@@ -52,13 +52,13 @@ class StoreTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
     $this->assertSession()->fieldExists('mail[0][value]');
-    $this->assertSession()->fieldExists('address[0][country_code]');
+    $this->assertSession()->fieldExists('address[0][address][country_code]');
     $this->assertSession()->fieldExists('billing_countries[]');
     $this->assertSession()->fieldExists('uid[0][target_id]');
     $this->assertSession()->fieldExists('default');
 
-    $this->getSession()->getPage()->fillField('address[0][country_code]', 'US');
-    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][administrative_area]"]\').length > 0 && jQuery.active == 0;');
+    $this->getSession()->getPage()->fillField('address[0][address][country_code]', 'US');
+    $this->getSession()->wait(4000, 'jQuery(\'select[name="address[0][address][administrative_area]"]\').length > 0 && jQuery.active == 0;');
 
     $name = $this->randomMachineName(8);
     $edit = [
@@ -73,7 +73,7 @@ class StoreTest extends CommerceBrowserTestBase {
       'postal_code' => '94043',
     ];
     foreach ($address as $property => $value) {
-      $path = 'address[0][' . $property . ']';
+      $path = 'address[0][address][' . $property . ']';
       $edit[$path] = $value;
     }
     $this->submitForm($edit, t('Save'));

@@ -35,6 +35,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   protected $product;
 
   /**
+   * The store.
+   *
+   * @var \Drupal\commerce_store\Entity\StoreInterface
+   */
+  protected $store;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -65,7 +72,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
 
     $this->placeBlock('commerce_cart');
 
-    $store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
+    $this->store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -81,7 +88,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'title' => 'My product',
       'variations' => [$variation],
-      'stores' => [$store],
+      'stores' => [$this->store],
     ]);
   }
 
@@ -117,6 +124,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $order_item->save();
     $order = Order::create([
       'type' => 'default',
+      'store_id' => $this->store,
       'state' => 'in_checkout',
       'order_number' => '6',
       'mail' => 'test@example.com',
@@ -171,11 +179,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[address][0][given_name]' => $this->randomString(),
-      'billing_information[address][0][family_name]' => $this->randomString(),
-      'billing_information[address][0][organization]' => $this->randomString(),
-      'billing_information[address][0][address_line1]' => $this->randomString(),
-      'billing_information[address][0][locality]' => $this->randomString(),
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
@@ -195,11 +205,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[address][0][given_name]' => $this->randomString(),
-      'billing_information[address][0][family_name]' => $this->randomString(),
-      'billing_information[address][0][organization]' => $this->randomString(),
-      'billing_information[address][0][address_line1]' => $this->randomString(),
-      'billing_information[address][0][locality]' => $this->randomString(),
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');

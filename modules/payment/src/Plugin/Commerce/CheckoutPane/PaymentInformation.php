@@ -8,7 +8,6 @@ use Drupal\commerce_payment\Entity\PaymentGatewayInterface as EntityPaymentGatew
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -43,7 +42,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   protected $renderer;
 
   /**
-   * Constructs a new BillingInformation object.
+   * Constructs a new PaymentInformation object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -138,7 +137,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $this->attachPaymentMethodForm($payment_gateway, $pane_form, $form_state);
     }
     else {
-      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+      $store = $this->order->getStore();
       $billing_profile = $this->order->getBillingProfile();
       if (!$billing_profile) {
         $billing_profile = Profile::create([
@@ -147,14 +146,12 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
         ]);
       }
 
-      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-      $form_display->buildForm($billing_profile, $pane_form, $form_state);
-      // Remove the details wrapper from the address field.
-      if (!empty($pane_form['address']['widget'][0])) {
-        $pane_form['address']['widget'][0]['#type'] = 'container';
-      }
-      // Store the billing profile for the validate/submit methods.
-      $pane_form['#entity'] = $billing_profile;
+      $pane_form['billing_information'] = [
+        '#type' => 'commerce_profile_select',
+        '#default_value' => $billing_profile,
+        '#default_country' => $store->getAddress()->getCountryCode(),
+        '#available_countries' => $store->getBillingCountries(),
+      ];
     }
 
     return $pane_form;
@@ -254,13 +251,6 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
         $form_state->setError($complete_form, $this->noPaymentGatewayErrorMessage());
       }
     }
-    else {
-      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
-      $billing_profile = $pane_form['#entity'];
-      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-      $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
-      $form_display->validateFormValues($billing_profile, $pane_form, $form_state);
-    }
   }
 
   /**
@@ -290,14 +280,8 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $this->order->setBillingProfile($payment_method->getBillingProfile());
     }
     else {
-      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
       $this->order->payment_gateway = $payment_gateway;
-      /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
-      $billing_profile = $pane_form['#entity'];
-      $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-      $form_display->extractFormValues($billing_profile, $pane_form, $form_state);
-      $billing_profile->save();
-      $this->order->setBillingProfile($billing_profile);
+      $this->order->setBillingProfile($pane_form['billing_information']['#profile']);
     }
   }
 
