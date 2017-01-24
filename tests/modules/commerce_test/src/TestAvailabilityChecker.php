@@ -24,8 +24,8 @@ class TestAvailabilityChecker implements AvailabilityCheckerInterface {
    * {@inheritdoc}
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    // Always return neutral.
-    return AvailabilityResponse::neutral();
+    // Always return unavailable.
+    return AvailabilityResponse::unavailable(0, 0);
   }
 
 }
