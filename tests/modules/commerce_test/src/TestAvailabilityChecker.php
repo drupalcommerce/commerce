@@ -3,7 +3,7 @@
 namespace Drupal\commerce_test;
 
 use Drupal\commerce\AvailabilityCheckerInterface;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
+use Drupal\commerce\AvailabilityResponse;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;

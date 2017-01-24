@@ -2,10 +2,6 @@
 
 namespace Drupal\commerce;
 
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponseNeutral;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable;
-
 /**
  * Default implementation of the availability manager.
  */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce\AvailabilityResponse;
+namespace Drupal\commerce;
 
 /**
  * An object representing a response to an availability request.
@@ -59,14 +59,14 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
   }
 
   /**
-   * Creates an AvailabilityResponseInterface object with isAvailable() === TRUE.
+   * Creates an AvailabilityResponseAvailable object.
    *
    * @param int $min
    *   The minimum amount available.
    * @param int $max
    *   The maximum amount available.
    *
-   * @return \Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable
+   * @return \Drupal\commerce\AvailabilityResponseAvailable
    *   isAvailable() will be TRUE.
    */
   public static function available($min, $max) {
@@ -74,7 +74,7 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
   }
 
   /**
-   * Creates an AvailabilityResponseInterface object with isUnavailable() === TRUE.
+   * Creates an AvailabilityResponseUnavailable object.
    *
    * @param int $min
    *   The minimum amount available.
@@ -84,7 +84,7 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
    *   (optional) The reason why availability is unavailable.
    *   Intended for developers, hence not translatable.
    *
-   * @return \Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable
+   * @return \Drupal\commerce\AvailabilityResponseUnavailable
    *   isUnavailable() will be TRUE.
    */
   public static function unavailable($min, $max, $reason = NULL) {
@@ -93,9 +93,9 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
   }
 
   /**
-   * Creates an AvailabilityResponseInterface object with isNeutral() === TRUE.
+   * Creates an AvailabilityResponseNeutral object.
    *
-   * @return \Drupal\commerce\AvailabilityResponse\AvailabilityResponseNeutral
+   * @return \Drupal\commerce\AvailabilityResponseNeutral
    *   isNeutral() will be TRUE.
    */
   public static function neutral() {
@@ -104,8 +104,6 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @see \Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable
    */
   public function isAvailable() {
     return FALSE;
@@ -113,8 +111,6 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @see \Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable
    */
   public function isUnavailable() {
     return FALSE;
@@ -122,8 +118,6 @@ abstract class AvailabilityResponse implements AvailabilityResponseInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @see \Drupal\Core\Access\AccessResultNeutral
    */
   public function isNeutral() {
     return FALSE;

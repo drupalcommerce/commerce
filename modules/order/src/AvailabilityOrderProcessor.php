@@ -38,7 +38,7 @@ class AvailabilityOrderProcessor implements OrderProcessorInterface {
     foreach ($order->getItems() as $order_item) {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
-        /** @var \Drupal\commerce\AvailabilityResponse\AvailabilityResponseInterface $availability */
+        /** @var \Drupal\commerce\AvailabilityResponseInterface $availability */
         $availability = $this->availabilityManager->check($purchased_entity, $order_item->getQuantity(), $context);
         if (!$availability->isNeutral()) {
           if ($availability->getMax() == 0) {

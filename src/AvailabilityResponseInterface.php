@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce\AvailabilityResponse;
+namespace Drupal\commerce;
 
 /**
  * Defines the interface for responses to availability checks.

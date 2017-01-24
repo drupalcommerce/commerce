@@ -3,10 +3,10 @@
 namespace Drupal\Tests\commerce\Unit;
 
 use Drupal\commerce\AvailabilityManager;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponseAvailable;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponseNeutral;
-use Drupal\commerce\AvailabilityResponse\AvailabilityResponseUnavailable;
+use Drupal\commerce\AvailabilityResponse;
+use Drupal\commerce\AvailabilityResponseAvailable;
+use Drupal\commerce\AvailabilityResponseNeutral;
+use Drupal\commerce\AvailabilityResponseUnavailable;
 use Drupal\commerce\Context;
 use Drupal\Tests\UnitTestCase;
 
@@ -99,7 +99,7 @@ class AvailabilityManagerTest extends UnitTestCase {
 
     $this->availabilityManager->addChecker($fourth_checker);
     $result = $this->availabilityManager->check($entity, 1, $context);
-    $this->assertInstanceOf(AvailabilityResponseUnavailable::class, $result, 'The checked entity is not available when a checker that returns unavailable applies');
+    $this->assertInstanceOf(AvailabilityResponseUnavailable::class, $result, 'The checked entity is not available when a checker that returns unavailable applies.');
 
     $expectedCheckers = [$first_checker, $second_checker, $third_checker, $fourth_checker];
     $checkers = $this->availabilityManager->getCheckers();

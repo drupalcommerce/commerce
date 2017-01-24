@@ -1,7 +1,10 @@
 <?php
 
-namespace Drupal\commerce\AvailabilityResponse;
+namespace Drupal\commerce;
 
+/**
+ * An object representing a positive response to an availability request.
+ */
 class AvailabilityResponseAvailable extends AvailabilityResponse {
 
   /**
