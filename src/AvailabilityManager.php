@@ -45,8 +45,8 @@ class AvailabilityManager implements AvailabilityManagerInterface {
           continue;
         }
         $has_opinion = TRUE;
-        $min = min($min, $response->getMin());
-        $max = max($max, $response->getMax());
+        $min = max($min, $response->getMin());
+        $max = min($max, $response->getMax());
       }
     }
     if (!$has_opinion) {
