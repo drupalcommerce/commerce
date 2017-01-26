@@ -14,6 +14,7 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#type' => 'commerce_price',
  *   '#title' => $this->t('Amount'),
  *   '#default_value' => ['number' => '99.99', 'currency_code' => 'USD'],
+ *   '#allow_negative' => FALSE,
  *   '#size' => 60,
  *   '#maxlength' => 128,
  *   '#required' => TRUE,
@@ -33,6 +34,7 @@ class Price extends FormElement {
       '#size' => 10,
       '#maxlength' => 128,
       '#default_value' => NULL,
+      '#allow_negative' => FALSE,
       '#attached' => [
         'library' => ['commerce_price/admin'],
       ],
@@ -99,6 +101,7 @@ class Price extends FormElement {
       '#min_fraction_digits' => min($fraction_digits),
       // '6' is the field storage maximum.
       '#max_fraction_digits' => 6,
+      '#min' => $element['#allow_negative'] ? NULL : 0,
     ];
     unset($element['#size']);
     unset($element['#maxlength']);
