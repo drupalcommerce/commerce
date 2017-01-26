@@ -78,6 +78,7 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
       '#default_value' => ($adjustment) ? $adjustment->getAmount()->toArray() : NULL,
+      '#allow_negative' => TRUE,
       '#states' => [
         'optional' => [
           'select[name="' . $states_selector_name . '"]' => ['value' => '_none'],
