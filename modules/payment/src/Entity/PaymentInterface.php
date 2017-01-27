@@ -115,12 +115,64 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
   public function setAmount(Price $amount);
 
   /**
+   * Gets the authorized payment amount.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The authorized payment amount, or NULL.
+   */
+  public function getAuthorizedAmount();
+
+  /**
+   * Sets the authorized payment amount.
+   *
+   * @param \Drupal\commerce_price\Price $authorized_amount
+   *   The authorized payment amount.
+   *
+   * @return $this
+   */
+  public function setAuthorizedAmount(Price $authorized_amount);
+
+  /**
+   * Gets the captured payment amount.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The captured payment amount, or NULL.
+   */
+  public function getCapturedAmount();
+
+  /**
+   * Gets the uncaptured payment amount.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The uncaptured payment amount, or NULL.
+   */
+  public function getUncapturedAmount();
+
+  /**
+   * Sets the captured payment amount.
+   *
+   * @param \Drupal\commerce_price\Price $captured_amount
+   *   The captured payment amount.
+   *
+   * @return $this
+   */
+  public function setCapturedAmount(Price $captured_amount);
+
+  /**
    * Gets the refunded payment amount.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The refunded payment amount, or NULL.
    */
   public function getRefundedAmount();
+
+  /**
+   * Gets the unrefunded payment amount.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The unrefunded payment amount, or NULL.
+   */
+  public function getUnrefundedAmount();
 
   /**
    * Sets the refunded payment amount.
@@ -139,6 +191,14 @@ interface PaymentInterface extends ContentEntityInterface, EntityWithPaymentGate
    *   The payment state.
    */
   public function getState();
+
+  /**
+   * Gets the payment state suggestion based on current payment amounts.
+   *
+   * @return \Drupal\state_machine\Plugin\Field\FieldType\StateItemInterface
+   *   The payment state.
+   */
+  public function getStateSuggestion();
 
   /**
    * Gets whether this is a test payment.

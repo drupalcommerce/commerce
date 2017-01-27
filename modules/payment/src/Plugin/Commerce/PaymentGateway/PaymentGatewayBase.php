@@ -281,13 +281,16 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   public function buildPaymentOperations(PaymentInterface $payment) {
     $operations = [];
     if ($this instanceof SupportsAuthorizationsInterface) {
-      $access = $payment->getState()->value == 'authorization';
+      $access =
+        in_array($payment->getState()->value, ['authorization', 'partially_captured', 'capture_partially_refunded', 'capture_refunded'])
+        && $payment->getCapturedAmount()->lessThan($payment->getAuthorizedAmount());
       $operations['capture'] = [
         'title' => $this->t('Capture'),
         'page_title' => $this->t('Capture payment'),
         'plugin_form' => 'capture-payment',
         'access' => $access,
       ];
+      $access = $payment->getState()->value == 'authorization';
       $operations['void'] = [
         'title' => $this->t('Void'),
         'page_title' => $this->t('Void payment'),
@@ -296,7 +299,9 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       ];
     }
     if ($this instanceof SupportsRefundsInterface) {
-      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded']);
+      $access =
+        in_array($payment->getState()->value, ['partially_captured', 'capture_completed', 'capture_partially_refunded'])
+        && $payment->getRefundedAmount()->lessThan($payment->getCapturedAmount());
       $operations['refund'] = [
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),

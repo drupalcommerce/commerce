@@ -80,6 +80,7 @@ class OffsiteRedirect extends OffsitePaymentGatewayBase {
       'test' => $this->getMode() == 'test',
       'remote_id' => $request->query->get('txn_id'),
       'remote_state' => $request->query->get('payment_status'),
+      'authorized_amount' => $request->query->get('amount'),
       'authorized' => REQUEST_TIME,
     ]);
     $payment->save();

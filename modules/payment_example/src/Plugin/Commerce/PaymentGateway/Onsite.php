@@ -117,8 +117,10 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $test = $this->getMode() == 'test';
     $payment->setTest($test);
     $payment->setRemoteId($remote_id);
+    $payment->setAuthorizedAmount($payment->getAmount());
     $payment->setAuthorizedTime(REQUEST_TIME);
     if ($capture) {
+      $payment->setCapturedAmount($payment->getAmount());
       $payment->setCapturedTime(REQUEST_TIME);
     }
     $payment->save();
@@ -128,20 +130,27 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function capturePayment(PaymentInterface $payment, Price $amount = NULL) {
-    if ($payment->getState()->value != 'authorization') {
-      throw new \InvalidArgumentException('Only payments in the "authorization" state can be captured.');
+    if (!in_array($payment->getState()->value, ['authorization', 'partially_captured', 'capture_partially_refunded', 'capture_refunded'])) {
+      throw new \InvalidArgumentException($this->t("Payments in @state state can't be captured.", ['@state' => $payment->getState()->value]));
     }
-    // If not specified, capture the entire amount.
-    $amount = $amount ?: $payment->getAmount();
+
+    // If not specified, capture the entire uncaptured amount.
+    $uncaptured_amount = $payment->getUncapturedAmount();
+    $amount = $amount ?: $uncaptured_amount;
+
+    // Validate the requested amount.
+    if ($amount->greaterThan($uncaptured_amount)) {
+      throw new InvalidRequestException($this->t("Can't capture more than @amount.", ['@amount' => $uncaptured_amount->__toString()]));
+    }
 
     // Perform the capture request here, throw an exception if it fails.
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     $remote_id = $payment->getRemoteId();
     $number = $amount->getNumber();
 
-    $payment->state = 'capture_completed';
-    $payment->setAmount($amount);
+    $payment->setCapturedAmount($payment->getCapturedAmount()->add($amount));
     $payment->setCapturedTime(REQUEST_TIME);
+    $payment->state = $payment->getStateSuggestion();
     $payment->save();
   }
 
@@ -165,15 +174,17 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
    * {@inheritdoc}
    */
   public function refundPayment(PaymentInterface $payment, Price $amount = NULL) {
-    if (!in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded'])) {
-      throw new \InvalidArgumentException('Only payments in the "capture_completed" and "capture_partially_refunded" states can be refunded.');
+    if (!in_array($payment->getState()->value, ['partially_captured', 'capture_completed', 'capture_partially_refunded'])) {
+      throw new \InvalidArgumentException($this->t("Payments in @state state can't be refunded.", ['@state' => $payment->getState()->value]));
     }
-    // If not specified, refund the entire amount.
-    $amount = $amount ?: $payment->getAmount();
+
+    // If not specified, refund the entire unrefunded amount.
+    $unrefunded_amount = $payment->getUnrefundedAmount();
+    $amount = $amount ?: $unrefunded_amount;
+
     // Validate the requested amount.
-    $balance = $payment->getBalance();
-    if ($amount->greaterThan($balance)) {
-      throw new InvalidRequestException(sprintf("Can't refund more than %s.", $balance->__toString()));
+    if ($amount->greaterThan($unrefunded_amount)) {
+      throw new InvalidRequestException($this->t("Can't refund more than @amount.", ['@amount' => $unrefunded_amount->__toString()]));
     }
 
     // Perform the refund request here, throw an exception if it fails.
@@ -181,16 +192,8 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $remote_id = $payment->getRemoteId();
     $number = $amount->getNumber();
 
-    $old_refunded_amount = $payment->getRefundedAmount();
-    $new_refunded_amount = $old_refunded_amount->add($amount);
-    if ($new_refunded_amount->lessThan($payment->getAmount())) {
-      $payment->state = 'capture_partially_refunded';
-    }
-    else {
-      $payment->state = 'capture_refunded';
-    }
-
-    $payment->setRefundedAmount($new_refunded_amount);
+    $payment->setRefundedAmount($payment->getRefundedAmount()->add($amount));
+    $payment->state = $payment->getStateSuggestion();
     $payment->save();
   }
 

@@ -33,9 +33,9 @@ class PaymentRefundForm extends PaymentGatewayFormBase {
     $amount = new Price($values['amount']['number'], $values['amount']['currency_code']);
     /** @var \Drupal\commerce_payment\Entity\PaymentInterface $payment */
     $payment = $this->entity;
-    $balance = $payment->getBalance();
-    if ($amount->greaterThan($balance)) {
-      $form_state->setError($form['amount'], t("Can't refund more than @amount.", ['@amount' => $balance->__toString()]));
+    $unrefunded_amount = $payment->getUnrefundedAmount();
+    if ($amount->greaterThan($unrefunded_amount)) {
+      $form_state->setError($form['amount'], t("Can't refund more than @amount.", ['@amount' => $unrefunded_amount->__toString()]));
     }
   }
 
