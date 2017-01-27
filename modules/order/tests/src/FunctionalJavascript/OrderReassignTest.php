@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_order\FunctionalJavascript;
 
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -14,15 +13,7 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  */
 class OrderReassignTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
   use JavascriptTestTrait;
-
-  /**
-   * The store entity.
-   *
-   * @var \Drupal\commerce_store\Entity\Store
-   */
-  protected $store;
 
   /**
    * Modules to enable.
@@ -50,7 +41,6 @@ class OrderReassignTest extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->store = $this->createStore();
   }
 
   /**

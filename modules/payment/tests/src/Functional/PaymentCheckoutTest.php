@@ -6,7 +6,6 @@ use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -16,8 +15,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  * @group commerce
  */
 class PaymentCheckoutTest extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * The current user.
@@ -52,8 +49,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
-
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
@@ -68,7 +63,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'title' => 'My product',
       'variations' => [$variation],
-      'stores' => [$store],
+      'stores' => [$this->store],
     ]);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
