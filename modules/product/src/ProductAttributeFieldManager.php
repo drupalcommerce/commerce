@@ -256,7 +256,7 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * @param $variation_type_id
    *
    * @return int
-   * The highest weight of the components in the display.
+   *   The highest weight of the components in the display.
    */
   protected function getHighestWeight($variation_type_id) {
     $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
