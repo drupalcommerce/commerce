@@ -120,6 +120,20 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAdjustedUnitPrice() {
+    $this->recalculateTotalPrice();
+    if ($unit_price = $this->getUnitPrice()) {
+      $adjusted_price = $unit_price;
+      foreach ($this->getAdjustments() as $adjustment) {
+        $adjusted_price = $adjusted_price->add($adjustment->getAmount());
+      }
+      return $adjusted_price;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUnitPrice(Price $unit_price) {
     $this->set('unit_price', $unit_price);
     $this->recalculateTotalPrice();

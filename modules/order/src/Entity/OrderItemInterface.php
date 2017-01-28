@@ -89,6 +89,17 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getUnitPrice();
 
   /**
+   * Gets the order item unit price, with all order item adjustments applied.
+   *
+   * Useful for situations when the order item unit price needs to be calculated
+   * on its own, e.g. in order item sales tax calculation.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order item adjusted unit price, or NULL.
+   */
+  public function getAdjustedUnitPrice();
+
+  /**
    * Sets the order item unit price.
    *
    * @param \Drupal\commerce_price\Price $unit_price
