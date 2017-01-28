@@ -5,6 +5,7 @@ namespace Drupal\commerce_price\Plugin\Field\FieldType;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -20,6 +21,13 @@ use Drupal\Core\TypedData\DataDefinition;
  * )
  */
 class PriceItem extends FieldItemBase {
+
+  /**
+   * An altered list of available currencies.
+   *
+   * @var array
+   */
+  protected static $availableCurrencies = [];
 
   /**
    * {@inheritdoc}
@@ -60,6 +68,64 @@ class PriceItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultFieldSettings() {
+    return [
+        'available_currencies' => [],
+      ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $currencies = \Drupal::entityTypeManager()->getStorage('commerce_currency')->loadMultiple();
+
+    $currencies_options = [];
+    foreach ($currencies as $currency) {
+      $currencies_options[] = $currency->getCurrencyCode();
+    }
+
+    $element = [];
+    $element['available_currencies'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Available currencies'),
+      '#description' => $this->t('If no currencies are selected, all currencies will be available.'),
+      '#options' => $currencies_options,
+      '#default_value' => $this->getSetting('available_currencies'),
+      '#multiple' => TRUE,
+    ];
+
+    return $element;
+  }
+
+  /**
+   * Gets the available currencies for the current field.
+   *
+   * @return array
+   *   A list of currencies codes.
+   */
+  public function getAvailableCurrencies() {
+    // Alter the list once per field, instead of once per field delta.
+    $field_definition = $this->getFieldDefinition();
+    $definition_id = spl_object_hash($field_definition);
+    if (!isset(static::$availableCurrencies[$definition_id])) {
+      $available_currencies = $this->getSetting('available_currencies');
+      if (empty($available_currencies)) {
+        $currencies = \Drupal::entityTypeManager()->getStorage('commerce_currency')->loadMultiple();
+
+        foreach ($currencies as $currency) {
+          $available_currencies[] = $currency->getCurrencyCode();
+        }
+      }
+      static::$availableCurrencies[$definition_id] = $available_currencies;
+    }
+
+    return static::$availableCurrencies[$definition_id];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConstraints() {
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
     $constraints = parent::getConstraints();
@@ -70,6 +136,9 @@ class PriceItem extends FieldItemBase {
         ],
       ],
     ]);
+
+    $available_currencies = $this->getAvailableCurrencies();
+    $constraints[] = $manager->create('Currency', ['availableCurrencies' => $available_currencies]);
 
     return $constraints;
   }
