@@ -34,7 +34,6 @@ class OrderTest extends OrderBrowserTestBase {
 
     $order_exists = (bool) Order::load($order->id());
     $this->assertNotEmpty($order_exists, 'The new order has been created in the database.');
-    $this->assertEquals($order->id(), $order->getOrderNumber(), 'The order number matches the order ID');
   }
 
   /**

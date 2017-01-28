@@ -54,6 +54,7 @@ class OrderUserTest extends OrderBrowserTestBase {
       'uid' => $uid,
       'order_items' => [$order_item],
       'mail' => 'testViewOrder@example.com',
+      'order_number' => '1',
     ]);
     $order->save();
 
