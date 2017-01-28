@@ -82,7 +82,7 @@ class PriceItem extends FieldItemBase {
 
     $currencies_options = [];
     foreach ($currencies as $currency) {
-      $currencies_options[] = $currency->getCurrencyCode();
+      $currencies_options[$currency->getCurrencyCode()] = $currency->getCurrencyCode();
     }
 
     $element = [];
@@ -114,7 +114,7 @@ class PriceItem extends FieldItemBase {
         $currencies = \Drupal::entityTypeManager()->getStorage('commerce_currency')->loadMultiple();
 
         foreach ($currencies as $currency) {
-          $available_currencies[] = $currency->getCurrencyCode();
+          $available_currencies[$currency->getCurrencyCode()] = $currency->getCurrencyCode();
         }
       }
       static::$availableCurrencies[$definition_id] = $available_currencies;
