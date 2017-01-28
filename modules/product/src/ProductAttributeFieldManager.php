@@ -185,9 +185,8 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       ->setTargetBundle($variation_type_id)
       ->setName($field_name)
       ->setLabel($field_label)
-      ->setCardinality(1)
       ->setRequired(TRUE)
-      ->setTranslatable(TRUE)
+      ->setTranslatable(FALSE)
       ->setSetting('target_type', 'commerce_product_attribute_value')
       ->setSetting('handler', 'default')
       ->setSetting('handler_settings', [
