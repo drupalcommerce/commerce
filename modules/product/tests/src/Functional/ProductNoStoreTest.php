@@ -16,7 +16,6 @@ class ProductNoStoreTest extends CommerceBrowserTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'commerce_store',
     'commerce_product',
   ];
 
@@ -35,6 +34,7 @@ class ProductNoStoreTest extends CommerceBrowserTestBase {
    * Tests creating a product.
    */
   public function testCreateProduct() {
+    $this->store->delete();
     $this->drupalGet('admin/commerce/products');
     $this->clickLink('Add product');
 

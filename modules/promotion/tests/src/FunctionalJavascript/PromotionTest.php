@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_promotion\FunctionalJavascript;
 
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -14,7 +13,6 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  */
 class PromotionTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
   use JavascriptTestTrait;
 
   /**
@@ -39,8 +37,6 @@ class PromotionTest extends CommerceBrowserTestBase {
    * @group create
    */
   public function testCreatePromotion() {
-    $this->createStore(NULL, NULL, 'default', TRUE);
-
     $this->drupalGet('admin/commerce/promotions');
     $this->getSession()->getPage()->clickLink('Add a new promotion');
     $this->drupalGet('promotion/add');
@@ -76,8 +72,6 @@ class PromotionTest extends CommerceBrowserTestBase {
    * Tests editing a promotion.
    */
   public function testEditPromotion() {
-    $this->createStore(NULL, NULL, 'default', TRUE);
-
     $promotion = $this->createEntity('commerce_promotion', [
       'name' => $this->randomMachineName(8),
       'status' => TRUE,

@@ -34,6 +34,7 @@ class OrderNoStoreTest extends CommerceBrowserTestBase {
    * Tests creating an order.
    */
   public function testCreateOrder() {
+    $this->store->delete();
     $this->drupalGet('admin/commerce/orders');
     $this->clickLink('Create a new order');
 

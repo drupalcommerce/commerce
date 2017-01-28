@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_payment\Functional;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -15,8 +14,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  * @group commerce
  */
 class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * The current user.
@@ -51,8 +48,6 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
-
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'sku' => strtolower($this->randomMachineName()),
@@ -67,7 +62,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'title' => 'My product',
       'variations' => [$variation],
-      'stores' => [$store],
+      'stores' => [$this->store],
     ]);
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
