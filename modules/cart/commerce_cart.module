@@ -118,9 +118,12 @@ function commerce_cart_form_entity_form_display_edit_form_alter(array &$form, Fo
   $entity = $form_state->getFormObject()->getEntity();
   if ($form['#entity_type'] == 'commerce_order_item' && $entity->getMode() == 'add_to_cart') {
     $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
+    unset($options['commerce_entity_select']);
     unset($options['entity_reference_autocomplete_tags']);
     unset($options['entity_reference_autocomplete']);
     unset($options['inline_entity_form_complex']);
+    unset($options['options_buttons']);
+    unset($options['options_select']);
   }
 }
 
