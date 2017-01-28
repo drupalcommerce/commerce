@@ -224,16 +224,19 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * {@inheritdoc}
    */
   public function deleteField(ProductAttributeInterface $attribute, $variation_type_id) {
-    if (!$this->canDeleteField($attribute, $variation_type_id)) {
+    $field_name = $this->buildFieldName($attribute);
+    $field_definition = BundleFieldDefinition::create('entity_reference')
+      ->setTargetEntityTypeId('commerce_product_variation')
+      ->setTargetBundle($variation_type_id)
+      ->setName($field_name);
+
+    if ($this->configurableFieldManager->hasData($field_definition)) {
       return;
     }
 
-    $field_name = $this->buildFieldName($attribute);
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if ($field) {
-      $field->delete();
-      $this->clearCaches();
-    }
+    $this->configurableFieldManager->deleteField($field_definition);
+
+    $this->clearCaches();
   }
 
   /**
