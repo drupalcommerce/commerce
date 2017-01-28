@@ -115,9 +115,9 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
  */
 function commerce_order_theme_suggestions_commerce_order_receipt(array $variables) {
   if (isset($variables['order_entity'])) {
+    $order = $variables['order_entity'];
     $original = $variables['theme_hook_original'];
-    $order_entity_bundle = $variables['order_entity']->bundle();
-    $variables['theme_hook_suggestions'][] = $original . '__' . $order_entity_bundle;
+    $variables['theme_hook_suggestions'][] = $original . '__' . $order->bundle();
   }
 }
 
