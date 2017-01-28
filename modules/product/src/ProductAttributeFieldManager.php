@@ -8,7 +8,6 @@ use Drupal\commerce\ConfigurableFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\commerce\BundleFieldDefinition;
 
 /**
@@ -222,7 +221,6 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       ->setTargetEntityTypeId('commerce_product_variation')
       ->setTargetBundle($variation_type_id)
       ->setName($field_name);
-
     $this->configurableFieldManager->deleteField($field_definition);
 
     $this->clearCaches();
