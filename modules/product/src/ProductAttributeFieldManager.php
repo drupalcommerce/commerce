@@ -206,18 +206,13 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    // Prevent an EntityQuery crash by first confirming the field exists.
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if (!$field) {
-      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
-    }
-    $query = $this->queryFactory->get('commerce_product_variation')
-      ->condition('type', $variation_type_id)
-      ->exists($field_name)
-      ->range(0, 1);
-    $result = $query->execute();
+    $field_definition = BundleFieldDefinition::create('entity_reference')
+      ->setTargetEntityTypeId('commerce_product_variation')
+      ->setTargetBundle($variation_type_id)
+      ->setName($field_name);
+    $has_data = $this->configurableFieldManager->hasData($field_definition);
 
-    return empty($result);
+    return empty($has_data);
   }
 
   /**
@@ -229,10 +224,6 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       ->setTargetEntityTypeId('commerce_product_variation')
       ->setTargetBundle($variation_type_id)
       ->setName($field_name);
-
-    if ($this->configurableFieldManager->hasData($field_definition)) {
-      return;
-    }
 
     $this->configurableFieldManager->deleteField($field_definition);
 
