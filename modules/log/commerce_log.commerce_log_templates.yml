@@ -11,3 +11,15 @@ order_placed:
   category: commerce_order
   label: 'Order placed'
   template: '<p>The order was placed.</p>'
+order_validated:
+  category: commerce_order
+  label: 'Order validated'
+  template: '<p>The order was validated.</p>'
+order_fulfilled:
+  category: commerce_order
+  label: 'Order fulfilled'
+  template: '<p>The order was fulfilled.</p>'
+order_canceled:
+  category: commerce_order
+  label: 'Order canceled'
+  template: '<p>The order was canceled.</p>'

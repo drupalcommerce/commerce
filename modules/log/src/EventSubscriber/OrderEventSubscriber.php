@@ -31,6 +31,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     $events = [
       'commerce_order.place.pre_transition' => ['onPlaceTransition', -100],
+      'commerce_order.validate.pre_transition' => ['onValidateTransition', -100],
+      'commerce_order.fulfill.pre_transition' => ['onFulfillTransition', -100],
+      'commerce_order.cancel.pre_transition' => ['onCancelTransition', -100],
     ];
     return $events;
   }
@@ -45,6 +48,42 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
     $this->logStorage->generate($order, 'order_placed')->save();
+  }
+
+  /**
+   * Creates a log when an order is validated.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The transition event.
+   */
+  public function onValidateTransition(WorkflowTransitionEvent $event) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $event->getEntity();
+    $this->logStorage->generate($order, 'order_validated')->save();
+  }
+
+  /**
+   * Creates a log when an order is fulfilled.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The transition event.
+   */
+  public function onFulfillTransition(WorkflowTransitionEvent $event) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $event->getEntity();
+    $this->logStorage->generate($order, 'order_fulfilled')->save();
+  }
+
+  /**
+   * Creates a log when an order is canceled.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The transition event.
+   */
+  public function onCancelTransition(WorkflowTransitionEvent $event) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $event->getEntity();
+    $this->logStorage->generate($order, 'order_canceled')->save();
   }
 
 }
