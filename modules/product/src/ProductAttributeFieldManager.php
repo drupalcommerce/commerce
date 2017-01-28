@@ -254,7 +254,7 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * Gets the highest weight of the attribute field components in the display.
    *
    * @param $variation_type_id
-   *
+   *   The variation type id.
    * @return int
    *   The highest weight of the components in the display.
    */
