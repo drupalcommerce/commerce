@@ -6,7 +6,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests the setting of the order number during place transition.
+ * Tests the setting of the order number during order placement.
  *
  * @group commerce
  */
