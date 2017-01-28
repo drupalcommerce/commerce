@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_store\Functional;
 
 use Drupal\commerce_store\Entity\StoreType;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -15,14 +14,13 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 class StoreTypeTest extends CommerceBrowserTestBase {
 
   use BlockCreationTrait;
-  use StoreCreationTrait;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['block', 'commerce_store'];
+  public static $modules = ['block'];
 
   /**
    * {@inheritdoc}
@@ -32,16 +30,6 @@ class StoreTypeTest extends CommerceBrowserTestBase {
 
     $this->placeBlock('local_tasks_block');
     $this->placeBlock('page_title_block');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getAdministratorPermissions() {
-    return array_merge([
-      'administer commerce_store_type',
-      'administer commerce_store',
-    ], parent::getAdministratorPermissions());
   }
 
   /**

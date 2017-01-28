@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce\FunctionalJavascript;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\field\Entity\FieldConfig;
@@ -18,7 +17,6 @@ use Drupal\user\Entity\Role;
 class PluginItemTest extends CommerceBrowserTestBase {
 
   use JavascriptTestTrait;
-  use StoreCreationTrait;
 
   /**
    * Modules to enable.

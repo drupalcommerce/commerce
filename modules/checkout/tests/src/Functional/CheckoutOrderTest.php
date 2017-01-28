@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_price\Price;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\profile\Entity\Profile;
 use Drupal\commerce_order\Entity\OrderItem;
@@ -17,8 +16,6 @@ use Drupal\user\RoleInterface;
  * @group commerce
  */
 class CheckoutOrderTest extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * The current user.
@@ -35,20 +32,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   protected $product;
 
   /**
-   * The store.
-   *
-   * @var \Drupal\commerce_store\Entity\StoreInterface
-   */
-  protected $store;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = ['system', 'field', 'user', 'text',
     'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
-    'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
+    'commerce_price', 'commerce_product', 'commerce_cart',
     'commerce_checkout', 'commerce_order', 'views_ui',
     // @see https://www.drupal.org/node/2807567
     'editor',
@@ -71,8 +61,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $this->placeBlock('commerce_cart');
-
-    $this->store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',

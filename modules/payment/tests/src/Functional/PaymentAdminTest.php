@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -13,8 +12,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  * @group commerce
  */
 class PaymentAdminTest extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * An on-site payment gateway.
@@ -45,13 +42,6 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   protected $order;
 
   /**
-   * The store entity.
-   *
-   * @var \Drupal\commerce_store\Entity\Store
-   */
-  protected $store;
-
-  /**
    * {@inheritdoc}
    */
   public static $modules = [
@@ -77,8 +67,6 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->store = $this->createStore();
 
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
