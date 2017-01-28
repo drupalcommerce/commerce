@@ -78,8 +78,6 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    *   The entity query factory.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @internal param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager The entity field manager.*   The entity field manager.
-   * @internal param \Drupal\commerce\ConfigurableFieldManagerInterface The configurable field manager.*   The configurable field manager.
    */
   public function __construct(EntityFieldManagerInterface $entity_field_manager, ConfigurableFieldManagerInterface $configurableFieldManager, EntityTypeBundleInfoInterface $entity_type_bundle_info, QueryFactory $query_factory, CacheBackendInterface $cache) {
     $this->entityFieldManager = $entity_field_manager;
