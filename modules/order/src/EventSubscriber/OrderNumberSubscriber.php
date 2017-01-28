@@ -5,6 +5,12 @@ namespace Drupal\commerce_order\EventSubscriber;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Generates the order number for placed orders.
+ *
+ * Modules wishing to override this logic can register their
+ * own event subscriber with a higher weight (e.g. -10).
+ */
 class OrderNumberSubscriber implements EventSubscriberInterface {
 
   /**
