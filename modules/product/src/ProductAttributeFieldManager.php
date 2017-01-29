@@ -187,7 +187,7 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
       ->setSetting('target_type', 'commerce_product_attribute_value')
       ->setSetting('handler', 'default')
       ->setSetting('handler_settings', [
-          'target_bundles' => [$attribute->id()],
+        'target_bundles' => [$attribute->id()],
       ])
       ->setDisplayOptions('form', [
         'type' => 'options_select',
@@ -242,8 +242,9 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
   /**
    * Gets the highest weight of the attribute field components in the display.
    *
-   * @param $variation_type_id
+   * @param string $variation_type_id
    *   The variation type id.
+   *
    * @return int
    *   The highest weight of the components in the display.
    */
