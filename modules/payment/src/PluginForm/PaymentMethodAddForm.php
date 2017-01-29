@@ -11,6 +11,20 @@ use Drupal\profile\Entity\Profile;
 class PaymentMethodAddForm extends PaymentGatewayFormBase {
 
   /**
+   * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
+   * Constructs a new PaymentMethodAddForm.
+   */
+  public function __construct() {
+    $this->routeMatch = \Drupal::service('current_route_match');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getErrorElement(array $form, FormStateInterface $form_state) {
@@ -51,6 +65,11 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#type' => 'commerce_profile_select',
       '#default_value' => $billing_profile,
     ];
+    if ($order = $this->routeMatch->getParameter('commerce_order')) {
+      $store = $order->getStore();
+      $form['billing_information']['#default_country'] = $store->getAddress()->getCountryCode();
+      $form['billing_information']['#available_countries'] = $store->getBillingCountries();
+    }
 
     return $form;
   }
