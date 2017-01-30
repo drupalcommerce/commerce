@@ -165,6 +165,20 @@ function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
 function commerce_order_views_data_alter(array &$data) {
   $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
   $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
+  $adjustment_type_filter = [
+    'title' => t('Adjustment type'),
+    'help' => t('Filters adjustments by type.'),
+    'field' => 'adjustments_type',
+    'id' => 'commerce_adjustment_type_filter',
+  ];
+  $data['commerce_order__adjustments']['commerce_adjustment_type'] = [
+    'title' => t('Adjustment type'),
+    'filter' => $adjustment_type_filter,
+  ];
+  $data['commerce_order_item__adjustments']['commerce_adjustment_type'] = [
+    'title' => t('Adjustment type'),
+    'filter' => $adjustment_type_filter,
+  ];
 }
 
 /**

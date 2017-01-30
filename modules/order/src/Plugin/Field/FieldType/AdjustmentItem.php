@@ -29,6 +29,9 @@ class AdjustmentItem extends FieldItemBase {
     $properties['value'] = DataDefinition::create('any')
       ->setLabel(t('Value'))
       ->setRequired(TRUE);
+    $properties['type'] = DataDefinition::create('string')
+      ->setLabel(t('Type'))
+      ->setRequired(TRUE);
 
     return $properties;
   }
@@ -37,19 +40,18 @@ class AdjustmentItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return $this->value === NULL || !$this->value instanceof Adjustment;
+    return $this->value === NULL || !$this->value instanceof Adjustment || $this->type === NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setValue($values, $notify = TRUE) {
-    if (is_array($values)) {
-      // The property definition causes the adjustment to be in 'value' key.
-      $values = reset($values);
-    }
-    if (!$values instanceof Adjustment) {
-      $values = NULL;
+    if ($values instanceof Adjustment) {
+      $values = [
+        'type' => $values->getType(),
+        'value' => $values,
+      ];
     }
     parent::setValue($values, $notify);
   }
@@ -60,6 +62,13 @@ class AdjustmentItem extends FieldItemBase {
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return [
       'columns' => [
+        // @todo Update hook for schema change for existing entity field data.
+        'type' => [
+          'description' => 'The adjustment type.',
+          'type' => 'varchar_ascii',
+          'length' => 255,
+          'not null' => TRUE,
+        ],
         'value' => [
           'description' => 'The adjustment value.',
           'type' => 'blob',
