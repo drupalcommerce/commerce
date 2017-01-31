@@ -5,6 +5,9 @@
  * Provides activity logs for Commerce entities.
  */
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Implements hook_preprocess_commerce_order().
  */
@@ -19,4 +22,18 @@ function commerce_log_preprocess_commerce_order(&$variables) {
     '#embed' => TRUE,
     '#title' => t('Order activity'),
   ];
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function commerce_log_entity_access(EntityInterface $entity, $operation, $account) {
+  // Allow logs to be viewed by all users for now.
+  // @todo Remove once we implement the full log permissions.
+  if ($operation == 'view') {
+    if ($entity->getEntityTypeId() == 'commerce_log') {
+      return AccessResult::allowed();
+    }
+  }
+  return AccessResult::neutral();
 }
