@@ -70,8 +70,8 @@ class PriceItem extends FieldItemBase {
    */
   public static function defaultFieldSettings() {
     return [
-        'available_currencies' => [],
-      ] + parent::defaultFieldSettings();
+      'available_currencies' => [],
+    ] + parent::defaultFieldSettings();
   }
 
   /**

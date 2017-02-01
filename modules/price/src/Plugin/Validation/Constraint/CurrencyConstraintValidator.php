@@ -63,11 +63,11 @@ class CurrencyConstraintValidator extends ConstraintValidator implements Contain
     }
 
     $available_currencies = $constraint->availableCurrencies;
-     if (!empty($available_currencies) && !in_array($currency_code, $available_currencies)) {
-       $this->context->buildViolation($constraint->notAvailableMessage)
-          ->atPath('currency_code')
-          ->setParameter('%value', $this->formatValue($currency_code))
-          ->addViolation();
+    if (!empty($available_currencies) && !in_array($currency_code, $available_currencies)) {
+      $this->context->buildViolation($constraint->notAvailableMessage)
+        ->atPath('currency_code')
+        ->setParameter('%value', $this->formatValue($currency_code))
+        ->addViolation();
     }
   }
 
