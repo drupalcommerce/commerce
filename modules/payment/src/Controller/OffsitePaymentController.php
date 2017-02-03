@@ -40,15 +40,6 @@ class OffsitePaymentController {
     try {
       $payment_gateway_plugin->onReturn($commerce_order, $request);
       $redirect_step = $checkout_flow_plugin->getNextStepId();
-
-      // Once the payment method has been updated with real payment details
-      // in payment gateway's onReturn implementation, we can mark it as
-      // reusable to be shown in the UI.
-      if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface) {
-        $payment_method = $commerce_order->payment_method->entity;
-        $payment_method->setReusable(TRUE);
-        $payment_method->save();
-      }
     }
     catch (PaymentGatewayException $e) {
       \Drupal::logger('commerce_payment')->error($e->getMessage());
