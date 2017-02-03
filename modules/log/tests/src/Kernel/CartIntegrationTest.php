@@ -63,7 +63,6 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     'commerce_log',
     'commerce_product',
     'commerce_order',
-    'commerce_test',
   ];
 
   /**
@@ -139,6 +138,24 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $this->render($build);
 
     $this->assertText("{$this->variation->label()} removed from the cart.");
+  }
+
+  /**
+   * Tests that a log is generated when a quantity changed for an order item.
+   */
+  public function testQuantityChangedFromCart() {
+    $this->enableCommerceCart();
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->createUser());
+    $order_item = $this->cartManager->addEntity($cart, $this->variation);
+    $order_item->setQuantity(2);
+    $this->cartManager->updateOrderItem($cart, $order_item);
+
+    $logs = $this->logStorage->loadByEntity($cart);
+    $log = end($logs);
+    $build = $this->logViewBuilder->view($log);
+    $this->render($build);
+
+    $this->assertText("Quantity of {$this->variation->label()} changed in the cart from 1.0 to 2.");
   }
 
   /**
