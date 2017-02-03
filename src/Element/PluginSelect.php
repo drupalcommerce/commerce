@@ -136,7 +136,7 @@ class PluginSelect extends CommerceElementBase {
   /**
    * Ajax callback.
    */
-  public static function pluginFormAjax(&$form, FormStateInterface &$form_state, Request $request) {
+  public static function pluginFormAjax(&$form, FormStateInterface $form_state, Request $request) {
     $triggering_element = $form_state->getTriggeringElement();
     while (!isset($triggering_element['#ajax_array_parents'])) {
       array_pop($triggering_element['#array_parents']);
