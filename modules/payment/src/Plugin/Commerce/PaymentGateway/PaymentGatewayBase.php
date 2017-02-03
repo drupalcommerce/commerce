@@ -105,6 +105,8 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     $default_forms = [];
     if ($this instanceof SupportsStoredPaymentMethodsInterface) {
       $default_forms['add-payment'] = 'Drupal\commerce_payment\PluginForm\PaymentAddForm';
+    }
+    if ($this instanceof SupportsCreatingStoredPaymentMethodsInterface) {
       $default_forms['add-payment-method'] = 'Drupal\commerce_payment\PluginForm\PaymentMethodAddForm';
     }
     if ($this instanceof SupportsUpdatingStoredPaymentMethodsInterface) {
