@@ -87,6 +87,17 @@ commerce_payment.checkout.cancel:
       commerce_order:
         type: entity:commerce_order
 
+commerce_payment.return:
+  path: '/payment/return/{commerce_payment_gateway}'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::returnPage'
+  requirements:
+    _access: 'TRUE'
+  options:
+    parameters:
+      commerce_payment_gateway:
+        type: entity:commerce_payment_gateway
+
 commerce_payment.notify:
   path: '/payment/notify/{commerce_payment_gateway}'
   defaults:

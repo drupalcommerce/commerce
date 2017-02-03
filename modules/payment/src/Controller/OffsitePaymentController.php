@@ -6,7 +6,8 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
-use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsCreatingStoredPaymentMethodsOffsiteInterface;
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Core\Access\AccessException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,6 +73,29 @@ class OffsitePaymentController {
     $checkout_flow = $commerce_order->checkout_flow->entity;
     $checkout_flow_plugin = $checkout_flow->getPlugin();
     $checkout_flow_plugin->redirectToStep($checkout_flow_plugin->getPreviousStepId());
+  }
+
+  /**
+   * Provides the "return" page for offsite stored payment method creation.
+   *
+   * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $commerce_payment_gateway
+   *   The payment gateway.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   *
+   * @throws \Drupal\Core\Access\AccessException
+   * @throws \Drupal\commerce\Response\NeedsRedirectException
+   */
+  public function returnPage(PaymentGatewayInterface $commerce_payment_gateway, Request $request) {
+    $payment_gateway_plugin = $commerce_payment_gateway->getPlugin();
+    if (!$payment_gateway_plugin instanceof SupportsCreatingStoredPaymentMethodsOffsiteInterface) {
+      throw new AccessException('Invalid payment gateway provided.');
+    }
+
+    $payment_gateway_plugin->onCreatePaymentMethod($request);
+
+    $redirect_url = Url::fromRoute('entity.commerce_payment_method.collection', ['user' => \Drupal::currentUser()->id()])->toString();
+    throw new NeedsRedirectException($redirect_url);
   }
 
   /**

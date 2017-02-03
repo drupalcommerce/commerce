@@ -5,7 +5,15 @@ namespace Drupal\commerce_payment\Plugin\Commerce\PaymentGateway;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 
 /**
- * Defines the interface for gateways which support updating stored payment methods.
+ * Defines the interface for gateways which support storing payment methods.
+ *
+ * The interface should be used for gateways (both onsite and offsite) which
+ * support "stand alone" creation of stored payment methods (outside of the
+ * checkout process).
+ *
+ * Offsite gateways should implement additionally
+ * SupportsCreatingStoredPaymentMethodsOffsiteInterface, which provides method
+ * to handle user return from the offsite redirect.
  */
 interface SupportsCreatingStoredPaymentMethodsInterface {
 
