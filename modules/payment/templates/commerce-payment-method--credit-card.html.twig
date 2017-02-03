@@ -22,14 +22,10 @@
 <article{{ attributes }}>
   <div class="field field--name-label">
     {{ payment_method.label }}
-    {% if payment_method_entity.card_type.value %}
-      <span class="payment-method-icon payment-method-icon--{{ payment_method_entity.card_type.value }}"></span>
-    {% endif %}
+    <span class="payment-method-icon payment-method-icon--{{ payment_method_entity.card_type.value }}"></span>
   </div>
-  {% if payment_method_entity.expiresTime %}
-    <div class="field field--name-expires">
-      {{ 'Expires'|t }} {{ payment_method_entity.expiresTime|format_date('custom', 'n/Y') }}
-    </div>
-  {% endif %}
+  <div class="field field--name-expires">
+    {{ 'Expires'|t }} {{ payment_method_entity.expiresTime|format_date('custom', 'n/Y') }}
+  </div>
   {{ payment_method.billing_profile }}
 </article>

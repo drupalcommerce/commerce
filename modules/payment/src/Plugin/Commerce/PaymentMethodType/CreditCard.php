@@ -21,17 +21,12 @@ class CreditCard extends PaymentMethodTypeBase {
    * {@inheritdoc}
    */
   public function buildLabel(PaymentMethodInterface $payment_method) {
-    if ($payment_method->card_type->value) {
-      $card_type = CreditCardHelper::getType($payment_method->card_type->value);
-      $args = [
-        '@card_type' => $card_type->getLabel(),
-        '@card_number' => $payment_method->card_number->value,
-      ];
-      return $this->t('@card_type ending in @card_number', $args);
-    }
-    else {
-      return $this->t('New credit card');
-    }
+    $card_type = CreditCardHelper::getType($payment_method->card_type->value);
+    $args = [
+      '@card_type' => $card_type->getLabel(),
+      '@card_number' => $payment_method->card_number->value,
+    ];
+    return $this->t('@card_type ending in @card_number', $args);
   }
 
   /**
