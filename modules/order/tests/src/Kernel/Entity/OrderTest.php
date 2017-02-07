@@ -265,6 +265,48 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('10.00', 'USD'), $order->getTotalPaid());
     $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
 
+    // Create a payment via Payment
+    $order->save();
+    $payment = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('7.00', 'USD'),
+      'payment_gateway' => 'example',
+    ]);
+    $payment->save();
+
+    // Confirm that payments update the order total paid and balance.
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
+
+    // Confirm that we can set the refunded amount
+    $payment->setRefundedAmount(new Price('5.00', 'USD'))->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('12.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
+
+    // Confirm that when we delete the payment, the payment and the refund are removed from the order
+    $payment->delete();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('10.00', 'USD'), $order->getTotalPaid());
+
+    // Create a payment via Payment
+    $payment2 = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('7.00', 'USD'),
+      'payment_gateway' => 'example',
+    ]);
+    $payment2->save();
+
+    // Confirm that adding a payment updates the order balance
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
+
+    // Test that the total paid amount can be set explicitly on the order.
+    $order->setTotalPaid(new Price('0.00', 'USD'));
+    $order->save();
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
+
     // Confirm that we can set total paid on order
     $order->setTotalPaid(new Price('7.00', 'USD'));
     $this->assertEquals(new Price('10.00', 'USD'), $order->getBalance());
