@@ -182,7 +182,6 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function setAmount(Price $amount) {
     $this->set('amount', $amount);
-    $this->getOrder()->addPayment($amount);
     return $this;
   }
 
@@ -200,7 +199,6 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function setRefundedAmount(Price $refunded_amount) {
     $this->set('refunded_amount', $refunded_amount);
-    $this->getOrder()->subtractPayment($refunded_amount);
     return $this;
   }
 
@@ -304,6 +302,26 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       if (empty($this->getCompletedTime())) {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
+    }
+    // Add or subtract payments from order.
+    if ($this->isNew()) {
+      $this->getOrder()->addPayment($this->getAmount())->save();
+    }
+    else {
+      $this->getOrder()->subtractPayment($this->getRefundedAmount())->save();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+
+    // Subtract each payment from order.
+    foreach ($entities as $payment) {
+      $net_payment = $payment->getAmount()->subtract($payment->getRefundedAmount());
+      $payment->getOrder()->subtractPayment($net_payment)->save();
     }
   }
 
