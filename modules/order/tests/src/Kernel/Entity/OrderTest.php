@@ -30,19 +30,6 @@ class OrderTest extends CommerceKernelTestBase {
   protected $user;
 
   /**
-<<<<<<< HEAD
-   * The payment gateway plugin.
-   *
-   * @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface
-   */
-  protected $payment_gateway_plugin;
-=======
-   * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface;
-   */
-  protected $payment_gateway;
->>>>>>> Support multiple partial refunds.
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -299,7 +286,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order = Order::load($order->id());
     $this->assertEquals(new Price('10.00', 'USD'), $order->getTotalPaid());
 
-    // Create a payment via Payment
+    // Confirm that adding a payment updates the order balance
     $payment2 = Payment::create([
       'order_id' => $order->id(),
       'amount' => new Price('7.00', 'USD'),
@@ -307,24 +294,45 @@ class OrderTest extends CommerceKernelTestBase {
       'state' => 'completed',
     ]);
     $payment2->save();
-
-    // Confirm that adding a payment updates the order balance
     $order = Order::load($order->id());
     $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
     // Test that payments can be partially refunded multiple times.
-    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface $payment_gateway_plugin */
-    $payment_gateway_plugin = $this->payment_gateway->getPlugin();
-
-    // Refund partial
-    $payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
 
     // Refund the remaining
-    $payment_gateway_plugin->refundPayment($payment2, new Price('2.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('2.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
+
+    // Test that deleted payments update the order total paid and balance.
+    $order->save();
+    $payment3 = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('7.00', 'USD'),
+      'payment_gateway' => 'example',
+    ]);
+    $payment3->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
+
+    // Confirm payment refunding updates order
+    $payment3->setRefundedAmount(new Price('5.00', 'USD'))->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('12.00', 'USD'), $order->getTotalPaid());
+    $this->assertEquals(new Price('5.00', 'USD'), $order->getBalance());
+
+    $payment4 = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('2.00', 'USD'),
+      'payment_gateway' => 'example',
+    ]);
+    $payment4->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('3.00', 'USD'), $order->getBalance());
 
     // Test that the total paid amount can be set explicitly on the order.
     $order->setTotalPaid(new Price('0.00', 'USD'));
