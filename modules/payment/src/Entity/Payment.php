@@ -280,7 +280,9 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       $this->getOrder()->addPayment($this->getAmount())->save();
     }
     else {
-      $this->getOrder()->subtractPayment($this->getRefundedAmount())->save();
+      $original = $this->values['original'];
+      $net_refund = $this->getRefundedAmount()->subtract($original->getRefundedAmount());
+      $this->getOrder()->subtractPayment($net_refund)->save();
     }
   }
 
