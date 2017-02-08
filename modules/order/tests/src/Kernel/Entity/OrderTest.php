@@ -30,9 +30,11 @@ class OrderTest extends CommerceKernelTestBase {
   protected $user;
 
   /**
-   * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface;
+   * The payment gateway plugin.
+   *
+   * @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface
    */
-  protected $payment_gateway;
+  protected $payment_gateway_plugin;
 
   /**
    * Modules to enable.
@@ -74,7 +76,7 @@ class OrderTest extends CommerceKernelTestBase {
       'plugin' => 'example_onsite',
     ]);
     $payment_gateway->save();
-    $this->payment_gateway = $payment_gateway;
+    $this->payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
@@ -299,7 +301,7 @@ class OrderTest extends CommerceKernelTestBase {
     $payment->save();
     $order = Order::load($order->id());
     $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
-    $payment->setRefundedAmount(new Price('5.00', 'USD'))->save();
+    $this->payment_gateway_plugin->refundPayment($payment, new Price('5.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
     $payment->delete();
@@ -316,14 +318,10 @@ class OrderTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
 
     // Test that payments can be partially refunded multiple times.
-    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface $payment_gateway_plugin */
-    $payment_gateway_plugin = $this->payment_gateway->getPlugin();
-
-    $payment_gateway_plugin->refundPayment($payment2, new Price('17.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('17.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
-
-    $payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
+    $this->payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
     $order = Order::load($order->id());
     $this->assertEquals(new Price('22.00', 'USD'), $order->getBalance());
 
@@ -332,7 +330,7 @@ class OrderTest extends CommerceKernelTestBase {
     $order->save();
     $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
 
-    // Test that payments update the order total paid and balance.
+    // Test that deleted payments update the order total paid and balance.
     $order->save();
     $payment = Payment::create([
       'order_id' => $order->id(),
