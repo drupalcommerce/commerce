@@ -30,6 +30,11 @@ class OrderTest extends CommerceKernelTestBase {
   protected $user;
 
   /**
+   * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface;
+   */
+  protected $payment_gateway;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -63,11 +68,13 @@ class OrderTest extends CommerceKernelTestBase {
       'orderType' => 'default',
     ])->save();
 
-    PaymentGateway::create([
+    $payment_gateway = PaymentGateway::create([
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
-    ])->save();
+    ]);
+    $payment_gateway->save();
+    $this->payment_gateway = $payment_gateway;
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
