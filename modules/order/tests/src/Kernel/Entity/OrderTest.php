@@ -30,6 +30,11 @@ class OrderTest extends CommerceKernelTestBase {
   protected $user;
 
   /**
+   * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface;
+   */
+  protected $payment_gateway;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -63,11 +68,13 @@ class OrderTest extends CommerceKernelTestBase {
       'orderType' => 'default',
     ])->save();
 
-    PaymentGateway::create([
+    $payment_gateway = PaymentGateway::create([
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
-    ])->save();
+    ]);
+    $payment_gateway->save();
+    $this->payment_gateway = $payment_gateway;
 
     $user = $this->createUser();
     $this->user = $this->reloadEntity($user);
@@ -278,6 +285,52 @@ class OrderTest extends CommerceKernelTestBase {
     unset($multiplied_order_item_adjustments[0]);
     $this->assertEquals(array_merge($multiplied_order_item_adjustments, $adjustments), $order->collectAdjustments());
     $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[2]->getAmount());
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
+
+    // Test that payments update the order total paid and balance.
+    $order->save();
+    $payment = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('25.00', 'USD'),
+      'payment_gateway' => 'example',
+      'state' => 'capture_completed',
+    ]);
+    $payment->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('2.00', 'USD'), $order->getBalance());
+    $payment->setRefundedAmount(new Price('5.00', 'USD'))->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('7.00', 'USD'), $order->getBalance());
+    $payment->delete();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
+    $payment2 = Payment::create([
+      'order_id' => $order->id(),
+      'amount' => new Price('27.00', 'USD'),
+      'payment_gateway' => 'example',
+      'state' => 'capture_completed',
+    ]);
+    $payment2->save();
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('0.00', 'USD'), $order->getBalance());
+
+    // Test that payments can be partially refunded multiple times.
+    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsRefundsInterface $payment_gateway_plugin */
+    $payment_gateway_plugin = $this->payment_gateway->getPlugin();
+
+    $payment_gateway_plugin->refundPayment($payment2, new Price('17.00', 'USD'));
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('17.00', 'USD'), $order->getBalance());
+
+    $payment_gateway_plugin->refundPayment($payment2, new Price('5.00', 'USD'));
+    $order = Order::load($order->id());
+    $this->assertEquals(new Price('22.00', 'USD'), $order->getBalance());
+
+    // Test that the total paid amount can be set explicitly on the order.
+    $order->setTotalPaid(new Price('0.00', 'USD'));
+    $order->save();
+    $this->assertEquals(new Price('27.00', 'USD'), $order->getBalance());
 
     // Test that payments update the order total paid and balance.
     $order->save();
