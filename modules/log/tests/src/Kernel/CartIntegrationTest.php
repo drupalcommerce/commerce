@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_log\Kernel;
 
 use Drupal\commerce_price\Price;
-use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -14,6 +13,13 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * @group commerce
  */
 class CartIntegrationTest extends CommerceKernelTestBase {
+
+  /**
+   * A sample user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
 
   /**
    * The variation to test against.
@@ -63,7 +69,6 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     'commerce_log',
     'commerce_product',
     'commerce_order',
-    'commerce_test',
   ];
 
   /**
@@ -79,7 +84,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
     $this->installConfig(['commerce_product', 'commerce_order']);
-    $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $this->user = $this->createUser();
     $this->logStorage = $this->container->get('entity_type.manager')->getStorage('commerce_log');
     $this->logViewBuilder = $this->container->get('entity_type.manager')->getViewBuilder('commerce_log');
 
@@ -88,23 +93,13 @@ class CartIntegrationTest extends CommerceKernelTestBase {
     $variation_type->setGenerateTitle(FALSE);
     $variation_type->save();
 
-    $product = Product::create([
-      'type' => 'default',
-      'title' => 'Default testing product',
-    ]);
-    $product->save();
-
-    $variation1 = ProductVariation::create([
+    $this->variation = ProductVariation::create([
       'type' => 'default',
       'sku' => 'TEST_' . strtolower($this->randomMachineName()),
       'title' => 'Testing product',
       'status' => 1,
       'price' => new Price('12.00', 'USD'),
     ]);
-    $variation1->save();
-    $product->addVariation($variation1)->save();
-
-    $this->variation = $variation1;
   }
 
   /**
@@ -112,7 +107,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
    */
   public function testAddedToCart() {
     $this->enableCommerceCart();
-    $cart = $this->cartProvider->createCart('default', $this->store, $this->createUser());
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $this->cartManager->addEntity($cart, $this->variation);
 
     $logs = $this->logStorage->loadByEntity($cart);
@@ -128,7 +123,7 @@ class CartIntegrationTest extends CommerceKernelTestBase {
    */
   public function testRemovedFromCart() {
     $this->enableCommerceCart();
-    $cart = $this->cartProvider->createCart('default', $this->store, $this->createUser());
+    $cart = $this->cartProvider->createCart('default', $this->store, $this->user);
     $order_item = $this->cartManager->addEntity($cart, $this->variation);
     $this->cartManager->removeOrderItem($cart, $order_item);
 
