@@ -75,14 +75,14 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
   public function defaultConfiguration() {
     $available_steps = array_keys($this->checkoutFlow->getSteps());
     $default_step = $this->pluginDefinition['default_step'];
-    if (!in_array($default_step, $available_steps)) {
+    if (!$default_step || !in_array($default_step, $available_steps)) {
       // The specified default step isn't available on the parent checkout flow.
       $default_step = '_disabled';
     }
 
     return [
       'step' => $default_step,
-      'weight' => 0,
+      'weight' => 10,
     ];
   }
 
