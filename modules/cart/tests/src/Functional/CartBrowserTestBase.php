@@ -11,6 +11,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\commerce_order\Functional\OrderBrowserTestBase;
+use Behat\Mink\Element\NodeElement as BehatNodeElement;
 
 /**
  * Defines base class for commerce_cart test cases.
@@ -236,6 +237,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    *
    * @param \Behat\Mink\Element\NodeElement $form
    *   The Add to Cart form object.
+   *
    * @return array
    *   The array of values:
    *   - "product_id": The form parent product ID.
@@ -250,7 +252,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    *
    * @see \Drupal\Tests\commerce_cart\FunctionalJavascript\MultipleCartFormsTest->testMultipleCartsOnPage()
    */
-  protected function getAddToCartFormValues(NodeElement $form) {
+  protected function getAddToCartFormValues(BehatNodeElement $form) {
     $values = [];
     $values['product_id'] = [];
     $values['form_id'] = $form->getAttribute('id');
@@ -310,6 +312,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    *
    * @param \Behat\Mink\Element\NodeElement $cart
    *   The Shopping Cart form object.
+   *
    * @return array
    *   The array of order items having the following values:
    *   - "title": The title of an order item.
@@ -319,9 +322,9 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    *
    * @see \Drupal\Tests\commerce_cart\FunctionalJavascript\MultipleCartFormsTest->assertAddToCartFormValues()
    */
-  protected function getShoppingCartValues(NodeElement $cart) {
+  protected function getShoppingCartValues(BehatNodeElement $cart) {
     $order_items = [];
-    foreach ($cart->findAll('css','td.views-field-purchased-entity') as $item) {
+    foreach ($cart->findAll('css', 'td.views-field-purchased-entity') as $item) {
       $row = $item->getParent();
       $order_items[] = [
         'title' => $row->find('css', '.field--name-title')->getText(),
