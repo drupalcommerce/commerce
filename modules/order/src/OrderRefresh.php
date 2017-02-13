@@ -3,7 +3,7 @@
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\Context;
-use Drupal\commerce\TimeInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
@@ -39,7 +39,7 @@ class OrderRefresh implements OrderRefreshInterface {
   /**
    * The time.
    *
-   * @var \Drupal\commerce\TimeInterface
+   * @var \Drupal\Component\Datetime\TimeInterface
    */
   protected $time;
 
@@ -59,7 +59,7 @@ class OrderRefresh implements OrderRefreshInterface {
    *   The chain price resolver.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\commerce\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user, TimeInterface $time) {

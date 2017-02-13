@@ -92,7 +92,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     if (empty($payment_method)) {
       throw new \InvalidArgumentException('The provided payment has no payment method referenced.');
     }
-    if (REQUEST_TIME >= $payment_method->getExpiresTime()) {
+    if (\Drupal::time()->getCurrentTime() >= $payment_method->getExpiresTime()) {
       throw new HardDeclineException('The provided payment method has expired');
     }
 
@@ -117,9 +117,9 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $test = $this->getMode() == 'test';
     $payment->setTest($test);
     $payment->setRemoteId($remote_id);
-    $payment->setAuthorizedTime(REQUEST_TIME);
+    $payment->setAuthorizedTime(\Drupal::time()->getCurrentTime());
     if ($capture) {
-      $payment->setCapturedTime(REQUEST_TIME);
+      $payment->setCapturedTime(\Drupal::time()->getCurrentTime());
     }
     $payment->save();
   }
@@ -141,7 +141,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
 
     $payment->state = 'capture_completed';
     $payment->setAmount($amount);
-    $payment->setCapturedTime(REQUEST_TIME);
+    $payment->setCapturedTime(\Drupal::time()->getCurrentTime());
     $payment->save();
   }
 

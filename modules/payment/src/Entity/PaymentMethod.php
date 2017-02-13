@@ -188,7 +188,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    */
   public function isExpired() {
     $expires = $this->getExpiresTime();
-    return $expires > 0 && $expires <= REQUEST_TIME;
+    return $expires > 0 && $expires <= \Drupal::time()->getCurrentTime();
   }
 
   /**

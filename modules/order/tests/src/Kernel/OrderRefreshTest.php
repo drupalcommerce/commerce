@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_order\Kernel;
 
-use Drupal\commerce\TimeInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_order\OrderRefresh;

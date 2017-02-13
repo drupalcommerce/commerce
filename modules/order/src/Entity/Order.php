@@ -452,7 +452,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     $original_state = isset($this->original) ? $this->original->getState()->value : '';
     if ($state == 'completed' && $original_state != 'completed') {
       if (empty($this->getCompletedTime())) {
-        $this->setCompletedTime(REQUEST_TIME);
+        $this->setCompletedTime(\Drupal::time()->getCurrentTime());
       }
     }
 
