@@ -228,4 +228,110 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
     ]));
   }
 
+  /**
+   * Helper method to fetch values from an Add to Cart form displayed on a page.
+   *
+   * Works with the following variation attribute form display widgets: select
+   * list, radio buttons, rendered attribute and variation titles select list.
+   *
+   * @param \Behat\Mink\Element\NodeElement $form
+   *   The Add to Cart form object.
+   * @return array
+   *   The array of values:
+   *   - "product_id": The form parent product ID.
+   *   - "form_id": The Add to cart form ID.
+   *   - "title": The selected variation title.
+   *   - "sku": The selected variation SKU.
+   *   - "price": The selected variation formatted price.
+   *   - "attributes": Attributes labels and values keyed by a field label:
+   *     - "ignored"|"chosen": The (not) selected/(un)checked attribute data.
+   *       - "label": The label for an attribute.
+   *       - "value": The ID of an attribute.
+   *
+   * @see \Drupal\Tests\commerce_cart\FunctionalJavascript\MultipleCartFormsTest->testMultipleCartsOnPage()
+   */
+  protected function getAddToCartFormValues(NodeElement $form) {
+    $values = [];
+    $values['product_id'] = [];
+    $values['form_id'] = $form->getAttribute('id');
+    $grand_parent = $form->getParent()->getParent();
+    $title = $grand_parent->find('css', '[class^="product--variation-field--variation_title__"]');
+    $values['title'] = is_object($title) ? $title->getText() : '';
+    $sku = $grand_parent->find('css', '[class^="product--variation-field--variation_sku__"]');
+    $values['sku'] = is_object($sku) ? $sku->getText() : '';
+    if (!empty($values['sku'])) {
+      foreach (explode(' ', $sku->getAttribute('class')) as $class) {
+        $parts = explode('product--variation-field--variation_sku__', $class);
+        if (count($parts) == 2 && is_numeric($parts[1])) {
+          $values['product_id'] = $parts[1];
+        }
+      }
+    }
+    $price = $grand_parent->find('css', '[class^="product--variation-field--variation_price__"]');
+    $values['price'] = is_object($price) ? $price->find('css', '.field__item')->getText() : '';
+    $attributes = $form->find('css', '[id^="edit-purchased-entity-0-attributes"]') ?: $form->find('css', '.form-item-purchased-entity-0-variation');
+    $values['attributes'] = [];
+    if (is_object($attributes)) {
+      $attributes = $attributes->findAll('css', '[id^="edit-purchased-entity-0-attributes-attribute-"]');
+      $attributes = $attributes ?: $attributes->findAll('css', '[id^="edit-purchased-entity-0-variation"]');
+      if (!empty($attributes)) {
+        foreach ($attributes as $attribute) {
+          $element = $attribute->getTagName();
+          if ($element == 'select') {
+            $parent = $attribute->getParent()->find('css', '[for^="edit-purchased-entity-0-attributes-attribute-"]');
+            $parent = $parent ?: $attributes[0]->getParent()->find('css', '[for^="edit-purchased-entity-0-variation"]');
+            $field_label = $parent->getText();
+            foreach ($attribute->findAll('named', ['option', '']) as $option) {
+              $values['attributes'][$field_label][$option->isSelected() ? 'chosen' : 'ignored'][] = [
+                'label' => $option->getText(),
+                'value' => $option->getValue(),
+              ];
+            }
+          }
+          elseif ($element == 'fieldset' && $legend = $attribute->find('css', '.fieldset-legend')) {
+            $field_label = $legend->getText();
+            $checked = $attribute->find('css', '.form-radios')->find('css', 'input[checked="checked"]');
+            foreach ($attribute->findAll('named', ['radio', '']) as $radio) {
+              $values['attributes'][$field_label][$radio->isChecked() ? 'chosen' : 'ignored'][] = [
+                'label' => $radio->getParent()->find('css', '[for^="edit-purchased-entity-0-attributes-attribute-"]')->getText(),
+                'value' => $radio->getAttribute('value'),
+              ];
+            }
+          }
+        }
+      }
+    }
+
+    return $values;
+  }
+
+  /**
+   * Helper method to fetch values from the shopping cart displayed on a page.
+   *
+   * @param \Behat\Mink\Element\NodeElement $cart
+   *   The Shopping Cart form object.
+   * @return array
+   *   The array of order items having the following values:
+   *   - "title": The title of an order item.
+   *   - "quantity": The quantity of an order item.
+   *   - "price": The price of an order item.
+   *   - "total": The total of an order item.
+   *
+   * @see \Drupal\Tests\commerce_cart\FunctionalJavascript\MultipleCartFormsTest->assertAddToCartFormValues()
+   */
+  protected function getShoppingCartValues(NodeElement $cart) {
+    $order_items = [];
+    foreach ($cart->findAll('css','td.views-field-purchased-entity') as $item) {
+      $row = $item->getParent();
+      $order_items[] = [
+        'title' => $row->find('css', '.field--name-title')->getText(),
+        'quantity' => $row->find('css', '[id^="edit-edit-quantity"]')->getValue(),
+        'price' => $row->find('css', '.views-field-unit-price__number')->getText(),
+        'total' => $row->find('css', '.views-field-total-price__number')->getText(),
+      ];
+    }
+
+    return $order_items;
+  }
+
 }
