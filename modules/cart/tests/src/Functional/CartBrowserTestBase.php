@@ -230,7 +230,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
   }
 
   /**
-   * Helper method to fetch values from an Add to Cart form displayed on a page.
+   * Helper method to fetch values from the Add to Cart form displayed on a page.
    *
    * Works with the following variation attribute form display widgets: select
    * list, radio buttons, rendered attribute and variation titles select list.
@@ -254,7 +254,7 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
    */
   protected function getAddToCartFormValues(BehatNodeElement $form) {
     $values = [];
-    $values['product_id'] = [];
+    $values['product_id'] = '';
     $values['form_id'] = $form->getAttribute('id');
     $grand_parent = $form->getParent()->getParent();
     $title = $grand_parent->find('css', '[class^="product--variation-field--variation_title__"]');
@@ -274,8 +274,8 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
     $attributes = $form->find('css', '[id^="edit-purchased-entity-0-attributes"]') ?: $form->find('css', '.form-item-purchased-entity-0-variation');
     $values['attributes'] = [];
     if (is_object($attributes)) {
-      $attributes = $attributes->findAll('css', '[id^="edit-purchased-entity-0-attributes-attribute-"]');
-      $attributes = $attributes ?: $attributes->findAll('css', '[id^="edit-purchased-entity-0-variation"]');
+      $titles = $attributes->findAll('css', '[id^="edit-purchased-entity-0-variation"]');
+      $attributes = $titles ?: $attributes->findAll('css', '[id^="edit-purchased-entity-0-attributes-attribute-"]');
       if (!empty($attributes)) {
         foreach ($attributes as $attribute) {
           $element = $attribute->getTagName();
@@ -292,7 +292,6 @@ abstract class CartBrowserTestBase extends OrderBrowserTestBase {
           }
           elseif ($element == 'fieldset' && $legend = $attribute->find('css', '.fieldset-legend')) {
             $field_label = $legend->getText();
-            $checked = $attribute->find('css', '.form-radios')->find('css', 'input[checked="checked"]');
             foreach ($attribute->findAll('named', ['radio', '']) as $radio) {
               $values['attributes'][$field_label][$radio->isChecked() ? 'chosen' : 'ignored'][] = [
                 'label' => $radio->getParent()->find('css', '[for^="edit-purchased-entity-0-attributes-attribute-"]')->getText(),
