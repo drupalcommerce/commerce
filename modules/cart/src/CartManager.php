@@ -72,6 +72,7 @@ class CartManager implements CartManagerInterface {
 
     $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
     if ($save_cart) {
+      $this->resetCheckoutFlow($cart);
       $cart->save();
     }
   }
@@ -123,6 +124,7 @@ class CartManager implements CartManagerInterface {
     }
 
     if ($save_cart) {
+      $this->resetCheckoutFlow($cart);
       $cart->save();
     }
 
@@ -139,6 +141,7 @@ class CartManager implements CartManagerInterface {
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
     if ($save_cart) {
+      $this->resetCheckoutFlow($cart);
       $cart->save();
     }
   }
@@ -151,7 +154,19 @@ class CartManager implements CartManagerInterface {
     $cart->removeItem($order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
     if ($save_cart) {
+      $this->resetCheckoutFlow($cart);
       $cart->save();
+    }
+  }
+
+  /**
+   * Resets the checkout flow status.
+   *
+   * @param OrderInterface $cart
+   */
+  private function resetCheckoutFlow(OrderInterface $cart) {
+    if (!$cart->get('checkout_flow')->isEmpty()) {
+      $cart->set('checkout_step', '');
     }
   }
 
