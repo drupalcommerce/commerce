@@ -4,7 +4,7 @@ commerce.admin_commerce:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Commerce'
   requirements:
-    _permission: 'access administration pages'
+    _permission: 'access commerce administration pages'
 
 commerce.configuration:
   path: '/admin/commerce/config'
@@ -12,5 +12,4 @@ commerce.configuration:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'Configuration'
   requirements:
-    _permission: 'access administration pages'
-
+    _permission: 'access commerce administration pages'

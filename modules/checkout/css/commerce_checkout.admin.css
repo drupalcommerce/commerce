@@ -1,0 +1,65 @@
+/**
+ * @file
+ * Styles for the checkout flow add/edit form.
+ */
+
+.checkout-pane-overview .region-title td {
+  font-weight: bold;
+}
+.checkout-pane-overview .region-message td {
+  font-style: italic;
+}
+
+.checkout-pane-overview .pane-configuration-summary-cell {
+  line-height: 1em;
+}
+.checkout-pane-overview .pane-configuration-summary {
+  float: left; /* LTR */
+  font-size: .9em;
+}
+[dir="rtl"] .checkout-pane-overview .pane-configuration-summary {
+  float: right;
+}
+.checkout-pane-overview .pane-configuration-summary-cell .warning {
+  display: block;
+  float: left; /* LTR */
+  margin-right: .5em;
+}
+[dir="rtl"] .checkout-pane-overview .pane-configuration-summary-cell .warning {
+  float: right;
+}
+.checkout-pane-overview .pane-configuration-edit-wrapper {
+  float: right; /* LTR */
+}
+[dir="rtl"] .checkout-pane-overview .pane-configuration-edit-wrapper {
+  float: left;
+}
+.checkout-pane-overview .pane-configuration-edit {
+  float: right; /* LTR */
+}
+[dir="rtl"] .checkout-pane-overview .pane-configuration-edit {
+  float: left;
+}
+.checkout-pane-overview .pane-configuration-editing td {
+  vertical-align: top;
+}
+
+.checkout-pane-overview tr.pane-configuration-changed {
+  background: #ffffbb;
+}
+.checkout-pane-overview tr.drag {
+  background: #ffee77;
+}
+.checkout-pane-overview tr.pane-configuration-editing {
+  background: #d5e9f2;
+}
+.checkout-pane-overview input.pane-configuration-edit {
+  margin: 0;
+  padding: 1px 8px;
+}
+.checkout-pane-overview .pane-configuration-edit-form .form-item {
+  margin: 10px 0;
+}
+.checkout-pane-overview .pane-configuration-edit-form .form-submit {
+  margin-bottom: 0;
+}

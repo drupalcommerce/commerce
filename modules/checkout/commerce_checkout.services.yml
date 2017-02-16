@@ -1,0 +1,23 @@
+services:
+  commerce_checkout.chain_checkout_flow_resolver:
+    class: Drupal\commerce_checkout\Resolver\ChainCheckoutFlowResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce_checkout.checkout_flow_resolver }
+
+  commerce_checkout.default_checkout_flow_resolver:
+    class: Drupal\commerce_checkout\Resolver\DefaultCheckoutFlowResolver
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: commerce_checkout.checkout_flow_resolver, priority: -100 }
+
+  commerce_checkout.checkout_order_manager:
+    class: Drupal\commerce_checkout\CheckoutOrderManager
+    arguments: ['@commerce_checkout.chain_checkout_flow_resolver']
+
+  plugin.manager.commerce_checkout_flow:
+    class: Drupal\commerce_checkout\CheckoutFlowManager
+    parent: default_plugin_manager
+
+  plugin.manager.commerce_checkout_pane:
+    class: Drupal\commerce_checkout\CheckoutPaneManager
+    parent: default_plugin_manager

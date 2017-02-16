@@ -48,7 +48,7 @@ class NumberFormatRepository extends ExternalNumberFormatRepository implements N
   /**
    * {@inheritdoc}
    */
-  public function get($locale, $fallback_locale = null) {
+  public function get($locale, $fallback_locale = NULL) {
     $locale = $this->resolveLocale($locale, $fallback_locale);
     if (isset($this->numberFormats[$locale])) {
       return $this->numberFormats[$locale];
@@ -61,7 +61,7 @@ class NumberFormatRepository extends ExternalNumberFormatRepository implements N
     }
     else {
       $filename = $this->definitionPath . $locale . '.json';
-      $definition = json_decode(file_get_contents($filename), true);
+      $definition = json_decode(file_get_contents($filename), TRUE);
       $this->cache->set($cache_key, $definition, CacheBackendInterface::CACHE_PERMANENT, ['number_formats']);
     }
     // Instantiate and alter the number format.

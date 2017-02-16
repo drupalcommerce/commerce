@@ -1,0 +1,7 @@
+administer commerce_checkout_flow:
+  title: 'Administer checkout flows'
+  'restrict access': TRUE
+
+access checkout:
+  title: 'Access checkout'
+  description: 'Complete a purchase through the checkout form.'

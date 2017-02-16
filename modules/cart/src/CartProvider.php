@@ -3,6 +3,7 @@
 namespace Drupal\commerce_cart;
 
 use Drupal\commerce_cart\Exception\DuplicateCartException;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -34,11 +35,11 @@ class CartProvider implements CartProviderInterface {
   protected $cartSession;
 
   /**
-   * The loaded cart data, keyed by cart order id, then grouped by uid.
+   * The loaded cart data, grouped by uid, then keyed by cart order ID.
    *
    * Each data item is an array with the following keys:
    * - type: The order type.
-   * - store_id: The store id.
+   * - store_id: The store ID.
    *
    * Example:
    * @code
@@ -101,6 +102,23 @@ class CartProvider implements CartProviderInterface {
     }
 
     return $cart;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function finalizeCart(OrderInterface $cart, $save_cart = TRUE) {
+    $cart->cart = FALSE;
+    if ($save_cart) {
+      $cart->save();
+    }
+    // The cart is anonymous, move it to the 'completed' session.
+    if (!$cart->getCustomerId()) {
+      $this->cartSession->deleteCartId($cart->id(), CartSession::ACTIVE);
+      $this->cartSession->addCartId($cart->id(), CartSession::COMPLETED);
+    }
+    // Remove the cart order from the internal cache, if present.
+    unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
   }
 
   /**
@@ -188,9 +206,10 @@ class CartProvider implements CartProviderInterface {
     // Getting the cart data and validating the cart ids received from the
     // session requires loading the entities. This is a performance hit, but
     // it's assumed that these entities would be loaded at one point anyway.
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
-      if ($cart->getOwnerId() != $uid || empty($cart->cart)) {
+      if ($cart->getCustomerId() != $uid || empty($cart->cart)) {
         // Skip orders that are no longer eligible.
         continue;
       }

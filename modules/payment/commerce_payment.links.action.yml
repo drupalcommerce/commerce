@@ -1,0 +1,17 @@
+entity.commerce_payment.add_form:
+  route_name: entity.commerce_payment.add_form
+  title: 'Add payment'
+  appears_on:
+    - entity.commerce_payment.collection
+
+entity.commerce_payment_gateway.add_form:
+  route_name: entity.commerce_payment_gateway.add_form
+  title: 'Add payment gateway'
+  appears_on:
+    - entity.commerce_payment_gateway.collection
+
+entity.commerce_payment_method.add_form:
+  route_name: entity.commerce_payment_method.add_form
+  title: 'Add payment method'
+  appears_on:
+    - entity.commerce_payment_method.collection

@@ -5,10 +5,9 @@
  * Defines the Order entity and associated features.
  */
 
-use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce\BundleFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_theme().
@@ -18,6 +17,10 @@ function commerce_order_theme($existing, $type, $theme, $path) {
     'commerce_order' => [
       'render element' => 'elements',
     ],
+    'commerce_order__admin' => [
+      'base hook' => 'commerce_order',
+      'render element' => 'elements',
+    ],
     'commerce_order__user' => [
       'base hook' => 'commerce_order',
       'render element' => 'elements',
@@ -25,22 +28,30 @@ function commerce_order_theme($existing, $type, $theme, $path) {
     'commerce_order_edit_form' => [
       'render element' => 'form',
     ],
+    'commerce_order_receipt' => [
+      'variables' => [
+        'order_entity' => NULL,
+        'billing_information' => NULL,
+        'shipping_information' => NULL,
+        'payment_method' => NULL,
+        'totals' => NULL,
+      ],
+    ],
+    'commerce_order_total_summary' => [
+      'variables' => [
+        'totals' => NULL,
+      ],
+    ],
   ];
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
+ * Implements hook_local_tasks_alter().
  */
-function commerce_order_commerce_order_presave(OrderInterface $order) {
-  $place_transition = $order->getState()->getWorkflow()->getTransition('place');
-  if (!$order->isNew() && empty($order->getPlacedTime()) && $place_transition) {
-    $from_states = $place_transition->getFromStates();
-    $from_state = reset($from_states);
-    $from_state = $from_state->getId();
-    $to_state = $place_transition->getToState()->getId();
-    if ($order->original->state->value == $from_state && $order->state->value == $to_state) {
-      $order->setPlacedTime(REQUEST_TIME);
-    }
+function commerce_order_local_tasks_alter(&$definitions) {
+  $id = 'entity.profile.user_profile_form:profile.type.customer';
+  if (isset($definitions[$id])) {
+    $definitions[$id]['title'] = t('Address book');
   }
 }
 
@@ -49,13 +60,13 @@ function commerce_order_commerce_order_presave(OrderInterface $order) {
  *
  * - Changes the label of the purchased_entity field to the label of the
  *   target type (e.g. 'Product variation').
- * - Forbids editing the purchased_entity once the line item is no longer new.
+ * - Forbids editing the purchased_entity once the order item is no longer new.
  */
 function commerce_order_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
   $field_name = $field_definition->getName();
   $entity_type = $field_definition->getTargetEntityTypeId();
-  if ($field_name == 'purchased_entity' && $entity_type == 'commerce_line_item') {
+  if ($field_name == 'purchased_entity' && $entity_type == 'commerce_order_item') {
     if (!empty($element['target_id']['#target_type'])) {
       $target_type = \Drupal::service('entity_type.manager')->getDefinition($element['target_id']['#target_type']);
       $element['target_id']['#title'] = $target_type->getLabel();
@@ -90,11 +101,15 @@ function template_preprocess_commerce_order(&$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
 
-  $variables['order'] = $order;
-  // Helpful $content variable for templates.
-  $variables['content'] = [];
-  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
+  $variables['order_entity'] = $order;
+  $variables['order'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['order'][$key] = $variables['elements'][$key];
+  }
+
+  if ($order->getBillingProfile()) {
+    $profile_view_bulder = \Drupal::entityTypeManager()->getViewBuilder('profile');
+    $variables['order']['billing_information'] = $profile_view_bulder->view($order->getBillingProfile());
   }
 }
 
@@ -106,64 +121,51 @@ function commerce_order_theme_suggestions_commerce_order(array $variables) {
 }
 
 /**
- * Adds the default line_items field to an order type.
+ * Implements hook_theme_suggestions_commerce_order_receipt().
+ */
+function commerce_order_theme_suggestions_commerce_order_receipt(array $variables) {
+  if (isset($variables['order_entity'])) {
+    $order = $variables['order_entity'];
+    $original = $variables['theme_hook_original'];
+    $variables['theme_hook_suggestions'][] = $original . '__' . $order->bundle();
+  }
+}
+
+/**
+ * Adds the default order_items field to an order type.
  *
- * Line items can't be a base field because the Views integration is broken.
+ * Order items can't be a base field because the Views integration is broken.
  * Instead, it is created as a configurable field for each order type.
  *
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
  */
-function commerce_order_add_line_items_field($order_type) {
-  $field_storage = FieldStorageConfig::loadByName('commerce_order', 'line_items');
-  $field = FieldConfig::loadByName('commerce_order', $order_type->id(), 'line_items');
-  if (empty($field_storage)) {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'line_items',
-      'entity_type' => 'commerce_order',
-      'type' => 'entity_reference',
-      'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
-      'settings' => [
-        'target_type' => 'commerce_line_item',
-      ],
-      'locked' => TRUE,
-      'translatable' => FALSE,
-    ]);
-    $field_storage->save();
-  }
-  if (empty($field)) {
-    $field = FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => $order_type->id(),
-      'label' => 'Line items',
-      'required' => TRUE,
-      'settings' => [
-        'handler' => 'default',
-        'handler_settings' => [],
-      ],
-      'translatable' => FALSE,
-    ]);
-    $field->save();
-
-    $view_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'view');
-    $view_display->setComponent('line_items', [
-      'type' => 'commerce_line_item_table',
-      'weight' => 0,
-    ]);
-    $view_display->save();
-
-    $form_display = commerce_get_entity_display('commerce_order', $order_type->id(), 'form');
-    $form_display->setComponent('line_items', [
+function commerce_order_add_order_items_field($order_type) {
+  $field_definition = BundleFieldDefinition::create('entity_reference')
+    ->setTargetEntityTypeId('commerce_order')
+    ->setTargetBundle($order_type->id())
+    ->setName('order_items')
+    ->setLabel('Order items')
+    ->setCardinality(BundleFieldDefinition::CARDINALITY_UNLIMITED)
+    ->setRequired(TRUE)
+    ->setSetting('target_type', 'commerce_order_type')
+    ->setSetting('handler', 'default')
+    ->setDisplayOptions('form', [
       'type' => 'inline_entity_form_complex',
       'weight' => 0,
       'settings' => [
         'override_labels' => TRUE,
-        'label_singular' => 'line item',
-        'label_plural' => 'line items',
+        'label_singular' => 'order item',
+        'label_plural' => 'order items',
       ],
+    ])
+    ->setDisplayOptions('view', [
+      'type' => 'commerce_order_item_table',
+      'weight' => 0,
     ]);
-    $form_display->save();
-  }
+
+  $configurable_field_manager = \Drupal::service('commerce.configurable_field_manager');
+  $configurable_field_manager->createField($field_definition);
 }
 
 /**
@@ -172,4 +174,19 @@ function commerce_order_add_line_items_field($order_type) {
 function commerce_order_views_data_alter(array &$data) {
   $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
   $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
+}
+
+/**
+ * Implements hook_mail().
+ *
+ * Captures the outgoing mail and sets appropriate message body and headers.
+ */
+function commerce_order_mail($key, &$message, $params) {
+  if (isset($params['headers'])) {
+    $message['headers'] = array_merge($message['headers'], $params['headers']);
+  }
+
+  $message['from'] = $params['from'];
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
 }

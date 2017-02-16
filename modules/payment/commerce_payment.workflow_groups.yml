@@ -1,0 +1,3 @@
+commerce_payment:
+  label: Payment
+  entity_type: commerce_payment

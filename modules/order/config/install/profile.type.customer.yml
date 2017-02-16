@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - commerce_order
+id: customer
+label: Customer
+registration: false
+multiple: true
+weight: 0

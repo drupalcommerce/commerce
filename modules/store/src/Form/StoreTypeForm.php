@@ -2,18 +2,19 @@
 
 namespace Drupal\commerce_store\Form;
 
-use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 
-class StoreTypeForm extends BundleEntityFormBase {
+class StoreTypeForm extends CommerceBundleEntityFormBase {
 
   /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = $this->entity;
 
     $form['label'] = [
@@ -21,7 +22,6 @@ class StoreTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $store_type->label(),
-      '#description' => $this->t('Label for the store type.'),
       '#required' => TRUE,
     ];
     $form['id'] = [
@@ -37,6 +37,7 @@ class StoreTypeForm extends BundleEntityFormBase {
       '#title' => $this->t('Description'),
       '#default_value' => $store_type->getDescription(),
     ];
+    $form = $this->buildTraitForm($form, $form_state);
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -61,8 +62,17 @@ class StoreTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->validateTraitForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
+    $this->submitTraitForm($form, $form_state);
+
     drupal_set_message($this->t('Saved the %label store type.', [
       '%label' => $this->entity->label(),
     ]));

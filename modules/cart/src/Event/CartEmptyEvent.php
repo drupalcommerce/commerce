@@ -20,23 +20,23 @@ class CartEmptyEvent extends Event {
   protected $cart;
 
   /**
-   * The removed line items.
+   * The removed order items.
    *
-   * @var \Drupal\commerce_order\Entity\LineItemInterface[]
+   * @var \Drupal\commerce_order\Entity\OrderItemInterface[]
    */
-  protected $lineItems;
+  protected $orderItems;
 
   /**
    * Constructs a new CartEmptyEvent.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
-   * @param \Drupal\commerce_order\Entity\LineItemInterface[] $line_items
-   *   The removed line items.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface[] $order_items
+   *   The removed order items.
    */
-  public function __construct(OrderInterface $cart, array $line_items) {
+  public function __construct(OrderInterface $cart, array $order_items) {
     $this->cart = $cart;
-    $this->lineItems = $line_items;
+    $this->orderItems = $order_items;
   }
 
   /**
@@ -50,13 +50,13 @@ class CartEmptyEvent extends Event {
   }
 
   /**
-   * Gets the removed line items.
+   * Gets the removed order items.
    *
-   * @return \Drupal\commerce_order\Entity\LineItemInterface[]
-   *   The removed line items.
+   * @return \Drupal\commerce_order\Entity\OrderItemInterface[]
+   *   The removed order items.
    */
-  public function getLineItems() {
-    return $this->lineItems;
+  public function getOrderItems() {
+    return $this->orderItems;
   }
 
 }

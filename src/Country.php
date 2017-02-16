@@ -28,6 +28,7 @@ final class Country {
    * Gets the country code.
    *
    * @return string
+   *   The country code.
    */
   public function getCountryCode() {
     return $this->countryCode;
@@ -37,6 +38,7 @@ final class Country {
    * Gets the string representation of the country.
    *
    * @return string
+   *   The string representation of the country
    */
   public function __toString() {
     return $this->countryCode;

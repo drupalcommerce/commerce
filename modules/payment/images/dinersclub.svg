@@ -1,0 +1,19 @@
+<svg id="Diners.svg" xmlns="http://www.w3.org/2000/svg" width="128" height="80" viewBox="0 0 128 80">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke: #d9d9d9;
+        stroke-linejoin: round;
+        stroke-width: 1px;
+      }
+
+      .cls-2 {
+        fill: #0079be;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <rect id="Rounded_Rectangle_1_copy_2" data-name="Rounded Rectangle 1 copy 2" class="cls-1" width="128" height="80" rx="6" ry="6"/>
+  <path class="cls-2" d="M70.252,13.919H57.765C43.083,13.913,31,24.461,31,39.719,31,53.675,43.08,65.144,57.765,65.077H70.252C84.76,65.144,98,53.672,98,39.719,98,24.458,84.76,13.913,70.252,13.919ZM57.826,62.872C44.41,62.866,33.535,52.385,33.532,39.452S44.41,16.033,57.826,16.03,82.119,26.517,82.119,39.452,71.244,62.866,57.826,62.872ZM63.333,25.6v27.71A14.649,14.649,0,0,0,63.333,25.6Zm-20.9,13.853A14.88,14.88,0,0,0,52.309,53.3V25.6A14.9,14.9,0,0,0,42.429,39.449Z"/>
+</svg>

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_store\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the store type entity class.
@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_store_type",
  *   label = @Translation("Store type"),
+ *   label_singular = @Translation("store type"),
+ *   label_plural = @Translation("store types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count store type",
+ *     plural = "@count store types",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_store\StoreTypeListBuilder",
  *     "form" = {
@@ -19,10 +25,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
- *   admin_permission = "administer store types",
+ *   admin_permission = "administer commerce_store_type",
  *   config_prefix = "commerce_store_type",
  *   bundle_of = "commerce_store",
  *   entity_keys = {
@@ -35,6 +40,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "uuid",
  *     "description",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/store-types/add",
@@ -44,28 +50,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class StoreType extends ConfigEntityBundleBase implements StoreTypeInterface {
-
-  /**
-   * The store type machine name.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The store type UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
-
-  /**
-   * The store type label.
-   *
-   * @var string
-   */
-  protected $label;
+class StoreType extends CommerceBundleEntityBase implements StoreTypeInterface {
 
   /**
    * A brief description of this store type.

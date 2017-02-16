@@ -17,7 +17,7 @@ class ProductListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['title'] = t('Title');
     $header['type'] = t('Type');
-    $header['type'] = t('Status');
+    $header['status'] = t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -25,7 +25,7 @@ class ProductListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var \Drupal\commerce_product\Entity\ProductTypeInterface $product_type */
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $entity */
     $product_type = ProductType::load($entity->bundle());
 
     $row['title']['data'] = [

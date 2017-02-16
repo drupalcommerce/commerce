@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Plugin\views\field\RemoveButton.
- */
-
 namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
@@ -15,9 +10,9 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for removing the line item.
+ * Defines a form element for removing the order item.
  *
- * @ViewsField("commerce_line_item_remove_button")
+ * @ViewsField("commerce_order_item_remove_button")
  */
 class RemoveButton extends FieldPluginBase {
 
@@ -82,7 +77,7 @@ class RemoveButton extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsForm(&$form, FormStateInterface $form_state) {
+  public function viewsForm(array &$form, FormStateInterface $form_state) {
     // Make sure we do not accidentally cache this form.
     $form['#cache']['max-age'] = 0;
     // The view is empty, abort.
@@ -96,10 +91,10 @@ class RemoveButton extends FieldPluginBase {
       $form[$this->options['id']][$row_index] = [
         '#type' => 'submit',
         '#value' => t('Remove'),
-        '#name' => 'delete-line-item-' . $row_index,
-        '#remove_line_item' => TRUE,
+        '#name' => 'delete-order-item-' . $row_index,
+        '#remove_order_item' => TRUE,
         '#row_index' => $row_index,
-        '#attributes' => ['class' => ['delete-line-item']],
+        '#attributes' => ['class' => ['delete-order-item']],
       ];
     }
   }
@@ -112,12 +107,13 @@ class RemoveButton extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+  public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#remove_line_item'])) {
+    if (!empty($triggering_element['#remove_order_item'])) {
       $row_index = $triggering_element['#row_index'];
-      $line_item = $this->getEntity($this->view->result[$row_index]);
-      $this->cartManager->removeLineItem($line_item->getOrder(), $line_item);
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $this->getEntity($this->view->result[$row_index]);
+      $this->cartManager->removeOrderItem($order_item->getOrder(), $order_item);
     }
   }
 

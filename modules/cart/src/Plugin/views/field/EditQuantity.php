@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_cart\Plugin\views\Field\EditQuantity.
- */
-
 namespace Drupal\commerce_cart\Plugin\views\field;
 
 use Drupal\commerce_cart\CartManagerInterface;
@@ -15,9 +10,9 @@ use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a form element for editing the line item quantity.
+ * Defines a form element for editing the order item quantity.
  *
- * @ViewsField("commerce_line_item_edit_quantity")
+ * @ViewsField("commerce_order_item_edit_quantity")
  */
 class EditQuantity extends FieldPluginBase {
 
@@ -82,7 +77,7 @@ class EditQuantity extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsForm(&$form, FormStateInterface $form_state) {
+  public function viewsForm(array &$form, FormStateInterface $form_state) {
     // Make sure we do not accidentally cache this form.
     $form['#cache']['max-age'] = 0;
     // The view is empty, abort.
@@ -93,8 +88,8 @@ class EditQuantity extends FieldPluginBase {
 
     $form[$this->options['id']]['#tree'] = TRUE;
     foreach ($this->view->result as $row_index => $row) {
-      $line_item = $this->getEntity($row);
-      $quantity = $line_item->getQuantity();
+      $order_item = $this->getEntity($row);
+      $quantity = $order_item->getQuantity();
 
       $form[$this->options['id']][$row_index] = [
         '#type' => 'number',
@@ -119,14 +114,15 @@ class EditQuantity extends FieldPluginBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+  public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
     $quantities = $form_state->getValue($this->options['id']);
     foreach ($quantities as $row_index => $quantity) {
-      $line_item = $this->getEntity($this->view->result[$row_index]);
-      if ($line_item->getQuantity() != $quantity) {
-        $line_item->setQuantity($quantity);
-        $order = $line_item->getOrder();
-        $this->cartManager->updateLineItem($order, $line_item);
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $this->getEntity($this->view->result[$row_index]);
+      if ($order_item->getQuantity() != $quantity) {
+        $order_item->setQuantity($quantity);
+        $order = $order_item->getOrder();
+        $this->cartManager->updateOrderItem($order, $order_item);
       }
     }
   }

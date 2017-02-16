@@ -4,12 +4,10 @@ namespace Drupal\commerce_cart;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_order\Entity\LineItemInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\CartEmptyEvent;
-use Drupal\commerce_cart\Event\CartEntityAddEvent;
-use Drupal\commerce_cart\Event\CartLineItemRemoveEvent;
-use Drupal\commerce_cart\Event\CartLineItemUpdateEvent;
+use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,18 +21,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class CartManager implements CartManagerInterface {
 
   /**
-   * The line item storage.
+   * The order item storage.
    *
-   * @var \Drupal\commerce_order\LineItemStorageInterface
+   * @var \Drupal\commerce_order\OrderItemStorageInterface
    */
-  protected $lineItemStorage;
+  protected $orderItemStorage;
 
   /**
-   * The line item matcher.
+   * The order item matcher.
    *
-   * @var \Drupal\commerce_cart\LineItemMatcherInterface
+   * @var \Drupal\commerce_cart\OrderItemMatcherInterface
    */
-  protected $lineItemMatcher;
+  protected $orderItemMatcher;
 
   /**
    * The event dispatcher.
@@ -55,32 +53,32 @@ class CartManager implements CartManagerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\commerce_cart\LineItemMatcherInterface $line_item_matcher
-   *   The line item matcher.
+   * @param \Drupal\commerce_cart\OrderItemMatcherInterface $order_item_matcher
+   *   The order item matcher.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LineItemMatcherInterface $line_item_matcher, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
-    $this->lineItemStorage = $entity_type_manager->getStorage('commerce_line_item');
-    $this->lineItemMatcher = $line_item_matcher;
-    $this->eventDispatcher = $event_dispatcher;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderItemMatcherInterface $order_item_matcher, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
+    $this->orderItemStorage = $entity_type_manager->getStorage('commerce_order_item');
+    $this->orderItemMatcher = $order_item_matcher;
     $this->languageManager = $language_manager;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
    * {@inheritdoc}
    */
   public function emptyCart(OrderInterface $cart, $save_cart = TRUE) {
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface[] $line_items */
-    $line_items = $cart->getLineItems();
-    foreach ($line_items as $line_item) {
-      $line_item->delete();
+    $order_items = $cart->getItems();
+    foreach ($order_items as $order_item) {
+      $order_item->delete();
     }
-    $cart->setLineItems([]);
+    $cart->setItems([]);
+    $cart->setAdjustments([]);
 
-    $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $line_items));
+    $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
     if ($save_cart) {
       $cart->save();
     }
@@ -90,79 +88,82 @@ class CartManager implements CartManagerInterface {
    * {@inheritdoc}
    */
   public function addEntity(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity = 1, $combine = TRUE, $save_cart = TRUE) {
-    $line_item = $this->createLineItem($entity, $quantity);
-    return $this->addLineItem($cart, $line_item, $combine);
+    $order_item = $this->createOrderItem($entity, $quantity);
+    return $this->addOrderItem($cart, $order_item, $combine, $save_cart);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createLineItem(PurchasableEntityInterface $entity, $quantity = 1) {
-    $line_item = $this->lineItemStorage->createFromPurchasableEntity($entity, [
+  public function createOrderItem(PurchasableEntityInterface $entity, $quantity = 1) {
+    $order_item = $this->orderItemStorage->createFromPurchasableEntity($entity, [
       'quantity' => $quantity,
-      // @todo Remove once the price calculation is in place.
-      'unit_price' => $entity->price,
     ]);
 
-    return $line_item;
+    return $order_item;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addLineItem(OrderInterface $cart, LineItemInterface $line_item, $combine = TRUE, $save_cart = TRUE) {
-    $purchased_entity = $line_item->getPurchasedEntity();
-    $quantity = $line_item->getQuantity();
-    $matching_line_item = NULL;
+  public function addOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $combine = TRUE, $save_cart = TRUE) {
+    $purchased_entity = $order_item->getPurchasedEntity();
+    $quantity = $order_item->getQuantity();
+    $matching_order_item = NULL;
     if ($combine) {
-      $matching_line_item = $this->lineItemMatcher->match($line_item, $cart->getLineItems());
+      $matching_order_item = $this->orderItemMatcher->match($order_item, $cart->getItems());
     }
-    $needs_cart_save = FALSE;
-    if ($matching_line_item) {
-      $new_quantity = $matching_line_item->getQuantity() + $quantity;
-      $matching_line_item->setQuantity($new_quantity);
-      $matching_line_item->save();
+    if ($matching_order_item) {
+      $new_quantity = Calculator::add($matching_order_item->getQuantity(), $quantity);
+      $matching_order_item->setQuantity($new_quantity);
+      $matching_order_item->save();
+      $saved_order_item = $matching_order_item;
     }
     else {
-      $line_item->save();
-      $cart->addLineItem($line_item);
-      $needs_cart_save = TRUE;
+      $order_item->save();
+      $cart->addItem($order_item);
+      $saved_order_item = $order_item;
     }
 
     // If the language is different, we need to save it again. If we are already
     // planning to trigger the save, there is no need to do the additional
     // checks.
-    if (!$needs_cart_save && $cart->getLanguage()->getId() <> $this->languageManager->getCurrentLanguage()->getId()) {
+    if (!$needs_cart_save && $cart->getLanguage()->getId() !== $this->languageManager->getCurrentLanguage()->getId()) {
       $needs_cart_save = TRUE;
     }
 
-    $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $line_item);
-    $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
+    if ($purchased_entity) {
+      $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $saved_order_item);
+      $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
+    }
     if ($needs_cart_save && $save_cart) {
       $cart->save();
     }
 
-    return $line_item;
+    return $saved_order_item;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function updateLineItem(OrderInterface $cart, LineItemInterface $line_item) {
-    /** @var \Drupal\commerce_order\Entity\LineItemInterface $original_line_item */
-    $original_line_item = $this->lineItemStorage->loadUnchanged($line_item->id());
-    $line_item->save();
-    $event = new CartLineItemUpdateEvent($cart, $line_item, $original_line_item);
-    $this->eventDispatcher->dispatch(CartEvents::CART_LINE_ITEM_UPDATE, $event);
+  public function updateOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE) {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $original_order_item */
+    $original_order_item = $this->orderItemStorage->loadUnchanged($order_item->id());
+    $order_item->save();
+    $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
+    $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    if ($save_cart) {
+      $cart->save();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function removeLineItem(OrderInterface $cart, LineItemInterface $line_item, $save_cart = TRUE) {
-    $line_item->delete();
-    $cart->removeLineItem($line_item);
-    $this->eventDispatcher->dispatch(CartEvents::CART_LINE_ITEM_REMOVE, new CartLineItemRemoveEvent($cart, $line_item));
+  public function removeOrderItem(OrderInterface $cart, OrderItemInterface $order_item, $save_cart = TRUE) {
+    $order_item->delete();
+    $cart->removeItem($order_item);
+    $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
     if ($save_cart) {
       $cart->save();
     }

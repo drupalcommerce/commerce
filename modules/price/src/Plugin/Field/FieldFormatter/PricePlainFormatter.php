@@ -86,7 +86,7 @@ class PricePlainFormatter extends FormatterBase implements ContainerFactoryPlugi
     foreach ($items as $delta => $item) {
       $elements[$delta] = [
         '#theme' => 'commerce_price_plain',
-        '#amount' => $item->amount,
+        '#number' => $item->number,
         '#currency' => $currencies[$item->currency_code],
         '#cache' => [
           'contexts' => [

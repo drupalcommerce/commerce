@@ -35,7 +35,7 @@ class EntityBundle extends Field {
 
     $form['hide_single_bundle'] = [
       '#type' => 'checkbox',
-      '#title' => t('Hide if there\'s only one bundle.'),
+      '#title' => t("Hide if there's only one bundle."),
       '#default_value' => $this->options['hide_single_bundle'],
     ];
   }

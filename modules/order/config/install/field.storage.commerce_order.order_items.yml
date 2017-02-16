@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_order
+id: commerce_order.order_items
+field_name: order_items
+entity_type: commerce_order
+type: entity_reference
+settings:
+  target_type: commerce_order_item
+module: core
+locked: true
+cardinality: -1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

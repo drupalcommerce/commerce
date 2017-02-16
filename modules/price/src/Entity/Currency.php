@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_currency",
  *   label = @Translation("Currency"),
+ *   label_singular = @Translation("currency"),
+ *   label_plural = @Translation("currencies"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count currency",
+ *     plural = "@count currencies",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_price\Form\CurrencyForm",
@@ -18,11 +24,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_price\CurrencyListBuilder",
  *   },
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce_currency",
  *   config_prefix = "commerce_currency",
  *   entity_keys = {
  *     "id" = "currencyCode",

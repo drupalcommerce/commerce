@@ -5,9 +5,15 @@
     "homepage": "http://drupal.org/project/commerce",
     "license": "GPL-2.0+",
     "require": {
-        "commerceguys/intl": "dev-master",
-        "commerceguys/pricing": "dev-master",
-        "commerceguys/tax": "dev-master"
+        "drupal/core": "~8.2",
+        "drupal/address": "~1.0",
+        "drupal/entity": "~1.0",
+        "drupal/entity_reference_revisions": "~1.0",
+        "drupal/inline_entity_form": "~1.0",
+        "drupal/profile": "1.x-dev",
+        "drupal/state_machine": "~1.0",
+        "commerceguys/intl": "~0.7",
+        "ext-bcmath": "*"
     },
     "minimum-stability": "dev"
 }

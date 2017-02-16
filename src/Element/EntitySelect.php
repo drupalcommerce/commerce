@@ -30,6 +30,7 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#target_type' => 'commerce_store',
  *   '#multiple' => TRUE,
  * ];
+ *
  * @end
  *
  * @FormElement("commerce_entity_select")
@@ -147,6 +148,8 @@ class EntitySelect extends FormElement {
       if ($value_element['#type'] == 'checkboxes') {
         // Remove unselected checkboxes.
         $value = array_filter($value);
+        // Non-numeric keys can cause issues when passing values to TypedData.
+        $value = array_values($value);
       }
       elseif (!empty($value_element['#tags'])) {
         // Extract the entity ids from a multivalue autocomplete.

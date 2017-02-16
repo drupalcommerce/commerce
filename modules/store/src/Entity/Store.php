@@ -2,13 +2,11 @@
 
 namespace Drupal\commerce_store\Entity;
 
-use CommerceGuys\Addressing\Enum\AddressField;
+use CommerceGuys\Addressing\AddressFormat\AddressField;
 use Drupal\address\AddressInterface;
 use Drupal\commerce_price\Entity\CurrencyInterface;
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -18,28 +16,37 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
+ *   label_singular = @Translation("store"),
+ *   label_plural = @Translation("stores"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count store",
+ *     plural = "@count stores",
+ *   ),
  *   bundle_label = @Translation("Store type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_store\Event\StoreEvent",
  *     "storage" = "Drupal\commerce_store\StoreStorage",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_store\StoreListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
+ *       "default" = "Drupal\commerce_store\Form\StoreForm",
  *       "add" = "Drupal\commerce_store\Form\StoreForm",
  *       "edit" = "Drupal\commerce_store\Form\StoreForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
  *   base_table = "commerce_store",
  *   data_table = "commerce_store_field_data",
- *   admin_permission = "administer stores",
+ *   admin_permission = "administer commerce_store",
+ *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
@@ -52,7 +59,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "canonical" = "/store/{commerce_store}",
  *     "add-page" = "/store/add",
- *     "add-form" = "/store/add/{type}",
+ *     "add-form" = "/store/add/{commerce_store_type}",
  *     "edit-form" = "/store/{commerce_store}/edit",
  *     "delete-form" = "/store/{commerce_store}/delete",
  *     "delete-multiple-form" = "/admin/commerce/stores/delete",
@@ -63,27 +70,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Store extends ContentEntityBase implements StoreInterface {
-
-  use EntityKeysFieldsTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    // If no owner has been set explicitly, make the current user the owner.
-    if (!$this->getOwner()) {
-      $this->setOwnerId($this->getCurrentUserId());
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->get('store_id')->value;
-  }
 
   /**
    * {@inheritdoc}
@@ -215,7 +201,7 @@ class Store extends ContentEntityBase implements StoreInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
@@ -276,8 +262,13 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', TRUE);
 
-    // Disable the recipient and organization fields on the store address.
-    $disabled_fields = [AddressField::RECIPIENT, AddressField::ORGANIZATION];
+    // Disable the name and organization fields on the store address.
+    $disabled_fields = [
+      AddressField::GIVEN_NAME,
+      AddressField::ADDITIONAL_NAME,
+      AddressField::FAMILY_NAME,
+      AddressField::ORGANIZATION,
+    ];
     $fields['address'] = BaseFieldDefinition::create('address')
       ->setLabel(t('Address'))
       ->setDescription(t('The store address.'))
@@ -286,7 +277,9 @@ class Store extends ContentEntityBase implements StoreInterface {
       ->setSetting('fields', array_diff(AddressField::getAll(), $disabled_fields))
       ->setDisplayOptions('form', [
         'type' => 'address_default',
-        'settings' => [],
+        'settings' => [
+          'default_country' => 'site_default',
+        ],
         'weight' => 3,
       ])
       ->setDisplayConfigurable('view', TRUE)

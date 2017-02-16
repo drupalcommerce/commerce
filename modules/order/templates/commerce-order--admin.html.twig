@@ -1,0 +1,90 @@
+{#
+/**
+ * @file
+ * Order template used on the admin order page.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper.
+ * - order: The rendered order fields.
+ *   Use 'order' to print them all, or print a subset such as
+ *   'order.order_number'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ order|without('order_number') }}
+ *   @endcode
+ * - order_entity: The order entity.
+ *
+ * @ingroup themeable
+ */
+#}
+
+{{ attach_library('commerce_order/form') }}
+{% set order_state = order_entity.getState.getLabel %}
+
+<div class="layout-order-form clearfix">
+  <div class="layout-region layout-region-order-main">
+    {{ order.order_items }}
+    {{ order.total_price }}
+
+    {% if order.activity %}
+      <h2>{% trans %}Order activity{% endtrans %}</h2>
+      {{ order.activity }}
+    {% endif %}
+  </div>
+  <div class="layout-region layout-region-order-secondary">
+    <div class="entity-meta">
+      <div class="entity-meta__header">
+        <h3 class="entity-meta__title">
+          {{ order_state }}
+        </h3>
+        {% for key in ['completed', 'placed', 'changed'] %}
+          {% if order[key] %}
+            <div class="form-item">
+              {{ order[key] }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <details open>
+        <summary role="button">
+          {{ 'Customer Information'|t }}
+        </summary>
+        <div class="details-wrapper">
+          {% for key in ['uid', 'mail', 'ip_address'] %}
+            {% if order[key] %}
+              <div class="form-item">
+                {{ order[key] }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </details>
+      {% if order.billing_information %}
+        <details open>
+          <summary role="button">
+            {{ 'Billing information'|t }}
+          </summary>
+          <div class="details-wrapper">
+            {{ order.billing_information }}
+          </div>
+        </details>
+      {% endif %}
+      {% if order.shipping_information %}
+        <details open>
+          <summary role="button">
+            {{ 'Shipping information'|t }}
+          </summary>
+          <div class="details-wrapper">
+            {{ order.shipping_information }}
+          </div>
+        </details>
+      {% endif %}
+      {# If the order has possible transitions, render the field for transition buttons. #}
+      {% if order_entity.getState.getTransitions is not empty %}
+        <div class="entity-meta__header">
+          {{ order.state }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

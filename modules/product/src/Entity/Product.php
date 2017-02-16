@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\entity\EntityKeysFieldsTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -16,10 +15,19 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_product",
  *   label = @Translation("Product"),
+ *   label_singular = @Translation("product"),
+ *   label_plural = @Translation("products"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product",
+ *     plural = "@count products",
+ *   ),
+ *   bundle_label = @Translation("Product type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductEvent",
  *     "storage" = "Drupal\commerce\CommerceContentEntityStorage",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "access" = "Drupal\commerce\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
+ *     "view_builder" = "Drupal\commerce_product\ProductViewBuilder",
  *     "list_builder" = "Drupal\commerce_product\ProductListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -30,12 +38,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\AdminCreateHtmlRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
+ *     "translation" = "Drupal\commerce_product\ProductTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce_product",
+ *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   translatable = TRUE,
  *   base_table = "commerce_product",
@@ -51,7 +59,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {
  *     "canonical" = "/product/{commerce_product}",
  *     "add-page" = "/product/add",
- *     "add-form" = "/product/add/{type}",
+ *     "add-form" = "/product/add/{commerce_product_type}",
  *     "edit-form" = "/product/{commerce_product}/edit",
  *     "delete-form" = "/product/{commerce_product}/delete",
  *     "delete-multiple-form" = "/admin/commerce/products/delete",
@@ -63,7 +71,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class Product extends ContentEntityBase implements ProductInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -114,11 +122,8 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    $stores = [];
-    foreach ($this->get('stores') as $store_item) {
-      $stores[] = $store_item->entity;
-    }
-    return $stores;
+    $stores = $this->get('stores')->referencedEntities();
+    return $this->ensureTranslations($stores);
   }
 
   /**
@@ -167,15 +172,123 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    $this->get('uid')->target_id;
-    return $this;
+    return $this->get('uid')->target_id;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setOwnerId($uid) {
-    return $this->set('uid', $uid);
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVariationIds() {
+    $variation_ids = [];
+    foreach ($this->get('variations') as $field_item) {
+      $variation_ids[] = $field_item->target_id;
+    }
+    return $variation_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVariations() {
+    $variations = $this->get('variations')->referencedEntities();
+    return $this->ensureTranslations($variations);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVariations(array $variations) {
+    $this->set('variations', $variations);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariations() {
+    return !$this->get('variations')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addVariation(ProductVariationInterface $variation) {
+    if (!$this->hasVariation($variation)) {
+      $this->get('variations')->appendItem($variation);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeVariation(ProductVariationInterface $variation) {
+    $index = $this->getVariationIndex($variation);
+    if ($index !== FALSE) {
+      $this->get('variations')->offsetUnset($index);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasVariation(ProductVariationInterface $variation) {
+    return in_array($variation->id(), $this->getVariationIds());
+  }
+
+  /**
+   * Gets the index of the given variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return int|bool
+   *   The index of the given variation, or FALSE if not found.
+   */
+  protected function getVariationIndex(ProductVariationInterface $variation) {
+    return array_search($variation->id(), $this->getVariationIds());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultVariation() {
+    foreach ($this->getVariations() as $variation) {
+      // Return the first active variation.
+      if ($variation->isActive() && $variation->access('view')) {
+        return $variation;
+      }
+    }
+  }
+
+  /**
+   * Ensures that the provided entities are in the current entity's language.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   The entities to process.
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   *   The processed entities.
+   */
+  protected function ensureTranslations(array $entities) {
+    $langcode = $this->language()->getId();
+    foreach ($entities as $index => $entity) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      if ($entity->hasTranslation($langcode)) {
+        $entities[$index] = $entity->getTranslation($langcode);
+      }
+    }
+
+    return $entities;
   }
 
   /**
@@ -216,7 +329,7 @@ class Product extends ContentEntityBase implements ProductInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))

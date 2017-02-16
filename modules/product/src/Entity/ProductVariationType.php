@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product variation type entity class.
@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",
  *   label = @Translation("Product variation type"),
+ *   label_singular = @Translation("product variation type"),
+ *   label_plural = @Translation("product variation types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product variation type",
+ *     plural = "@count product variation types",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_product\ProductVariationTypeListBuilder",
  *     "form" = {
@@ -19,11 +25,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "commerce_product_variation_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce_product_type",
  *   bundle_of = "commerce_product_variation",
  *   entity_keys = {
  *     "id" = "id",
@@ -33,8 +38,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   config_export = {
  *     "id",
  *     "label",
- *     "lineItemType",
+ *     "orderItemType",
  *     "generateTitle",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-variation-types/add",
@@ -44,21 +50,14 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductVariationType extends ConfigEntityBundleBase implements ProductVariationTypeInterface {
+class ProductVariationType extends CommerceBundleEntityBase implements ProductVariationTypeInterface {
 
   /**
-   * The product variation type ID.
+   * The order item type ID.
    *
    * @var string
    */
-  protected $id;
-
-  /**
-   * The line item type ID.
-   *
-   * @var string
-   */
-  protected $lineItemType;
+  protected $orderItemType;
 
   /**
    * Whether the product variation title should be automatically generated.
@@ -70,15 +69,15 @@ class ProductVariationType extends ConfigEntityBundleBase implements ProductVari
   /**
    * {@inheritdoc}
    */
-  public function getLineItemTypeId() {
-    return $this->lineItemType;
+  public function getOrderItemTypeId() {
+    return $this->orderItemType;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setLineItemTypeId($line_item_type_id) {
-    $this->lineItemType = $line_item_type_id;
+  public function setOrderItemTypeId($order_item_type_id) {
+    $this->orderItemType = $order_item_type_id;
     return $this;
   }
 

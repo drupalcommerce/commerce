@@ -5,20 +5,11 @@ commerce_order.commerce_order_type.*.third_party.commerce_cart:
     cart_form_view:
         type: string
         label: 'Shopping cart form view'
-    refresh_mode:
-        type: string
-        label: 'Shopping cart refresh mode'
-    refresh_frequency:
-        type: integer
-        label: 'Shopping cart refresh frequency'
 
 block.settings.commerce_cart:
   type: block_settings
   label: 'Cart block'
   mapping:
-    item_text:
-      type: string
-      label: 'Items text'
     dropdown:
       type: boolean
       label: 'Display cart contents in dropdown'

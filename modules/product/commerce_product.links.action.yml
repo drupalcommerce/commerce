@@ -4,6 +4,12 @@ entity.commerce_product.add_page:
   appears_on:
     - entity.commerce_product.collection
 
+entity.commerce_product_attribute.add_form:
+  route_name: entity.commerce_product_attribute.add_form
+  title: 'Add product attribute'
+  appears_on:
+    - entity.commerce_product_attribute.collection
+
 entity.commerce_product_type.add_form:
   route_name: entity.commerce_product_type.add_form
   title: 'Add product type'

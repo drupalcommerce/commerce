@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * Provides payment functionality.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_commerce_checkout_pane_info_alter().
+ */
+function commerce_payment_commerce_checkout_pane_info_alter(&$definitions) {
+  // The payment_information pane replaces the billing_information one.
+  unset($definitions['billing_information']);
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_payment_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_order') {
+    $fields['payment_gateway'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Payment gateway'))
+      ->setDescription(t('The payment gateway.'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'commerce_payment_gateway');
+
+    $fields['payment_method'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Payment method'))
+      ->setDescription(t('The payment method.'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'commerce_payment_method');
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_payment_theme() {
+  return [
+    'commerce_payment_method' => [
+      'render element' => 'elements',
+    ],
+    'commerce_payment_method__credit_card' => [
+      'base hook' => 'commerce_payment_method',
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_payment_method().
+ */
+function commerce_payment_theme_suggestions_commerce_payment_method(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_payment_method', $variables);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function commerce_payment_commerce_payment_method_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if ($entity->bundle() == 'credit_card') {
+    $build['#attached']['library'][] = 'commerce_payment/payment_method_icons';
+  }
+}
+
+/**
+ * Prepares variables for payment method templates.
+ *
+ * Default template: commerce-payment-method.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_payment_method(array &$variables) {
+  /** @var Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+  $payment_method = $variables['elements']['#commerce_payment_method'];
+
+  $variables['payment_method_entity'] = $payment_method;
+  $variables['payment_method_url'] = $payment_method->toUrl();
+  $variables['payment_method'] = [
+    // The label is generated dynamically, so it's not present in 'elements'.
+    'label' => [
+      '#markup' => $payment_method->label(),
+    ],
+  ];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['payment_method'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_preprocess_commerce_order().
+ */
+function commerce_payment_preprocess_commerce_order(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['elements']['#commerce_order'];
+  if (!$order->get('payment_method')->isEmpty()) {
+    $variables['payment_method'] = [
+      '#markup' => $order->get('payment_method')->first()->entity->label(),
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_commerce_order_receipt().
+ */
+function commerce_payment_preprocess_commerce_order_receipt(&$variables) {
+  /** @var Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $variables['order_entity'];
+  if (!$order->get('payment_method')->isEmpty()) {
+    $variables['payment_method'] = [
+      '#markup' => $order->get('payment_method')->first()->entity->label(),
+    ];
+  }
+}

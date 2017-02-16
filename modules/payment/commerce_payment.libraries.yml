@@ -1,0 +1,20 @@
+payment_method_form:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_payment.payment_method_form.css: {}
+
+payment_method_icons:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_payment.payment_method_icons.css: {}
+
+offsite_redirect:
+  version: VERSION
+  js:
+    js/offsite-redirect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings

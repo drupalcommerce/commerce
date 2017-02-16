@@ -8,7 +8,7 @@ namespace Drupal\commerce;
 final class Locale {
 
   /**
-   * The locale
+   * The locale.
    *
    * @var string
    */
@@ -28,6 +28,7 @@ final class Locale {
    * Gets the locale code.
    *
    * @return string
+   *   The locale code.
    */
   public function getLocaleCode() {
     return $this->localeCode;
@@ -37,6 +38,7 @@ final class Locale {
    * Gets the string representation of the locale.
    *
    * @return string
+   *   The string representation of the locale.
    */
   public function __toString() {
     return $this->localeCode;

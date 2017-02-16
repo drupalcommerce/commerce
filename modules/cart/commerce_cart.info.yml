@@ -5,11 +5,12 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce
-  - commerce_order
-  - commerce_product
+  - commerce:commerce_order
+  - commerce:commerce_price
+  - commerce:commerce_product
   - views
 config_devel:
   install:
-    - core.entity_form_mode.commerce_line_item.add_to_cart
+    - core.entity_form_mode.commerce_order_item.add_to_cart
     - views.view.commerce_cart_form
     - views.view.commerce_carts

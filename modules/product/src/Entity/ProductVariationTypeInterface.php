@@ -2,33 +2,33 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\Entity\CommerceBundleEntityInterface;
 
 /**
  * Defines the interface for product variation types.
  */
-interface ProductVariationTypeInterface extends ConfigEntityInterface {
+interface ProductVariationTypeInterface extends CommerceBundleEntityInterface {
 
   /**
-   * Gets the product variation type's line item type ID.
+   * Gets the product variation type's order item type ID.
    *
-   * Used for finding/creating the appropriate line item when purchasing a
+   * Used for finding/creating the appropriate order item when purchasing a
    * product (adding it to an order).
    *
    * @return string
-   *   The line item type ID.
+   *   The order item type ID.
    */
-  public function getLineItemTypeId();
+  public function getOrderItemTypeId();
 
   /**
-   * Sets the product variation type's line item type ID.
+   * Sets the product variation type's order item type ID.
    *
-   * @param string $line_item_type_id
-   *   The line item type ID.
+   * @param string $order_item_type_id
+   *   The order item type ID.
    *
    * @return $this
    */
-  public function setLineItemTypeId($line_item_type_id);
+  public function setOrderItemTypeId($order_item_type_id);
 
   /**
    * Gets whether the product variation title should be automatically generated.

@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce_price\Price;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\entity\EntityKeysFieldsTrait;
-use Drupal\field\FieldConfigInterface;
+use Drupal\Core\Url;
 use Drupal\user\UserInterface;
 
 /**
@@ -18,9 +18,17 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   label_singular = @Translation("product variation"),
+ *   label_plural = @Translation("product variations"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product variation",
+ *     plural = "@count product variations",
+ *   ),
+ *   bundle_label = @Translation("Product variation type"),
  *   handlers = {
  *     "event" = "Drupal\commerce_product\Event\ProductVariationEvent",
  *     "storage" = "Drupal\commerce_product\ProductVariationStorage",
+ *     "access" = "Drupal\commerce\EmbeddedEntityAccessControlHandler",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -29,9 +37,10 @@ use Drupal\user\UserInterface;
  *     "inline_form" = "Drupal\commerce_product\Form\ProductVariationInlineForm",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   admin_permission = "administer products",
+ *   admin_permission = "administer commerce_product",
  *   fieldable = TRUE,
  *   translatable = TRUE,
+ *   content_translation_ui_skip = TRUE,
  *   base_table = "commerce_product_variation",
  *   data_table = "commerce_product_variation_field_data",
  *   entity_keys = {
@@ -48,14 +57,32 @@ use Drupal\user\UserInterface;
  */
 class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
 
-  use EntityChangedTrait, EntityKeysFieldsTrait;
+  use EntityChangedTrait;
 
   /**
-   * Local cache for attribute field definitions.
-   *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface[]
+   * {@inheritdoc}
    */
-  protected $attributeFieldDefinitions;
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if ($rel == 'canonical') {
+      $route_name = 'entity.commerce_product.canonical';
+      $route_parameters = [
+        'commerce_product' => $this->getProductId(),
+      ];
+      $options = [
+        'query' => [
+          'v' => $this->id(),
+        ],
+        'entity_type' => 'commerce_product',
+        'entity' => $this->getProduct(),
+        // Display links by default based on the current language.
+        'language' => $this->language(),
+      ];
+      return new Url($route_name, $route_parameters, $options);
+    }
+    else {
+      return parent::toUrl($rel, $options);
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -105,7 +132,17 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getPrice() {
-    return $this->get('price')->first();
+    if (!$this->get('price')->isEmpty()) {
+      return $this->get('price')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPrice(Price $price) {
+    $this->set('price', $price);
+    return $this;
   }
 
   /**
@@ -157,44 +194,57 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    $this->get('uid')->target_id;
-    return $this;
+    return $this->get('uid')->target_id;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setOwnerId($uid) {
-    return $this->set('uid', $uid);
+    $this->set('uid', $uid);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLineItemTypeId() {
-    // The line item type is a bundle-level setting.
+  public function getStores() {
+    $product = $this->getProduct();
+    return $product ? $product->getStores() : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrderItemTypeId() {
+    // The order item type is a bundle-level setting.
     $type_storage = $this->entityTypeManager()->getStorage('commerce_product_variation_type');
     $type_entity = $type_storage->load($this->bundle());
 
-    return $type_entity->getLineItemTypeId();
+    return $type_entity->getOrderItemTypeId();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLineItemTitle() {
-    return $this->label();
+  public function getOrderItemTitle() {
+    $label = $this->label();
+    if (!$label) {
+      $label = $this->generateTitle();
+    }
+
+    return $label;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getAttributeIds() {
+  public function getAttributeValueIds() {
     $attribute_ids = [];
-    foreach ($this->getAttributeFieldDefinitions() as $name => $definition) {
-      $field = $this->get($name);
+    foreach ($this->getAttributeFieldNames() as $field_name) {
+      $field = $this->get($field_name);
       if (!$field->isEmpty()) {
-        $attribute_ids[$name] = $field->target_id;
+        $attribute_ids[$field_name] = $field->target_id;
       }
     }
 
@@ -204,9 +254,9 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   /**
    * {@inheritdoc}
    */
-  public function getAttributeId($field_name) {
-    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
-    if (!isset($attribute_field_definitions[$field_name])) {
+  public function getAttributeValueId($field_name) {
+    $attribute_field_names = $this->getAttributeFieldNames();
+    if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
     $attribute_id = NULL;
@@ -223,7 +273,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    */
   public function getAttributeValues() {
     $attribute_values = [];
-    foreach ($this->getAttributeFieldDefinitions() as $field_name => $definition) {
+    foreach ($this->getAttributeFieldNames() as $field_name) {
       $field = $this->get($field_name);
       if (!$field->isEmpty()) {
         $attribute_values[$field_name] = $field->entity;
@@ -237,8 +287,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getAttributeValue($field_name) {
-    $attribute_field_definitions = $this->getAttributeFieldDefinitions();
-    if (!isset($attribute_field_definitions[$field_name])) {
+    $attribute_field_names = $this->getAttributeFieldNames();
+    if (!in_array($field_name, $attribute_field_names)) {
       throw new \InvalidArgumentException(sprintf('Unknown attribute field name "%s".', $field_name));
     }
     $attribute_value = NULL;
@@ -251,19 +301,27 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
   }
 
   /**
+   * Gets the names of the entity's attribute fields.
+   *
+   * @return string[]
+   *   The attribute field names.
+   */
+  protected function getAttributeFieldNames() {
+    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
+    $field_map = $attribute_field_manager->getFieldMap($this->bundle());
+    return array_column($field_map, 'field_name');
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function getAttributeFieldDefinitions() {
-    if (!isset($this->attributeFieldDefinitions)) {
-      $definitions = $this->getFieldDefinitions();
-      $this->attributeFieldDefinitions = array_filter($definitions, function ($definition) {
-        if ($definition instanceof FieldConfigInterface) {
-          return $definition->getThirdPartySetting('commerce_product', 'attribute_field');
-        }
-      });
-    }
-
-    return $this->attributeFieldDefinitions;
+  public function getCacheTagsToInvalidate() {
+    $tags = parent::getCacheTagsToInvalidate();
+    // Invalidate the variations view builder and product caches.
+    return Cache::mergeTags($tags, [
+      'commerce_product:' . $this->getProductId(),
+      'commerce_product_variation_view',
+    ]);
   }
 
   /**
@@ -315,7 +373,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields = self::entityKeysBaseFieldDefinitions($entity_type);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Author'))
@@ -339,7 +397,6 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDescription(t('The unique, machine-readable identifier for a variation.'))
       ->setRequired(TRUE)
       ->addConstraint('ProductVariationSku')
-      ->setTranslatable(TRUE)
       ->setSetting('display_description', TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -396,6 +453,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       ->setDescription(t('Whether the variation is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 99,
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')

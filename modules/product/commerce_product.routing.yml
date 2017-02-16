@@ -4,7 +4,15 @@ entity.commerce_product.collection:
     _entity_list: 'commerce_product'
     _title: 'Products'
   requirements:
-    _permission: 'administer products'
+    _permission: 'administer commerce_product'
+
+entity.commerce_product_attribute.collection:
+  path: '/admin/commerce/product-attributes'
+  defaults:
+    _entity_list: 'commerce_product_attribute'
+    _title: 'Product attributes'
+  requirements:
+    _permission: 'administer commerce_product_attribute'
 
 entity.commerce_product_type.collection:
   path: '/admin/commerce/config/product-types'
@@ -12,7 +20,7 @@ entity.commerce_product_type.collection:
     _entity_list: 'commerce_product_type'
     _title: 'Product types'
   requirements:
-    _permission: 'administer product types'
+    _permission: 'administer commerce_product_type'
 
 entity.commerce_product_variation_type.collection:
   path: '/admin/commerce/config/product-variation-types'
@@ -20,4 +28,4 @@ entity.commerce_product_variation_type.collection:
     _entity_list: 'commerce_product_variation_type'
     _title: 'Product variation types'
   requirements:
-    _permission: 'administer product types'
+    _permission: 'administer commerce_product_type'

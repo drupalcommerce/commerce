@@ -1,0 +1,48 @@
+/**
+ * @file
+ * Styles for the payment method icons.
+ */
+
+.payment-method-icon {
+  display: inline-block;
+  width: 40px;
+  height: 25px;
+  background-size: 40px 25px;
+  text-indent: -9999px;
+  box-shadow: 0 0 0.01em black;
+  margin-left: 5px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.payment-method-icon--visa {
+  background-image: url(../images/visa.svg);
+}
+
+.payment-method-icon--mastercard {
+  background-image: url(../images/mastercard.svg);
+}
+
+.payment-method-icon--maestro {
+  background-image: url(../images/maestro.svg);
+}
+
+.payment-method-icon--amex {
+  background-image: url(../images/amex.svg);
+}
+
+.payment-method-icon--dinersclub {
+  background-image: url(../images/dinersclub.svg);
+}
+
+.payment-method-icon--discover {
+  background-image: url(../images/discover.svg);
+}
+
+.payment-method-icon--jcb {
+  background-image: url(../images/jcb.svg);
+}
+
+.payment-method-icon--unionpay {
+  background-image: url(../images/jcb.svg);
+}

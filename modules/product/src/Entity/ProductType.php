@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the product type entity class.
@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_product_type",
  *   label = @Translation("Product type"),
+ *   label_singular = @Translation("product type"),
+ *   label_plural = @Translation("product types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count product type",
+ *     plural = "@count product types",
+ *   ),
  *   handlers = {
  *     "list_builder" = "Drupal\commerce_product\ProductTypeListBuilder",
  *     "form" = {
@@ -19,11 +25,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "commerce_product_type",
- *   admin_permission = "administer product types",
+ *   admin_permission = "administer commerce_product_type",
  *   bundle_of = "commerce_product",
  *   entity_keys = {
  *     "id" = "id",
@@ -35,6 +40,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "description",
  *     "variationType",
+ *     "injectVariationFields",
+ *     "traits",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/product-types/add",
@@ -44,28 +51,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface {
-
-  /**
-   * The product type machine name and primary ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The product type UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
-
-  /**
-   * The product type label.
-   *
-   * @var string
-   */
-  protected $label;
+class ProductType extends CommerceBundleEntityBase implements ProductTypeInterface {
 
   /**
    * The product type description.
@@ -80,6 +66,13 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    * @var string
    */
   protected $variationType;
+
+  /**
+   * Indicates if variation fields should be injected.
+   *
+   * @var bool
+   */
+  protected $injectVariationFields = TRUE;
 
   /**
    * {@inheritdoc}
@@ -108,6 +101,21 @@ class ProductType extends ConfigEntityBundleBase implements ProductTypeInterface
    */
   public function setVariationTypeId($variation_type_id) {
     $this->variationType = $variation_type_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldInjectVariationFields() {
+    return $this->injectVariationFields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInjectVariationFields($inject) {
+    $this->injectVariationFields = (bool) $inject;
     return $this;
   }
 

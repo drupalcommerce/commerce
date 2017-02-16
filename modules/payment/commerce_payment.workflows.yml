@@ -1,0 +1,50 @@
+payment_default:
+  id: payment_default
+  group: commerce_payment
+  label: 'Default'
+  states:
+    new:
+      label: 'New'
+    authorization:
+      label: 'Authorization'
+    authorization_voided:
+      label: 'Authorization (Voided)'
+    authorization_expired:
+      label: 'Authorization (Expired)'
+    capture_completed:
+      label: 'Capture (Completed)'
+    capture_partially_refunded:
+      label: 'Capture (Partially refunded)'
+    capture_refunded:
+      label: 'Capture (Refunded)'
+  transitions:
+    # Transitions are required by the state_machine module,
+    # but aren't actually used by the payment API.
+    authorize:
+      label: 'Authorize payment'
+      from: [new]
+      to: authorization
+    void:
+      label: 'Void payment'
+      from: [authorization]
+      to: authorization_voided
+    expire:
+      label: 'Expire payment'
+      from: [authorization]
+      to: authorization_expired
+    authorize_capture:
+      label: 'Authorize and capture payment'
+      from: [new]
+      to: capture_completed
+    capture:
+      label: 'Capture payment'
+      from: [authorization]
+      to: capture_completed
+    partially_refund:
+      label: 'Partially refund payment'
+      from: [capture_completed]
+      to: capture_partially_refunded
+    refund:
+      label: 'Refund payment'
+      from: [capture_completed, capture_partially_refunded]
+      to: capture_refunded

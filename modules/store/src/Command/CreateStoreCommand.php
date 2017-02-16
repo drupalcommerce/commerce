@@ -47,7 +47,7 @@ class CreateStoreCommand extends ContainerAwareCommand {
 
     $currency_importer->import($currency_code);
     $values = [
-      'type' => 'default',
+      'type' => 'online',
       'uid' => 1,
       'name' => $input->getOption('name'),
       'mail' => $input->getOption('mail'),

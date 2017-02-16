@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - commerce_payment
+  config:
+    - field.storage.user.commerce_remote_id
+  module:
+    - commerce
+    - user
+id: user.user.commerce_remote_id
+field_name: commerce_remote_id
+entity_type: user
+bundle: user
+label: 'Remote ID'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: commerce_remote_id

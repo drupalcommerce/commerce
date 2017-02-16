@@ -4,6 +4,7 @@ namespace Drupal\commerce_price\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -41,7 +42,14 @@ class CurrencyForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface $currency */
     $currency = $this->entity;
+
+    $import_url = Url::fromRoute('entity.commerce_currency.import')->toString();
+    $form['message'] = [
+      '#type' => 'markup',
+      '#markup' => $this->t('This form is only intended for creating custom currencies. Real-world currencies should be <a href=":url">imported</a>.', [':url' => $import_url]),
+    ];
 
     $form['name'] = [
       '#type' => 'textfield',
@@ -58,19 +66,21 @@ class CurrencyForm extends EntityForm {
       '#pattern' => '[A-Z]{3}',
       '#placeholder' => 'XXX',
       '#maxlength' => 3,
-      '#size' => 3,
+      '#size' => 4,
       '#disabled' => !$currency->isNew(),
       '#required' => TRUE,
     ];
+    $iso_4217_url = Url::fromUri('https://en.wikipedia.org/wiki/ISO_4217')->toString();
     $form['numericCode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Numeric code'),
+      '#description' => $this->t('The three digit code, as defined by <a href=":url" target="_blank">ISO 4217</a>.', [':url' => $iso_4217_url]),
       '#default_value' => $currency->getNumericCode(),
       '#element_validate' => ['::validateNumericCode'],
       '#pattern' => '[\d]{3}',
       '#placeholder' => '999',
       '#maxlength' => 3,
-      '#size' => 3,
+      '#size' => 4,
       '#required' => TRUE,
     ];
     $form['symbol'] = [
@@ -95,7 +105,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the currency code.
    */
-  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateCurrencyCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $currency_code = $element['#value'];
     if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
@@ -112,7 +122,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the numeric code.
    */
-  public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateNumericCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $numeric_code = $element['#value'];
     if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {

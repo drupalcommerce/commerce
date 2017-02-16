@@ -6,12 +6,12 @@ entity.commerce_order.add_page:
 
 entity.commerce_order_type.add_form:
   route_name: entity.commerce_order_type.add_form
-  title: 'Add a new order type'
+  title: 'Add order type'
   appears_on:
     - entity.commerce_order_type.collection
 
-entity.commerce_line_item_type.add_form:
-  route_name: entity.commerce_line_item_type.add_form
-  title: 'Add a new line item type'
+entity.commerce_order_item_type.add_form:
+  route_name: entity.commerce_order_item_type.add_form
+  title: 'Add order item type'
   appears_on:
-    - entity.commerce_line_item_type.collection
+    - entity.commerce_order_item_type.collection

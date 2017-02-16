@@ -1,0 +1,146 @@
+<?php
+
+/**
+ * @file
+ * Provides configurable checkout flows.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_checkout_theme() {
+  $theme = [
+    'commerce_checkout_progress' => [
+      'variables' => [
+        'steps' => [],
+      ],
+    ],
+    'commerce_checkout_form' => [
+      'render element' => 'form',
+    ],
+    'commerce_checkout_form__with_summary' => [
+      'base hook' => 'commerce_checkout_form',
+    ],
+  ];
+
+  return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_checkout_theme_suggestions_commerce_checkout_form(array $variables) {
+  $original = $variables['theme_hook_original'];
+  $suggestions = [];
+  $suggestions[] = $original;
+  // If the checkout form has an order summary, suggest the enhanced layout.
+  if (isset($variables['form']['order_summary']) && Element::isVisibleElement($variables['form']['order_summary'])) {
+    $suggestions[] = $original . '__with_summary';
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_checkout_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_order') {
+    $fields['checkout_flow'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Checkout flow'))
+      ->setSetting('target_type', 'commerce_checkout_flow')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', [
+        'type' => 'hidden',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', FALSE)
+      ->setDisplayConfigurable('form', FALSE);
+
+    // @todo Implement a custom widget that shows itself when the flow is set
+    // and allows a step to be chosen from a dropdown.
+    $fields['checkout_step'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Checkout step'))
+      ->setDisplayOptions('form', [
+        'type' => 'hidden',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('view', FALSE)
+      ->setDisplayConfigurable('form', FALSE);
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'commerce_order_type_form'.
+ */
+function commerce_checkout_form_commerce_order_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+  $order_type = $form_state->getFormObject()->getEntity();
+  $storage = \Drupal::entityTypeManager()->getStorage('commerce_checkout_flow');
+  $checkout_flows = $storage->loadMultiple();
+  $checkout_flows = array_map(function ($checkout_flow) {
+    return $checkout_flow->label();
+  }, $checkout_flows);
+
+  $form['commerce_checkout'] = [
+    '#type' => 'details',
+    '#title' => t('Checkout settings'),
+    '#weight' => 5,
+    '#open' => TRUE,
+    '#collapsible' => TRUE,
+  ];
+  $form['commerce_checkout']['checkout_flow'] = [
+    '#type' => 'select',
+    '#title' => t('Checkout flow'),
+    '#options' => $checkout_flows,
+    '#default_value' => $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default'),
+    '#required' => TRUE,
+  ];
+  $form['actions']['submit']['#submit'][] = 'commerce_checkout_order_type_form_submit';
+}
+
+/**
+ * Submission handler for commerce_checkout_form_commerce_order_type_form_alter().
+ */
+function commerce_checkout_order_type_form_submit($form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
+  $order_type = $form_state->getFormObject()->getEntity();
+  $settings = $form_state->getValue(['commerce_checkout']);
+  $order_type->setThirdPartySetting('commerce_checkout', 'checkout_flow', $settings['checkout_flow']);
+  $order_type->save();
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_checkout_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
+    // Only add the Checkout button if the cart form view has order items.
+    $view = reset($form_state->getBuildInfo()['args']);
+    if (!empty($view->result)) {
+      $form['actions']['checkout'] = [
+        '#type' => 'submit',
+        '#value' => t('Checkout'),
+        '#weight' => 5,
+        '#access' => \Drupal::currentUser()->hasPermission('access checkout'),
+        '#submit' => array_merge($form['#submit'], ['commerce_checkout_order_item_views_form_submit']),
+        '#order_id' => $view->argument['order_id']->value[0],
+      ];
+    }
+  }
+}
+
+/**
+ * Submit handler used to redirect to the checkout page.
+ */
+function commerce_checkout_order_item_views_form_submit($form, FormStateInterface $form_state) {
+  $order_id = $form_state->getTriggeringElement()['#order_id'];
+  $form_state->setRedirect('commerce_checkout.form', ['commerce_order' => $order_id]);
+}

@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -106,14 +105,14 @@ class ProductForm extends ContentEntityForm {
       'changed' => [
         '#type' => 'item',
         '#wrapper_attributes' => [
-          'class' => ['entity-meta__last-saved', 'container-inline']
+          'class' => ['entity-meta__last-saved', 'container-inline'],
         ],
         '#markup' => '<h4 class="label inline">' . $this->t('Last saved') . '</h4> ' . $last_saved,
       ],
       'author' => [
         '#type' => 'item',
         '#wrapper_attributes' => [
-          'class' => ['author', 'container-inline']
+          'class' => ['author', 'container-inline'],
         ],
         '#markup' => '<h4 class="label inline">' . $this->t('Author') . '</h4> ' . $product->getOwner()->getDisplayName(),
       ],
@@ -187,7 +186,7 @@ class ProductForm extends ContentEntityForm {
    * @return array
    *   The modified visibility_settings element.
    */
-  public static function hideEmptyVisibilitySettings($form) {
+  public static function hideEmptyVisibilitySettings(array $form) {
     if (isset($form['stores']['widget']['target_id'])) {
       $stores_element = $form['stores']['widget']['target_id'];
       if (!Element::getVisibleChildren($stores_element)) {
@@ -246,7 +245,7 @@ class ProductForm extends ContentEntityForm {
     // 1     | 1           » publish   & Save and publish          & Save as unpublished
     // 1     | 0           » unpublish & Save and publish          & Save as unpublished
     // 0     | 1           » publish   & Save and keep published   & Save and unpublish
-    // 0     | 0           » unpublish & Save and keep unpublished & Save and publish
+    // 0     | 0           » unpublish & Save and keep unpublished & Save and publish.
     if ($product->isNew()) {
       $element['publish']['#value'] = $this->t('Save and publish');
       $element['unpublish']['#value'] = $this->t('Save as unpublished');

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ruleset name="Commerce coding standards">
+  <description>Drupal 8 coding standards</description>
+
+  <exclude-pattern>*/.git/*</exclude-pattern>
+  <exclude-pattern>*/config/*</exclude-pattern>
+  <exclude-pattern>*/css/*</exclude-pattern>
+  <exclude-pattern>*/js/*</exclude-pattern>
+  <exclude-pattern>*/icons/*</exclude-pattern>
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+
+  <rule ref="Drupal"/>
+
+  <!-- The following rules are intentionally disabled. -->
+  <rule ref="Drupal.Commenting.ClassComment.Missing">
+    <severity>0</severity>
+  </rule>
+  <rule ref="Drupal.Files.LineLength.TooLong">
+    <severity>0</severity>
+  </rule>
+  <rule ref="Drupal.Array.Array.LongLineDeclaration">
+    <severity>0</severity>
+  </rule>
+  <rule ref="Drupal.Commenting.VariableComment.VarOrder">
+    <severity>0</severity>
+  </rule>
+  <!-- Complains about '#element_validate callback:' -->
+  <rule ref="Drupal.Commenting.DocComment.ShortNotCapital">
+    <severity>0</severity>
+  </rule>
+  <!-- Complains a lot about tests which don't need short descriptions. -->
+  <rule ref="Drupal.Commenting.DocComment.MissingShort">
+    <severity>0</severity>
+  </rule>
+  <rule ref="Drupal.Commenting.DocComment.ShortSingleLine">
+    <severity>0</severity>
+  </rule>
+  <!-- Complains about annotation classes. -->
+  <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
+    <severity>0</severity>
+  </rule>
+
+</ruleset>

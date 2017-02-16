@@ -34,6 +34,11 @@ class ProductVariationInlineForm extends EntityInlineForm {
   public function getTableFields($bundles) {
     $fields = parent::getTableFields($bundles);
     $fields['label']['label'] = t('Title');
+    $fields['price'] = [
+      'type' => 'field',
+      'label' => t('Price'),
+      'weight' => 10,
+    ];
     $fields['status'] = [
       'type' => 'field',
       'label' => t('Status'),
@@ -79,10 +84,10 @@ class ProductVariationInlineForm extends EntityInlineForm {
   }
 
   /**
-   * Loads and returns a product variation type with the given id.
+   * Loads and returns a product variation type with the given ID.
    *
-   * @param $variation_type_id
-   *   The ID of the variation type.
+   * @param string $variation_type_id
+   *   The variation type ID.
    *
    * @return \Drupal\commerce_product\Entity\ProductVariationTypeInterface
    *   The loaded product variation type.

@@ -113,13 +113,13 @@ class OrderForm extends ContentEntityForm {
       $form['uid']['#group'] = 'customer';
     }
     else {
-      $user_link = $order->getOwner()->toLink()->toString();
+      $user_link = $order->getCustomer()->toLink()->toString();
       $form['customer']['uid'] = $this->fieldAsReadOnly($this->t('Customer'), $user_link);
     }
     if (isset($form['mail'])) {
       $form['mail']['#group'] = 'customer';
     }
-    else {
+    elseif (!empty($order->getEmail())) {
       $form['customer']['mail'] = $this->fieldAsReadOnly($this->t('Contact email'), $order->getEmail());
     }
     // All additional customer information should come after uid/mail.
@@ -143,7 +143,7 @@ class OrderForm extends ContentEntityForm {
     return [
       '#type' => 'item',
       '#wrapper_attributes' => [
-        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline']
+        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline'],
       ],
       '#markup' => '<h4 class="label inline">' . $label . '</h4> ' . $value,
     ];

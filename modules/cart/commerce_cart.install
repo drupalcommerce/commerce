@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Cart.
+ */
+
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_cart_install() {
+  // Allow all roles to use cart.
+  user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access cart']);
+  user_role_grant_permissions(AccountInterface::AUTHENTICATED_ROLE, ['access cart']);
+}

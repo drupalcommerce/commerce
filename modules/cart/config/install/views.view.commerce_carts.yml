@@ -29,7 +29,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'administer orders'
+          perm: 'access commerce_order overview'
       cache:
         type: none
         options: {  }
@@ -88,7 +88,7 @@ display:
             store_id: store_id
             uid: uid
             mail: uid
-            total_price__amount: total_price__amount
+            total_price__number: total_price__number
             changed: changed
             operations: operations
           info:
@@ -120,7 +120,7 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            total_price__amount:
+            total_price__number:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -460,10 +460,10 @@ display:
           entity_type: commerce_order
           entity_field: mail
           plugin_id: field
-        total_price__amount:
-          id: total_price__amount
+        total_price__number:
+          id: total_price__number
           table: commerce_order
-          field: total_price__amount
+          field: total_price__number
           relationship: none
           group_type: group
           admin_label: ''
@@ -508,7 +508,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: amount
+          click_sort_column: number
           type: commerce_price_default
           settings:
             strip_trailing_zeroes: false
@@ -651,7 +651,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: false
           expose:

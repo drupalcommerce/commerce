@@ -1,0 +1,4 @@
+entity.commerce_checkout_flow.edit_form:
+  route_name: entity.commerce_checkout_flow.edit_form
+  base_route: entity.commerce_checkout_flow.edit_form
+  title: Edit

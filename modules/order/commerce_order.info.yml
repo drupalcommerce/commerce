@@ -5,24 +5,25 @@ package: Commerce
 core: 8.x
 dependencies:
   - commerce
-  - commerce_price
-  - commerce_store
-  - datetime
-  - inline_entity_form
+  - commerce:commerce_price
+  - commerce:commerce_store
+  - entity_reference_revisions
   - options
   - profile
   - state_machine
 config_devel:
-  - views.view.commerce_orders
-  - views.view.commerce_line_item_table
-  - views.view.commerce_user_orders
-  - commerce_order.commerce_order_type.default
-  - field.field.commerce_order.default.line_items
-  - field.storage.commerce_order.line_items
-  - core.entity_form_display.commerce_order.default.default
-  - core.entity_view_display.commerce_order.default.default
-  - core.entity_view_display.commerce_order.default.user
-  - core.entity_form_display.profile.billing.default
-  - core.entity_view_display.profile.billing.default
-  - core.entity_view_mode.commerce_order.user
-  - system.action.commerce_delete_order_action
+  install:
+    - commerce_order.commerce_order_type.default
+    - core.entity_form_display.commerce_order.default.default
+    - core.entity_view_display.commerce_order.default.default
+    - core.entity_view_display.commerce_order.default.user
+    - core.entity_view_mode.commerce_order.user
+    - core.entity_form_display.profile.customer.default
+    - core.entity_view_display.profile.customer.default
+    - field.field.commerce_order.default.order_items
+    - field.storage.commerce_order.order_items
+    - views.view.commerce_orders
+    - views.view.commerce_order_item_table
+    - views.view.commerce_user_orders
+    - profile.type.customer
+    - system.action.commerce_delete_order_action

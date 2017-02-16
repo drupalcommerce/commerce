@@ -1,0 +1,15 @@
+commerce_price_test.number_test_form:
+  path: '/commerce_price_test/number_test_form'
+  defaults:
+    _form: '\Drupal\commerce_price_test\Form\NumberTestForm'
+    _title: 'Number test form'
+  requirements:
+    _access: 'TRUE'
+
+commerce_price_test.price_test_form:
+  path: '/commerce_price_test/price_test_form'
+  defaults:
+    _form: '\Drupal\commerce_price_test\Form\PriceTestForm'
+    _title: 'Price test form'
+  requirements:
+    _access: 'TRUE'

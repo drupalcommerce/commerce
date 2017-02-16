@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Provides a UI for managing promotions.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_promotion_theme() {
+  return [
+    'commerce_promotion' => [
+      'render element' => 'elements',
+    ],
+    'commerce_promotion_form' => [
+      'render element' => 'form',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_commerce_promotion().
+ */
+function commerce_promotion_theme_suggestions_commerce_promotion(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_promotion', $variables);
+}
+
+/**
+ * Prepares variables for promotion templates.
+ *
+ * Default template: commerce-promotion.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_promotion(array &$variables) {
+  /** @var Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+  $promotion = $variables['elements']['#commerce_promotion'];
+
+  $variables['promotion_entity'] = $promotion;
+  $variables['promotion_url'] = $promotion->toUrl();
+  $variables['promotion'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['promotion'][$key] = $variables['elements'][$key];
+  }
+}

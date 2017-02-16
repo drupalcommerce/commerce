@@ -1,0 +1,29 @@
+admin:
+  version: VERSION
+  js:
+    js/commerce_checkout.admin.js: {}
+  css:
+    theme:
+      css/commerce_checkout.admin.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/jquery.once
+
+login_pane:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_checkout.layout.css: {}
+
+checkout_progress:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_checkout.progress.css: {}
+
+form:
+  version: VERSION
+  css:
+    theme:
+      css/commerce_checkout.form.css: {}

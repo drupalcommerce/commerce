@@ -1,0 +1,14 @@
+administer commerce_payment_gateway:
+  title: 'Administer payment gateways'
+  'restrict access': TRUE
+
+administer commerce_payment:
+  title: 'Administer payments'
+  'restrict access': TRUE
+
+administer commerce_payment_method:
+  title: 'Administer payment methods'
+  'restrict access': TRUE
+
+manage own commerce_payment_method:
+  title: 'Manage own payment methods'

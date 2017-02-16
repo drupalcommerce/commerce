@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce\Resolver;
 
-use Drupal\commerce\CountryContextInterface;
+use Drupal\commerce\CurrentCountryInterface;
 use Drupal\commerce\Locale;
 use Drupal\Core\Language\LanguageManagerInterface;
 
@@ -19,45 +19,47 @@ class DefaultLocaleResolver implements LocaleResolverInterface {
   protected $languageManager;
 
   /**
-   * The country context.
+   * The current country.
    *
-   * @var \Drupal\commerce\CountryContextInterface
+   * @var \Drupal\commerce\CurrentCountryInterface
    */
-  protected $countryContext;
+  protected $currentCountry;
 
   /**
    * Constructs a new DefaultLocaleResolver object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\commerce\CountryContextInterface $country_context
-   *   The country context.
+   * @param \Drupal\commerce\CurrentCountryInterface $current_country
+   *   The current country.
    */
-  public function __construct(LanguageManagerInterface $language_manager, CountryContextInterface $country_context) {
+  public function __construct(LanguageManagerInterface $language_manager, CurrentCountryInterface $current_country) {
     $this->languageManager = $language_manager;
-    $this->countryContext = $country_context;
+    $this->currentCountry = $current_country;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolve() {
-    $language = $this->languageManager->getConfigOverrideLanguage()->getId();
-    $language_parts = explode('-', $language);
-    if (count($language_parts) > 1 && strlen(end($language_parts)) == 2) {
+    // The getCurrentLanguage() fallback is a workaround for core bug #2684873.
+    $language = $this->languageManager->getConfigOverrideLanguage() ?: $this->languageManager->getCurrentLanguage();
+    $langcode = $language->getId();
+    $langcode_parts = explode('-', $langcode);
+    if (count($langcode_parts) > 1 && strlen(end($langcode_parts)) == 2) {
       // The current language already has a country component (e.g. 'pt-br'),
       // it qualifies as a full locale.
-      $locale = $language;
+      $locale = $langcode;
     }
-    elseif ($country = $this->countryContext->getCountry()) {
+    elseif ($country = $this->currentCountry->getCountry()) {
       // Assemble the locale using the resolved country. This can result
       // in non-existent combinations such as 'en-RS', it's up to the locale
       // consumers (e.g. the number format repository) to perform fallback.
-      $locale = $language . '-' . $country;
+      $locale = $langcode . '-' . $country;
     }
     else {
       // Worst case scenario, the country is unknown.
-      $locale = $language;
+      $locale = $langcode;
     }
 
     return new Locale($locale);

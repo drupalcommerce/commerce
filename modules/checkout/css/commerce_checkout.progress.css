@@ -1,0 +1,26 @@
+/**
+ * @file
+ * Default theme implementation for the checkout progress component.
+ */
+
+body {
+  counter-reset: checkout-progress;
+}
+
+.checkout-progress--step {
+  display: inline;
+  padding-right: 1em;
+}
+
+/**
+ * display: inline removes the list numbers, so they're added back via CSS3
+ * counters to avoid using float: left, which gives uneven spacing.
+ */
+.checkout-progress--step:before {
+  content: counter(checkout-progress) ". ";
+  counter-increment: checkout-progress;
+}
+
+.checkout-progress--step__current {
+  font-weight: bold;
+}

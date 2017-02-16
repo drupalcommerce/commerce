@@ -2,23 +2,23 @@
 /**
  * @file
  *
- * Default theme implementation for stores.
+ * Default template for stores.
  *
  * Available variables:
- * - content: Items for the content of the store.
- *   Use 'content' to print them all, or print a subset such as
- *   'content.name'. Use the following code to exclude the
- *   printing of a given child element:
- *   @code
- *   {{ content|without('name') }}
- *   @endcode
  * - attributes: HTML attributes for the wrapper.
- * - store: The store object.
- * - url: The store URL.
+ * - store: The rendered store fields.
+ *   Use 'store' to print them all, or print a subset such as
+ *   'store.name'. Use the following code to exclude the
+ *   printing of a given field:
+ *   @code
+ *   {{ store|without('name') }}
+ *   @endcode
+ * - store_entity: The store entity.
+ * - store_url: The store URL.
  *
  * @ingroup themeable
  */
 #}
 <article{{ attributes }}>
-  {{ content }}
+  {{ store }}
 </article>

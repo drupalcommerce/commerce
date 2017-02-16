@@ -1,0 +1,99 @@
+entity.commerce_payment.add_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/add'
+  defaults:
+    _form: '\Drupal\commerce_payment\Form\PaymentAddForm'
+    _title: 'Add payment'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _entity_create_access: 'commerce_payment'
+
+entity.commerce_payment.operation_form:
+  path: '/admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation}'
+  defaults:
+    _entity_form: 'commerce_payment.operation'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+      commerce_payment:
+        type: 'entity:commerce_payment'
+  requirements:
+    _commerce_payment_operation_access: 'TRUE'
+
+entity.commerce_payment.collection:
+  path: '/admin/commerce/orders/{commerce_order}/payments'
+  defaults:
+    _entity_list: 'commerce_payment'
+    _title: 'Payments'
+  requirements:
+    _permission: 'administer commerce_payment'
+
+entity.commerce_payment_gateway.collection:
+  path: '/admin/commerce/config/payment-gateways'
+  defaults:
+    _entity_list: 'commerce_payment_gateway'
+    _title: 'Payment gateways'
+  requirements:
+    _permission: 'administer commerce_payment_gateway'
+
+entity.commerce_payment_method.add_form:
+  path: '/user/{user}/payment-methods/add'
+  defaults:
+    _form: '\Drupal\commerce_payment\Form\PaymentMethodAddForm'
+    _title: 'Add payment method'
+  requirements:
+    _custom_access: '\Drupal\commerce_payment\PaymentMethodAccessCheck::checkAccess'
+  options:
+    parameters:
+      user:
+        type: entity:user
+
+entity.commerce_payment_method.collection:
+  path: '/user/{user}/payment-methods'
+  defaults:
+    _entity_list: 'commerce_payment_method'
+    _title: 'Payment methods'
+  requirements:
+    _custom_access: '\Drupal\commerce_payment\PaymentMethodAccessCheck::checkAccess'
+  options:
+    parameters:
+      user:
+        type: entity:user
+
+commerce_payment.checkout.return:
+  path: '/checkout/{commerce_order}/{step}/return'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::returnCheckoutPage'
+  requirements:
+    _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
+    _module_dependencies: commerce_checkout
+  options:
+    parameters:
+      commerce_order:
+        type: entity:commerce_order
+
+commerce_payment.checkout.cancel:
+  path: '/checkout/{commerce_order}/{step}/cancel'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::cancelCheckoutPage'
+  requirements:
+    _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
+    _module_dependencies: commerce_checkout
+  options:
+    parameters:
+      commerce_order:
+        type: entity:commerce_order
+
+commerce_payment.notify:
+  path: '/payment/notify/{commerce_payment_gateway}'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\OffsitePaymentController::notifyPage'
+  requirements:
+    _access: 'TRUE'
+  options:
+    parameters:
+      commerce_payment_gateway:
+        type: entity:commerce_payment_gateway

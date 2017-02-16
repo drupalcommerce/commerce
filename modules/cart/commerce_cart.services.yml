@@ -1,4 +1,10 @@
 services:
+  cache_context.cart:
+    class: Drupal\commerce_cart\Cache\Context\CartCacheContext
+    arguments: ['@current_user', '@commerce_cart.cart_provider']
+    tags:
+      - { name: cache.context }
+
   commerce_cart.cart_session:
     class: Drupal\commerce_cart\CartSession
     arguments: ['@session']
@@ -9,14 +15,18 @@ services:
 
   commerce_cart.cart_manager:
     class: Drupal\commerce_cart\CartManager
-    arguments: ['@entity_type.manager', '@commerce_cart.line_item_matcher', '@language_manager', '@event_dispatcher']
-
-  commerce_cart.line_item_matcher:
-      class: Drupal\commerce_cart\LineItemMatcher
-      arguments: ['@event_dispatcher']
+    arguments: ['@entity_type.manager', '@commerce_cart.order_item_matcher', '@language_manager', '@event_dispatcher']
 
   commerce_cart.order_language:
     class: Drupal\commerce_cart\EventSubscriber\CartLanguage
     arguments: ['@language_manager']
+
+  commerce_cart.order_item_matcher:
+    class: Drupal\commerce_cart\OrderItemMatcher
+    arguments: ['@event_dispatcher']
+
+  commerce_cart.order_subscriber:
+    class: Drupal\commerce_cart\EventSubscriber\OrderEventSubscriber
+    arguments: ['@commerce_cart.cart_provider']
     tags:
       - { name: event_subscriber }

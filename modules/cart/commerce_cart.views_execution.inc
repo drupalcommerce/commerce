@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Provides views execution hooks for commerce_cart.
+ * Provides views execution hooks for Cart.
  */
 
 use Drupal\views\ViewExecutable;

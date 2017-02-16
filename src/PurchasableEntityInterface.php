@@ -14,25 +14,41 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface PurchasableEntityInterface extends ContentEntityInterface {
 
   /**
-   * Gets the purchasable entity's line item type ID.
+   * Gets the stores through which the purchasable entity is sold.
    *
-   * Used for finding/creating the appropriate line item when purchasing a
+   * @return \Drupal\commerce_store\Entity\StoreInterface[]
+   *   The stores.
+   */
+  public function getStores();
+
+  /**
+   * Gets the purchasable entity's order item type ID.
+   *
+   * Used for finding/creating the appropriate order item when purchasing a
    * product (adding it to an order).
    *
    * @return string
-   *   The line item type ID.
+   *   The order item type ID.
    */
-  public function getLineItemTypeId();
+  public function getOrderItemTypeId();
 
   /**
-   * Gets the purchasable entity's line item title.
+   * Gets the purchasable entity's order item title.
    *
-   * Saved in the $lineItem->title field to protect the line items of
+   * Saved in the $order_item->title field to protect the order items of
    * completed orders against changes in the referenced purchased entity.
    *
    * @return string
-   *   The line item title.
+   *   The order item title.
    */
-  public function getLineItemTitle();
+  public function getOrderItemTitle();
+
+  /**
+   * Gets the purchasable entity's price.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The price, or NULL.
+   */
+  public function getPrice();
 
 }

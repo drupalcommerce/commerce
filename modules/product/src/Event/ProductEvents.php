@@ -88,6 +88,18 @@ final class ProductEvents {
   const PRODUCT_TRANSLATION_DELETE = 'commerce_product.commerce_product.translation_delete';
 
   /**
+   * Name of the event fired after changing the product variation via ajax.
+   *
+   * Allows modules to add arbitrary ajax commands to the response returned by
+   * the add to cart form #ajax callback.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_product\Event\ProductVariationAjaxChangeEvent
+   */
+  const PRODUCT_VARIATION_AJAX_CHANGE = 'commerce_product.commerce_product_variation.ajax_change';
+
+  /**
    * Name of the event fired after loading a product variation.
    *
    * @Event

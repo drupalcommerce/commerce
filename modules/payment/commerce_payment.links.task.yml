@@ -1,0 +1,14 @@
+entity.commerce_payment.collection:
+  route_name: entity.commerce_payment.collection
+  base_route: entity.commerce_order.canonical
+  title: Payments
+
+entity.commerce_payment_gateway.edit_form:
+  route_name: entity.commerce_payment_gateway.edit_form
+  base_route: entity.commerce_payment_gateway.edit_form
+  title: Edit
+
+entity.commerce_payment_method.collection:
+  route_name: entity.commerce_payment_method.collection
+  base_route: entity.user.canonical
+  title: Payment methods

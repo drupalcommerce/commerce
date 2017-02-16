@@ -4,6 +4,8 @@ namespace Drupal\commerce_cart\Plugin\Block;
 
 use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -74,7 +76,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function defaultConfiguration() {
     return [
-      'item_text' => $this->t('items'),
       'dropdown' => TRUE,
     ];
   }
@@ -83,12 +84,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
-    $form['commerce_cart_item_text'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Items text'),
-      '#default_value' => $this->configuration['item_text'],
-      '#description' => $this->t('Shown after the number. Defaults to "items"'),
-    ];
     $form['commerce_cart_dropdown'] = [
       '#type' => 'radios',
       '#title' => $this->t('Display cart contents in a dropdown'),
@@ -106,7 +101,6 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->configuration['item_text'] = $form_state->getValue('commerce_cart_item_text');
     $this->configuration['dropdown'] = $form_state->getValue('commerce_cart_dropdown');
   }
 
@@ -117,11 +111,17 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   A render array.
    */
   public function build() {
+    $cachable_metadata = new CacheableMetadata();
+    $cachable_metadata->addCacheContexts(['user', 'session']);
+
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->cartProvider->getCarts();
     $carts = array_filter($carts, function ($cart) {
       /** @var \Drupal\commerce_order\Entity\OrderInterface $cart */
-      return $cart->hasLineItems();
+      // There is a chance the cart may have converted from a draft order, but
+      // is still in session. Such as just completing check out. So we verify
+      // that the cart is still a cart.
+      return $cart->hasItems() && $cart->cart->value;
     });
 
     $count = 0;
@@ -129,16 +129,17 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     if (!empty($carts)) {
       $cart_views = $this->getCartViews($carts);
       foreach ($carts as $cart_id => $cart) {
-        foreach ($cart->getLineItems() as $line_item) {
-          $count += (int) $line_item->getQuantity();
+        foreach ($cart->getItems() as $order_item) {
+          $count += (int) $order_item->getQuantity();
         }
+        $cachable_metadata->addCacheableDependency($cart);
       }
     }
 
     $links = [];
     $links[] = [
       '#type' => 'link',
-      '#title' => t('Cart'),
+      '#title' => $this->t('Cart'),
       '#url' => Url::fromRoute('commerce_cart.page'),
     ];
 
@@ -153,10 +154,13 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
         '#alt' => $this->t('Shopping cart'),
       ],
       '#count' => $count,
-      '#item_text' => $this->configuration['item_text'],
+      '#count_text' => $this->formatPlural($count, '@count item', '@count items'),
       '#url' => Url::fromRoute('commerce_cart.page')->toString(),
       '#content' => $cart_views,
       '#links' => $links,
+      '#cache' => [
+        'contexts' => ['cart'],
+      ],
     ];
   }
 
@@ -167,12 +171,12 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The cart orders.
    *
    * @return array
-   *   An array of view ids keyed by cart order id.
+   *   An array of view ids keyed by cart order ID.
    */
   protected function getCartViews(array $carts) {
     $cart_views = [];
     if ($this->configuration['dropdown']) {
-      $order_type_ids = array_map(function($cart) {
+      $order_type_ids = array_map(function ($cart) {
         return $cart->bundle();
       }, $carts);
       $order_type_storage = $this->entityTypeManager->getStorage('commerce_order_type');
@@ -180,6 +184,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
       $available_views = [];
       foreach ($order_type_ids as $cart_id => $order_type_id) {
+        /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
         $order_type = $order_types[$order_type_id];
         $available_views[$cart_id] = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
       }
@@ -200,11 +205,25 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Find proper cache tags to make this cacheable
    */
-  public function getCacheMaxAge() {
-    return 0;
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['cart']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $cache_tags = parent::getCacheTags();
+    $cart_cache_tags = [];
+
+    /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
+    $carts = $this->cartProvider->getCarts();
+    foreach ($carts as $cart) {
+      // Add tags for all carts regardless items or cart flag.
+      $cart_cache_tags = Cache::mergeTags($cart_cache_tags, $cart->getCacheTags());
+    }
+    return Cache::mergeTags($cache_tags, $cart_cache_tags);
   }
 
 }

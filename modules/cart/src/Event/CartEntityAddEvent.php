@@ -4,7 +4,7 @@ namespace Drupal\commerce_cart\Event;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_order\Entity\LineItemInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -36,14 +36,14 @@ class CartEntityAddEvent extends Event {
   protected $quantity;
 
   /**
-   * The destination line item.
+   * The destination order item.
    *
-   * @var \Drupal\commerce_order\Entity\LineItemInterface
+   * @var \Drupal\commerce_order\Entity\OrderItemInterface
    */
-  protected $lineItem;
+  protected $orderItem;
 
   /**
-   * Constructs a new CartLineItemEvent.
+   * Constructs a new CartOrderItemEvent.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $cart
    *   The cart order.
@@ -51,14 +51,14 @@ class CartEntityAddEvent extends Event {
    *   The added entity.
    * @param float $quantity
    *   The quantity.
-   * @param \Drupal\commerce_order\Entity\LineItemInterface $line_item
-   *   The destination line item.
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
+   *   The destination order item.
    */
-  public function __construct(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity, LineItemInterface $line_item) {
+  public function __construct(OrderInterface $cart, PurchasableEntityInterface $entity, $quantity, OrderItemInterface $order_item) {
     $this->cart = $cart;
     $this->entity = $entity;
     $this->quantity = $quantity;
-    $this->lineItem = $line_item;
+    $this->orderItem = $order_item;
   }
 
   /**
@@ -88,7 +88,7 @@ class CartEntityAddEvent extends Event {
    *   The added entity.
    */
   public function getEntity() {
-    return $this->cart;
+    return $this->entity;
   }
 
   /**
@@ -102,13 +102,13 @@ class CartEntityAddEvent extends Event {
   }
 
   /**
-   * Gets the destination line item.
+   * Gets the destination order item.
    *
-   * @return \Drupal\commerce_order\Entity\LineItemInterface
-   *   The destination line item.
+   * @return \Drupal\commerce_order\Entity\OrderItemInterface
+   *   The destination order item.
    */
-  public function getLineItem() {
-    return $this->lineItem;
+  public function getOrderItem() {
+    return $this->orderItem;
   }
 
 }

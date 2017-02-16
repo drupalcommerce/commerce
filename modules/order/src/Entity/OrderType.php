@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the order type entity class.
@@ -10,6 +10,12 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  * @ConfigEntityType(
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
+ *   label_singular = @Translation("order type"),
+ *   label_plural = @Translation("order types"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count order type",
+ *     plural = "@count order types",
+ *   ),
  *   handlers = {
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderTypeForm",
@@ -18,11 +24,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *       "create" = "Drupal\entity\Routing\CreateHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\commerce_order\OrderTypeListBuilder",
  *   },
- *   admin_permission = "administer order types",
+ *   admin_permission = "administer commerce_order_type",
  *   config_prefix = "commerce_order_type",
  *   bundle_of = "commerce_order",
  *   entity_keys = {
@@ -34,6 +39,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "workflow",
+ *     "traits",
+ *     "refresh_mode",
+ *     "refresh_frequency",
+ *     "sendReceipt",
+ *     "receiptBcc",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -43,21 +53,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
-
-  /**
-   * The order type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The order type label.
-   *
-   * @var string
-   */
-  protected $label;
+class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
 
   /**
    * The order type workflow ID.
@@ -65,6 +61,34 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    * @var string
    */
   protected $workflow;
+
+  /**
+   * The order type refresh mode.
+   *
+   * @var string
+   */
+  protected $refresh_mode;
+
+  /**
+   * The order type refresh frequency.
+   *
+   * @var int
+   */
+  protected $refresh_frequency;
+
+  /**
+   * Whether to email the customer a receipt when an order is placed.
+   *
+   * @var bool
+   */
+  protected $sendReceipt;
+
+  /**
+   * The receipt BCC email.
+   *
+   * @var bool
+   */
+  protected $receiptBcc;
 
   /**
    * {@inheritdoc}
@@ -78,6 +102,67 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setWorkflowId($workflow_id) {
     $this->workflow = $workflow_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRefreshMode() {
+    return $this->refresh_mode;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRefreshMode($refresh_mode) {
+    $this->refresh_mode = $refresh_mode;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRefreshFrequency() {
+    // The refresh frequency must always be at least 1s.
+    return !empty($this->refresh_frequency) ? $this->refresh_frequency : 1;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRefreshFrequency($refresh_frequency) {
+    $this->refresh_frequency = $refresh_frequency;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldSendReceipt() {
+    return $this->sendReceipt;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSendReceipt($send_receipt) {
+    $this->sendReceipt = (bool) $send_receipt;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReceiptBcc() {
+    return $this->receiptBcc;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReceiptBcc($receipt_bcc) {
+    $this->receiptBcc = $receipt_bcc;
     return $this;
   }
 

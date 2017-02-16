@@ -3,6 +3,7 @@
 namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
 
@@ -20,10 +21,10 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function getProduct();
 
   /**
-   * Gets the parent product id.
+   * Gets the parent product ID.
    *
    * @return int|null
-   *   The product id, or null.
+   *   The product ID, or null.
    */
   public function getProductId();
 
@@ -64,12 +65,14 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setTitle($title);
 
   /**
-   * Gets the variation price.
+   * Sets the variation price.
    *
-   * @return object
-   *   The variation price.
+   * @param \Drupal\commerce_price\Price $price
+   *   The price.
+   *
+   * @return $this
    */
-  public function getPrice();
+  public function setPrice(Price $price);
 
   /**
    * Gets whether the variation is active.
@@ -110,28 +113,28 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets the attribute IDs.
+   * Gets the attribute value IDs.
    *
    * @return int[]
-   *   The attribute IDs, keyed by field name.
+   *   The attribute value IDs, keyed by field name.
    */
-  public function getAttributeIds();
+  public function getAttributeValueIds();
 
   /**
-   * Gets the attribute id for the given field name.
+   * Gets the attribute value id for the given field name.
    *
    * @param string $field_name
    *   The field name.
    *
    * @return int|null
-   *   The attribute ID, or NULL.
+   *   The attribute value ID, or NULL.
    */
-  public function getAttributeId($field_name);
+  public function getAttributeValueId($field_name);
 
   /**
    * Gets the attribute values.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface[]
    *   The attribute values, keyed by field name.
    */
   public function getAttributeValues();
@@ -142,17 +145,9 @@ interface ProductVariationInterface extends PurchasableEntityInterface, EntityCh
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return \Drupal\commerce_product\Entity\ProductAttributeValueInterface|null
    *   The attribute value, or NULL.
    */
   public function getAttributeValue($field_name);
-
-  /**
-   * Gets an array of attribute field definitions.
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
-   *   An array of attribute field definitions, keyed by field name.
-   */
-  public function getAttributeFieldDefinitions();
 
 }

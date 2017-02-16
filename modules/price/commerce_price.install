@@ -1,13 +1,15 @@
 <?php
 
 /**
+ * @file
+ * Contains install and update functions for Price.
+ */
+
+/**
  * Implements hook_requirements().
- *
- * Check that the Commerce Guys' Libraries have been installed.
  */
 function commerce_price_requirements($phase) {
   $requirements = [];
-
   if ($phase == 'install') {
     if (!class_exists('\CommerceGuys\Intl\Currency\CurrencyRepository')) {
       $requirements['commerce_price_library'] = [

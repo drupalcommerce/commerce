@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 
 /**
  * Implements hook_theme().
@@ -19,7 +20,7 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
       'variables' => [
         'icon' => NULL,
         'count' => NULL,
-        'item_text' => 'items',
+        'count_text' => '',
         'content' => NULL,
         'url' => NULL,
         'links' => [],
@@ -56,16 +57,16 @@ function commerce_cart_entity_base_field_info(EntityTypeInterface $entity_type) 
 /**
  * Implements hook_entity_bundle_create().
  *
- * Creates an 'add_to_cart' form display for each new line item type.
+ * Creates an 'add_to_cart' form display for each new order item type.
  */
 function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
-  if ($entity_type_id == 'commerce_line_item' && !\Drupal::isConfigSyncing()) {
+  if ($entity_type_id == 'commerce_order_item' && !\Drupal::isConfigSyncing()) {
     $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
-    $form_display = $storage->load('commerce_line_item.' . $bundle . '.add_to_cart');
+    $form_display = $storage->load('commerce_order_item.' . $bundle . '.add_to_cart');
     if (!$form_display) {
       /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
       $form_display = $storage->create([
-        'targetEntityType' => 'commerce_line_item',
+        'targetEntityType' => 'commerce_order_item',
         'bundle' => $bundle,
         'mode' => 'add_to_cart',
         'status' => TRUE,
@@ -81,7 +82,18 @@ function commerce_cart_entity_bundle_create($entity_type_id, $bundle) {
  * Implements hook_entity_type_build().
  */
 function commerce_cart_entity_type_build(array &$entity_types) {
-  $entity_types['commerce_line_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
+  $entity_types['commerce_order_item']->setFormClass('add_to_cart', '\Drupal\commerce_cart\Form\AddToCartForm');
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function commerce_cart_user_login($account) {
+  // Assign the anonymous user's carts to the logged-in account.
+  // This will only affect the carts that are in the user's session.
+  $anonymous = new AnonymousUserSession();
+  $carts = \Drupal::service('commerce_cart.cart_provider')->getCarts($anonymous);
+  \Drupal::service('commerce_order.order_assignment')->assignMultiple($carts, $account);
 }
 
 /**
@@ -98,17 +110,20 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
 /**
  * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
  *
- * Hides irrelevant purchased_entity widgets on the add_to_cart line item
+ * Hides irrelevant purchased_entity widgets on the add_to_cart order item
  * form display.
  */
-function commerce_product_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+function commerce_cart_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
   $entity = $form_state->getFormObject()->getEntity();
-  if ($form['#entity_type'] == 'commerce_line_item' && $entity->getMode() == 'add_to_cart') {
+  if ($form['#entity_type'] == 'commerce_order_item' && $entity->getMode() == 'add_to_cart') {
     $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
+    unset($options['commerce_entity_select']);
     unset($options['entity_reference_autocomplete_tags']);
     unset($options['entity_reference_autocomplete']);
     unset($options['inline_entity_form_complex']);
+    unset($options['options_buttons']);
+    unset($options['options_select']);
   }
 }
 
@@ -139,8 +154,6 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   $order_type = $form_state->getFormObject()->getEntity();
   $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
   $cart_block_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
-  $refresh_mode = $order_type->getThirdPartySetting('commerce_cart', 'refresh_mode', 'owner_only');
-  $refresh_frequency = $order_type->getThirdPartySetting('commerce_cart', 'refresh_frequency', 30);
   // Prepare a list of views tagged 'commerce_cart_form'.
   $view_storage = \Drupal::entityTypeManager()->getStorage('view');
   $available_form_views = [];
@@ -175,27 +188,6 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
     '#default_value' => $cart_block_view,
   ];
 
-  $form['commerce_cart']['refresh_intro'] = [
-    '#markup' => '<p> ' . t('These settings let you control how shopping carts are refreshed, the process during which line item prices are recalculated.') . '</p>',
-  ];
-  $form['commerce_cart']['refresh_mode'] = [
-    '#type' => 'radios',
-    '#title' => t('Shopping cart refresh mode'),
-    '#options' => [
-      'always' => t('Refresh a shopping cart when it is loaded regardless of who it belongs to.'),
-      'owner_only' => t('Only refresh a shopping cart when it is loaded if it belongs to the current user.'),
-    ],
-    '#default_value' => $refresh_mode,
-  ];
-  $form['commerce_cart']['refresh_frequency'] = [
-    '#type' => 'textfield',
-    '#title' => t('Shopping cart refresh frequency'),
-    '#description' => t('Shopping carts will only be refreshed if more than the specified number of seconds have passed since they were last refreshed.'),
-    '#default_value' => $refresh_frequency,
-    '#required' => TRUE,
-    '#size' => 10,
-    '#field_suffix' => t('seconds'),
-  ];
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
 }
 
@@ -203,10 +195,9 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
  * Form submission handler for 'commerce_order_type_form'.
  */
 function commerce_cart_order_type_form_submit($form, FormStateInterface $form_state) {
-  $settings = &$form_state->getValues('commerce_cart');
+  $settings = &$form_state->getValue('commerce_cart');
   $order_type = $form_state->getFormObject()->getEntity();
-  $order_type->setThirdPartySetting('commerce_cart', 'refresh_mode', $settings['refresh_mode']);
-  $order_type->setThirdPartySetting('commerce_cart', 'refresh_frequency', $settings['refresh_frequency']);
+  // @todo open follow up and fix cart_form_view, commerce_cart_block saving.
   $order_type->save();
 }
 
@@ -214,15 +205,15 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
  * Implements hook_views_data_alter().
  */
 function commerce_cart_views_data_alter(array &$data) {
-  $data['commerce_line_item']['edit_quantity']['field'] = [
+  $data['commerce_order_item']['edit_quantity']['field'] = [
     'title' => t('Quantity text field'),
     'help' => t('Adds a text field for editing the quantity.'),
-    'id' => 'commerce_line_item_edit_quantity',
+    'id' => 'commerce_order_item_edit_quantity',
   ];
-  $data['commerce_line_item']['remove_button']['field'] = [
+  $data['commerce_order_item']['remove_button']['field'] = [
     'title' => t('Remove button'),
-    'help' => t('Adds a button for removing the line item.'),
-    'id' => 'commerce_line_item_remove_button',
+    'help' => t('Adds a button for removing the order item.'),
+    'id' => 'commerce_order_item_remove_button',
   ];
 }
 

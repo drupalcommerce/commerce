@@ -84,7 +84,7 @@ class CurrencyImportForm extends FormBase {
       $this->importer->import($currency_code);
     }
     drupal_set_message($this->t('Imported the selected currencies.'));
-    $form_state->setRebuild();
+    $form_state->setRedirect('entity.commerce_currency.collection');
   }
 
 }

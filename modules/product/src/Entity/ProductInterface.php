@@ -2,14 +2,15 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce_store\Entity\EntityStoresInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
  * Defines the interface for products.
  */
-interface ProductInterface extends EntityChangedInterface, EntityInterface, EntityOwnerInterface {
+interface ProductInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, EntityStoresInterface {
 
   /**
    * Gets the product title.
@@ -68,39 +69,79 @@ interface ProductInterface extends EntityChangedInterface, EntityInterface, Enti
   public function setCreatedTime($timestamp);
 
   /**
-   * Gets the stores through which the product is sold.
-   *
-   * @return \Drupal\commerce_store\Entity\StoreInterface[]
-   *   The stores.
-   */
-  public function getStores();
-
-  /**
-   * Sets the stores through which the product is sold.
-   *
-   * @param \Drupal\commerce_store\Entity\StoreInterface[] $stores
-   *   The stores through which the product is sold.
-   *
-   * @return $this
-   */
-  public function setStores(array $stores);
-
-  /**
-   * Gets the ids of stores through which the product is sold.
+   * Gets the variation IDs.
    *
    * @return int[]
-   *   The ids of stores through which the product is sold.
+   *   The variation IDs.
    */
-  public function getStoreIds();
+  public function getVariationIds();
 
   /**
-   * Sets the ids of stores through which the product is sold.
+   * Gets the variations.
    *
-   * @param int[] $store_ids
-   *   The ids of stores through which the product is sold.
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface[]
+   *   The variations.
+   */
+  public function getVariations();
+
+  /**
+   * Sets the variations.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
+   *   The variations.
    *
    * @return $this
    */
-  public function setStoreIds(array $store_ids);
+  public function setVariations(array $variations);
+
+  /**
+   * Gets whether the product has variations.
+   *
+   * A product must always have at least one variation, but a newly initialized
+   * (or invalid) product entity might not have any.
+   *
+   * @return bool
+   *   TRUE if the product has variations, FALSE otherwise.
+   */
+  public function hasVariations();
+
+  /**
+   * Adds a variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return $this
+   */
+  public function addVariation(ProductVariationInterface $variation);
+
+  /**
+   * Removes a variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return $this
+   */
+  public function removeVariation(ProductVariationInterface $variation);
+
+  /**
+   * Checks whether the product has a given variation.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface $variation
+   *   The variation.
+   *
+   * @return bool
+   *   TRUE if the variation was found, FALSE otherwise.
+   */
+  public function hasVariation(ProductVariationInterface $variation);
+
+  /**
+   * Gets the default variation.
+   *
+   * @return \Drupal\commerce_product\Entity\ProductVariationInterface
+   *   The default variation.
+   */
+  public function getDefaultVariation();
 
 }

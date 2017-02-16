@@ -13,3 +13,9 @@ services:
     arguments: ['@entity_type.manager']
     tags:
       - { name: commerce_store.store_resolver, priority: -100 }
+
+  cache_context.store:
+    class: Drupal\commerce_store\Cache\Context\StoreCacheContext
+    arguments: ['@commerce_store.store_context']
+    tags:
+      - { name: cache.context}

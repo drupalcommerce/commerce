@@ -2,27 +2,27 @@
 
 namespace Drupal\commerce_cart\EventSubscriber;
 
-use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class OrderSubscriber.
+ * Makes a commerce cart language aware.
  */
 class CartLanguage implements EventSubscriberInterface {
 
   /**
    * The language manager.
    *
-   * @var Drupal\Core\Language\LanguageManager
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * CartLanguage constructor.
    *
-   * @param Drupal\Core\Language\LanguageManager $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(LanguageManager $language_manager) {
+  public function __construct(LanguageManagerInterface $language_manager) {
     $this->languageManager = $language_manager;
   }
 
@@ -41,11 +41,8 @@ class CartLanguage implements EventSubscriberInterface {
    */
   public function updateLanguage($event) {
     $cart = $event->getCart();
-
     $order_language = $this->languageManager->getCurrentLanguage();
-
     $cart->setLanguage($order_language);
-
     $event->setCart($cart);
   }
 

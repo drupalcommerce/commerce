@@ -1,0 +1,20 @@
+entity.commerce_checkout_flow.collection:
+  path: '/admin/commerce/config/checkout-flows'
+  defaults:
+    _entity_list: 'commerce_checkout_flow'
+    _title: 'Checkout flows'
+  requirements:
+    _permission: 'administer commerce_checkout_flow'
+
+commerce_checkout.form:
+  path: '/checkout/{commerce_order}/{step}'
+  defaults:
+    _controller: '\Drupal\commerce_checkout\Controller\CheckoutController::formPage'
+    _title: 'Checkout'
+    step: null
+  requirements:
+    _custom_access: '\Drupal\commerce_checkout\Controller\CheckoutController::checkAccess'
+  options:
+    parameters:
+      commerce_order:
+        type: entity:commerce_order

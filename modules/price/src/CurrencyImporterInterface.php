@@ -35,7 +35,7 @@ interface CurrencyImporterInterface {
    * @param string $country_code
    *   The country code.
    *
-   * @return \Drupal\commerce_price\Entity\CurrencyInterface|NULL
+   * @return \Drupal\commerce_price\Entity\CurrencyInterface|null
    *   The saved currency entity or NULL if the given country's currency
    *   isn't known.
    *
