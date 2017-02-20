@@ -19,6 +19,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_order",
  *   label = @Translation("Order"),
+ *   label_collection = @Translation("Orders"),
  *   label_singular = @Translation("order"),
  *   label_plural = @Translation("orders"),
  *   label_count = @PluralTranslation(

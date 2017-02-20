@@ -16,6 +16,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  * @ContentEntityType(
  *   id = "commerce_promotion",
  *   label = @Translation("Promotion"),
+ *   label_collection = @Translation("Promotions"),
  *   label_singular = @Translation("promotion"),
  *   label_plural = @Translation("promotions"),
  *   label_count = @PluralTranslation(
