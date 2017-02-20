@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Language\LanguageManager;
 use Drupal\user\UserInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
@@ -46,11 +47,13 @@ use Drupal\profile\Entity\ProfileInterface;
  *   },
  *   base_table = "commerce_order",
  *   admin_permission = "administer commerce_order",
+ *   translatable = FALSE,
  *   permission_granularity = "bundle",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "order_id",
  *     "label" = "order_number",
+ *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "bundle" = "type"
  *   },
@@ -275,6 +278,21 @@ class Order extends ContentEntityBase implements OrderInterface {
     $this->set('adjustments', $adjustments);
     $this->recalculateTotalPrice();
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setLanguage($language) {
+    $this->set('langcode', $language->getId());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLanguage() {
+    $langcode = $this->get('langcode')->getLangcode();
+    return $this->languageManager()->getLanguage($langcode);
   }
 
   /**

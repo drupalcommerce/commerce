@@ -78,6 +78,16 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * - Disables the possibility to disable localization of the order entity. But
+ *   it does still allow you to change the behavior.
+ */
+function commerce_order_form_language_content_settings_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  unset($form['entity_types']['#options']['commerce_order']);
+}
+
+/**
  * Prepares variables for order templates.
  *
  * Default template: commerce-order.html.twig.

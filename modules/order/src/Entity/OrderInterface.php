@@ -56,6 +56,24 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setStore(StoreInterface $store);
 
   /**
+   * Gets the language.
+   *
+   * @return \Drupal\Core\Language\LanguageInterface[]
+   *   The orders language.
+   */
+  public function getLanguage();
+
+  /**
+   * Sets the language.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface[] $language
+   *   The language.
+   *
+   * @return $this
+   */
+  public function setLanguage($language);
+
+  /**
    * Gets the store ID.
    *
    * @return int

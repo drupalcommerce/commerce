@@ -72,6 +72,16 @@ class CartEntityAddEvent extends Event {
   }
 
   /**
+   * Sets the cart order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   */
+  public function setCart(OrderInterface $cart) {
+    $this->cart = $cart;
+  }
+
+  /**
    * Gets the added entity.
    *
    * @return \Drupal\commerce\PurchasableEntityInterface

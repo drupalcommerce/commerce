@@ -7,11 +7,9 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\CartEmptyEvent;
-use Drupal\commerce_cart\Event\CartEntityAddEvent;
-use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
-use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
 use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -44,18 +42,28 @@ class CartManager implements CartManagerInterface {
   protected $eventDispatcher;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new CartManager object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\commerce_cart\OrderItemMatcherInterface $order_item_matcher
    *   The order item matcher.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderItemMatcherInterface $order_item_matcher, EventDispatcherInterface $event_dispatcher) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, OrderItemMatcherInterface $order_item_matcher, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher) {
     $this->orderItemStorage = $entity_type_manager->getStorage('commerce_order_item');
     $this->orderItemMatcher = $order_item_matcher;
+    $this->languageManager = $language_manager;
     $this->eventDispatcher = $event_dispatcher;
   }
 
@@ -117,12 +125,18 @@ class CartManager implements CartManagerInterface {
       $saved_order_item = $order_item;
     }
 
+    // If the language is different, we need to save it again. If we are already
+    // planning to trigger the save, there is no need to do the additional
+    // checks.
+    if (!$needs_cart_save && $cart->getLanguage()->getId() !== $this->languageManager->getCurrentLanguage()->getId()) {
+      $needs_cart_save = TRUE;
+    }
+
     if ($purchased_entity) {
       $event = new CartEntityAddEvent($cart, $purchased_entity, $quantity, $saved_order_item);
       $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
     }
-
-    if ($save_cart) {
+    if ($needs_cart_save && $save_cart) {
       $cart->save();
     }
 
