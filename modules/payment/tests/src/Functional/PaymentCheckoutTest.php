@@ -31,6 +31,13 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   protected $product;
 
   /**
+   * A payment method.
+   *
+   * @var \Drupal\commerce_payment\Entity\PaymentMethodInterface
+   */
+  protected $paymentMethod;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -78,6 +85,14 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     ]);
     $gateway->save();
 
+    $this->paymentMethod = $this->createEntity('commerce_payment_method', [
+      'type' => 'credit_card',
+      'payment_gateway' => $gateway->id(),
+      'card_type' => 'visa',
+      'card_number' => '9999',
+      'reusable' => FALSE,
+    ]);
+
     // Cheat so we don't need JS to interact w/ Address field widget.
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $customer_form_display */
     $customer_form_display = EntityFormDisplay::load('profile.customer.default');
@@ -93,10 +108,23 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
   public function testCheckoutWithPayment() {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
-    $cart_link = $this->getSession()->getPage()->findLink('your cart');
-    $cart_link->click();
-    $this->submitForm([], 'Checkout');
+    // The order's payment method should be available and default.
+    $order = Order::load(1);
+    $order->payment_method = $this->paymentMethod;
+    $order->save();
+    $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Order Summary');
+    $radio_button = $this->getSession()->getPage()->findField('Visa ending in 9999');
+    $this->assertNotNull($radio_button);
+    $this->assertTrue($radio_button->getAttribute('checked'));
+    // Without it, 'New credit card' should be default.
+    $order->payment_method = NULL;
+    $order->save();
+    $this->drupalGet('checkout/1');
+    $radio_button = $this->getSession()->getPage()->findField('New credit card');
+    $this->assertNotNull($radio_button);
+    $this->assertTrue($radio_button->getAttribute('checked'));
+
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
@@ -119,7 +147,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
 
     $order = Order::load(1);
-
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $order->payment_gateway->entity;
     $this->assertEquals('example_onsite', $payment_gateway->id());

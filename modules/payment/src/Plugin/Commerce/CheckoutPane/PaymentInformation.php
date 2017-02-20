@@ -176,11 +176,16 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $options = [];
     $default_option = NULL;
+    $order_payment_method = $this->order->payment_method->entity;
     $customer = $this->order->getCustomer();
     if ($customer) {
       $payment_methods = $payment_method_storage->loadReusable($customer, $payment_gateway);
       foreach ($payment_methods as $payment_method) {
         $options[$payment_method->id()] = $payment_method->label();
+      }
+      // The order's payment method must always be available.
+      if ($order_payment_method && !isset($options[$order_payment_method->id()])) {
+        $options[$order_payment_method->id()] = $order_payment_method->label();
       }
     }
     $payment_method_types = $payment_gateway_plugin->getPaymentMethodTypes();
@@ -188,9 +193,13 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $id = 'new_' . $payment_method_type->getPluginId();
       $options[$id] = $payment_method_type->getCreateLabel();
     }
-    $values = $form_state->getValue($pane_form['#parents']);
+    $user_input = $form_state->getUserInput();
+    $values = NestedArray::getValue($user_input, $pane_form['#parents']);
     if (!empty($values['payment_method'])) {
       $selected_option = $values['payment_method'];
+    }
+    elseif ($order_payment_method) {
+      $selected_option = $this->order->payment_method->target_id;
     }
     else {
       $default_payment_method_type = $payment_gateway_plugin->getDefaultPaymentMethodType();
