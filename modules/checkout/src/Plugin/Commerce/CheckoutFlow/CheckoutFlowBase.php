@@ -292,6 +292,13 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
+  public function getBaseFormId() {
+    return 'commerce_checkout_flow';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'commerce_checkout_flow_' . $this->pluginId;
   }
