@@ -317,4 +317,76 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
   }
 
+  /**
+   * Tests the behaviour of the checkout after a product count is updated.
+   */
+  public function testCheckoutFlowOnCartUpdate() {
+    // Add a product to the cart.
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+
+    // Submit the form until review.
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+    $this->submitForm([
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
+    ], 'Continue to review');
+
+    // Go back to the checkout page and check we are on the same state.
+    $this->getSession()->getPage()->findLink('Cart')->click();
+
+    // Submit the form until review.
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
+
+    // Update the cart by adding a new product and checkout again.
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    $this->submitForm([], 'Checkout');
+
+    // Check that we do not go back to the summary page.
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+    // Submit it so it is ready for the next part of the test.
+    $this->submitForm([], 'Continue to review');
+
+    // Check that if we add a second product, the cart is also resetted.
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => 9.99,
+        'currency_code' => 'USD',
+      ],
+    ]);
+
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product2 = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+      'stores' => [$this->store],
+    ]);
+
+    // Update the cart by adding a new product and checkout again.
+    $this->drupalGet($product2->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    $this->submitForm([], 'Checkout');
+
+    // Check that we do not go back to the summary page.
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+  }
+
 }
