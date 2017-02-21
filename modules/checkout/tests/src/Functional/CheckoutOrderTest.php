@@ -317,4 +317,61 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
   }
 
+  /**
+   * Tests checkout behaviour after a cart update.
+   */
+  public function testCheckoutFlowOnCartUpdate() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    // Submit the form until review.
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+    $this->submitForm([
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
+    ], 'Continue to review');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
+    // By default the checkout step is preserved upon return.
+    $this->drupalGet('/checkout/1');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
+
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => 9.99,
+        'currency_code' => 'USD',
+      ],
+    ]);
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product2 = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+      'stores' => [$this->store],
+    ]);
+    // Adding a new product to the cart resets the checkout step.
+    $this->drupalGet($product2->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+
+    // Removing a product from the cart resets the checkout step.
+    $this->submitForm([], 'Continue to review');
+    $this->drupalGet('/cart');
+    $this->submitForm([], 'Remove');
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+  }
+
 }

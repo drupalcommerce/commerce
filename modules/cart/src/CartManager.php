@@ -71,6 +71,7 @@ class CartManager implements CartManagerInterface {
     $cart->setAdjustments([]);
 
     $this->eventDispatcher->dispatch(CartEvents::CART_EMPTY, new CartEmptyEvent($cart, $order_items));
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
     }
@@ -122,6 +123,7 @@ class CartManager implements CartManagerInterface {
       $this->eventDispatcher->dispatch(CartEvents::CART_ENTITY_ADD, $event);
     }
 
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
     }
@@ -138,6 +140,7 @@ class CartManager implements CartManagerInterface {
     $order_item->save();
     $event = new CartOrderItemUpdateEvent($cart, $order_item, $original_order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_UPDATE, $event);
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
     }
@@ -150,8 +153,21 @@ class CartManager implements CartManagerInterface {
     $order_item->delete();
     $cart->removeItem($order_item);
     $this->eventDispatcher->dispatch(CartEvents::CART_ORDER_ITEM_REMOVE, new CartOrderItemRemoveEvent($cart, $order_item));
+    $this->resetCheckoutStep($cart);
     if ($save_cart) {
       $cart->save();
+    }
+  }
+
+  /**
+   * Resets the checkout step.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   */
+  protected function resetCheckoutStep(OrderInterface $cart) {
+    if ($cart->hasField('checkout_step')) {
+      $cart->set('checkout_step', '');
     }
   }
 
