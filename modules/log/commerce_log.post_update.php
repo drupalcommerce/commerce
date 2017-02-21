@@ -6,7 +6,7 @@
  */
 
 /**
- * Revert Order activity view to fix log entry order.
+ * Revert the Activity view to make the date column sortable.
  */
 function commerce_log_post_update_1() {
   /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
