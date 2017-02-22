@@ -11,7 +11,6 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\profile\Entity\Profile;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -35,13 +34,6 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   protected $entityTypeManager;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new PaymentInformation object.
    *
    * @param array $configuration
@@ -54,14 +46,11 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
    *   The parent checkout flow.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
 
     $this->entityTypeManager = $entity_type_manager;
-    $this->renderer = $renderer;
   }
 
   /**
@@ -73,8 +62,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $plugin_id,
       $plugin_definition,
       $checkout_flow,
-      $container->get('entity_type.manager'),
-      $container->get('renderer')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -82,7 +70,7 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
-    $summary = '';
+    $summary = [];
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $payment_gateway = $this->order->payment_gateway->entity;
     if (!$payment_gateway) {
@@ -93,16 +81,20 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $payment_method = $this->order->payment_method->entity;
     if ($payment_gateway_plugin instanceof SupportsStoredPaymentMethodsInterface && $payment_method) {
       $view_builder = $this->entityTypeManager->getViewBuilder('commerce_payment_method');
-      $payment_method_view = $view_builder->view($payment_method, 'default');
-      $summary = $this->renderer->render($payment_method_view);
+      return $view_builder->view($payment_method, 'default');
     }
     else {
       $billing_profile = $this->order->getBillingProfile();
       if ($billing_profile) {
         $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
         $profile_view = $profile_view_builder->view($billing_profile, 'default');
-        $summary = $payment_gateway->getPlugin()->getDisplayLabel();
-        $summary .= $this->renderer->render($profile_view);
+        $label = $payment_gateway->getPlugin()->getDisplayLabel();
+        return [
+          'label' => [
+            '#markup' => $label,
+          ],
+          'profile' => $profile_view,
+        ];
       }
     }
 

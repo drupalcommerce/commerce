@@ -38,9 +38,7 @@ class Review extends CheckoutPaneBase implements CheckoutPaneInterface {
           '#type' => 'fieldset',
           '#title' => $label,
         ];
-        $pane_form[$pane_id]['summary'] = [
-          '#markup' => $summary,
-        ];
+        $pane_form[$pane_id]['summary'] = $summary;
       }
     }
 
