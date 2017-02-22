@@ -113,8 +113,8 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    * To skip showing a summary for a non-visible pane, check isVisible()
    * and return an empty string.
    *
-   * @return string
-   *   An HTML summary of the pane values.
+   * @return array
+   *   An render array summary of the pane values.
    */
   public function buildPaneSummary();
 

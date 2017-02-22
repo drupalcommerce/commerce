@@ -6,7 +6,6 @@ use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,13 +28,6 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
   protected $entityTypeManager;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Constructs a new BillingInformation object.
    *
    * @param array $configuration
@@ -48,14 +40,11 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    *   The parent checkout flow.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
 
     $this->entityTypeManager = $entity_type_manager;
-    $this->renderer = $renderer;
   }
 
   /**
@@ -67,8 +56,7 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
       $plugin_id,
       $plugin_definition,
       $checkout_flow,
-      $container->get('entity_type.manager'),
-      $container->get('renderer')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -76,13 +64,11 @@ class BillingInformation extends CheckoutPaneBase implements CheckoutPaneInterfa
    * {@inheritdoc}
    */
   public function buildPaneSummary() {
-    $summary = '';
     if ($billing_profile = $this->order->getBillingProfile()) {
       $profile_view_builder = $this->entityTypeManager->getViewBuilder('profile');
-      $summary = $profile_view_builder->view($billing_profile, 'default');
-      $summary = $this->renderer->render($summary);
+      return $profile_view_builder->view($billing_profile, 'default');
     }
-    return $summary;
+    return [];
   }
 
   /**
