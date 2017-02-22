@@ -3,12 +3,28 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce\CommerceContentEntityStorage;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Defines the payment storage.
  */
 class PaymentStorage extends CommerceContentEntityStorage {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadForOrder(OrderInterface $order) {
+    $query = $this->getQuery()
+      ->condition('order_id', $order->id())
+      ->sort('payment_id', 'DESC');
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+
+    return $this->loadMultiple($result);
+  }
 
   /**
    * {@inheritdoc}
