@@ -33,8 +33,6 @@ class PromotionTest extends CommerceBrowserTestBase {
 
   /**
    * Tests creating a promotion.
-   *
-   * @group create
    */
   public function testCreatePromotion() {
     $this->drupalGet('admin/commerce/promotions');
@@ -57,6 +55,45 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
 
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
+
+    $this->submitForm($edit, t('Save'));
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
+    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = Promotion::load(1)->get('offer')->first();
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+  }
+
+  /**
+   * Tests creating a promotion with an end date.
+   */
+  public function testCreatePromotionWithEndDate() {
+    $this->drupalGet('admin/commerce/promotions');
+    $this->getSession()->getPage()->clickLink('Add a new promotion');
+    $this->drupalGet('promotion/add');
+
+    // Check the integrity of the form.
+    $this->assertSession()->fieldExists('name[0][value]');
+
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+
+    $name = $this->randomMachineName(8);
+    $edit = [
+      'name[0][value]' => $name,
+      'offer[0][target_plugin_configuration][amount]' => '10.0',
+    ];
+
+    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
+    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+
+    $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
+
+    // Set an end date.
+    $this->getSession()->getPage()->checkField('end_date[0][has_value]');
+    $edit['end_date[0][value][date]'] = date("Y") + 1 . '-01-01';
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
