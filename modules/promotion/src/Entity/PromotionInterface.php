@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion\Entity;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\Context\ContextInterface;
 
 /**
  * Defines the interface for promotions.
@@ -194,7 +195,9 @@ interface PromotionInterface extends EntityInterface, EntityStoresInterface {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
+   * @param \Drupal\Core\Plugin\Context\ContextInterface $source_context
+   *   The source context.
    */
-  public function apply(EntityInterface $entity);
+  public function apply(EntityInterface $entity, ContextInterface $source_context = NULL);
 
 }

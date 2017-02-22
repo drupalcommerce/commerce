@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\ContextInterface;
 
 /**
  * Defines the promotion entity class.
@@ -271,13 +272,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function apply(EntityInterface $entity) {
+  public function apply(EntityInterface $entity, ContextInterface $source_context = NULL) {
     $entity_type_id = $entity->getEntityTypeId();
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
 
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
+    $offer = $this->get('offer')->first()->getTargetInstance([
+      $entity_type_id => $context,
+      'source' => $source_context,
+    ]);
     $offer->execute();
   }
 

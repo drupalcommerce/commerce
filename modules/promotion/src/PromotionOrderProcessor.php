@@ -41,8 +41,13 @@ class PromotionOrderProcessor implements OrderProcessorInterface {
    */
   public function process(OrderInterface $order) {
     $order_type = $this->orderTypeStorage->load($order->bundle());
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
     $promotions = $this->promotionStorage->loadValid($order_type, $order->getStore());
     foreach ($promotions as $promotion) {
+      // Coupons has separate order processor.
+      if (!$promotion->get('coupons')->isEmpty()) {
+        continue;
+      }
       if ($promotion->applies($order)) {
         $promotion->apply($order);
       }
