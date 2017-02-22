@@ -90,7 +90,7 @@ abstract class CheckoutPaneBase extends PluginBase implements CheckoutPaneInterf
    * {@inheritdoc}
    */
   public function buildConfigurationSummary() {
-    return [];
+    return '';
   }
 
   /**
