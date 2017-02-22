@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_payment\Functional;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -76,15 +75,6 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
       'payment_method_types' => ['credit_card'],
     ]);
     $gateway->save();
-
-    // Cheat so we don't need JS to interact w/ Address field widget.
-    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $customer_form_display */
-    $customer_form_display = EntityFormDisplay::load('profile.customer.default');
-    $address_component = $customer_form_display->getComponent('address');
-    $address_component['settings']['default_country'] = 'US';
-    $customer_form_display->setComponent('address', $address_component);
-    $customer_form_display->save();
-
   }
 
   /**
