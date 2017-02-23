@@ -204,9 +204,11 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
       $default_option = 'new--' . $default_payment_method_type->getPluginId() . '--' . $order_payment_gateway->id();
     }
     else {
-      $default_payment_method_type = $payment_gateway_plugin->getDefaultPaymentMethodType();
-      $default_option = 'new--' . $default_payment_method_type->getPluginId() . '--' . $payment_gateway->id();
-      $default_payment_gateway_plugin = $payment_gateway_plugin;
+      /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $default_payment_gateway */
+      $first_option = end($options);
+      $default_payment_gateway = $this->paymentGatewayStorage->load($first_option['payment_gateway']);
+      $default_payment_gateway_plugin = $default_payment_gateway->getPlugin();
+      $default_option = $first_option['id'];
     }
 
     // Prepare the form for ajax.
