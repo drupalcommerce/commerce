@@ -113,6 +113,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     // Decrease the working order version to lock it.
     $version = $current_order->getVersion() - 1;
     $this->setVersion($version);
+    return $this;
   }
 
   /**
@@ -123,6 +124,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
     $version = $current_order->getVersion() + 1;
     $this->setVersion($version);
+    return $this;
   }
 
   /**

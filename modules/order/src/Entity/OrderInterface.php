@@ -43,13 +43,12 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return int
    *   Version identifier of the order.
    */
-
   public function getVersion();
 
   /**
    * Sets the order version identifier.
    *
-   * @param int
+   * @param int $version
    *   Version identifier of the order.
    *
    * @return $this
@@ -59,12 +58,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   /**
    * Lock the order for further savings.
    * Force decrease the working order version to lock it.
+   *
+   * @return $this
    */
   public function lock();
 
   /**
    * Unlock the order for further savings.
-   * Froce increase the working order version to unlock it.
+   * Force increase the working order version to unlock it.
+   *
+   * @return $this
    */
   public function unlock();
 
