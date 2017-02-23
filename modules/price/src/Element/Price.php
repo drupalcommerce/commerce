@@ -18,6 +18,7 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#size' => 60,
  *   '#maxlength' => 128,
  *   '#required' => TRUE,
+ *   '#available_currencies' => ['USD', 'EUR'],
  * ];
  * @endcode
  *
@@ -31,6 +32,9 @@ class Price extends FormElement {
   public function getInfo() {
     $class = get_class($this);
     return [
+      // List of currencies codes. If empty, all currencies will be available.
+      '#available_currencies' => [],
+
       '#size' => 10,
       '#maxlength' => 128,
       '#default_value' => NULL,
@@ -79,6 +83,11 @@ class Price extends FormElement {
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
     $currencies = $currency_storage->loadMultiple();
     $currency_codes = array_keys($currencies);
+    // Keep only available currencies.
+    $available_currencies = $element['#available_currencies'];
+    if (isset($available_currencies) && !empty($available_currencies)) {
+      $currency_codes = array_intersect($currency_codes, $available_currencies);
+    }
     // Stop rendering if there are no currencies available.
     if (empty($currency_codes)) {
       return $element;
