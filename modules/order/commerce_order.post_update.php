@@ -5,6 +5,8 @@
  * Post update functions for Order.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Revert Order views to fix broken Price fields.
  */
@@ -148,4 +150,21 @@ function commerce_order_post_update_5() {
   }
 
   return $message;
+}
+
+/**
+ * Add 'version' field to 'commerce_order' entities.
+ */
+function commerce_order_post_update_6() {
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Version'))
+    ->setDescription(t('The order version number, it gets incremented on each save.'))
+    ->setReadOnly(TRUE)
+    ->setSetting('unsigned', TRUE)
+    ->setDefaultValue(1);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('version', 'commerce_order', 'commerce_order', $storage_definition);
+
+  return t('The order version number field was created.');
 }

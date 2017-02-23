@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
@@ -108,6 +109,55 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
 }
 
 /**
+ * Implements hook_form_alter() for Views commerce cart forms.
+ */
+function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) {
+  // Check for a Views commerce cart forms.
+  if ($form_state->get('step') == 'views_form_views_form') {
+    /** @var \Drupal\views\Entity\View $view */
+    $view = reset($form_state->getBuildInfo()['args'])->storage;
+    if (commerce_cart_is_commerce_cart_view($view)) {
+      $view_argument = reset($view->getExecutable()->argument);
+      if (!empty($view_argument->value)) {
+        // Replace the form submit button label.
+        $form['actions']['submit']['#value'] = t('Update cart');
+
+        $order_id = $view_argument->getValue();
+        /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+        $order = Order::load($order_id);
+        $form_state->set('order_id', $order->id());
+        // Order version must be sent to the client, for later overwrite error checking.
+        $form['version'] = [
+          '#type' => 'hidden',
+          '#default_value' => $order->getVersion(),
+        ];
+        // Add validation.
+        $form['actions']['submit']['#validate'][] = 'commerce_cart_commerce_cart_form_validate';
+        // Also for remove button is available.
+        if (!empty($form['remove_button'])) {
+          foreach (\Drupal\Core\Render\Element::children($form['remove_button']) as $key) {
+            $form['remove_button'][$key]['#validate'][] = 'commerce_cart_commerce_cart_form_validate';
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Validate handler for Views commerce cart forms.
+ */
+function commerce_cart_commerce_cart_form_validate($form, FormStateInterface $form_state) {
+  // Re-load the order.
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = Order::load($form_state->get('order_id'));
+  // A change to the order version must not validate.
+  if ($order->getVersion() > $form_state->getValue('version')) {
+    $form_state->setErrorByName('', t('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.'));
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
  *
  * Hides irrelevant purchased_entity widgets on the add_to_cart order item
@@ -138,6 +188,10 @@ function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInt
       // Move the cart element to the bottom of the meta sidebar container.
       $form['cart']['#group'] = 'meta';
       $form['cart']['#weight'] = 100;
+      // Warning it the order is cart and it was modified in the last hour.
+      if (!empty($order->get('cart')->value) && (REQUEST_TIME - $order->getChangedTime()) < 3600) {
+        drupal_set_message(t('This order has been modified by the customer in the last hour. Modifying it here could cause their future changes to be lost. Proceed with caution.'), 'warning');
+      }
     }
     else {
       // Only draft orders can be carts.
@@ -151,6 +205,7 @@ function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInt
  * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_order_type_form'.
  */
 function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
   $order_type = $form_state->getFormObject()->getEntity();
   $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
   $cart_block_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
@@ -159,10 +214,10 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   $available_form_views = [];
   $available_block_views = [];
   foreach ($view_storage->loadMultiple() as $view) {
-    if (strpos($view->get('tag'), 'commerce_cart_form') !== FALSE) {
+    if (commerce_cart_is_commerce_cart_view($view)) {
       $available_form_views[$view->id()] = $view->label();
     }
-    elseif (strpos($view->get('tag'), 'commerce_cart_block') !== FALSE) {
+    elseif (commerce_cart_is_commerce_cart_view($view, 'commerce_cart_block')) {
       $available_block_views[$view->id()] = $view->label();
     }
   }
@@ -222,4 +277,28 @@ function commerce_cart_views_data_alter(array &$data) {
  */
 function template_preprocess_commerce_cart_block(&$variables) {
   $variables['attributes']['class'][] = 'cart--cart-block';
+}
+
+/**
+ * Helper function to check if a view is a 'commerce_cart' view.
+ *
+ *  @param string $cart_view_tag
+ *   The view tag for commerce cart views to check for.
+ *
+ *  @param \Drupal\views\Entity\View $view
+ *   The view
+ *
+ * @return bool
+ *   True if View has 'commerce_cart' view like tag, has commerce_order as base
+ *   table and the order_id as the first argument.
+ *   Otherwise return FALSE.
+ */
+function commerce_cart_is_commerce_cart_view($view, $cart_view_tag = 'commerce_cart_form') {
+  if ($view->get('base_table') == 'commerce_order' && strpos($view->get('tag'), $cart_view_tag) !== FALSE) {
+    $view_argument = reset($view->getExecutable()->getDisplay()->options['arguments']);
+    if ($view_argument['field'] == 'order_id') {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }

@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_order\Exception\OrderVersionMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -63,7 +64,10 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "collection" = "/admin/commerce/orders"
  *   },
  *   bundle_entity_type = "commerce_order_type",
- *   field_ui_base_route = "entity.commerce_order_type.edit_form"
+ *   field_ui_base_route = "entity.commerce_order_type.edit_form",
+ *   constraints = {
+ *     "OrderVersion" = {}
+ *   }
  * )
  */
 class Order extends ContentEntityBase implements OrderInterface {
@@ -83,6 +87,42 @@ class Order extends ContentEntityBase implements OrderInterface {
   public function setOrderNumber($order_number) {
     $this->set('order_number', $order_number);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVersion() {
+    return $this->get('version')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVersion($version) {
+    $this->set('version', $version);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function lock() {
+    /** @var OrderInterface $current_order */
+    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
+    // Decrease the working order version to lock it.
+    $version = $current_order->getVersion() - 1;
+    $this->setVersion($version);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unlock() {
+    /** @var OrderInterface $current_order */
+    $current_order = $this->entityTypeManager()->getStorage($this->entityTypeId)->loadUnchanged($this->id());
+    $version = $current_order->getVersion() + 1;
+    $this->setVersion($version);
   }
 
   /**
@@ -446,6 +486,17 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setEmail($customer->getEmail());
       }
     }
+    else {
+      // Increment order version on each save.
+      /** @var OrderInterface $saved_entity */
+      $saved_entity = $storage->loadUnchanged($this->id());
+      // A change to the order version must add an exception.
+      if ($saved_entity && $saved_entity->getVersion() > $this->getVersion()) {
+        throw new OrderVersionMismatchException('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+      }
+      $version = $this->getVersion() + 1;
+      $this->setVersion($version);
+    }
 
     // Maintain the completed timestamp.
     $state = $this->getState()->value;
@@ -555,6 +606,13 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+
+    $fields['version'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Version'))
+      ->setDescription(t('The order version number, it gets incremented on each save.'))
+      ->setReadOnly(TRUE)
+      ->setSetting('unsigned', TRUE)
+      ->setDefaultValue(1);
 
     $fields['order_number'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Order number'))

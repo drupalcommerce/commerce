@@ -345,6 +345,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       }
     }
 
+    // Make sure we unlock the order so it can be saved on checkout.
+    $this->order->unlock();
     $this->order->save();
   }
 

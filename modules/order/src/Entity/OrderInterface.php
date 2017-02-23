@@ -38,6 +38,37 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function setOrderNumber($order_number);
 
   /**
+   * Gets the order version identifier.
+   *
+   * @return int
+   *   Version identifier of the order.
+   */
+
+  public function getVersion();
+
+  /**
+   * Sets the order version identifier.
+   *
+   * @param int
+   *   Version identifier of the order.
+   *
+   * @return $this
+   */
+  public function setVersion($version);
+
+  /**
+   * Lock the order for further savings.
+   * Force decrease the working order version to lock it.
+   */
+  public function lock();
+
+  /**
+   * Unlock the order for further savings.
+   * Froce increase the working order version to unlock it.
+   */
+  public function unlock();
+
+  /**
    * Gets the store.
    *
    * @return \Drupal\commerce_store\Entity\StoreInterface|null
