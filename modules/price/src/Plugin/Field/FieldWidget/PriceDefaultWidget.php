@@ -28,6 +28,10 @@ class PriceDefaultWidget extends WidgetBase {
       $element['#default_value'] = $items[$delta]->toPrice()->toArray();
     }
 
+    $available_currencies = $items[$delta]->getAvailableCurrencies();
+
+    $element['#available_currencies'] = $available_currencies;
+
     return $element;
   }
 
