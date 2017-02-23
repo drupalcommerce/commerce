@@ -35,14 +35,14 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
   /**
    * The payment gateway storage.
    *
-   * @var \Drupal\commerce_payment\PaymentGatewayStorageInterface $paymentGatewayStorage
+   * @var \Drupal\commerce_payment\PaymentGatewayStorageInterface
    */
-
   protected $paymentGatewayStorage;
+
   /**
    * The payment method storage.
    *
-   * @var \Drupal\commerce_payment\PaymentMethodStorageInterface $paymentMethodStorage
+   * @var \Drupal\commerce_payment\PaymentMethodStorageInterface
    */
   protected $paymentMethodStorage;
 
