@@ -91,7 +91,12 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active status'))
       ->setDescription(t('A boolean indicating whether the Coupon is active.'))
-      ->setDefaultValue(TRUE);
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 99,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
