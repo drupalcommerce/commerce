@@ -83,13 +83,11 @@ class Price extends FormElement {
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
     $currencies = $currency_storage->loadMultiple();
     $currency_codes = array_keys($currencies);
-
     // Keep only available currencies.
     $available_currencies = $element['#available_currencies'];
     if (isset($available_currencies) && !empty($available_currencies)) {
       $currency_codes = array_intersect($currency_codes, $available_currencies);
     }
-
     // Stop rendering if there are no currencies available.
     if (empty($currency_codes)) {
       return $element;
