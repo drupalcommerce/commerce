@@ -88,6 +88,8 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
     if (empty($definition['context'][$target])) {
       $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);
     }
+    $definition['context']['source'] = new ContextDefinition('entity', 'Source entity', FALSE);
+
   }
 
 }

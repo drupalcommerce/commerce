@@ -5,6 +5,8 @@
  * Provides a UI for managing promotions.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
@@ -49,4 +51,35 @@ function template_preprocess_commerce_promotion(array &$variables) {
   foreach (Element::children($variables['elements']) as $key) {
     $variables['promotion'][$key] = $variables['elements'][$key];
   }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  if ($entity_type->id() != 'commerce_order') {
+    return $fields;
+  }
+
+  $fields['coupons'] = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Coupons'))
+    ->setDescription(t('Coupons which was applied to order or order items.'))
+    ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+    ->setRequired(FALSE)
+    ->setSetting('target_type', 'commerce_promotion_coupon')
+    ->setSetting('handler', 'default')
+    ->setTranslatable(TRUE)
+    ->setDisplayOptions('form', array(
+      'type' => 'entity_reference_autocomplete',
+      'weight' => 5,
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'size' => '60',
+        'autocomplete_type' => 'tags',
+        'placeholder' => '',
+      ),
+    ));
+
+  return $fields;
 }
