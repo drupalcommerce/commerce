@@ -6,7 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 
 /**
- * Removes an expired Cart
+ * Removes an expired Cart.
  *
  * @QueueWorker(
  *  id = "cart_expiries",
@@ -15,19 +15,27 @@ use Drupal\Core\Queue\QueueWorkerBase;
  * )
  */
 class CartExpire extends QueueWorkerBase {
-    /**
-     * {@inheritdoc}
-     */
-    public function processItem($data)
-    {
-        if ($data instanceof OrderInterface && $data->getCompletedTime() > 0) {
-            $order_type_storage = \Drupal::entityTypeManager()->getStorage('commerce_order_type');
-            $order_type = $order_type_storage->load($data->bundle());
-            $elapsed = REQUEST_TIME - $data->getCreatedTime();
-            $expiry = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiry') * 3600 * 24;
-            if ($elapsed >= $expiry) {
-                $data->delete();
-            }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processItem($data) {
+    $orders = \Drupal::entityTypeManager()->getStorage('commerce_order')
+      ->loadMultiple($data);
+    foreach ($orders as $order) {
+      // Ensure that orders slated for clearing have not been completed since
+      // they were last queued.
+      if ($order instanceof OrderInterface && is_null($order->getCompletedTime())) {
+        $order_type_storage = \Drupal::entityTypeManager()
+          ->getStorage('commerce_order_type');
+        $order_type = $order_type_storage->load($order->bundle());
+        $elapsed = REQUEST_TIME - $order->getCreatedTime();
+        $expiry = $order_type->getThirdPartySetting('commerce_cart',
+            'cart_expiry') * 3600 * 24;
+        if ($elapsed >= $expiry) {
+          $order->delete();
         }
+      }
     }
+  }
 }

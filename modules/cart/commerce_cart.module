@@ -193,24 +193,23 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   ];
 
   $form['commerce_cart']['enable_expiration'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Enable cart expiration for this order type'),
-      '#default_value' => !empty($cart_expiry),
+    '#type' => 'checkbox',
+    '#title' => t('Enable cart expiration for this order type'),
+    '#default_value' => !empty($cart_expiry),
   ];
 
-  $form['commerce_cart']['cart_expiration'] =  [
-      '#type' => 'number',
-      '#title' => t('Days until cart expires'),
-      '#description' => t('The cart will be removed in the number of days ' .
-          'specified. Set to 0 disable cart expiry.'),
-      '#default_value' => $cart_expiry ?: 0,
-      '#required' => TRUE,
-      '#states' => [
-          'visible' => [
-              ':input[name="commerce_cart[enable_expiration]"]' =>
-                  ['checked' => TRUE],
-          ],
+  $form['commerce_cart']['cart_expiration'] = [
+    '#type' => 'number',
+    '#title' => t('Days until cart expires'),
+    '#description' => t('The cart will be removed in the number of days specified. Set to 0 disable cart expiry.'),
+    '#default_value' => $cart_expiry ?: 0,
+    '#required' => TRUE,
+    '#states' => [
+      'visible' => [
+        ':input[name="commerce_cart[enable_expiration]"]' =>
+            ['checked' => TRUE],
       ],
+    ],
   ];
 
   $form['actions']['submit']['#submit'][] = 'commerce_cart_order_type_form_submit';
@@ -256,10 +255,14 @@ function template_preprocess_commerce_cart_block(&$variables) {
  * Implements hook_cron().
  */
 function commerce_cart_cron() {
-    $queue = \Drupal::queue('cart_expiries');
+  $queue = \Drupal::queue('cart_expiries');
 
-    $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
-    foreach($order_storage->loadMultiple() as $order) {
-        $queue->createItem($order);
-    }
+  $ids = \Drupal::entityQuery('commerce_order')
+    ->notExists('completed')
+    ->execute();
+
+  // Queue ids in groups of 50.
+  for ($i = 0; $i < count($ids); $i += 50) {
+    $queue->createItem(array_slice($ids, $i, $i + 50));
+  }
 }
