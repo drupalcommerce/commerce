@@ -28,6 +28,10 @@ entity.commerce_payment.collection:
   defaults:
     _entity_list: 'commerce_payment'
     _title: 'Payments'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
   requirements:
     _permission: 'administer commerce_payment'
 

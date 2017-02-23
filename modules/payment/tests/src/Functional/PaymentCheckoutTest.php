@@ -6,7 +6,6 @@ use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -92,14 +91,6 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'card_number' => '9999',
       'reusable' => FALSE,
     ]);
-
-    // Cheat so we don't need JS to interact w/ Address field widget.
-    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $customer_form_display */
-    $customer_form_display = EntityFormDisplay::load('profile.customer.default');
-    $address_component = $customer_form_display->getComponent('address');
-    $address_component['settings']['default_country'] = 'US';
-    $customer_form_display->setComponent('address', $address_component);
-    $customer_form_display->save();
   }
 
   /**
