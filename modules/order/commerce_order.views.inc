@@ -18,3 +18,12 @@ function commerce_order_views_data() {
   ];
   return $data;
 }
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function commerce_order_views_data_alter(array &$data) {
+  $data['commerce_order']['store_id']['field']['id'] = 'commerce_store';
+  $data['commerce_order']['state']['filter']['id'] = 'state_machine_state';
+  $data['commerce_order_item']['purchased_entity']['field']['id'] = 'commerce_order_item_purchased_entity';
+}
