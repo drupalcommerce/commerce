@@ -157,7 +157,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   $order_type = $form_state->getFormObject()->getEntity();
   $cart_form_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_form_view', 'commerce_cart_form');
   $cart_block_view = $order_type->getThirdPartySetting('commerce_cart', 'cart_block_view', 'commerce_cart_block');
-  $cart_expiry = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiry');
+  $cart_expiry = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration');
   // Prepare a list of views tagged 'commerce_cart_form'.
   $view_storage = \Drupal::entityTypeManager()->getStorage('view');
   $available_form_views = [];
@@ -224,7 +224,7 @@ function commerce_cart_order_type_form_submit($form, FormStateInterface $form_st
   // @todo open follow up and fix cart_form_view, commerce_cart_block saving.
 
   $cart_expiry = $settings['enable_expiration'] ?: 0;
-  $order_type->setThirdPartySetting('commerce_cart', 'cart_expiry', $cart_expiry);
+  $order_type->setThirdPartySetting('commerce_cart', 'cart_expiration', $cart_expiry);
   $order_type->save();
 }
 
@@ -255,10 +255,10 @@ function template_preprocess_commerce_cart_block(&$variables) {
  * Implements hook_cron().
  */
 function commerce_cart_cron() {
-  $queue = \Drupal::queue('cart_expiries');
+  $queue = \Drupal::queue('cart_expirations');
 
   $ids = \Drupal::entityQuery('commerce_order')
-    ->notExists('completed')
+    ->condition('cart', TRUE)
     ->execute();
 
   // Queue ids in groups of 50.
