@@ -6,6 +6,7 @@ use Drupal\commerce_checkout\Entity\CheckoutFlow;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -97,13 +98,13 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
    * Tests than an order can go through checkout steps.
    */
   public function testCheckoutWithPayment() {
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     // The order's payment method should be available and default.
     $order = Order::load(1);
     $order->payment_method = $this->paymentMethod;
     $order->save();
-    $this->drupalGet('checkout/1');
+    $this->drupalGet(Url::fromRoute('commerce_checkout.form', ['commerce_order' => 1]));
     $this->assertSession()->pageTextContains('Order Summary');
     $radio_button = $this->getSession()->getPage()->findField('Visa ending in 9999');
     $this->assertNotNull($radio_button);
@@ -157,7 +158,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
    * Tests that a declined payment does not complete checkout.
    */
   public function testDeclineStopsCheckout() {
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
@@ -204,7 +205,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $plugin->setConfiguration($configuration);
     $checkout_flow->save();
 
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();

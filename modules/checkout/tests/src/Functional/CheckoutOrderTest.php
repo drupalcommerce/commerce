@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_checkout\Functional;
 
 use Drupal\commerce_price\Price;
+use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\profile\Entity\Profile;
 use Drupal\commerce_order\Entity\OrderItem;
@@ -123,31 +124,33 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ]);
     $order->save();
 
+    $checkout_url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id()]);
+
     // Anonymous user with no session.
     $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
 
     // Authenticated order owner.
     $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(200);
 
     // Authenticated user who does not own the order.
     $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
     $this->drupalLogin($user);
 
     // Order with no order items.
     $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
 
     // Authenticated order owner without the 'access checkout' permission.
     $order->addItem($order_item)->save();
     user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($checkout_url);
     $this->assertSession()->statusCodeEquals(403);
   }
 
@@ -156,7 +159,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    */
   public function testGuestOrderCheckout() {
     $this->drupalLogout();
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
@@ -182,7 +185,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
     // Test second order.
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
@@ -219,7 +222,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $config->save();
 
     $this->drupalLogout();
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
@@ -235,7 +238,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
 
     // Test account validation.
     $this->drupalLogout();
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
@@ -295,25 +298,27 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests the order summary.
    */
   public function testOrderSummary() {
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
 
+    $checkout_url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => 1]);
+
     // Test the default settings: ensure the default view is shown.
-    $this->drupalGet('/checkout/1');
+    $this->drupalGet($checkout_url);
     $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
 
     // Disable the order summary.
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
+    $this->drupalGet($this->getAbsoluteUrl('/admin/commerce/config/checkout-flows/manage/default'));
     $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
-    $this->drupalGet('/checkout/1');
+    $this->drupalGet($checkout_url);
     $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
 
     // Use a different view for the order summary.
-    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
+    $this->drupalGet($this->getAbsoluteUrl('/admin/structure/views/view/commerce_checkout_order_summary/duplicate'));
     $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
+    $this->drupalGet($this->getAbsoluteUrl('/admin/commerce/config/checkout-flows/manage/default'));
     $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
-    $this->drupalGet('/checkout/1');
+    $this->drupalGet($checkout_url);
     $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
   }
 
@@ -321,7 +326,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests checkout behaviour after a cart update.
    */
   public function testCheckoutFlowOnCartUpdate() {
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->getSession()->getPage()->findLink('your cart')->click();
     // Submit the form until review.
@@ -339,7 +344,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     ], 'Continue to review');
     $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
     // By default the checkout step is preserved upon return.
-    $this->drupalGet('/checkout/1');
+    $checkout_url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => 1]);
+    $this->drupalGet($checkout_url);
     $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
 
     $variation = $this->createEntity('commerce_product_variation', [
@@ -358,7 +364,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'stores' => [$this->store],
     ]);
     // Adding a new product to the cart resets the checkout step.
-    $this->drupalGet($product2->toUrl()->toString());
+    $this->drupalGet($product2->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
@@ -367,7 +373,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
 
     // Removing a product from the cart resets the checkout step.
     $this->submitForm([], 'Continue to review');
-    $this->drupalGet('/cart');
+    $this->drupalGet(Url::fromRoute('commerce_cart.page'));
     $this->submitForm([], 'Remove');
     $this->submitForm([], 'Checkout');
     $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
