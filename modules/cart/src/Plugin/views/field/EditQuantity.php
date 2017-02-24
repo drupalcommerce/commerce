@@ -115,7 +115,7 @@ class EditQuantity extends FieldPluginBase {
    *   The current state of the form.
    */
   public function viewsFormSubmit(array &$form, FormStateInterface $form_state) {
-    $quantities = $form_state->getValue($this->options['id']);
+    $quantities = $form_state->getValue($this->options['id'], []);
     foreach ($quantities as $row_index => $quantity) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($this->view->result[$row_index]);
