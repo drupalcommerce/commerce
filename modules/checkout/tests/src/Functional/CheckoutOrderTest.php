@@ -140,7 +140,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogin($user);
 
     // Order with no order items.
-    $order->removeItem($order_item)->save();
+    $order->removeItem($order_item)->unlock()->save();
     $this->drupalGet('/checkout/' . $order->id());
     $this->assertSession()->statusCodeEquals(403);
 

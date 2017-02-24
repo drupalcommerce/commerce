@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_order\Kernel;
 
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+
 /**
  * Tests order level validation constraints.
  *

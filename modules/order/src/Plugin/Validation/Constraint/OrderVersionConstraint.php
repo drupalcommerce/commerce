@@ -16,4 +16,5 @@ use Symfony\Component\Validator\Constraint;
 class OrderVersionConstraint extends Constraint {
 
   public $message = 'The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.';
+
 }

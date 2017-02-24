@@ -110,7 +110,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->assertTrue($radio_button->getAttribute('checked'));
     // Without it, 'New credit card' should be default.
     $order->payment_method = NULL;
-    $order->save();
+    $order->unlock()->save();
     $this->drupalGet('checkout/1');
     $radio_button = $this->getSession()->getPage()->findField('New credit card');
     $this->assertNotNull($radio_button);
