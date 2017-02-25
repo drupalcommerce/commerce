@@ -20,11 +20,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class CartExpire extends QueueWorkerBase implements ContainerFactoryPluginInterface {
   /**
-   * The entity type manager.
+   * The order storage.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $entityTypeManager;
+  protected $orderStorage;
+
+  /**
+   * The order type storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $orderTypeStorage;
 
   /**
    * The commerce time service.
@@ -34,7 +41,7 @@ class CartExpire extends QueueWorkerBase implements ContainerFactoryPluginInterf
   protected $time;
 
   /**
-   * Constructs a new CartBlock.
+   * Constructs a new CartExpire object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -47,14 +54,11 @@ class CartExpire extends QueueWorkerBase implements ContainerFactoryPluginInterf
    * @param \Drupal\commerce\TimeInterface $time
    *   The time service.
    */
-  public function __construct(array $configuration,
-                              $plugin_id,
-                              $plugin_definition,
-                              EntityTypeManagerInterface $entity_type_manager,
-                              TimeInterface $time) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->entityTypeManager = $entity_type_manager;
+    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->orderTypeStorage = $entity_type_manager->getStorage('commerce_order_type');
     $this->time = $time;
   }
 
@@ -75,16 +79,13 @@ class CartExpire extends QueueWorkerBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function processItem($data) {
-    $orders = $this->entityTypeManager->getStorage('commerce_order')
-      ->loadMultiple($data);
+    $orders = $this->orderStorage->loadMultiple($data);
     foreach ($orders as $order) {
       // Ensure that orders slated for clearing have not been completed since
       // they were last queued.
       if ($order instanceof OrderInterface && $order->cart->value == 1) {
-        $order_type_storage = $this->entityTypeManager
-          ->getStorage('commerce_order_type');
-        $order_type = $order_type_storage->load($order->bundle());
-        $elapsed = $this->time->getCurrentTime() - $order->getCreatedTime();
+        $order_type = $this->orderTypeStorage->load($order->bundle());
+        $elapsed = $this->time->getCurrentTime() - $order->getChangedTime();
         $expiry = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration') * 3600 * 24;
         if ($elapsed >= $expiry) {
           $order->delete();

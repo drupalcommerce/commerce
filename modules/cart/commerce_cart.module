@@ -201,7 +201,7 @@ function commerce_cart_form_commerce_order_type_form_alter(array &$form, FormSta
   $form['commerce_cart']['cart_expiration'] = [
     '#type' => 'number',
     '#title' => t('Days until cart expires'),
-    '#description' => t('The cart will be removed in the number of days specified. Set to 0 disable cart expiry.'),
+    '#description' => t('The cart will be removed in the number of days specified. Set to 0 disable cart expiration.'),
     '#default_value' => $cart_expiry ?: 0,
     '#required' => TRUE,
     '#states' => [
@@ -257,12 +257,23 @@ function template_preprocess_commerce_cart_block(&$variables) {
 function commerce_cart_cron() {
   $queue = \Drupal::queue('cart_expirations');
 
-  $ids = \Drupal::entityQuery('commerce_order')
-    ->condition('cart', TRUE)
-    ->execute();
+  $time = \Drupal::service('commerce.time');
+  $type_storage = \Drupal::entityTypeManager()->getStorage('commerce_order_type');
+  $order_types = $type_storage->loadMultiple();
 
-  // Queue ids in groups of 50.
-  for ($i = 0; $i < count($ids); $i += 50) {
-    $queue->createItem(array_slice($ids, $i, $i + 50));
+  foreach ($order_types as $order_type) {
+    $expiration_days = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration');
+    if ($expiration_days > 0) {
+      $expiration = $time->getCurrentTime() - ($expiration_days * 3600 * 24);
+
+      // Queue abandoned carts in groups of 50.
+      $ids = \Drupal::entityQuery('commerce_order')
+        ->condition('cart', TRUE)
+        ->condition('changed', $expiration, '<')
+        ->range(0, 50)
+        ->execute();
+
+      $queue->createItem($ids);
+    }
   }
 }
