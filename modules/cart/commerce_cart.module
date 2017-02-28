@@ -6,7 +6,6 @@
  */
 
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_order\Entity\Order;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
@@ -123,8 +122,10 @@ function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) 
         $form['actions']['submit']['#value'] = t('Update cart');
 
         $order_id = $view_argument->getValue();
+        /** @var \Drupal\commerce_order\OrderStorage $storage */
+        $storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
         /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-        $order = Order::load($order_id);
+        $order = $storage->loadUnchanged($order_id);
         $form_state->set('order_id', $order->id());
         // Order version must be sent to the client, for later overwrite error checking.
         $form['version'] = [
@@ -149,8 +150,10 @@ function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) 
  */
 function commerce_cart_commerce_cart_form_validate($form, FormStateInterface $form_state) {
   // Re-load the order.
+  /** @var \Drupal\commerce_order\OrderStorage $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
   /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-  $order = Order::load($form_state->get('order_id'));
+  $order = $storage->loadUnchanged($form_state->get('order_id'));
   // A change to the order version must not validate.
   if ($order->getVersion() > $form_state->getValue('version')) {
     $form_state->setErrorByName('', t('The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.'));
@@ -189,7 +192,7 @@ function commerce_cart_form_commerce_order_form_alter(array &$form, FormStateInt
       $form['cart']['#group'] = 'meta';
       $form['cart']['#weight'] = 100;
       // Warning it the order is cart and it was modified in the last hour.
-      if (!empty($order->get('cart')->value) && (REQUEST_TIME - $order->getChangedTime()) < 3600) {
+      if (!empty($order->get('cart')->value) && (\Drupal::service('commerce.time')->getRequestTime() - $order->getChangedTime()) < 3600) {
         drupal_set_message(t('This order has been modified by the customer in the last hour. Modifying it here could cause their future changes to be lost. Proceed with caution.'), 'warning');
       }
     }
