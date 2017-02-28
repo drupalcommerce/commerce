@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   id = "commerce_promotion_coupon",
  *   label = @Translation("Coupon"),
  *   handlers = {
+ *     "storage" = "Drupal\commerce_promotion\CouponStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\ContentEntityForm",
