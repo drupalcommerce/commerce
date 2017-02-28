@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Plugin\views\field;
 
-use Drupal\views\Plugin\views\field\EntityField;
+use Drupal\views\Plugin\views\field\Field;
 use Drupal\views\ResultRow;
 
 /**
@@ -10,7 +10,7 @@ use Drupal\views\ResultRow;
  *
  * @ViewsField("commerce_order_item_purchased_entity")
  */
-class PurchasedEntity extends EntityField {
+class PurchasedEntity extends Field {
 
   /**
    * {@inheritdoc}
