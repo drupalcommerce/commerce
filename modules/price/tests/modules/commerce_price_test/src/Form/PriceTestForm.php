@@ -24,6 +24,7 @@ class PriceTestForm extends FormBase {
       '#title' => $this->t('Amount'),
       '#default_value' => ['number' => '99.99', 'currency_code' => 'USD'],
       '#required' => TRUE,
+      '#available_currencies' => ['USD', 'EUR'],
     ];
     $form['submit'] = [
       '#type' => 'submit',

@@ -23,6 +23,26 @@ entity.commerce_payment.operation_form:
   requirements:
     _commerce_payment_operation_access: 'TRUE'
 
+entity.commerce_payment.collection:
+  path: '/admin/commerce/orders/{commerce_order}/payments'
+  defaults:
+    _entity_list: 'commerce_payment'
+    _title: 'Payments'
+  options:
+    parameters:
+      commerce_order:
+        type: 'entity:commerce_order'
+  requirements:
+    _permission: 'administer commerce_payment'
+
+entity.commerce_payment_gateway.collection:
+  path: '/admin/commerce/config/payment-gateways'
+  defaults:
+    _entity_list: 'commerce_payment_gateway'
+    _title: 'Payment gateways'
+  requirements:
+    _permission: 'administer commerce_payment_gateway'
+
 entity.commerce_payment_method.add_form:
   path: '/user/{user}/payment-methods/add'
   defaults:

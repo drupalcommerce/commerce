@@ -103,7 +103,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         TRUE => $this->t('Authorize and capture'),
         FALSE => $this->t('Authorize only (requires manual capture after checkout)'),
       ],
-      '#default_value' => $this->configuration['capture'],
+      '#default_value' => (int) $this->configuration['capture'],
     ];
 
     return $form;

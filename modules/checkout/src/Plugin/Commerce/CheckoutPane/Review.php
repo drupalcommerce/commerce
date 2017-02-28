@@ -26,6 +26,13 @@ class Review extends CheckoutPaneBase implements CheckoutPaneInterface {
     });
     foreach ($enabled_panes as $pane_id => $pane) {
       if ($summary = $pane->buildPaneSummary()) {
+        // BC layer for panes which still return rendered strings.
+        if ($summary && !is_array($summary)) {
+          $summary = [
+            '#markup' => $summary,
+          ];
+        }
+
         $label = $pane->getLabel();
         if ($pane->isVisible()) {
           $edit_link = Link::createFromRoute($this->t('Edit'), 'commerce_checkout.form', [
@@ -38,9 +45,7 @@ class Review extends CheckoutPaneBase implements CheckoutPaneInterface {
           '#type' => 'fieldset',
           '#title' => $label,
         ];
-        $pane_form[$pane_id]['summary'] = [
-          '#markup' => $summary,
-        ];
+        $pane_form[$pane_id]['summary'] = $summary;
       }
     }
 

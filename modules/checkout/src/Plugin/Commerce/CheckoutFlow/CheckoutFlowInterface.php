@@ -5,6 +5,7 @@ namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -16,7 +17,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
  * administrator. This configuration is stored in the commerce_checkout_flow
  * config entity and injected into the plugin at instantiation.
  */
-interface CheckoutFlowInterface extends FormInterface, ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
+interface CheckoutFlowInterface extends FormInterface, BaseFormIdInterface, ConfigurablePluginInterface, PluginFormInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
    * Gets the current order.

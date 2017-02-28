@@ -29,6 +29,16 @@ field.value.commerce_price:
       type: string
       label: 'Currency code'
 
+field.field_settings.commerce_price:
+  type: mapping
+  label: 'Price field settings'
+  mapping:
+    available_currencies:
+      type: sequence
+      label: 'Available currencies'
+      sequence:
+        - type: string
+
 field.formatter.settings.commerce_price_default:
   type: mapping
   label: 'Default price formatter settings'
