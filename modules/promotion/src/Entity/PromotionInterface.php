@@ -4,12 +4,13 @@ namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the interface for promotions.
  */
-interface PromotionInterface extends EntityInterface, EntityStoresInterface {
+interface PromotionInterface extends ContentEntityInterface, EntityStoresInterface {
 
   /**
    * Gets the promotion name.
