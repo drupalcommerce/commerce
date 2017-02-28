@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce_payment\Functional;
 
-use Drupal\commerce_payment\Entity\PaymentMethod;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
