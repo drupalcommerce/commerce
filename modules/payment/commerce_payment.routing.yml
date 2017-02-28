@@ -67,6 +67,20 @@ entity.commerce_payment_method.collection:
       user:
         type: entity:user
 
+entity.commerce_payment_method.set_default:
+  path: '/user/{user}/payment-methods/{commerce_payment_method}/set-default'
+  defaults:
+    _controller: '\Drupal\commerce_payment\Controller\PaymentMethodController::setDefault'
+  options:
+    parameters:
+      user:
+        type: entity:user
+      commerce_payment_method:
+        type: entity:commerce_payment_method
+  requirements:
+    _custom_access: '\Drupal\commerce_payment\PaymentMethodAccessCheck::checkAccess'
+    _csrf_token: 'TRUE'
+
 commerce_payment.checkout.return:
   path: '/checkout/{commerce_order}/{step}/return'
   defaults:
