@@ -50,6 +50,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *     "canonical" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "edit-form" = "/user/{user}/payment-methods/{commerce_payment_method}/edit",
  *     "delete-form" = "/user/{user}/payment-methods/{commerce_payment_method}/delete",
+ *     "set-default" = "/user/{user}/payment-methods/{commerce_payment_method}/set-default",
  *   },
  * )
  */
@@ -181,14 +182,14 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    * {@inheritdoc}
    */
   public function isDefault() {
-    return $this->get('is_default')->value;
+    return (bool) $this->get('is_default')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setDefault($default) {
-    $this->set('is_default', $default);
+  public function setDefault($is_default) {
+    $this->set('is_default', (bool) $is_default);
     return $this;
   }
 
@@ -243,6 +244,38 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
     // Populate the payment_gateway_mode automatically.
     if ($this->get('payment_gateway_mode')->isEmpty()) {
       $this->set('payment_gateway_mode', $payment_gateway->getPlugin()->getMode());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $storage */
+    parent::postSave($storage, $update);
+
+    // No default needed for anonymous.
+    if (!$this->getOwner()) {
+      return;
+    }
+
+    // Check if this payment method is, or became the default.
+    if ($this->isDefault()) {
+      /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface[] $payment_methods */
+      $payment_methods = $storage->loadMultipleByUser($this->getOwner());
+
+      // Ensure that all other profiles are set to not default.
+      foreach ($payment_methods as $payment_method) {
+        if ($payment_method->id() != $this->id() && $payment_method->isDefault()) {
+          $payment_method->setDefault(FALSE);
+          $payment_method->save();
+        }
+      }
+    }
+    elseif (count($storage->loadMultipleByUser($this->getOwner())) == 1) {
+      // Set as default if it is the only payment method for the user.
+      $this->setDefault(TRUE);
+      $this->save();
     }
   }
 

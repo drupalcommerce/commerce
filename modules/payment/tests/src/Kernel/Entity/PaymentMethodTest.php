@@ -49,6 +49,7 @@ class PaymentMethodTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
+    $this->installEntitySchema('commerce_payment');
     $this->installEntitySchema('commerce_payment_method');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_payment');
@@ -141,6 +142,22 @@ class PaymentMethodTest extends CommerceKernelTestBase {
 
     $payment_method->setCreatedTime(635879700);
     $this->assertEquals(635879700, $payment_method->getCreatedTime());
+
+    $payment_method->save();
+    $this->assertTrue($payment_method->isDefault());
+    /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('commerce_payment_method');
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method2 */
+    $payment_method2 = PaymentMethod::create([
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+    ]);
+    $payment_method2->setOwner($this->user);
+    $payment_method2->setDefault(TRUE);
+    $payment_method2->save();
+
+    $default_payment_method = $storage->loadDefaultByUser($this->user);
+    $this->assertEquals($payment_method2->id(), $default_payment_method->id());
   }
 
 }

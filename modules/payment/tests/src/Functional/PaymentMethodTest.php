@@ -27,6 +27,13 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
   protected $collectionUrl;
 
   /**
+   * Payment method entity storage.
+   *
+   * @var \Drupal\commerce_payment\PaymentMethodStorageInterface
+   */
+  public $paymentMethodStorage;
+
+  /**
    * An on-site payment gateway.
    *
    * @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface
@@ -55,12 +62,14 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
 
     $this->collectionUrl = 'user/' . $this->user->id() . '/payment-methods';
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGateway $payment_gateway */
+    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
+    $this->paymentMethodStorage = $this->container->get('entity_type.manager')
+      ->getStorage('commerce_payment_method');
   }
 
   /**
@@ -99,7 +108,7 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->assertSession()->addressEquals($this->collectionUrl);
     $this->assertSession()->pageTextContains('Visa ending in 1111 saved to your payment methods.');
 
-    $payment_method = PaymentMethod::load(1);
+    $payment_method = $this->paymentMethodStorage->load(1);
     $this->assertEquals($this->user->id(), $payment_method->getOwnerId());
   }
 
@@ -126,8 +135,59 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Delete');
     $this->assertSession()->addressEquals($this->collectionUrl);
 
-    $payment_gateway = PaymentMethod::load($payment_method->id());
-    $this->assertNull($payment_gateway);
+    $payment_method = $this->paymentMethodStorage->loadUnchanged($payment_method->id());
+    $this->assertNull($payment_method);
+  }
+
+  /**
+   * Tests deleting a payment method.
+   */
+  public function testPaymentMethodSetDefault() {
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $this->createEntity('commerce_payment_method', [
+      'uid' => $this->user->id(),
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+    ]);
+
+    $details = [
+      'type' => 'visa',
+      'number' => '4111111111111111',
+      'expiration' => ['month' => '01', 'year' => date("Y") + 1],
+    ];
+    $this->paymentGateway->getPlugin()->createPaymentMethod($payment_method, $details);
+    $payment_method = $this->paymentMethodStorage->loadUnchanged($payment_method->id());
+    // The first payment method should be set as default.
+    $this->assertTrue($payment_method->isDefault());
+    $this->drupalGet($this->collectionUrl);
+    $this->assertSession()->pageTextNotContains('Mark as default');
+
+    // Add a second payment method and test the 'Mark as default' operation.
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method2 */
+    $payment_method2 = $this->createEntity('commerce_payment_method', [
+      'uid' => $this->user->id(),
+      'type' => 'credit_card',
+      'payment_gateway' => 'example',
+    ]);
+
+    $details = [
+      'type' => 'mastercard',
+      'number' => '5555555555554444',
+      'expiration' => ['month' => '01', 'year' => date("Y") + 1],
+    ];
+    $this->paymentGateway->getPlugin()->createPaymentMethod($payment_method2, $details);
+    $this->assertFalse($payment_method2->isDefault());
+
+    $this->drupalGet($this->collectionUrl);
+    $this->getSession()->getPage()->clickLink('Mark as default');
+    $this->assertSession()->addressEquals($this->collectionUrl);
+    $this->assertSession()->pageTextContains(t('The @label payment method has been marked as default.', ['@label' => $payment_method2->label()]));
+
+    // Test the updated payment methods.
+    $payment_method = $this->paymentMethodStorage->loadUnchanged($payment_method->id());
+    $payment_method2 = $this->paymentMethodStorage->loadUnchanged($payment_method2->id());
+    $this->assertTrue($payment_method2->isDefault());
+    $this->assertFalse($payment_method->isDefault());
   }
 
 }

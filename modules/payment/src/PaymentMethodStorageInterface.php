@@ -28,4 +28,26 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    */
   public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway, array $billing_countries = []);
 
+  /**
+   * Loads the given user's payment methods.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *    The user entity.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
+   *    An array of loaded payment methods entities.
+   */
+  public function loadMultipleByUser(UserInterface $account);
+
+  /**
+   * Loads the default user payment method.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *    The user entity.
+   *
+   * @return \Drupal\commerce_payment\Entity\PaymentMethodInterfaces
+   *   The default payment method.
+   */
+  public function loadDefaultByUser(UserInterface $account);
+
 }
