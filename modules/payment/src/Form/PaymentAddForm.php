@@ -149,7 +149,8 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
 
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
     $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
-    $payment_methods = $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway);
+    $billing_countries = $this->order->getStore()->getBillingCountries();
+    $payment_methods = $payment_method_storage->loadReusable($this->order->getCustomer(), $selected_payment_gateway, $billing_countries);
 
     if (!empty($payment_methods)) {
       $selected_payment_method = reset($payment_methods);
