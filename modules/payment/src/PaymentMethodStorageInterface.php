@@ -3,6 +3,7 @@
 namespace Drupal\commerce_payment;
 
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
+use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\user\UserInterface;
 
@@ -18,10 +19,12 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    *   The user account.
    * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
    *   The payment gateway.
+   * @param \Drupal\commerce_store\Entity\StoreInterface $store
+   *   An optional store to filter by, for available billing countries.
    *
    * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
    *   The reusable payment methods.
    */
-  public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway);
+  public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway, StoreInterface $store = NULL);
 
 }
