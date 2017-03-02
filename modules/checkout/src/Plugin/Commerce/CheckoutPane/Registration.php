@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Provides the login pane.
+ * Provides the registration pane.
  *
  * @CommerceCheckoutPane(
  *   id = "registration",
