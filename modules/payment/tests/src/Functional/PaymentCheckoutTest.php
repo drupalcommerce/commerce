@@ -89,7 +89,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
       'payment_gateway' => $gateway->id(),
       'card_type' => 'visa',
       'card_number' => '9999',
-      'reusable' => FALSE,
+      'reusable' => TRUE,
     ]);
   }
 
