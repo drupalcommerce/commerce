@@ -34,7 +34,7 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
    * Gets the promotion description.
    *
    * @return string
-   *    The promotion description.
+   *   The promotion description.
    */
   public function getDescription();
 
