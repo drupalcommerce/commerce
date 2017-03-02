@@ -81,7 +81,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
    * Tests the off-site redirect using the POST redirect method.
    */
   public function testCheckoutWithOffsiteRedirectPost() {
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
@@ -124,7 +124,7 @@ class PaymentCheckoutOffsiteRedirectTest extends CommerceBrowserTestBase {
     ]);
     $payment_gateway->save();
 
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
