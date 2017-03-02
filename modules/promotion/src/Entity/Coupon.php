@@ -72,6 +72,7 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
       ->setDescription(t('The Coupon entity code.'))
+      ->addConstraint('CouponCode')
       ->setSettings([
         'max_length' => 50,
         'text_processing' => 0,
