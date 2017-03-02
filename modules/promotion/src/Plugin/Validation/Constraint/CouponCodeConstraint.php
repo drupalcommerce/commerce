@@ -14,6 +14,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class CouponCodeConstraint extends Constraint {
 
-  public $message = 'The Code %code is already in use and must be unique.';
+  public $message = 'A coupon with code %value already exists. Enter a unique code.';
 
 }
