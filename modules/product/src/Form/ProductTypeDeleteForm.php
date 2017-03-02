@@ -23,7 +23,7 @@ class ProductTypeDeleteForm extends EntityDeleteForm {
    * Constructs a new ProductTypeDeleteForm object.
    *
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   *    The entity query object.
+   *   The entity query object.
    */
   public function __construct(QueryFactory $query_factory) {
     $this->queryFactory = $query_factory;
