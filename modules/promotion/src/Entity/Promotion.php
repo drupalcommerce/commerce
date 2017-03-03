@@ -284,6 +284,23 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a back-reference on each promotion coupon.
+    foreach ($this->coupons as $item) {
+      /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
+      $coupon = $item->entity;
+      if (!$coupon->getPromotionId()) {
+        $coupon->promotion_id = $this->id();
+        $coupon->save();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
