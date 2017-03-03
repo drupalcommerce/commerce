@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion\Entity;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Context\Context;
@@ -128,6 +129,99 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   public function setOrderTypeIds(array $order_type_ids) {
     $this->set('order_types', $order_type_ids);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCouponsIds() {
+    $coupon_ids = [];
+    foreach ($this->get('coupons') as $field_item) {
+      $coupon_ids[] = $field_item->target_id;
+    }
+    return $coupon_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCouponsCodes() {
+    $coupon_codes = [];
+    foreach ($this->getCoupons() as $coupon) {
+      $coupon_codes[] = $coupon->getCode();
+    }
+    return $coupon_codes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCoupons() {
+    $coupons = $this->get('coupons')->referencedEntities();
+    return $coupons;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCoupons(array $coupons) {
+    $this->set('coupons', $coupons);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasCoupons() {
+    return !$this->get('coupons')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCoupon(CouponInterface $coupon) {
+    if (!$this->hasCoupon($coupon)) {
+      $this->get('coupons')->appendItem($coupon);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeCoupon(CouponInterface $coupon) {
+    $index = $this->getCouponIndex($coupon);
+    if ($index !== FALSE) {
+      $this->get('coupons')->offsetUnset($index);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasCoupon(CouponInterface $coupon) {
+    return in_array($coupon->id(), $this->getCouponsIds());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasCouponCode($code) {
+    return in_array($code, $this->getCouponsCodes());
+  }
+
+  /**
+   * Gets the index of the given coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return int|bool
+   *   The index of the given coupon, or FALSE if not found.
+   */
+  protected function getCouponIndex(CouponInterface $coupon) {
+    return array_search($coupon->id(), $this->getCouponsIds());
   }
 
   /**
