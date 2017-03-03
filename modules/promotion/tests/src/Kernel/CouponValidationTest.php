@@ -55,6 +55,11 @@ class CouponValidationTest extends EntityKernelTestBase {
     $this->assertEquals(count($violations), 1);
     $this->assertEquals($violations[0]->getPropertyPath(), 'code');
     $this->assertEquals($violations[0]->getMessage(), 'A coupon with code %value already exists. Enter a unique code.');
+
+    // Try with a different code.
+    $coupon->setCode($coupon_code . 'X');
+    $violations = $coupon->validate();
+    $this->assertEquals(count($violations), 0);
   }
 
 }
