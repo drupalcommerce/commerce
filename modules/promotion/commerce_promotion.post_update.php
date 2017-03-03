@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Adds coupons field to orders.
  */
