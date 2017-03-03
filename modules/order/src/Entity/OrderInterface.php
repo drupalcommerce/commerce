@@ -328,8 +328,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @param mixed $default
    *   The default value.
    *
-   * @return array
-   *   The order data.
+   * @return mixed
+   *   The value.
    */
   public function getData($key, $default = NULL);
 

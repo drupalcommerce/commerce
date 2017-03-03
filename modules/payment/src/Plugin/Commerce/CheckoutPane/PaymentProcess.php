@@ -177,6 +177,9 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
 
       return $pane_form;
     }
+    else {
+      $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+    }
   }
 
   /**
