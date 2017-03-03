@@ -41,3 +41,20 @@ function commerce_promotion_post_update_2() {
     $promotion->save();
   }
 }
+
+/**
+ * Delete orphaned coupons.
+ */
+function commerce_promotion_post_update_3() {
+  /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
+  $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
+  /** @var \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons */
+  $coupons = $coupon_storage->loadMultiple();
+  $delete_coupons = [];
+  foreach ($coupons as $coupon) {
+    if (!$coupon->getPromotion()) {
+      $delete_coupons[] = $coupon;
+    }
+  }
+  $coupon_storage->delete($delete_coupons);
+}

@@ -395,6 +395,25 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the coupons of a deleted promotion.
+    $coupons = [];
+    foreach ($entities as $entity) {
+      if (empty($entity->coupons)) {
+        continue;
+      }
+      foreach ($entity->coupons as $item) {
+        $coupons[$item->target_id] = $item->entity;
+      }
+    }
+    /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
+    $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
+    $coupon_storage->delete($coupons);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
