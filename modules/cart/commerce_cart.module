@@ -256,24 +256,28 @@ function template_preprocess_commerce_cart_block(&$variables) {
  */
 function commerce_cart_cron() {
   $queue = \Drupal::queue('cart_expirations');
-
   $time = \Drupal::service('commerce.time');
+  $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
   $type_storage = \Drupal::entityTypeManager()->getStorage('commerce_order_type');
   $order_types = $type_storage->loadMultiple();
 
   foreach ($order_types as $order_type) {
     $expiration_days = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration');
+
     if ($expiration_days > 0) {
       $expiration = $time->getCurrentTime() - ($expiration_days * 3600 * 24);
 
       // Queue abandoned carts in groups of 50.
-      $ids = \Drupal::entityQuery('commerce_order')
+      $ids = $order_storage->getQuery()
+        ->condition('type', $order_type->id())
         ->condition('cart', TRUE)
         ->condition('changed', $expiration, '<')
         ->range(0, 50)
         ->execute();
 
-      $queue->createItem($ids);
+      if (!empty($ids)) {
+        $queue->createItem($ids);
+      }
     }
   }
 }
