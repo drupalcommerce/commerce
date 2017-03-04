@@ -1,0 +1,6 @@
+name: Commerce Product Access Test
+description: Test module for testing product and variation access
+core: 8.x
+type: module
+dependencies:
+  - commerce_product
