@@ -47,6 +47,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     ];
     if ($payment_method->bundle() == 'credit_card') {
       $form['payment_details'] = $this->buildCreditCardForm($form['payment_details'], $form_state);
+      $form['#attached']['library'][] = 'commerce_payment/credit_card_validation';
     }
     elseif ($payment_method->bundle() == 'paypal') {
       $form['payment_details'] = $this->buildPayPalForm($form['payment_details'], $form_state);
@@ -173,6 +174,7 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       '#required' => TRUE,
       '#maxlength' => 19,
       '#size' => 20,
+      '#suffix' => '<div id="cc-validation"></div>',
     ];
     $element['expiration'] = [
       '#type' => 'container',
