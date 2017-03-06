@@ -26,7 +26,7 @@
     {{ order.order_items }}
     {{ order.total_price }}
 
-    {% if order.activity %}
+    {% if order.activity|render|striptags|trim is not empty %}
       <h2>{% trans %}Order activity{% endtrans %}</h2>
       {{ order.activity }}
     {% endif %}
