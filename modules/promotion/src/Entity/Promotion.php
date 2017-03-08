@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion\Entity;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Context\Context;
@@ -279,6 +280,25 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
     $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
     $offer->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the coupons of a deleted promotion.
+    $coupons = [];
+    foreach ($entities as $entity) {
+      if (empty($entity->coupons)) {
+        continue;
+      }
+      foreach ($entity->coupons as $item) {
+        $coupons[$item->target_id] = $item->entity;
+      }
+    }
+    /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
+    $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
+    $coupon_storage->delete($coupons);
   }
 
   /**
