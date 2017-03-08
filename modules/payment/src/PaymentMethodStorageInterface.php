@@ -18,10 +18,14 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    *   The user account.
    * @param \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway
    *   The payment gateway.
+   * @param array $billing_countries
+   *   (Optional) A list of billing countries to filter by.
+   *   For example, if ['US', 'FR'] is given, only payment methods
+   *   with billing profiles from those countries will be returned.
    *
    * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface[]
    *   The reusable payment methods.
    */
-  public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway);
+  public function loadReusable(UserInterface $account, PaymentGatewayInterface $payment_gateway, array $billing_countries = []);
 
 }

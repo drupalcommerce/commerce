@@ -24,6 +24,10 @@
   <rule ref="Drupal.Commenting.VariableComment.VarOrder">
     <severity>0</severity>
   </rule>
+  <!-- Complains about example code. -->
+  <rule ref="Generic.CodeAnalysis.UselessOverridingMethod.Found">
+    <severity>0</severity>
+  </rule>
   <!-- Complains about '#element_validate callback:' -->
   <rule ref="Drupal.Commenting.DocComment.ShortNotCapital">
     <severity>0</severity>

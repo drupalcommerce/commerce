@@ -68,16 +68,30 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $profile = $this->createEntity('profile', [
+      'type' => 'customer',
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
+      'uid' => $this->adminUser->id(),
+    ]);
+
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
-
     $this->paymentMethod = $this->createEntity('commerce_payment_method', [
       'uid' => $this->loggedInUser->id(),
       'type' => 'credit_card',
       'payment_gateway' => 'example',
+      'billing_profile' => $profile,
     ]);
 
     $details = [

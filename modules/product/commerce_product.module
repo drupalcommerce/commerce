@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce\BundleFieldDefinition;
+use Drupal\commerce_product\Entity\ProductTypeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
@@ -36,8 +37,8 @@ function commerce_product_entity_form_display_update(EntityFormDisplayInterface 
  * Implements hook_ENTITY_TYPE_update().
  */
 function commerce_product_entity_view_display_update(EntityInterface $entity) {
-  // The product view uses the variation view and needs to be cleared, which doesn't happen automatically
-  // because we're editing the variation, not the product
+  // The product view uses the variation view and needs to be cleared, which doesn't
+  // happen automatically because we're editing the variation, not the product.
   if (substr($entity->getConfigTarget(), 0, 27) === 'commerce_product_variation.') {
     Cache::invalidateTags(['commerce_product_view']);
   }
@@ -177,7 +178,7 @@ function template_preprocess_commerce_product_attribute_value(array &$variables)
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
-function commerce_product_add_stores_field($product_type) {
+function commerce_product_add_stores_field(ProductTypeInterface $product_type) {
   $field_definition = BundleFieldDefinition::create('entity_reference')
     ->setTargetEntityTypeId('commerce_product')
     ->setTargetBundle($product_type->id())
@@ -204,7 +205,7 @@ function commerce_product_add_stores_field($product_type) {
  * @param string $label
  *   (optional) The label for the body instance. Defaults to 'Body'.
  */
-function commerce_product_add_body_field($product_type, $label = 'Body') {
+function commerce_product_add_body_field(ProductTypeInterface $product_type, $label = 'Body') {
   $field_definition = BundleFieldDefinition::create('text_with_summary')
     ->setTargetEntityTypeId('commerce_product')
     ->setTargetBundle($product_type->id())
@@ -233,7 +234,7 @@ function commerce_product_add_body_field($product_type, $label = 'Body') {
  * @param \Drupal\commerce_product\Entity\ProductTypeInterface $product_type
  *   The product type.
  */
-function commerce_product_add_variations_field($product_type) {
+function commerce_product_add_variations_field(ProductTypeInterface $product_type) {
   $field_definition = BundleFieldDefinition::create('entity_reference')
     ->setTargetEntityTypeId('commerce_product')
     ->setTargetBundle($product_type->id())
