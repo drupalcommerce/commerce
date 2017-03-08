@@ -103,7 +103,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
     $attributes = $this->entityTypeManager->getStorage('commerce_product_attribute')->loadMultiple();
     $attribute_options = array_map(function ($attribute) {
       /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
-      return $attribute->label();
+      return $this->t("%label => @id", array("%label" => $attribute->label(), "@id" => $attribute->id()));
     }, $attributes);
 
     $form['original_attributes'] = [
