@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -96,6 +97,36 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setStoreIds([$this->store->id()]);
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
+
+    $coupon_code1 = $this->randomMachineName();
+    $coupon1 = Coupon::create([
+      'code' => $coupon_code1,
+      'status' => TRUE,
+    ]);
+    $coupon1->save();
+    $coupon_code2 = $this->randomMachineName();
+    $coupon2 = Coupon::create([
+      'code' => $coupon_code2,
+      'status' => TRUE,
+    ]);
+    $coupon2->save();
+    $coupon1 = Coupon::load($coupon1->id());
+    $coupon2 = Coupon::load($coupon2->id());
+    $coupons = [$coupon1, $coupon2];
+    $coupon_ids = [$coupon1->id(), $coupon2->id()];
+    $coupon_codes = [$coupon1->getCode(), $coupon2->getCode()];
+    $this->assertEmpty($promotion->hasCoupons());
+    $promotion->setCoupons($coupons);
+    $this->assertTrue($promotion->hasCoupons());
+    $this->assertEquals($coupons, $promotion->getCoupons());
+    $this->assertEquals($coupon_ids, $promotion->getCouponsIds());
+    $this->assertEquals($coupon_codes, $promotion->getCouponsCodes());
+    $this->assertTrue($promotion->hasCouponCode($coupon1->getCode()));
+    $this->assertTrue($promotion->hasCoupon($coupon1));
+    $promotion->removeCoupon($coupon1);
+    $this->assertFalse($promotion->hasCoupon($coupon1));
+    $promotion->addCoupon($coupon1);
+    $this->assertTrue($promotion->hasCoupon($coupon1));
 
     $promotion->setCurrentUsage(1);
     $this->assertEquals(1, $promotion->getCurrentUsage());

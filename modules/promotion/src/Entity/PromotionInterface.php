@@ -85,6 +85,90 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setOrderTypeIds(array $order_type_ids);
 
   /**
+   * Gets the coupon IDs.
+   *
+   * @return int[]
+   *   The coupon IDs.
+   */
+  public function getCouponsIds();
+
+  /**
+   * Gets the coupon codes.
+   *
+   * @return string[]
+   *   The coupon codes.
+   */
+  public function getCouponsCodes();
+
+  /**
+   * Gets the coupons.
+   *
+   * @return \Drupal\commerce_promotion\Entity\CouponInterface[]
+   *   The coupons.
+   */
+  public function getCoupons();
+
+  /**
+   * Sets the coupons.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons
+   *   The coupons.
+   *
+   * @return $this
+   */
+  public function setCoupons(array $coupons);
+
+  /**
+   * Gets whether the promotion has coupons.
+   *
+   * @return bool
+   *   TRUE if the promotion has coupons, FALSE otherwise.
+   */
+  public function hasCoupons();
+
+  /**
+   * Adds a coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return $this
+   */
+  public function addCoupon(CouponInterface $coupon);
+
+  /**
+   * Removes a coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return $this
+   */
+  public function removeCoupon(CouponInterface $coupon);
+
+  /**
+   * Checks whether the promotion has a given coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return bool
+   *   TRUE if the coupon was found, FALSE otherwise.
+   */
+  public function hasCoupon(CouponInterface $coupon);
+
+  /**
+   * Checks whether the promotion has a given coupon code.
+   *
+   * @param string $code
+   *   The coupon code.
+   *
+   * @return bool
+   *   TRUE if the coupon was found, FALSE otherwise.
+   */
+  public function hasCouponCode($code);
+
+  /**
    * Gets the promotion current usage.
    *
    * Represents the number of times the promotion was used.
