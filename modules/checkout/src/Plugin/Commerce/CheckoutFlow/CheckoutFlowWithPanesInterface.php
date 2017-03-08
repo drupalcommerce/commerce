@@ -18,4 +18,15 @@ interface CheckoutFlowWithPanesInterface extends CheckoutFlowInterface {
    */
   public function getPanes($step_id = NULL);
 
+  /**
+   * Gets a pane with the given ID.
+   *
+   * @param string $pane_id
+   *   The pane ID.
+   *
+   * @return \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface|null
+   *   The pane, or NULL if not found.
+   */
+  public function getPane($pane_id);
+
 }
