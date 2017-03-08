@@ -103,7 +103,6 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   # Add the oauth token to prevent GitHub timeouts.
   - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
-  - composer self-update
   - composer global require "hirak/prestissimo:^0.3"
   - composer global require "lionsad/drupal_ti:dev-master"
   - composer global require "squizlabs/php_codesniffer:2.*"
@@ -124,7 +123,11 @@ before_script:
   - drupal-ti before_script
 
 script:
-  - phpcs --standard=phpcs.xml .
+  - phpcs --standard=phpcs.xml src -s
+  - phpcs --standard=phpcs.xml modules -s
+  - phpcs --standard=phpcs.xml tests -s
+  - phpcs --standard=phpcs.xml commerce.module
+
   - drupal-ti script
   - drupal-ti --include ".travis-simpletest-js.sh"
 
