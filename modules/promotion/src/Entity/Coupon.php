@@ -83,7 +83,7 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    // The product backreference, populated by Promotion::postSave().
+    // The promotion backreference, populated by Promotion::postSave().
     $fields['promotion_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Promotion'))
       ->setDescription(t('The parent promotion.'))
