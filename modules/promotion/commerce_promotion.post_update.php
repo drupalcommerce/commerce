@@ -18,8 +18,7 @@ function commerce_promotion_post_update_1() {
 }
 
 /**
- * Add the 'promotion_id' field to 'commerce_promotion_coupon' entities
- * and update existing coupons data.
+ * Adds the 'promotion_id' field to coupons.
  */
 function commerce_promotion_post_update_2() {
   $storage_definition = BaseFieldDefinition::create('entity_reference')
@@ -32,13 +31,11 @@ function commerce_promotion_post_update_2() {
   $update_manager = \Drupal::entityDefinitionUpdateManager();
   $update_manager->installFieldStorageDefinition('promotion_id', 'commerce_promotion_coupon', 'commerce_promotion', $storage_definition);
 
-  // Updates on existing data.
   /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
   $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
-  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
   $promotions = $promotion_storage->loadMultiple();
   foreach ($promotions as $promotion) {
-    // Save promotion to update the coupon promotion id field.
+    // Promotion::preSave() will populate the new field.
     $promotion->save();
   }
 }
