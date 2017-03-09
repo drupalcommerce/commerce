@@ -14,7 +14,7 @@ class OrderTypeDeleteForm extends EntityDeleteForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $order_count = $order_item_count = $this->entityTypeManager->getStorage('commerce_order')->getQuery()
+    $order_count = $this->entityTypeManager->getStorage('commerce_order')->getQuery()
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();
