@@ -10,6 +10,22 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface CouponInterface extends ContentEntityInterface {
 
   /**
+   * Gets the parent promotion.
+   *
+   * @return \Drupal\commerce_promotion\Entity\PromotionInterface|null
+   *   The promotion entity, or null.
+   */
+  public function getPromotion();
+
+  /**
+   * Gets the parent promotion ID.
+   *
+   * @return int|null
+   *   The promotion ID, or null.
+   */
+  public function getPromotionId();
+
+  /**
    * Gets the coupon code.
    *
    * @return string
