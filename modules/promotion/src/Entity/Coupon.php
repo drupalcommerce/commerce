@@ -36,6 +36,20 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   /**
    * {@inheritdoc}
    */
+  public function getPromotion() {
+    return $this->get('promotion_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPromotionId() {
+    return $this->get('promotion_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCode() {
     return $this->get('code')->value;
   }
@@ -68,6 +82,14 @@ class Coupon extends ContentEntityBase implements CouponInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+
+    // The promotion backreference, populated by Promotion::postSave().
+    $fields['promotion_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Promotion'))
+      ->setDescription(t('The parent promotion.'))
+      ->setSetting('target_type', 'commerce_promotion')
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
