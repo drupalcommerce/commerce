@@ -45,7 +45,7 @@ interface PaymentMethodStorageInterface extends ContentEntityStorageInterface {
    * @param \Drupal\user\UserInterface $account
    *    The user entity.
    *
-   * @return \Drupal\commerce_payment\Entity\PaymentMethodInterfaces
+   * @return \Drupal\commerce_payment\Entity\PaymentMethodInterface
    *   The default payment method.
    */
   public function loadDefaultByUser(UserInterface $account);

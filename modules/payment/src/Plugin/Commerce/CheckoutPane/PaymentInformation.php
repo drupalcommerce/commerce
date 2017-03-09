@@ -324,7 +324,18 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     }
     else {
       $option_ids = array_keys($options);
-      $default_option = reset($option_ids);
+      // Use customer default payment method if available for the current pane.
+      if ($customer = $this->order->getCustomer()) {
+        /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $payment_method_storage */
+        $payment_method_storage = $this->entityTypeManager->getStorage('commerce_payment_method');
+        $default_payment_method = $payment_method_storage->loadDefaultByUser($this->order->getCustomer());
+        if (in_array($default_payment_method->id(), $option_ids)) {
+          $default_option = $default_payment_method->id();
+        }
+      }
+      if (!$default_option) {
+        $default_option = reset($option_ids);
+      }
     }
 
     return $default_option;
