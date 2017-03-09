@@ -4,12 +4,11 @@ namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\commerce\ConfigurableFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\commerce\BundleFieldDefinition;
 
 /**
  * Default implementation of the ProductAttributeFieldManagerInterface.
@@ -22,6 +21,13 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
+
+  /**
+   * The configurable field manager.
+   *
+   * @var \Drupal\commerce\ConfigurableFieldManagerInterface
+   */
+  protected $configurableFieldManager;
 
   /**
    * The entity type bundle info.
@@ -63,6 +69,8 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\commerce\ConfigurableFieldManagerInterface $configurableFieldManager
+   *   The configurable entity manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
@@ -70,8 +78,9 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, QueryFactory $query_factory, CacheBackendInterface $cache) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, ConfigurableFieldManagerInterface $configurableFieldManager, EntityTypeBundleInfoInterface $entity_type_bundle_info, QueryFactory $query_factory, CacheBackendInterface $cache) {
     $this->entityFieldManager = $entity_field_manager;
+    $this->configurableFieldManager = $configurableFieldManager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->queryFactory = $query_factory;
     $this->cache = $cache;
@@ -167,47 +176,26 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function createField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    $field_storage = FieldStorageConfig::loadByName('commerce_product_variation', $field_name);
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if (empty($field_storage)) {
-      $field_storage = FieldStorageConfig::create([
-        'field_name' => $field_name,
-        'entity_type' => 'commerce_product_variation',
-        'type' => 'entity_reference',
-        'cardinality' => 1,
-        'settings' => [
-          'target_type' => 'commerce_product_attribute_value',
-        ],
-        'translatable' => FALSE,
-      ]);
-      $field_storage->save();
-    }
-    if (empty($field)) {
-      $field = FieldConfig::create([
-        'field_storage' => $field_storage,
-        'bundle' => $variation_type_id,
-        'label' => $attribute->label(),
-        'required' => TRUE,
-        'settings' => [
-          'handler' => 'default',
-          'handler_settings' => [
-            'target_bundles' => [$attribute->id()],
-          ],
-        ],
-        'translatable' => FALSE,
-      ]);
-      $field->save();
-
-      /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
-      $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
-      $form_display->setComponent($field_name, [
+    $field_label = $attribute->label();
+    $field_definition = BundleFieldDefinition::create('entity_reference')
+      ->setTargetEntityTypeId('commerce_product_variation')
+      ->setTargetBundle($variation_type_id)
+      ->setName($field_name)
+      ->setLabel($field_label)
+      ->setRequired(TRUE)
+      ->setTranslatable(FALSE)
+      ->setSetting('target_type', 'commerce_product_attribute_value')
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', [
+        'target_bundles' => [$attribute->id()],
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
-        'weight' => $this->getHighestWeight($form_display) + 1,
+        'weight' => $this->getHighestWeight($variation_type_id) + 1,
       ]);
-      $form_display->save();
+    $this->configurableFieldManager->createField($field_definition);
 
-      $this->clearCaches();
-    }
+    $this->clearCaches();
   }
 
   /**
@@ -215,34 +203,27 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
    */
   public function canDeleteField(ProductAttributeInterface $attribute, $variation_type_id) {
     $field_name = $this->buildFieldName($attribute);
-    // Prevent an EntityQuery crash by first confirming the field exists.
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if (!$field) {
-      throw new \InvalidArgumentException(sprintf('Could not find the attribute field "%s" for attribute "%s".', $field_name, $attribute->id()));
-    }
-    $query = $this->queryFactory->get('commerce_product_variation')
-      ->condition('type', $variation_type_id)
-      ->exists($field_name)
-      ->range(0, 1);
-    $result = $query->execute();
+    $field_definition = BundleFieldDefinition::create('entity_reference')
+      ->setTargetEntityTypeId('commerce_product_variation')
+      ->setTargetBundle($variation_type_id)
+      ->setName($field_name);
+    $has_data = $this->configurableFieldManager->hasData($field_definition);
 
-    return empty($result);
+    return empty($has_data);
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteField(ProductAttributeInterface $attribute, $variation_type_id) {
-    if (!$this->canDeleteField($attribute, $variation_type_id)) {
-      return;
-    }
-
     $field_name = $this->buildFieldName($attribute);
-    $field = FieldConfig::loadByName('commerce_product_variation', $variation_type_id, $field_name);
-    if ($field) {
-      $field->delete();
-      $this->clearCaches();
-    }
+    $field_definition = BundleFieldDefinition::create('entity_reference')
+      ->setTargetEntityTypeId('commerce_product_variation')
+      ->setTargetBundle($variation_type_id)
+      ->setName($field_name);
+    $this->configurableFieldManager->deleteField($field_definition);
+
+    $this->clearCaches();
   }
 
   /**
@@ -261,13 +242,14 @@ class ProductAttributeFieldManager implements ProductAttributeFieldManagerInterf
   /**
    * Gets the highest weight of the attribute field components in the display.
    *
-   * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display
-   *   The form display.
+   * @param string $variation_type_id
+   *   The variation type id.
    *
    * @return int
    *   The highest weight of the components in the display.
    */
-  protected function getHighestWeight(EntityFormDisplayInterface $form_display) {
+  protected function getHighestWeight($variation_type_id) {
+    $form_display = commerce_get_entity_display('commerce_product_variation', $variation_type_id, 'form');
     $field_names = array_keys($this->getFieldDefinitions($form_display->getTargetBundle()));
     $weights = [];
     foreach ($field_names as $field_name) {
