@@ -124,6 +124,15 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public function isVisible() {
+    // This pane can't be used without the PaymentInformation pane.
+    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
+    return $payment_info_pane->isVisible() && $payment_info_pane->getStepId() != '_disabled';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
     // The payment gateway is currently always required to be set.
     if ($this->order->get('payment_gateway')->isEmpty()) {
@@ -177,6 +186,9 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
 
       return $pane_form;
     }
+    else {
+      $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+    }
   }
 
   /**
@@ -217,12 +229,8 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
    * @throws \Drupal\Core\Form\EnforcedResponseException
    */
   protected function redirectToPreviousStep() {
-    $previous_step_id = $this->checkoutFlow->getPreviousStepId();
-    foreach ($this->checkoutFlow->getPanes() as $pane) {
-      if ($pane->getId() == 'payment_information') {
-        $previous_step_id = $pane->getStepId();
-      }
-    }
+    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
+    $previous_step_id = $payment_info_pane->getStepId();
     $this->checkoutFlow->redirectToStep($previous_step_id);
   }
 

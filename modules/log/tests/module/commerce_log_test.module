@@ -1,5 +1,10 @@
 <?php
-use Drupal\commerce_log\Entity\Log;
+
+/**
+ * @file
+ * Test module for Log.
+ */
+
 use Drupal\Core\Entity\EntityInterface;
 
 /**
