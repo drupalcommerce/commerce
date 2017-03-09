@@ -152,6 +152,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   /**
    * {@inheritdoc}
    */
+  public function getDetails() {
+    return ($this->configuration['details']['value']) ? $this->configuration['details'] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPaymentType() {
     return $this->paymentType;
   }
@@ -217,6 +224,10 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
 
     return [
       'mode' => $modes ? reset($modes) : '',
+      'details' => [
+        'value' => '',
+        'format' => 'plain_text',
+      ],
       'payment_method_types' => [],
     ];
   }
@@ -237,6 +248,14 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       '#default_value' => $this->configuration['mode'],
       '#required' => TRUE,
       '#access' => !empty($modes),
+    ];
+    $form['details'] = [
+      '#type' => 'text_format',
+      '#title' => $this->t('Additional details'),
+      '#description' => $this->t('Additional details about payment to be shown to the customer on checkout.'),
+      '#default_value' => $this->configuration['details']['value'],
+      '#format' => $this->configuration['details']['format'],
+      '#rows' => 2,
     ];
     if (count($payment_method_types) > 1) {
       $form['payment_method_types'] = [
@@ -271,6 +290,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       $values['payment_method_types'] = array_filter($values['payment_method_types']);
 
       $this->configuration['mode'] = $values['mode'];
+      $this->configuration['details'] = $values['details'];
       $this->configuration['payment_method_types'] = array_keys($values['payment_method_types']);
     }
   }
