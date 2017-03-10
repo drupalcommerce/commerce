@@ -169,6 +169,25 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getData($key, $default = NULL) {
+    $data = [];
+    if (!$this->get('data')->isEmpty()) {
+      $data = $this->get('data')->first()->getValue();
+    }
+    return isset($data[$key]) ? $data[$key] : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setData($key, $value) {
+    $this->get('data')->__set($key, $value);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -274,6 +293,10 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setReadOnly(TRUE)
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['data'] = BaseFieldDefinition::create('map')
+      ->setLabel(t('Data'))
+      ->setDescription(t('A serialized array of additional data.'));
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

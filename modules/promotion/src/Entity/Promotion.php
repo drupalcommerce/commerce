@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion\Entity;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Context\Context;
@@ -167,6 +168,81 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCouponIds() {
+    $coupon_ids = [];
+    foreach ($this->get('coupons') as $field_item) {
+      $coupon_ids[] = $field_item->target_id;
+    }
+    return $coupon_ids;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCoupons() {
+    $coupons = $this->get('coupons')->referencedEntities();
+    return $coupons;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCoupons(array $coupons) {
+    $this->set('coupons', $coupons);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasCoupons() {
+    return !$this->get('coupons')->isEmpty();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCoupon(CouponInterface $coupon) {
+    if (!$this->hasCoupon($coupon)) {
+      $this->get('coupons')->appendItem($coupon);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removeCoupon(CouponInterface $coupon) {
+    $index = $this->getCouponIndex($coupon);
+    if ($index !== FALSE) {
+      $this->get('coupons')->offsetUnset($index);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasCoupon(CouponInterface $coupon) {
+    return in_array($coupon->id(), $this->getCouponIds());
+  }
+
+  /**
+   * Gets the index of the given coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return int|bool
+   *   The index of the given coupon, or FALSE if not found.
+   */
+  protected function getCouponIndex(CouponInterface $coupon) {
+    return array_search($coupon->id(), $this->getCouponIds());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCurrentUsage() {
     return $this->get('current_usage')->value;
   }
@@ -279,6 +355,39 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
     $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
     $offer->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure there's a back-reference on each coupon.
+    foreach ($this->coupons as $item) {
+      /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
+      $coupon = $item->entity;
+      if (!$coupon->getPromotionId()) {
+        $coupon->promotion_id = $this->id();
+        $coupon->save();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Delete the linked coupons.
+    $coupons = [];
+    foreach ($entities as $entity) {
+      foreach ($entity->getCoupons() as $coupon) {
+        $coupons[] = $coupon;
+      }
+    }
+    /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
+    $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
+    $coupon_storage->delete($coupons);
   }
 
   /**

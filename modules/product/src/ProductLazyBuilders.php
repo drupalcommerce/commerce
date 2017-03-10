@@ -53,10 +53,14 @@ class ProductLazyBuilders {
   public function addToCartForm($product_id, $view_mode, $combine) {
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
-
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
-    $order_item = $order_item_storage->createFromPurchasableEntity($product->getDefaultVariation());
+    $default_variation = $product->getDefaultVariation();
+    if (!$default_variation) {
+      return [];
+    }
+
+    $order_item = $order_item_storage->createFromPurchasableEntity($default_variation);
     $form_state_additions = [
       'product' => $product,
       'view_mode' => $view_mode,
