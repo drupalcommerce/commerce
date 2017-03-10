@@ -14,7 +14,7 @@ class OrderAdminActivityTest extends CommerceBrowserTestBase {
   /**
    * The order to test against.
    *
-   * @var \Drupal\commerce_order\Entity\OrderInterface $order
+   * @var \Drupal\commerce_order\Entity\OrderInterface
    */
   protected $order;
 
@@ -66,4 +66,5 @@ class OrderAdminActivityTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains(t('Order activity'));
     $this->assertSession()->pageTextContains(t('The order was placed.'));
   }
+
 }
