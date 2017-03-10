@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AnonymousUserSession;
 
 /**
@@ -136,7 +137,7 @@ function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) 
         $form['actions']['submit']['#validate'][] = 'commerce_cart_commerce_cart_form_validate';
         // Also for remove button is available.
         if (!empty($form['remove_button'])) {
-          foreach (\Drupal\Core\Render\Element::children($form['remove_button']) as $key) {
+          foreach (Element::children($form['remove_button']) as $key) {
             $form['remove_button'][$key]['#validate'][] = 'commerce_cart_commerce_cart_form_validate';
           }
         }
@@ -285,11 +286,10 @@ function template_preprocess_commerce_cart_block(&$variables) {
 /**
  * Helper function to check if a view is a 'commerce_cart' view.
  *
- *  @param string $cart_view_tag
+ * @param \Drupal\views\Entity\View $view
+ *   The view.
+ * @param string $cart_view_tag
  *   The view tag for commerce cart views to check for.
- *
- *  @param \Drupal\views\Entity\View $view
- *   The view
  *
  * @return bool
  *   True if View has 'commerce_cart' view like tag, has commerce_order as base
