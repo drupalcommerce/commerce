@@ -12,6 +12,12 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * @ContentEntityType(
  *   id = "commerce_promotion_coupon",
  *   label = @Translation("Coupon"),
+ *   label_singular = @Translation("coupon"),
+ *   label_plural = @Translation("coupons"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count coupon",
+ *     plural = "@count coupons",
+ *   ),
  *   handlers = {
  *     "storage" = "Drupal\commerce_promotion\CouponStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
@@ -94,6 +100,7 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
       ->setDescription(t('The Coupon entity code.'))
+      ->addConstraint('CouponCode')
       ->setSettings([
         'max_length' => 50,
         'text_processing' => 0,
