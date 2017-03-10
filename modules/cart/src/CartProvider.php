@@ -124,6 +124,22 @@ class CartProvider implements CartProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function cancelCart(OrderInterface $cart, $save_cart = TRUE) {
+    $cart->cart = FALSE;
+    if ($save_cart) {
+      $cart->save();
+    }
+    // The cart is anonymous, remove it from the session.
+    if (!$cart->getCustomerId()) {
+      $this->cartSession->deleteCartId($cart->id(), CartSession::ACTIVE);
+    }
+    // Remove the cart order from the internal cache, if present.
+    unset($this->cartData[$cart->getCustomerId()][$cart->id()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCart($order_type, StoreInterface $store, AccountInterface $account = NULL) {
     $cart = NULL;
     $cart_id = $this->getCartId($order_type, $store, $account);
@@ -190,6 +206,7 @@ class CartProvider implements CartProviderInterface {
 
     if ($account->isAuthenticated()) {
       $query = $this->orderStorage->getQuery()
+        ->condition('state', 'draft')
         ->condition('cart', TRUE)
         ->condition('uid', $account->id())
         ->sort('order_id', 'DESC');
@@ -209,7 +226,7 @@ class CartProvider implements CartProviderInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface[] $carts */
     $carts = $this->orderStorage->loadMultiple($cart_ids);
     foreach ($carts as $cart) {
-      if ($cart->getCustomerId() != $uid || empty($cart->cart)) {
+      if ($cart->getCustomerId() != $uid || empty($cart->cart) || $cart->getState()->value != 'draft') {
         // Skip orders that are no longer eligible.
         continue;
       }

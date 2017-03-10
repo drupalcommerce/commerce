@@ -29,7 +29,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events = ['commerce_order.place.pre_transition' => 'finalizeCart'];
+    $events['commerce_order.place.pre_transition'] = 'finalizeCart';
+    $events['commerce_order.cancel.pre_transition'] = 'cancelCart';
     return $events;
   }
 
@@ -43,6 +44,19 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $event->getEntity();
     if ($order->cart->value == TRUE) {
       $this->cartProvider->finalizeCart($order, FALSE);
+    }
+  }
+
+  /**
+   * Cancels the cart when the order is canceled.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The workflow transition event.
+   */
+  public function cancelCart(WorkflowTransitionEvent $event) {
+    $order = $event->getEntity();
+    if ($order->cart->value == TRUE) {
+      $this->cartProvider->cancelCart($order, FALSE);
     }
   }
 

@@ -44,6 +44,18 @@ interface CartProviderInterface {
   public function finalizeCart(OrderInterface $cart, $save_cart = TRUE);
 
   /**
+   * Cancels the given cart order.
+   *
+   * Removes the cart flag from the order and saves it.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $cart
+   *   The cart order.
+   * @param bool $save_cart
+   *   Whether to immediately save the cart or not.
+   */
+  public function cancelCart(OrderInterface $cart, $save_cart = TRUE);
+
+  /**
    * Gets the cart order for the given store and user.
    *
    * @param string $order_type
