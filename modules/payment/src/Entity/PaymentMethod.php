@@ -230,6 +230,11 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
     /** @var \Drupal\commerce_payment\PaymentMethodStorageInterface $storage */
     parent::postSave($storage, $update);
 
+    // No default needed for anonymous.
+    if (!$this->getOwner()) {
+      return;
+    }
+
     // Check if this payment method is, or became the default.
     if ($this->isDefault()) {
       /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface[] $payment_methods */
