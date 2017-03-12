@@ -26,6 +26,9 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
         'links' => [],
       ],
     ],
+    'commerce_cart_empty_page' => [
+      'render element' => 'element',
+    ],
   ];
 }
 
