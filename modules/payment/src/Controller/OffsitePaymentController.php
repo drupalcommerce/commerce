@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Controller;
 
+use Drupal\commerce_checkout\CheckoutOrderManager;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
@@ -32,8 +33,12 @@ class OffsitePaymentController {
     if (!$payment_gateway_plugin instanceof OffsitePaymentGatewayInterface) {
       throw new AccessException('The payment gateway for the order does not implement ' . OffsitePaymentGatewayInterface::class);
     }
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\commerce_checkout\CheckoutOrderManager $checkout_order_manager */
+    $checkout_order_manager = new CheckoutOrderManager($entity_type_manager);
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
-    $checkout_flow = $commerce_order->checkout_flow->entity;
+    $checkout_flow = $checkout_order_manager->getCheckoutFlow($commerce_order);
     $checkout_flow_plugin = $checkout_flow->getPlugin();
 
     try {
@@ -67,8 +72,12 @@ class OffsitePaymentController {
     }
 
     $payment_gateway_plugin->onCancel($commerce_order, $request);
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\commerce_checkout\CheckoutOrderManager $checkout_order_manager */
+    $checkout_order_manager = new CheckoutOrderManager($entity_type_manager);
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
-    $checkout_flow = $commerce_order->checkout_flow->entity;
+    $checkout_flow = $checkout_order_manager->getCheckoutFlow($commerce_order);
     $checkout_flow_plugin = $checkout_flow->getPlugin();
     $checkout_flow_plugin->redirectToStep($checkout_flow_plugin->getPreviousStepId());
   }
