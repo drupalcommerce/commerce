@@ -11,6 +11,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\views\Entity\View;
 
 /**
  * Implements hook_theme().
@@ -299,7 +300,7 @@ function template_preprocess_commerce_cart_block(&$variables) {
  *   table and the order_id as the first argument.
  *   Otherwise return FALSE.
  */
-function commerce_cart_is_commerce_cart_view(\Drupal\views\Entity\View $view, $cart_view_tag = 'commerce_cart_form') {
+function commerce_cart_is_commerce_cart_view(View $view, $cart_view_tag = 'commerce_cart_form') {
   if ($view->get('base_table') == 'commerce_order' && strpos($view->get('tag'), $cart_view_tag) !== FALSE) {
     $view_argument = reset($view->getExecutable()->getDisplay()->options['arguments']);
     if ($view_argument['field'] == 'order_id') {
