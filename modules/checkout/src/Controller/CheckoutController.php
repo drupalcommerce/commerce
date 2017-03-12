@@ -5,6 +5,7 @@ namespace Drupal\commerce_checkout\Controller;
 use Drupal\commerce_cart\CartSession;
 use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_checkout\CheckoutOrderManagerInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -12,7 +13,9 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Provides the checkout form page.
@@ -75,13 +78,23 @@ class CheckoutController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return array
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
    *   The render form.
    */
   public function formPage(RouteMatchInterface $route_match) {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
+    $requested_step = $route_match->getParameter('step');
     $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
+
+    // Determine the order's step. If the order does not have access to the
+    // requested step, it will be redirected appropriately.
+    $order_step = $this->selectCheckoutStep($order, $requested_step);
+    if ($requested_step !== $order_step) {
+      $url = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id(), 'step' => $order_step]);
+      return new RedirectResponse($url->toString());
+    }
+
     $form_state = new FormState();
     return $this->formBuilder->buildForm($checkout_flow->getPlugin(), $form_state);
   }
@@ -101,6 +114,11 @@ class CheckoutController implements ContainerInjectionInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $route_match->getParameter('commerce_order');
 
+    // Check if the order has been canceled.
+    if ($order->getState()->value == 'canceled') {
+      return AccessResult::forbidden()->addCacheableDependency($order);
+    }
+
     // The user can checkout only their own non-empty orders.
     if ($account->isAuthenticated()) {
       $customer_check = $account->id() == $order->getCustomerId();
@@ -115,8 +133,45 @@ class CheckoutController implements ContainerInjectionInterface {
       ->andIf(AccessResult::allowedIf($order->hasItems()))
       ->andIf(AccessResult::allowedIfHasPermission($account, 'access checkout'))
       ->addCacheableDependency($order);
-
     return $access;
+  }
+
+  /**
+   * Checks access to a particular checkout page.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   * @param string $requested_step
+   *   The requested step.
+   *
+   * @return bool
+   *   TRUE or FALSE indicating access.
+   */
+  protected function selectCheckoutStep(OrderInterface $order, $requested_step) {
+    $checkout_flow = $this->checkoutOrderManager->getCheckoutFlow($order);
+    $order_step = $order->checkout_step->value;
+    // An empty $order_step means the checkout flow is at the first step.
+    if (empty($order_step)) {
+      $visible_steps = $checkout_flow->getPlugin()->getVisibleSteps();
+      $visible_step_ids = array_keys($visible_steps);
+      $order_step = reset($visible_step_ids);
+    }
+
+    $order_state = $order->getState()->value;
+
+    // An order is expected to be a draft throughout checkout, unless it has
+    // been placed, in which it can view the complete step.
+    if ($order_state != 'draft' && $requested_step == 'complete') {
+      return $requested_step;
+    }
+    // The order is a draft, continue other logic checks.
+    else {
+      // Draft orders cannot reach the complete step.
+      if ($requested_step == 'complete') {
+        return $order_step;
+      }
+    }
+    return $order_step;
   }
 
 }

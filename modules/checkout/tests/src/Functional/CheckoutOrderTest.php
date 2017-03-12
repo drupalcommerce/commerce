@@ -8,7 +8,6 @@ use Drupal\profile\Entity\Profile;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItemType;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -82,10 +81,17 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
 
   /**
    * Tests order access.
+   *
+   * @group access
    */
   public function testOrderAccess() {
+    $checkout_access_role = $this->createRole(['access checkout']);
     $user = $this->drupalCreateUser();
+    $user->addRole($checkout_access_role);
+    $user->save();
     $user2 = $this->drupalCreateUser();
+    $user2->addRole($checkout_access_role);
+    $user2->save();
 
     OrderItemType::create([
       'id' => 'test',
@@ -120,35 +126,64 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'ip_address' => '127.0.0.1',
       'billing_profile' => $profile,
       'order_items' => [$order_item],
+      'cart' => TRUE,
     ]);
     $order->save();
+    $order_information_url = '/checkout/' . $order->id() . '/order_information';
+    $review_url = '/checkout/' . $order->id() . '/review';
+    $complete_url = '/checkout/' . $order->id() . '/complete';
 
-    // Anonymous user with no session.
-    $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
+    // Trying to access the checkout completion page with an authenticated
+    // user not owning the order.
+    $this->drupalGet($complete_url);
     $this->assertSession()->statusCodeEquals(403);
 
-    // Authenticated order owner.
+    // Cart owner trying to access the checkout completion page should
+    // redirect.
     $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
+    $this->drupalGet($complete_url);
+    $this->assertSession()->addressNotEquals($complete_url);
+
+    // Review page with order owner.
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressNotEquals($review_url);
+
+    // Go to review checkout step.
+    $order->addItem($order_item)->save();
+    $order->checkout_step = 'review';
+    $order->save();
+
+    // Try accessing the review step.
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressEquals($review_url);
     $this->assertSession()->statusCodeEquals(200);
 
-    // Authenticated user who does not own the order.
-    $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalLogin($user);
+    // Try accessing the previous step that has no previous_label.
+    $this->drupalGet($order_information_url);
+    // We get redirected to the review step.
+    $this->assertSession()->addressEquals($review_url);
+    $this->assertSession()->statusCodeEquals(200);
 
-    // Order with no order items.
-    $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
+    // Complete checkout.
+    $order->checkout_step = 'complete';
+    $transition = $order->getState()->getWorkflow()->getTransition('place');
+    $order->getState()->applyTransition($transition);
+    $order->save();
 
-    // Authenticated order owner without the 'access checkout' permission.
-    $order->addItem($order_item)->save();
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
+    // Try accessing the first step.
+    $this->drupalGet($order_information_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Try accessing the review step.
+    $this->drupalGet($review_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Try accessing the complete step.
+    $this->drupalGet($complete_url);
+    $this->assertSession()->addressEquals($complete_url);
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
