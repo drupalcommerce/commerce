@@ -182,7 +182,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
   protected function actions(array $form, FormStateInterface $form_state) {
     $actions['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Add to cart'),
+      '#value' => $form_state->get(['settings', 'skip_cart']) ? $this->t('Checkout') : $this->t('Add to cart'),
       '#submit' => ['::submitForm'],
     ];
 
@@ -202,18 +202,40 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
 
     $order_type_id = $this->orderTypeResolver->resolve($order_item);
     $store = $this->selectStore($purchased_entity);
-    $cart = $this->cartProvider->getCart($order_type_id, $store);
-    if (!$cart) {
-      $cart = $this->cartProvider->createCart($order_type_id, $store);
-    }
-    $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
-    // Other submit handlers might need the cart ID.
-    $form_state->set('cart_id', $cart->id());
 
-    drupal_set_message($this->t('@entity added to @cart-link.', [
-      '@entity' => $purchased_entity->label(),
-      '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
-    ]));
+    if ($form_state->get(['settings', 'skip_cart'])) {
+      // Create the new order.
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+      $order = $this->entityTypeManager->getStorage('commerce_order')->create([
+        'type' => $order_type_id,
+        'store_id' => $store->id(),
+        'uid' => $this->currentUser()->id(),
+        'cart' => FALSE,
+      ]);
+
+      $order->addItem($order_item);
+      $order->save();
+
+      // Other submit handlers might need the cart ID.
+      $form_state->set('cart_id', $order->id());
+
+      $form_state->setRedirect('commerce_checkout.form', ['commerce_order' => $order->id()]);
+    }
+    else {
+      $cart = $this->cartProvider->getCart($order_type_id, $store);
+      if (!$cart) {
+        $cart = $this->cartProvider->createCart($order_type_id, $store);
+      }
+      $this->cartManager->addOrderItem($cart, $order_item, $form_state->get(['settings', 'combine']));
+      // Other submit handlers might need the cart ID.
+      $form_state->set('cart_id', $cart->id());
+
+      drupal_set_message($this->t('@entity added to @cart-link.', [
+        '@entity' => $purchased_entity->label(),
+        '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
+      ]));
+    }
+
   }
 
   /**

@@ -47,11 +47,13 @@ class ProductLazyBuilders {
    *   The view mode used to render the product.
    * @param bool $combine
    *   TRUE to combine order items containing the same product variation.
+   * @param bool $skip_cart
+   *   TRUE to skip cart and directly go the checkout.
    *
    * @return array
    *   A renderable array containing the cart form.
    */
-  public function addToCartForm($product_id, $view_mode, $combine) {
+  public function addToCartForm($product_id, $view_mode, $combine, $skip_cart) {
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
@@ -74,6 +76,7 @@ class ProductLazyBuilders {
       'view_mode' => $view_mode,
       'settings' => [
         'combine' => $combine,
+        'skip_cart' => $skip_cart,
       ],
     ]);
 

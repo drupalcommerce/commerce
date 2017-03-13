@@ -26,6 +26,7 @@ class AddToCartFormatter extends FormatterBase {
   public static function defaultSettings() {
     return [
       'combine' => TRUE,
+      'skip_cart' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -39,6 +40,12 @@ class AddToCartFormatter extends FormatterBase {
       '#title' => t('Combine order items containing the same product variation.'),
       '#description' => t('The order item type, referenced product variation, and data from fields exposed on the Add to Cart form must all match to combine.'),
       '#default_value' => $this->getSetting('combine'),
+    ];
+    $form['skip_cart'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Skip cart, create a new order and immediately start the checkout process.'),
+      '#description' => t('Adds the product to a new order and immediately goes to the checkout page.'),
+      '#default_value' => $this->getSetting('skip_cart'),
     ];
 
     return $form;
@@ -55,6 +62,9 @@ class AddToCartFormatter extends FormatterBase {
     else {
       $summary[] = $this->t('Do not combine order items containing the same product variation.');
     }
+    if ($this->getSetting('skip_cart')) {
+      $summary[] = $this->t('Skip cart');
+    }
 
     return $summary;
   }
@@ -70,6 +80,7 @@ class AddToCartFormatter extends FormatterBase {
           $items->getEntity()->id(),
           $this->viewMode,
           $this->getSetting('combine'),
+          $this->getSetting('skip_cart'),
         ],
       ],
       '#create_placeholder' => TRUE,
