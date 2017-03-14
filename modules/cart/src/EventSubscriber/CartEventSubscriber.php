@@ -26,6 +26,8 @@ class CartEventSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
    *   The cart provider.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The string translation service.
    */
   public function __construct(CartProviderInterface $cart_provider, TranslationInterface $string_translation) {
     $this->cartProvider = $cart_provider;
