@@ -25,6 +25,13 @@ class OrderValidationTest extends CommerceKernelTestBase {
   ];
 
   /**
+   * A test user to be used as orders customer.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -34,49 +41,69 @@ class OrderValidationTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
     $this->installConfig(['commerce_order']);
+    $this->user = $this->createUser(['mail' => 'test@example.com']);
   }
 
   /**
    * Tests the order validation.
    */
   public function testOrderValidation() {
-    $user = $this->createUser(['mail' => 'test@example.com']);
+    // Order item needed for order validation.
+    $this->entityManager->getStorage('commerce_order_item_type')->create([
+      'id' => 'default',
+      'label' => 'Default',
+      'orderType' => 'default',
+      'purchasableEntityType' => '',
+    ])->save();
     $order_item = $this->entityManager->getStorage('commerce_order_item')->create([
       'type' => 'default',
-    ]);
+    ])->save();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->entityManager->getStorage('commerce_order')->create([
       'type' => 'default',
-      'mail' => $user->getEmail(),
-      'uid' => $user->id(),
+      'mail' => $this->user->getEmail(),
+      'uid' => $this->user->id(),
       'store_id' => $this->store->id(),
       'order_items' => [$order_item],
-      ''
+      'order_number' => 1,
     ]);
     $order->save();
 
     // Validate the order entity created.
     $violations = $order->validate()->getEntityViolations();
     $this->assertEquals(count($violations), 0, 'No violations when validating a default order.');
-    if (count($violations) > 0 && !empty($violations[0])) {
-      $this->assertTrue($violations[0]->getMessage() . $violations[0]->getPropertyPath());
-    }
+
+    // Order store validation.
+    $order->setStoreId(NULL);
     $violations = $order->validate();
-    //$this->assertEquals(count($violations), 0, 'No violations when validating a default order.');
-    //$this->assertEquals($violations[1]->getPropertyPath(), 'code');
-    $this->assertEquals($violations[1]->getMessage(), 'SSSS');
-    $this->assertEquals($violations[0]->getPropertyPath(), 'code');
-    $this->assertEquals($violations[0]->getMessage(), 'SSSS');
+    $this->assertEquals(count($violations), 1, 'Violation found when store is empty.');
+    $this->assertEquals($violations[0]->getPropertyPath(), 'store_id');
+    $this->assertEquals($violations[0]->getMessage(), 'This value should not be null.');
+    $order->setStoreId($this->store->id());
 
-    // Save the order for version increment.
-    $order->save();
+    // Order mail validation.
+    $order->setEmail('test');
+    $violations = $order->validate();
+    $this->assertEquals(count($violations), 1, 'Violation found when mail id not valid.');
+    $this->assertEquals($violations[0]->getPropertyPath(), 'mail.0.value');
+    $this->assertEquals($violations[0]->getMessage(), 'This value is not a valid email address.');
+    $order->setEmail($this->user->getEmail());
 
-    // Set the version to 1 (first version).
-    $order->set('version', 1);
-    $violations = $order->validate()->getEntityViolations();
-    $this->assertEquals(count($violations), 1, 'Violation found when version is less the last version.');
-    $this->assertEquals($violations[0]->getPropertyPath(), '');
-    $this->assertEquals($violations[0]->getMessage(), 'The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+    // Order number validation.
+    $order->setOrderNumber(NULL);
+    $violations = $order->validate();
+    $this->assertEquals(count($violations), 1, 'Violation found when order number is empty.');
+    $this->assertEquals($violations[0]->getPropertyPath(), 'order_number');
+    $this->assertEquals($violations[0]->getMessage(), 'This value should not be null.');
+    $order->setOrderNumber(1);
+
+    // Order items validation.
+    $order->setItems([]);
+    $violations = $order->validate();
+    $this->assertEquals(count($violations), 1, 'Violation found when order items field is empty.');
+    $this->assertEquals($violations[0]->getPropertyPath(), 'order_items');
+    $this->assertEquals($violations[0]->getMessage(), 'This value should not be null.');
+
   }
 
   /**
@@ -96,14 +123,12 @@ class OrderValidationTest extends CommerceKernelTestBase {
    * Tests order constraints are validated.
    */
   public function testOrderConstraintValidation() {
-    $user = $this->createUser(['mail' => 'test@example.com']);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->entityManager->getStorage('commerce_order')->create([
       'type' => 'default',
-      'mail' => $user->getEmail(),
-      'uid' => $user->id(),
+      'mail' => $this->user->getEmail(),
+      'uid' => $this->user->id(),
       'store_id' => $this->store->id(),
-      'order_items' => [],
     ]);
     $order->save();
 
