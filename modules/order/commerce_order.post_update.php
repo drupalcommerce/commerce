@@ -5,8 +5,6 @@
  * Post update functions for Order.
  */
 
-use Drupal\Core\Field\BaseFieldDefinition;
-
 /**
  * Revert Order views to fix broken Price fields.
  */
