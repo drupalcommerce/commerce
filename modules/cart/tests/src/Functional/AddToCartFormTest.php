@@ -38,6 +38,38 @@ class AddToCartFormTest extends CartBrowserTestBase {
   }
 
   /**
+   * Test adding a product to the cart.
+   */
+  public function testSkipCart() {
+    $product = $this->variation->getProduct();
+
+    // Enable the skip_cart setting.
+    $display = entity_get_display('commerce_product', $product->bundle(), 'default');
+    $component = $display->getComponent('variations');
+    $component['settings']['skip_cart'] = TRUE;
+    $display
+      ->setComponent('variations', $component)
+      ->save();
+
+    // Test the changes to the form when the skip_cart option is enabled.
+    $this->drupalGet('product/' . $product->id());
+    $this->assertSession()->buttonExists('Checkout');
+    $this->assertSession()->buttonNotExists('Add to cart');
+
+
+
+    $this->submitForm([], 'Checkout');
+    $this->assertTrue(preg_match('|checkout/(\d+)$|', $this->getUrl(), $matches), 'Correctly redirected to checkout');
+
+    $order = Order::load([$matches[1]]);
+    $this->assertFalse($order->get('cart')->value);
+
+    $order_items = $order->getItems();
+    $this->assertNotEmpty(count($order_items) == 1, 'One order item was created.');
+    $this->assertOrderItemInOrder($this->variation, $order_items[0], 1);
+  }
+
+  /**
    * Test assigning an anonymous cart to a logged in user.
    */
   public function testCartAssignment() {
