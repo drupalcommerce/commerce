@@ -9,7 +9,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  *
  * @group commerce
  */
-class OrderConstraintsTest extends CommerceKernelTestBase {
+class OrderValidationTest extends CommerceKernelTestBase {
 
   /**
    * Modules to enable.
@@ -37,6 +37,49 @@ class OrderConstraintsTest extends CommerceKernelTestBase {
   }
 
   /**
+   * Tests the order validation.
+   */
+  public function testOrderValidation() {
+    $user = $this->createUser(['mail' => 'test@example.com']);
+    $order_item = $this->entityManager->getStorage('commerce_order_item')->create([
+      'type' => 'default',
+    ]);
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $this->entityManager->getStorage('commerce_order')->create([
+      'type' => 'default',
+      'mail' => $user->getEmail(),
+      'uid' => $user->id(),
+      'store_id' => $this->store->id(),
+      'order_items' => [$order_item],
+      ''
+    ]);
+    $order->save();
+
+    // Validate the order entity created.
+    $violations = $order->validate()->getEntityViolations();
+    $this->assertEquals(count($violations), 0, 'No violations when validating a default order.');
+    if (count($violations) > 0 && !empty($violations[0])) {
+      $this->assertTrue($violations[0]->getMessage() . $violations[0]->getPropertyPath());
+    }
+    $violations = $order->validate();
+    //$this->assertEquals(count($violations), 0, 'No violations when validating a default order.');
+    //$this->assertEquals($violations[1]->getPropertyPath(), 'code');
+    $this->assertEquals($violations[1]->getMessage(), 'SSSS');
+    $this->assertEquals($violations[0]->getPropertyPath(), 'code');
+    $this->assertEquals($violations[0]->getMessage(), 'SSSS');
+
+    // Save the order for version increment.
+    $order->save();
+
+    // Set the version to 1 (first version).
+    $order->set('version', 1);
+    $violations = $order->validate()->getEntityViolations();
+    $this->assertEquals(count($violations), 1, 'Violation found when version is less the last version.');
+    $this->assertEquals($violations[0]->getPropertyPath(), '');
+    $this->assertEquals($violations[0]->getMessage(), 'The order has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
+  }
+
+  /**
    * Tests defining order constraints via order type annotations and hooks.
    */
   public function testOrderConstraintDefinition() {
@@ -53,13 +96,14 @@ class OrderConstraintsTest extends CommerceKernelTestBase {
    * Tests order constraints are validated.
    */
   public function testOrderConstraintValidation() {
-    $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $user = $this->createUser(['mail' => 'test@example.com']);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->entityManager->getStorage('commerce_order')->create([
       'type' => 'default',
       'mail' => $user->getEmail(),
       'uid' => $user->id(),
       'store_id' => $this->store->id(),
+      'order_items' => [],
     ]);
     $order->save();
 
@@ -69,7 +113,6 @@ class OrderConstraintsTest extends CommerceKernelTestBase {
     if (count($violations) > 0 && !empty($violations[0])) {
       $this->assertTrue($violations[0]->getMessage() . $violations[0]->getPropertyPath());
     }
-
     // Save the order for version increment.
     $order->save();
 
