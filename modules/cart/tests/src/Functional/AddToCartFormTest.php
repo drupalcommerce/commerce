@@ -17,6 +17,15 @@ use Drupal\field\Entity\FieldConfig;
 class AddToCartFormTest extends CartBrowserTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'commerce_checkout',
+  ];
+
+  /**
    * Test adding a product to the cart.
    */
   public function testProductAddToCartForm() {
@@ -38,7 +47,7 @@ class AddToCartFormTest extends CartBrowserTestBase {
   }
 
   /**
-   * Test adding a product to the cart.
+   * Test the skip cart formatter setting.
    */
   public function testSkipCart() {
     $product = $this->variation->getProduct();
@@ -56,13 +65,32 @@ class AddToCartFormTest extends CartBrowserTestBase {
     $this->assertSession()->buttonExists('Checkout');
     $this->assertSession()->buttonNotExists('Add to cart');
 
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->statusCodeEquals(200);
+    preg_match('|checkout/(\d+)$|', $this->getUrl(), $matches);
+    $this->assertNotEmpty($matches, 'Correctly redirected to checkout');
 
+    $order = Order::load($matches[1]);
+    $this->assertEquals(0, $order->get('cart')->value);
+
+    $order_items = $order->getItems();
+    $this->assertNotEmpty(count($order_items) == 1, 'One order item was created.');
+    $this->assertOrderItemInOrder($this->variation, $order_items[0], 1);
+
+    // Now test as an anonymous user.
+    $this->drupalLogout();
+
+    $this->drupalGet('product/' . $product->id());
+    $this->assertSession()->buttonExists('Checkout');
+    $this->assertSession()->buttonNotExists('Add to cart');
 
     $this->submitForm([], 'Checkout');
-    $this->assertTrue(preg_match('|checkout/(\d+)$|', $this->getUrl(), $matches), 'Correctly redirected to checkout');
+    $this->assertSession()->statusCodeEquals(200);
+    preg_match('|checkout/(\d+)$|', $this->getUrl(), $matches);
+    $this->assertNotEmpty($matches, 'Correctly redirected to checkout');
 
-    $order = Order::load([$matches[1]]);
-    $this->assertFalse($order->get('cart')->value);
+    $order = Order::load($matches[1]);
+    $this->assertEquals(0, $order->get('cart')->value);
 
     $order_items = $order->getItems();
     $this->assertNotEmpty(count($order_items) == 1, 'One order item was created.');

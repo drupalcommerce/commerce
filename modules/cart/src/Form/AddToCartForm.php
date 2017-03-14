@@ -6,6 +6,7 @@ use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
+use Drupal\commerce_cart\CartSessionInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
@@ -37,6 +38,13 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    * @var \Drupal\commerce_cart\CartProviderInterface
    */
   protected $cartProvider;
+
+  /**
+   * The cart session.
+   *
+   * @var \Drupal\commerce_cart\CartSessionInterface
+   */
+  protected $cartSession;
 
   /**
    * The order type resolver.
@@ -86,6 +94,8 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    *   The cart manager.
    * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
    *   The cart provider.
+   * @param \Drupal\commerce_cart\CartSessionInterface $cart_session
+   *   The cart session.
    * @param \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $order_type_resolver
    *   The order type resolver.
    * @param \Drupal\commerce_store\StoreContextInterface $store_context
@@ -95,11 +105,12 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
-    parent::__construct($entity_manager, $entity_type_bundle_info, $time);
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, CartSessionInterface $cart_session, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
+    parent::__construct($entity_manager);
 
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
+    $this->cartSession = $cart_session;
     $this->orderTypeResolver = $order_type_resolver;
     $this->storeContext = $store_context;
     $this->chainPriceResolver = $chain_price_resolver;
@@ -116,6 +127,7 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
       $container->get('datetime.time'),
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
+      $container->get('commerce_cart.cart_session'),
       $container->get('commerce_order.chain_order_type_resolver'),
       $container->get('commerce_store.store_context'),
       $container->get('commerce_price.chain_price_resolver'),
@@ -218,6 +230,10 @@ class AddToCartForm extends ContentEntityForm implements AddToCartFormInterface 
 
       // Other submit handlers might need the cart ID.
       $form_state->set('cart_id', $order->id());
+
+      // Add the order as a completed cart to allow anonymous checkout access.
+      // @todo Find a better way for this.
+      $this->cartSession->addCartId($order->id(), CartSessionInterface::COMPLETED);
 
       $form_state->setRedirect('commerce_checkout.form', ['commerce_order' => $order->id()]);
     }

@@ -61,6 +61,9 @@ field.formatter.settings.commerce_add_to_cart:
     combine:
       type: boolean
       label: 'Whether to attempt to combine order items containing the same product variation'
+    skip_cart:
+      type: boolean
+      label: 'Whether to skip cart and go directly to checkout'
 
 field.formatter.settings.commerce_product_attributes_overview:
   type: mapping
