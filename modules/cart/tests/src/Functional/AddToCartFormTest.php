@@ -17,15 +17,6 @@ use Drupal\field\Entity\FieldConfig;
 class AddToCartFormTest extends CartBrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = [
-    'commerce_checkout',
-  ];
-
-  /**
    * Test adding a product to the cart.
    */
   public function testProductAddToCartForm() {
