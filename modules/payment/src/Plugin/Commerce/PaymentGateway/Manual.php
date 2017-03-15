@@ -86,7 +86,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
         if ($convert == -1 || $convert === FALSE) {
           $form_state->setError($form['manual']['expires'], $this->t('Invalid offset time format.'));
         }
-        if ($convert < REQUEST_TIME) {
+        if ($convert < \Drupal::service('commerce.time')->getRequestTime()) {
           $form_state->setError($form['manual']['expires'], $this->t('Future offset time is needed for Expires.'));
         }
       }
@@ -125,7 +125,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
     }
 
     $payment->state = 'pending';
-    $payment->setAuthorizedTime(REQUEST_TIME);
+    $payment->setAuthorizedTime(\Drupal::service('commerce.time')->getRequestTime());
     $payment->save();
   }
 
@@ -142,7 +142,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
 
     $payment->state = 'completed';
     $payment->setAmount($amount);
-    $payment->setCapturedTime(REQUEST_TIME);
+    $payment->setCapturedTime(\Drupal::service('commerce.time')->getRequestTime());
     $payment->save();
   }
 
@@ -192,7 +192,6 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
    */
   public function createPaymentMethod(PaymentMethodInterface $payment_method, array $payment_details) {
     // No expected keys required for Manual payments.
-
     // Set expires according with configuration.
     $expires = $this->configuration['expires'] ? strtotime($this->configuration['expires']) : 0;
     // The remote ID returned by the request.

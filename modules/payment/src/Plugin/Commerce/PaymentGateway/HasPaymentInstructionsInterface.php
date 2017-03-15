@@ -11,7 +11,7 @@ interface HasPaymentInstructionsInterface {
   /**
    * Creates a payment method with the given payment instructions.
    *
-   * @return array|NULL
+   * @return array|null
    *   A renderable array containing payment instructions or NULL.
    */
   public function getPaymentInstructions();

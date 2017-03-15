@@ -26,4 +26,5 @@ interface ManualPaymentGatewayInterface extends PaymentGatewayInterface, HasPaym
    *   Thrown when the transaction fails for any reason.
    */
   public function createPayment(PaymentInterface $payment);
+
 }
