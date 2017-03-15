@@ -93,6 +93,8 @@ function template_preprocess_commerce_payment_method(array &$variables) {
       '#markup' => $payment_method->label(),
     ],
   ];
+  $expires = $payment_method->getExpiresTime();
+  $variables['payment_method_expires'] = $expires ? date('n/Y', $expires) : t('Never');
   foreach (Element::children($variables['elements']) as $key) {
     $variables['payment_method'][$key] = $variables['elements'][$key];
   }

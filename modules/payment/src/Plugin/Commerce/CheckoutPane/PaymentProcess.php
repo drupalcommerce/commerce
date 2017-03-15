@@ -7,6 +7,7 @@ use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
+use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\ManualPaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -145,6 +146,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
     $payment_gateway_plugin = $payment_gateway->getPlugin();
 
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+    /** @var \Drupal\commerce_payment\Entity\Payment $payment */
     $payment = $payment_storage->create([
       'state' => 'new',
       'amount' => $this->order->getTotalPrice(),
@@ -185,6 +187,24 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       ]);
 
       return $pane_form;
+    }
+    elseif ($payment_gateway_plugin instanceof ManualPaymentGatewayInterface) {
+      try {
+        $payment->payment_method = $this->order->payment_method->entity;
+        $payment_gateway_plugin->createPayment($payment);
+        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+      }
+      catch (DeclineException $e) {
+        $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
+      }
+      catch (PaymentGatewayException $e) {
+        \Drupal::logger('commerce_payment')->error($e->getMessage());
+        $message = $this->t('We encountered an unexpected error processing your payment method. Please try again later.');
+        drupal_set_message($message, 'error');
+        $this->redirectToPreviousStep();
+      }
     }
     else {
       $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
