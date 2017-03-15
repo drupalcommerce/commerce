@@ -400,7 +400,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
 
     $form_state->setRedirect('commerce_checkout.form', [
       'commerce_order' => $this->order->id(),
-      'step' => $this->checkoutFlow->getNextStepId(),
+      'step' => $this->checkoutFlow->getNextStepId($this->getStepId()),
     ]);
   }
 

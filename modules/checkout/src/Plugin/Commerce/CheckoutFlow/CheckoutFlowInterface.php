@@ -28,34 +28,26 @@ interface CheckoutFlowInterface extends FormInterface, BaseFormIdInterface, Conf
   public function getOrder();
 
   /**
-   * Gets the current step ID.
+   * Gets the previous step ID for the given step ID.
    *
-   * @return string
-   *   The current step ID.
-   */
-  public function getStepId();
-
-  /**
-   * Gets the previous step ID.
-   *
-   * Determined based on the position of the current step ID in the list
-   * of visible steps.
+   * @param string $step_id
+   *   The step ID.
    *
    * @return string|null
    *   The previous step, or NULL if there is none.
    */
-  public function getPreviousStepId();
+  public function getPreviousStepId($step_id);
 
   /**
-   * Gets the next step ID.
+   * Gets the next step ID for the given step ID.
    *
-   * Determined based on the position of the current step ID in the list
-   * of visible steps.
+   * @param string $step_id
+   *   The step ID.
    *
    * @return string|null
    *   The next step ID, or NULL if there is none.
    */
-  public function getNextStepId();
+  public function getNextStepId($step_id);
 
   /**
    * Redirects an order to a specific step in the checkout.

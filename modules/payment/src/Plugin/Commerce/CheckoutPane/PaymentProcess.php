@@ -151,12 +151,13 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       'payment_gateway' => $payment_gateway->id(),
       'order_id' => $this->order->id(),
     ]);
+    $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
@@ -187,7 +188,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       return $pane_form;
     }
     else {
-      $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+      $this->checkoutFlow->redirectToStep($next_step_id);
     }
   }
 
