@@ -80,7 +80,6 @@ class CouponRedemptionForm extends CommerceElementBase {
     // $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
     $wrapper_id = $id_prefix . '-ajax-wrapper';
 
-    $form_state->set('order', $element['#order']);
     $element = [
       '#tree' => TRUE,
       '#prefix' => '<div id="' . $wrapper_id . '">',
@@ -119,10 +118,10 @@ class CouponRedemptionForm extends CommerceElementBase {
     if (empty($coupon_code)) {
       return;
     }
+    $entity_type_manager = \Drupal::entityTypeManager();
     $code_path = implode('][', $coupon_parents);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $form_state->get('order');
-    $entity_type_manager = \Drupal::entityTypeManager();
+    $order = $entity_type_manager->getStorage('commerce_order')->load($element['#order']->id());
 
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = $entity_type_manager->getStorage('commerce_promotion_coupon');
@@ -168,9 +167,9 @@ class CouponRedemptionForm extends CommerceElementBase {
   public static function submitForm(array &$element, FormStateInterface $form_state) {
     $coupon_parents = array_merge($element['#parents'], ['code']);
     $coupon_code = $form_state->getValue($coupon_parents);
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $form_state->get('order');
     $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $entity_type_manager->getStorage('commerce_order')->load($element['#order']->id());
     $order_type_storage = $entity_type_manager->getStorage('commerce_order_type');
     /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
     $promotion_storage = $entity_type_manager->getStorage('commerce_promotion');
