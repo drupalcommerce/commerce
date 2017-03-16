@@ -246,11 +246,18 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
-    // The $step_id argument is optional only because PHP disallows adding required
-    // arguments to an existing interface's method.
+    // The $step_id argument is optional only because PHP disallows adding
+    // required arguments to an existing interface's method.
     if (empty($step_id)) {
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
+    if ($form_state->isRebuilding()) {
+      // Ensure a fresh order whenever form is rebuilt, such as during an
+      // operation which uses AJAX and may have altered the order.
+      $order_storage = $this->entityTypeManager->getStorage('commerce_order');
+      $this->order = $order_storage->load($this->order->id());
+    }
+
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
     $form['#step_id'] = $step_id;

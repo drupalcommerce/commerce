@@ -6,6 +6,7 @@ use Drupal\commerce\Element\CommerceElementBase;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_promotion\Entity\PromotionInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -31,10 +32,14 @@ class CouponRedemptionForm extends CommerceElementBase {
     $class = get_class($this);
     return [
       // The order to which the coupon will be applied to.
-      '#order' => NULL,
+      '#order_id' => NULL,
       '#title' => t('Coupon code'),
       '#description' => t('Enter your coupon code here.'),
       '#submit_title' => t('Apply coupon'),
+      '#submit_message' => t('Coupon applied'),
+      '#remove_title' => t('Remove coupon'),
+      // The coupon ID.
+      '#default_value' => NULL,
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
@@ -67,11 +72,14 @@ class CouponRedemptionForm extends CommerceElementBase {
    *   The processed form element.
    */
   public static function processForm(array $element, FormStateInterface $form_state, array &$complete_form) {
-    if (empty($element['#order'])) {
-      throw new \InvalidArgumentException('The commerce_coupon_redemption_form element requires the #order property.');
+    if (empty($element['#order_id'])) {
+      throw new \InvalidArgumentException('The commerce_coupon_redemption_form element requires the #order_id property.');
     }
-    if (!$element['#order'] instanceof OrderInterface) {
-      throw new \InvalidArgumentException('The commerce_coupon_redemption_form #order property must be an order entity.');
+
+    $order_storage = \Drupal::entityTypeManager()->getStorage('commerce_order');
+    $order = $order_storage->load($element['#order_id']);
+    if (!$order instanceof OrderInterface) {
+      throw new \InvalidArgumentException('The commerce_coupon_redemption #order_id must be a valid order ID.');
     }
 
     $id_prefix = implode('-', $element['#parents']);
@@ -80,7 +88,8 @@ class CouponRedemptionForm extends CommerceElementBase {
     // $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
     $wrapper_id = $id_prefix . '-ajax-wrapper';
 
-    $form_state->set('order', $element['#order']);
+    $has_coupons = !$order->get('coupons')->isEmpty();
+
     $element = [
       '#tree' => TRUE,
       '#prefix' => '<div id="' . $wrapper_id . '">',
@@ -92,21 +101,99 @@ class CouponRedemptionForm extends CommerceElementBase {
       '#type' => 'textfield',
       '#title' => $element['#title'],
       '#description' => $element['#description'],
+      '#access' => !$has_coupons,
     ];
     $element['apply'] = [
       '#type' => 'submit',
       '#value' => $element['#submit_title'],
       '#name' => 'apply_coupon',
       '#limit_validation_errors' => [
-        array_merge($element['#parents'], ['code']),
+        $element['#parents'],
       ],
+      '#submit' => [
+        [get_called_class(), 'addCoupon'],
+      ],
+      '#ajax' => [
+        'callback' => [get_called_class(), 'ajaxRefresh'],
+        'wrapper' => $element['#wrapper_id'],
+      ],
+      '#access' => !$has_coupons,
+    ];
+
+    $element['remove'] = [
+      '#type' => 'submit',
+      '#value' => $element['#remove_title'],
+      '#name' => 'remove_coupon',
+      '#ajax' => [
+        'callback' => [get_called_class(), 'ajaxRefresh'],
+        'wrapper' => $element['#wrapper_id'],
+      ],
+      '#weight' => 50,
+      '#limit_validation_errors' => [
+        $element['#parents'],
+      ],
+      '#submit' => [
+        [get_called_class(), 'removeCoupon'],
+      ],
+      '#access' => $has_coupons,
     ];
 
     return $element;
   }
 
   /**
-   * Validates the coupon redemption form.
+   * Ajax callback.
+   */
+  public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
+    $parents = $form_state->getTriggeringElement()['#parents'];
+    array_pop($parents);
+    return NestedArray::getValue($form, $parents);
+  }
+
+  /**
+   * Apply coupon submit callback.
+   */
+  public static function addCoupon(array $form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $parents = $triggering_element['#parents'];
+    array_pop($parents);
+    $element = NestedArray::getValue($form, $parents);
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $order_storage = $entity_type_manager->getStorage('commerce_order');
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $order_storage->load($element['#order_id']);
+
+    $coupon = $form_state->getValue($parents);
+    $order->get('coupons')->appendItem($coupon);
+    drupal_set_message($element['#submit_message']);
+
+    $order->save();
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Remove coupon submit callback.
+   */
+  public static function removeCoupon(array $form, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    $parents = $triggering_element['#parents'];
+    array_pop($parents);
+    $element = NestedArray::getValue($form, $parents);
+
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $order_storage = $entity_type_manager->getStorage('commerce_order');
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $order_storage->load($element['#order_id']);
+
+    $order->get('coupons')->setValue([]);
+
+    $order->save();
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Validates the coupon redemption element.
    *
    * @param array $element
    *   The form element.
@@ -119,10 +206,11 @@ class CouponRedemptionForm extends CommerceElementBase {
     if (empty($coupon_code)) {
       return;
     }
-    $code_path = implode('][', $coupon_parents);
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $form_state->get('order');
     $entity_type_manager = \Drupal::entityTypeManager();
+    $code_path = implode('][', $coupon_parents);
+    $order_storage = $entity_type_manager->getStorage('commerce_order');
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $order_storage->load($element['#order_id']);
 
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = $entity_type_manager->getStorage('commerce_promotion_coupon');
@@ -155,10 +243,13 @@ class CouponRedemptionForm extends CommerceElementBase {
       $form_state->setErrorByName($code_path, t('Coupon is invalid'));
       return;
     }
+    else {
+      $form_state->setValueForElement($element, $coupon);
+    }
   }
 
   /**
-   * Submits the coupon redemption form.
+   * Submits the coupon redemption element.
    *
    * @param array $element
    *   The form element.
@@ -166,27 +257,7 @@ class CouponRedemptionForm extends CommerceElementBase {
    *   The current state of the form.
    */
   public static function submitForm(array &$element, FormStateInterface $form_state) {
-    $coupon_parents = array_merge($element['#parents'], ['code']);
-    $coupon_code = $form_state->getValue($coupon_parents);
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $form_state->get('order');
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $order_type_storage = $entity_type_manager->getStorage('commerce_order_type');
-    /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
-    $promotion_storage = $entity_type_manager->getStorage('commerce_promotion');
-    /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
-    $coupon_storage = $entity_type_manager->getStorage('commerce_promotion_coupon');
-
-    $coupon = $coupon_storage->loadByCode($coupon_code);
-    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
-    $order_type = $order_type_storage->load($order->bundle());
-    $promotion = $promotion_storage->loadByCoupon($order_type, $order->getStore(), $coupon);
-
-    if (self::couponApplies($order, $promotion, $coupon)) {
-      $order->get('coupons')->appendItem($coupon);
-      $order->save();
-      drupal_set_message(t('Coupon applied'));
-    }
+    // The coupon was set as element value when validated.
   }
 
   /**
