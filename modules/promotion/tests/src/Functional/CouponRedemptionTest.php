@@ -116,17 +116,19 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce_promotion\Entity\CouponInterface $existing_coupon */
     $existing_coupon = $this->promotion->get('coupons')->first()->entity;
 
+    $this->assertSession()->pageTextContains('Enter your promotion code to redeem a discount.');
+
     // Test entering an invalid coupon.
-    $this->getSession()->getPage()->fillField('Coupon code', $this->randomString());
-    $this->getSession()->getPage()->pressButton('Apply coupon');
+    $this->getSession()->getPage()->fillField('Promotion code', $this->randomString());
+    $this->getSession()->getPage()->pressButton('Apply');
     $this->assertSession()->pageTextContains('Coupon is invalid');
 
     $this->getSession()->getPage()->fillField('coupons[code]', $existing_coupon->getCode());
-    $this->getSession()->getPage()->pressButton('Apply coupon');
+    $this->getSession()->getPage()->pressButton('Apply');
     $this->assertSession()->pageTextContains('Coupon applied');
 
     $this->getSession()->getPage()->fillField('coupons[code]', $existing_coupon->getCode());
-    $this->getSession()->getPage()->pressButton('Apply coupon');
+    $this->getSession()->getPage()->pressButton('Apply');
     $this->assertSession()->pageTextContains('Coupon has already been redeemed');
   }
 

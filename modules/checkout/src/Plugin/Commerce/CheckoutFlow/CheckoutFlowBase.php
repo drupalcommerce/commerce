@@ -154,24 +154,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
-  public function buildOrderSummary(array $form, FormStateInterface $form_state) {
-    $order_summary = [];
-    if (!empty($this->configuration['order_summary_view'])) {
-      $order_summary = [
-        '#type' => 'view',
-        '#name' => $this->configuration['order_summary_view'],
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
-      ];
-    }
-
-    return $order_summary;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function calculateDependencies() {
     return [];
   }
@@ -309,6 +291,32 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     }
 
     $this->order->save();
+  }
+
+  /**
+   * Builds the order summary for the current checkout step.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The form structure.
+   */
+  protected function buildOrderSummary(array $form, FormStateInterface $form_state) {
+    $order_summary = [];
+    if (!empty($this->configuration['order_summary_view'])) {
+      $order_summary = [
+        '#type' => 'view',
+        '#name' => $this->configuration['order_summary_view'],
+        '#display_id' => 'default',
+        '#arguments' => [$this->order->id()],
+        '#embed' => TRUE,
+      ];
+    }
+
+    return $order_summary;
   }
 
   /**
