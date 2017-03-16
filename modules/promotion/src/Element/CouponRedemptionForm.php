@@ -32,6 +32,9 @@ class CouponRedemptionForm extends CommerceElementBase {
     return [
       // The order to which the coupon will be applied to.
       '#order' => NULL,
+      '#title' => t('Coupon code'),
+      '#description' => t('Enter your coupon code here.'),
+      '#submit_title' => t('Apply coupon'),
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],
@@ -87,12 +90,12 @@ class CouponRedemptionForm extends CommerceElementBase {
     ] + $element;
     $element['code'] = [
       '#type' => 'textfield',
-      '#title' => t('Coupon code'),
-      '#description' => t('Enter your coupon code here.'),
+      '#title' => $element['#title'],
+      '#description' => $element['#description'],
     ];
     $element['apply'] = [
       '#type' => 'submit',
-      '#value' => t('Apply coupon'),
+      '#value' => $element['#submit_title'],
       '#name' => 'apply_coupon',
       '#limit_validation_errors' => [
         array_merge($element['#parents'], ['code']),
