@@ -7,6 +7,7 @@
 
 /**
  * Update user Remote ID field data using payments gateways instead of module.
+ *
  * @see https://www.drupal.org/node/2861181
  */
 function commerce_payment_post_update_1(&$sandbox) {
