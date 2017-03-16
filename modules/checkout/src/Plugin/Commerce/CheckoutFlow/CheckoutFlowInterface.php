@@ -7,7 +7,6 @@ use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
@@ -82,18 +81,5 @@ interface CheckoutFlowInterface extends FormInterface, BaseFormIdInterface, Conf
    *   An array of step definitions, keyed by step ID.
    */
   public function getVisibleSteps();
-
-  /**
-   * Builds the order summary for the current checkout step.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   The form structure.
-   */
-  public function buildOrderSummary(array $form, FormStateInterface $form_state);
 
 }
