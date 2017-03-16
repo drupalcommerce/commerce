@@ -136,4 +136,21 @@ interface PaymentMethodInterface extends ContentEntityInterface, EntityChangedIn
    */
   public function setCreatedTime($timestamp);
 
+  /**
+   * Gets the user remote ID for the payment method if any.
+   *
+   * @return string|null
+   *   The user remote ID for the payment method or NULL.
+   */
+  public function getOwnerRemoteId();
+
+  /**
+   * Sets the user remote ID for the payment method using the payment gateway id
+   * as provider.
+   *
+   * @param string $remote_id
+   *   The remote ID.
+   */
+  public function setOwnerRemoteId($remote_id);
+
 }
