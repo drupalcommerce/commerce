@@ -11,7 +11,11 @@
  * @see https://www.drupal.org/node/2861181
  */
 function commerce_payment_post_update_1(&$sandbox) {
-  // Get the user ids that have 'commerce_remote_id' field not emtpy.
+  // Get the user ids that have 'commerce_remote_id' field not empty.
+  // First check is any user has this field set.
+  if (\Drupal::entityQuery('user')->exists('commerce_remote_id')->count()->execute() == 0) {
+    return t('No user Remote ID field data to update.');
+  }
   $result = \Drupal::entityQuery('user')->exists('commerce_remote_id')->execute();
 
   // Use the sandbox to store the information needed to track progression.
