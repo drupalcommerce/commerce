@@ -22,7 +22,7 @@ use Drupal\Core\Form\FormStateInterface;
  * ];
  * @endcode
  * The element value ($form_state->getValue('coupon')) will be the
- * coupon ID. Note that the order is not saved if the element was 
+ * coupon ID. Note that the order is not saved if the element was
  * submitted as a result of the main form being submitted. It is the
  * responsibility of the caller to update the order in that case.
  *
