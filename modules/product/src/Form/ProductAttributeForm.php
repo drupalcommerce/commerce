@@ -86,6 +86,7 @@ class ProductAttributeForm extends BundleEntityFormBase {
     $attribute_field_map = $this->attributeFieldManager->getFieldMap();
     $variation_type_storage = $this->entityTypeManager->getStorage('commerce_product_variation_type');
     $variation_types = $variation_type_storage->loadMultiple();
+    $disabled_variation_types = [];
     foreach ($variation_types as $variation_type) {
       $variation_type_id = $variation_type->id();
       $form['variation_types']['#options'][$variation_type_id] = $variation_type->label();
@@ -95,12 +96,19 @@ class ProductAttributeForm extends BundleEntityFormBase {
         if (in_array($attribute->id(), $used_attributes)) {
           $form['original_variation_types']['#value'][$variation_type_id] = $variation_type_id;
           $form['variation_types']['#default_value'][$variation_type_id] = $variation_type_id;
-          $form['variation_types'][$variation_type_id] = [
-            '#disabled' => !$this->attributeFieldManager->canDeleteField($attribute, $variation_type_id),
-          ];
+          if (!$this->attributeFieldManager->canDeleteField($attribute, $variation_type_id)) {
+            $form['variation_types'][$variation_type_id] = [
+              '#disabled' => TRUE,
+            ];
+            $disabled_variation_types[] = $variation_type_id;
+          }
         }
       }
     }
+    $form['disabled_variation_types'] = [
+      '#type' => 'value',
+      '#value' => $disabled_variation_types,
+    ];
 
     if ($this->moduleHandler->moduleExists('content_translation')) {
       $enabled = TRUE;
@@ -371,6 +379,8 @@ class ProductAttributeForm extends BundleEntityFormBase {
 
     $original_variation_types = $form_state->getValue('original_variation_types', []);
     $variation_types = array_filter($form_state->getValue('variation_types', []));
+    $disabled_variation_types = $form_state->getValue('disabled_variation_types', []);
+    $variation_types = array_unique(array_merge($disabled_variation_types, $variation_types));
     $selected_variation_types = array_diff($variation_types, $original_variation_types);
     $unselected_variation_types = array_diff($original_variation_types, $variation_types);
     if ($selected_variation_types) {

@@ -118,13 +118,19 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       '#access' => !empty($attribute_options),
     ];
     // Disable options which cannot be unset because of existing data.
+    $disabled_attributes = [];
     foreach ($used_attributes as $attribute_id) {
       if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
         $form['attributes'][$attribute_id] = [
           '#disabled' => TRUE,
         ];
+        $disabled_attributes[] = $attribute_id;
       }
     }
+    $form['disabled_attributes'] = [
+      '#type' => 'value',
+      '#value' => $disabled_attributes,
+    ];
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -165,6 +171,8 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
     $attribute_storage = $this->entityTypeManager->getStorage('commerce_product_attribute');
     $original_attributes = $form_state->getValue('original_attributes');
     $attributes = array_filter($form_state->getValue('attributes'));
+    $disabled_attributes = $form_state->getValue('disabled_attributes');
+    $attributes = array_unique(array_merge($disabled_attributes, $attributes));
     $selected_attributes = array_diff($attributes, $original_attributes);
     $unselected_attributes = array_diff($original_attributes, $attributes);
     if ($selected_attributes) {
