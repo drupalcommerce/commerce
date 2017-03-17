@@ -193,7 +193,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment);
-        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
