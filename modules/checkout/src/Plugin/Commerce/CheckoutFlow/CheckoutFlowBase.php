@@ -252,8 +252,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       throw new \InvalidArgumentException('The $step_id cannot be empty.');
     }
     if ($form_state->isRebuilding()) {
-      // Ensure a fresh order whenever form is rebuilt, such as during an
-      // operation which uses AJAX and may have altered the order.
+      // Ensure a fresh order, in case an ajax submit has modified it.
       $order_storage = $this->entityTypeManager->getStorage('commerce_order');
       $this->order = $order_storage->load($this->order->id());
     }
