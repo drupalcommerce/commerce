@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -127,7 +128,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
       'store_id' => $this->store,
     ]);
 
-    $this->paymentUri = 'admin/commerce/orders/' . $this->order->id() . '/payments';
+    $this->paymentUri = Url::fromRoute('entity.commerce_payment.collection', ['commerce_order' => $this->order->id()])->toString();
   }
 
   /**
