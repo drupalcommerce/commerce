@@ -654,6 +654,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'commerce_order_total_summary',
+        'weight' => 0,
       ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
