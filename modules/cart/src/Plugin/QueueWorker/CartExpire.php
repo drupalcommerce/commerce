@@ -83,11 +83,11 @@ class CartExpire extends QueueWorkerBase implements ContainerFactoryPluginInterf
     foreach ($orders as $order) {
       // Ensure that orders slated for clearing have not been completed since
       // they were last queued.
-      if ($order instanceof OrderInterface && $order->cart->value == 1) {
+      if ($order instanceof OrderInterface && $order->get('cart')->value == TRUE) {
         $order_type = $this->orderTypeStorage->load($order->bundle());
         $elapsed = $this->time->getCurrentTime() - $order->getChangedTime();
-        $expiry = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration') * 3600 * 24;
-        if ($elapsed >= $expiry) {
+        $cart_expiration = $order_type->getThirdPartySetting('commerce_cart', 'cart_expiration');
+        if ($elapsed >= $cart_expiration) {
           $order->delete();
         }
       }

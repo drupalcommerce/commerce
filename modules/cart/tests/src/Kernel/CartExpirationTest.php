@@ -94,7 +94,7 @@ class CartExpirationTest extends CommerceKernelTestBase {
 
     // Set expiration to 3 days.
     $order_type = OrderType::load('default');
-    $order_type->setThirdPartySetting('commerce_cart', 'cart_expiration', 3);
+    $order_type->setThirdPartySetting('commerce_cart', 'cart_expiration', (3 * 60 * 60 * 24));
     $order_type->save();
 
     /** @var \Drupal\commerce\TimeInterface $time */
@@ -154,7 +154,7 @@ class CartExpirationTest extends CommerceKernelTestBase {
 
     $this->container->get('cron')->run();
 
-    $orders = $this->orderStorage->loadMultiple();
+    $orders = $this->orderStorage->getQuery()->execute();
     $this->assertEquals(3, count($orders));
     $this->assertNull($this->orderStorage->load($cart1->id()));
     $this->assertNull($this->orderStorage->load($cart2->id()));
