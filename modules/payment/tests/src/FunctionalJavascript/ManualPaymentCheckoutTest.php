@@ -94,7 +94,7 @@ class ManualPaymentCheckoutTest extends CommerceBrowserTestBase {
       'expires' => '',
       'instructions' => [
         'value' => 'Test instructions.',
-        'format' => 'plain_text'
+        'format' => 'plain_text',
       ],
       'payment_method_types' => ['manual'],
     ]);

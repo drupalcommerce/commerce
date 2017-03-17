@@ -91,7 +91,7 @@ class ManualPaymentAdminTest extends CommerceBrowserTestBase {
       'expires' => '',
       'instructions' => [
         'value' => 'Test instructions.',
-        'format' => 'plain_text'
+        'format' => 'plain_text',
       ],
     ]);
     $this->paymentGateway->save();
