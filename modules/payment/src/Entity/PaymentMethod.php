@@ -228,7 +228,8 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
     $remote_id = NULL;
     $owner = $this->getOwner();
     if ($owner) {
-      $remote_id = $owner->commerce_remote_id->getByProvider($this->getPaymentGatewayId());
+      $payment_gateway = $this->getPaymentGateway();
+      $remote_id = $owner->commerce_remote_id->getByProvider($payment_gateway->id() . '-' . $payment_gateway->getPlugin()->getMode());
     }
     return $remote_id;
   }
@@ -239,7 +240,8 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   public function setOwnerRemoteId($remote_id) {
     $owner = $this->getOwner();
     if ($owner) {
-      $owner->commerce_remote_id->setByProvider($this->getPaymentGatewayId(), $remote_id);
+      $payment_gateway = $this->getPaymentGateway();
+      $owner->commerce_remote_id->setByProvider($payment_gateway->id() . '-' . $payment_gateway->getPlugin()->getMode(), $remote_id);
       $owner->save();
     }
   }
