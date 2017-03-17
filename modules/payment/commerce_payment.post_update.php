@@ -19,7 +19,6 @@ function commerce_payment_post_update_1(&$sandbox) {
       $sandbox['current'] = 0;
       // Total entities that must be visited.
       $sandbox['max'] = $count;
-      // A place to store messages during the run.
 
       // Get the first payment gateway for every payment module.
       $payment_gateways_by_module = [];
