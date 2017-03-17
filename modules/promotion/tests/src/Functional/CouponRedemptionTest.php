@@ -125,11 +125,15 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
 
     $this->getSession()->getPage()->fillField('coupons[code]', $existing_coupon->getCode());
     $this->getSession()->getPage()->pressButton('Apply');
+
     $this->assertSession()->pageTextContains('Coupon applied');
 
-    $this->getSession()->getPage()->fillField('coupons[code]', $existing_coupon->getCode());
-    $this->getSession()->getPage()->pressButton('Apply');
-    $this->assertSession()->pageTextContains('Coupon has already been redeemed');
+    $this->assertSession()->fieldNotExists('coupons[code]');
+    $this->assertSession()->buttonNotExists('Apply');
+    $this->getSession()->getPage()->pressButton('Remove promotion');
+
+    $this->assertSession()->fieldExists('coupons[code]');
+    $this->assertSession()->buttonExists('Apply');
   }
 
 }

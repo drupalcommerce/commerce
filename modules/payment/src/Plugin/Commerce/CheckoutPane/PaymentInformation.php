@@ -128,6 +128,13 @@ class PaymentInformation extends CheckoutPaneBase implements ContainerFactoryPlu
     $pane_form['#wrapper_id'] = Html::getUniqueId('payment-information-wrapper');
     $pane_form['#prefix'] = '<div id="' . $pane_form['#wrapper_id'] . '">';
     $pane_form['#suffix'] = '</div>';
+    // Core bug #1988968 doesn't allow the payment method add form JS to depend
+    // on an external library, so the libraries need to be preloaded here.
+    foreach ($payment_gateways as $payment_gateway) {
+      if ($js_library = $payment_gateway->getPlugin()->getJsLibrary()) {
+        $pane_form['#attached']['library'][] = $js_library;
+      }
+    }
 
     $pane_form['payment_method'] = [
       '#type' => 'radios',
