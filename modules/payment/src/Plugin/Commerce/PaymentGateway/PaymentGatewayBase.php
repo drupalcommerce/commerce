@@ -329,7 +329,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
       ];
     }
     if ($this instanceof SupportsRefundsInterface) {
-      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded']);
+      $access = in_array($payment->getState()->value, ['capture_completed', 'capture_partially_refunded', 'completed']);
       $operations['refund'] = [
         'title' => $this->t('Refund'),
         'page_title' => $this->t('Refund payment'),
