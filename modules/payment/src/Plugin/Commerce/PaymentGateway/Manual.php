@@ -18,7 +18,6 @@ use Drupal\Core\Form\FormStateInterface;
  *   display_label = "Manual",
  *   payment_type = "payment_manual",
  *   payment_method_types = {"manual"},
- *   modes = {"manual" = "Manual"},
  * )
  */
 class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInterface {
@@ -124,6 +123,8 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
       throw new HardDeclineException('The provided payment method has expired');
     }
 
+    $test = $this->getMode() == 'test';
+    $payment->setTest($test);
     $payment->state = 'pending';
     $payment->setAuthorizedTime(\Drupal::service('commerce.time')->getRequestTime());
     $payment->save();
