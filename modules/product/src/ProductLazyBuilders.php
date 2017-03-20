@@ -46,11 +46,13 @@ class ProductLazyBuilders {
    *   The view mode used to render the product.
    * @param bool $combine
    *   TRUE to combine order items containing the same product variation.
+   * @param string $langcode
+   *   A language code to use in form.
    *
    * @return array
    *   A renderable array containing the cart form.
    */
-  public function addToCartForm($product_id, $view_mode, $combine) {
+  public function addToCartForm($product_id, $view_mode, $combine, $langcode) {
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
@@ -58,6 +60,11 @@ class ProductLazyBuilders {
     $default_variation = $product->getDefaultVariation();
     if (!$default_variation) {
       return [];
+    }
+
+    // Load Product for current language.
+    if ($product->isTranslatable() && $product->langcode->value != $langcode && $product->hasTranslation($langcode)) {
+      $product = $product->getTranslation($langcode);
     }
 
     $order_item = $order_item_storage->createFromPurchasableEntity($default_variation);
