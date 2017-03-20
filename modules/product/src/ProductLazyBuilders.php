@@ -57,14 +57,15 @@ class ProductLazyBuilders {
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $this->entityTypeManager->getStorage('commerce_product')->load($product_id);
-    $default_variation = $product->getDefaultVariation();
-    if (!$default_variation) {
-      return [];
-    }
 
     // Load Product for current language.
     if ($product->isTranslatable() && $product->langcode->value != $langcode && $product->hasTranslation($langcode)) {
       $product = $product->getTranslation($langcode);
+    }
+
+    $default_variation = $product->getDefaultVariation();
+    if (!$default_variation) {
+      return [];
     }
 
     $order_item = $order_item_storage->createFromPurchasableEntity($default_variation);
