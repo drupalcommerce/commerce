@@ -103,6 +103,11 @@ abstract class ProductVariationWidgetBase extends WidgetBase implements Containe
     $response = $ajax_renderer->renderResponse($form, $request, $route_match);
 
     $variation = ProductVariation::load($form_state->get('selected_variation'));
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $form_state->get('product');
+    if ($variation->hasTranslation($product->language()->getId())) {
+      $variation = $variation->getTranslation($product->language()->getId());
+    }
     /** @var \Drupal\commerce_product\ProductVariationFieldRendererInterface $variation_field_renderer */
     $variation_field_renderer = \Drupal::service('commerce_product.variation_field_renderer');
     $view_mode = $form_state->get('form_display')->getMode();

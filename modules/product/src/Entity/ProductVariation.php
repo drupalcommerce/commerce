@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -55,7 +55,7 @@ use Drupal\user\UserInterface;
  *   field_ui_base_route = "entity.commerce_product_variation_type.edit_form",
  * )
  */
-class ProductVariation extends ContentEntityBase implements ProductVariationInterface {
+class ProductVariation extends CommerceContentEntityBase implements ProductVariationInterface {
 
   use EntityChangedTrait;
 
@@ -89,7 +89,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function getProduct() {
-    return $this->get('product_id')->entity;
+    $product = $this->getTranslatedReferencedEntities('product_id');
+    return reset($product);
   }
 
   /**
@@ -277,7 +278,10 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     foreach ($this->getAttributeFieldNames() as $field_name) {
       $field = $this->get($field_name);
       if (!$field->isEmpty()) {
-        $attribute_values[$field_name] = $field->entity;
+        /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $entity */
+        $entity = $field->entity;
+        $attribute_value = $entity->getTranslation($this->language()->getId());
+        $attribute_values[$field_name] = $attribute_value;
       }
     }
 
@@ -295,7 +299,9 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $attribute_value = NULL;
     $field = $this->get($field_name);
     if (!$field->isEmpty()) {
-      $attribute_value = $field->entity;
+      /** @var \Drupal\commerce_product\Entity\ProductAttributeValueInterface $entity */
+      $entity = $field->entity;
+      $attribute_value = $entity->getTranslation($this->language()->getId());
     }
 
     return $attribute_value;
