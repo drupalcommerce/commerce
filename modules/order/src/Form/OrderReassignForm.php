@@ -3,10 +3,10 @@
 namespace Drupal\commerce_order\Form;
 
 use Drupal\commerce_order\OrderAssignment;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
-use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,19 +28,29 @@ class OrderReassignForm extends FormBase {
    *
    * @var \Drupal\commerce_order\OrderAssignment
    */
-  protected $order_assignment_service;
+  protected $OrderAssignment;
+
+  /**
+   * The user storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $userStorage;
 
   /**
    * Constructs a new OrderReassignForm object.
    *
    * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
    *   The current route match.
-   * @param \Drupal\commerce_order\OrderAssignment $order_assignment_service
+   * @param \Drupal\commerce_order\OrderAssignment $order_assignment
    *   The order assignment service.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $user_storage
+   *   The user storage.
    */
-  public function __construct(CurrentRouteMatch $current_route_match, OrderAssignment $order_assignment_service) {
+  public function __construct(CurrentRouteMatch $current_route_match, OrderAssignment $order_assignment, EntityStorageInterface $user_storage) {
     $this->order = $current_route_match->getParameter('commerce_order');
-    $this->order_assignment_service = $order_assignment_service;
+    $this->OrderAssignment = $order_assignment;
+    $this->userStorage = $user_storage;
   }
 
   /**
@@ -49,7 +59,8 @@ class OrderReassignForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('current_route_match'),
-      $container->get('commerce_order.order_assignment')
+      $container->get('commerce_order.order_assignment'),
+      $container->get('entity.manager')->getStorage('user')
     );
   }
 
@@ -111,8 +122,9 @@ class OrderReassignForm extends FormBase {
     $this->submitCustomerForm($form, $form_state);
 
     $values = $form_state->getValues();
-
-    $this->order_assignment_service->assign($this->order, User::load($values['uid']), TRUE);
+    /** @var \Drupal\user\UserInterface $user */
+    $user = $this->userStorage->load($values['uid']);
+    $this->OrderAssignment->assign($this->order, $user);
 
     drupal_set_message($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),

@@ -17,10 +17,8 @@ interface OrderAssignmentInterface {
    *   The order.
    * @param \Drupal\user\UserInterface $account
    *   The user account.
-   * @param bool $force
-   *   If we should reassign even when it already is.
    */
-  public function assign(OrderInterface $order, UserInterface $account, $force = FALSE);
+  public function assign(OrderInterface $order, UserInterface $account);
 
   /**
    * Assigns multiple anonymous orders to the given user account.
@@ -29,9 +27,7 @@ interface OrderAssignmentInterface {
    *   The orders.
    * @param \Drupal\user\UserInterface $account
    *   The user account.
-   * @param bool $force
-   *   If we should reassign even when it already is.
    */
-  public function assignMultiple(array $orders, UserInterface $account, $force = FALSE);
+  public function assignMultiple(array $orders, UserInterface $account);
 
 }

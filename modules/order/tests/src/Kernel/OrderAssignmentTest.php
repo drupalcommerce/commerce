@@ -112,9 +112,10 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests if a single order cannot be reassigned if it already is.
+   * Tests if a single order and its profile can be reassigned when it is not
+   * yet done.
    */
-  public function testSingleOrderReassignmentImpossible() {
+  public function testReassignCurrentlyUnassignedOrder() {
     // The new user we will assign the order to.
     $new_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
@@ -123,28 +124,38 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $assignment_service->assign($this->order, $new_user);
 
     // Check that the reassignment worked.
-    $this->assertEquals($this->user->id(), $this->order->getCustomerId());
+    $this->assertEquals($new_user->id(), $this->order->getCustomerId());
+    $this->assertEquals($new_user->id(), $this->order->getBillingProfile()->getOwnerId());
   }
 
   /**
-   * Tests if a single order can be reassigned even when it already is.
+   * Tests if a single order and its profile can be reassigned when it is not
+   * yet done.
    */
-  public function testSingleOrderReassignment() {
+  public function testReassignCurrentlyAssignedOrder() {
     // The new user we will assign the order to.
     $new_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
+    // Change the order billing profile owner id.
+    $billing_profile = $this->order->getBillingProfile();
+    $billing_profile->setOwnerId($this->order->getCustomerId());
+    $billing_profile->save();
+    $billing_profile_uid = $this->order->getCustomerId();
+
     /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
     $assignment_service = $this->container->get('commerce_order.order_assignment');
-    $assignment_service->assign($this->order, $new_user, TRUE);
+    $assignment_service->assign($this->order, $new_user);
 
     // Check that the reassignment worked.
     $this->assertEquals($new_user->id(), $this->order->getCustomerId());
+    $this->assertEquals($billing_profile_uid, $this->order->getBillingProfile()->getOwnerId());
   }
 
   /**
-   * Tests that multiple orders cannot be reassigned if it already is.
+   * Tests that multiple orders and its profile can be reassigned when it is not
+   * yet done.
    */
-  public function testMultipleOrdersReassignmentImpossible() {
+  public function testReassignCurrentlyUnassignedOrders() {
     $order2 = $this->order->createDuplicate();
     $order2->save();
 
@@ -158,29 +169,10 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $assignment_service = $this->container->get('commerce_order.order_assignment');
     $assignment_service->assignMultiple($orders, $new_user);
 
-    $this->assertEquals($this->user->id(), $this->order->getCustomerId());
-    $this->assertEquals($this->user->id(), $order2->getCustomerId());
-  }
-
-  /**
-   * Tests that multiple orders can be reassigned even when they already are.
-   */
-  public function testMultipleOrdersReassignment() {
-    $order2 = $this->order->createDuplicate();
-    $order2->save();
-
-    // The new user we will assign the order to.
-    $new_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
-
-    // Create our array.
-    $orders = [$this->order, $order2];
-
-    /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = $this->container->get('commerce_order.order_assignment');
-    $assignment_service->assignMultiple($orders, $new_user, TRUE);
-
     $this->assertEquals($new_user->id(), $this->order->getCustomerId());
+    $this->assertEquals($new_user->id(), $this->order->getBillingProfile()->getOwnerId());
     $this->assertEquals($new_user->id(), $order2->getCustomerId());
+    $this->assertEquals($new_user->id(), $order2->getBillingProfile()->getOwnerId());
   }
 
 }
