@@ -41,8 +41,8 @@ class OrderAssignment implements OrderAssignmentInterface {
   /**
    * {@inheritdoc}
    */
-  public function assign(OrderInterface $order, UserInterface $account) {
-    if (!empty($order->getCustomerId())) {
+  public function assign(OrderInterface $order, UserInterface $account, $force = FALSE) {
+    if ($force === FALSE && !empty($order->getCustomerId())) {
       // Skip orders which already have a customer.
       return;
     }
@@ -65,9 +65,9 @@ class OrderAssignment implements OrderAssignmentInterface {
   /**
    * {@inheritdoc}
    */
-  public function assignMultiple(array $orders, UserInterface $account) {
+  public function assignMultiple(array $orders, UserInterface $account, $force = FALSE) {
     foreach ($orders as $order) {
-      $this->assign($order, $account);
+      $this->assign($order, $account, $force);
     }
   }
 
