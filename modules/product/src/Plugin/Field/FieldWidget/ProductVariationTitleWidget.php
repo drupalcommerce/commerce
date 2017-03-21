@@ -72,8 +72,9 @@ class ProductVariationTitleWidget extends ProductVariationWidgetBase implements 
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
     /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations */
+    $variations = [];
     foreach ($product->getVariations() as $variation) {
-      $variations[$variation->id()] = $variation;
+      $variations[] = $variation;
     }
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
