@@ -119,12 +119,12 @@ class EditQuantity extends FieldPluginBase {
     foreach ($quantities as $row_index => $quantity) {
       /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
       $order_item = $this->getEntity($this->view->result[$row_index]);
-      // Remove order item if no quantity
+      // Remove order item if no quantity.
       if (empty($quantity)) {
         $this->cartManager->removeOrderItem($order_item->getOrder(), $order_item);
       }
-      // Otherwise update quantity of order item
-      else if ($order_item->getQuantity() != $quantity) {
+      // Otherwise update quantity of order item.
+      elseif ($order_item->getQuantity() != $quantity) {
         $order_item->setQuantity($quantity);
         $order = $order_item->getOrder();
         $this->cartManager->updateOrderItem($order, $order_item);
