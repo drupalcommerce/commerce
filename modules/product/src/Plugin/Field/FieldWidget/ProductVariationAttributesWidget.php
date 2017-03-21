@@ -6,6 +6,7 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -25,6 +26,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class ProductVariationAttributesWidget extends ProductVariationWidgetBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The entity repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
 
   /**
    * The attribute field manager.
@@ -58,9 +66,10 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, ProductAttributeFieldManagerInterface $attribute_field_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, ProductAttributeFieldManagerInterface $attribute_field_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $entity_type_manager);
 
+    $this->entityRepository = $entity_repository;
     $this->attributeFieldManager = $attribute_field_manager;
     $this->attributeStorage = $entity_type_manager->getStorage('commerce_product_attribute');
   }
@@ -76,6 +85,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
+      $container->get('entity.repository'),
       $container->get('commerce_product.attribute_field_manager')
     );
   }
@@ -86,6 +96,7 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
+    $langcode = $product->language()->getId();
     $variations = $product->getVariations();
     if (count($variations) === 0) {
       // Nothing to purchase, tell the parent form to hide itself.
@@ -129,6 +140,10 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
       if (!in_array($selected_variation, $variations)) {
         $selected_variation = reset($variations);
       }
+    }
+    // Make sure we use the translated selected variation.
+    if ($selected_variation->hasTranslation($langcode)) {
+      $selected_variation = $selected_variation->getTranslation($langcode);
     }
 
     $element['variation'] = [
@@ -236,10 +251,12 @@ class ProductVariationAttributesWidget extends ProductVariationWidgetBase implem
     foreach ($field_names as $field_name) {
       /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute_type */
       $attribute_type = $this->attributeStorage->load(substr($field_name, 10));
+      // Make sure we have translation for attribute.
+      $attribute_type = $this->entityRepository->getTranslationFromContext($attribute_type, $selected_variation->language()->getId());
       $field = $field_definitions[$field_name];
       $attributes[$field_name] = [
         'field_name' => $field_name,
-        'title' => $this->t($field->getLabel()),
+        'title' => $attribute_type->label(),
         'required' => $field->isRequired(),
         'element_type' => $attribute_type->getElementType(),
       ];

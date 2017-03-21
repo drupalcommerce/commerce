@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -65,7 +65,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   },
  * )
  */
-class Promotion extends ContentEntityBase implements PromotionInterface {
+class Promotion extends CommerceContentEntityBase implements PromotionInterface {
 
   /**
    * {@inheritdoc}
@@ -135,7 +135,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function getStores() {
-    return $this->get('stores')->referencedEntities();
+    return $this->getTranslatedReferencedEntities('stores');
   }
 
   /**
