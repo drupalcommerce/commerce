@@ -177,8 +177,9 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
    *   The reloaded entity.
    */
   protected function reloadEntity(EntityInterface $entity) {
-    $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+    $storage = $this->container->get('entity.manager')->getStorage($entity->getEntityTypeId());
     $storage->resetCache([$entity->id()]);
     return $storage->load($entity->id());
   }
+
 }

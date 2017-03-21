@@ -10,7 +10,6 @@ use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
-
 /**
  * Tests the assignment and reassignment of an order.
  *
@@ -120,12 +119,13 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $new_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = \Drupal::service('commerce_order.order_assignment');
+    $assignment_service = $this->container->get('commerce_order.order_assignment');
     $assignment_service->assign($this->order, $new_user);
 
     // Check that the reassignment worked.
     $this->assertEquals($this->user->id(), $this->order->getCustomerId());
   }
+
   /**
    * Tests if a single order can be reassigned even when it already is.
    */
@@ -134,7 +134,7 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $new_user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = \Drupal::service('commerce_order.order_assignment');
+    $assignment_service = $this->container->get('commerce_order.order_assignment');
     $assignment_service->assign($this->order, $new_user, TRUE);
 
     // Check that the reassignment worked.
@@ -155,12 +155,13 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $orders = [$this->order, $order2];
 
     /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = \Drupal::service('commerce_order.order_assignment');
+    $assignment_service = $this->container->get('commerce_order.order_assignment');
     $assignment_service->assignMultiple($orders, $new_user);
 
     $this->assertEquals($this->user->id(), $this->order->getCustomerId());
     $this->assertEquals($this->user->id(), $order2->getCustomerId());
   }
+
   /**
    * Tests that multiple orders can be reassigned even when they already are.
    */
@@ -175,10 +176,11 @@ class OrderAssignmentTest extends CommerceKernelTestBase {
     $orders = [$this->order, $order2];
 
     /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = \Drupal::service('commerce_order.order_assignment');
+    $assignment_service = $this->container->get('commerce_order.order_assignment');
     $assignment_service->assignMultiple($orders, $new_user, TRUE);
 
     $this->assertEquals($new_user->id(), $this->order->getCustomerId());
     $this->assertEquals($new_user->id(), $order2->getCustomerId());
   }
+
 }

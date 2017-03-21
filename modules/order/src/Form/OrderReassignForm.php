@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_order\Form;
 
+use Drupal\commerce_order\OrderAssignment;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
@@ -23,20 +24,33 @@ class OrderReassignForm extends FormBase {
   protected $order;
 
   /**
+   * The order assignment service.
+   *
+   * @var \Drupal\commerce_order\OrderAssignment
+   */
+  protected $order_assignment_service;
+
+  /**
    * Constructs a new OrderReassignForm object.
    *
    * @param \Drupal\Core\Routing\CurrentRouteMatch $current_route_match
    *   The current route match.
+   * @param \Drupal\commerce_order\OrderAssignment $order_assignment_service
+   *   The order assignment service.
    */
-  public function __construct(CurrentRouteMatch $current_route_match) {
+  public function __construct(CurrentRouteMatch $current_route_match, OrderAssignment $order_assignment_service) {
     $this->order = $current_route_match->getParameter('commerce_order');
+    $this->order_assignment_service = $order_assignment_service;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('current_route_match'));
+    return new static(
+      $container->get('current_route_match'),
+      $container->get('commerce_order.order_assignment')
+    );
   }
 
   /**
@@ -98,9 +112,7 @@ class OrderReassignForm extends FormBase {
 
     $values = $form_state->getValues();
 
-    /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
-    $assignment_service = \Drupal::service('commerce_order.order_assignment');
-    $assignment_service->assign($this->order, User::load($values['uid']), TRUE);
+    $this->order_assignment_service->assign($this->order, User::load($values['uid']), TRUE);
 
     drupal_set_message($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),

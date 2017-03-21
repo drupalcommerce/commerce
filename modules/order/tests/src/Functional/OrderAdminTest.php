@@ -168,16 +168,14 @@ class OrderAdminTest extends OrderBrowserTestBase {
       'uid' => $this->loggedInUser,
       'store_id' => $this->store,
     ]);
-
     $this->drupalGet($order->toUrl('reassign-form'));
-    $this->assertSession()->statusCodeEquals(200);
 
     $this->submitForm(['edit-uid' => $new_user->getUsername()], t('Reassign order'));
     $this->assertSession()->pageTextContains(t('has been assigned to customer @customer.', [
       '@customer' => $new_user->getUsername(),
     ]));
 
-    // Reload the entity so we do not compare the cached version
+    // Reload the entity so we do not compare the cached version.
     $order = $this->reloadEntity($order);
     $this->assertEquals($new_user->id(), $order->getCustomerId());
   }
