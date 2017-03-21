@@ -5,6 +5,7 @@ namespace Drupal\commerce_order\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -96,9 +97,11 @@ class OrderReassignForm extends FormBase {
     $this->submitCustomerForm($form, $form_state);
 
     $values = $form_state->getValues();
-    $this->order->setEmail($values['mail']);
-    $this->order->setCustomerId($values['uid']);
-    $this->order->save();
+
+    /** @var \Drupal\commerce_order\OrderAssignment $assignment_service */
+    $assignment_service = \Drupal::service('commerce_order.order_assignment');
+    $assignment_service->assign($this->order, User::load($values['uid']), TRUE);
+
     drupal_set_message($this->t('The order %label has been assigned to customer %customer.', [
       '%label' => $this->order->label(),
       '%customer' => $this->order->getCustomer()->label(),

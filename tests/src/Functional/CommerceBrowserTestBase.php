@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\commerce_store\StoreCreationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 
@@ -166,4 +167,18 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
     $this->assertNotEmpty($valid, $message);
   }
 
+  /**
+   * Reloads the entity after clearing the static cache.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to reload.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The reloaded entity.
+   */
+  protected function reloadEntity(EntityInterface $entity) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+    $storage->resetCache([$entity->id()]);
+    return $storage->load($entity->id());
+  }
 }

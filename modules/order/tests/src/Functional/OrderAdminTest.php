@@ -155,6 +155,34 @@ class OrderAdminTest extends OrderBrowserTestBase {
   }
 
   /**
+   * Tests that an admin can reassign an order.
+   */
+  public function testReassignOrder() {
+    // The new user we will assign the order to.
+    $new_user = $this->createUser();
+
+    /** @var \Drupal\commerce_order\Entity\Order $order */
+    $order = $this->createEntity('commerce_order', [
+      'type' => 'default',
+      'mail' => $this->loggedInUser->getEmail(),
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
+    ]);
+
+    $this->drupalGet($order->toUrl('reassign-form'));
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->submitForm(['edit-uid' => $new_user->getUsername()], t('Reassign order'));
+    $this->assertSession()->pageTextContains(t('has been assigned to customer @customer.', [
+      '@customer' => $new_user->getUsername(),
+    ]));
+
+    // Reload the entity so we do not compare the cached version
+    $order = $this->reloadEntity($order);
+    $this->assertEquals($new_user->id(), $order->getCustomerId());
+  }
+
+  /**
    * Tests that an admin can view an order's details.
    */
   public function testAdminOrderView() {
