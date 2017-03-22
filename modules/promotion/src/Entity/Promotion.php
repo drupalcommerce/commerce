@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -303,6 +303,24 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCompatibility() {
+    return $this->get('compatibility')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCompatibility($compatibility) {
+    if (!in_array($compatibility, [self::COMPATIBLE_NONE, self::COMPATIBLE_ANY])) {
+      throw new \InvalidArgumentException('Invalid compatibility type');
+    }
+    $this->get('compatibility')->value = $compatibility;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
@@ -333,13 +351,29 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(EntityInterface $entity) {
+  public function applies(EntityAdjustableInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
 
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
     $offer = $this->get('offer')->first()->getTargetInstance();
     if ($offer->getTargetEntityType() !== $entity_type_id) {
       return FALSE;
+    }
+
+    // Check compatibility.
+    // @todo port remaining strategies from Commerce Discount #2762997.
+    switch ($this->getCompatibility()) {
+      case self::COMPATIBLE_NONE:
+        // If there are any existing promotions, then this cannot apply.
+        foreach ($entity->getAdjustments() as $adjustment) {
+          if ($adjustment->getType() == 'promotion') {
+            return FALSE;
+          }
+        }
+        break;
+
+      case self::COMPATIBLE_ANY:
+        break;
     }
 
     // @todo should whatever invokes this method be providing the context?
@@ -362,7 +396,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function apply(EntityInterface $entity) {
+  public function apply(EntityAdjustableInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
@@ -539,6 +573,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         'weight' => 6,
       ]);
 
+    $fields['compatibility'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Compatibility with other promotions'))
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_promotion\Entity\Promotion', 'getCompatibilityOptions'])
+      ->setRequired(TRUE)
+      ->setDefaultValue(self::COMPATIBLE_ANY)
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'weight' => 4,
+      ]);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Enabled'))
       ->setDescription(t('Whether the promotion is enabled.'))
@@ -613,6 +657,19 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       return strnatcasecmp($a_label, $b_label);
     }
     return ($a_weight < $b_weight) ? -1 : 1;
+  }
+
+  /**
+   * Gets the allowed values for the 'compatibility' base field.
+   *
+   * @return array
+   *   The allowed values.
+   */
+  public static function getCompatibilityOptions() {
+    return [
+      self::COMPATIBLE_ANY => t('Any promotion'),
+      self::COMPATIBLE_NONE => t('Not with any other promotions'),
+    ];
   }
 
 }

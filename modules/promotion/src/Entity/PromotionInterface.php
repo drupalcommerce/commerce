@@ -2,15 +2,18 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the interface for promotions.
  */
 interface PromotionInterface extends ContentEntityInterface, EntityStoresInterface {
+
+  const COMPATIBLE_ANY = 'any';
+  const COMPATIBLE_NONE = 'none';
 
   /**
    * Gets the promotion name.
@@ -227,6 +230,24 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setEndDate(DrupalDateTime $end_date);
 
   /**
+   * Gets the promotion compatibility.
+   *
+   * @return string
+   *   The compatibility.
+   */
+  public function getCompatibility();
+
+  /**
+   * Sets the promotion compatibility.
+   *
+   * @param string $compatibility
+   *   The compatibility.
+   *
+   * @return $this
+   */
+  public function setCompatibility($compatibility);
+
+  /**
    * Get whether the promotion is enabled.
    *
    * @return bool
@@ -265,20 +286,20 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Checks whether the promotion entity can be applied.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
+   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
+   *   The adjustable entity.
    *
    * @return bool
    *   TRUE if promotion can be applied, or false if conditions failed.
    */
-  public function applies(EntityInterface $entity);
+  public function applies(EntityAdjustableInterface $entity);
 
   /**
    * Apply the promotion to an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
+   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
+   *   The adjustable entity.
    */
-  public function apply(EntityInterface $entity);
+  public function apply(EntityAdjustableInterface $entity);
 
 }
