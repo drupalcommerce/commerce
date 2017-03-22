@@ -103,13 +103,12 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
       else {
         $position = 'next';
       }
-
       // Create breadcrumb style links for active checkout steps.
-      if ($index <= $current_step_index) {
+      if ($index <= $current_step_index && $configuration['display_checkout_progress_breadcrumb_links']) {
         $label = Link::createFromRoute($step_definition['label'], 'commerce_checkout.form', [
           'commerce_order' => $order->id(),
           'step' => $step_id,
-        ])->toString();
+        ])->toRenderable();
       }
       else {
         $label = $step_definition['label'];
