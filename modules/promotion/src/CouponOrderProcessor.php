@@ -69,15 +69,10 @@ class CouponOrderProcessor implements OrderProcessorInterface {
         continue;
       }
 
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $plugin */
-      $plugin = $promotion->get('offer')->first()->getTargetInstance();
-      $target_entity_type = $plugin->getTargetEntityType();
-      if ($target_entity_type == PromotionOfferInterface::ORDER) {
-        if ($promotion->applies($order)) {
-          $promotion->apply($order);
-        }
+      if ($promotion->applies($order)) {
+        $promotion->apply($order);
       }
-      elseif ($target_entity_type == PromotionOfferInterface::ORDER_ITEM) {
+      else {
         foreach ($order->getItems() as $order_item) {
           if ($promotion->applies($order_item)) {
             $promotion->apply($order_item);

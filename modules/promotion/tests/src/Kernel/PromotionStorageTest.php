@@ -12,6 +12,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests promotion storage.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class PromotionStorageTest extends CommerceKernelTestBase {
 

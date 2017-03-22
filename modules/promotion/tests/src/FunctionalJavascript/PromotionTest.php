@@ -42,8 +42,8 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_percentage_off');
+    $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
     $edit = [
@@ -52,7 +52,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     ];
 
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
 
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
@@ -77,8 +77,8 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_percentage_off');
+    $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
     $edit = [
@@ -87,7 +87,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     ];
 
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
 
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
@@ -113,7 +113,7 @@ class PromotionTest extends CommerceBrowserTestBase {
       'name' => $this->randomMachineName(8),
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -132,7 +132,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_changed = Promotion::load($promotion->id());
     $this->assertEquals($new_promotion_name, $promotion_changed->getName(), 'The promotion name successfully updated.');
 
@@ -153,7 +153,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('This action cannot be undone.');
     $this->submitForm([], t('Delete'));
 
-    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
+    $this->container->get('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_exists = (bool) Promotion::load($promotion->id());
     $this->assertEmpty($promotion_exists, 'The new promotion has been deleted from the database using UI.');
   }

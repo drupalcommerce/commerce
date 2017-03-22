@@ -11,6 +11,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests coupon integration with orders.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class CouponOrderIntegrationTest extends CommerceKernelTestBase {
 

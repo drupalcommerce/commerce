@@ -127,6 +127,10 @@ class PluginSelect extends CommerceElementBase {
       $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
       if ($plugin instanceof PluginFormInterface) {
         $element['target_plugin_configuration'] = $plugin->buildConfigurationForm($element['target_plugin_configuration'], $form_state);
+        // Need parents modification for proper ajax handle.
+        $element['target_plugin_configuration']['#tree'] = TRUE;
+        $element['target_plugin_configuration']['#parents'] = array_merge($element['#parents'], ['target_plugin_configuration']);
+        $element['target_plugin_configuration']['#array_parents'] = array_merge($element['#array_parents'], ['target_plugin_configuration']);
       }
     }
 

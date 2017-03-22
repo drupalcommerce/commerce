@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Defines an interface for objects that contain adjustments.
  *
- * @see \Drupal\commerce_order\Entity\OrderInterfaceEntity
- * @see \Drupal\commerce_order\Entity\OrderItemInterfaceEntity
+ * @see \Drupal\commerce_order\Entity\OrderInterface
+ * @see \Drupal\commerce_order\Entity\OrderItemInterface
  */
 interface EntityAdjustableInterface extends EntityInterface {
 

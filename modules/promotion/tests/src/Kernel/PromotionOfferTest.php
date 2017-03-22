@@ -13,6 +13,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests promotion offers.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class PromotionOfferTest extends CommerceKernelTestBase {
 
@@ -103,7 +104,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -144,7 +145,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.50',
         ],
@@ -174,7 +175,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests offer target entity type.
+   * Tests that a promotion applies regardless.
    */
   public function testTargetType() {
     // Use addOrderItem so the total is calculated.
@@ -195,7 +196,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -214,7 +215,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.50',
         ],
@@ -222,10 +223,10 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     ]);
     $promotion->save();
 
-    $result = $promotion->applies($this->order);
+    $result = $promotion->applies($order_item);
 
-    // Promotion target is for the order items. This should fail.
-    $this->assertEmpty($result);
+    // Applies to both order and order items unless conditions say otherwise.
+    $this->assertTrue($result);
   }
 
 }

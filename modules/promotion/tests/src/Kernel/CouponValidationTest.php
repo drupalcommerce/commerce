@@ -10,6 +10,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
  * Tests coupon validation constraints.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class CouponValidationTest extends EntityKernelTestBase {
 

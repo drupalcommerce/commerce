@@ -320,13 +320,6 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public function applies(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
-
-    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance();
-    if ($offer->getTargetEntityType() !== $entity_type_id) {
-      return FALSE;
-    }
-
     // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
 
@@ -334,9 +327,16 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     // @todo support OR operations.
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
     foreach ($this->get('conditions') as $item) {
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
-      $condition = $item->getTargetInstance([$entity_type_id => $context]);
-      if (!$condition->evaluate()) {
+      try {
+        /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+        $condition = $item->getTargetInstance([$entity_type_id => $context]);
+        if (!$condition->evaluate()) {
+          return FALSE;
+        }
+      }
+      catch (\Exception $e) {
+        // In case of exception return false rather than error.
+        // @todo currently this happens with ContextException.
         return FALSE;
       }
     }
@@ -348,12 +348,11 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public function apply(EntityInterface $entity) {
-    $entity_type_id = $entity->getEntityTypeId();
     // @todo should whatever invokes this method be providing the context?
-    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+    $context = new Context(new ContextDefinition('entity:' . $entity->getEntityTypeId()), $entity);
 
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
+    $offer = $this->get('offer')->first()->getTargetInstance(['adjustable_entity' => $context]);
     $offer->execute();
   }
 
