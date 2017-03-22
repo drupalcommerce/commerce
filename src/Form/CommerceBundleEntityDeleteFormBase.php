@@ -20,7 +20,7 @@ class CommerceBundleEntityDeleteFormBase extends EntityDeleteForm {
     $content_entity_type = $this->entityTypeManager->getDefinition($bundle_entity_type->getBundleOf());
     $usage_count = $this->entityTypeManager->getStorage($content_entity_type->id())
       ->getQuery()
-      ->condition('type', $this->entity->id())
+      ->condition($content_entity_type->getKey('bundle'), $this->entity->id())
       ->count()
       ->execute();
     if ($usage_count) {
