@@ -9,6 +9,7 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  * Tests the coupon redemption form element.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class CouponRedemptionTest extends CommerceBrowserTestBase {
 
@@ -88,7 +89,7 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],

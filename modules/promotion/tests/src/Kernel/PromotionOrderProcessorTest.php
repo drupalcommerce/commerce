@@ -14,6 +14,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests the promotion order processor.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class PromotionOrderProcessorTest extends CommerceKernelTestBase {
 
@@ -100,7 +101,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
@@ -150,7 +151,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_id' => 'commerce_promotion_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],

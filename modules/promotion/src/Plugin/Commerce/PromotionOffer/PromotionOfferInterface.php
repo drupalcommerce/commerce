@@ -15,21 +15,10 @@ use Drupal\Core\Plugin\PluginFormInterface;
  */
 interface PromotionOfferInterface extends ConfigurablePluginInterface, ContainerFactoryPluginInterface, ContextAwarePluginInterface, ExecutableInterface, PluginFormInterface {
 
-  const ORDER = 'commerce_order';
-  const ORDER_ITEM = 'commerce_order_item';
-
-  /**
-   * Gets the entity type the offer is for.
-   *
-   * @return string
-   *   The entity type it applies to.
-   */
-  public function getTargetEntityType();
-
   /**
    * Get the target entity for the offer.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\commerce_order\EntityAdjustableInterface
    *   The target entity.
    */
   public function getTargetEntity();

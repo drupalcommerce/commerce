@@ -10,6 +10,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests coupon field definition updated to orders.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class CouponsFieldPostUpdateTest extends CommerceKernelTestBase {
 

@@ -9,6 +9,7 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
  * Tests coupon storage.
  *
  * @group commerce
+ * @group commerce_promotion
  */
 class CouponStorageTest extends CommerceKernelTestBase {
 

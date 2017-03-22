@@ -59,15 +59,8 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   /**
    * {@inheritdoc}
    */
-  public function getTargetEntityType() {
-    return $this->pluginDefinition['target_entity_type'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getTargetEntity() {
-    return $this->getContextValue($this->getTargetEntityType());
+    return $this->getContextValue('adjustable_entity');
   }
 
   /**
