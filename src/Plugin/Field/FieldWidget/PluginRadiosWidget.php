@@ -31,7 +31,7 @@ class PluginRadiosWidget extends WidgetBase {
       '#categories' => $this->fieldDefinition->getSetting('categories'),
       '#default_value' => [
         'target_plugin_id' => $items[$delta]->target_plugin_id,
-        'target_plugin_configuration' => $items[$delta]->target_plugin_configuration,
+        'target_plugin_configuration' => $items[$delta]->target_plugin_configuration ?: [],
       ],
       '#required' => $this->fieldDefinition->isRequired(),
       '#title' => $this->fieldDefinition->getLabel(),
