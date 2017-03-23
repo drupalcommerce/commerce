@@ -22,7 +22,6 @@ class OrderTotalPrice extends PromotionConditionBase {
   public function defaultConfiguration() {
     return [
       'amount' => NULL,
-      // @todo expose the operator in form.
       'operator' => '>',
     ] + parent::defaultConfiguration();
   }
@@ -31,7 +30,7 @@ class OrderTotalPrice extends PromotionConditionBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form += parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $amount = $this->configuration['amount'];
     // A bug in the plugin_select form element causes $amount to be incomplete.
@@ -39,6 +38,7 @@ class OrderTotalPrice extends PromotionConditionBase {
       $amount = NULL;
     }
 
+    $form['operator'] = $this->operatorFormItem($this->configuration['operator']);
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),

@@ -40,4 +40,29 @@ abstract class PromotionConditionBase extends ConditionPluginBase implements Pro
     return parent::submitConfigurationForm($form, SubformState::createForSubform($form, $form_state->getCompleteForm(), $form_state));
   }
 
+  /**
+   * Returns form item for exposing operator in comparisons.
+   *
+   * @param string $default_value
+   *   The default value.
+   *
+   * @return array
+   *   The form item.
+   */
+  protected function operatorFormItem($default_value) {
+    return [
+      '#type' => 'select',
+      '#title' => t('Operator'),
+      '#options' => [
+        '>' => t('Greater than'),
+        '>=' => t('Greater than or equal to'),
+        '<=' => t('Less than or equal to'),
+        '<' => t('Less than'),
+        '==' => t('Equals'),
+      ],
+      '#default_value' => $default_value,
+      '#required' => TRUE,
+    ];
+  }
+
 }

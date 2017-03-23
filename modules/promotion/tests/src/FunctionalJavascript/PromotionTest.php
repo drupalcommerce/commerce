@@ -46,7 +46,6 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
     $this->waitForAjaxToFinish();
-    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][amount]', '10.0');
 
     // Change, assert any values reset.
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
@@ -86,7 +85,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->assertSession()->fieldExists('name[0][value]');
 
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
     $edit = [
@@ -95,7 +94,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     ];
 
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
 
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
