@@ -31,7 +31,7 @@ class CommerceBundleEntityDeleteFormBase extends EntityDeleteForm {
             '%type' => $this->entity->label(),
             '%entity' => $content_entity_type->getSingularLabel(),
             '%entities' => $content_entity_type->getPluralLabel(),
-            '%entity_type' => $content_entity_type->getBundleLabel()
+            '%entity_type' => $content_entity_type->getBundleLabel(),
           ]) . '</p>';
       $form['#title'] = $this->getQuestion();
       $form['description'] = ['#markup' => $caption];
