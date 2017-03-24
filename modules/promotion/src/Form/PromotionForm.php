@@ -122,10 +122,8 @@ class PromotionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-
     /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = $this->entity;
+    $promotion = parent::validateForm($form, $form_state);
 
     // We need to validate that the target entity of conditions match the offer.
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
