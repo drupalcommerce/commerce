@@ -84,6 +84,10 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
       $definition['category'] = $this->entityTypeManager->getDefinition($target)->getLabel();
     }
 
+    // Add a context definition for the promotion being executed.
+    $definition['context']['commerce_promotion'] = new ContextDefinition('entity:commerce_promotion', $this->t('Promotion'));
+    $definition['context']['commerce_promotion_coupon'] = new ContextDefinition('entity:commerce_promotion_coupon', $this->t('Coupon'), FALSE);
+
     // Generate the context definition if it is missing.
     if (empty($definition['context'][$target])) {
       $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);

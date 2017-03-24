@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce_promotion module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_promotion_schema() {
+  $schema['commerce_promotion_usage'] = [
+    'description' => 'Stores module data as key/value pairs per user.',
+    'fields' => [
+      'promotion_id' => [
+        'description' => 'Primary key: {commerce_promotion}.promotion_id for promotion.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'coupon_id' => [
+        'description' => 'Primary key: {commerce_promotion_coupon}.id for coupon.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+      'order_id' => [
+        'description' => 'Primary key: {commerce_order}.order_id for order.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'uid' => [
+        'description' => 'Primary key: {users}.uid for user.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['promotion_id', 'coupon_id', 'order_id'],
+    'indexes' => [
+      'promotion_id' => ['promotion_id'],
+      'coupon_id' => ['coupon_id'],
+    ],
+    'foreign keys' => [
+      'promotion_id' => ['commerce_promotion' => 'promotion_id'],
+      'coupon_id' => ['commerce_promotion_coupon' => 'id'],
+      'order_id' => ['commerce_order' => 'order_id'],
+      'uid' => ['users' => 'uid'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Install the `commerce_promotion_usage` table schema.
+ */
+function commerce_promotion_update_8001() {
+  drupal_install_schema('commerce_promotion');
+}

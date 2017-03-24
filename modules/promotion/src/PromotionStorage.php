@@ -24,7 +24,26 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
     if (empty($result)) {
       return [];
     }
+
+    $usages_query = $this->database->select('commerce_promotion_usage', 'cpu');
+    $usages_query->condition('promotion_id', array_keys($result), 'IN');
+    $usages_query->addField('cpu', 'promotion_id');
+    $usages_query->addExpression("COUNT(promotion_id)", 'count');
+    $usages_query->groupBy('promotion_id');
+    $usages_result = $usages_query->execute()->fetchAllAssoc('promotion_id', \PDO::FETCH_ASSOC);
+
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
     $promotions = $this->loadMultiple($result);
+
+    // Remove any promotions that have hit their usage limit.
+    foreach ($promotions as $promotion) {
+      $promotion_id = $promotion->id();
+      if (isset($usages_result[$promotion_id])) {
+        if ($promotion->getUsageLimit() >= $usages_result[$promotion_id]['count']) {
+          unset($promotions[$promotion_id]);
+        }
+      }
+    }
 
     return $promotions;
   }
