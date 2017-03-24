@@ -55,6 +55,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $this->placeBlock('commerce_cart');
+    $this->placeBlock('commerce_checkout_progress');
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -78,15 +79,26 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    * Tests than an order can go through checkout steps.
    */
   public function testGuestOrderCheckout() {
+    $config = \Drupal::configFactory()->getEditable('commerce_checkout.commerce_checkout_flow.default');
+    $config->set('configuration.display_checkout_progress_breadcrumb_links', TRUE);
+    $config->save();
+
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
-    $cart_link = $this->getSession()->getPage()->findLink('your cart');
-    $cart_link->click();
+    $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextNotContains('Order Summary');
+    // Check breadcrumbs are links.
+    $this->assertSession()->elementsCount('css', '.block-commerce-checkout-progress li.checkout-progress--step > a', 1);
     $this->submitForm([], 'Continue as Guest');
+    // Check breadcrumb link functionality.
+    $this->assertSession()->elementsCount('css', '.block-commerce-checkout-progress li.checkout-progress--step > a', 2);
+    $this->getSession()->getPage()->findLink('Login')->click();
+    $this->assertSession()->pageTextNotContains('Order Summary');
+    $this->getSession()->getPage()->findLink('Order information')->click();
+    $this->assertSession()->pageTextContains('Order Summary');
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
@@ -101,6 +113,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
     $this->assertSession()->pageTextContains('Order Summary');
+    $this->assertSession()->elementsCount('css', '.block-commerce-checkout-progress li.checkout-progress--step > a', 3);
     $this->submitForm([], 'Pay and complete purchase');
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
@@ -108,8 +121,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
-    $cart_link = $this->getSession()->getPage()->findLink('your cart');
-    $cart_link->click();
+    $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextNotContains('Order Summary');
     $this->submitForm([], 'Continue as Guest');
@@ -144,8 +156,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
-    $cart_link = $this->getSession()->getPage()->findLink('your cart');
-    $cart_link->click();
+    $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextContains('New Customer');
     $this->submitForm([
@@ -155,13 +166,14 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'login[register][password][pass2]' => 'pass',
     ], 'Create account and continue');
     $this->assertSession()->pageTextContains('Billing information');
+    // Check breadcrumbs are not links. (the default setting)
+    $this->assertSession()->elementNotExists('css', '.block-commerce-checkout-progress li.checkout-progress--step > a');
 
     // Test account validation.
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
-    $cart_link = $this->getSession()->getPage()->findLink('your cart');
-    $cart_link->click();
+    $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextContains('New Customer');
 
