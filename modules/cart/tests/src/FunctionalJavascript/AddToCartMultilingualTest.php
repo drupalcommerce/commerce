@@ -95,7 +95,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $product = $this->variation->getProduct();
     $product->setTitle('Title');
     $product->save();
-    // Add translation
+    // Add translation.
     $product_fr = $product->toArray();
     $product_fr['title'] = 'FR title';
     $product->addTranslation('fr', $product_fr)->save();
@@ -197,7 +197,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     // @todo
     $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
     $order_item_form_display->setComponent('purchased_entity', [
-      'type' => 'commerce_product_variation_title'
+      'type' => 'commerce_product_variation_title',
     ]);
     $order_item_form_display->save();
 
