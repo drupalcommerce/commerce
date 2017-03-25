@@ -55,6 +55,11 @@ final class Adjustment {
     if (!$definition['amount'] instanceof Price) {
       throw new \InvalidArgumentException(sprintf('Property "amount" should be an instance of %s.', Price::class));
     }
+    $adjustment_type_manager = \Drupal::service('plugin.manager.commerce_adjustment_type');
+    $types = $adjustment_type_manager->getDefinitions();
+    if (empty($types[$definition['type']])) {
+      throw new \InvalidArgumentException(sprintf('%s is an invalid adjustment type.', $definition['type']));
+    }
 
     $this->type = $definition['type'];
     $this->label = $definition['label'];

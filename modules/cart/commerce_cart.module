@@ -26,6 +26,9 @@ function commerce_cart_theme($existing, $type, $theme, $path) {
         'links' => [],
       ],
     ],
+    'commerce_cart_empty_page' => [
+      'render element' => 'element',
+    ],
   ];
 }
 
@@ -108,20 +111,6 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_update().
- */
-function commerce_cart_commerce_order_presave(OrderInterface $order) {
-  if (!$order->isNew() && $order->cart->value == TRUE) {
-    $place_transition = $order->getState()->getWorkflow()->getTransition('place');
-    $from_states = $place_transition->getFromStates();
-    $to_state = $place_transition->getToState()->getId();
-    if (in_array($order->original->state->value, array_keys($from_states)) && $order->state->value == $to_state) {
-      \Drupal::service('commerce_cart.cart_provider')->finalizeCart($order, FALSE);
-    }
-  }
-}
-
-/**
  * Implements hook_form_FORM_ID_alter() for 'entity_form_display_edit_form'.
  *
  * Hides irrelevant purchased_entity widgets on the add_to_cart order item
@@ -132,9 +121,12 @@ function commerce_cart_form_entity_form_display_edit_form_alter(array &$form, Fo
   $entity = $form_state->getFormObject()->getEntity();
   if ($form['#entity_type'] == 'commerce_order_item' && $entity->getMode() == 'add_to_cart') {
     $options = &$form['fields']['purchased_entity']['plugin']['type']['#options'];
+    unset($options['commerce_entity_select']);
     unset($options['entity_reference_autocomplete_tags']);
     unset($options['entity_reference_autocomplete']);
     unset($options['inline_entity_form_complex']);
+    unset($options['options_buttons']);
+    unset($options['options_select']);
   }
 }
 

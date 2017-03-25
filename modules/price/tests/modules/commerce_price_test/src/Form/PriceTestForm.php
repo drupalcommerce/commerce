@@ -12,7 +12,7 @@ class PriceTestForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'commerce_price_test_form';
+    return 'commerce_price_element_test_form';
   }
 
   /**
@@ -23,9 +23,8 @@ class PriceTestForm extends FormBase {
       '#type' => 'commerce_price',
       '#title' => $this->t('Amount'),
       '#default_value' => ['number' => '99.99', 'currency_code' => 'USD'],
-      '#size' => 60,
-      '#maxlength' => 128,
       '#required' => TRUE,
+      '#available_currencies' => ['USD', 'EUR'],
     ];
     $form['submit'] = [
       '#type' => 'submit',

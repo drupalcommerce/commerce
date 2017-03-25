@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -80,7 +79,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the order amount condition.
+   * Tests the order total condition.
    */
   public function testOrderTotal() {
     // Use addOrderItem so the total is calculated.
@@ -111,7 +110,10 @@ class PromotionConditionTest extends CommerceKernelTestBase {
         [
           'target_plugin_id' => 'commerce_promotion_order_total_price',
           'target_plugin_configuration' => [
-            'amount' => new Price('20.00', 'USD'),
+            'amount' => [
+              'number' => '20.00',
+              'currency_code' => 'USD',
+            ],
           ],
         ],
       ],
@@ -119,8 +121,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     $promotion->save();
 
     $result = $promotion->applies($this->order);
-
-    $this->assertTrue($result);
+    $this->assertNotEmpty($result);
 
     $promotion = Promotion::create([
       'name' => 'Promotion 1',
@@ -137,7 +138,10 @@ class PromotionConditionTest extends CommerceKernelTestBase {
         [
           'target_plugin_id' => 'commerce_promotion_order_total_price',
           'target_plugin_configuration' => [
-            'amount' => new Price('50.00', 'USD'),
+            'amount' => [
+              'number' => '50.00',
+              'currency_code' => 'USD',
+            ],
           ],
         ],
       ],
@@ -146,7 +150,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
 
     $result = $promotion->applies($this->order);
 
-    $this->assertFalse($result);
+    $this->assertEmpty($result);
   }
 
 }

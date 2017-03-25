@@ -65,6 +65,13 @@ class CommercePaymentGateway extends Plugin {
   public $forms = [];
 
   /**
+   * The JS library ID.
+   *
+   * @var string
+   */
+  public $js_library;
+
+  /**
    * The payment type used by the payment gateway.
    *
    * @var string
@@ -100,7 +107,7 @@ class CommercePaymentGateway extends Plugin {
    * @param array $values
    *   The annotation values.
    */
-  public function __construct($values) {
+  public function __construct(array $values) {
     if (empty($values['modes'])) {
       $values['modes'] = [
         'test' => t('Test'),

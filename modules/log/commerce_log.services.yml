@@ -1,0 +1,8 @@
+services:
+  plugin.manager.commerce_log_template:
+    class: Drupal\commerce_log\LogTemplateManager
+    arguments: ['@module_handler', '@cache.discovery', '@plugin.manager.commerce_log_category']
+
+  plugin.manager.commerce_log_category:
+    class: Drupal\commerce_log\LogCategoryManager
+    arguments: ['@module_handler', '@cache.discovery']

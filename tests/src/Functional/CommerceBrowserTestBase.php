@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\simpletest\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 
@@ -12,6 +13,14 @@ use Drupal\Tests\BrowserTestBase;
 abstract class CommerceBrowserTestBase extends BrowserTestBase {
 
   use BlockCreationTrait;
+  use StoreCreationTrait;
+
+  /**
+   * The store entity.
+   *
+   * @var \Drupal\commerce_store\Entity\Store
+   */
+  protected $store;
 
   /**
    * Modules to enable.
@@ -29,6 +38,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
     'field',
     'commerce',
     'commerce_price',
+    'commerce_store',
   ];
 
   /**
@@ -44,6 +54,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $this->store = $this->createStore();
     $this->placeBlock('local_tasks_block');
     $this->placeBlock('local_actions_block');
     $this->placeBlock('page_title_block');
@@ -67,6 +78,8 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
       'access administration pages',
       'access commerce administration pages',
       'administer commerce_currency',
+      'administer commerce_store',
+      'administer commerce_store_type',
     ];
   }
 
@@ -150,7 +163,7 @@ abstract class CommerceBrowserTestBase extends BrowserTestBase {
       $valid = FALSE;
     }
 
-    $this->assertTrue($valid, $message);
+    $this->assertNotEmpty($valid, $message);
   }
 
 }

@@ -2,14 +2,15 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityTraitManagerInterface;
+use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
-use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ProductVariationTypeForm extends BundleEntityFormBase {
+class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
 
   /**
    * The attribute field manager.
@@ -21,10 +22,14 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
   /**
    * Constructs a new ProductVariationTypeForm object.
    *
+   * @param \Drupal\commerce\EntityTraitManagerInterface $trait_manager
+   *   The entity trait manager.
    * @param \Drupal\commerce_product\ProductAttributeFieldManagerInterface $attribute_field_manager
    *   The attribute field manager.
    */
-  public function __construct(ProductAttributeFieldManagerInterface $attribute_field_manager) {
+  public function __construct(EntityTraitManagerInterface $trait_manager, ProductAttributeFieldManagerInterface $attribute_field_manager) {
+    parent::__construct($trait_manager);
+
     $this->attributeFieldManager = $attribute_field_manager;
   }
 
@@ -33,6 +38,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('plugin.manager.commerce_entity_trait'),
       $container->get('commerce_product.attribute_field_manager')
     );
   }
@@ -65,6 +71,7 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       '#title' => t('Generate variation titles based on attribute values.'),
       '#default_value' => $variation_type->shouldGenerateTitle(),
     ];
+    $form = $this->buildTraitForm($form, $form_state);
 
     if ($this->moduleHandler->moduleExists('commerce_order')) {
       // Prepare a list of order item types used to purchase product variations.
@@ -111,13 +118,19 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
       '#access' => !empty($attribute_options),
     ];
     // Disable options which cannot be unset because of existing data.
+    $disabled_attributes = [];
     foreach ($used_attributes as $attribute_id) {
       if (!$this->attributeFieldManager->canDeleteField($attributes[$attribute_id], $variation_type->id())) {
         $form['attributes'][$attribute_id] = [
           '#disabled' => TRUE,
         ];
+        $disabled_attributes[] = $attribute_id;
       }
     }
+    $form['disabled_attributes'] = [
+      '#type' => 'value',
+      '#value' => $disabled_attributes,
+    ];
 
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
@@ -142,14 +155,24 @@ class ProductVariationTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $this->validateTraitForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('Saved the %label product variation type.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_variation_type.collection');
 
+    $this->submitTraitForm($form, $form_state);
     $attribute_storage = $this->entityTypeManager->getStorage('commerce_product_attribute');
     $original_attributes = $form_state->getValue('original_attributes');
     $attributes = array_filter($form_state->getValue('attributes'));
+    $disabled_attributes = $form_state->getValue('disabled_attributes');
+    $attributes = array_unique(array_merge($disabled_attributes, $attributes));
     $selected_attributes = array_diff($attributes, $original_attributes);
     $unselected_attributes = array_diff($original_attributes, $attributes);
     if ($selected_attributes) {

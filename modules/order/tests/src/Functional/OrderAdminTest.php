@@ -53,7 +53,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     // Check the integrity of the edit form.
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('billing_profile');
+    $this->assertSession()->fieldExists('billing_profile[0][profile][address][0][address][given_name]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][purchased_entity][0][target_id]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][quantity][0][value]');
     $this->assertSession()->fieldExists('order_items[form][inline_entity_form][unit_price][0][number]');
@@ -77,7 +77,12 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ];
     $this->submitForm($edit, 'Update order item');
     $edit = [
-      'billing_profile' => $this->billingProfile->id(),
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 street',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
       'adjustments[0][type]' => 'custom',
       'adjustments[0][definition][label]' => 'Test fee',
       'adjustments[0][definition][amount][number]' => '2.00',
@@ -99,6 +104,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = Order::create([
       'type' => 'default',
       'state' => 'completed',
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
     ]);
     $order->save();
 
@@ -120,6 +127,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $this->drupalGet($order->toUrl('edit-form'));
     $this->assertSession()->fieldValueEquals('adjustments[0][definition][label]', '10% off');
     $this->assertSession()->fieldValueEquals('adjustments[1][definition][label]', 'Handling fee');
+    $this->assertSession()->optionExists('adjustments[2][type]', 'Custom');
+    $this->assertSession()->optionNotExists('adjustments[2][type]', 'Test order adjustment type');
   }
 
   /**
@@ -129,6 +138,8 @@ class OrderAdminTest extends OrderBrowserTestBase {
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
       'mail' => $this->loggedInUser->getEmail(),
+      'uid' => $this->loggedInUser,
+      'store_id' => $this->store,
     ]);
     $this->drupalGet($order->toUrl('delete-form'));
     $this->assertSession()->statusCodeEquals(200);
@@ -140,7 +151,7 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order_exists = (bool) Order::load($order->id());
-    $this->assertFalse($order_exists, 'The order has been deleted from the database.');
+    $this->assertEmpty($order_exists, 'The order has been deleted from the database.');
   }
 
   /**
@@ -156,16 +167,27 @@ class OrderAdminTest extends OrderBrowserTestBase {
     ]);
     $order = $this->createEntity('commerce_order', [
       'type' => 'default',
+      'store_id' => $this->store->id(),
       'mail' => $this->loggedInUser->getEmail(),
       'order_items' => [$order_item],
+      'state' => 'draft',
+      'uid' => $this->loggedInUser,
     ]);
 
     // First test that the current admin user can see the order.
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(200);
-
-    // Order displays email address.
     $this->assertSession()->pageTextContains($this->loggedInUser->getEmail());
+
+    // Confirm that the transition buttons are visible and functional.
+    $workflow = $order->getState()->getWorkflow();
+    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
+    foreach ($transitions as $transition) {
+      $this->assertSession()->buttonExists($transition->getLabel());
+    }
+    $this->click('input.js-form-submit#edit-place');
+    $this->assertSession()->buttonNotExists('Place order');
+    $this->assertSession()->buttonNotExists('Cancel order');
 
     // Logout and check that anonymous users cannot see the order admin screen
     // and receive a 403 error code.
@@ -173,37 +195,6 @@ class OrderAdminTest extends OrderBrowserTestBase {
 
     $this->drupalGet($order->toUrl()->toString());
     $this->assertSession()->statusCodeEquals(403);
-  }
-
-  /**
-   * Tests that the order workflow transition buttons appear on the order page.
-   */
-  public function testOrderWorkflowTransitionButtons() {
-    $order_item = $this->createEntity('commerce_order_item', [
-      'type' => 'default',
-      'unit_price' => [
-        'number' => '999',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order = $this->createEntity('commerce_order', [
-      'type' => 'default',
-      'mail' => $this->loggedInUser->getEmail(),
-      'order_items' => [$order_item],
-      'state' => 'draft',
-    ]);
-
-    $this->drupalGet('admin/commerce/orders/' . $order->id());
-
-    $workflow = $order->getState()->getWorkflow();
-    $transitions = $workflow->getAllowedTransitions($order->getState()->value, $order);
-    foreach ($transitions as $transition) {
-      $this->assertSession()->buttonExists($transition->getLabel());
-    }
-
-    $this->click('input.js-form-submit#edit-place');
-    $this->assertSession()->buttonNotExists('Place order');
-    $this->assertSession()->buttonNotExists('Cancel order');
   }
 
 }

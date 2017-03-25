@@ -29,6 +29,13 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
   protected $entityTypeManager;
 
   /**
+   * The ID of the parent config entity.
+   *
+   * @var string
+   */
+  protected $entityId;
+
+  /**
    * The payment type used by the gateway.
    *
    * @var \Drupal\commerce_payment\Plugin\Commerce\PaymentType\PaymentTypeInterface
@@ -62,6 +69,9 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
+    // The plugin most know the ID of its parent config entity.
+    $this->entityId = $configuration['_entity_id'];
+    unset($configuration['_entity_id']);
     // Instantiate the types right away to ensure that their IDs are valid.
     $this->paymentType = $payment_type_manager->createInstance($this->pluginDefinition['payment_type']);
     foreach ($this->pluginDefinition['payment_method_types'] as $plugin_id) {
@@ -137,6 +147,17 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function getSupportedModes() {
     return $this->pluginDefinition['modes'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getJsLibrary() {
+    $js_library = NULL;
+    if (!empty($this->pluginDefinition['js_library'])) {
+      $js_library = $this->pluginDefinition['js_library'];
+    }
+    return $js_library;
   }
 
   /**

@@ -29,8 +29,8 @@ class ChainOrderTypeResolver implements ChainOrderTypeResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function addResolver(OrderTypeResolverInterface $resolver, $priority) {
-    $this->resolvers[$priority] = $resolver;
+  public function addResolver(OrderTypeResolverInterface $resolver) {
+    $this->resolvers[] = $resolver;
   }
 
   /**

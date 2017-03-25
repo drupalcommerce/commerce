@@ -30,13 +30,22 @@ class AdjustmentDefaultWidget extends WidgetBase {
 
     $element['#attached']['library'][] = 'commerce_price/admin';
 
+    /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
+    $plugin_manager = \Drupal::service('plugin.manager.commerce_adjustment_type');
+
+    $types = [
+      '_none' => $this->t('- Select -'),
+    ];
+    foreach ($plugin_manager->getDefinitions() as $id => $definition) {
+      if ($definition['has_ui'] == TRUE) {
+        $types[$id] = $definition['label'];
+      }
+    }
+
     $element['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Type'),
-      '#options' => [
-        '_none' => $this->t('- Select -'),
-        'custom' => $this->t('Apply order adjustment'),
-      ],
+      '#options' => $types,
       '#weight' => 1,
       '#default_value' => ($adjustment) ? $adjustment->getType() : '_none',
     ];
@@ -54,8 +63,8 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'container',
       '#weight' => 2,
       '#states' => [
-        'visible' => [
-          'select[name="' . $states_selector_name . '"]' => ['value' => 'custom'],
+        'invisible' => [
+          'select[name="' . $states_selector_name . '"]' => ['value' => '_none'],
         ],
       ],
     ];
@@ -69,9 +78,10 @@ class AdjustmentDefaultWidget extends WidgetBase {
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
       '#default_value' => ($adjustment) ? $adjustment->getAmount()->toArray() : NULL,
+      '#allow_negative' => TRUE,
       '#states' => [
-        'required' => [
-          'select[name="' . $states_selector_name . '"]' => ['value' => 'custom'],
+        'optional' => [
+          'select[name="' . $states_selector_name . '"]' => ['value' => '_none'],
         ],
       ],
     ];

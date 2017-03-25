@@ -1,13 +1,7 @@
 commerce_product.commerce_product_type.*:
-  type: config_entity
+  type: commerce_config_entity_bundle
   label: 'Product type'
   mapping:
-    id:
-      type: string
-      label: 'ID'
-    label:
-      type: label
-      label: 'Label'
     description:
       type: text
       label: 'Description'
@@ -19,18 +13,12 @@ commerce_product.commerce_product_type.*:
       label: 'Inject product variation fields into the rendered product'
 
 commerce_product.commerce_product_variation_type.*:
-  type: config_entity
+  type: commerce_config_entity_bundle
   label: 'Product variation type'
   mapping:
-    id:
-      type: string
-      label: 'ID'
-    label:
-      type: label
-      label: 'Label'
     orderItemType:
       type: string
-      label: 'order item type'
+      label: 'Order item type'
     generateTitle:
       type: boolean
       label: 'Generate variation titles based on attribute values'

@@ -2,13 +2,7 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\profile\Entity\Profile;
-use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_order\Entity\OrderItemType;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -16,8 +10,6 @@ use Drupal\user\RoleInterface;
  * @group commerce
  */
 class CheckoutOrderTest extends CommerceBrowserTestBase {
-
-  use StoreCreationTrait;
 
   /**
    * The current user.
@@ -38,13 +30,23 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'user', 'text',
-    'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
-    'commerce_price', 'commerce_store', 'commerce_product', 'commerce_cart',
-    'commerce_checkout', 'commerce_order', 'views_ui',
-    // @see https://www.drupal.org/node/2807567
-    'editor',
+  public static $modules = [
+    'commerce_product',
+    'commerce_order',
+    'commerce_cart',
+    'commerce_checkout',
+    'views_ui',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAdministratorPermissions() {
+    return array_merge([
+      'administer commerce_checkout_flow',
+      'administer views',
+    ], parent::getAdministratorPermissions());
+  }
 
   /**
    * {@inheritdoc}
@@ -53,8 +55,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     parent::setUp();
 
     $this->placeBlock('commerce_cart');
-
-    $store = $this->createStore('Demo', 'demo@example.com', 'default', TRUE);
 
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
@@ -70,86 +70,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'type' => 'default',
       'title' => 'My product',
       'variations' => [$variation],
-      'stores' => [$store],
+      'stores' => [$this->store],
     ]);
-  }
-
-  /**
-   * Tests order access.
-   */
-  public function testOrderAccess() {
-    $user = $this->drupalCreateUser();
-    $user2 = $this->drupalCreateUser();
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
-    $profile = Profile::create([
-      'type' => 'customer',
-      'address' => [
-        'country' => 'FR',
-        'postal_code' => '75002',
-        'locality' => 'Paris',
-        'address_line1' => 'A french street',
-        'given_name' => 'John',
-        'family_name' => 'LeSmith',
-      ],
-    ]);
-    $profile->save();
-    $order_item = OrderItem::create([
-      'type' => 'test',
-    ]);
-    $order_item->save();
-    $order = Order::create([
-      'type' => 'default',
-      'state' => 'in_checkout',
-      'order_number' => '6',
-      'mail' => 'test@example.com',
-      'uid' => $user->id(),
-      'ip_address' => '127.0.0.1',
-      'billing_profile' => $profile,
-      'order_items' => [$order_item],
-    ]);
-    $order->save();
-
-    // Anonymous user with no session.
-    $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner.
-    $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Authenticated user who does not own the order.
-    $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalLogin($user);
-
-    // Order with no order items.
-    $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner without the 'access checkout' permission.
-    $order->addItem($order_item)->save();
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getAdministratorPermissions() {
-    return array_merge([
-      'administer commerce_checkout_flow',
-      'administer views',
-    ], parent::getAdministratorPermissions());
   }
 
   /**
@@ -168,11 +90,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[address][0][given_name]' => $this->randomString(),
-      'billing_information[address][0][family_name]' => $this->randomString(),
-      'billing_information[address][0][organization]' => $this->randomString(),
-      'billing_information[address][0][address_line1]' => $this->randomString(),
-      'billing_information[address][0][locality]' => $this->randomString(),
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
@@ -192,11 +116,13 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'contact_information[email]' => 'guest@example.com',
       'contact_information[email_confirm]' => 'guest@example.com',
-      'billing_information[address][0][given_name]' => $this->randomString(),
-      'billing_information[address][0][family_name]' => $this->randomString(),
-      'billing_information[address][0][organization]' => $this->randomString(),
-      'billing_information[address][0][address_line1]' => $this->randomString(),
-      'billing_information[address][0][locality]' => $this->randomString(),
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
     ], 'Continue to review');
     $this->assertSession()->pageTextContains('Contact information');
     $this->assertSession()->pageTextContains('Billing information');
@@ -312,6 +238,63 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
     $this->drupalGet('/checkout/1');
     $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
+  }
+
+  /**
+   * Tests checkout behaviour after a cart update.
+   */
+  public function testCheckoutFlowOnCartUpdate() {
+    $this->drupalGet($this->product->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    // Submit the form until review.
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+    $this->submitForm([
+      'billing_information[profile][address][0][address][given_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][family_name]' => $this->randomString(),
+      'billing_information[profile][address][0][address][organization]' => $this->randomString(),
+      'billing_information[profile][address][0][address][address_line1]' => $this->randomString(),
+      'billing_information[profile][address][0][address][postal_code]' => '94043',
+      'billing_information[profile][address][0][address][locality]' => 'Mountain View',
+      'billing_information[profile][address][0][address][administrative_area]' => 'CA',
+    ], 'Continue to review');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
+    // By default the checkout step is preserved upon return.
+    $this->drupalGet('/checkout/1');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Review');
+
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
+        'number' => 9.99,
+        'currency_code' => 'USD',
+      ],
+    ]);
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product2 = $this->createEntity('commerce_product', [
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+      'stores' => [$this->store],
+    ]);
+    // Adding a new product to the cart resets the checkout step.
+    $this->drupalGet($product2->toUrl()->toString());
+    $this->submitForm([], 'Add to cart');
+    $this->getSession()->getPage()->findLink('your cart')->click();
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
+
+    // Removing a product from the cart resets the checkout step.
+    $this->submitForm([], 'Continue to review');
+    $this->drupalGet('/cart');
+    $this->submitForm([], 'Remove');
+    $this->submitForm([], 'Checkout');
+    $this->assertSession()->elementContains('css', 'h1.page-title', 'Order information');
+    $this->assertSession()->elementNotContains('css', 'h1.page-title', 'Review');
   }
 
 }

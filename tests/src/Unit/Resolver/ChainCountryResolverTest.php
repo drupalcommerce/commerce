@@ -65,7 +65,7 @@ class ChainCountryResolverTest extends UnitTestCase {
     ];
     arsort($resolvers, SORT_NUMERIC);
     foreach ($resolvers as $id => $priority) {
-      $this->chainCountryResolver->addResolver($container->get($id), $priority);
+      $this->chainCountryResolver->addResolver($container->get($id));
     }
 
     $result = $this->chainCountryResolver->resolve();

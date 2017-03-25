@@ -50,7 +50,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
   public function testLoadFromActive() {
     $config_name = 'commerce_store.commerce_store_type.testing';
     $data = $this->configUpdater->loadFromActive($config_name);
-    $this->assertEqual($data['id'], 'testing');
+    $this->assertEquals($data['id'], 'testing');
   }
 
   /**
@@ -59,7 +59,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
   public function testLoadFromExtension() {
     $config_name = 'views.view.commerce_stores';
     $data = $this->configUpdater->loadFromExtension($config_name);
-    $this->assertEqual($data['id'], 'commerce_stores');
+    $this->assertEquals($data['id'], 'commerce_stores');
   }
 
   /**
@@ -68,7 +68,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
   public function testIsModified() {
     $config_name = 'commerce_store.commerce_store_type.testing';
     $config = $this->configUpdater->loadFromActive($config_name);
-    $this->assertFalse($this->configUpdater->isModified($config));
+    $this->assertEmpty($this->configUpdater->isModified($config));
 
     /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = \Drupal::entityTypeManager()->getStorage('commerce_store_type')->load('testing');
@@ -76,7 +76,7 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $store_type->save();
 
     $config = $this->configUpdater->loadFromActive($config_name);
-    $this->assertTrue($this->configUpdater->isModified($config));
+    $this->assertNotEmpty($this->configUpdater->isModified($config));
   }
 
   /**
@@ -90,15 +90,15 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $failed = $result->getFailed();
     $succeeded = $result->getSucceeded();
 
-    $this->assertTrue(empty($failed));
-    $this->assertEqual($succeeded[$config_name], "$config_name was successfully imported");
+    $this->assertEmpty($failed);
+    $this->assertEquals($succeeded[$config_name], "$config_name was successfully imported");
 
     $result = $this->configUpdater->import([$config_name]);
     $failed = $result->getFailed();
     $succeeded = $result->getSucceeded();
 
-    $this->assertTrue(empty($succeeded));
-    $this->assertEqual($failed[$config_name], "$config_name already exists, use revert to update");
+    $this->assertEmpty($succeeded);
+    $this->assertEquals($failed[$config_name], "$config_name already exists, use revert to update");
   }
 
   /**
@@ -115,18 +115,18 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $failed = $result->getFailed();
     $succeeded = $result->getSucceeded();
 
-    $this->assertTrue(empty($succeeded));
-    $this->assertEqual($failed[$config_name], "$config_name could not be reverted because it was modified by the user");
+    $this->assertEmpty($succeeded);
+    $this->assertEquals($failed[$config_name], "$config_name could not be reverted because it was modified by the user");
 
     $result = $this->configUpdater->revert([$config_name], FALSE);
     $succeeded = $result->getSucceeded();
 
-    $this->assertFalse(empty($succeeded));
-    $this->assertEqual($succeeded[$config_name], "$config_name was successfully reverted");
+    $this->assertNotEmpty($succeeded);
+    $this->assertEquals($succeeded[$config_name], "$config_name was successfully reverted");
 
     /** @var \Drupal\commerce_store\Entity\StoreTypeInterface $store_type */
     $store_type = \Drupal::entityTypeManager()->getStorage('commerce_store_type')->load('testing');
-    $this->assertNull($store_type->getDescription());
+    $this->assertEmpty($store_type->getDescription());
   }
 
   /**
@@ -138,8 +138,8 @@ class ConfigUpdaterTest extends CommerceKernelTestBase {
     $failed = $result->getFailed();
     $succeeded = $result->getSucceeded();
 
-    $this->assertTrue(empty($failed));
-    $this->assertEqual($succeeded[$config_name], "$config_name was successfully deleted");
+    $this->assertEmpty($failed);
+    $this->assertEquals($succeeded[$config_name], "$config_name was successfully deleted");
   }
 
 }

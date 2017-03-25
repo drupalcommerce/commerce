@@ -3,6 +3,7 @@
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\commerce_price\Price;
 
 /**
  * Provides an 'Order: Total amount comparison' condition.
@@ -51,13 +52,26 @@ class OrderTotalPrice extends PromotionConditionBase {
   /**
    * {@inheritdoc}
    */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    $values = $form_state->getValue($form['#parents']);
+    $this->configuration['amount'] = $values['amount'];
+    parent::submitConfigurationForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function evaluate() {
+    $amount = $this->configuration['amount'];
+    if (empty($amount)) {
+      return FALSE;
+    }
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $this->getTargetEntity();
     /** @var \Drupal\commerce_price\Price $total_price */
     $total_price = $order->getTotalPrice();
     /** @var \Drupal\commerce_price\Price $comparison_price */
-    $comparison_price = $this->configuration['amount'];
+    $comparison_price = new Price($amount['number'], $amount['currency_code']);
 
     switch ($this->configuration['operator']) {
       case '==':

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\commerce_promotion\FunctionalJavascript;
 
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
 
@@ -14,7 +13,6 @@ use Drupal\Tests\commerce\FunctionalJavascript\JavascriptTestTrait;
  */
 class PromotionTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
   use JavascriptTestTrait;
 
   /**
@@ -35,12 +33,51 @@ class PromotionTest extends CommerceBrowserTestBase {
 
   /**
    * Tests creating a promotion.
-   *
-   * @group create
    */
   public function testCreatePromotion() {
-    $this->createStore(NULL, NULL, 'default', TRUE);
+    $this->drupalGet('admin/commerce/promotions');
+    $this->getSession()->getPage()->clickLink('Add a new promotion');
+    $this->drupalGet('promotion/add');
 
+    // Check the integrity of the form.
+    $this->assertSession()->fieldExists('name[0][value]');
+    $name = $this->randomMachineName(8);
+    $this->getSession()->getPage()->fillField('name[0][value]', $name);
+
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][amount]', '10.0');
+
+    // Change, assert any values reset.
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][amount]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][amount]', '10.0');
+
+    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_configuration][amount][number]', '50.00');
+    $this->getSession()->getPage()->checkField('conditions[0][target_plugin_configuration][negate]');
+
+    $this->submitForm([], t('Save'));
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
+    $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
+    $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
+    $offer_field = Promotion::load(1)->get('offer')->first();
+    $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = Promotion::load(1)->get('conditions')->first();
+    $this->assertEquals('50.00', $condition_field->target_plugin_configuration['amount']['number']);
+    $this->assertEquals(TRUE, $condition_field->target_plugin_configuration['negate']);
+  }
+
+  /**
+   * Tests creating a promotion with an end date.
+   */
+  public function testCreatePromotionWithEndDate() {
     $this->drupalGet('admin/commerce/promotions');
     $this->getSession()->getPage()->clickLink('Add a new promotion');
     $this->drupalGet('promotion/add');
@@ -62,8 +99,12 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
 
+    // Set an end date.
+    $this->getSession()->getPage()->checkField('end_date[0][has_value]');
+    $edit['end_date[0][value][date]'] = date("Y") + 1 . '-01-01';
+
     $this->submitForm($edit, t('Save'));
-    $this->assertSession()->pageTextContains("The promotion $name has been successfully saved.");
+    $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
 
@@ -76,8 +117,6 @@ class PromotionTest extends CommerceBrowserTestBase {
    * Tests editing a promotion.
    */
   public function testEditPromotion() {
-    $this->createStore(NULL, NULL, 'default', TRUE);
-
     $promotion = $this->createEntity('commerce_promotion', [
       'name' => $this->randomMachineName(8),
       'status' => TRUE,
@@ -124,7 +163,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_exists = (bool) Promotion::load($promotion->id());
-    $this->assertFalse($promotion_exists, 'The new promotion has been deleted from the database using UI.');
+    $this->assertEmpty($promotion_exists, 'The new promotion has been deleted from the database using UI.');
   }
 
 }

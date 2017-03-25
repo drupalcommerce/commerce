@@ -44,7 +44,7 @@ trait JavascriptTestTrait {
   protected function assertJsCondition($condition, $timeout = 1000, $message = '') {
     $message = $message ?: "Javascript condition met:\n" . $condition;
     $result = $this->getSession()->getDriver()->wait($timeout, $condition);
-    $this->assertTrue($result, $message);
+    $this->assertNotEmpty($result, $message);
   }
 
   /**

@@ -31,13 +31,6 @@ class CompletionMessage extends CheckoutPaneBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationSummary() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['message'] = [

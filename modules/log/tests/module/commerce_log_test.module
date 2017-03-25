@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Test module for Log.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function commerce_log_test_entity_test_insert(EntityInterface $entity) {
+  /** @var \Drupal\commerce_log\LogStorageInterface $log_storage */
+  $log_storage = \Drupal::entityTypeManager()->getStorage('commerce_log');
+  $params = [
+    'entity_label' => $entity->label(),
+  ];
+  $log = $log_storage->generate($entity, 'entity_test_created', $params);
+  $log->save();
+}

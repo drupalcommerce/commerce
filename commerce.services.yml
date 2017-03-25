@@ -3,6 +3,10 @@ services:
     class: Drupal\commerce\BundlePluginInstaller
     arguments: ['@entity_type.manager', '@entity_bundle.listener', '@field_storage_definition.listener', '@field_definition.listener']
 
+  commerce.configurable_field_manager:
+    class: Drupal\commerce\ConfigurableFieldManager
+    arguments: ['@entity_type.manager']
+
   commerce.credentials_check_flood:
     class: Drupal\commerce\CredentialsCheckFlood
     arguments: ['@flood', '@entity_type.manager', '@config.factory']
@@ -55,3 +59,7 @@ services:
     arguments: ['@commerce.current_country']
     tags:
       - { name: cache.context}
+
+  plugin.manager.commerce_entity_trait:
+    class: Drupal\commerce\EntityTraitManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@commerce.configurable_field_manager']

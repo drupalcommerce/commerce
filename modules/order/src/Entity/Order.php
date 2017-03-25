@@ -40,7 +40,7 @@ use Drupal\profile\Entity\ProfileInterface;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "route_provider" = {
- *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *       "default" = "Drupal\commerce_order\OrderRouteProvider",
  *       "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
@@ -298,6 +298,48 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function collectAdjustments() {
+    $adjustments = [];
+    foreach ($this->getItems() as $order_item) {
+      foreach ($order_item->getAdjustments() as $adjustment) {
+        // Order item adjustments apply to the unit price, they
+        // must be multiplied by quantity before they are used.
+        $multiplied_adjustment = new Adjustment([
+          'type' => $adjustment->getType(),
+          'label' => $adjustment->getLabel(),
+          'source_id' => $adjustment->getSourceId(),
+          'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+        ]);
+        $adjustments[] = $multiplied_adjustment;
+      }
+    }
+    foreach ($this->getAdjustments() as $adjustment) {
+      $adjustments[] = $adjustment;
+    }
+
+    return $adjustments;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubtotalPrice() {
+    $currency_code = $this->getOrderCurrencyCode();
+    if (!$currency_code) {
+      // The order object is not complete enough to have a subtotal price yet.
+      return;
+    }
+
+    $subtotal_price = new Price('0', $currency_code);
+    foreach ($this->getItems() as $order_item) {
+      $subtotal_price = $subtotal_price->add($order_item->getTotalPrice());
+    }
+    return $subtotal_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTotalPrice() {
     if (!$this->get('total_price')->isEmpty()) {
       return $this->get('total_price')->first()->toPrice();
@@ -425,55 +467,53 @@ class Order extends ContentEntityBase implements OrderInterface {
    * Recalculates the order item total price.
    */
   protected function recalculateTotalPrice() {
-    $total_price = $this->getTotalPrice();
-    if ($total_price) {
-      $currency_code = $total_price->getCurrencyCode();
-    }
-    else {
-      $currency_code = $this->initializeCurrencyCode();
-      if (!$currency_code) {
-        // The order object is not complete enough to have a total price yet.
-        return;
-      }
+    $currency_code = $this->getOrderCurrencyCode();
+    if (!$currency_code) {
+      // The order object is not complete enough to have a total price yet.
+      return;
     }
 
     $total_price = new Price('0', $currency_code);
     foreach ($this->getItems() as $order_item) {
       $total_price = $total_price->add($order_item->getTotalPrice());
-      foreach ($order_item->getAdjustments() as $adjustment) {
-        $adjustment_total = $adjustment->getAmount()->multiply($order_item->getQuantity());
-        $total_price = $total_price->add($adjustment_total);
-      }
     }
-    foreach ($this->getAdjustments() as $adjustment) {
+    foreach ($this->collectAdjustments() as $adjustment) {
       $total_price = $total_price->add($adjustment->getAmount());
     }
     $this->total_price = $total_price;
   }
 
   /**
-   * Initializes the order currency code.
+   * Gets the order's currency code.
    *
-   * Takes the currency of the first order item if found.
-   * Otherwise it falls back to the store's default currency.
+   * Priority:
+   * 1) Total price currency.
+   * 2) First order item currency.
+   * 3) Store's default currency.
    *
    * @return string|null
    *   The currency code, or NULL if the order is in an incomplete state
    *   (no order items, no store).
    */
-  protected function initializeCurrencyCode() {
-    if ($this->hasItems()) {
+  protected function getOrderCurrencyCode() {
+    $currency_code = NULL;
+    if ($total_price = $this->getTotalPrice()) {
+      $currency_code = $total_price->getCurrencyCode();
+    }
+    elseif ($this->hasItems()) {
       $order_items = $this->getItems();
       $first_order_item = reset($order_items);
       /** @var \Drupal\commerce_price\Price $unit_price */
       $unit_price = $first_order_item->getUnitPrice();
       if ($unit_price) {
-        return $unit_price->getCurrencyCode();
+        $currency_code = $unit_price->getCurrencyCode();
       }
     }
-    if ($store = $this->getStore()) {
-      return $store->getDefaultCurrencyCode();
+    elseif ($store = $this->getStore()) {
+      $currency_code = $store->getDefaultCurrencyCode();
     }
+
+    return $currency_code;
   }
 
   /**
@@ -481,14 +521,6 @@ class Order extends ContentEntityBase implements OrderInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-
-    // If no order number has been set explicitly, set it to the order ID.
-    if (!$this->getOrderNumber()) {
-      $this->setOrderNumber($this->id());
-      // Order was refreshed in the save that just occurred, don't repeat it.
-      $this->setRefreshState(self::REFRESH_SKIP);
-      $this->save();
-    }
 
     // Ensure there's a back-reference on each order item.
     foreach ($this->getItems() as $order_item) {
@@ -545,8 +577,8 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Owner'))
-      ->setDescription(t('The order owner.'))
+      ->setLabel(t('Customer'))
+      ->setDescription(t('The customer.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       ->setDefaultValueCallback('Drupal\commerce_order\Entity\Order::getCurrentUserId')
@@ -590,14 +622,14 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['billing_profile'] = BaseFieldDefinition::create('entity_reference_revisions')
-      ->setLabel(t('Billing profile'))
+      ->setLabel(t('Billing information'))
       ->setDescription(t('Billing profile'))
       ->setSetting('target_type', 'profile')
       ->setSetting('handler', 'default')
       ->setSetting('handler_settings', ['target_bundles' => ['customer']])
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'options_select',
+        'type' => 'commerce_billing_profile',
         'weight' => 0,
         'settings' => [],
       ])
@@ -612,13 +644,18 @@ class Order extends ContentEntityBase implements OrderInterface {
         'type' => 'commerce_adjustment_default',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', FALSE);
 
     $fields['total_price'] = BaseFieldDefinition::create('commerce_price')
       ->setLabel(t('Total price'))
       ->setDescription(t('The total price of the order.'))
       ->setReadOnly(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'commerce_order_total_summary',
+        'weight' => 0,
+      ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -646,7 +683,8 @@ class Order extends ContentEntityBase implements OrderInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time when the order was last edited.'));
+      ->setDescription(t('The time when the order was last edited.'))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['placed'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Placed'))

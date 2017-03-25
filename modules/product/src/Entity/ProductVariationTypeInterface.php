@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_product\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\commerce\Entity\CommerceBundleEntityInterface;
 
 /**
  * Defines the interface for product variation types.
  */
-interface ProductVariationTypeInterface extends ConfigEntityInterface {
+interface ProductVariationTypeInterface extends CommerceBundleEntityInterface {
 
   /**
    * Gets the product variation type's order item type ID.

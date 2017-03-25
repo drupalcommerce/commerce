@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_order\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\commerce\Entity\CommerceBundleEntityBase;
 
 /**
  * Defines the order type entity class.
@@ -39,8 +39,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "workflow",
+ *     "traits",
  *     "refresh_mode",
- *     "refresh_frequency"
+ *     "refresh_frequency",
+ *     "sendReceipt",
+ *     "receiptBcc",
  *   },
  *   links = {
  *     "add-form" = "/admin/commerce/config/order-types/add",
@@ -50,21 +53,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
-
-  /**
-   * The order type ID.
-   *
-   * @var string
-   */
-  protected $id;
-
-  /**
-   * The order type label.
-   *
-   * @var string
-   */
-  protected $label;
+class OrderType extends CommerceBundleEntityBase implements OrderTypeInterface {
 
   /**
    * The order type workflow ID.
@@ -86,6 +75,20 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    * @var int
    */
   protected $refresh_frequency;
+
+  /**
+   * Whether to email the customer a receipt when an order is placed.
+   *
+   * @var bool
+   */
+  protected $sendReceipt;
+
+  /**
+   * The receipt BCC email.
+   *
+   * @var bool
+   */
+  protected $receiptBcc;
 
   /**
    * {@inheritdoc}
@@ -130,6 +133,36 @@ class OrderType extends ConfigEntityBundleBase implements OrderTypeInterface {
    */
   public function setRefreshFrequency($refresh_frequency) {
     $this->refresh_frequency = $refresh_frequency;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldSendReceipt() {
+    return $this->sendReceipt;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSendReceipt($send_receipt) {
+    $this->sendReceipt = (bool) $send_receipt;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getReceiptBcc() {
+    return $this->receiptBcc;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setReceiptBcc($receipt_bcc) {
+    $this->receiptBcc = $receipt_bcc;
     return $this;
   }
 

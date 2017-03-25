@@ -107,6 +107,33 @@ interface OrderItemInterface extends ContentEntityInterface, EntityAdjustableInt
   public function getTotalPrice();
 
   /**
+   * Gets an order item data value with the given key.
+   *
+   * Used to store temporary data during order processing (i.e. checkout).
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $default
+   *   The default value.
+   *
+   * @return mixed
+   *   The value.
+   */
+  public function getData($key, $default = NULL);
+
+  /**
+   * Sets an order item data value with the given key.
+   *
+   * @param string $key
+   *   The key.
+   * @param mixed $value
+   *   The value.
+   *
+   * @return $this
+   */
+  public function setData($key, $value);
+
+  /**
    * Gets the order item creation timestamp.
    *
    * @return int

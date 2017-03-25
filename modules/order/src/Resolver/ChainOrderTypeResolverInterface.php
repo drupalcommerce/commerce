@@ -15,10 +15,8 @@ interface ChainOrderTypeResolverInterface extends OrderTypeResolverInterface {
    *
    * @param \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $resolver
    *   The resolver.
-   * @param int $priority
-   *   The priority.
    */
-  public function addResolver(OrderTypeResolverInterface $resolver, $priority);
+  public function addResolver(OrderTypeResolverInterface $resolver);
 
   /**
    * Gets all added resolvers.

@@ -221,7 +221,34 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function hasItem(OrderItemInterface $order_item);
 
   /**
+   * Collects all adjustments that belong to the order.
+   *
+   * Unlike getAdjustments() which returns only order adjustments,
+   * this method returns both order and order item adjustments.
+   *
+   * Important:
+   * The returned order item adjustments are multiplied by quantity,
+   * so that they can be safely added to the order adjustments.
+   *
+   * @return \Drupal\commerce_order\Adjustment[]
+   *   The adjustments.
+   */
+  public function collectAdjustments();
+
+  /**
+   * Gets the order subtotal price.
+   *
+   * Represents a sum of all order item totals.
+   *
+   * @return \Drupal\commerce_price\Price|null
+   *   The order subtotal price, or NULL.
+   */
+  public function getSubtotalPrice();
+
+  /**
    * Gets the order total price.
+   *
+   * Represents a sum of all order item totals along with adjustments.
    *
    * @return \Drupal\commerce_price\Price|null
    *   The order total price, or NULL.
@@ -267,8 +294,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @param mixed $default
    *   The default value.
    *
-   * @return array
-   *   The order data.
+   * @return mixed
+   *   The value.
    */
   public function getData($key, $default = NULL);
 

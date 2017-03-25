@@ -6,6 +6,7 @@ use Drupal\commerce_checkout\CheckoutPaneManager;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -91,7 +92,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
         ];
       }
       // Sort the panes and flatten the array.
-      uasort($this->panes, ['\Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+      uasort($this->panes, [SortArray::class, 'sortByWeightElement']);
       $this->panes = array_map(function ($pane_data) {
         return $pane_data['pane'];
       }, $this->panes);
@@ -106,6 +107,14 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
     }
 
     return $panes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPane($pane_id) {
+    $panes = $this->getPanes();
+    return isset($panes[$pane_id]) ? $panes[$pane_id] : NULL;
   }
 
   /**
@@ -426,7 +435,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The complete form state.
    */
-  public static function validatePaneConfigurationForm(&$pane_configuration_form, FormStateInterface $form_state) {
+  public static function validatePaneConfigurationForm(array &$pane_configuration_form, FormStateInterface $form_state) {
     $pane_id = $pane_configuration_form['#pane_id'];
     /** @var \Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface[] $panes */
     $panes = $form_state->get('panes');
@@ -443,7 +452,7 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The complete form state.
    */
-  public static function multistepSubmit($form, FormStateInterface $form_state) {
+  public static function multistepSubmit(array $form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
     switch ($triggering_element['#op']) {
       case 'edit':
@@ -521,18 +530,19 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildForm($form, $form_state);
+  public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
+    $form = parent::buildForm($form, $form_state, $step_id);
 
-    $panes = $this->getPanes($this->stepId);
+    $panes = $this->getPanes($step_id);
     foreach ($panes as $pane_id => $pane) {
-      $form[$pane_id] = [
-        '#parents' => [$pane_id],
-        '#type' => $pane->getWrapperElement(),
-        '#title' => $pane->getLabel(),
-        '#access' => $pane->isVisible(),
-      ];
-      $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+      if ($pane->isVisible()) {
+        $form[$pane_id] = [
+          '#parents' => [$pane_id],
+          '#type' => $pane->getWrapperElement(),
+          '#title' => $pane->getLabel(),
+        ];
+        $form[$pane_id] = $pane->buildPaneForm($form[$pane_id], $form_state, $form);
+      }
     }
 
     return $form;
@@ -544,9 +554,11 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    $panes = $this->getPanes($this->stepId);
+    $panes = $this->getPanes($form['#step_id']);
     foreach ($panes as $pane_id => $pane) {
-      $pane->validatePaneForm($form[$pane_id], $form_state, $form);
+      if ($pane->isVisible()) {
+        $pane->validatePaneForm($form[$pane_id], $form_state, $form);
+      }
     }
   }
 
@@ -554,9 +566,11 @@ abstract class CheckoutFlowWithPanesBase extends CheckoutFlowBase implements Che
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $panes = $this->getPanes($this->stepId);
+    $panes = $this->getPanes($form['#step_id']);
     foreach ($panes as $pane_id => $pane) {
-      $pane->submitPaneForm($form[$pane_id], $form_state, $form);
+      if ($pane->isVisible()) {
+        $pane->submitPaneForm($form[$pane_id], $form_state, $form);
+      }
     }
 
     parent::submitForm($form, $form_state);

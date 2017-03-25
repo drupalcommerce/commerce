@@ -14,10 +14,8 @@ interface OrderRefreshInterface {
    *
    * @param \Drupal\commerce_order\OrderProcessorInterface $processor
    *   The order processor.
-   * @param int $priority
-   *   The processor's priority.
    */
-  public function addProcessor(OrderProcessorInterface $processor, $priority);
+  public function addProcessor(OrderProcessorInterface $processor);
 
   /**
    * Checks whether the order should be refreshed.

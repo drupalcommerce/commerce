@@ -1,0 +1,9 @@
+name: Commerce Order Test
+type: module
+description: Contains various non-specific things needed in order tests.
+package: Testing
+core: 8.x
+dependencies:
+  - commerce_store
+  - commerce_product
+  - commerce_order

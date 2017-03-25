@@ -2,12 +2,15 @@
 
 namespace Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow;
 
+use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -41,13 +44,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   protected $order;
 
   /**
-   * The current step ID.
-   *
-   * @var string
-   */
-  protected $stepId;
-
-  /**
    * Constructs a new CheckoutFlowBase object.
    *
    * @param array $configuration
@@ -70,12 +66,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->order = $route_match->getParameter('commerce_order');
-    // The order is empty when the checkout flow is initialized outside of the
-    // checkout form (usually in the checkout flow admin UI). There's no need
-    // to determine the current step ID in that case, it won't be used.
-    if ($this->order) {
-      $this->stepId = $this->processStepId($route_match->getParameter('step'));
-    }
   }
 
   /**
@@ -93,29 +83,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
-   * Processes the requested step ID.
-   *
-   * @param string $requested_step_id
-   *   The step ID.
-   *
-   * @return string
-   *   The processed step ID.
-   */
-  protected function processStepId($requested_step_id) {
-    $step_ids = array_keys($this->getVisibleSteps());
-    $step_id = $requested_step_id;
-    if (empty($step_id) || !in_array($step_id, $step_ids)) {
-      // Take the step ID from the order, or default to the first one.
-      $step_id = $this->order->checkout_step->value;
-      if (empty($step_id)) {
-        $step_id = reset($step_ids);
-      }
-    }
-
-    return $step_id;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getOrder() {
@@ -125,26 +92,35 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
-  public function getStepId() {
-    return $this->stepId;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getPreviousStepId() {
+  public function getPreviousStepId($step_id) {
     $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
+    $current_index = array_search($step_id, $step_ids);
     return isset($step_ids[$current_index - 1]) ? $step_ids[$current_index - 1] : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getNextStepId() {
+  public function getNextStepId($step_id) {
     $step_ids = array_keys($this->getVisibleSteps());
-    $current_index = array_search($this->stepId, $step_ids);
+    $current_index = array_search($step_id, $step_ids);
     return isset($step_ids[$current_index + 1]) ? $step_ids[$current_index + 1] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function redirectToStep($step_id) {
+    $this->order->set('checkout_step', $step_id);
+    if ($step_id == 'complete') {
+      $transition = $this->order->getState()->getWorkflow()->getTransition('place');
+      $this->order->getState()->applyTransition($transition);
+    }
+    $this->order->save();
+    throw new NeedsRedirectException(Url::fromRoute('commerce_checkout.form', [
+      'commerce_order' => $this->order->id(),
+      'step' => $step_id,
+    ])->toString());
   }
 
   /**
@@ -154,9 +130,9 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     // Each checkout flow plugin defines its own steps.
     // These two steps are always expected to be present.
     return [
-      'offsite_payment' => [
+      'payment' => [
         'label' => $this->t('Payment'),
-        'next_label' => $this->t('Continue to payment'),
+        'next_label' => $this->t('Pay and complete purchase'),
         'has_order_summary' => FALSE,
       ],
       'complete' => [
@@ -173,24 +149,6 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function getVisibleSteps() {
     // All steps are visible by default.
     return $this->getSteps();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildOrderSummary(array $form, FormStateInterface $form_state) {
-    $order_summary = [];
-    if (!empty($this->configuration['order_summary_view'])) {
-      $order_summary = [
-        '#type' => 'view',
-        '#name' => $this->configuration['order_summary_view'],
-        '#display_id' => 'default',
-        '#arguments' => [$this->order->id()],
-        '#embed' => TRUE,
-      ];
-    }
-
-    return $order_summary;
   }
 
   /**
@@ -273,20 +231,34 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
-    return $this->pluginId;
+  public function getBaseFormId() {
+    return 'commerce_checkout_flow';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function getFormId() {
+    return 'commerce_checkout_flow_' . $this->pluginId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state, $step_id = NULL) {
+    // The $step_id argument is optional only because PHP disallows adding
+    // required arguments to an existing interface's method.
+    if (empty($step_id)) {
+      throw new \InvalidArgumentException('The $step_id cannot be empty.');
+    }
+
     $steps = $this->getVisibleSteps();
     $form['#tree'] = TRUE;
-    $form['#title'] = $steps[$this->stepId]['label'];
+    $form['#step_id'] = $step_id;
+    $form['#title'] = $steps[$step_id]['label'];
     $form['#theme'] = ['commerce_checkout_form'];
     $form['#attached']['library'][] = 'commerce_checkout/form';
-    if ($steps[$this->stepId]['has_order_summary']) {
+    if ($steps[$step_id]['has_order_summary']) {
       if ($order_summary = $this->buildOrderSummary($form, $form_state)) {
         $form['order_summary'] = $order_summary;
       }
@@ -305,8 +277,8 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($next_step_id = $this->getNextStepId()) {
-      $this->order->checkout_step = $next_step_id;
+    if ($next_step_id = $this->getNextStepId($form['#step_id'])) {
+      $this->order->set('checkout_step', $next_step_id);
       $form_state->setRedirect('commerce_checkout.form', [
         'commerce_order' => $this->order->id(),
         'step' => $next_step_id,
@@ -323,17 +295,29 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the order summary for the current checkout step.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The form structure.
    */
-  public function previousForm(array &$form, FormStateInterface $form_state) {
-    $previous_step_id = $this->getPreviousStepId();
-    $this->order->checkout_step = $previous_step_id;
-    $this->order->save();
+  protected function buildOrderSummary(array $form, FormStateInterface $form_state) {
+    $order_summary = [];
+    if (!empty($this->configuration['order_summary_view'])) {
+      $order_summary = [
+        '#type' => 'view',
+        '#name' => $this->configuration['order_summary_view'],
+        '#display_id' => 'default',
+        '#arguments' => [$this->order->id()],
+        '#embed' => TRUE,
+      ];
+    }
 
-    $form_state->setRedirect('commerce_checkout.form', [
-      'commerce_order' => $this->order->id(),
-      'step' => $previous_step_id,
-    ]);
+    return $order_summary;
   }
 
   /**
@@ -348,34 +332,30 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
    *   The actions element.
    */
   protected function actions(array $form, FormStateInterface $form_state) {
+    $steps = $this->getVisibleSteps();
+    $next_step_id = $this->getNextStepId($form['#step_id']);
+    $previous_step_id = $this->getPreviousStepId($form['#step_id']);
+    $has_next_step = $next_step_id && isset($steps[$next_step_id]['next_label']);
+    $has_previous_step = $previous_step_id && isset($steps[$previous_step_id]['previous_label']);
+
     $actions = [
       '#type' => 'actions',
+      '#access' => $has_next_step,
     ];
-    $steps = $this->getVisibleSteps();
-    $previous_step_id = $this->getPreviousStepId();
-    if ($previous_step_id && isset($steps[$previous_step_id]['previous_label'])) {
-      $actions['previous'] = [
-        '#type' => 'submit',
-        '#value' => $steps[$previous_step_id]['previous_label'],
-        '#submit' => [
-          '::previousForm',
-        ],
-      ];
-    }
-    $next_step_id = $this->getNextStepId();
-    if ($next_step_id && isset($steps[$next_step_id]['next_label'])) {
+    if ($has_next_step) {
       $actions['next'] = [
         '#type' => 'submit',
         '#value' => $steps[$next_step_id]['next_label'],
         '#button_type' => 'primary',
         '#submit' => ['::submitForm'],
       ];
-    }
-    // Hide the actions element if it has no buttons.
-    $actions['#access'] = isset($actions['previous']) || isset($actions['next']);
-    // Once these two steps are reached, the user can't go back.
-    if (in_array($this->stepId, ['offsite_payment', 'complete'])) {
-      $actions['#access'] = FALSE;
+      if ($has_previous_step) {
+        $label = $steps[$previous_step_id]['previous_label'];
+        $actions['next']['#suffix'] = Link::createFromRoute($label, 'commerce_checkout.form', [
+          'commerce_order' => $this->order->id(),
+          'step' => $previous_step_id,
+        ])->toString();
+      }
     }
 
     return $actions;

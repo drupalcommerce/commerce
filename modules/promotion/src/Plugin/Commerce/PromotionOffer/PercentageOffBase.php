@@ -35,15 +35,14 @@ abstract class PercentageOffBase extends PromotionOfferBase {
     $form += parent::buildConfigurationForm($form, $form_state);
 
     $form['amount'] = [
-      '#type' => 'number',
+      '#type' => 'commerce_number',
       '#title' => $this->t('Percentage'),
       '#default_value' => $this->configuration['amount'] * 100,
       '#maxlength' => 255,
       '#required' => TRUE,
-      '#step' => 0.1,
       '#min' => 0,
       '#max' => 100,
-      '#length' => 4,
+      '#size' => 4,
       '#field_suffix' => t('%'),
     ];
 
@@ -55,7 +54,7 @@ abstract class PercentageOffBase extends PromotionOfferBase {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue($form['#parents']);
-    if (empty($values['target_plugin_configuration']['amount'])) {
+    if (empty($values['amount'])) {
       $form_state->setError($form, $this->t('Percentage amount cannot be empty.'));
     }
   }

@@ -3,6 +3,8 @@
 namespace Drupal\Tests\commerce_order\Functional;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_price\Price;
 
 /**
  * Tests normal user operations with orders.
@@ -38,12 +40,21 @@ class OrderUserTest extends OrderBrowserTestBase {
   public function testViewOrder() {
     $uid = $this->loggedInUser->id();
 
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 2,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = Order::create([
       'type' => 'default',
       'state' => 'completed',
       'uid' => $uid,
+      'order_items' => [$order_item],
       'mail' => 'testViewOrder@example.com',
+      'order_number' => '1',
     ]);
     $order->save();
 

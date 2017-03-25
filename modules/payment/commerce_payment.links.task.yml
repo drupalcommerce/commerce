@@ -1,6 +1,6 @@
 entity.commerce_payment.collection:
   route_name: entity.commerce_payment.collection
-  base_route: entity.commerce_order.edit_form
+  base_route: entity.commerce_order.canonical
   title: Payments
 
 entity.commerce_payment_gateway.edit_form:

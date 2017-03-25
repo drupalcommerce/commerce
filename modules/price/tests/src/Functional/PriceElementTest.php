@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce_price\Functional;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -36,7 +35,7 @@ class PriceElementTest extends CommerceBrowserTestBase {
       'amount[number]' => 'invalid',
     ];
     $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains('Amount is not numeric.');
+    $this->assertSession()->pageTextContains('Amount must be a number.');
 
     // Valid submit.
     $edit = [
@@ -51,6 +50,7 @@ class PriceElementTest extends CommerceBrowserTestBase {
    */
   public function testMultipleCurrency() {
     $this->container->get('commerce_price.currency_importer')->import('EUR');
+    $this->container->get('commerce_price.currency_importer')->import('CHF');
 
     $this->drupalGet('/commerce_price_test/price_test_form');
     $this->assertSession()->fieldExists('amount[number]');
@@ -59,7 +59,9 @@ class PriceElementTest extends CommerceBrowserTestBase {
     $this->assertSession()->fieldValueEquals('amount[number]', '99.99');
     $this->assertSession()->optionExists('amount[currency_code]', 'EUR');
     $element = $this->assertSession()->optionExists('amount[currency_code]', 'USD');
-    $this->assertTrue($element->isSelected());
+    $this->assertNotEmpty($element->isSelected());
+    // CHF is not in #availabe_currencies so it must not be present.
+    $this->assertSession()->optionNotExists('amount[currency_code]', 'CHF');
 
     // Invalid submit.
     $edit = [
@@ -67,7 +69,7 @@ class PriceElementTest extends CommerceBrowserTestBase {
       'amount[currency_code]' => 'USD',
     ];
     $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains('Amount is not numeric.');
+    $this->assertSession()->pageTextContains('Amount must be a number.');
 
     // Valid submit.
     $edit = [
@@ -76,27 +78,6 @@ class PriceElementTest extends CommerceBrowserTestBase {
     ];
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->pageTextContains('The number is "10.99" and the currency code is "EUR".');
-  }
-
-  /**
-   * Tests the element with a non-English number format.
-   */
-  public function testLocalFormat() {
-    // French uses a comma as a decimal separator.
-    ConfigurableLanguage::createFromLangcode('fr')->save();
-    $this->config('system.site')->set('default_langcode', 'fr')->save();
-
-    $this->drupalGet('/commerce_price_test/price_test_form');
-    $this->assertSession()->fieldExists('amount[number]');
-    // Default value.
-    $this->assertSession()->fieldValueEquals('amount[number]', '99,99');
-
-    // Valid submit.
-    $edit = [
-      'amount[number]' => '10,99',
-    ];
-    $this->submitForm($edit, 'Submit');
-    $this->assertSession()->pageTextContains('The number is "10.99" and the currency code is "USD".');
   }
 
 }

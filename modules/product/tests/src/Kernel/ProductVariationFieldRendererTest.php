@@ -149,9 +149,9 @@ class ProductVariationFieldRendererTest extends CommerceKernelTestBase {
     $product_display->save();
 
     $rendered_fields = $this->variationFieldRenderer->renderFields($variation);
-    $this->assertFalse(isset($rendered_fields['status']), 'Variation status field was not rendered');
-    $this->assertTrue(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
-    $this->assertTrue(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
+    $this->assertEmpty(isset($rendered_fields['status']), 'Variation status field was not rendered');
+    $this->assertNotEmpty(isset($rendered_fields['sku']), 'Variation SKU field was rendered');
+    $this->assertNotEmpty(isset($rendered_fields['attribute_color']), 'Variation atrribute color field was rendered');
     $this->assertEquals('product--variation-field--variation_sku__' . $variation->getProductId(), $rendered_fields['sku']['#ajax_replace_class']);
     $this->assertEquals('product--variation-field--variation_attribute_color__' . $variation->getProductId(), $rendered_fields['attribute_color']['#ajax_replace_class']);
 

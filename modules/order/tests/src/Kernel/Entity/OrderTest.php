@@ -7,7 +7,6 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
-use Drupal\commerce_store\Entity\Store;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -90,7 +89,9 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::getAdjustments
    * @covers ::setAdjustments
    * @covers ::addAdjustment
+   * @covers ::collectAdjustments
    * @covers ::recalculateTotalPrice
+   * @covers ::getSubtotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
    * @covers ::getRefreshState
@@ -165,14 +166,14 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setItems([$order_item, $another_order_item]);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItems());
+    $this->assertNotEmpty($order->hasItems());
     $order->removeItem($another_order_item);
     $this->assertEquals([$order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($order_item));
-    $this->assertFalse($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($order_item));
+    $this->assertEmpty($order->hasItem($another_order_item));
     $order->addItem($another_order_item);
     $this->assertEquals([$order_item, $another_order_item], $order->getItems());
-    $this->assertTrue($order->hasItem($another_order_item));
+    $this->assertNotEmpty($order->hasItem($another_order_item));
 
     $this->assertEquals(new Price('8.00', 'USD'), $order->getTotalPrice());
     $adjustments = [];
@@ -190,7 +191,11 @@ class OrderTest extends CommerceKernelTestBase {
     $order->addAdjustment($adjustments[1]);
     $adjustments = $order->getAdjustments();
     $this->assertEquals($adjustments, $order->getAdjustments());
+    $collected_adjustments = $order->collectAdjustments();
+    $this->assertEquals($adjustments[0]->getAmount(), $collected_adjustments[0]->getAmount());
+    $this->assertEquals($adjustments[1]->getAmount(), $collected_adjustments[1]->getAmount());
     $order->removeAdjustment($adjustments[0]);
+    $this->assertEquals(new Price('8.00', 'USD'), $order->getSubtotalPrice());
     $this->assertEquals(new Price('18.00', 'USD'), $order->getTotalPrice());
     $this->assertEquals([$adjustments[1]], $order->getAdjustments());
     $order->setAdjustments($adjustments);
@@ -206,6 +211,8 @@ class OrderTest extends CommerceKernelTestBase {
     ]));
     $order->addItem($another_order_item);
     $this->assertEquals(new Price('27.00', 'USD'), $order->getTotalPrice());
+    $collected_adjustments = $order->collectAdjustments();
+    $this->assertEquals(new Price('10.00', 'USD'), $collected_adjustments[2]->getAmount());
 
     $this->assertEquals('completed', $order->getState()->value);
 

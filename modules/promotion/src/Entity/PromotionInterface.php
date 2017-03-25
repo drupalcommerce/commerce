@@ -4,12 +4,13 @@ namespace Drupal\commerce_promotion\Entity;
 
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the interface for promotions.
  */
-interface PromotionInterface extends EntityInterface, EntityStoresInterface {
+interface PromotionInterface extends ContentEntityInterface, EntityStoresInterface {
 
   /**
    * Gets the promotion name.
@@ -33,7 +34,7 @@ interface PromotionInterface extends EntityInterface, EntityStoresInterface {
    * Gets the promotion description.
    *
    * @return string
-   *    The promotion description.
+   *   The promotion description.
    */
   public function getDescription();
 
@@ -82,6 +83,71 @@ interface PromotionInterface extends EntityInterface, EntityStoresInterface {
    * @return $this
    */
   public function setOrderTypeIds(array $order_type_ids);
+
+  /**
+   * Gets the coupon IDs.
+   *
+   * @return int[]
+   *   The coupon IDs.
+   */
+  public function getCouponIds();
+
+  /**
+   * Gets the coupons.
+   *
+   * @return \Drupal\commerce_promotion\Entity\CouponInterface[]
+   *   The coupons.
+   */
+  public function getCoupons();
+
+  /**
+   * Sets the coupons.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface[] $coupons
+   *   The coupons.
+   *
+   * @return $this
+   */
+  public function setCoupons(array $coupons);
+
+  /**
+   * Gets whether the promotion has coupons.
+   *
+   * @return bool
+   *   TRUE if the promotion has coupons, FALSE otherwise.
+   */
+  public function hasCoupons();
+
+  /**
+   * Adds a coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return $this
+   */
+  public function addCoupon(CouponInterface $coupon);
+
+  /**
+   * Removes a coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return $this
+   */
+  public function removeCoupon(CouponInterface $coupon);
+
+  /**
+   * Checks whether the promotion has a given coupon.
+   *
+   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
+   *   The coupon.
+   *
+   * @return bool
+   *   TRUE if the coupon was found, FALSE otherwise.
+   */
+  public function hasCoupon(CouponInterface $coupon);
 
   /**
    * Gets the promotion current usage.

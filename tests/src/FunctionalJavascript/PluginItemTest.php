@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\commerce\FunctionalJavascript;
 
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\field\Entity\FieldConfig;
@@ -18,7 +17,13 @@ use Drupal\user\Entity\Role;
 class PluginItemTest extends CommerceBrowserTestBase {
 
   use JavascriptTestTrait;
-  use StoreCreationTrait;
+
+  /**
+   * The entity_test storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $entityTestStorage;
 
   /**
    * Modules to enable.
@@ -60,45 +65,129 @@ class PluginItemTest extends CommerceBrowserTestBase {
     ]);
     $field->save();
 
+    $this->entityTestStorage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+  }
+
+  /**
+   * Tests the plugin_select element, as select widget.
+   */
+  public function testPluginSelectSelectField() {
     $display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
     $display->setComponent('test_conditions', [
       'type' => 'commerce_plugin_select',
     ])->save();
-  }
 
-  /**
-   * Tests the plugin select field.
-   */
-  public function testPluginSelectField() {
     // Add the field.
     $entity = $this->createEntity('entity_test', [
       'name' => 'Test',
     ]);
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'commerce_test_user_role');
-    $this->getSession()->wait(4000);
+    $this->waitForAjaxToFinish();
+
     $this->submitForm([
       'test_conditions[0][target_plugin_configuration][roles][test_role]' => 1,
       'test_conditions[0][target_plugin_configuration][negate]' => 0,
     ], 'Save');
     $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
 
-    \Drupal::entityTypeManager()->getStorage('entity_test')->resetCache();
-    $entity = \Drupal::entityTypeManager()->getStorage('entity_test')->load($entity->id());
+    $this->entityTestStorage->resetCache([$entity->id()]);
+    $entity = $this->entityTestStorage->load($entity->id());
 
     $test_user1 = $this->createEntity('user', [
       'name' => 'Test user 1',
       'status' => TRUE,
       'roles' => ['test_role'],
     ]);
+    $user1_context = new Context(new ContextDefinition('entity:user'), $test_user1);
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
     $condition_field = $entity->test_conditions->first();
     $this->assertNotNull($condition_field);
 
-    // Executes and returns TRUE that user1 has role.
+    /** @var \Drupal\Core\Condition\ConditionInterface $plugin */
+    $plugin = $condition_field->getTargetInstance(['user' => $user1_context]);
+    $this->assertFalse($plugin->isNegated());
+    $this->assertTrue($plugin->execute());
+
+    // Set the condition to be negated.
+    $this->drupalGet($entity->toUrl('edit-form'));
+    $this->submitForm([
+      'test_conditions[0][target_plugin_configuration][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][negate]' => 1,
+    ], 'Save');
+    $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
+
+    $this->entityTestStorage->resetCache([$entity->id()]);
+    $entity = $this->entityTestStorage->load($entity->id());
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = $entity->test_conditions->first();
+    /** @var \Drupal\Core\Condition\ConditionInterface $plugin */
+    $plugin = $condition_field->getTargetInstance(['user' => $user1_context]);
+
+    $this->assertTrue($plugin->isNegated());
+    $this->assertFalse($plugin->execute());
+  }
+
+  /**
+   * Tests the plugin_select element, as radio widget.
+   */
+  public function testPluginSelectRadiosField() {
+    $display = commerce_get_entity_display('entity_test', 'entity_test', 'form');
+    $display->setComponent('test_conditions', [
+      'type' => 'commerce_plugin_radios',
+    ])->save();
+
+    // Add the field.
+    $entity = $this->createEntity('entity_test', [
+      'name' => 'Test',
+    ]);
+    $this->drupalGet($entity->toUrl('edit-form'));
+    $this->getSession()->getPage()->fillField('test_conditions[0][target_plugin_id]', 'commerce_test_user_role');
+    $this->waitForAjaxToFinish();
+
+    $this->submitForm([
+      'test_conditions[0][target_plugin_configuration][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][negate]' => 0,
+    ], 'Save');
+    $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
+
+    $this->entityTestStorage->resetCache([$entity->id()]);
+    $entity = $this->entityTestStorage->load($entity->id());
+
+    $test_user1 = $this->createEntity('user', [
+      'name' => 'Test user 1',
+      'status' => TRUE,
+      'roles' => ['test_role'],
+    ]);
     $user1_context = new Context(new ContextDefinition('entity:user'), $test_user1);
-    $this->assertTrue($condition_field->getTargetInstance(['user' => $user1_context])->execute());
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = $entity->test_conditions->first();
+    $this->assertNotNull($condition_field);
+
+    /** @var \Drupal\Core\Condition\ConditionInterface $plugin */
+    $plugin = $condition_field->getTargetInstance(['user' => $user1_context]);
+    $this->assertFalse($plugin->isNegated());
+    $this->assertTrue($plugin->execute());
+
+    // Set the condition to be negated.
+    $this->drupalGet($entity->toUrl('edit-form'));
+    $this->submitForm([
+      'test_conditions[0][target_plugin_configuration][roles][test_role]' => 1,
+      'test_conditions[0][target_plugin_configuration][negate]' => 1,
+    ], 'Save');
+    $this->assertSession()->pageTextContains('entity_test 1 has been updated.');
+
+    $this->entityTestStorage->resetCache([$entity->id()]);
+    $entity = $this->entityTestStorage->load($entity->id());
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = $entity->test_conditions->first();
+    /** @var \Drupal\Core\Condition\ConditionInterface $plugin */
+    $plugin = $condition_field->getTargetInstance(['user' => $user1_context]);
+
+    $this->assertTrue($plugin->isNegated());
+    $this->assertFalse($plugin->execute());
   }
 
 }

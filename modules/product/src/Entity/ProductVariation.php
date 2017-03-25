@@ -63,7 +63,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function toUrl($rel = 'canonical', array $options = []) {
-    if ($rel == 'canonical') {
+    // StringFormatter assumes 'revision' is always a valid link template.
+    if (in_array($rel, ['canonical', 'revision'])) {
       $route_name = 'entity.commerce_product.canonical';
       $route_parameters = [
         'commerce_product' => $this->getProductId(),
