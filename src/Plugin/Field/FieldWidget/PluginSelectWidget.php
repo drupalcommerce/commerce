@@ -24,13 +24,14 @@ class PluginSelectWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     list($field_type, $derivative) = explode(':', $this->fieldDefinition->getType());
+
     return [
       '#type' => 'commerce_plugin_select',
       '#plugin_type' => $derivative,
       '#categories' => $this->fieldDefinition->getSetting('categories'),
       '#default_value' => [
         'target_plugin_id' => $items[$delta]->target_plugin_id,
-        'target_plugin_configuration' => $items[$delta]->target_plugin_configuration,
+        'target_plugin_configuration' => $items[$delta]->target_plugin_configuration ?: [],
       ],
       '#required' => $this->fieldDefinition->isRequired(),
       '#title' => $this->fieldDefinition->getLabel(),

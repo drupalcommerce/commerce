@@ -41,22 +41,25 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
+    $name = $this->randomMachineName(8);
+    $this->getSession()->getPage()->fillField('name[0][value]', $name);
 
     $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][amount]', '10.0');
 
-    $name = $this->randomMachineName(8);
-    $edit = [
-      'name[0][value]' => $name,
-      'offer[0][target_plugin_configuration][amount]' => '10.0',
-    ];
+    // Change, assert any values reset.
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->waitForAjaxToFinish();
+    $this->assertSession()->fieldValueNotEquals('offer[0][target_plugin_configuration][amount]', '10.0');
+    $this->getSession()->getPage()->fillField('offer[0][target_plugin_configuration][amount]', '10.0');
 
     $this->getSession()->getPage()->fillField('conditions[0][target_plugin_id]', 'commerce_promotion_order_total_price');
-    $this->getSession()->wait(2000, "jQuery('.ajax-progress').length === 0");
+    $this->waitForAjaxToFinish();
+    $this->getSession()->getPage()->fillField('conditions[0][target_plugin_configuration][amount][number]', '50.00');
+    $this->getSession()->getPage()->checkField('conditions[0][target_plugin_configuration][negate]');
 
-    $edit['conditions[0][target_plugin_configuration][amount][number]'] = '50.00';
-
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
     $this->assertEquals(count($promotion_count), 1, 'promotions exists in the table.');
@@ -64,6 +67,11 @@ class PromotionTest extends CommerceBrowserTestBase {
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = Promotion::load(1)->get('offer')->first();
     $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition_field */
+    $condition_field = Promotion::load(1)->get('conditions')->first();
+    $this->assertEquals('50.00', $condition_field->target_plugin_configuration['amount']['number']);
+    $this->assertEquals(TRUE, $condition_field->target_plugin_configuration['negate']);
   }
 
   /**
