@@ -318,6 +318,21 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getWeight() {
+    return (int) $this->get('weight')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWeight($weight) {
+    $this->set('weight', $weight);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function applies(EntityInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
 
@@ -536,6 +551,20 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         'weight' => 20,
       ]);
 
+    $fields['weight'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Weight'))
+      ->setDescription(t('The weight of this promotion in relation to others.'))
+      ->setDefaultValue(0)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'integer',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'number',
+        'weight' => 4,
+      ]);
+
     return $fields;
   }
 
@@ -562,6 +591,28 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   public static function getDefaultEndDate() {
     // Today + 1 year.
     return gmdate('Y-m-d', time() + 31536000);
+  }
+
+  /**
+   * Helper callback for uasort() to sort promotions by weight and label.
+   *
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $a
+   *   The first promotion to sort.
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $b
+   *   The second promotion to sort.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sort(PromotionInterface $a, PromotionInterface $b) {
+    $a_weight = $a->getWeight();
+    $b_weight = $b->getWeight();
+    if ($a_weight == $b_weight) {
+      $a_label = $a->label();
+      $b_label = $b->label();
+      return strnatcasecmp($a_label, $b_label);
+    }
+    return ($a_weight < $b_weight) ? -1 : 1;
   }
 
 }

@@ -68,6 +68,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       ->condition('start_date', gmdate('Y-m-d'), '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
+    $query->sort('weight', 'ASC');
     return $query;
   }
 
