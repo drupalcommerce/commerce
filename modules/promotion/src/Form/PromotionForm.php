@@ -40,7 +40,7 @@ class PromotionForm extends ContentEntityForm {
     $form['#theme'] = ['commerce_promotion_form'];
     $form['#attached']['library'][] = 'commerce_promotion/form';
 
-    $form['options'] = [
+    $form['advanced'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
@@ -48,28 +48,25 @@ class PromotionForm extends ContentEntityForm {
     $form['option_details'] = [
       '#type' => 'container',
       '#title' => $this->t('Options'),
-      '#open' => TRUE,
-      '#group' => 'options',
+      '#group' => 'advanced',
       '#attributes' => ['class' => ['entity-meta__header']],
       '#weight' => -100,
     ];
-
-    $form['advanced'] = [
-      '#type' => 'vertical_tabs',
-      '#weight' => 99,
-    ];
     $form['date_details'] = [
       '#type' => 'details',
+      '#open' => TRUE,
       '#title' => $this->t('Dates'),
       '#group' => 'advanced',
     ];
     $form['usage_details'] = [
       '#type' => 'details',
+      '#open' => TRUE,
       '#title' => $this->t('Usage'),
       '#group' => 'advanced',
     ];
     $form['compatibility_details'] = [
       '#type' => 'details',
+      '#open' => TRUE,
       '#title' => $this->t('Compatibility'),
       '#group' => 'advanced',
     ];

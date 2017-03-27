@@ -581,14 +581,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('The weight of this promotion in relation to others.'))
-      ->setDefaultValue(0)
-      ->setDisplayOptions('form', [
-        'type' => 'number',
-        'weight' => 5,
-        'settings' => [
-          'placeholder' => '0'
-        ],
-      ]);
+      ->setDefaultValue(0);
 
     return $fields;
   }

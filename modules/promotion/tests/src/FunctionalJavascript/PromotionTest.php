@@ -44,17 +44,17 @@ class PromotionTest extends CommerceBrowserTestBase {
     $name = $this->randomMachineName(8);
     $this->getSession()->getPage()->fillField('name[0][value]', $name);
 
-    $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->getPage()->selectFieldOption('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_product_percentage_off');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_configuration][amount]', '10.0');
 
     // Change, assert any values reset.
-    $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->getPage()->selectFieldOption('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_order_percentage_off');
     $this->waitForAjaxToFinish();
     $this->assertSession()->fieldValueNotEquals('offer[0][plugin_select][target_plugin_configuration][amount]', '10.0');
     $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_configuration][amount]', '10.0');
 
-    $this->getSession()->getPage()->fillField('conditions[0][plugin_select][target_plugin_id]', 'commerce_promotion_order_total_price');
+    $this->getSession()->getPage()->selectFieldOption('conditions[0][plugin_select][target_plugin_id]', 'commerce_promotion_order_total_price');
     $this->waitForAjaxToFinish();
     $this->getSession()->getPage()->fillField('conditions[0][plugin_select][target_plugin_configuration][amount][number]', '50.00');
     $this->getSession()->getPage()->checkField('conditions[0][plugin_select][target_plugin_configuration][negate]');
