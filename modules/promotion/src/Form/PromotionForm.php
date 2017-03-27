@@ -32,12 +32,6 @@ class PromotionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    $store_query = $this->entityManager->getStorage('commerce_store')->getQuery();
-    $store_count = $store_query->count()->execute();
-
-    $order_type_query = $this->entityTypeManager->getStorage('commerce_order_type')->getQuery();
-    $order_type_count = $order_type_query->count()->execute();
-
     /* @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
     $promotion = $this->entity;
 
@@ -45,7 +39,8 @@ class PromotionForm extends ContentEntityForm {
     $form['#tree'] = TRUE;
     $form['#theme'] = ['commerce_promotion_form'];
     $form['#attached']['library'][] = 'commerce_promotion/form';
-    $form['advanced'] = [
+
+    $form['options'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['entity-meta']],
       '#weight' => 99,
@@ -53,34 +48,15 @@ class PromotionForm extends ContentEntityForm {
     $form['option_details'] = [
       '#type' => 'container',
       '#title' => $this->t('Options'),
-      '#group' => 'advanced',
+      '#open' => TRUE,
+      '#group' => 'options',
       '#attributes' => ['class' => ['entity-meta__header']],
       '#weight' => -100,
-      'enabled' => [
-        '#type' => 'html_tag',
-        '#tag' => 'h3',
-        '#value' => $promotion->isEnabled() ? $this->t('Enabled') : $this->t('Not enabled'),
-        '#access' => !$promotion->isNew(),
-        '#attributes' => [
-          'class' => 'entity-meta__title',
-        ],
-      ],
     ];
-    $form['order_type_details'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Order types'),
-      '#group' => 'advanced',
-      '#open' => $this->entity->isNew(),
-      // Entity select only renders if more than one option available.
-      '#access' => ($order_type_count > 1),
-    ];
-    $form['store_details'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Stores'),
-      '#group' => 'advanced',
-      '#open' => $this->entity->isNew(),
-      // Entity select only renders if more than one option available.
-      '#access' => ($store_count > 1),
+
+    $form['advanced'] = [
+      '#type' => 'vertical_tabs',
+      '#weight' => 99,
     ];
     $form['date_details'] = [
       '#type' => 'details',
@@ -101,8 +77,8 @@ class PromotionForm extends ContentEntityForm {
     $field_details_mapping = [
       'status' => 'option_details',
       'weight' => 'option_details',
-      'order_types' => 'order_type_details',
-      'stores' => 'store_details',
+      'order_types' => 'option_details',
+      'stores' => 'option_details',
       'start_date' => 'date_details',
       'end_date' => 'date_details',
       'usage_limit' => 'usage_details',
