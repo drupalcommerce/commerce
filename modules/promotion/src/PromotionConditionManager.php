@@ -65,6 +65,21 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
   /**
    * {@inheritdoc}
    */
+  public function createInstance($plugin_id, array $configuration = []) {
+    $plugin = $this->getFactory()->createInstance($plugin_id, $configuration);
+    // If we receive any context values via config set it into the plugin.
+    if (!empty($configuration['context'])) {
+      foreach ($configuration['context'] as $name => $context) {
+        $plugin->setContextValue($name, $context);
+      }
+    }
+
+    return $plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 

@@ -74,12 +74,15 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
    * {@inheritdoc}
    */
   public function applyAdjustment(EntityAdjustableInterface $entity, Price $amount) {
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+    $promotion = $this->getContextValue('commerce_promotion');
+
     $entity->addAdjustment(new Adjustment([
       'type' => 'promotion',
       // @todo Change to label from UI when added in #2770731.
       'label' => t('Discount'),
       'amount' => $amount->multiply('-1'),
-      'source_id' => $this->getPluginId(),
+      'source_id' => $promotion->id(),
     ]));
   }
 

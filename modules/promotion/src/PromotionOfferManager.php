@@ -51,7 +51,6 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
    */
   public function createInstance($plugin_id, array $configuration = []) {
     $plugin = $this->getFactory()->createInstance($plugin_id, $configuration);
-
     // If we receive any context values via config set it into the plugin.
     if (!empty($configuration['context'])) {
       foreach ($configuration['context'] as $name => $context) {
@@ -88,6 +87,8 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
     if (empty($definition['context'][$target])) {
       $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);
     }
+    // Add a context definition for the promotion being executed.
+    $definition['context']['commerce_promotion'] = new ContextDefinition('entity:commerce_promotion', $this->t('Promotion'));
   }
 
 }

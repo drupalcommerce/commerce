@@ -153,26 +153,6 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function hasCoupon(CouponInterface $coupon);
 
   /**
-   * Gets the promotion current usage.
-   *
-   * Represents the number of times the promotion was used.
-   *
-   * @return int
-   *   The promotion current usage.
-   */
-  public function getCurrentUsage();
-
-  /**
-   * Sets the promotion current usage.
-   *
-   * @param int $current_usage
-   *   The promotion current usage.
-   *
-   * @return $this
-   */
-  public function setCurrentUsage($current_usage);
-
-  /**
    * Gets the promotion usage limit.
    *
    * Represents the maximum number of times the promotion can be used.

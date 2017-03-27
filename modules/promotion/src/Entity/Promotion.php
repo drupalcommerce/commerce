@@ -243,21 +243,6 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCurrentUsage() {
-    return $this->get('current_usage')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCurrentUsage($current_usage) {
-    $this->set('current_usage', $current_usage);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getUsageLimit() {
     return $this->get('usage_limit')->value;
   }
@@ -376,9 +361,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         break;
     }
 
-    // @todo should whatever invokes this method be providing the context?
     $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
-
     // Execute each plugin, this is an AND operation.
     // @todo support OR operations.
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
@@ -398,11 +381,11 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public function apply(EntityAdjustableInterface $entity) {
     $entity_type_id = $entity->getEntityTypeId();
-    // @todo should whatever invokes this method be providing the context?
-    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
-
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
+    $offer = $this->get('offer')->first()->getTargetInstance([
+      $entity_type_id => new Context(new ContextDefinition('entity:' . $entity_type_id), $entity),
+      'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
+    ]);
     $offer->execute();
   }
 
@@ -537,11 +520,6 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
           'label_plural' => 'coupons',
         ],
       ]);
-
-    $fields['current_usage'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Current usage'))
-      ->setDescription(t('The number of times the promotion was used.'))
-      ->setDefaultValue(0);
 
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))

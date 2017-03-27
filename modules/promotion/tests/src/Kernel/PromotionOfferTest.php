@@ -60,6 +60,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
     $this->offerManager = $this->container->get('plugin.manager.commerce_promotion_offer');
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
