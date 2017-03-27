@@ -245,6 +245,24 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   public function setEnabled($enabled);
 
   /**
+   * Gets the weight.
+   *
+   * @return int
+   *   The weight.
+   */
+  public function getWeight();
+
+  /**
+   * Sets the weight.
+   *
+   * @param int $weight
+   *   The weight.
+   *
+   * @return $this
+   */
+  public function setWeight($weight);
+
+  /**
    * Checks whether the promotion entity can be applied.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity

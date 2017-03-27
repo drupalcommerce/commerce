@@ -120,7 +120,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests that promotions with coupons do not get loaded PromotionStorage::loadValid.
+   * Tests that promotions with coupons do not get loaded.
    */
   public function testValidWithCoupons() {
     $order_type = OrderType::load('default');
@@ -196,6 +196,59 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     // Verify valid promotions load.
     $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
     $this->assertEquals($promotion1->label(), $valid_promotion->label());
+  }
+
+  /**
+   * Tests that promotions are loaded by weight.
+   *
+   * @group debug
+   */
+  public function testWeight() {
+    $order_type = OrderType::load('default');
+
+    $promotion1 = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 4,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    $promotion2 = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 2,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $promotion3 = Promotion::create([
+      'name' => 'Promotion 3',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => -10,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion3->save());
+    $promotion4 = Promotion::create([
+      'name' => 'Promotion 4',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 1,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion4->save());
+
+    $promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion3->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion4->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion2->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion1->label(), $promotion->label());
   }
 
 }
