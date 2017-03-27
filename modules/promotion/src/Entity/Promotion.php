@@ -588,6 +588,9 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDisplayOptions('form', [
         'type' => 'number',
         'weight' => 4,
+        'settings' => [
+          'placeholder' => '0'
+        ],
       ]);
 
     return $fields;

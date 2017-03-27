@@ -100,7 +100,7 @@ class PromotionForm extends ContentEntityForm {
 
     $field_details_mapping = [
       'status' => 'option_details',
-      'description' => 'option_details',
+      'weight' => 'option_details',
       'order_types' => 'order_type_details',
       'stores' => 'store_details',
       'start_date' => 'date_details',
