@@ -249,7 +249,6 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals($promotion2->label(), $promotion->label());
     $promotion = array_shift($promotions);
     $this->assertEquals($promotion1->label(), $promotion->label());
-
   }
 
 }
