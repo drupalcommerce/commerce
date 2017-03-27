@@ -2,3 +2,7 @@ promotion:
   label: Promotion
   has_ui: true
   weight: 0
+promotion_coupon:
+  label: Coupon
+  has_ui: true
+  weight: 0

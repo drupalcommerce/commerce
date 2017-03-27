@@ -65,6 +65,22 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
   /**
    * {@inheritdoc}
    */
+  public function createInstance($plugin_id, array $configuration = []) {
+    $plugin = $this->getFactory()->createInstance($plugin_id, $configuration);
+
+    // If we receive any context values via config set it into the plugin.
+    if (!empty($configuration['context'])) {
+      foreach ($configuration['context'] as $name => $context) {
+        $plugin->setContextValue($name, $context);
+      }
+    }
+
+    return $plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
@@ -83,6 +99,10 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
     if (empty($definition['category'])) {
       $definition['category'] = $this->entityTypeManager->getDefinition($target)->getLabel();
     }
+
+    // Add a context definition for the promotion being executed.
+    $definition['context']['commerce_promotion'] = new ContextDefinition('entity:commerce_promotion', $this->t('Promotion'));
+    $definition['context']['commerce_promotion_coupon'] = new ContextDefinition('entity:commerce_promotion_coupon', $this->t('Coupon'), FALSE);
 
     // Generate the context definition if it is missing.
     if (empty($definition['context'][$target])) {

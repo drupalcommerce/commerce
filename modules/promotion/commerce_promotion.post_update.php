@@ -84,3 +84,17 @@ function commerce_promotion_post_update_4() {
     $promotion->save();
   }
 }
+
+/**
+ * Remove promotion current_usage field.
+ */
+function commerce_promotion_post_update_5() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setName('current_usage')
+    ->setTargetEntityTypeId('commerce_promotion')
+    ->setLabel(t('Current usage'))
+    ->setDescription(t('The number of times the promotion was used.'))
+    ->setDefaultValue(0);
+  $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
+}

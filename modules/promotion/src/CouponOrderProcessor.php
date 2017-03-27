@@ -74,13 +74,13 @@ class CouponOrderProcessor implements OrderProcessorInterface {
       $target_entity_type = $plugin->getTargetEntityType();
       if ($target_entity_type == PromotionOfferInterface::ORDER) {
         if ($promotion->applies($order)) {
-          $promotion->apply($order);
+          $promotion->apply($order, $coupon);
         }
       }
       elseif ($target_entity_type == PromotionOfferInterface::ORDER_ITEM) {
         foreach ($order->getItems() as $order_item) {
           if ($promotion->applies($order_item)) {
-            $promotion->apply($order_item);
+            $promotion->apply($order_item, $coupon);
           }
         }
       }

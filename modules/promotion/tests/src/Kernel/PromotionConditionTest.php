@@ -59,8 +59,8 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
-    // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
