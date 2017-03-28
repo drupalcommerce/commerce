@@ -43,6 +43,19 @@ class PromotionUsage implements PromotionUsageInterface {
   /**
    * {@inheritdoc}
    */
+  public function deleteUsage(array $promotions) {
+    $promotion_ids = array_map(function ($promotion) {
+      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+      return $promotion->id();
+    }, $promotions);
+    $this->connection->delete('commerce_promotion_usage')
+      ->condition('promotion_id', $promotion_ids, 'IN')
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getUsage(PromotionInterface $promotion, CouponInterface $coupon = NULL, $mail = NULL) {
     $coupons = $coupon ? [$coupon] : [];
     $usages = $this->getUsageMultiple([$promotion], $coupons, $mail);

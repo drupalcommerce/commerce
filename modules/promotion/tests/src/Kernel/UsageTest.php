@@ -106,6 +106,7 @@ class UsageTest extends CommerceKernelTestBase {
    * Tests the usage API.
    *
    * @covers ::addUsage
+   * @covers ::deleteUsage
    * @covers ::getUsage
    * @covers ::getUsageMultiple
    */
@@ -137,12 +138,16 @@ class UsageTest extends CommerceKernelTestBase {
     // Test filtering by customer email.
     $this->assertEquals(2, $this->usage->getUsage($promotion, NULL, 'admin@example.com'));
     $this->assertEquals(1, $this->usage->getUsage($promotion, NULL, 'customer@example.com'));
+
+    $this->usage->deleteUsage([$promotion]);
+    $this->assertEquals(0, $this->usage->getUsage($promotion));
   }
 
   /**
    * Tests the order integration.
    *
    * @covers ::addUsage
+   * @covers ::deleteUsage
    * @covers ::getUsage
    * @covers ::getUsageMultiple
    */
@@ -180,6 +185,12 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(1, $this->usage->getUsage($first_promotion));
     $this->assertEquals(1, $this->usage->getUsage($second_promotion));
     $this->assertEquals([1 => 1, 2 => 1], $this->usage->getUsageMultiple([$first_promotion, $second_promotion]));
+
+    // Deleting a promotion should delete its usage.
+    $first_promotion->delete();
+    $this->assertEquals(0, $this->usage->getUsage($first_promotion));
+    $this->assertEquals(1, $this->usage->getUsage($second_promotion));
+    $this->assertEquals([1 => 0, 2 => 1], $this->usage->getUsageMultiple([$first_promotion, $second_promotion]));
   }
 
   /**

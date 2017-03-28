@@ -27,6 +27,14 @@ interface PromotionUsageInterface {
   public function addUsage(OrderInterface $order, PromotionInterface $promotion, CouponInterface $coupon = NULL);
 
   /**
+   * Deletes all usage records for the given promotions.
+   *
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions
+   *   The promotions.
+   */
+  public function deleteUsage(array $promotions);
+
+  /**
    * Gets the usage for the given promotion.
    *
    * The optional $coupon and $mail parameters can be used to restrict the

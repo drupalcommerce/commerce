@@ -410,7 +410,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    // Delete the linked coupons.
+    // Delete the linked coupons and usage records.
     $coupons = [];
     foreach ($entities as $entity) {
       foreach ($entity->getCoupons() as $coupon) {
@@ -420,6 +420,9 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
     $coupon_storage->delete($coupons);
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+    $usage->deleteUsage($entities);
   }
 
   /**
