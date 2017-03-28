@@ -53,6 +53,7 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
    */
   public static $modules = [
     'language',
+    'content_translation',
   ];
 
   /**
@@ -61,10 +62,16 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
   public function setUp() {
     parent::setUp();
     // Add a new language.
-    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFRomLangcode('fr')->save();
 
     /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
     $variation_type = ProductVariationType::load($this->variation->bundle());
+    // Enable translation for the product and ensure the change is picked up.
+    \Drupal::service('content_translation.manager')->setEnabled('commerce_product_variation', $variation_type->id(), TRUE);
+    drupal_static_reset();
+    \Drupal::entityManager()->clearCachedDefinitions();
+    \Drupal::service('router.builder')->rebuild();
+    \Drupal::service('entity.definition_update_manager')->applyUpdates();
 
     $color_attributes = $this->createAttributeSet($variation_type, 'color', [
       'red' => 'Red',
@@ -129,30 +136,32 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
           'number' => 999,
           'currency_code' => 'USD',
         ],
-        'attribute_color' => $updated_color_attributes[$value[0]],
-        'attribute_size' => $updated_size_attributes[$value[1]],
       ]);
+      $variation->attribute_color = $updated_color_attributes[$value[0]];
+      $variation->attribute_size = $updated_size_attributes[$value[1]];
       $variation->save();
+      $variation = ProductVariation::load($variation->id());
+      $product->variations->appendItem($variation);
+      $product->save();
+      // Add variation FR translation.
       $variation_fr = $variation->toArray();
       $variation->addTranslation('fr', $variation_fr)->save();
-      $variation = ProductVariation::load($variation->id());
+      $variation->save();
       $variations[] = $variation;
-      $product->variations->appendItem($variation);
     }
     $product->save();
     $this->product = Product::load($product->id());
 
-    $this->variations = $variations;
+    $this->variations = $product->getVariations();
     $this->colorAttributes = $updated_color_attributes;
     $this->sizeAttributes = $updated_size_attributes;
-
   }
 
   /**
    * Tests adding a product to the cart using
    * 'commerce_product_variation_attributes' widget.
    */
-  public function te2222stProductVariationAttributesWidget() {
+  public function testProductVariationAttributesWidget() {
     $this->drupalGet($this->product->toUrl());
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_color]', 'Red');
     $this->assertAttributeSelected('purchased_entity[0][attributes][attribute_size]', 'Small');
@@ -194,7 +203,6 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
    * widget.
    */
   public function testProductVariationTitleWidget() {
-    // @todo
     $order_item_form_display = EntityFormDisplay::load('commerce_order_item.default.add_to_cart');
     $order_item_form_display->setComponent('purchased_entity', [
       'type' => 'commerce_product_variation_title',
@@ -204,28 +212,23 @@ class AddToCartMultilingualTest extends CartBrowserTestBase {
     $this->drupalGet($this->product->toUrl());
     $this->assertSession()->selectExists('purchased_entity[0][variation]');
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'Title - Red, Small');
-    $this->assertAttributeExists('purchased_entity[0][variation]', 'Title - Red, Medium');
     $this->getSession()->getPage()->pressButton('Add to cart');
 
     // Change the site language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+    $this->product = Product::load($this->product->id());
     $this->drupalGet($this->product->toUrl());
     // Use AJAX to change the size to Medium, keeping the color on Red.
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Title - FR Red, FR Small');
-    $this->assertAttributeExists('purchased_entity[0][variation]', 'Title - FR Red, FR Medium');
-    $this->assertAttributeExists('purchased_entity[0][variation]', 'Title - FR Red, FR Large');
-    $this->assertAttributeExists('purchased_entity[0][variation]', 'Title - FR Blue, FR Small');
-    $this->assertAttributeExists('purchased_entity[0][variation]', 'Title - FR Blue, FR Medium');
-    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Title - FR Red, FR Medium');
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Red, FR Small');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'FR title - FR Red, FR Medium');
     $this->waitForAjaxToFinish();
-    $this->assertAttributeSelected('purchased_entity[0][variation]', 'Title - FR Red, FR Medium');
-    $this->assertSession()->pageTextContains('Title - FR Red, FR Medium');
-
+    $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Red, FR Medium');
+    $this->assertSession()->pageTextContains('FR title - FR Red, FR Medium');
     // Use AJAX to change the color to Blue, keeping the size on Medium.
-    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'Title - FR Blue, FR Medium');
+    $this->getSession()->getPage()->selectFieldOption('purchased_entity[0][variation]', 'FR title - FR Blue, FR Medium');
     $this->waitForAjaxToFinish();
     $this->assertAttributeSelected('purchased_entity[0][variation]', 'FR title - FR Blue, FR Medium');
-    $this->assertSession()->pageTextContains('Title - FR Blue, FR Medium');
+    $this->assertSession()->pageTextContains('FR title - FR Blue, FR Medium');
     $this->getSession()->getPage()->pressButton('Add to cart');
 
     $this->cart = Order::load($this->cart->id());
