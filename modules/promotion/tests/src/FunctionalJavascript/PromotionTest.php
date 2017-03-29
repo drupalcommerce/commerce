@@ -85,7 +85,7 @@ class PromotionTest extends CommerceBrowserTestBase {
     // Check the integrity of the form.
     $this->assertSession()->fieldExists('name[0][value]');
 
-    $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_product_percentage_off');
+    $this->getSession()->getPage()->fillField('offer[0][plugin_select][target_plugin_id]', 'commerce_promotion_order_percentage_off');
     $this->waitForAjaxToFinish();
 
     $name = $this->randomMachineName(8);
