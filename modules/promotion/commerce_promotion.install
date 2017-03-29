@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the commerce_promotion module.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Implements hook_schema().
  */
@@ -63,6 +65,36 @@ function commerce_promotion_schema() {
 /**
  * Install the `commerce_promotion_usage` table schema.
  */
-function commerce_promotion_update_8001() {
+function commerce_promotion_update_8201() {
   drupal_install_schema('commerce_promotion');
+}
+
+/**
+ * Remove the current_usage field from promotions, add the weight field.
+ */
+function commerce_promotion_update_8202() {
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setName('current_usage')
+    ->setTargetEntityTypeId('commerce_promotion')
+    ->setLabel(t('Current usage'))
+    ->setDescription(t('The number of times the promotion was used.'))
+    ->setDefaultValue(0);
+  $entity_definition_update->uninstallFieldStorageDefinition($storage_definition);
+
+  $storage_definition = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Weight'))
+    ->setDescription(t('The weight of this promotion in relation to others.'))
+    ->setDefaultValue(0)
+    ->setDisplayOptions('view', [
+      'label' => 'hidden',
+      'type' => 'integer',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'number',
+      'weight' => 4,
+    ]);
+  $entity_definition_update->installFieldStorageDefinition('weight', 'commerce_promotion', 'commerce_promotion', $storage_definition);
 }
