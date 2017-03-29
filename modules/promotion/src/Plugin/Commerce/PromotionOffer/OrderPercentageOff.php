@@ -7,7 +7,7 @@ namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
  *
  * @CommercePromotionOffer(
  *   id = "commerce_promotion_order_percentage_off",
- *   label = @Translation("Percentage off"),
+ *   label = @Translation("Percentage amount off of the order total"),
  *   target_entity_type = "commerce_order",
  * )
  */
