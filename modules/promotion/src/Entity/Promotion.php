@@ -529,7 +529,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDescription(t('The maximum number of times the promotion can be used. 0 for unlimited.'))
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'type' => 'commerce_usage_limit',
         'weight' => 4,
       ]);
 
