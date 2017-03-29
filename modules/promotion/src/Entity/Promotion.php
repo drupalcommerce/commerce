@@ -493,7 +493,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_plugin_select',
+        'type' => 'commerce_plugin_radios',
         'weight' => 3,
       ]);
 
@@ -565,30 +565,23 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ]);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enabled'))
+      ->setLabel(t('Status'))
       ->setDescription(t('Whether the promotion is enabled.'))
       ->setDefaultValue(TRUE)
+      ->setRequired(TRUE)
+      ->setSettings([
+        'on_label' => t('Active'),
+        'off_label' => t('Disabled'),
+      ])
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'settings' => [
-          'display_label' => TRUE,
-        ],
-        'weight' => 20,
+        'type' => 'options_buttons',
+        'weight' => 0,
       ]);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('The weight of this promotion in relation to others.'))
-      ->setDefaultValue(0)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'integer',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'number',
-        'weight' => 4,
-      ]);
+      ->setDefaultValue(0);
 
     return $fields;
   }
