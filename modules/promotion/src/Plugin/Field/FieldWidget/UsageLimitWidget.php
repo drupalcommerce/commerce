@@ -50,6 +50,7 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->usage = $usage;
   }
+
   /**
    * {@inheritdoc}
    */
@@ -69,8 +70,8 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
    */
   public static function defaultSettings() {
     return [
-        'description' => 'This is tracked by customer email.',
-      ] + parent::defaultSettings();
+      'description' => 'This is tracked by customer email.',
+    ] + parent::defaultSettings();
   }
 
   /**
