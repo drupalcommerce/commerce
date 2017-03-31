@@ -6,7 +6,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 
 /**
- * Adjustment processor to attach adjustments during order refresh during tests.
+ * Adds order and order item adjustments for testing purposes.
  */
 class TestAdjustmentProcessor implements OrderProcessorInterface {
 
