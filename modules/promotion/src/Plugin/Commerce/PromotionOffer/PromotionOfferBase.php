@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\Core\Executable\ExecutablePluginBase;
@@ -59,15 +59,15 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   /**
    * {@inheritdoc}
    */
-  public function getTargetEntityType() {
-    return $this->pluginDefinition['target_entity_type'];
+  public function getOrder() {
+    return $this->getContextValue('commerce_order');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getTargetEntity() {
-    return $this->getContextValue($this->getTargetEntityType());
+  public function getPromotion() {
+    return $this->getContextValue('commerce_promotion');
   }
 
   /**
