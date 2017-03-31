@@ -244,6 +244,13 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *   The order subtotal price, or NULL.
    */
   public function getSubtotalPrice();
+  
+  /**
+   * Recalculates the order total price.
+   *
+   * @return $this
+   */
+  public function recalculateTotalPrice();
 
   /**
    * Gets the order total price.
@@ -364,10 +371,5 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @return $this
    */
   public function setCompletedTime($timestamp);
-
-  /**
-   * Recalculates the order item total price.
-   */
-  public function recalculateTotalPrice();
 
 }
