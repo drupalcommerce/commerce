@@ -460,13 +460,12 @@ class Order extends ContentEntityBase implements OrderInterface {
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);
     }
-    $this->recalculateTotalPrice();
   }
 
   /**
-   * Recalculates the order item total price.
+   * {@inheritdoc}
    */
-  protected function recalculateTotalPrice() {
+  public function recalculateTotalPrice() {
     $currency_code = $this->getOrderCurrencyCode();
     if (!$currency_code) {
       // The order object is not complete enough to have a total price yet.

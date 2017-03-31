@@ -365,4 +365,9 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    */
   public function setCompletedTime($timestamp);
 
+  /**
+   * Recalculates the order item total price.
+   */
+  public function recalculateTotalPrice();
+
 }

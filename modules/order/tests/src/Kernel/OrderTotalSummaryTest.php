@@ -176,7 +176,7 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
     $this->assertEquals(new Price('11.00', 'USD'), $totals['total']);
 
-    $this->assertCount(3, $totals['adjustments']);
+    $this->assertCount(1, $totals['adjustments']);
     $first = array_shift($totals['adjustments']);
     $this->assertEquals('promotion', $first['type']);
     $this->assertEquals('Back to school discount', $first['label']);
