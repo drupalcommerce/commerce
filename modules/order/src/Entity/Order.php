@@ -336,6 +336,27 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
     return $subtotal_price;
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function recalculateTotalPrice() {
+    $currency_code = $this->getOrderCurrencyCode();
+    if (!$currency_code) {
+      // The order object is not complete enough to have a total price yet.
+      return $this;
+    }
+
+    $total_price = new Price('0', $currency_code);
+    foreach ($this->getItems() as $order_item) {
+      $total_price = $total_price->add($order_item->getTotalPrice());
+    }
+    foreach ($this->collectAdjustments() as $adjustment) {
+      $total_price = $total_price->add($adjustment->getAmount());
+    }
+    $this->total_price = $total_price;
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -460,26 +481,6 @@ class Order extends ContentEntityBase implements OrderInterface {
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function recalculateTotalPrice() {
-    $currency_code = $this->getOrderCurrencyCode();
-    if (!$currency_code) {
-      // The order object is not complete enough to have a total price yet.
-      return;
-    }
-
-    $total_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $total_price = $total_price->add($order_item->getTotalPrice());
-    }
-    foreach ($this->collectAdjustments() as $adjustment) {
-      $total_price = $total_price->add($adjustment->getAmount());
-    }
-    $this->total_price = $total_price;
   }
 
   /**
