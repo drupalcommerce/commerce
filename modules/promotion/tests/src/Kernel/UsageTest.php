@@ -4,8 +4,10 @@ namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_promotion\Entity\Promotion;
@@ -70,7 +72,7 @@ class UsageTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -89,6 +91,12 @@ class UsageTest extends CommerceKernelTestBase {
       'label' => 'Test',
       'orderType' => 'default',
     ])->save();
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
 
     $this->order = Order::create([
       'type' => 'default',
@@ -98,7 +106,7 @@ class UsageTest extends CommerceKernelTestBase {
       'order_number' => '6',
       'store_id' => $this->store,
       'uid' => $this->createUser(),
-      'order_items' => [],
+      'order_items' => [$order_item],
     ]);
   }
 
