@@ -112,9 +112,9 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests order total summary using only order adjustments.
+   * Tests the order total summary with order adjustments.
    */
-  public function testOrderAdjustmentOrderTotalSummary() {
+  public function testWithOrderAdjustments() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'default',
@@ -136,7 +136,6 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-
     $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
     $this->assertEquals(new Price('7.00', 'USD'), $totals['total']);
 
@@ -149,9 +148,9 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests order total summary using only order item adjustments.
+   * Tests the order total summary with order item adjustments.
    */
-  public function testOrderItemAdjustmentOrderTotalSummary() {
+  public function testWithOrderItemAdjustments() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'default',
@@ -172,7 +171,6 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-
     $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
     $this->assertEquals(new Price('11.00', 'USD'), $totals['total']);
 
@@ -185,11 +183,9 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests the order total summary.
-   *
-   * Uses a mix of order item and order level adjustments.
+   * Tests the order total summary with both order and order item adjustments.
    */
-  public function testMultipleAdjustmentOrderTotalSummary() {
+  public function testWithAllAdjustments() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'default',
@@ -232,7 +228,6 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
     $this->order->save();
 
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-
     $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
     $this->assertEquals(new Price('28.00', 'USD'), $totals['total']);
 
