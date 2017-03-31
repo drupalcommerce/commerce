@@ -114,47 +114,58 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'quantity' => 2,
       'unit_price' => new Price('12.00', 'USD'),
     ]);
-    $order_item->save();
-
-    $order_item->addAdjustment(new Adjustment([
+    $order_item_test_adjustments = [];
+    $order_item_test_adjustments[] = new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
-    ]));
-    $order_item->save();
+    ]);
     // This adjustment should be first.
-    $order_item->addAdjustment(new Adjustment([
+    $order_item_test_adjustments[] = new Adjustment([
       'type' => 'test_adjustment_type',
       'label' => '50 cent item fee',
       'amount' => new Price('0.50', 'USD'),
-    ]));
-
+    ]);
+    $order_item->setData('test_adjustments', $order_item_test_adjustments);
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
     $order->addItem($order_item);
 
-    $order->addAdjustment(new Adjustment([
+    $test_order_adjustments = [];
+    $test_order_adjustments[] = new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
       'source_id' => '1',
-    ]));
+    ]);
+    $order->setData('test_adjustments', $test_order_adjustments);
+
+    // Custom adjustments persist, so we manually add.
     $order->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
     ]));
-
-    $order->setRefreshState(Order::REFRESH_SKIP);
     $order->save();
-    $this->order = $this->reloadEntity($order);
+    $this->order = $order;
   }
 
   /**
    * Tests the order total summary.
    */
   public function testOrderTotalSummary() {
+    $this->assertCount(1, $this->order->collectAdjustments());
+    $totals = $this->orderTotalSummary->buildTotals($this->order);
+
+    $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
+    $this->assertCount(1, $totals['adjustments']);
+    $this->assertEquals(new Price('34.00', 'USD'), $totals['total']);
+
+    $this->order->setData('apply_test_adjustments', TRUE);
+    $this->order->save();
+
+    $this->assertCount(4, $this->order->collectAdjustments());
     $totals = $this->orderTotalSummary->buildTotals($this->order);
 
     $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
