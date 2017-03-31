@@ -244,7 +244,7 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    *   The order subtotal price, or NULL.
    */
   public function getSubtotalPrice();
-  
+
   /**
    * Recalculates the order total price.
    *
