@@ -5,6 +5,7 @@
  * Post update functions for Promotion.
  */
 
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
@@ -55,4 +56,31 @@ function commerce_promotion_post_update_3() {
     }
   }
   $coupon_storage->delete($delete_coupons);
+}
+
+/**
+ * Add the compatibility field to promotions.
+ */
+function commerce_promotion_post_update_4() {
+  $storage_definition = BaseFieldDefinition::create('list_string')
+    ->setLabel(t('Compatibility with other promotions'))
+    ->setSetting('allowed_values_function', ['\Drupal\commerce_promotion\Entity\Promotion', 'getCompatibilityOptions'])
+    ->setRequired(TRUE)
+    ->setDefaultValue(PromotionInterface::COMPATIBLE_ANY)
+    ->setDisplayOptions('form', [
+      'type' => 'options_select',
+      'weight' => 4,
+    ]);
+
+  $entity_definition_update = \Drupal::entityDefinitionUpdateManager();
+  $entity_definition_update->installFieldStorageDefinition('compatibility', 'commerce_promotion', 'commerce_promotion', $storage_definition);
+
+  /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
+  $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
+  /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
+  $promotions = $promotion_storage->loadMultiple();
+  foreach ($promotions as $promotion) {
+    $promotion->setCompatibility(PromotionInterface::COMPATIBLE_ANY);
+    $promotion->save();
+  }
 }

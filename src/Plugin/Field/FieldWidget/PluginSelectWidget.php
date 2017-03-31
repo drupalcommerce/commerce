@@ -25,7 +25,10 @@ class PluginSelectWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     list($field_type, $derivative) = explode(':', $this->fieldDefinition->getType());
 
-    return [
+    $element = [
+      '#type' => 'container',
+    ] + $element;
+    $element['plugin_select'] = [
       '#type' => 'commerce_plugin_select',
       '#plugin_type' => $derivative,
       '#categories' => $this->fieldDefinition->getSetting('categories'),
@@ -33,9 +36,22 @@ class PluginSelectWidget extends WidgetBase {
         'target_plugin_id' => $items[$delta]->target_plugin_id,
         'target_plugin_configuration' => $items[$delta]->target_plugin_configuration ?: [],
       ],
-      '#required' => $this->fieldDefinition->isRequired(),
       '#title' => $this->fieldDefinition->getLabel(),
+      '#required' => $this->fieldDefinition->isRequired(),
     ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    // Remove the `plugin_select` container element key from values.
+    foreach ($values as $delta => $value) {
+      $values[$delta] = $value['plugin_select'];
+    }
+    return parent::massageFormValues($values, $form, $form_state);
   }
 
 }

@@ -2,25 +2,21 @@
 
 namespace Drupal\Tests\commerce_promotion\Kernel;
 
-use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItemType;
+use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Promotion;
+use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests promotion conditions.
+ * Tests promotion compatibility options.
  *
  * @group commerce
+ * @group commerce_promotion
  */
-class PromotionConditionTest extends CommerceKernelTestBase {
-
-  /**
-   * The condition manager.
-   *
-   * @var \Drupal\commerce_promotion\PromotionConditionManager
-   */
-  protected $conditionManager;
+class PromotionCompatibilityTest extends CommerceKernelTestBase {
 
   /**
    * The test order.
@@ -39,7 +35,6 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     'profile',
     'state_machine',
     'commerce_order',
-    'commerce_product',
     'commerce_promotion',
   ];
 
@@ -52,8 +47,8 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_type');
-    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
+    $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
       'profile',
       'commerce_order',
@@ -61,6 +56,7 @@ class PromotionConditionTest extends CommerceKernelTestBase {
     ]);
     $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
+    // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
@@ -75,29 +71,21 @@ class PromotionConditionTest extends CommerceKernelTestBase {
       'order_number' => '6',
       'store_id' => $this->store,
       'order_items' => [],
+      'total_price' => new Price('100.00', 'USD'),
+      'uid' => $this->createUser()->id(),
     ]);
   }
 
   /**
-   * Tests the order total condition.
+   * Tests the compatibility setting.
    */
-  public function testOrderTotal() {
-    // Use addOrderItem so the total is calculated.
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => 2,
-      'unit_price' => [
-        'number' => '20.00',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order_item->save();
-    $this->order->addItem($order_item);
+  public function testCompatibility() {
+    $order_type = OrderType::load('default');
 
     // Starts now, enabled. No end time.
-    $promotion = Promotion::create([
+    $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
+      'order_types' => [$order_type],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
@@ -106,26 +94,12 @@ class PromotionConditionTest extends CommerceKernelTestBase {
           'amount' => '0.10',
         ],
       ],
-      'conditions' => [
-        [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
-          'target_plugin_configuration' => [
-            'amount' => [
-              'number' => '20.00',
-              'currency_code' => 'USD',
-            ],
-          ],
-        ],
-      ],
     ]);
-    $promotion->save();
+    $this->assertEquals(SAVED_NEW, $promotion1->save());
 
-    $result = $promotion->applies($this->order);
-    $this->assertNotEmpty($result);
-
-    $promotion = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
+    $promotion2 = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$order_type],
       'stores' => [$this->store->id()],
       'status' => TRUE,
       'offer' => [
@@ -134,23 +108,24 @@ class PromotionConditionTest extends CommerceKernelTestBase {
           'amount' => '0.10',
         ],
       ],
-      'conditions' => [
-        [
-          'target_plugin_id' => 'commerce_promotion_order_total_price',
-          'target_plugin_configuration' => [
-            'amount' => [
-              'number' => '50.00',
-              'currency_code' => 'USD',
-            ],
-          ],
-        ],
-      ],
     ]);
-    $promotion->save();
+    $this->assertEquals(SAVED_NEW, $promotion2->save());
 
-    $result = $promotion->applies($this->order);
+    $this->assertTrue($promotion1->applies($this->order));
+    $this->assertTrue($promotion2->applies($this->order));
 
-    $this->assertEmpty($result);
+    $promotion1->setWeight(-10);
+    $promotion1->save();
+
+    $promotion2->setWeight(10);
+    $promotion2->setCompatibility(PromotionInterface::COMPATIBLE_NONE);
+    $promotion2->save();
+
+    $promotion1->apply($this->order);
+    $this->assertFalse($promotion2->applies($this->order));
+
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->assertEquals(1, count($this->order->collectAdjustments()));
   }
 
 }

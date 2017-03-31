@@ -43,7 +43,6 @@ class CouponOrderIntegrationTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
@@ -52,7 +51,7 @@ class CouponOrderIntegrationTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
-
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
     $this->user = $this->createUser();
 
     OrderItemType::create([
