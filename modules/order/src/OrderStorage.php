@@ -91,12 +91,10 @@ class OrderStorage extends CommerceContentEntityStorage {
     if ($entity->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
       $this->orderRefresh->refresh($entity);
     }
-
     // Only the REFRESH_ON_LOAD state needs to be persisted on the entity.
     if ($entity->getRefreshState() != OrderInterface::REFRESH_ON_LOAD) {
       $entity->setRefreshState(NULL);
     }
-
     $entity->recalculateTotalPrice();
 
     return $id;
