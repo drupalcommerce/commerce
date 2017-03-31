@@ -336,7 +336,7 @@ class Order extends ContentEntityBase implements OrderInterface {
     }
     return $subtotal_price;
   }
-  
+
   /**
    * {@inheritdoc}
    */
