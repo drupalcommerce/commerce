@@ -57,9 +57,7 @@ class PaymentGatewayForm extends CommercePluginEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $gateway */
     $gateway = $this->entity;
-    $plugins = array_map(function ($definition) {
-      return $definition['label'];
-    }, $this->pluginManager->getDefinitions());
+    $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
     asort($plugins);
 
     // Use the first available plugin as the default value.

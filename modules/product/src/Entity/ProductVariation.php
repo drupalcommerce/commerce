@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -356,10 +357,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $product_title = $this->getProduct()->getTitle();
     if ($attribute_values = $this->getAttributeValues()) {
-      $attribute_labels = array_map(function ($attribute_value) {
-        return $attribute_value->label();
-      }, $attribute_values);
-
+      $attribute_labels = EntityHelper::extractLabels($attribute_values);
       $title = $product_title . ' - ' . implode(', ', $attribute_labels);
     }
     else {

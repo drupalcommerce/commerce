@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_promotion\Entity\PromotionInterface;
@@ -44,12 +45,8 @@ class PromotionUsage implements PromotionUsageInterface {
    * {@inheritdoc}
    */
   public function deleteUsage(array $promotions) {
-    $promotion_ids = array_map(function ($promotion) {
-      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
-      return $promotion->id();
-    }, $promotions);
     $this->connection->delete('commerce_promotion_usage')
-      ->condition('promotion_id', $promotion_ids, 'IN')
+      ->condition('promotion_id', EntityHelper::extractIds($promotions), 'IN')
       ->execute();
   }
 
@@ -66,20 +63,13 @@ class PromotionUsage implements PromotionUsageInterface {
    * {@inheritdoc}
    */
   public function getUsageMultiple(array $promotions, array $coupons = [], $mail = NULL) {
-    $promotion_ids = array_map(function ($promotion) {
-      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
-      return $promotion->id();
-    }, $promotions);
+    $promotion_ids = EntityHelper::extractIds($promotions);
     $query = $this->connection->select('commerce_promotion_usage', 'cpu');
     $query->addField('cpu', 'promotion_id');
     $query->addExpression('COUNT(promotion_id)', 'count');
     $query->condition('promotion_id', $promotion_ids, 'IN');
     if (!empty($coupons)) {
-      $coupon_ids = array_map(function ($coupon) {
-        /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
-        return $coupon->id();
-      }, $coupons);
-      $query->condition('coupon_id', $coupon_ids, 'IN');
+      $query->condition('coupon_id', EntityHelper::extractIds($coupons), 'IN');
     }
     if (!empty($mail)) {
       $query->condition('mail', $mail);
