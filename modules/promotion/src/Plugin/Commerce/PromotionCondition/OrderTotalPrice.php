@@ -11,7 +11,7 @@ use Drupal\commerce_price\Price;
  * @CommercePromotionCondition(
  *   id = "commerce_promotion_order_total_price",
  *   label = @Translation("Total amount"),
- *   target_entity_type = "commerce_order",
+ *   target_entity_type = "commerce_order"
  * )
  */
 class OrderTotalPrice extends PromotionConditionBase {

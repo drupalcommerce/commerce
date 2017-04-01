@@ -43,7 +43,7 @@ abstract class PercentageOffBase extends PromotionOfferBase {
       '#min' => 0,
       '#max' => 100,
       '#size' => 4,
-      '#field_suffix' => t('%'),
+      '#field_suffix' => $this->t('%'),
     ];
 
     return $form;

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -336,21 +336,13 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(EntityAdjustableInterface $entity) {
-    $entity_type_id = $entity->getEntityTypeId();
-
-    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance();
-    if ($offer->getTargetEntityType() !== $entity_type_id) {
-      return FALSE;
-    }
-
+  public function applies(OrderInterface $order) {
     // Check compatibility.
     // @todo port remaining strategies from Commerce Discount #2762997.
     switch ($this->getCompatibility()) {
       case self::COMPATIBLE_NONE:
         // If there are any existing promotions, then this cannot apply.
-        foreach ($entity->getAdjustments() as $adjustment) {
+        foreach ($order->collectAdjustments() as $adjustment) {
           if ($adjustment->getType() == 'promotion') {
             return FALSE;
           }
@@ -361,29 +353,53 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         break;
     }
 
-    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+    $contexts = [
+      'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
+    ];
+
+    // If there are no conditions, it applies automatically.
+    if ($this->get('conditions')->isEmpty()) {
+      return TRUE;
+    }
+
     // Execute each plugin, this is an AND operation.
     // @todo support OR operations.
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
     foreach ($this->get('conditions') as $item) {
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
-      $condition = $item->getTargetInstance([$entity_type_id => $context]);
-      if (!$condition->evaluate()) {
-        return FALSE;
+      $definition = $item->getTargetDefinition();
+
+      if ($definition['target_entity_type'] == 'commerce_order') {
+        /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+        $condition = $item->getTargetInstance($contexts + [
+          'commerce_order' => new Context(new ContextDefinition('entity:commerce_order'), $order),
+        ]);
+        if ($condition->evaluate()) {
+          return TRUE;
+        }
+      }
+      elseif ($definition['target_entity_type'] == 'commerce_order_item') {
+        foreach ($order->getItems() as $order_item) {
+          /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+          $condition = $item->getTargetInstance($contexts + [
+            'commerce_order_item' => new Context(new ContextDefinition('entity:commerce_order_item'), $order_item),
+          ]);
+          if ($condition->evaluate()) {
+            return TRUE;
+          }
+        }
       }
     }
 
-    return TRUE;
+    return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function apply(EntityAdjustableInterface $entity) {
-    $entity_type_id = $entity->getEntityTypeId();
+  public function apply(OrderInterface $order) {
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
     $offer = $this->get('offer')->first()->getTargetInstance([
-      $entity_type_id => new Context(new ContextDefinition('entity:' . $entity_type_id), $entity),
+      'commerce_order' => new Context(new ContextDefinition('entity:commerce_order'), $order),
       'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
     ]);
     $offer->execute();

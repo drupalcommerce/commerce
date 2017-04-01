@@ -93,12 +93,10 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
     if (!$this->entityTypeManager->getDefinition($target)) {
       throw new PluginException(sprintf('The promotion condition %s must reference a valid entity type, %s given.', $plugin_id, $target));
     }
-
     // If the plugin did not specify a category, use the target entity's label.
     if (empty($definition['category'])) {
       $definition['category'] = $this->entityTypeManager->getDefinition($target)->getLabel();
     }
-
     // Generate the context definition if it is missing.
     if (empty($definition['context'][$target])) {
       $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);

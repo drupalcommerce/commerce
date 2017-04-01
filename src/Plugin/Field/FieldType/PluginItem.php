@@ -119,6 +119,13 @@ class PluginItem extends FieldItemBase implements PluginItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function getTargetDefinition() {
+    return $this->getPluginManager()->getDefinition($this->target_plugin_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getTargetInstance(array $contexts = []) {
     $plugin = $this->getPluginManager()
       ->createInstance($this->target_plugin_id, $this->target_plugin_configuration);
