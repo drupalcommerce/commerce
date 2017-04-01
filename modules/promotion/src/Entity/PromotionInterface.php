@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_store\Entity\EntityStoresInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -266,20 +266,20 @@ interface PromotionInterface extends ContentEntityInterface, EntityStoresInterfa
   /**
    * Checks whether the promotion entity can be applied.
    *
-   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
-   *   The adjustable entity.
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
    *
    * @return bool
-   *   TRUE if promotion can be applied, or false if conditions failed.
+   *   TRUE if promotion can be applied, FALSE otherwise.
    */
-  public function applies(EntityAdjustableInterface $entity);
+  public function applies(OrderInterface $order);
 
   /**
-   * Apply the promotion to an entity.
+   * Applies the promotion to the given order.
    *
-   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
-   *   The adjustable entity.
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
    */
-  public function apply(EntityAdjustableInterface $entity);
+  public function apply(OrderInterface $order);
 
 }

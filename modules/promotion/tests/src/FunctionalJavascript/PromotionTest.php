@@ -20,7 +20,12 @@ class PromotionTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['block', 'commerce_promotion'];
+  public static $modules = [
+    'block',
+    'path',
+    'commerce_product',
+    'commerce_promotion',
+  ];
 
   /**
    * {@inheritdoc}

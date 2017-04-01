@@ -94,37 +94,6 @@ class PromotionForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion */
-    $promotion = parent::validateForm($form, $form_state);
-
-    // We need to validate that the target entity of conditions match the offer.
-    if (!$promotion->get('offer')->isEmpty()) {
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-      $offer = $promotion->get('offer')->first()->getTargetInstance();
-      $target_entity_type_id = $offer->getTargetEntityType();
-      /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $condition */
-      foreach ($promotion->get('conditions') as $delta => $condition) {
-        // Skip empty values.
-        if ($condition->isEmpty()) {
-          continue;
-        }
-        /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $plugin */
-        $plugin = $condition->getTargetInstance();
-        if ($plugin->getTargetEntityType() != $target_entity_type_id) {
-          $target_definition = $this->entityTypeManager->getDefinition($target_entity_type_id);
-          $form_state->setError($form['conditions']['widget'][$delta], $this->t('The %label condition does not match the offer target type of %type', [
-            '%label' => $plugin->getPluginDefinition()['label'],
-            '%type' => $target_definition->getLabel(),
-          ]));
-        }
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
     drupal_set_message($this->t('Saved the %label promotion.', ['%label' => $this->entity->label()]));

@@ -15,7 +15,7 @@ interface PromotionConditionInterface extends ConditionInterface {
    * @return string
    *   The entity type it applies to.
    */
-  public function getTargetEntityType();
+  public function getTargetEntityTypeId();
 
   /**
    * Get the target entity for the offer.
