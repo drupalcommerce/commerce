@@ -61,7 +61,7 @@ class PromotionForm extends ContentEntityForm {
     $form['usage_details'] = [
       '#type' => 'details',
       '#open' => TRUE,
-      '#title' => $this->t('Usage'),
+      '#title' => $this->t('Usage limits'),
       '#group' => 'advanced',
     ];
     $form['compatibility_details'] = [

@@ -38,21 +38,6 @@
   [dir="rtl"] .layout-region-promotion-secondary {
     float: left;
   }
-
-  /* @todo File an issue to add a standard class to all text-like inputs */
-  .layout-region-promotion-secondary .form-autocomplete,
-  .layout-region-promotion-secondary .form-text,
-  .layout-region-promotion-secondary .form-tel,
-  .layout-region-promotion-secondary .form-email,
-  .layout-region-promotion-secondary .form-url,
-  .layout-region-promotion-secondary .form-search,
-  .layout-region-promotion-secondary .form-number,
-  .layout-region-promotion-secondary .form-color,
-  .layout-region-promotion-secondary textarea {
-    box-sizing:         border-box;
-    width: 100%;
-    max-width: 100%;
-  }
 }
 
 /**
