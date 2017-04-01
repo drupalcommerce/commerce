@@ -64,6 +64,10 @@ class PromotionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->fillField('conditions[0][plugin_select][target_plugin_configuration][amount][number]', '50.00');
     $this->getSession()->getPage()->checkField('conditions[0][plugin_select][target_plugin_configuration][negate]');
 
+    // Test 'usage_limit' field and its 'commerce_usage_limit' widget.
+    $this->getSession()->getPage()->hasCheckedField(' Unlimited');
+    $this->assertFalse($this->getSession()->getDriver()->isVisible('//input[@type="number" and @name="usage_limit[0][usage_limit]"]'));
+
     $this->submitForm([], t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");
     $promotion_count = $this->getSession()->getPage()->find('xpath', '//table/tbody/tr/td[text()="' . $name . '"]');
@@ -148,6 +152,24 @@ class PromotionTest extends CommerceBrowserTestBase {
     \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
     $promotion_changed = Promotion::load($promotion->id());
     $this->assertEquals($new_promotion_name, $promotion_changed->getName(), 'The promotion name successfully updated.');
+
+    // Test 'usage_limit' field and its 'commerce_usage_limit' widget.
+    $this->assertNull($promotion_changed->getUsageLimit(), 'There is not usage limit set.');
+    $this->drupalGet($promotion->toUrl('edit-form'));
+    $this->getSession()->getPage()->hasCheckedField(' Unlimited');
+    // The usage limit number input hidden if field is empty.
+    $usage_limit_xpath = '//input[@type="number" and @name="usage_limit[0][usage_limit]"]';
+    $this->assertFalse($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
+    $this->getSession()->getPage()->checkField('Limited number of uses');
+    $this->assertTrue($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
+    $this->getSession()->getPage()->fillField('usage_limit[0][usage_limit]', '99');
+    $this->submitForm([], t('Save'));
+    \Drupal::service('entity_type.manager')->getStorage('commerce_promotion')->resetCache([$promotion->id()]);
+    $promotion_changed = Promotion::load($promotion->id());
+    $this->assertEquals('99', $promotion_changed->getUsageLimit(), 'The usage limit was set.');
+    $this->drupalGet($promotion->toUrl('edit-form'));
+    $this->getSession()->getPage()->hasCheckedField('Limited number of uses');
+    $this->assertTrue($this->getSession()->getDriver()->isVisible($usage_limit_xpath));
 
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion_changed->get('offer')->first();
