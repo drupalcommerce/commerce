@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion;
 
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Form\FormInterface;
@@ -25,6 +26,13 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
    * @var \Drupal\commerce_promotion\Entity\PromotionInterface[]
    */
   protected $entities = [];
+
+  /**
+   * The promotion usage counts.
+   *
+   * @var array
+   */
+  protected $usages;
 
   /**
    * Whether tabledrag is enabled.
@@ -56,6 +64,9 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
     // Sort the entities using the entity class's sort() method.
     uasort($entities, [$this->entityType->getClass(), 'sort']);
 
+    $usage = \Drupal::getContainer()->get('commerce_promotion.usage');
+    $this->usages = $usage->getUsageMultiple($entities);
+
     return $entities;
   }
 
@@ -63,8 +74,11 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['name'] = $this->t('Name');
-    $header['status'] = $this->t('Enabled');
+    $header['name'] = $this->t('Promotion');
+    $header['offer'] = $this->t('Offer');
+    $header['usage'] = $this->t('Usage');
+    $header['status'] = $this->t('Status');
+    $header['coupons'] = $this->t('Coupons');
     if ($this->hasTableDrag) {
       $header['weight'] = $this->t('Weight');
     }
@@ -75,11 +89,62 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var \Drupal\commerce_shipping\Entity\ShippingMethodInterface $entity */
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $entity */
     $row['#attributes']['class'][] = 'draggable';
     $row['#weight'] = $entity->getWeight();
-    $row['name'] = $entity->label();
-    $row['status'] = $entity->isEnabled() ? $this->t('Enabled') : $this->t('Disabled');
+    $row['name'] = $entity->toLink($entity->label(), 'edit-form')->toRenderable();
+
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer */
+    $offer = $entity->get('offer')->first();
+    $row['offer'] = $offer->getTargetDefinition()['label'];
+
+    $usage_limit = $entity->getUsageLimit();
+    if ($usage_limit == 0) {
+      $row['usage'] = '&infin;';
+    }
+    else {
+      $row['usage'] = $this->usages[$entity->id()] . ' / ' . $entity->getUsageLimit();
+    }
+
+    if (!$entity->isEnabled()) {
+      $status = $this->t('Disabled');
+    }
+    elseif ($usage_limit > 0 && $this->usages[$entity->id()] >= $usage_limit) {
+      $status = $this->t('Inactive');
+    }
+    else {
+      $now = new DrupalDateTime();
+
+      $start_date = $entity->getStartDate();
+      $start_now_diff = $start_date->diff($now);
+
+      $end_date = $entity->getEndDate();
+      if ($start_now_diff->invert == 1 && $start_now_diff->days >= 0) {
+        $status = $this->t('Starts on :date', [
+          ':date' => $start_date->format('M, d Y'),
+        ]);
+      }
+      elseif ($end_date) {
+        $end_now_diff = $end_date->diff($now);
+        if ($end_now_diff->invert == 1 && $end_now_diff->days > 0) {
+          $status = $this->t('Ends on :date', [
+            ':date' => $end_date->format('M, d Y'),
+          ]);
+        }
+        else {
+          $status = $this->t('Inactive');
+        }
+      }
+      else {
+        $status = $this->t('Active');
+      }
+    }
+
+    $row['status'] = $status;
+
+    $coupon_count = $entity->get('coupons')->count();
+    $row['coupons'] = $coupon_count ?: $this->t('None');
+
     if ($this->hasTableDrag) {
       $row['weight'] = [
         '#type' => 'weight',
@@ -122,12 +187,10 @@ class PromotionListBuilder extends EntityListBuilder implements FormInterface {
     ];
     foreach ($this->entities as $entity) {
       $row = $this->buildRow($entity);
-      if (isset($row['name'])) {
-        $row['name'] = ['#markup' => $row['name']];
-      }
-      if (isset($row['status'])) {
-        $row['status'] = ['#markup' => $row['status']];
-      }
+      $row['offer'] = ['#markup' => $row['offer']];
+      $row['usage'] = ['#markup' => $row['usage']];
+      $row['status'] = ['#markup' => $row['status']];
+      $row['coupons'] = ['#markup' => $row['coupons']];
       if (isset($row['weight'])) {
         $row['weight']['#delta'] = $delta;
       }
