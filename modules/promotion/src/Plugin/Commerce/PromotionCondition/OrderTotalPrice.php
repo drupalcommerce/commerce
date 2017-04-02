@@ -22,7 +22,6 @@ class OrderTotalPrice extends PromotionConditionBase {
   public function defaultConfiguration() {
     return [
       'amount' => NULL,
-      // @todo expose the operator in form.
       'operator' => '>',
     ] + parent::defaultConfiguration();
   }
@@ -31,7 +30,7 @@ class OrderTotalPrice extends PromotionConditionBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form += parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
 
     $amount = $this->configuration['amount'];
     // A bug in the plugin_select form element causes $amount to be incomplete.
@@ -39,6 +38,13 @@ class OrderTotalPrice extends PromotionConditionBase {
       $amount = NULL;
     }
 
+    $form['operator'] = [
+      '#type' => 'select',
+      '#title' => t('Operator'),
+      '#options' => $this->getComparisonOperators(),
+      '#default_value' => $this->configuration['operator'],
+      '#required' => TRUE,
+    ];
     $form['amount'] = [
       '#type' => 'commerce_price',
       '#title' => t('Amount'),
@@ -53,9 +59,10 @@ class OrderTotalPrice extends PromotionConditionBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+
     $values = $form_state->getValue($form['#parents']);
     $this->configuration['amount'] = $values['amount'];
-    parent::submitConfigurationForm($form, $form_state);
   }
 
   /**
@@ -74,9 +81,6 @@ class OrderTotalPrice extends PromotionConditionBase {
     $comparison_price = new Price($amount['number'], $amount['currency_code']);
 
     switch ($this->configuration['operator']) {
-      case '==':
-        return $total_price->equals($comparison_price);
-
       case '>=':
         return $total_price->greaterThanOrEqual($comparison_price);
 
@@ -88,6 +92,9 @@ class OrderTotalPrice extends PromotionConditionBase {
 
       case '<':
         return $total_price->lessThan($comparison_price);
+
+      case '==':
+        return $total_price->equals($comparison_price);
 
       default:
         throw new \InvalidArgumentException("Invalid operator {$this->configuration['operator']}");

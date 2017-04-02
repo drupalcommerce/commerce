@@ -40,4 +40,20 @@ abstract class PromotionConditionBase extends ConditionPluginBase implements Pro
     return parent::submitConfigurationForm($form, SubformState::createForSubform($form, $form_state->getCompleteForm(), $form_state));
   }
 
+  /**
+   * Gets the comparison operators.
+   *
+   * @return array
+   *   The comparison operators.
+   */
+  protected function getComparisonOperators() {
+    return [
+      '>' => $this->t('Greater than'),
+      '>=' => $this->t('Greater than or equal to'),
+      '<=' => $this->t('Less than or equal to'),
+      '<' => $this->t('Less than'),
+      '==' => $this->t('Equals'),
+    ];
+  }
+
 }
