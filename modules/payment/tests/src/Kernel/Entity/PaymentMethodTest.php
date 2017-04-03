@@ -138,9 +138,6 @@ class PaymentMethodTest extends CommerceKernelTestBase {
 
     $payment_method->setCreatedTime(635879700);
     $this->assertEquals(635879700, $payment_method->getCreatedTime());
-
-    $payment_method->setOwnerRemoteId('123456');
-    $this->assertEquals('123456', $payment_method->getOwnerRemoteId());
   }
 
 }

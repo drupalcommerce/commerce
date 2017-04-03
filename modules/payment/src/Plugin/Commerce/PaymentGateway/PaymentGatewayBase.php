@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginWithFormsTrait;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -317,6 +318,27 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
     }
 
     return $operations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerRemoteId(UserInterface $user) {
+    $remote_id = NULL;
+    if ($user->isAuthenticated()) {
+      $remote_id = $user->commerce_remote_id->getByProvider($this->entityId . '-' . $this->getMode());
+    }
+    return $remote_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerRemoteId(UserInterface $user, $remote_id) {
+    if ($user->isAuthenticated()) {
+      $user->commerce_remote_id->setByProvider($this->entityId . '-' . $this->getMode(), $remote_id);
+      $user->save();
+    }
   }
 
 }

@@ -224,31 +224,6 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
   /**
    * {@inheritdoc}
    */
-  public function getOwnerRemoteId() {
-    $remote_id = NULL;
-    $owner = $this->getOwner();
-    if ($owner) {
-      $payment_gateway = $this->getPaymentGateway();
-      $remote_id = $owner->commerce_remote_id->getByProvider($payment_gateway->id() . '-' . $payment_gateway->getPlugin()->getMode());
-    }
-    return $remote_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerRemoteId($remote_id) {
-    $owner = $this->getOwner();
-    if ($owner) {
-      $payment_gateway = $this->getPaymentGateway();
-      $owner->commerce_remote_id->setByProvider($payment_gateway->id() . '-' . $payment_gateway->getPlugin()->getMode(), $remote_id);
-      $owner->save();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
