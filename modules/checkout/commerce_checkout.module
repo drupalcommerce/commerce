@@ -21,6 +21,11 @@ function commerce_checkout_theme() {
         'steps' => [],
       ],
     ],
+    'commerce_checkout_completion_message' => [
+      'variables' => [
+        'order_entity' => NULL,
+      ],
+    ],
     'commerce_checkout_form' => [
       'render element' => 'form',
     ],

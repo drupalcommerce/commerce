@@ -24,6 +24,5 @@ configuration:
       step: review
       weight: 3
     completion_message:
-      message: 'Your order number is %order_number. You can view your order on your account page when logged in.'
       step: complete
       weight: 4
