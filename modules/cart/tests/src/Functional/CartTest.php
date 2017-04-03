@@ -34,7 +34,6 @@ class CartTest extends OrderBrowserTestBase {
    */
   public static $modules = [
     'commerce_cart',
-    'node',
   ];
 
   /**
