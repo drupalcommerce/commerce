@@ -47,8 +47,6 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
    */
   public static $modules = [
     'block',
-    'commerce_cart',
-    'commerce_promotion',
     'commerce_promotion_test',
   ];
 
