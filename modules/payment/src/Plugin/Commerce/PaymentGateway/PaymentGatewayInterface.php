@@ -116,18 +116,18 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
   /**
    * Gets the user remote ID for the payment gateway if any.
    *
-   * @param \Drupal\user\UserInterface
+   * @param \Drupal\user\UserInterface $user
    *   The user.
    *
    * @return string|null
-   *   The user remote ID for the payment method or NULL.
+   *   The user remote ID for the payment gateway or NULL.
    */
   public function getOwnerRemoteId(UserInterface $user);
 
   /**
-   * Sets the user remote ID for the payment gateways.
+   * Sets the user remote ID for the payment gateway.
    *
-   * @param \Drupal\user\UserInterface
+   * @param \Drupal\user\UserInterface $user
    *   The user.
    * @param string $remote_id
    *   The remote ID.
