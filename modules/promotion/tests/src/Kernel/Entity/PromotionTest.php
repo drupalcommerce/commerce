@@ -52,6 +52,8 @@ class PromotionTest extends CommerceKernelTestBase {
   /**
    * @covers ::getName
    * @covers ::setName
+   * @covers ::getDisplayName
+   * @covers ::setDisplayName
    * @covers ::getDescription
    * @covers ::setDescription
    * @covers ::getOrderTypes
@@ -86,6 +88,9 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setName('My Promotion');
     $this->assertEquals('My Promotion', $promotion->getName());
+
+    $promotion->setDisplayName('My Promotion Display');
+    $this->assertEquals('My Promotion Display', $promotion->getDisplayName());
 
     $promotion->setDescription('My Promotion Description');
     $this->assertEquals('My Promotion Description', $promotion->getDescription());
@@ -140,6 +145,16 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setEnabled(TRUE);
     $this->assertEquals(TRUE, $promotion->isEnabled());
+
+    // Check that a promotion created without a display name gets it's display name
+    // set to the name.
+    $promotion = Promotion::create([
+      'name' => 'My Promotion',
+      'status' => FALSE,
+    ]);
+
+    $promotion->save();
+    $this->assertEquals('My Promotion', $promotion->getDisplayName());
   }
 
 }
