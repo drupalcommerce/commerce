@@ -141,7 +141,7 @@ class CartManagerTest extends CommerceKernelTestBase {
 
     $this->cartManager->emptyCart($cart);
     $this->assertEmpty($cart->getItems());
-    $this->assertEquals(new Price('0.00', 'USD'), $cart->getTotalPrice());
+    $this->assertEquals(NULL, $cart->getTotalPrice());
   }
 
   /**

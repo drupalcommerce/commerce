@@ -69,8 +69,6 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::addCoupon
    * @covers ::removeCoupon
    * @covers ::hasCoupon
-   * @covers ::getCurrentUsage
-   * @covers ::setCurrentUsage
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
    * @covers ::getStartDate
@@ -130,9 +128,6 @@ class PromotionTest extends CommerceKernelTestBase {
     $this->assertFalse($promotion->hasCoupon($coupon1));
     $promotion->addCoupon($coupon1);
     $this->assertTrue($promotion->hasCoupon($coupon1));
-
-    $promotion->setCurrentUsage(1);
-    $this->assertEquals(1, $promotion->getCurrentUsage());
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
