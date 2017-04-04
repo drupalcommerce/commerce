@@ -4,6 +4,8 @@ namespace Drupal\commerce_product\Entity;
 
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Event\ProductEvents;
+use Drupal\commerce_product\Event\ProductVariationTitleGenerateEvent;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -364,6 +366,11 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
       // When there are no attribute fields, there's only one variation.
       $title = $product_title;
     }
+
+    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event = new ProductVariationTitleGenerateEvent($title, $this);
+    $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_TITLE_GENERATE, $event);
 
     return $title;
   }
