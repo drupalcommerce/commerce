@@ -63,6 +63,10 @@ class PromotionUsage implements PromotionUsageInterface {
    * {@inheritdoc}
    */
   public function getUsageMultiple(array $promotions, array $coupons = [], $mail = NULL) {
+    if (empty($promotions)) {
+      return [];
+    }
+
     $promotion_ids = EntityHelper::extractIds($promotions);
     $query = $this->connection->select('commerce_promotion_usage', 'cpu');
     $query->addField('cpu', 'promotion_id');
