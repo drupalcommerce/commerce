@@ -371,6 +371,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
     $event_dispatcher = \Drupal::service('event_dispatcher');
     $event = new ProductVariationTitleGenerateEvent($title, $this);
     $event_dispatcher->dispatch(ProductEvents::PRODUCT_VARIATION_TITLE_GENERATE, $event);
+    $title = $event->getTitle();
 
     return $title;
   }
