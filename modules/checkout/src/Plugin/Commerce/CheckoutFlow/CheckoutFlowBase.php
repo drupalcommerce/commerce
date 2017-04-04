@@ -178,6 +178,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
   public function defaultConfiguration() {
     return [
       'display_checkout_progress' => TRUE,
+      'display_checkout_progress_breadcrumb_links' => FALSE,
       'order_summary_view' => 'commerce_checkout_order_summary',
     ];
   }
@@ -200,6 +201,12 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
       '#title' => $this->t('Display checkout progress'),
       '#description' => $this->t('Used by the checkout progress block to determine visibility.'),
       '#default_value' => $this->configuration['display_checkout_progress'],
+    ];
+    $form['display_checkout_progress_breadcrumb_links'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display checkout progress breadcrumb as links'),
+      '#description' => $this->t('Let the checkout progress block render the breadcrumb as links.'),
+      '#default_value' => $this->configuration['display_checkout_progress_breadcrumb_links'],
     ];
     $form['order_summary_view'] = [
       '#type' => 'select',
@@ -224,6 +231,7 @@ abstract class CheckoutFlowBase extends PluginBase implements CheckoutFlowInterf
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['display_checkout_progress'] = $values['display_checkout_progress'];
+      $this->configuration['display_checkout_progress_breadcrumb_links'] = $values['display_checkout_progress_breadcrumb_links'];
       $this->configuration['order_summary_view'] = $values['order_summary_view'];
     }
   }

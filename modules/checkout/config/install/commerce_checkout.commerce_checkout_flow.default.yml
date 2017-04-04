@@ -6,6 +6,7 @@ label: Default
 plugin: multistep_default
 configuration:
   display_checkout_progress: true
+  display_checkout_progress_breadcrumb_links: false
   order_summary_view: commerce_checkout_order_summary
   panes:
     login:
