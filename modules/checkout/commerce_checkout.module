@@ -29,7 +29,7 @@ function commerce_checkout_theme() {
     'commerce_checkout_form' => [
       'render element' => 'form',
     ],
-    'commerce_checkout_form__with_summary' => [
+    'commerce_checkout_form__with_sidebar' => [
       'base hook' => 'commerce_checkout_form',
     ],
   ];
@@ -44,9 +44,9 @@ function commerce_checkout_theme_suggestions_commerce_checkout_form(array $varia
   $original = $variables['theme_hook_original'];
   $suggestions = [];
   $suggestions[] = $original;
-  // If the checkout form has an order summary, suggest the enhanced layout.
-  if (isset($variables['form']['order_summary']) && Element::isVisibleElement($variables['form']['order_summary'])) {
-    $suggestions[] = $original . '__with_summary';
+  // If the checkout form has a sidebar, suggest the enhanced layout.
+  if (isset($variables['form']['sidebar']) && Element::isVisibleElement($variables['form']['sidebar'])) {
+    $suggestions[] = $original . '__with_sidebar';
   }
 
   return $suggestions;

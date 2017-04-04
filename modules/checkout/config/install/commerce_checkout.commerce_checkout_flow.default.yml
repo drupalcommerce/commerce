@@ -6,7 +6,6 @@ label: Default
 plugin: multistep_default
 configuration:
   display_checkout_progress: true
-  order_summary_view: commerce_checkout_order_summary
   panes:
     login:
       allow_guest_checkout: true
@@ -26,3 +25,7 @@ configuration:
     completion_message:
       step: complete
       weight: 4
+    order_summary:
+      view: commerce_checkout_order_summary
+      step: _sidebar
+      weight: 5

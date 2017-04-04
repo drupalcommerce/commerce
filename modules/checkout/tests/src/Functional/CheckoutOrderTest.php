@@ -215,32 +215,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
   }
 
   /**
-   * Tests the order summary.
-   */
-  public function testOrderSummary() {
-    $this->drupalGet($this->product->toUrl()->toString());
-    $this->submitForm([], 'Add to cart');
-
-    // Test the default settings: ensure the default view is shown.
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Disable the order summary.
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Use a different view for the order summary.
-    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
-    $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
-  }
-
-  /**
    * Tests checkout behaviour after a cart update.
    */
   public function testCheckoutFlowOnCartUpdate() {
