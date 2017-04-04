@@ -40,4 +40,15 @@ interface PromotionStorageInterface extends ContentEntityStorageInterface {
    */
   public function loadByCoupon(OrderTypeInterface $order_type, StoreInterface $store, CouponInterface $coupon);
 
+  /**
+   * Builds a query that will load all promotions that are no longer valid
+   * determined by the base field limiting values.
+   *
+   * @param bool $only_enabled
+   *   Only include currently enabled promotions that have expired.
+   * @return array|bool|\Drupal\Core\Entity\EntityInterface[]
+   *   The expired promotion entities. Returns FALSE if none found.
+   */
+  public function loadExpired($only_enabled);
+
 }

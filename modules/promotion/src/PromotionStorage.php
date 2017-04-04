@@ -107,6 +107,46 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
+   * Builds a query that will load all promotions that are no longer valid
+   * determined by the base field limiting values.
+   *
+   * @param bool $only_enabled
+   *   Only include currently enabled promotions that have expired.
+   * @return array|bool|\Drupal\Core\Entity\EntityInterface[]
+   *   The expired promotion entities. Returns FALSE if none found.
+   */
+  public function loadExpired($only_enabled = TRUE) {
+    // Subquery to determine the amount of times a coupon has been used.
+    $usage_query = $this->database->select('commerce_promotion_usage', 'cpu');
+    $usage_query->addExpression('COUNT(cpu.promotion_id)', 'count');
+    $usage_query->where('cpu.promotion_id = cpd.promotion_id');
+    $usage_query->groupBy('cpu.promotion_id');
+
+    $query = $this->database->select($this->getDataTable(), 'cpd');
+
+    // We want to get results of queries that have passed their final date or
+    // have met their max usage.
+    $or_condition = $query->orConditionGroup()
+      ->condition('cpd.end_date', gmdate('Y-m-d'), '<=')
+      ->condition('cpd.usage_limit', $usage_query, '<=');
+
+    $query->addField('cpd', 'promotion_id');
+    $query->condition($or_condition);
+
+    if ($only_enabled) {
+      $query->condition('cpd.status', 1);
+    }
+
+    $result = $query->execute()->fetchCol(0);
+
+    if (empty($result)) {
+      return FALSE;
+    }
+
+    return $this->loadMultiple($result);
+  }
+
+  /**
    * Builds the base query for loading valid promotions.
    *
    * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
