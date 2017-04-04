@@ -2,8 +2,6 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
-use Drupal\commerce_price\Price;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Core\Executable\ExecutableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -15,36 +13,20 @@ use Drupal\Core\Plugin\PluginFormInterface;
  */
 interface PromotionOfferInterface extends ConfigurablePluginInterface, ContainerFactoryPluginInterface, ContextAwarePluginInterface, ExecutableInterface, PluginFormInterface {
 
-  const ORDER = 'commerce_order';
-  const ORDER_ITEM = 'commerce_order_item';
+  /**
+   * Gets the parent promotion.
+   *
+   * @return \Drupal\commerce_promotion\Entity\PromotionInterface
+   *   The promotion.
+   */
+  public function getPromotion();
 
   /**
-   * Gets the entity type the offer is for.
+   * Gets the order.
    *
-   * @return string
-   *   The entity type it applies to.
+   * @return \Drupal\commerce_order\Entity\OrderInterface
+   *   The order.
    */
-  public function getTargetEntityType();
-
-  /**
-   * Get the target entity for the offer.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   The target entity.
-   */
-  public function getTargetEntity();
-
-  /**
-   * Applies the promotion offer's adjustment to an item.
-   *
-   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
-   *   The adjustable entity.
-   * @param \Drupal\commerce_price\Price $amount
-   *   The price object.
-   *
-   * @return \Drupal\commerce_order\Adjustment
-   *   The adjustment.
-   */
-  public function applyAdjustment(EntityAdjustableInterface $entity, Price $amount);
+  public function getOrder();
 
 }

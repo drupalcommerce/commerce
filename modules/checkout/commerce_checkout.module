@@ -5,6 +5,7 @@
  * Provides configurable checkout flows.
  */
 
+use Drupal\commerce\EntityHelper;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
@@ -18,6 +19,11 @@ function commerce_checkout_theme() {
     'commerce_checkout_progress' => [
       'variables' => [
         'steps' => [],
+      ],
+    ],
+    'commerce_checkout_completion_message' => [
+      'variables' => [
+        'order_entity' => NULL,
       ],
     ],
     'commerce_checkout_form' => [
@@ -85,9 +91,6 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
   $order_type = $form_state->getFormObject()->getEntity();
   $storage = \Drupal::entityTypeManager()->getStorage('commerce_checkout_flow');
   $checkout_flows = $storage->loadMultiple();
-  $checkout_flows = array_map(function ($checkout_flow) {
-    return $checkout_flow->label();
-  }, $checkout_flows);
 
   $form['commerce_checkout'] = [
     '#type' => 'details',
@@ -99,7 +102,7 @@ function commerce_checkout_form_commerce_order_type_form_alter(array &$form, For
   $form['commerce_checkout']['checkout_flow'] = [
     '#type' => 'select',
     '#title' => t('Checkout flow'),
-    '#options' => $checkout_flows,
+    '#options' => EntityHelper::extractLabels($checkout_flows),
     '#default_value' => $order_type->getThirdPartySetting('commerce_checkout', 'checkout_flow', 'default'),
     '#required' => TRUE,
   ];
