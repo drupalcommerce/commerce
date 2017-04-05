@@ -11,11 +11,11 @@
 #}
 <div class="layout-checkout-form clearfix">
   <div class="layout-region layout-region-checkout-main">
-    {{ form|without('order_summary', 'actions') }}
+    {{ form|without('sidebar', 'actions') }}
   </div>
   <div class="layout-region layout-region-checkout-secondary">
     <h3>{% trans %} Order Summary {% endtrans %}</h3>
-    {{ form.order_summary }}
+    {{ form.sidebar }}
   </div>
   <div class="layout-region layout-region-checkout-footer">
     {{ form.actions }}

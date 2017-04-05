@@ -89,7 +89,7 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
     // Prepare the steps as expected by the template.
     $steps = [];
     $visible_steps = $checkout_flow_plugin->getVisibleSteps();
-    $current_step_id = $checkout_flow_plugin->getStepId();
+    $current_step_id = $this->checkoutOrderManager->getCheckoutStepId($order);
     $current_step_index = array_search($current_step_id, array_keys($visible_steps));
     $index = 0;
     foreach ($visible_steps as $step_id => $step_definition) {
