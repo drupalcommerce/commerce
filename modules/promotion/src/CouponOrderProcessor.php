@@ -4,7 +4,6 @@ namespace Drupal\commerce_promotion;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
-use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -69,20 +68,8 @@ class CouponOrderProcessor implements OrderProcessorInterface {
         continue;
       }
 
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $plugin */
-      $plugin = $promotion->get('offer')->first()->getTargetInstance();
-      $target_entity_type = $plugin->getTargetEntityType();
-      if ($target_entity_type == PromotionOfferInterface::ORDER) {
-        if ($promotion->applies($order)) {
-          $promotion->apply($order);
-        }
-      }
-      elseif ($target_entity_type == PromotionOfferInterface::ORDER_ITEM) {
-        foreach ($order->getItems() as $order_item) {
-          if ($promotion->applies($order_item)) {
-            $promotion->apply($order_item);
-          }
-        }
+      if ($promotion->applies($order)) {
+        $promotion->apply($order);
       }
     }
   }

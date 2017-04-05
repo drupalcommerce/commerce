@@ -52,7 +52,6 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     'commerce_log',
     'commerce_product',
     'commerce_order',
-    'commerce_test',
   ];
 
   /**
@@ -104,26 +103,22 @@ class OrderIntegrationTest extends CommerceKernelTestBase {
     $profile->save();
     $profile = $this->reloadEntity($profile);
 
-    /** @var \Drupal\commerce_order\Entity\Order $order */
+    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
+    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
+
+    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
+    $order_item1->save();
     $order = Order::create([
       'type' => 'default',
+      'store_id' => $this->store->id(),
       'state' => 'draft',
       'mail' => $user->getEmail(),
       'uid' => $user->id(),
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'billing_profile' => $profile,
-      'store_id' => $this->store->id(),
+      'order_items' => [$order_item1],
     ]);
-    $order->save();
-
-    /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
-    $order_item_storage = $this->container->get('entity_type.manager')->getStorage('commerce_order_item');
-
-    // Add order item.
-    $order_item1 = $order_item_storage->createFromPurchasableEntity($variation1);
-    $order_item1->save();
-    $order->addItem($order_item1);
     $order->save();
     $this->order = $this->reloadEntity($order);
   }

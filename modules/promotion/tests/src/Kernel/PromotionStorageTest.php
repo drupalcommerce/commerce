@@ -52,6 +52,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->promotionStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion');
   }

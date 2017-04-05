@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_promotion\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
@@ -46,7 +47,7 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -54,6 +55,7 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
@@ -61,6 +63,12 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
       'label' => 'Test',
       'orderType' => 'default',
     ])->save();
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
 
     $this->order = Order::create([
       'type' => 'default',
@@ -69,7 +77,7 @@ class PromotionCompatibilityTest extends CommerceKernelTestBase {
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
       'store_id' => $this->store,
-      'order_items' => [],
+      'order_items' => [$order_item],
       'total_price' => new Price('100.00', 'USD'),
       'uid' => $this->createUser()->id(),
     ]);

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce\EntityTraitManagerInterface;
 use Drupal\commerce\Form\CommerceBundleEntityFormBase;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
@@ -80,15 +81,12 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
       $order_item_types = array_filter($order_item_types, function ($order_item_type) {
         return $order_item_type->getPurchasableEntityTypeId() == 'commerce_product_variation';
       });
-      $order_item_types = array_map(function ($order_item_type) {
-        return $order_item_type->label();
-      }, $order_item_types);
 
       $form['orderItemType'] = [
         '#type' => 'select',
         '#title' => $this->t('Order item type'),
         '#default_value' => $variation_type->getOrderItemTypeId(),
-        '#options' => $order_item_types,
+        '#options' => EntityHelper::extractLabels($order_item_types),
         '#empty_value' => '',
         '#required' => TRUE,
       ];
@@ -101,10 +99,7 @@ class ProductVariationTypeForm extends CommerceBundleEntityFormBase {
     }
     /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface[] $attributes */
     $attributes = $this->entityTypeManager->getStorage('commerce_product_attribute')->loadMultiple();
-    $attribute_options = array_map(function ($attribute) {
-      /** @var \Drupal\commerce_product\Entity\ProductAttributeInterface $attribute */
-      return $attribute->label();
-    }, $attributes);
+    $attribute_options = EntityHelper::extractLabels($attributes);
 
     $form['original_attributes'] = [
       '#type' => 'value',
