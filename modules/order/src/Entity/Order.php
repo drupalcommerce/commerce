@@ -3,7 +3,6 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -324,17 +323,35 @@ class Order extends ContentEntityBase implements OrderInterface {
    * {@inheritdoc}
    */
   public function getSubtotalPrice() {
-    $currency_code = $this->getOrderCurrencyCode();
-    if (!$currency_code) {
-      // The order object is not complete enough to have a subtotal price yet.
-      return;
-    }
-
-    $subtotal_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $subtotal_price = $subtotal_price->add($order_item->getTotalPrice());
+    /** @var \Drupal\commerce_price\Price $subtotal_price */
+    $subtotal_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $subtotal_price = $subtotal_price ? $subtotal_price->add($order_item_total) : $order_item_total;
+      }
     }
     return $subtotal_price;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function recalculateTotalPrice() {
+    /** @var \Drupal\commerce_price\Price $total_price */
+    $total_price = NULL;
+    if ($this->hasItems()) {
+      foreach ($this->getItems() as $order_item) {
+        $order_item_total = $order_item->getTotalPrice();
+        $total_price = $total_price ? $total_price->add($order_item_total) : $order_item_total;
+      }
+      foreach ($this->collectAdjustments() as $adjustment) {
+        $total_price = $total_price->add($adjustment->getAmount());
+      }
+    }
+    $this->total_price = $total_price;
+
+    return $this;
   }
 
   /**
@@ -460,60 +477,6 @@ class Order extends ContentEntityBase implements OrderInterface {
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);
     }
-    $this->recalculateTotalPrice();
-  }
-
-  /**
-   * Recalculates the order item total price.
-   */
-  protected function recalculateTotalPrice() {
-    $currency_code = $this->getOrderCurrencyCode();
-    if (!$currency_code) {
-      // The order object is not complete enough to have a total price yet.
-      return;
-    }
-
-    $total_price = new Price('0', $currency_code);
-    foreach ($this->getItems() as $order_item) {
-      $total_price = $total_price->add($order_item->getTotalPrice());
-    }
-    foreach ($this->collectAdjustments() as $adjustment) {
-      $total_price = $total_price->add($adjustment->getAmount());
-    }
-    $this->total_price = $total_price;
-  }
-
-  /**
-   * Gets the order's currency code.
-   *
-   * Priority:
-   * 1) Total price currency.
-   * 2) First order item currency.
-   * 3) Store's default currency.
-   *
-   * @return string|null
-   *   The currency code, or NULL if the order is in an incomplete state
-   *   (no order items, no store).
-   */
-  protected function getOrderCurrencyCode() {
-    $currency_code = NULL;
-    if ($total_price = $this->getTotalPrice()) {
-      $currency_code = $total_price->getCurrencyCode();
-    }
-    elseif ($this->hasItems()) {
-      $order_items = $this->getItems();
-      $first_order_item = reset($order_items);
-      /** @var \Drupal\commerce_price\Price $unit_price */
-      $unit_price = $first_order_item->getUnitPrice();
-      if ($unit_price) {
-        $currency_code = $unit_price->getCurrencyCode();
-      }
-    }
-    elseif ($store = $this->getStore()) {
-      $currency_code = $store->getDefaultCurrencyCode();
-    }
-
-    return $currency_code;
   }
 
   /**
@@ -654,6 +617,7 @@ class Order extends ContentEntityBase implements OrderInterface {
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'commerce_order_total_summary',
+        'weight' => 0,
       ])
       ->setDisplayConfigurable('form', FALSE)
       ->setDisplayConfigurable('view', TRUE);

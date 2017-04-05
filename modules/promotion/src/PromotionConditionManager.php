@@ -65,6 +65,21 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
   /**
    * {@inheritdoc}
    */
+  public function createInstance($plugin_id, array $configuration = []) {
+    $plugin = $this->getFactory()->createInstance($plugin_id, $configuration);
+    // If we receive any context values via config set it into the plugin.
+    if (!empty($configuration['context'])) {
+      foreach ($configuration['context'] as $name => $context) {
+        $plugin->setContextValue($name, $context);
+      }
+    }
+
+    return $plugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
@@ -78,12 +93,10 @@ class PromotionConditionManager extends DefaultPluginManager implements Executab
     if (!$this->entityTypeManager->getDefinition($target)) {
       throw new PluginException(sprintf('The promotion condition %s must reference a valid entity type, %s given.', $plugin_id, $target));
     }
-
     // If the plugin did not specify a category, use the target entity's label.
     if (empty($definition['category'])) {
       $definition['category'] = $this->entityTypeManager->getDefinition($target)->getLabel();
     }
-
     // Generate the context definition if it is missing.
     if (empty($definition['context'][$target])) {
       $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);

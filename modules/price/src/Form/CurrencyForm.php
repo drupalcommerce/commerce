@@ -94,7 +94,7 @@ class CurrencyForm extends EntityForm {
       '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
       '#description' => $this->t('The number of digits after the decimal sign.'),
-      '#default_value' => $currency->getFractionDigits() ?: 2,
+      '#default_value' => $currency->getFractionDigits(),
       '#min' => 0,
       '#required' => TRUE,
     ];

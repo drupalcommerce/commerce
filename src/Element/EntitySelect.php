@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce\Element;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\FormElement;
 
@@ -84,9 +85,7 @@ class EntitySelect extends FormElement {
 
     if ($entity_count <= $element['#autocomplete_threshold']) {
       $entities = $storage->loadMultiple();
-      $entity_labels = array_map(function ($entity) {
-        return $entity->label();
-      }, $entities);
+      $entity_labels = EntityHelper::extractLabels($entities);
       // Radio buttons don't have a None option by default.
       if (!$element['#multiple'] && !$element['#required']) {
         $entity_labels = ['' => t('None')] + $entity_labels;

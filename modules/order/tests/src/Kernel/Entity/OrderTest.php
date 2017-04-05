@@ -6,6 +6,7 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
+use Drupal\commerce_price\Exception\CurrencyMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
@@ -90,8 +91,8 @@ class OrderTest extends CommerceKernelTestBase {
    * @covers ::setAdjustments
    * @covers ::addAdjustment
    * @covers ::collectAdjustments
-   * @covers ::recalculateTotalPrice
    * @covers ::getSubtotalPrice
+   * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
    * @covers ::getState
    * @covers ::getRefreshState
@@ -115,6 +116,7 @@ class OrderTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'test',
+      'quantity' => '1',
       'unit_price' => new Price('2.00', 'USD'),
     ]);
     $order_item->save();
@@ -231,6 +233,57 @@ class OrderTest extends CommerceKernelTestBase {
 
     $order->setCompletedTime(635879900);
     $this->assertEquals(635879900, $order->getCompletedTime());
+  }
+
+  /**
+   * Tests the order with order items using different currencies.
+   *
+   * @covers ::getSubtotalPrice
+   * @covers ::recalculateTotalPrice
+   * @covers ::getTotalPrice
+   */
+  public function testMultipleCurrencies() {
+    $currency_importer = \Drupal::service('commerce_price.currency_importer');
+    $currency_importer->import('EUR');
+
+    $usd_order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('2.00', 'USD'),
+    ]);
+    $usd_order_item->save();
+    $eur_order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => '1',
+      'unit_price' => new Price('3.00', 'EUR'),
+    ]);
+    $eur_order_item->save();
+
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order->save();
+
+    // The order currency should match the currency of the first order item.
+    $this->assertNull($order->getTotalPrice());
+    $order->addItem($usd_order_item);
+    $this->assertEquals($usd_order_item->getTotalPrice(), $order->getTotalPrice());
+
+    // Replacing the order item should replace the order total and its currency.
+    $order->removeItem($usd_order_item);
+    $order->addItem($eur_order_item);
+    $this->assertEquals($eur_order_item->getTotalPrice(), $order->getTotalPrice());
+
+    // Adding a second order item with a different currency should fail.
+    $currency_mismatch = FALSE;
+    try {
+      $order->addItem($usd_order_item);
+    }
+    catch (CurrencyMismatchException $e) {
+      $currency_mismatch = TRUE;
+    }
+    $this->assertTrue($currency_mismatch);
   }
 
 }

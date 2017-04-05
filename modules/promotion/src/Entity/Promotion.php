@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -243,21 +243,6 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCurrentUsage() {
-    return $this->get('current_usage')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCurrentUsage($current_usage) {
-    $this->set('current_usage', $current_usage);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getUsageLimit() {
     return $this->get('usage_limit')->value;
   }
@@ -303,6 +288,24 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCompatibility() {
+    return $this->get('compatibility')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCompatibility($compatibility) {
+    if (!in_array($compatibility, [self::COMPATIBLE_NONE, self::COMPATIBLE_ANY])) {
+      throw new \InvalidArgumentException('Invalid compatibility type');
+    }
+    $this->get('compatibility')->value = $compatibility;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
@@ -318,42 +321,86 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(EntityInterface $entity) {
-    $entity_type_id = $entity->getEntityTypeId();
-
-    /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance();
-    if ($offer->getTargetEntityType() !== $entity_type_id) {
-      return FALSE;
-    }
-
-    // @todo should whatever invokes this method be providing the context?
-    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
-
-    // Execute each plugin, this is an AND operation.
-    // @todo support OR operations.
-    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
-    foreach ($this->get('conditions') as $item) {
-      /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
-      $condition = $item->getTargetInstance([$entity_type_id => $context]);
-      if (!$condition->evaluate()) {
-        return FALSE;
-      }
-    }
-
-    return TRUE;
+  public function getWeight() {
+    return (int) $this->get('weight')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function apply(EntityInterface $entity) {
-    $entity_type_id = $entity->getEntityTypeId();
-    // @todo should whatever invokes this method be providing the context?
-    $context = new Context(new ContextDefinition('entity:' . $entity_type_id), $entity);
+  public function setWeight($weight) {
+    $this->set('weight', $weight);
+    return $this;
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies(OrderInterface $order) {
+    // Check compatibility.
+    // @todo port remaining strategies from Commerce Discount #2762997.
+    switch ($this->getCompatibility()) {
+      case self::COMPATIBLE_NONE:
+        // If there are any existing promotions, then this cannot apply.
+        foreach ($order->collectAdjustments() as $adjustment) {
+          if ($adjustment->getType() == 'promotion') {
+            return FALSE;
+          }
+        }
+        break;
+
+      case self::COMPATIBLE_ANY:
+        break;
+    }
+
+    // If there are no conditions, the promotion applies automatically.
+    if ($this->get('conditions')->isEmpty()) {
+      return TRUE;
+    }
+
+    $contexts = [
+      'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
+    ];
+    // Execute each plugin, this is an AND operation.
+    // @todo support OR operations.
+    /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $item */
+    foreach ($this->get('conditions') as $item) {
+      $definition = $item->getTargetDefinition();
+
+      if ($definition['target_entity_type'] == 'commerce_order') {
+        /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+        $condition = $item->getTargetInstance($contexts + [
+          'commerce_order' => new Context(new ContextDefinition('entity:commerce_order'), $order),
+        ]);
+        if ($condition->evaluate()) {
+          return TRUE;
+        }
+      }
+      elseif ($definition['target_entity_type'] == 'commerce_order_item') {
+        foreach ($order->getItems() as $order_item) {
+          /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionCondition\PromotionConditionInterface $condition */
+          $condition = $item->getTargetInstance($contexts + [
+            'commerce_order_item' => new Context(new ContextDefinition('entity:commerce_order_item'), $order_item),
+          ]);
+          if ($condition->evaluate()) {
+            return TRUE;
+          }
+        }
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function apply(OrderInterface $order) {
     /** @var \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\PromotionOfferInterface $offer */
-    $offer = $this->get('offer')->first()->getTargetInstance([$entity_type_id => $context]);
+    $offer = $this->get('offer')->first()->getTargetInstance([
+      'commerce_promotion' => new Context(new ContextDefinition('entity:commerce_promotion'), $this),
+      'commerce_order' => new Context(new ContextDefinition('entity:commerce_order'), $order),
+    ]);
     $offer->execute();
   }
 
@@ -378,7 +425,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    // Delete the linked coupons.
+    // Delete the linked coupons and usage records.
     $coupons = [];
     foreach ($entities as $entity) {
       foreach ($entity->getCoupons() as $coupon) {
@@ -388,6 +435,9 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     /** @var \Drupal\commerce_promotion\CouponStorageInterface $coupon_storage */
     $coupon_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion_coupon');
     $coupon_storage->delete($coupons);
+    /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+    $usage = \Drupal::service('commerce_promotion.usage');
+    $usage->deleteUsage($entities);
   }
 
   /**
@@ -458,7 +508,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
-        'type' => 'commerce_plugin_select',
+        'type' => 'commerce_plugin_radios',
         'weight' => 3,
       ]);
 
@@ -489,17 +539,12 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         ],
       ]);
 
-    $fields['current_usage'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Current usage'))
-      ->setDescription(t('The number of times the promotion was used.'))
-      ->setDefaultValue(0);
-
     $fields['usage_limit'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Usage limit'))
       ->setDescription(t('The maximum number of times the promotion can be used. 0 for unlimited.'))
       ->setDefaultValue(0)
       ->setDisplayOptions('form', [
-        'type' => 'number',
+        'type' => 'commerce_usage_limit',
         'weight' => 4,
       ]);
 
@@ -524,17 +569,34 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
         'weight' => 6,
       ]);
 
+    $fields['compatibility'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Compatibility with other promotions'))
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_promotion\Entity\Promotion', 'getCompatibilityOptions'])
+      ->setRequired(TRUE)
+      ->setDefaultValue(self::COMPATIBLE_ANY)
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'weight' => 4,
+      ]);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enabled'))
+      ->setLabel(t('Status'))
       ->setDescription(t('Whether the promotion is enabled.'))
       ->setDefaultValue(TRUE)
+      ->setRequired(TRUE)
+      ->setSettings([
+        'on_label' => t('Active'),
+        'off_label' => t('Disabled'),
+      ])
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'settings' => [
-          'display_label' => TRUE,
-        ],
-        'weight' => 20,
+        'type' => 'options_buttons',
+        'weight' => 0,
       ]);
+
+    $fields['weight'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Weight'))
+      ->setDescription(t('The weight of this promotion in relation to others.'))
+      ->setDefaultValue(0);
 
     return $fields;
   }
@@ -562,6 +624,41 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   public static function getDefaultEndDate() {
     // Today + 1 year.
     return gmdate('Y-m-d', time() + 31536000);
+  }
+
+  /**
+   * Helper callback for uasort() to sort promotions by weight and label.
+   *
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $a
+   *   The first promotion to sort.
+   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $b
+   *   The second promotion to sort.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sort(PromotionInterface $a, PromotionInterface $b) {
+    $a_weight = $a->getWeight();
+    $b_weight = $b->getWeight();
+    if ($a_weight == $b_weight) {
+      $a_label = $a->label();
+      $b_label = $b->label();
+      return strnatcasecmp($a_label, $b_label);
+    }
+    return ($a_weight < $b_weight) ? -1 : 1;
+  }
+
+  /**
+   * Gets the allowed values for the 'compatibility' base field.
+   *
+   * @return array
+   *   The allowed values.
+   */
+  public static function getCompatibilityOptions() {
+    return [
+      self::COMPATIBLE_ANY => t('Any promotion'),
+      self::COMPATIBLE_NONE => t('Not with any other promotions'),
+    ];
   }
 
 }
