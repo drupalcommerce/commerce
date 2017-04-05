@@ -51,7 +51,6 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
    */
   public function createInstance($plugin_id, array $configuration = []) {
     $plugin = $this->getFactory()->createInstance($plugin_id, $configuration);
-
     // If we receive any context values via config set it into the plugin.
     if (!empty($configuration['context'])) {
       foreach ($configuration['context'] as $name => $context) {
@@ -68,26 +67,17 @@ class PromotionOfferManager extends DefaultPluginManager implements Categorizing
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
-    foreach (['id', 'label', 'target_entity_type'] as $required_property) {
+    foreach (['id', 'label'] as $required_property) {
       if (empty($definition[$required_property])) {
         throw new PluginException(sprintf('The promotion offer %s must define the %s property.', $plugin_id, $required_property));
       }
     }
 
-    $target = $definition['target_entity_type'];
-    if (!$this->entityTypeManager->getDefinition($target)) {
-      throw new PluginException(sprintf('The promotion offer %s must reference a valid entity type, %s given.', $plugin_id, $target));
-    }
-
-    // If the plugin did not specify a category, use the target entity's label.
     if (empty($definition['category'])) {
-      $definition['category'] = $this->entityTypeManager->getDefinition($target)->getLabel();
+      $definition['category'] = $this->t('Promotions');
     }
-
-    // Generate the context definition if it is missing.
-    if (empty($definition['context'][$target])) {
-      $definition['context'][$target] = new ContextDefinition('entity:' . $target, $definition['category']);
-    }
+    $definition['context']['commerce_promotion'] = new ContextDefinition('entity:commerce_promotion', $this->t('Promotion'));
+    $definition['context']['commerce_order'] = new ContextDefinition('entity:commerce_order', $this->t('Order'));
   }
 
 }

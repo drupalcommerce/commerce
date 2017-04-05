@@ -69,6 +69,7 @@ interface CheckoutFlowInterface extends FormInterface, BaseFormIdInterface, Conf
    *                     customer back to this step.
    *   - next_label: The label shown on the button that sends the customer to
    *                 this step.
+   *   - has_sidebar: Whether the step has a sidebar.
    *   If the previous_label or next_label keys are missing, the corresponding
    *   buttons will not be shown to the customer.
    */
