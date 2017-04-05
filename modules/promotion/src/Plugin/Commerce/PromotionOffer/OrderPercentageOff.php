@@ -18,9 +18,11 @@ class OrderPercentageOff extends PercentageOffBase {
    */
   public function execute() {
     $order = $this->getOrder();
-    $adjustment_amount = $order->getTotalPrice()->multiply($this->getAmount());
-    $adjustment_amount = $this->rounder->round($adjustment_amount);
-    $this->applyAdjustment($order, $adjustment_amount);
+    if ($order->getTotalPrice()) {
+      $adjustment_amount = $order->getTotalPrice()->multiply($this->getAmount());
+      $adjustment_amount = $this->rounder->round($adjustment_amount);
+      $this->applyAdjustment($order, $adjustment_amount);
+    }
   }
 
 }
