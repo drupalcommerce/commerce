@@ -44,7 +44,6 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -58,9 +57,9 @@ class PromotionStorageTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests loadValid().
+   * Tests loadAvailable().
    */
-  public function testLoadValid() {
+  public function testLoadAvailable() {
     $order_type = OrderType::load('default');
 
     // Starts now, enabled. No end time.
@@ -102,21 +101,21 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $promotion4->save());
 
     // Verify valid promotions load.
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(2, count($valid_promotions));
 
     // Move the 4th promotions start week to a week ago, makes it valid.
     $promotion4->setStartDate(new DrupalDateTime('-1 week'));
     $promotion4->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(3, count($valid_promotions));
 
     // Set promotion 3's end date six months ago, making it invalid.
     $promotion3->setEndDate(new DrupalDateTime('-6 month'));
     $promotion3->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(2, count($valid_promotions));
   }
 
@@ -160,43 +159,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     ]);
     $promotion3->save();
 
-    $this->assertEquals(2, count($this->promotionStorage->loadValid($order_type, $this->store)));
-  }
-
-  /**
-   * Tests loading a promotion by a coupon.
-   */
-  public function testLoadByCoupon() {
-    $order_type = OrderType::load('default');
-
-    $coupon_code = $this->randomMachineName();
-    $coupon = Coupon::create([
-      'code' => $coupon_code,
-      'status' => TRUE,
-    ]);
-    $coupon->save();
-
-    // Starts now, enabled. No end time.
-    $promotion1 = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$order_type],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'coupons' => [$coupon],
-    ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
-    // Starts now, enabled. No end time.
-    $promotion2 = Promotion::create([
-      'name' => 'Promotion 2',
-      'order_types' => [$order_type],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-    ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
-
-    // Verify valid promotions load.
-    $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
-    $this->assertEquals($promotion1->label(), $valid_promotion->label());
+    $this->assertEquals(2, count($this->promotionStorage->loadAvailable($order_type, $this->store)));
   }
 
   /**
@@ -240,7 +203,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     ]);
     $this->assertEquals(SAVED_NEW, $promotion4->save());
 
-    $promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
 
     $promotion = array_shift($promotions);
     $this->assertEquals($promotion3->label(), $promotion->label());

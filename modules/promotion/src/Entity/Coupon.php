@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -71,16 +72,30 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   /**
    * {@inheritdoc}
    */
-  public function isActive() {
+  public function isEnabled() {
     return (bool) $this->getEntityKey('status');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setActive($active) {
-    $this->set('status', (bool) $active);
+  public function setEnabled($enabled) {
+    $this->set('status', (bool) $enabled);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function available(OrderInterface $order) {
+    if (!$this->isEnabled()) {
+      return FALSE;
+    }
+    if (!$this->getPromotion()->available($order)) {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
@@ -99,7 +114,7 @@ class Coupon extends ContentEntityBase implements CouponInterface {
 
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
-      ->setDescription(t('The Coupon entity code.'))
+      ->setDescription(t('The unique, machine-readable identifier for a coupon.'))
       ->addConstraint('CouponCode')
       ->setSettings([
         'max_length' => 50,
@@ -119,14 +134,18 @@ class Coupon extends ContentEntityBase implements CouponInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Active status'))
-      ->setDescription(t('A boolean indicating whether the Coupon is active.'))
+      ->setLabel(t('Status'))
+      ->setDescription(t('Whether the coupon is enabled.'))
       ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'weight' => 99,
+      ->setRequired(TRUE)
+      ->setSettings([
+        'on_label' => t('Enabled'),
+        'off_label' => t('Disabled'),
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'weight' => 0,
+      ]);
 
     return $fields;
   }
