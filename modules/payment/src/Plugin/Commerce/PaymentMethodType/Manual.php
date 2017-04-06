@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType;
 
+use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\commerce_payment\Entity\PaymentMethodInterface;
 
 /**
@@ -41,6 +42,13 @@ class Manual extends PaymentMethodTypeBase {
     }
 
     return $label;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreateLabel(PaymentGatewayInterface $payment_gateway) {
+    return $payment_gateway->label();
   }
 
   /**

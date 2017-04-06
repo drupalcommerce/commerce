@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType;
 
+use Drupal\commerce_payment\Entity\PaymentGatewayInterface;
 use Drupal\Core\Plugin\PluginBase;
 
 /**
@@ -19,7 +20,7 @@ abstract class PaymentMethodTypeBase extends PluginBase implements PaymentMethod
   /**
    * {@inheritdoc}
    */
-  public function getCreateLabel() {
+  public function getCreateLabel(PaymentGatewayInterface $payment_gateway) {
     return $this->pluginDefinition['create_label'];
   }
 
