@@ -116,11 +116,11 @@ function commerce_cart_commerce_order_delete(OrderInterface $order) {
  * Implements hook_form_alter() for Views commerce cart forms.
  */
 function commerce_cart_form_alter(array &$form, FormStateInterface $form_state) {
-  // Check for a Views commerce cart forms.
+  // Check for a Views commerce cart forms that has the order id argument.
   if ($form_state->get('step') == 'views_form_views_form') {
     /** @var \Drupal\views\Entity\View $view */
     $view = reset($form_state->getBuildInfo()['args'])->storage;
-    if (commerce_cart_is_commerce_cart_view($view)) {
+    if (commerce_cart_is_commerce_cart_view($view) && !empty($view->getExecutable()->argument)) {
       $view_argument = reset($view->getExecutable()->argument);
       if (!empty($view_argument->value)) {
         // Replace the form submit button label.
