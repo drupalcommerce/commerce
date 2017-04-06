@@ -73,9 +73,6 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
 
   /**
    * {@inheritdoc}
-   *
-   * Loads the entities referenced in that field across all the entities being
-   * viewed.
    */
   public function view(FieldItemListInterface $items, $langcode = NULL) {
     // Check first if the total price is not empty.
@@ -84,6 +81,7 @@ class OrderTotalSummary extends FormatterBase implements ContainerFactoryPluginI
     }
     return parent::view($items, $langcode);
   }
+
   /**
    * {@inheritdoc}
    */
