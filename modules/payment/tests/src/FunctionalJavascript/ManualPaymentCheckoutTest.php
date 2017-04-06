@@ -140,7 +140,7 @@ class ManualPaymentCheckoutTest extends CommerceBrowserTestBase {
 
     $expected_options = [
       'Manual for Frederick Pabst (Pabst Blue Ribbon Dr, Milwaukee)',
-      'New manual',
+      'Manual',
     ];
     $page = $this->getSession()->getPage();
     foreach ($expected_options as $expected_option) {
@@ -189,7 +189,7 @@ class ManualPaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
-    $radio_button = $this->getSession()->getPage()->findField('New manual');
+    $radio_button = $this->getSession()->getPage()->findField('Manual');
     $radio_button->click();
     $this->waitForAjaxToFinish();
 
@@ -230,7 +230,7 @@ class ManualPaymentCheckoutTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
-    $radio_button = $this->getSession()->getPage()->findField('New manual');
+    $radio_button = $this->getSession()->getPage()->findField('Manual');
     $radio_button->click();
     $this->waitForAjaxToFinish();
 
