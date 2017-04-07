@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_price\Price;
+use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -48,11 +49,13 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
+    $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
       'profile',
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->user = $this->createUser();
 
@@ -118,6 +121,69 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
     $promotion->save();
 
     $this->assertNotEmpty($promotion->applies($this->order));
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+
+    $this->assertEquals(1, count($this->order->getAdjustments()));
+    $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
+  }
+
+  /**
+   * Tests the coupon based promotion processor.
+   */
+  public function testCouponPromotion() {
+    // Use addOrderItem so the total is calculated.
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 2,
+      'unit_price' => [
+        'number' => '20.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $order_item->save();
+    $this->order->addItem($order_item);
+    $this->order->save();
+
+    // Starts now, enabled. No end time.
+    $promotion_with_coupon = Promotion::create([
+      'name' => 'Promotion (with coupon)',
+      'order_types' => [$this->order->bundle()],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'offer' => [
+        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
+        'target_plugin_configuration' => [
+          'amount' => '0.10',
+        ],
+      ],
+      'conditions' => [
+        [
+          'target_plugin_id' => 'commerce_promotion_order_total_price',
+          'target_plugin_configuration' => [
+            'amount' => [
+              'number' => '20.00',
+              'currency_code' => 'USD',
+            ],
+          ],
+        ],
+      ],
+    ]);
+    $promotion_with_coupon->save();
+
+    $coupon = Coupon::create([
+      'code' => $this->randomString(),
+      'status' => TRUE,
+    ]);
+    $coupon->save();
+    $promotion_with_coupon->get('coupons')->appendItem($coupon);
+    $promotion_with_coupon->save();
+
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+
+    $this->assertEquals(0, count($this->order->getAdjustments()));
+
+    $this->order->get('coupons')->appendItem($coupon);
+    $this->order->save();
     $this->container->get('commerce_order.order_refresh')->refresh($this->order);
 
     $this->assertEquals(1, count($this->order->getAdjustments()));

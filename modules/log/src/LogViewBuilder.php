@@ -29,8 +29,12 @@ class LogViewBuilder extends EntityViewBuilder {
           'max-age' => $entity->getCacheMaxAge(),
         ],
       ];
+      // Give templates access to the source entity.
+      $source_type = str_replace('commerce_', '', $entity->getSourceEntityTypeId());
+      $build_list[$key]['#context'][$source_type] = $entity->getSourceEntity();
+
       $entityType = $this->entityTypeId;
-      $this->moduleHandler()->alter(array($entityType . '_build', 'entity_build'), $build_list[$key], $entity, $view_mode);
+      $this->moduleHandler()->alter([$entityType . '_build', 'entity_build'], $build_list[$key], $entity, $view_mode);
 
       $build_list[$key]['#weight'] = $weight++;
     }

@@ -85,10 +85,10 @@ class Currency extends ConfigEntityBase implements CurrencyInterface {
    *
    * @var int
    */
-  protected $fractionDigits;
+  protected $fractionDigits = 2;
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::id().
+   * {@inheritdoc}
    */
   public function id() {
     return $this->currencyCode;

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Entity;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -64,7 +65,8 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
    * {@inheritdoc}
    */
   public function toUrl($rel = 'canonical', array $options = []) {
-    if ($rel == 'canonical') {
+    // StringFormatter assumes 'revision' is always a valid link template.
+    if (in_array($rel, ['canonical', 'revision'])) {
       $route_name = 'entity.commerce_product.canonical';
       $route_parameters = [
         'commerce_product' => $this->getProductId(),
@@ -356,10 +358,7 @@ class ProductVariation extends ContentEntityBase implements ProductVariationInte
 
     $product_title = $this->getProduct()->getTitle();
     if ($attribute_values = $this->getAttributeValues()) {
-      $attribute_labels = array_map(function ($attribute_value) {
-        return $attribute_value->label();
-      }, $attribute_values);
-
+      $attribute_labels = EntityHelper::extractLabels($attribute_values);
       $title = $product_title . ' - ' . implode(', ', $attribute_labels);
     }
     else {

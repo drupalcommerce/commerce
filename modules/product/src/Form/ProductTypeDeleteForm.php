@@ -3,9 +3,7 @@
 namespace Drupal\commerce_product\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;
-use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the form to delete a product type.
@@ -13,36 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ProductTypeDeleteForm extends EntityDeleteForm {
 
   /**
-   * The query factory to create entity queries.
-   *
-   * @var \Drupal\Core\Entity\Query\QueryFactory
-   */
-  protected $queryFactory;
-
-  /**
-   * Constructs a new ProductTypeDeleteForm object.
-   *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   *    The entity query object.
-   */
-  public function __construct(QueryFactory $query_factory) {
-    $this->queryFactory = $query_factory;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.query')
-    );
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $product_count = $this->queryFactory->get('commerce_product')
+    $product_count = $this->entityTypeManager->getStorage('commerce_product')->getQuery()
       ->condition('type', $this->entity->id())
       ->count()
       ->execute();

@@ -12,7 +12,14 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * @ContentEntityType(
  *   id = "commerce_promotion_coupon",
  *   label = @Translation("Coupon"),
+ *   label_singular = @Translation("coupon"),
+ *   label_plural = @Translation("coupons"),
+ *   label_count = @PluralTranslation(
+ *     singular = "@count coupon",
+ *     plural = "@count coupons",
+ *   ),
  *   handlers = {
+ *     "storage" = "Drupal\commerce_promotion\CouponStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\Core\Entity\ContentEntityForm",
@@ -31,6 +38,20 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class Coupon extends ContentEntityBase implements CouponInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPromotion() {
+    return $this->get('promotion_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPromotionId() {
+    return $this->get('promotion_id')->target_id;
+  }
 
   /**
    * {@inheritdoc}
@@ -68,9 +89,18 @@ class Coupon extends ContentEntityBase implements CouponInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
+    // The promotion backreference, populated by Promotion::postSave().
+    $fields['promotion_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Promotion'))
+      ->setDescription(t('The parent promotion.'))
+      ->setSetting('target_type', 'commerce_promotion')
+      ->setReadOnly(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['code'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Coupon code'))
       ->setDescription(t('The Coupon entity code.'))
+      ->addConstraint('CouponCode')
       ->setSettings([
         'max_length' => 50,
         'text_processing' => 0,
@@ -91,7 +121,12 @@ class Coupon extends ContentEntityBase implements CouponInterface {
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Active status'))
       ->setDescription(t('A boolean indicating whether the Coupon is active.'))
-      ->setDefaultValue(TRUE);
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 99,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }

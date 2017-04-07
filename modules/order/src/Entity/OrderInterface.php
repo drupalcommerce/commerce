@@ -246,6 +246,13 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function getSubtotalPrice();
 
   /**
+   * Recalculates the order total price.
+   *
+   * @return $this
+   */
+  public function recalculateTotalPrice();
+
+  /**
    * Gets the order total price.
    *
    * Represents a sum of all order item totals along with adjustments.
@@ -294,8 +301,8 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
    * @param mixed $default
    *   The default value.
    *
-   * @return array
-   *   The order data.
+   * @return mixed
+   *   The value.
    */
   public function getData($key, $default = NULL);
 

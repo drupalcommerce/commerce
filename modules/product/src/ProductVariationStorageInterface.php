@@ -3,11 +3,12 @@
 namespace Drupal\commerce_product;
 
 use Drupal\commerce_product\Entity\ProductInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 
 /**
  * Defines the interface for product variation storage.
  */
-interface ProductVariationStorageInterface {
+interface ProductVariationStorageInterface extends ContentEntityStorageInterface {
 
   /**
    * Loads the variation from context.

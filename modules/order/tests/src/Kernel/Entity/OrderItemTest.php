@@ -64,6 +64,8 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::removeAdjustment
    * @covers ::recalculateTotalPrice
    * @covers ::getTotalPrice
+   * @covers ::getData
+   * @covers ::setData
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    */
@@ -105,6 +107,10 @@ class OrderItemTest extends CommerceKernelTestBase {
     $this->assertEquals([$adjustments[1]], $order_item->getAdjustments());
     $order_item->setAdjustments($adjustments);
     $this->assertEquals($adjustments, $order_item->getAdjustments());
+
+    $this->assertEquals('default', $order_item->getData('test', 'default'));
+    $order_item->setData('test', 'value');
+    $this->assertEquals('value', $order_item->getData('test', 'default'));
 
     $order_item->setCreatedTime(635879700);
     $this->assertEquals(635879700, $order_item->getCreatedTime());
