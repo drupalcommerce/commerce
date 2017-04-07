@@ -280,8 +280,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   /**
    * {@inheritdoc}
    */
-  public function setEndDate(DrupalDateTime $end_date) {
-    $this->get('end_date')->value = $end_date->format('Y-m-d');
+  public function setEndDate(DrupalDateTime $end_date = NULL) {
+    $this->get('end_date')->value = $end_date ? $end_date->format('Y-m-d') : NULL;
     return $this;
   }
 
@@ -331,6 +331,38 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
   public function setWeight($weight) {
     $this->set('weight', $weight);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function available(OrderInterface $order) {
+    if (!$this->isEnabled()) {
+      return FALSE;
+    }
+    if (!in_array($order->bundle(), $this->getOrderTypeIds())) {
+      return FALSE;
+    }
+    if (!in_array($order->getStoreId(), $this->getStoreIds())) {
+      return FALSE;
+    }
+    $time = \Drupal::service('commerce.time')->getRequestTime();
+    if ($this->getStartDate()->format('U') > $time) {
+      return FALSE;
+    }
+    $end_date = $this->getEndDate();
+    if ($end_date && $end_date->format('U') <= $time) {
+      return FALSE;
+    }
+    if ($usage_limit = $this->getUsageLimit()) {
+      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+      $usage = \Drupal::service('commerce_promotion.usage');
+      if ($usage_limit <= $usage->getUsage($this)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
   /**
@@ -585,7 +617,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setDefaultValue(TRUE)
       ->setRequired(TRUE)
       ->setSettings([
-        'on_label' => t('Active'),
+        'on_label' => t('Enabled'),
         'off_label' => t('Disabled'),
       ])
       ->setDisplayOptions('form', [

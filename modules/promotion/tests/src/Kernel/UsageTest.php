@@ -164,13 +164,14 @@ class UsageTest extends CommerceKernelTestBase {
       'name' => 'Promotion 1',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
     ]);
     $first_promotion->save();
     $coupon = Coupon::create([
@@ -209,14 +210,15 @@ class UsageTest extends CommerceKernelTestBase {
       'name' => 'Promotion 1',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'usage_limit' => 1,
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.10',
         ],
       ],
+      'usage_limit' => 1,
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
     ]);
     $promotion->save();
 
@@ -231,7 +233,7 @@ class UsageTest extends CommerceKernelTestBase {
     $this->assertEquals(1, $usage);
 
     $order_type = OrderType::load($this->order->bundle());
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEmpty($valid_promotions);
   }
 
