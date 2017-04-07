@@ -201,12 +201,12 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $fake_time = $this->prophesize(TimeInterface::class);
     $fake_time->getRequestTime()->willReturn(mktime(0, 0, 0, '01', '15', '2016'));
-    $this->container->set('commerce.time', $fake_time->reveal());
+    $this->container->set('datetime.time', $fake_time->reveal());
     $this->assertFalse($promotion->available($order));
 
     $fake_time = $this->prophesize(TimeInterface::class);
     $fake_time->getRequestTime()->willReturn(mktime(0, 0, 0, '01', '15', '2017'));
-    $this->container->set('commerce.time', $fake_time->reveal());
+    $this->container->set('datetime.time', $fake_time->reveal());
     $promotion->setEndDate(new DrupalDateTime('2017-01-14'));
     $this->assertFalse($promotion->available($order));
     $promotion->setEndDate(NULL);

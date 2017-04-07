@@ -347,7 +347,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
     if (!in_array($order->getStoreId(), $this->getStoreIds())) {
       return FALSE;
     }
-    $time = \Drupal::service('commerce.time')->getRequestTime();
+    $time = \Drupal::time()->getRequestTime();
     if ($this->getStartDate()->format('U') > $time) {
       return FALSE;
     }
