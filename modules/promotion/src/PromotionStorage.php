@@ -107,43 +107,61 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
-   * Builds a query that will load all promotions that are no longer valid
-   * determined by the base field limiting values.
+   * Return all active promotions that are no longer valid determined by their
+   * end date.
    *
-   * @param bool $only_enabled
-   *   Only include currently enabled promotions that have expired.
-   * @return array|bool|\Drupal\Core\Entity\EntityInterface[]
-   *   The expired promotion entities. Returns FALSE if none found.
+   * @return array|\Drupal\Core\Entity\EntityInterface[]
+   *   The expired promotion entities.
    */
-  public function loadExpired($only_enabled = TRUE) {
-    // Subquery to determine the amount of times a coupon has been used.
-    $usage_query = $this->database->select('commerce_promotion_usage', 'cpu');
-    $usage_query->addExpression('COUNT(cpu.promotion_id)', 'count');
-    $usage_query->where('cpu.promotion_id = cpd.promotion_id');
-    $usage_query->groupBy('cpu.promotion_id');
+  public function loadExpired() {
+    $query = $this->getQuery();
 
-    $query = $this->database->select($this->getDataTable(), 'cpd');
+    $query
+      ->condition('end_date', gmdate('Y-m-d'), '<')
+      ->condition('status', TRUE);
 
-    // We want to get results of queries that have passed their final date or
-    // have met their max usage.
-    $or_condition = $query->orConditionGroup()
-      ->condition('cpd.end_date', gmdate('Y-m-d'), '<=')
-      ->condition('cpd.usage_limit', $usage_query, '<=');
-
-    $query->addField('cpd', 'promotion_id');
-    $query->condition($or_condition);
-
-    if ($only_enabled) {
-      $query->condition('cpd.status', 1);
-    }
-
-    $result = $query->execute()->fetchCol(0);
+    $result = $query->execute();
 
     if (empty($result)) {
-      return FALSE;
+      return [];
     }
 
     return $this->loadMultiple($result);
+  }
+
+  /**
+   * Returns any promotions which are still active and have a met their maximum
+   * usage.
+   *
+   * @return array|\Drupal\Core\Entity\EntityInterface[]
+   *   Promotions with maxed usage.
+   */
+  public function loadMaxedUsage() {
+    $query = $this->getQuery();
+
+    $query
+      ->condition('usage_limit', 1, '>=')
+      ->condition('status', TRUE);
+
+    $result = $query->execute();
+
+    if (empty($result)) {
+      return [];
+    }
+
+    $promotions = $this->loadMultiple($result);
+    $maxed_promotions = [];
+
+    // Get an array of each promotion's use count.
+    $promotion_uses = $this->usage->getUsageMultiple($promotions);
+
+    foreach ($promotions as $promotion) {
+      if ($promotion_uses[$promotion->id()] >= $promotion->getUsageLimit()) {
+        $maxed_promotions[] = $promotion;
+      }
+    }
+
+    return $maxed_promotions;
   }
 
   /**
