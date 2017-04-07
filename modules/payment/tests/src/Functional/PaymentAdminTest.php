@@ -190,6 +190,8 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
       'payment_method' => $this->paymentMethod->id(),
       'order_id' => $this->order->id(),
       'amount' => new Price('10', 'USD'),
+      'authorized_amount' => new Price('10', 'USD'),
+      'captured_amount' => new Price('10', 'USD'),
     ]);
 
     $this->paymentGateway->getPlugin()->createPayment($payment, TRUE);

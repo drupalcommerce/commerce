@@ -154,10 +154,10 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    * {@inheritdoc}
    */
   public function getBalance() {
-    if ($amount = $this->getAmount()) {
-      $refunded_amount = $this->getRefundedAmount();
-      return $amount->subtract($refunded_amount);
-    }
+    return
+      $this->getAuthorizedAmount()->isZero() ? $this->getAmount() :
+      ($this->getCapturedAmount()->isZero() ? $this->getAuthorizedAmount() :
+      $this->getCapturedAmount()->subtract($this->getRefundedAmount()));
   }
 
   /**
@@ -180,10 +180,58 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAuthorizedAmount() {
+    if (!$this->get('authorized_amount')->isEmpty()) {
+      return $this->get('authorized_amount')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthorizedAmount(Price $authorized_amount) {
+    $this->set('authorized_amount', $authorized_amount);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCapturedAmount() {
+    if (!$this->get('captured_amount')->isEmpty()) {
+      return $this->get('captured_amount')->first()->toPrice();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUncapturedAmount() {
+    return $this->getAuthorizedAmount()->subtract($this->getCapturedAmount());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCapturedAmount(Price $captured_amount) {
+    $this->set('captured_amount', $captured_amount);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRefundedAmount() {
     if (!$this->get('refunded_amount')->isEmpty()) {
       return $this->get('refunded_amount')->first()->toPrice();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUnrefundedAmount() {
+    return $this->getCapturedAmount()->subtract($this->getRefundedAmount());
   }
 
   /**
@@ -199,6 +247,17 @@ class Payment extends ContentEntityBase implements PaymentInterface {
    */
   public function getState() {
     return $this->get('state')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStateSuggestion() {
+    return
+      $this->getRefundedAmount()->equals($this->getCapturedAmount()) ? 'capture_refunded' :
+      (!$this->getRefundedAmount()->isZero() ? 'capture_partially_refunded' :
+      ($this->getCapturedAmount()->lessThan($this->getAuthorizedAmount()) ? 'partially_captured' :
+      'capture_completed'));
   }
 
   /**
@@ -267,6 +326,20 @@ class Payment extends ContentEntityBase implements PaymentInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
+    // Initialize the authorized amount.
+    $authorized_amount = $this->getAuthorizedAmount();
+    if (!$authorized_amount) {
+      $authorized_amount = new Price('0', $this->getAmount()->getCurrencyCode());
+      $this->setAuthorizedAmount($authorized_amount);
+    }
+
+    // Initialize the captured amount.
+    $captured_amount = $this->getCapturedAmount();
+    if (!$captured_amount) {
+      $captured_amount = new Price('0', $this->getAmount()->getCurrencyCode());
+      $this->setCapturedAmount($captured_amount);
+    }
+
     // Initialize the refunded amount.
     $refunded_amount = $this->getRefundedAmount();
     if (!$refunded_amount) {
@@ -315,6 +388,16 @@ class Payment extends ContentEntityBase implements PaymentInterface {
       ->setLabel(t('Amount'))
       ->setDescription(t('The payment amount.'))
       ->setRequired(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['authorized_amount'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Authorized amount'))
+      ->setDescription(t('The authorized payment amount.'))
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['captured_amount'] = BaseFieldDefinition::create('commerce_price')
+      ->setLabel(t('Captured amount'))
+      ->setDescription(t('The captured payment amount.'))
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['refunded_amount'] = BaseFieldDefinition::create('commerce_price')
