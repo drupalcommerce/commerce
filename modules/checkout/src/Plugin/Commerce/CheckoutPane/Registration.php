@@ -213,7 +213,7 @@ class Registration extends CheckoutPaneBase implements CheckoutPaneInterface, Co
 
     $form_state->setRedirect('commerce_checkout.form', [
       'commerce_order' => $this->order->id(),
-      'step' => $this->checkoutFlow->getStepId(),
+      'step' => $complete_form['#step_id'],
     ]);
   }
 
