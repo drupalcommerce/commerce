@@ -118,6 +118,9 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
 
     $this->assertSession()->pageTextContains('Enter your promotion code to redeem a discount.');
 
+    // Test Order total summary promotion adjustment.
+    $this->assertSession()->elementTextNotContains('css', '.order-total-line', 'Discount');
+
     // Test entering an invalid coupon.
     $this->getSession()->getPage()->fillField('Promotion code', $this->randomString());
     $this->getSession()->getPage()->pressButton('Apply');
@@ -127,11 +130,14 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Apply');
 
     $this->assertSession()->pageTextContains('Coupon applied');
+    $this->assertSession()->elementTextContains('css', '.order-total-line', 'Discount');
+    $this->assertSession()->pageTextContains('-$99.90');
 
     $this->assertSession()->fieldNotExists('coupons[code]');
     $this->assertSession()->buttonNotExists('Apply');
     $this->getSession()->getPage()->pressButton('Remove promotion');
 
+    $this->assertSession()->elementTextNotContains('css', '.order-total-line', 'Discount');
     $this->assertSession()->fieldExists('coupons[code]');
     $this->assertSession()->buttonExists('Apply');
   }
