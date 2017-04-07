@@ -25,17 +25,19 @@ interface PromotionStorageInterface extends ContentEntityStorageInterface {
   public function loadAvailable(OrderTypeInterface $order_type, StoreInterface $store);
 
   /**
-   * Return active promotions that have passed their end date.
+   * Return all active promotions that are no longer valid determined by their
+   * end date.
    *
-   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
+   * @return array|\Drupal\Core\Entity\EntityInterface[]
    *   The expired promotion entities.
    */
   public function loadExpired();
 
   /**
-   * Returns active promotions which have a met their maximum usage.
+   * Returns any promotions which are still active and have a met their maximum
+   * usage.
    *
-   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
+   * @return array|\Drupal\Core\Entity\EntityInterface[]
    *   Promotions with maxed usage.
    */
   public function loadMaxedUsage();
