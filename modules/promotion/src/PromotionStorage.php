@@ -4,7 +4,6 @@ namespace Drupal\commerce_promotion;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
-use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
@@ -68,58 +67,8 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   /**
    * {@inheritdoc}
    */
-  public function loadValid(OrderTypeInterface $order_type, StoreInterface $store) {
-    $query = $this->buildLoadQuery($order_type, $store);
-    // Only load promotions without coupons. Promotions with coupons are loaded
-    // coupon-first in a different process.
-    $query->notExists('coupons');
-    $result = $query->execute();
-    if (empty($result)) {
-      return [];
-    }
-    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface[] $promotions */
-    $promotions = $this->loadMultiple($result);
-    // Remove any promotions that have hit their usage limit.
-    $usages = $this->usage->getUsageMultiple($promotions);
-    foreach ($promotions as $promotion_id => $promotion) {
-      $usage_limit = $promotion->getUsageLimit();
-      if ($usage_limit && $usage_limit <= $usages[$promotion_id]) {
-        unset($promotions[$promotion_id]);
-      }
-    }
-
-    return $promotions;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadByCoupon(OrderTypeInterface $order_type, StoreInterface $store, CouponInterface $coupon) {
-    $query = $this->buildLoadQuery($order_type, $store);
-    $query->condition('coupons', $coupon->id());
-    $result = $query->execute();
-    if (empty($result)) {
-      return [];
-    }
-    $promotions = $this->loadMultiple($result);
-
-    return reset($promotions);
-  }
-
-  /**
-   * Builds the base query for loading valid promotions.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
-   *   The order type.
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
-   *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
-   *   The entity query.
-   */
-  protected function buildLoadQuery(OrderTypeInterface $order_type, StoreInterface $store) {
+  public function loadAvailable(OrderTypeInterface $order_type, StoreInterface $store) {
     $query = $this->getQuery();
-
     $or_condition = $query->orConditionGroup()
       ->condition('end_date', gmdate('Y-m-d'), '>=')
       ->notExists('end_date', gmdate('Y-m-d'));
@@ -129,8 +78,30 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       ->condition('start_date', gmdate('Y-m-d'), '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
+    // Only load promotions without coupons. Promotions with coupons are loaded
+    // coupon-first in a different process.
+    $query->notExists('coupons');
     $query->sort('weight', 'ASC');
-    return $query;
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+
+    $promotions = $this->loadMultiple($result);
+    // Remove any promotions that have hit their usage limit.
+    $promotions_with_usage_limits = array_filter($promotions, function ($promotion) {
+      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+      return !empty($promotion->getUsageLimit());
+    });
+    $usages = $this->usage->getUsageMultiple($promotions_with_usage_limits);
+    foreach ($promotions_with_usage_limits as $promotion_id => $promotion) {
+      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+      if ($promotion->getUsageLimit() <= $usages[$promotion_id]) {
+        unset($promotions[$promotion_id]);
+      }
+    }
+
+    return $promotions;
   }
 
 }
