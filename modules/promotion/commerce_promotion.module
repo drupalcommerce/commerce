@@ -87,25 +87,27 @@ function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_t
  * Implements hook_cron()
  */
 function commerce_promotion_cron() {
-  commerce_promotion_disabled_expired();
-}
-
-/**
- * Get all expired promotions that are still active and disable them.
- */
-function commerce_promotion_disabled_expired() {
   /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
   $promotion_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_promotion');
 
-  // Get query for all expired promotions.
+  // Disable any promotions that have passed their end date.
   $promotions = $promotion_storage->loadExpired();
 
-  if ($promotions !== FALSE) {
-    // Disable all expired promotions.
+  if (!empty($promotions)) {
     foreach ($promotions as $promotion) {
       $promotion->setEnabled(FALSE);
       $promotion->save();
     }
   }
-}
 
+  // Disable any promotions that have met their max usage.
+  $promotions = $promotion_storage->loadMaxedUsage();
+
+  if (!empty($promotions)) {
+    foreach ($promotions as $promotion) {
+      $promotion->setEnabled(FALSE);
+      $promotion->save();
+    }
+  }
+
+}
