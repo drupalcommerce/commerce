@@ -50,10 +50,6 @@ services:
     class: Drupal\commerce\Config\ConfigUpdater
     arguments: ['@entity_type.manager', '@config.storage', '@config.factory']
 
-  commerce.time:
-    class: Drupal\commerce\Time
-    arguments: ['@request_stack']
-
   cache_context.country:
     class: Drupal\commerce\Cache\Context\CountryCacheContext
     arguments: ['@commerce.current_country']
