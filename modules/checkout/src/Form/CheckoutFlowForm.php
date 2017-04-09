@@ -43,9 +43,8 @@ class CheckoutFlowForm extends CommercePluginEntityFormBase {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\commerce_checkout\Entity\CheckoutFlowInterface $checkout_flow */
     $checkout_flow = $this->entity;
-    $plugins = array_map(function ($definition) {
-      return $definition['label'];
-    }, $this->pluginManager->getDefinitions());
+    $plugins = array_column($this->pluginManager->getDefinitions(), 'label', 'id');
+    asort($plugins);
 
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'commerce_checkout/admin';

@@ -154,6 +154,18 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function getDetails() {
     return ($this->configuration['details']['value']) ? $this->configuration['details'] : NULL;
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getJsLibrary() {
+    $js_library = NULL;
+    if (!empty($this->pluginDefinition['js_library'])) {
+      $js_library = $this->pluginDefinition['js_library'];
+    }
+    return $js_library;
   }
 
   /**

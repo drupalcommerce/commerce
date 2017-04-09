@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_product\Plugin\Field\FieldFormatter;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -168,9 +169,7 @@ class ProductAttributesOverview extends FormatterBase implements ContainerFactor
     }
     else {
       $attributes = $attribute_storage->loadMultiple(array_filter($this->getSetting('attributes')));
-      $attributes = array_map(function ($attribute) {
-        return $attribute->label();
-      }, $attributes);
+      $attributes = EntityHelper::extractLabels($attributes);
     }
     $summary[] = $this->t('Displaying the following attributes: @attributes', [
       '@attributes' => implode(', ', $attributes),

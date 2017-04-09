@@ -2,13 +2,7 @@
 
 namespace Drupal\Tests\commerce_checkout\Functional;
 
-use Drupal\commerce_price\Price;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
-use Drupal\profile\Entity\Profile;
-use Drupal\commerce_order\Entity\OrderItem;
-use Drupal\commerce_order\Entity\Order;
-use Drupal\commerce_order\Entity\OrderItemType;
-use Drupal\user\RoleInterface;
 
 /**
  * Tests the checkout of an order.
@@ -36,12 +30,12 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['system', 'field', 'user', 'text',
-    'entity', 'views', 'address', 'profile', 'commerce', 'inline_entity_form',
-    'commerce_price', 'commerce_product', 'commerce_cart',
-    'commerce_checkout', 'commerce_order', 'views_ui',
-    // @see https://www.drupal.org/node/2807567
-    'editor',
+  public static $modules = [
+    'commerce_product',
+    'commerce_order',
+    'commerce_cart',
+    'commerce_checkout',
+    'views_ui',
   ];
 
   /**
@@ -78,77 +72,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'variations' => [$variation],
       'stores' => [$this->store],
     ]);
-  }
-
-  /**
-   * Tests order access.
-   */
-  public function testOrderAccess() {
-    $user = $this->drupalCreateUser();
-    $user2 = $this->drupalCreateUser();
-
-    OrderItemType::create([
-      'id' => 'test',
-      'label' => 'Test',
-      'orderType' => 'default',
-    ])->save();
-    $profile = Profile::create([
-      'type' => 'customer',
-      'address' => [
-        'country' => 'FR',
-        'postal_code' => '75002',
-        'locality' => 'Paris',
-        'address_line1' => 'A french street',
-        'given_name' => 'John',
-        'family_name' => 'LeSmith',
-      ],
-    ]);
-    $profile->save();
-    $order_item = OrderItem::create([
-      'type' => 'default',
-      'quantity' => 2,
-      'unit_price' => new Price('12.00', 'USD'),
-    ]);
-    $order_item->save();
-    $order = Order::create([
-      'type' => 'default',
-      'store_id' => $this->store,
-      'state' => 'in_checkout',
-      'order_number' => '6',
-      'mail' => 'test@example.com',
-      'uid' => $user->id(),
-      'ip_address' => '127.0.0.1',
-      'billing_profile' => $profile,
-      'order_items' => [$order_item],
-    ]);
-    $order->save();
-
-    // Anonymous user with no session.
-    $this->drupalLogout();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner.
-    $this->drupalLogin($user);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Authenticated user who does not own the order.
-    $this->drupalLogin($user2);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalLogin($user);
-
-    // Order with no order items.
-    $order->removeItem($order_item)->save();
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
-
-    // Authenticated order owner without the 'access checkout' permission.
-    $order->addItem($order_item)->save();
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['access checkout']);
-    $this->drupalGet('/checkout/' . $order->id());
-    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
@@ -289,32 +212,6 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'login[register][password][pass2]' => 'pass',
     ], 'Create account and continue');
     $this->assertSession()->pageTextContains('The username User name is already taken.');
-  }
-
-  /**
-   * Tests the order summary.
-   */
-  public function testOrderSummary() {
-    $this->drupalGet($this->product->toUrl()->toString());
-    $this->submitForm([], 'Add to cart');
-
-    // Test the default settings: ensure the default view is shown.
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Disable the order summary.
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => ''], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementNotExists('css', '.view-id-commerce_checkout_order_summary');
-
-    // Use a different view for the order summary.
-    $this->drupalGet('/admin/structure/views/view/commerce_checkout_order_summary/duplicate');
-    $this->submitForm(['id' => 'duplicate_of_commerce_checkout_order_summary'], 'Duplicate');
-    $this->drupalGet('/admin/commerce/config/checkout-flows/manage/default');
-    $this->submitForm(['configuration[order_summary_view]' => 'duplicate_of_commerce_checkout_order_summary'], t('Save'));
-    $this->drupalGet('/checkout/1');
-    $this->assertSession()->elementExists('css', '.view-id-duplicate_of_commerce_checkout_order_summary');
   }
 
   /**

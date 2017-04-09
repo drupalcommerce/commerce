@@ -57,7 +57,7 @@ class PaymentCheckoutTest extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
-      'administer profiles',
+      'administer profile',
     ], parent::getAdministratorPermissions());
   }
 

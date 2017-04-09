@@ -4,6 +4,7 @@ namespace Drupal\commerce_test\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
 
 /**
  * Provides a 'User Role' condition.
@@ -49,7 +50,7 @@ class UserRole extends ConditionPluginBase {
     // Core plugins do not respect the #parents attribute passed in form.
     $values = $form_state->getValue($form['#parents']);
     $this->configuration['roles'] = array_filter($values['roles']);
-    parent::submitConfigurationForm($form, $form_state);
+    return parent::submitConfigurationForm($form, SubformState::createForSubform($form, $form_state->getCompleteForm(), $form_state));
   }
 
   /**

@@ -65,6 +65,13 @@ class CommercePaymentGateway extends Plugin {
   public $forms = [];
 
   /**
+   * The JS library ID.
+   *
+   * @var string
+   */
+  public $js_library;
+
+  /**
    * The payment type used by the payment gateway.
    *
    * @var string
