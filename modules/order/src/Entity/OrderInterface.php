@@ -221,6 +221,16 @@ interface OrderInterface extends ContentEntityInterface, EntityAdjustableInterfa
   public function hasItem(OrderItemInterface $order_item);
 
   /**
+   * Removes all adjustments that belong to the order.
+   *
+   * This includes both order and order item adjustments, with the exception
+   * of adjustments added via the UI.
+   *
+   * @return $this
+   */
+  public function clearAdjustments();
+
+  /**
    * Collects all adjustments that belong to the order.
    *
    * Unlike getAdjustments() which returns only order adjustments,
