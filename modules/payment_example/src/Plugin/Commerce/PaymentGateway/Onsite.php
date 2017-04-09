@@ -117,9 +117,9 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
     $test = $this->getMode() == 'test';
     $payment->setTest($test);
     $payment->setRemoteId($remote_id);
-    $payment->setAuthorizedTime(REQUEST_TIME);
+    $payment->setAuthorizedTime(\Drupal::time()->getRequestTime());
     if ($capture) {
-      $payment->setCapturedTime(REQUEST_TIME);
+      $payment->setCapturedTime(\Drupal::time()->getRequestTime());
     }
     $payment->save();
   }
@@ -141,7 +141,7 @@ class Onsite extends OnsitePaymentGatewayBase implements OnsiteInterface {
 
     $payment->state = 'capture_completed';
     $payment->setAmount($amount);
-    $payment->setCapturedTime(REQUEST_TIME);
+    $payment->setCapturedTime(\Drupal::time()->getRequestTime());
     $payment->save();
   }
 
