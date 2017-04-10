@@ -248,6 +248,9 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals($promotion1->label(), $promotion->label());
   }
 
+  /**
+   * Tests that active promotions which have expired are loaded.
+   */
   public function testLoadExpired() {
     $valid_promotion = Promotion::create([
       'name' => 'Valid Promotion',
@@ -266,12 +269,15 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $expired_promotion->save());
 
     $promotions = $this->promotionStorage->loadExpired();
-    $this->assertEquals(sizeof($promotions), 1);
+    $this->assertEquals(count($promotions), 1);
 
     $promotion = reset($promotions);
     $this->assertEquals($expired_promotion->label(), $promotion->label());
   }
 
+  /**
+   * Tests that active promotions which have met their maximum usage are loaded.
+   */
   public function testLoadUsed() {
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
@@ -296,7 +302,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $promotion3->save());
 
     $promotions = $this->promotionStorage->loadMaxedUsage();
-    $this->assertEquals(sizeof($promotions), 1);
+    $this->assertEquals(count($promotions), 1);
 
     $promotion = reset($promotions);
     $this->assertEquals($promotion1->label(), $promotion->label());

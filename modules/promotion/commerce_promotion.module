@@ -84,7 +84,7 @@ function commerce_promotion_entity_base_field_info(EntityTypeInterface $entity_t
 }
 
 /**
- * Implements hook_cron()
+ * Implements hook_cron().
  */
 function commerce_promotion_cron() {
   /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
@@ -94,6 +94,7 @@ function commerce_promotion_cron() {
   $promotions = $promotion_storage->loadExpired();
 
   if (!empty($promotions)) {
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     foreach ($promotions as $promotion) {
       $promotion->setEnabled(FALSE);
       $promotion->save();
@@ -104,6 +105,7 @@ function commerce_promotion_cron() {
   $promotions = $promotion_storage->loadMaxedUsage();
 
   if (!empty($promotions)) {
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     foreach ($promotions as $promotion) {
       $promotion->setEnabled(FALSE);
       $promotion->save();
