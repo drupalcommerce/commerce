@@ -105,10 +105,9 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
-   * Return all active promotions that are no longer valid determined by their
-   * end date.
+   * Return active promotions that have passed their end date.
    *
-   * @return array|\Drupal\Core\Entity\EntityInterface[]
+   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
    *   The expired promotion entities.
    */
   public function loadExpired() {
@@ -128,10 +127,9 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
   }
 
   /**
-   * Returns any promotions which are still active and have a met their maximum
-   * usage.
+   * Returns active promotions which have a met their maximum usage.
    *
-   * @return array|\Drupal\Core\Entity\EntityInterface[]
+   * @return \Drupal\commerce_promotion\Entity\PromotionInterface[]
    *   Promotions with maxed usage.
    */
   public function loadMaxedUsage() {
@@ -153,6 +151,7 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
     // Get an array of each promotion's use count.
     $promotion_uses = $this->usage->getUsageMultiple($promotions);
 
+    /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
     foreach ($promotions as $promotion) {
       if ($promotion_uses[$promotion->id()] >= $promotion->getUsageLimit()) {
         $maxed_promotions[] = $promotion;
