@@ -10,6 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_currency",
  *   label = @Translation("Currency"),
+ *   label_collection = @Translation("Currencies"),
  *   label_singular = @Translation("currency"),
  *   label_plural = @Translation("currencies"),
  *   label_count = @PluralTranslation(
