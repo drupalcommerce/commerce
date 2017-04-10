@@ -59,7 +59,7 @@ interface PaymentGatewayInterface extends PluginWithFormsInterface, Configurable
    */
   public function getDetails();
 
-  /*
+  /**
    * Gets the JS library ID.
    *
    * This is usually an external library defined in the module's
