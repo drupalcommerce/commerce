@@ -85,7 +85,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
         if ($convert == -1 || $convert === FALSE) {
           $form_state->setError($form['manual']['expires'], $this->t('Invalid offset time format.'));
         }
-        if ($convert < \Drupal::service('commerce.time')->getRequestTime()) {
+        if ($convert < \Drupal::time()->getRequestTime()) {
           $form_state->setError($form['manual']['expires'], $this->t('Future offset time is needed for Expires.'));
         }
       }
@@ -126,7 +126,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
     $test = $this->getMode() == 'test';
     $payment->setTest($test);
     $payment->state = 'pending';
-    $payment->setAuthorizedTime(\Drupal::service('commerce.time')->getRequestTime());
+    $payment->setAuthorizedTime(\Drupal::time()->getRequestTime());
     $payment->save();
   }
 
@@ -143,7 +143,7 @@ class Manual extends ManualPaymentGatewayBase implements ManualPaymentGatewayInt
 
     $payment->state = 'completed';
     $payment->setAmount($amount);
-    $payment->setCapturedTime(\Drupal::service('commerce.time')->getRequestTime());
+    $payment->setCapturedTime(\Drupal::time()->getRequestTime());
     $payment->save();
   }
 
