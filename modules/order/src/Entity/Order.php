@@ -3,6 +3,7 @@
 namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
