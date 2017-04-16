@@ -70,9 +70,7 @@ class CartController extends ControllerBase {
     }
     else {
       $build['empty'] = [
-        '#prefix' => '<div class="cart-empty-page">',
-        '#markup' => $this->t('Your shopping cart is empty.'),
-        '#suffix' => '</div>',
+        '#theme' => 'commerce_cart_empty_page',
       ];
     }
     $build['#cache'] = [

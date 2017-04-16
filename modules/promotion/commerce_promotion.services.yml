@@ -12,8 +12,14 @@ services:
     tags:
       - { name: commerce_order.order_processor, priority: 50 }
 
-  commerce_promotion.coupon_order_processor:
-    class: Drupal\commerce_promotion\CouponOrderProcessor
-    arguments: ['@entity_type.manager']
+  commerce_promotion.usage:
+    class: Drupal\commerce_promotion\PromotionUsage
+    arguments: ['@database']
     tags:
-      - { name: commerce_order.order_processor, priority: 50 }
+      - { name: backend_overridable }
+
+  commerce_promotion.order_subscriber:
+    class: Drupal\commerce_promotion\EventSubscriber\OrderEventSubscriber
+    arguments: ['@entity_type.manager', '@commerce_promotion.usage']
+    tags:
+      - { name: event_subscriber }

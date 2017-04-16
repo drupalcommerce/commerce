@@ -29,7 +29,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events = ['commerce_order.place.pre_transition' => 'finalizeCart'];
+    $events = [
+      'commerce_order.place.pre_transition' => 'finalizeCart',
+    ];
     return $events;
   }
 

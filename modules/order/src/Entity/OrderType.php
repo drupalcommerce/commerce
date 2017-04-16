@@ -10,6 +10,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_order_type",
  *   label = @Translation("Order type"),
+ *   label_collection = @Translation("Order types"),
  *   label_singular = @Translation("order type"),
  *   label_plural = @Translation("order types"),
  *   label_count = @PluralTranslation(

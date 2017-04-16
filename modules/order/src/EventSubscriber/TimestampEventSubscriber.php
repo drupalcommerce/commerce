@@ -27,7 +27,7 @@ class TimestampEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getEntity();
     if (empty($order->getPlacedTime())) {
-      $order->setPlacedTime(REQUEST_TIME);
+      $order->setPlacedTime(\Drupal::time()->getRequestTime());
     }
   }
 

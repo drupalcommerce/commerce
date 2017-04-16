@@ -4,8 +4,14 @@ namespace Drupal\commerce_promotion;
 
 use Drupal\commerce\CommerceContentEntityStorage;
 use Drupal\commerce_order\Entity\OrderTypeInterface;
-use Drupal\commerce_promotion\Entity\CouponInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines the promotion storage.
@@ -13,52 +19,56 @@ use Drupal\commerce_store\Entity\StoreInterface;
 class PromotionStorage extends CommerceContentEntityStorage implements PromotionStorageInterface {
 
   /**
-   * {@inheritdoc}
+   * The usage.
+   *
+   * @var \Drupal\commerce_promotion\PromotionUsageInterface
    */
-  public function loadValid(OrderTypeInterface $order_type, StoreInterface $store) {
-    $query = $this->buildLoadQuery($order_type, $store);
-    // Only load promotions without coupons. Promotions with coupons are loaded
-    // coupon-first in a different process.
-    $query->notExists('coupons');
-    $result = $query->execute();
-    if (empty($result)) {
-      return [];
-    }
-    $promotions = $this->loadMultiple($result);
+  protected $usage;
 
-    return $promotions;
+  /**
+   * Constructs a new PromotionStorage object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection to be used.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   The cache backend to be used.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\commerce_promotion\PromotionUsageInterface $usage
+   *   The usage.
+   */
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, EventDispatcherInterface $event_dispatcher, PromotionUsageInterface $usage) {
+    parent::__construct($entity_type, $database, $entity_manager, $cache, $language_manager, $event_dispatcher);
+
+    $this->usage = $usage;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function loadByCoupon(OrderTypeInterface $order_type, StoreInterface $store, CouponInterface $coupon) {
-    $query = $this->buildLoadQuery($order_type, $store);
-    $query->condition('coupons', $coupon->id());
-    $result = $query->execute();
-    if (empty($result)) {
-      return [];
-    }
-    $promotions = $this->loadMultiple($result);
-
-    return reset($promotions);
-
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('database'),
+      $container->get('entity.manager'),
+      $container->get('cache.entity'),
+      $container->get('language_manager'),
+      $container->get('event_dispatcher'),
+      $container->get('commerce_promotion.usage')
+    );
   }
 
   /**
-   * Builds the base query for loading valid promotions.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
-   *   The order type.
-   * @param \Drupal\commerce_store\Entity\StoreInterface $store
-   *   The store.
-   *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
-   *   The entity query.
+   * {@inheritdoc}
    */
-  protected function buildLoadQuery(OrderTypeInterface $order_type, StoreInterface $store) {
+  public function loadAvailable(OrderTypeInterface $order_type, StoreInterface $store) {
     $query = $this->getQuery();
-
     $or_condition = $query->orConditionGroup()
       ->condition('end_date', gmdate('Y-m-d'), '>=')
       ->notExists('end_date', gmdate('Y-m-d'));
@@ -68,7 +78,30 @@ class PromotionStorage extends CommerceContentEntityStorage implements Promotion
       ->condition('start_date', gmdate('Y-m-d'), '<=')
       ->condition('status', TRUE)
       ->condition($or_condition);
-    return $query;
+    // Only load promotions without coupons. Promotions with coupons are loaded
+    // coupon-first in a different process.
+    $query->notExists('coupons');
+    $query->sort('weight', 'ASC');
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
+    }
+
+    $promotions = $this->loadMultiple($result);
+    // Remove any promotions that have hit their usage limit.
+    $promotions_with_usage_limits = array_filter($promotions, function ($promotion) {
+      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+      return !empty($promotion->getUsageLimit());
+    });
+    $usages = $this->usage->getUsageMultiple($promotions_with_usage_limits);
+    foreach ($promotions_with_usage_limits as $promotion_id => $promotion) {
+      /** @var \Drupal\commerce_promotion\Entity\PromotionInterface $promotion */
+      if ($promotion->getUsageLimit() <= $usages[$promotion_id]) {
+        unset($promotions[$promotion_id]);
+      }
+    }
+
+    return $promotions;
   }
 
 }

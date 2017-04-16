@@ -9,8 +9,10 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Resolver\OrderTypeResolverInterface;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
 use Drupal\commerce_store\StoreContextInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
@@ -77,6 +79,10 @@ class AddToCartForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    * @param \Drupal\commerce_cart\CartManagerInterface $cart_manager
    *   The cart manager.
    * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
@@ -90,8 +96,8 @@ class AddToCartForm extends ContentEntityForm {
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
-    parent::__construct($entity_manager);
+  public function __construct(EntityManagerInterface $entity_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, CartManagerInterface $cart_manager, CartProviderInterface $cart_provider, OrderTypeResolverInterface $order_type_resolver, StoreContextInterface $store_context, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user) {
+    parent::__construct($entity_manager, $entity_type_bundle_info, $time);
 
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
@@ -109,6 +115,8 @@ class AddToCartForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('commerce_cart.cart_manager'),
       $container->get('commerce_cart.cart_provider'),
       $container->get('commerce_order.chain_order_type_resolver'),

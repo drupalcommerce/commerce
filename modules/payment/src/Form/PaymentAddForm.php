@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -123,15 +124,10 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
     }
     $selected_payment_gateway = $payment_gateways[$selected_payment_gateway_id];
     if (count($payment_gateways) > 1) {
-      $payment_gateway_options = array_map(function ($payment_gateway) {
-        /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-        return $payment_gateway->label();
-      }, $payment_gateways);
-
       $form['payment_gateway'] = [
         '#type' => 'radios',
         '#title' => $this->t('Payment gateway'),
-        '#options' => $payment_gateway_options,
+        '#options' => EntityHelper::extractLabels($payment_gateways),
         '#default_value' => $selected_payment_gateway_id,
         '#required' => TRUE,
         '#ajax' => [
