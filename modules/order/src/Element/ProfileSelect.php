@@ -135,6 +135,9 @@ class ProfileSelect extends CommerceElementBase {
     $profile_selection_parents[] = 'profile_selection';
     $profile_id = $form_state->getValue($profile_selection_parents);
     $storage = $form_state->getStorage();
+    $reuse_profile = (isset($storage['pane_' . $pane_id]['reuse_profile']))
+      ? $storage['pane_' . $pane_id]['reuse_profile']
+      : $element['#reuse_profile_default'];
 
     // User is adding a new profile.
     if ($profile_id && $profile_id == 'new_profile') {
@@ -160,18 +163,12 @@ class ProfileSelect extends CommerceElementBase {
     $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
 
-    $reuse_profile = (isset($storage['pane_' . $pane_id]['reuse_profile']))
-      ? $storage['pane_' . $pane_id]['reuse_profile']
-      : $element['#reuse_profile_default'];
-
     // Remember the current profile and mode in form state.
     if (!empty($default_profile)) {
       $storage['pane_' . $pane_id] = [
         'profile' => $default_profile,
         'mode' => $mode,
-        'reuse_profile' => $reuse_profile,
       ];
-      $form_state->setStorage($storage);
       $element['#default_value'] = $default_profile;
     }
     // No profiles found or user wants to create a new one.
@@ -199,6 +196,10 @@ class ProfileSelect extends CommerceElementBase {
         $widget_element['address']['#available_countries'] = $element['#available_countries'];
       }
     }
+
+    // Maintain the state of the Reuse Profile checkbox
+    $storage['pane_' . $pane_id]['reuse_profile'] = $reuse_profile;
+    $form_state->setStorage($storage);
 
     $called_class = get_called_class();
     $reuse_enabled = (!empty($element['#reuse_profile_label']) && !empty($element['#reuse_profile_source']));
