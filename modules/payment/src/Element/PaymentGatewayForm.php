@@ -19,6 +19,8 @@ use Drupal\Core\Form\FormStateInterface;
  *   // On submit, the payment method will be created remotely, and the
  *   // entity updated, for access via $form_state->getValue('payment_method')
  *   '#default_value' => $payment_method,
+ *   // Additional options to pass into the commerce_profile_select element.
+ *   '#profile_select_options' => [],
  * ];
  * @endcode
  *
@@ -35,6 +37,7 @@ class PaymentGatewayForm extends CommerceElementBase {
       '#operation' => '',
       // The entity operated on. Instance of EntityWithPaymentGatewayInterface.
       '#default_value' => NULL,
+      '#profile_select_options' => [],
       '#process' => [
         [$class, 'attachElementSubmit'],
         [$class, 'processForm'],

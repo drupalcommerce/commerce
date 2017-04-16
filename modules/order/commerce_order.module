@@ -181,3 +181,29 @@ function commerce_order_mail($key, &$message, $params) {
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 }
+
+/**
+ * Determine the current shipping profile for reuse as the billing profile.
+ *
+ * @param array $element
+ *   The element reusing the shipping profile.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ * @param array $complete_form
+ *   The complete checkout form.
+ *
+ * @return \Drupal\profile\Entity\ProfileInterface|NULL
+ *   The shipping profile, or NULL if none can be found.
+ */
+function commerce_order_get_shipping_profile(array $element, FormStateInterface $form_state, array $complete_form) {
+  $profile = NULL;
+
+  $storage = $form_state->getStorage();
+  if (isset($storage['pane_shipping_information[shipping_profile]']['profile'])) {
+    $profile = $storage['pane_shipping_information[shipping_profile]']['profile'];
+  } elseif (isset($complete_form['shipping_information']['shipping_profile']['#profile'])) {
+    $profile = $complete_form['shipping_information']['shipping_profile']['#profile'];
+  }
+
+  return $profile;
+}

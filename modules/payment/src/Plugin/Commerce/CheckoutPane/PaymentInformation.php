@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
+use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\BillingInformationPaneBase;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
@@ -18,7 +18,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   wrapper_element = "fieldset",
  * )
  */
-class PaymentInformation extends CheckoutPaneBase {
+class PaymentInformation extends BillingInformationPaneBase {
 
   /**
    * {@inheritdoc}
@@ -114,6 +114,7 @@ class PaymentInformation extends CheckoutPaneBase {
       }
     }
 
+    $profile_select_options = $this->getProfileSelectOptions();
     $selected_option = $pane_form['payment_method'][$default_option];
     $payment_gateway = $payment_gateways[$selected_option['#payment_gateway']];
     if ($payment_gateway->getPlugin() instanceof SupportsStoredPaymentMethodsInterface) {
@@ -129,6 +130,7 @@ class PaymentInformation extends CheckoutPaneBase {
         $pane_form['add_payment_method'] = [
           '#type' => 'commerce_payment_gateway_form',
           '#operation' => 'add-payment-method',
+          '#profile_select_options' => $profile_select_options,
           '#default_value' => $payment_method,
         ];
       }
@@ -148,7 +150,7 @@ class PaymentInformation extends CheckoutPaneBase {
         '#default_value' => $billing_profile,
         '#default_country' => $store->getAddress()->getCountryCode(),
         '#available_countries' => $store->getBillingCountries(),
-      ];
+      ] + $profile_select_options;
     }
 
     return $pane_form;
