@@ -118,6 +118,8 @@ class PaymentProcess extends CheckoutPaneBase {
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
         drupal_set_message($message, 'error');
+        $this->order->get('payment_gateway')->setValue(NULL);
+        $this->order->get('payment_method')->setValue(NULL);
         $this->redirectToPreviousStep();
       }
       catch (PaymentGatewayException $e) {
