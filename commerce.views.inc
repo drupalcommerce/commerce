@@ -20,10 +20,12 @@ function commerce_views_data_alter(array &$data) {
       if ($data_table = $entity_type->getDataTable()) {
         $data[$data_table][$entity_type->getKey('bundle')]['field']['id'] = 'commerce_entity_bundle';
         $data[$data_table][$entity_type->getKey('bundle')]['filter']['id'] = 'commerce_entity_bundle';
+        $data[$data_table][$entity_type->getKey('id')]['filter']['id'] = 'commerce_entity_select';
       }
       else {
         $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['field']['id'] = 'commerce_entity_bundle';
         $data[$entity_type->getBaseTable()][$entity_type->getKey('bundle')]['filter']['id'] = 'commerce_entity_bundle';
+        $data[$entity_type->getBaseTable()][$entity_type->getKey('id')]['filter']['id'] = 'commerce_entity_select';
       }
     }
   }

@@ -20,3 +20,10 @@ views.field.commerce_store:
     hide_single_store:
       type: boolean
       label: 'Hide if there''s only one store.'
+
+views.filter.commerce_store:
+  type: views.filter.commerce_entity_select
+  mapping:
+    hide_single_entity:
+      type: boolean
+      label: 'Hide if there''s only one store.'
