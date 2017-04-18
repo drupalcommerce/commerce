@@ -65,6 +65,22 @@ class MultipleCartFormsTest extends CartBrowserTestBase {
     $this->cart = Order::load($this->cart->id());
     $order_items = $this->cart->getItems();
     $this->assertEquals(new Price('6', 'USD'), $order_items[0]->getTotalPrice());
+
+    // Usually, rendered products are used for products Views,
+    // However there could be also fields needed, so we need to test also
+    // variations "commerce_add_to_cart" field formatter.
+    $this->drupalGet('/test-multiple-cart-forms-fields');
+
+    /** @var \Behat\Mink\Element\NodeElement[] $forms */
+    $forms = $this->getSession()->getPage()->findAll('css', '.commerce-order-item-add-to-cart-form');
+    $this->assertEquals(5, count($forms));
+    $this->submitForm([], 'Add to cart', $forms[3]->getAttribute('id'));
+
+    \Drupal::entityTypeManager()->getStorage('commerce_order')->resetCache();
+    $this->cart = Order::load($this->cart->id());
+    $order_items = $this->cart->getItems();
+    $this->assertEquals(2, count($order_items));
+    $this->assertEquals(new Price('9', 'USD'), $order_items[1]->getTotalPrice());
   }
 
 }
