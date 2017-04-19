@@ -158,10 +158,10 @@ class ProfileSelect extends CommerceElementBase {
       $default_profile = $element['#default_value'];
       $default_profile_id = $default_profile->id();
       $bundle = $default_profile->bundle();
-    }
 
-    if (empty($profiles) && !empty($default_profile)) {
-      $mode = 'edit';
+      if (empty($profiles) && !empty($default_profile)) {
+        $mode = 'edit';
+      }
     }
 
     $ajax_wrapper_id = Html::getUniqueId('profile-select-ajax-wrapper');
