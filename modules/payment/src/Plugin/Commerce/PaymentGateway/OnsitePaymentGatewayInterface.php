@@ -45,4 +45,13 @@ interface OnsitePaymentGatewayInterface extends PaymentGatewayInterface, Support
    */
   public function createPayment(PaymentInterface $payment, $capture = TRUE);
 
+  /**
+   * Determines if a payment should be captured by default.
+   *
+   * @return bool
+   *   TRUE if payments should be captured by default.
+   *   FALSE if payments should be authorized by default.
+   */
+  public function shouldCapturePaymentByDefault();
+
 }

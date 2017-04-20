@@ -56,8 +56,10 @@ class PaymentGatewayTest extends CommerceBrowserTestBase {
     $this->assertEquals('Example', $payment_gateway->label());
     $this->assertEquals('example_offsite_redirect', $payment_gateway->getPluginId());
     $this->assertEquals(TRUE, $payment_gateway->status());
+    /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface $payment_gateway_plugin */
     $payment_gateway_plugin = $payment_gateway->getPlugin();
     $this->assertEquals('test', $payment_gateway_plugin->getMode());
+    $this->assertFalse($payment_gateway_plugin->shouldCapturePaymentByDefault());
     $configuration = $payment_gateway_plugin->getConfiguration();
     $this->assertEquals('post', $configuration['redirect_method']);
   }
