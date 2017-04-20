@@ -2,10 +2,11 @@
 
 namespace Drupal\commerce_promotion\Element;
 
-use Drupal\commerce\Element\CommerceElementBase;
+use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\FormElement;
 
 /**
  * Provides a form element for redeeming a coupon.
@@ -26,7 +27,9 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("commerce_coupon_redemption_form")
  */
-class CouponRedemptionForm extends CommerceElementBase {
+class CouponRedemptionForm extends FormElement {
+
+  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}
