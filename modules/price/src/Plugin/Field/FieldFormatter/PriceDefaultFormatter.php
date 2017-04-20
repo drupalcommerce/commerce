@@ -165,6 +165,10 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
     }
     $currencies = $this->currencyStorage->loadMultiple($currency_codes);
 
+    $cache_tags = [
+      'config:' . $this->fieldDefinition->getTargetEntityTypeId() . '.' . $this->fieldDefinition->getTargetBundle() . '.' . $this->viewMode,
+    ];
+
     $elements = [];
     foreach ($items as $delta => $item) {
       $currency = $currencies[$item->currency_code];
@@ -175,6 +179,7 @@ class PriceDefaultFormatter extends FormatterBase implements ContainerFactoryPlu
             'languages:' . LanguageInterface::TYPE_INTERFACE,
             'country',
           ],
+          'tags' => $cache_tags,
         ],
       ];
     }
