@@ -87,8 +87,9 @@ class OrderStorage extends CommerceContentEntityStorage {
    */
   protected function doPreSave(EntityInterface $entity) {
     $id = parent::doPreSave($entity);
+    // Refresh only order with items.
     /** @var \Drupal\commerce_order\Entity\OrderInterface $entity */
-    if ($entity->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
+    if ($entity->hasItems() && $entity->getRefreshState() == OrderInterface::REFRESH_ON_SAVE) {
       $this->orderRefresh->refresh($entity);
     }
     // Only the REFRESH_ON_LOAD state needs to be persisted on the entity.
