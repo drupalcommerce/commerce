@@ -86,7 +86,6 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
       'name' => 'Promotion (with coupon)',
       'order_types' => ['default'],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
@@ -94,6 +93,8 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
         ],
       ],
       'conditions' => [],
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
     ]);
 
     $coupon = $this->createEntity('commerce_promotion_coupon', [
@@ -128,14 +129,17 @@ class CouponRedemptionTest extends CommerceBrowserTestBase {
     $this->getSession()->getPage()->pressButton('Apply');
 
     $this->assertSession()->pageTextContains('Coupon applied');
-    $this->assertSession()->elementTextContains('css', '.order-total-line', 'Discount');
+    // The view is processed before the coupon element, so it
+    // won't reflect the updated order until the page reloads.
+    $this->drupalGet(Url::fromRoute('commerce_cart.page'));
     $this->assertSession()->pageTextContains('-$99.90');
 
     $this->assertSession()->fieldNotExists('coupons[code]');
     $this->assertSession()->buttonNotExists('Apply');
     $this->getSession()->getPage()->pressButton('Remove promotion');
 
-    $this->assertSession()->elementTextNotContains('css', '.order-total-line', 'Discount');
+    $this->drupalGet(Url::fromRoute('commerce_cart.page'));
+    $this->assertSession()->pageTextNotContains('-$99.90');
     $this->assertSession()->fieldExists('coupons[code]');
     $this->assertSession()->buttonExists('Apply');
   }
