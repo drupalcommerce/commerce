@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Builds the form to delete an order item type.
+ * Provides a generic form for deleting bundle entities.
  */
 class CommerceBundleEntityDeleteFormBase extends EntityDeleteForm {
 
