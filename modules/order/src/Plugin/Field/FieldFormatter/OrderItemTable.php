@@ -23,14 +23,19 @@ class OrderItemTable extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $order = $items->getEntity();
-    return [
-      '#type' => 'view',
-      // @todo Allow the view to be configurable.
-      '#name' => 'commerce_order_item_table',
-      '#arguments' => [$order->id()],
-      '#embed' => TRUE,
-    ];
+    $element = [];
+    if ($items->count() > 0) {
+      $order = $items->getEntity();
+
+      $element[] = [
+        '#type' => 'view',
+        // @todo Allow the view to be configurable.
+        '#name' => 'commerce_order_item_table',
+        '#arguments' => [$order->id()],
+        '#embed' => TRUE,
+      ];
+    }
+    return $element;
   }
 
   /**
