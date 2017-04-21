@@ -396,7 +396,16 @@ display:
           entity_field: order_item_id
           plugin_id: standard
       header: {  }
-      footer: {  }
+      footer:
+        commerce_order_total:
+          id: commerce_order_total
+          table: views
+          field: commerce_order_total
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: false
+          plugin_id: commerce_order_total
       empty: {  }
       relationships:
         order_items:
