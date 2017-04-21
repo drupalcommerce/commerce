@@ -63,7 +63,9 @@ class AddToCartFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    return [
+    $elements = [];
+    $output = [];
+    $output['add_to_cart_form'] = [
       '#lazy_builder' => ['commerce_product.lazy_builders:addToCartForm', [
         $items->getEntity()->id(),
         $this->viewMode,
@@ -72,6 +74,8 @@ class AddToCartFormatter extends FormatterBase {
       ],
       '#create_placeholder' => TRUE,
     ];
+    $elements[] = $output;
+    return $elements;
   }
 
   /**
