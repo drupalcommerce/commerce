@@ -21,7 +21,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_order\Form\OrderTypeForm",
  *       "edit" = "Drupal\commerce_order\Form\OrderTypeForm",
- *       "delete" = "Drupal\commerce_order\Form\OrderTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
