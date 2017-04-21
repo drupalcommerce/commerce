@@ -598,7 +598,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
-        'type' => 'commerce_optional_date',
+        'type' => 'commerce_end_date',
         'weight' => 6,
       ]);
 
