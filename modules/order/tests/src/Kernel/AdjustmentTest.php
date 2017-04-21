@@ -92,6 +92,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
    * @covers ::getLabel
    * @covers ::getAmount
    * @covers ::getSourceId
+   * @covers ::isIncluded
    */
   public function testAdjustmentMethods() {
     $definition = [
@@ -99,6 +100,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
       'label' => '10% off',
       'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
+      'included' => TRUE,
     ];
 
     $adjustment = new Adjustment($definition);
@@ -107,6 +109,7 @@ class AdjustmentTest extends CommerceKernelTestBase {
     $this->assertEquals('-1.00', $adjustment->getAmount()->getNumber());
     $this->assertEquals('USD', $adjustment->getAmount()->getCurrencyCode());
     $this->assertEquals('1', $adjustment->getSourceId());
+    $this->assertTrue($adjustment->isIncluded());
   }
 
 }

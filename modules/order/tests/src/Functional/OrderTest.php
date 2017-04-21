@@ -86,8 +86,8 @@ class OrderTest extends OrderBrowserTestBase {
     $transition = $order->getState()->getWorkflow()->getTransition('place');
     $order->getState()->applyTransition($transition);
     $order->save();
-    $this->assertEquals($order->getPlacedTime(), REQUEST_TIME);
-    $this->assertEquals($order->getCompletedTime(), REQUEST_TIME);
+    $this->assertEquals($order->getPlacedTime(), \Drupal::time()->getRequestTime());
+    $this->assertEquals($order->getCompletedTime(), \Drupal::time()->getRequestTime());
   }
 
 }
