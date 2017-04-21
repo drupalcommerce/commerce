@@ -48,6 +48,7 @@ class ChainLocaleResolver implements ChainLocaleResolverInterface {
         return $result;
       }
     }
+    return NULL;
   }
 
 }

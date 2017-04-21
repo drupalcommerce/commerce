@@ -51,6 +51,7 @@ class ChainPriceResolver implements ChainPriceResolverInterface {
         return $result;
       }
     }
+    return NULL;
   }
 
 }

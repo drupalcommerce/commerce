@@ -48,6 +48,7 @@ class ChainStoreResolver implements ChainStoreResolverInterface {
         return $result;
       }
     }
+    return NULL;
   }
 
 }

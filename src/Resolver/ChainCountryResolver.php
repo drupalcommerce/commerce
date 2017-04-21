@@ -48,6 +48,7 @@ class ChainCountryResolver implements ChainCountryResolverInterface {
         return $result;
       }
     }
+    return NULL;
   }
 
 }
