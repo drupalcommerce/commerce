@@ -68,9 +68,11 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     // @todo Clean up once https://www.drupal.org/node/2318187 is fixed.
     if ($this->operation == 'add') {
       $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->uuid()]);
+      $fields = $this->entityFieldManager->getBaseFieldDefinitions('commerce_product');
     }
     else {
       $product = $this->entityTypeManager->getStorage('commerce_product')->create(['type' => $product_type->id()]);
+      $fields = $this->entityFieldManager->getFieldDefinitions('commerce_product', $product_type->id());
     }
 
     $form['label'] = [
@@ -114,6 +116,31 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
     ];
     $form = $this->buildTraitForm($form, $form_state);
 
+    $form['additional_settings'] = [
+      '#type' => 'vertical_tabs',
+      '#attached' => [
+        'library' => ['node/drupal.content_types'],
+      ],
+    ];
+    $form['submission'] = [
+      '#type' => 'details',
+      '#title' => t('Submission form settings'),
+      '#group' => 'additional_settings',
+      '#open' => TRUE,
+    ];
+    $form['submission']['title_label'] = [
+      '#title' => t('Title field label'),
+      '#type' => 'textfield',
+      '#default_value' => $fields['title']->getLabel(),
+      '#required' => TRUE,
+    ];
+    $form['submission']['title_description'] = [
+      '#title' => t('Title field description'),
+      '#type' => 'textarea',
+      '#default_value' => $fields['title']->getDescription(),
+      '#rows' => 2,
+    ];
+
     if ($this->moduleHandler->moduleExists('language')) {
       $form['language'] = [
         '#type' => 'details',
@@ -155,6 +182,18 @@ class ProductTypeForm extends CommerceBundleEntityFormBase {
       $this->entityFieldManager->clearCachedFieldDefinitions();
     }
     $this->submitTraitForm($form, $form_state);
+
+    $fields = $this->entityFieldManager->getFieldDefinitions('commerce_product', $this->entity->id());
+    // Update title field definition.
+    $title_field = $fields['title'];
+    $title_label = $form_state->getValue('title_label');
+    if ($title_field->getLabel() != $title_label) {
+      $title_field->getConfig($this->entity->id())->setLabel($title_label)->save();
+    }
+    $title_description = $form_state->getValue('title_description');
+    if ($title_field->getDescription() != $title_description) {
+      $title_field->getConfig($this->entity->id())->setDescription($title_description)->save();
+    }
 
     drupal_set_message($this->t('The product type %label has been successfully saved.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.commerce_product_type.collection');

@@ -68,11 +68,16 @@ class ProductTypeTest extends ProductBrowserTestBase {
     $edit = [
       'label' => 'Default2',
       'description' => 'New description.',
+      'title_label' => 'Foo',
+      'title_description' => '',
     ];
     $this->submitForm($edit, t('Save'));
     $product_type = ProductType::load('default');
     $this->assertEquals($product_type->label(), $edit['label'], 'The label of the product type has been changed.');
     $this->assertEquals($product_type->getDescription(), $edit['description'], 'The new product type has the correct label.');
+    $this->drupalGet('product/add');
+    $this->assertSession()->pageTextContains('Foo');
+    $this->assertSession()->pageTextNotContains('The product title.');
   }
 
   /**
