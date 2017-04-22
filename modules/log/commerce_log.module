@@ -11,11 +11,13 @@
 function commerce_log_preprocess_commerce_order(&$variables) {
   /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
+  $order_payments = \Drupal::entityTypeManager()->getStorage('commerce_payment')->loadByProperties(['order_id' => $order->id()]);
+  $entity_ids = implode(',', array_merge([$order->id()], array_keys($order_payments)));
   $variables['order']['activity'] = [
     '#type' => 'view',
     '#name' => 'commerce_activity',
     '#display_id' => 'default',
-    '#arguments' => [$order->id(), 'commerce_order'],
+    '#arguments' => [$entity_ids, 'commerce_order,commerce_payment'],
     '#embed' => TRUE,
     '#title' => t('Order activity'),
   ];

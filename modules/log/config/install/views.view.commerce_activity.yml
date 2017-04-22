@@ -337,7 +337,7 @@ display:
             type: none
             fail: 'not found'
           validate_options: {  }
-          break_phrase: false
+          break_phrase: true
           not: false
           entity_type: commerce_log
           entity_field: source_entity_id
@@ -379,7 +379,7 @@ display:
           case: none
           path_case: none
           transform_dash: false
-          break_phrase: false
+          break_phrase: true
           entity_type: commerce_log
           entity_field: source_entity_type
           plugin_id: string
