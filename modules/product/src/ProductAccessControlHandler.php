@@ -21,7 +21,7 @@ class ProductAccessControlHandler extends EntityAccessControlHandler {
     $result = parent::checkAccess($entity, $operation, $account);
 
     if ($result->isNeutral() && $entity->isPublished()) {
-      $result = AccessResult::allowedIfHasPermission($account, 'view published ' . $entity->getEntityTypeId());
+      $result = AccessResult::allowedIfHasPermission($account, 'view published commerce_product');
       $result->addCacheableDependency($entity);
     }
 

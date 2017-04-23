@@ -28,7 +28,7 @@ abstract class ProductBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * The product to test against.
    *
-   * @var \Drupal\commerce_product\Entity\ProductInterface[]
+   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
 
