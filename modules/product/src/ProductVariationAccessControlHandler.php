@@ -21,7 +21,6 @@ class ProductVariationAccessControlHandler extends EmbeddedEntityAccessControlHa
     $result = parent::checkAccess($entity, $operation, $account);
 
     if ($result->isNeutral()) {
-      // @todo move to permission.
       $result = AccessResult::allowedIf($entity->isActive());
       $result->addCacheableDependency($entity);
     }
