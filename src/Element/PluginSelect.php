@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Render\Element\FormElement;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,7 +26,9 @@ use Symfony\Component\HttpFoundation\Request;
  * ];
  * @endcode
  */
-class PluginSelect extends CommerceElementBase {
+class PluginSelect extends FormElement {
+
+  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}
@@ -42,6 +45,9 @@ class PluginSelect extends CommerceElementBase {
         [$class, 'attachElementSubmit'],
         [$class, 'processPluginSelect'],
         [$class, 'processAjaxForm'],
+      ],
+      '#after_build' => [
+        [$class, 'clearValues'],
       ],
       '#element_validate' => [
         [$class, 'validateElementSubmit'],
@@ -72,18 +78,17 @@ class PluginSelect extends CommerceElementBase {
     // Prefix and suffix used for Ajax replacement.
     $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
-
     $element['#tree'] = TRUE;
+
     $element['target_plugin_id'] = [
       '#type' => $element['#plugin_element_type'],
       '#title' => $element['#title'],
       '#multiple' => FALSE,
       '#ajax' => [
-        'callback' => [get_called_class(), 'pluginFormAjax'],
+        'callback' => [get_called_class(), 'ajaxRefresh'],
         'wrapper' => $ajax_wrapper_id,
       ],
       '#default_value' => $target_plugin_id,
-      '#ajax_array_parents' => $element['#array_parents'],
       '#required' => $element['#required'],
     ];
     // Add a "_none" option if the element is not required.
@@ -102,8 +107,8 @@ class PluginSelect extends CommerceElementBase {
         continue;
       }
 
-      // Group categorized plugins.
-      if (isset($definition['category'])) {
+      // Group categorized plugins, and if using a select element.
+      if (isset($definition['category']) && $element['#plugin_element_type'] == 'select') {
         $element['target_plugin_id']['#options'][(string) $definition['category']][$definition['id']] = $definition['label'];
       }
       else {
@@ -122,10 +127,13 @@ class PluginSelect extends CommerceElementBase {
     $element['target_plugin_configuration'] = [
       '#type' => 'container',
     ];
-    if ($target_plugin_id != '_none') {
+    if (!empty($target_plugin_id) && $target_plugin_id != '_none') {
       /** @var \Drupal\Core\Executable\ExecutableInterface $plugin */
       $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
       if ($plugin instanceof PluginFormInterface) {
+        $element['target_plugin_configuration'] = [
+          '#tree' => TRUE,
+        ];
         $element['target_plugin_configuration'] = $plugin->buildConfigurationForm($element['target_plugin_configuration'], $form_state);
       }
     }
@@ -136,15 +144,14 @@ class PluginSelect extends CommerceElementBase {
   /**
    * Ajax callback.
    */
-  public static function pluginFormAjax(&$form, FormStateInterface $form_state, Request $request) {
-    $triggering_element = $form_state->getTriggeringElement();
-    while (!isset($triggering_element['#ajax_array_parents'])) {
-      array_pop($triggering_element['#array_parents']);
-      $triggering_element = NestedArray::getValue($form, $triggering_element['#array_parents']);
-    }
-    $element = NestedArray::getValue($form, $triggering_element['#ajax_array_parents']);
+  public static function ajaxRefresh(&$form, FormStateInterface $form_state, Request $request) {
+    $target_plugin_id_element = $form_state->getTriggeringElement();
 
-    return $element;
+    // Radios are an extra parent deep compared to the select.
+    $slice_length = ($target_plugin_id_element['#type'] == 'radio') ? -2 : -1;
+
+    $plugin_select_element = NestedArray::getValue($form, array_slice($target_plugin_id_element['#array_parents'], 0, $slice_length));
+    return $plugin_select_element;
   }
 
   /**
@@ -180,8 +187,9 @@ class PluginSelect extends CommerceElementBase {
     // If a plugin was selected, create an instance and pass the configuration
     // values to its configuration form validation method.
     if ($target_plugin_id != '_none') {
+      /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
       $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-      $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
+      $plugin = $plugin_manager->createInstance($target_plugin_id, $element['#default_value']['target_plugin_configuration']);
       if ($plugin instanceof PluginFormInterface) {
         $plugin->validateConfigurationForm($element['target_plugin_configuration'], $form_state);
       }
@@ -202,8 +210,9 @@ class PluginSelect extends CommerceElementBase {
     // If a plugin was selected, create an instance and pass the configuration
     // values to its configuration form submission method.
     if ($target_plugin_id != '_none') {
+      /** @var \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager */
       $plugin_manager = \Drupal::service('plugin.manager.' . $element['#plugin_type']);
-      $plugin = $plugin_manager->createInstance($target_plugin_id, $values['target_plugin_configuration']);
+      $plugin = $plugin_manager->createInstance($target_plugin_id, $element['#default_value']['target_plugin_configuration']);
       if ($plugin instanceof PluginFormInterface) {
         /** @var \Drupal\Component\Plugin\ConfigurablePluginInterface $plugin */
         $plugin->submitConfigurationForm($element['target_plugin_configuration'], $form_state);
@@ -211,6 +220,30 @@ class PluginSelect extends CommerceElementBase {
         $form_state->setValueForElement($element, $values);
       }
     }
+  }
+
+  /**
+   * Clears the plugin-specific form values when the target plugin changes.
+   *
+   * Implemented as an #after_build callback because #after_build runs before
+   * validation, allowing the values to be cleared early enough to prevent the
+   * "Illegal choice" error.
+   */
+  public static function clearValues(array $element, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    if (!$triggering_element) {
+      return $element;
+    }
+
+    $triggering_element_name = end($triggering_element['#parents']);
+    if ($triggering_element_name == 'target_plugin_id') {
+      $input = &$form_state->getUserInput();
+      $parents = array_merge($element['#parents'], ['target_plugin_configuration']);
+      NestedArray::setValue($input, $parents, '');
+      $element['target_plugin_configuration']['#value'] = '';
+    }
+
+    return $element;
   }
 
 }

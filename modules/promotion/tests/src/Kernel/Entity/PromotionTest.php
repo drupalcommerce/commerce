@@ -2,8 +2,14 @@
 
 namespace Drupal\Tests\commerce_promotion\Kernel\Entity;
 
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_price\Price;
+use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -38,7 +44,7 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
+    $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -46,6 +52,12 @@ class PromotionTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+
+    OrderItemType::create([
+      'id' => 'test',
+      'label' => 'Test',
+      'orderType' => 'default',
+    ])->save();
   }
 
   /**
@@ -61,8 +73,13 @@ class PromotionTest extends CommerceKernelTestBase {
    * @covers ::setStores
    * @covers ::setStoreIds
    * @covers ::getStoreIds
-   * @covers ::getCurrentUsage
-   * @covers ::setCurrentUsage
+   * @covers ::getCouponIds
+   * @covers ::getCoupons
+   * @covers ::setCoupons
+   * @covers ::hasCoupons
+   * @covers ::addCoupon
+   * @covers ::removeCoupon
+   * @covers ::hasCoupon
    * @covers ::getUsageLimit
    * @covers ::setUsageLimit
    * @covers ::getStartDate
@@ -97,8 +114,31 @@ class PromotionTest extends CommerceKernelTestBase {
     $promotion->setStoreIds([$this->store->id()]);
     $this->assertEquals([$this->store->id()], $promotion->getStoreIds());
 
-    $promotion->setCurrentUsage(1);
-    $this->assertEquals(1, $promotion->getCurrentUsage());
+    $coupon1 = Coupon::create([
+      'code' => $this->randomMachineName(),
+      'status' => TRUE,
+    ]);
+    $coupon1->save();
+    $coupon2 = Coupon::create([
+      'code' => $this->randomMachineName(),
+      'status' => TRUE,
+    ]);
+    $coupon2->save();
+    $coupon1 = Coupon::load($coupon1->id());
+    $coupon2 = Coupon::load($coupon2->id());
+    $coupons = [$coupon1, $coupon2];
+    $coupon_ids = [$coupon1->id(), $coupon2->id()];
+
+    $this->assertFalse($promotion->hasCoupons());
+    $promotion->setCoupons($coupons);
+    $this->assertTrue($promotion->hasCoupons());
+    $this->assertEquals($coupons, $promotion->getCoupons());
+    $this->assertEquals($coupon_ids, $promotion->getCouponIds());
+    $this->assertTrue($promotion->hasCoupon($coupon1));
+    $promotion->removeCoupon($coupon1);
+    $this->assertFalse($promotion->hasCoupon($coupon1));
+    $promotion->addCoupon($coupon1);
+    $this->assertTrue($promotion->hasCoupon($coupon1));
 
     $promotion->setUsageLimit(10);
     $this->assertEquals(10, $promotion->getUsageLimit());
@@ -111,6 +151,68 @@ class PromotionTest extends CommerceKernelTestBase {
 
     $promotion->setEnabled(TRUE);
     $this->assertEquals(TRUE, $promotion->isEnabled());
+  }
+
+  /**
+   * @covers ::available
+   */
+  public function testAvailability() {
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
+    $order_item = OrderItem::create([
+      'type' => 'test',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order = Order::create([
+      'type' => 'default',
+      'state' => 'draft',
+      'mail' => 'test@example.com',
+      'ip_address' => '127.0.0.1',
+      'order_number' => '6',
+      'store_id' => $this->store,
+      'uid' => $this->createUser(),
+      'order_items' => [$order_item],
+    ]);
+    $order->setRefreshState(Order::REFRESH_SKIP);
+    $order->save();
+
+    $promotion = Promotion::create([
+      'order_types' => ['default'],
+      'stores' => [$this->store->id()],
+      'usage_limit' => 1,
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
+    ]);
+    $promotion->save();
+    $this->assertTrue($promotion->available($order));
+
+    $promotion->setEnabled(FALSE);
+    $this->assertFalse($promotion->available($order));
+    $promotion->setEnabled(TRUE);
+
+    $promotion->setOrderTypeIds(['test']);
+    $this->assertFalse($promotion->available($order));
+    $promotion->setOrderTypeIds(['default']);
+
+    $promotion->setStoreIds(['90']);
+    $this->assertFalse($promotion->available($order));
+    $promotion->setStoreIds([$this->store->id()]);
+
+    $fake_time = $this->prophesize(TimeInterface::class);
+    $fake_time->getRequestTime()->willReturn(mktime(0, 0, 0, '01', '15', '2016'));
+    $this->container->set('datetime.time', $fake_time->reveal());
+    $this->assertFalse($promotion->available($order));
+
+    $fake_time = $this->prophesize(TimeInterface::class);
+    $fake_time->getRequestTime()->willReturn(mktime(0, 0, 0, '01', '15', '2017'));
+    $this->container->set('datetime.time', $fake_time->reveal());
+    $promotion->setEndDate(new DrupalDateTime('2017-01-14'));
+    $this->assertFalse($promotion->available($order));
+    $promotion->setEndDate(NULL);
+
+    \Drupal::service('commerce_promotion.usage')->addUsage($order, $promotion);
+    $this->assertFalse($promotion->available($order));
   }
 
 }

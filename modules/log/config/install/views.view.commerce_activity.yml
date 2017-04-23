@@ -44,9 +44,8 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: some
+        type: none
         options:
-          items_per_page: 5
           offset: 0
       style:
         type: table
@@ -275,21 +274,6 @@ display:
           plugin_id: field
       filters: {  }
       sorts:
-        created:
-          id: created
-          table: commerce_log
-          field: created
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: DESC
-          exposed: false
-          expose:
-            label: ''
-          granularity: second
-          entity_type: commerce_log
-          entity_field: created
-          plugin_id: date
         log_id:
           id: log_id
           table: commerce_log

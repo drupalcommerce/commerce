@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_checkout_flow",
  *   label = @Translation("Checkout flow"),
+ *   label_collection = @Translation("Checkout flows"),
  *   label_singular = @Translation("checkout flow"),
  *   label_plural = @Translation("checkout flows"),
  *   label_count = @PluralTranslation(
