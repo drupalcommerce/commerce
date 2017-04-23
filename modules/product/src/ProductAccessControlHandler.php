@@ -20,9 +20,8 @@ class ProductAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\Core\Access\AccessResult $result */
     $result = parent::checkAccess($entity, $operation, $account);
 
-    if ($result->isNeutral()) {
-      // @todo move to permission.
-      $result = AccessResult::allowedIf($entity->isPublished());
+    if ($result->isNeutral() && $entity->isPublished()) {
+      $result = AccessResult::allowedIfHasPermission($account, 'view published ' . $entity->getEntityTypeId());
       $result->addCacheableDependency($entity);
     }
 

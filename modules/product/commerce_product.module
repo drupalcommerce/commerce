@@ -7,7 +7,6 @@
 
 use Drupal\commerce\BundleFieldDefinition;
 use Drupal\commerce_product\Entity\ProductTypeInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
