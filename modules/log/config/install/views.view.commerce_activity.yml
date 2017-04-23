@@ -1,3 +1,4 @@
+uuid: 146e4223-7414-428a-860d-0d5ffc5da7f8
 langcode: en
 status: true
 dependencies:
@@ -281,7 +282,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          order: DESC
+          order: ASC
           exposed: false
           expose:
             label: ''
