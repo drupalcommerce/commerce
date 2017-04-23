@@ -2,16 +2,15 @@
 
 namespace Drupal\commerce_order\Element;
 
-use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\profile\Entity\ProfileInterface;
-use Drupal\profile\Entity\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -138,7 +137,7 @@ class ProfileSelect extends RenderElement {
 
     // Create a new profile if user has chosen to do so.
     if (!$new_form && $mode == 'new') {
-      $default_profile = Profile::create([
+      $default_profile = \Drupal::entityTypeManager()->getStorage('profile')->create([
         'type' => $default_profile->bundle(),
         'uid' => $default_profile->getOwnerId(),
       ]);
@@ -547,7 +546,7 @@ class ProfileSelect extends RenderElement {
         ->condition('status', TRUE)
         ->sort('profile_id', 'DESC')
         ->execute();
-      $profiles = Profile::loadMultiple($profile_ids);
+      $profiles = \Drupal::entityTypeManager()->getStorage('profile')->loadMultiple($profile_ids);
     }
     return $profiles;
   }
