@@ -25,6 +25,8 @@ class OrderTotalSummary implements OrderTotalSummaryInterface {
    * {@inheritdoc}
    */
   public function buildTotals(OrderInterface $order) {
+    $order->setRefreshState(OrderInterface::REFRESH_SKIP);
+    $order->save();
     $types = $this->adjustmentTypeManager->getDefinitions();
     $adjustments = [];
     foreach ($order->collectAdjustments() as $adjustment) {
