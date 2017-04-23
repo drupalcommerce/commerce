@@ -62,6 +62,7 @@ class OrderTotalPrice extends PromotionConditionBase {
     parent::submitConfigurationForm($form, $form_state);
 
     $values = $form_state->getValue($form['#parents']);
+    $this->configuration['operator'] = $values['operator'];
     $this->configuration['amount'] = $values['amount'];
   }
 
