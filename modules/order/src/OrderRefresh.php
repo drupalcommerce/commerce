@@ -126,6 +126,8 @@ class OrderRefresh implements OrderRefreshInterface {
    * {@inheritdoc}
    */
   public function refresh(OrderInterface $order) {
+    $current_time = $this->time->getCurrentTime();
+    $order->setChangedTime($current_time);
     // Do not remove adjustments added in the user interface.
     $adjustments = $order->getAdjustments();
     foreach ($adjustments as $key => $adjustment) {
@@ -134,6 +136,10 @@ class OrderRefresh implements OrderRefreshInterface {
       }
     }
     $order->setAdjustments($adjustments);
+    // Nothing else can be done while the order is empty.
+    if (!$order->hasItems()) {
+      return;
+    }
 
     $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
@@ -152,13 +158,11 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    $current_time = $this->time->getCurrentTime();
     // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
       $order_item->setChangedTime($current_time);
       $order_item->save();
     }
-    $order->setChangedTime($current_time);
   }
 
 }
