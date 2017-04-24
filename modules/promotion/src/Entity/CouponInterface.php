@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_promotion\Entity;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
@@ -39,28 +40,40 @@ interface CouponInterface extends ContentEntityInterface {
    * @param string $code
    *   The coupon code.
    *
-   * @return \Drupal\commerce_promotion\Entity\CouponInterface
-   *   The coupon.
+   * @return $this
    */
   public function setCode($code);
 
   /**
-   * Returns the coupon status indicator.
+   * Gets whether the coupon is enabled.
    *
    * @return bool
-   *   TRUE if the coupon is active.
+   *   TRUE if the coupon is enabled, FALSE otherwise.
    */
-  public function isActive();
+  public function isEnabled();
 
   /**
-   * Sets the status of a coupon.
+   * Sets whether the coupon is enabled.
    *
-   * @param bool $active
-   *   TRUE to make coupon active, FALSE to set it to inactive.
+   * @param bool $enabled
+   *   Whether the coupon is enabled.
    *
-   * @return \Drupal\commerce_promotion\Entity\CouponInterface
-   *   The coupon.
+   * @return $this
    */
-  public function setActive($active);
+  public function setEnabled($enabled);
+
+  /**
+   * Checks whether the coupon is available for the given order.
+   *
+   * Ensures that the parent promotion is available, the coupon
+   * is enabled, and the usage limits are respected.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   *
+   * @return bool
+   *   TRUE if coupon is available, FALSE otherwise.
+   */
+  public function available(OrderInterface $order);
 
 }

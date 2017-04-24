@@ -19,6 +19,7 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "commerce_product_variation",
  *   label = @Translation("Product variation"),
+ *   label_collection = @Translation("Product variations"),
  *   label_singular = @Translation("product variation"),
  *   label_plural = @Translation("product variations"),
  *   label_count = @PluralTranslation(

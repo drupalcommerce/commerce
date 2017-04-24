@@ -17,6 +17,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  * @ContentEntityType(
  *   id = "commerce_promotion",
  *   label = @Translation("Promotion"),
+ *   label_collection = @Translation("Promotions"),
  *   label_singular = @Translation("promotion"),
  *   label_plural = @Translation("promotions"),
  *   label_count = @PluralTranslation(
@@ -280,8 +281,8 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
   /**
    * {@inheritdoc}
    */
-  public function setEndDate(DrupalDateTime $end_date) {
-    $this->get('end_date')->value = $end_date->format('Y-m-d');
+  public function setEndDate(DrupalDateTime $end_date = NULL) {
+    $this->get('end_date')->value = $end_date ? $end_date->format('Y-m-d') : NULL;
     return $this;
   }
 
@@ -331,6 +332,38 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
   public function setWeight($weight) {
     $this->set('weight', $weight);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function available(OrderInterface $order) {
+    if (!$this->isEnabled()) {
+      return FALSE;
+    }
+    if (!in_array($order->bundle(), $this->getOrderTypeIds())) {
+      return FALSE;
+    }
+    if (!in_array($order->getStoreId(), $this->getStoreIds())) {
+      return FALSE;
+    }
+    $time = \Drupal::time()->getRequestTime();
+    if ($this->getStartDate()->format('U') > $time) {
+      return FALSE;
+    }
+    $end_date = $this->getEndDate();
+    if ($end_date && $end_date->format('U') <= $time) {
+      return FALSE;
+    }
+    if ($usage_limit = $this->getUsageLimit()) {
+      /** @var \Drupal\commerce_promotion\PromotionUsageInterface $usage */
+      $usage = \Drupal::service('commerce_promotion.usage');
+      if ($usage_limit <= $usage->getUsage($this)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
   /**
@@ -565,7 +598,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
-        'type' => 'commerce_optional_date',
+        'type' => 'commerce_end_date',
         'weight' => 6,
       ]);
 
@@ -585,7 +618,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
       ->setDefaultValue(TRUE)
       ->setRequired(TRUE)
       ->setSettings([
-        'on_label' => t('Active'),
+        'on_label' => t('Enabled'),
         'off_label' => t('Disabled'),
       ])
       ->setDisplayOptions('form', [
@@ -610,7 +643,8 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    *   The default value (date string).
    */
   public static function getDefaultStartDate() {
-    return gmdate('Y-m-d');
+    $timestamp = \Drupal::time()->getRequestTime();
+    return gmdate('Y-m-d', $timestamp);
   }
 
   /**
@@ -623,7 +657,8 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    */
   public static function getDefaultEndDate() {
     // Today + 1 year.
-    return gmdate('Y-m-d', time() + 31536000);
+    $timestamp = \Drupal::time()->getRequestTime();
+    return gmdate('Y-m-d', $timestamp + 31536000);
   }
 
   /**

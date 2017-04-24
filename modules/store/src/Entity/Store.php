@@ -16,6 +16,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * @ContentEntityType(
  *   id = "commerce_store",
  *   label = @Translation("Store"),
+ *   label_collection = @Translation("Stores"),
  *   label_singular = @Translation("store"),
  *   label_plural = @Translation("stores"),
  *   label_count = @PluralTranslation(
