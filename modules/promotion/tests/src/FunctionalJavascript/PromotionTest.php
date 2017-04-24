@@ -120,7 +120,7 @@ class PromotionTest extends CommerceBrowserTestBase {
 
     // Set an end date.
     $this->getSession()->getPage()->checkField('end_date[0][has_value]');
-    $edit['end_date[0][value][date]'] = date("Y") + 1 . '-01-01';
+    $edit['end_date[0][container][value][date]'] = date("Y") + 1 . '-01-01';
 
     $this->submitForm($edit, t('Save'));
     $this->assertSession()->pageTextContains("Saved the $name promotion.");

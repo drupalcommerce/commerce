@@ -15,6 +15,7 @@ use Drupal\profile\Entity\ProfileInterface;
  * @ContentEntityType(
  *   id = "commerce_payment_method",
  *   label = @Translation("Payment method"),
+ *   label_collection = @Translation("Payment methods"),
  *   label_singular = @Translation("payment method"),
  *   label_plural = @Translation("payment methods"),
  *   label_count = @PluralTranslation(
@@ -188,7 +189,7 @@ class PaymentMethod extends ContentEntityBase implements PaymentMethodInterface 
    */
   public function isExpired() {
     $expires = $this->getExpiresTime();
-    return $expires > 0 && $expires <= REQUEST_TIME;
+    return $expires > 0 && $expires <= \Drupal::time()->getRequestTime();
   }
 
   /**

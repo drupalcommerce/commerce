@@ -10,6 +10,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_product_variation_type",
  *   label = @Translation("Product variation type"),
+ *   label_collection = @Translation("Product variation types"),
  *   label_singular = @Translation("product variation type"),
  *   label_plural = @Translation("product variation types"),
  *   label_count = @PluralTranslation(
@@ -21,7 +22,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "form" = {
  *       "add" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
  *       "edit" = "Drupal\commerce_product\Form\ProductVariationTypeForm",
- *       "delete" = "Drupal\commerce_product\Form\ProductVariationTypeDeleteForm"
+ *       "delete" = "Drupal\commerce\Form\CommerceBundleEntityDeleteFormBase"
  *     },
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
