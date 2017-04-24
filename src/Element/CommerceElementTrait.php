@@ -4,18 +4,17 @@ namespace Drupal\commerce\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\FormElement;
 
 /**
- * Provides a base class for Commerce form elements.
+ * Provides a trait for Commerce form elements.
  *
  * Allows form elements to use #commerce_element_submit, a substitute
  * for the #element_submit that's missing from Drupal core.
  *
- * Each inheriting form element should add the attachElementSubmit and
+ * Each form element using this trait should add the attachElementSubmit and
  * validateElementSubmit callbacks to their getInfo() methods.
  */
-abstract class CommerceElementBase extends FormElement {
+trait CommerceElementTrait {
 
   /**
    * Attaches the #commerce_element_submit functionality.

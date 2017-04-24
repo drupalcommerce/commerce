@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Render\Element\FormElement;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,7 +26,9 @@ use Symfony\Component\HttpFoundation\Request;
  * ];
  * @endcode
  */
-class PluginSelect extends CommerceElementBase {
+class PluginSelect extends FormElement {
+
+  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}

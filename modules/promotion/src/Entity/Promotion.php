@@ -598,7 +598,7 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
       ->setRequired(FALSE)
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
-        'type' => 'commerce_optional_date',
+        'type' => 'commerce_end_date',
         'weight' => 6,
       ]);
 
@@ -643,7 +643,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    *   The default value (date string).
    */
   public static function getDefaultStartDate() {
-    return gmdate('Y-m-d');
+    $timestamp = \Drupal::time()->getRequestTime();
+    return gmdate('Y-m-d', $timestamp);
   }
 
   /**
@@ -656,7 +657,8 @@ class Promotion extends ContentEntityBase implements PromotionInterface {
    */
   public static function getDefaultEndDate() {
     // Today + 1 year.
-    return gmdate('Y-m-d', time() + 31536000);
+    $timestamp = \Drupal::time()->getRequestTime();
+    return gmdate('Y-m-d', $timestamp + 31536000);
   }
 
   /**

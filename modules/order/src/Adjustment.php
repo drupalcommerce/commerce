@@ -41,6 +41,13 @@ final class Adjustment {
   protected $sourceId;
 
   /**
+   * Whether the adjustment is included in the base price.
+   *
+   * @var bool
+   */
+  protected $included = FALSE;
+
+  /**
    * Constructs a new Adjustment object.
    *
    * @param array $definition
@@ -67,6 +74,7 @@ final class Adjustment {
     if (!empty($definition['source_id'])) {
       $this->sourceId = $definition['source_id'];
     }
+    $this->included = !empty($definition['included']);
   }
 
   /**
@@ -107,6 +115,16 @@ final class Adjustment {
    */
   public function getAmount() {
     return $this->amount;
+  }
+
+  /**
+   * Gets whether the adjustment is included in the base price.
+   *
+   * @return bool
+   *   TRUE if the adjustment is included in the base price, FALSE otherwise.
+   */
+  public function isIncluded() {
+    return $this->included;
   }
 
 }

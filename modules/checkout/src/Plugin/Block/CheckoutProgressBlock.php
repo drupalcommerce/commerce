@@ -102,13 +102,17 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
       else {
         $position = 'next';
       }
+      $index++;
+      // Hide hidden steps until they are reached.
+      if (!empty($step_definition['hidden']) && $position != 'current') {
+        continue;
+      }
 
       $steps[] = [
         'id' => $step_id,
         'label' => $step_definition['label'],
         'position' => $position,
       ];
-      $index++;
     }
 
     return [

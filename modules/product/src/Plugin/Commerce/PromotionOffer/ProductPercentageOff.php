@@ -102,7 +102,10 @@ class ProductPercentageOff extends PercentageOffBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $product = $this->productStorage->load($this->configuration['product_id']);
+    $product = NULL;
+    if (!empty($this->configuration['product_id'])) {
+      $product = $this->productStorage->load($this->configuration['product_id']);
+    }
     $form['product_id'] = [
       '#type' => 'entity_autocomplete',
       '#title' => $this->t('Product'),
