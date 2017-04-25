@@ -117,35 +117,16 @@ class ProfileSelect extends RenderElement {
     $element['#suffix'] = '</div>';
     $called_class = get_called_class();
     $pane_storage = self::getPaneStorage($element, $form_state);
-    $mode = self::getMode($element, $form_state);
-    $new_form = empty($pane_storage['profile']);
-    $default_profile = ($new_form || $mode === 'new')
-      ? $element['#default_value']
-      : $pane_storage['profile'];
-    $profiles = self::getExistingProfiles($default_profile);
-
-    // If no account profiles returned but we're viewing one, edit it instead.
-    if ($mode == 'view' && empty($profiles)) {
-      $mode = 'edit';
-    }
-
-    // Select existing user profile if this is a new form.
-    if ($new_form && !$default_profile->id() && !empty($profiles)) {
-      $default_profile = reset($profiles);
-      $mode = 'view';
-    }
-
-    // Create a new profile if user has chosen to do so.
-    if (!$new_form && $mode == 'new') {
-      $default_profile = \Drupal::entityTypeManager()->getStorage('profile')->create([
-        'type' => $default_profile->bundle(),
-        'uid' => $default_profile->getOwnerId(),
-      ]);
-    }
-
-    // Assign the right profile to the element.
+    $profiles = self::getExistingProfiles($element['#default_value']);
+    $mode = self::getMode($element, $form_state, $profiles);
+    $default_profile = self::getDefaultProfile($element, $form_state, $mode, $profiles);
+    $selected_profile = self::getProfileSelectValue($element, $form_state);
     $element['#default_value'] = $default_profile;
     $element['#profile'] = $default_profile;
+    // Set up profile reuse functionality.
+    $reuse_profile = (isset($pane_storage['reuse_profile']))
+      ? $pane_storage['reuse_profile']
+      : $element['#reuse_profile_default'];
 
     // Set default address field options.
     $form_display = EntityFormDisplay::collectRenderDisplay($default_profile, 'default');
@@ -164,10 +145,7 @@ class ProfileSelect extends RenderElement {
       }
     }
 
-    // Set up profile reuse functionality.
-    $reuse_profile = (isset($pane_storage['reuse_profile']))
-      ? $pane_storage['reuse_profile']
-      : $element['#reuse_profile_default'];
+    // Show the profile reuse checkbox if enabled.
     if ((!empty($element['#reuse_profile_label']) && !empty($element['#reuse_profile_source']))) {
       $element['reuse_profile'] = [
         '#title' => $element['#reuse_profile_label'],
@@ -182,7 +160,7 @@ class ProfileSelect extends RenderElement {
       ];
     }
 
-    // Hide all profile fields except the checkbox if reuse_profile is checked.
+    // Hide the profile fields if profile reuse checkbox is checked.
     if ($reuse_profile) {
       self::hideProfileFields($element, ['reuse_profile']);
     }
@@ -209,7 +187,6 @@ class ProfileSelect extends RenderElement {
         ];
       }
 
-      // Viewing a profile.
       if ($mode == 'view') {
         $element['rendered_profile'] = [
           \Drupal::entityTypeManager()
@@ -251,6 +228,7 @@ class ProfileSelect extends RenderElement {
       'profile' => $default_profile,
       'mode' => $mode,
       'reuse_profile' => $reuse_profile,
+      'selected_profile' => $selected_profile,
     ]);
     return $element;
   }
@@ -503,27 +481,38 @@ class ProfileSelect extends RenderElement {
    *   The element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
+   * @param ProfileInterface[] $profiles
+   *   The user's profiles
    *
    * @return string
    *   The current mode.
    */
-  protected static function getMode(array $element, FormStateInterface $form_state) {
+  protected static function getMode(array $element, FormStateInterface $form_state, $profiles = []) {
     $pane_storage = self::getPaneStorage($element, $form_state);
-    $profile_selection_parents = $element['#parents'];
-    $profile_selection_parents[] = 'profile_selection';
-    $selected_profile = $form_state->getValue($profile_selection_parents);
-    $mode = 'view';
+    $selected_profile = self::getProfileSelectValue($element, $form_state);
+
+    if (is_null($selected_profile) && !empty($element['profile_selection']['#value'])) {
+      $selected_profile = $element['profile_selection']['#value'];
+    }
+
     // User is adding a new profile.
-    if (!empty($selected_profile) && $selected_profile == 'new_profile') {
-      $mode = 'new';
+    if (!empty($selected_profile)) {
+      $mode = ($selected_profile == 'new_profile') ? 'new' : 'view';
     }
     // If an AJAX rebuild happened, we might have our data in form state.
-    elseif (!empty($pane_storage['profile'])) {
+    elseif (!empty($pane_storage['profile']) && !empty($pane_storage['mode'])) {
       $mode = $pane_storage['mode'];
     }
-    elseif (!empty($element['#default_value']) && $element['#default_value'] instanceof ProfileInterface && !$element['#default_value']->id()) {
-      $mode = 'new';
+    // If a new form, either view an existing profile or create a new one.
+    else {
+      $mode = (!empty($profiles)) ? 'view' : 'new';
     }
+
+    // If no account profiles returned but we're viewing one, edit it instead.
+    if ($mode == 'view' && empty($profiles)) {
+      $mode = 'edit';
+    }
+
     return $mode;
   }
 
@@ -551,5 +540,57 @@ class ProfileSelect extends RenderElement {
     return $profiles;
   }
 
-}
+  /**
+   * Returns the selected value from the form state, or null if no selection
+   * has been submitted yet.
+   *
+   * @param array $element
+   *   The profile select element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return int|string|NULL
+   *   The selected profile ID, new_profile, or NULL.
+   */
+  protected static function getProfileSelectValue(array $element, FormStateInterface $form_state) {
+    $values = $form_state->getValues();
+    $pane_storage = self::getPaneStorage($element, $form_state);
+    $parents = $element['#parents'];
+    $parents[] = 'profile_selection';
 
+    $selected_value = NULL;
+    if (NestedArray::keyExists($values, $parents)) {
+      $selected_value = NestedArray::getValue($values, $parents);
+    }
+    elseif (!empty($pane_storage['profile_selection'])) {
+      $selected_value = $pane_storage['profile_selection'];
+    }
+
+    return $selected_value;
+  }
+
+  protected static function getDefaultProfile(array $element, FormStateInterface $form_state, $mode, array $profiles) {
+    $selected_value = self::getProfileSelectValue($element, $form_state);
+    $pane_storage = self::getPaneStorage($element, $form_state);
+    $default_profile = $element['#default_value'];
+
+    // If user wants to create a new profile, do so.
+    if ($selected_value && $mode == 'new') {
+      $default_profile = \Drupal::entityTypeManager()->getStorage('profile')->create([
+        'type' => $default_profile->bundle(),
+        'uid' => $default_profile->getOwnerId(),
+      ]);
+    }
+    // Load profile from form state if it exists.
+    elseif (!empty($pane_storage['profile'])) {
+      $default_profile = $pane_storage['profile'];
+    }
+    // Select existing user profile if this is a new form.
+    elseif(!$selected_value && $mode == 'view' && !$default_profile->id()) {
+      $default_profile = reset($profiles);
+    }
+
+    return $default_profile;
+  }
+
+}
