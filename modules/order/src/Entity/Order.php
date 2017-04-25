@@ -298,6 +298,23 @@ class Order extends ContentEntityBase implements OrderInterface {
   /**
    * {@inheritdoc}
    */
+  public function clearAdjustments() {
+    foreach ($this->getItems() as $order_item) {
+      $order_item->setAdjustments([]);
+    }
+    // Remove all order-level adjustments except the ones added via the UI.
+    $adjustments = $this->getAdjustments();
+    $adjustments = array_filter($adjustments, function ($adjustment) {
+      /** @var \Drupal\commerce_order\Adjustment $adjustment */
+      return $adjustment->getType() == 'custom';
+    });
+    $this->setAdjustments($adjustments);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function collectAdjustments() {
     $adjustments = [];
     foreach ($this->getItems() as $order_item) {
@@ -309,6 +326,7 @@ class Order extends ContentEntityBase implements OrderInterface {
           'label' => $adjustment->getLabel(),
           'source_id' => $adjustment->getSourceId(),
           'amount' => $adjustment->getAmount()->multiply($order_item->getQuantity()),
+          'included' => $adjustment->isIncluded(),
         ]);
         $adjustments[] = $multiplied_adjustment;
       }
