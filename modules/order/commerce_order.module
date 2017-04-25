@@ -6,6 +6,7 @@
  */
 
 use Drupal\commerce\BundleFieldDefinition;
+use Drupal\commerce_order\Entity\OrderTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
@@ -87,7 +88,7 @@ function commerce_order_field_widget_form_alter(&$element, FormStateInterface $f
  *   - elements: An associative array containing rendered fields.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_commerce_order(&$variables) {
+function template_preprocess_commerce_order(array &$variables) {
   /** @var Drupal\commerce_order\Entity\OrderInterface $order */
   $order = $variables['elements']['#commerce_order'];
 
@@ -130,7 +131,7 @@ function commerce_order_theme_suggestions_commerce_order_receipt(array $variable
  * @param \Drupal\commerce_order\Entity\OrderTypeInterface $order_type
  *   The order type.
  */
-function commerce_order_add_order_items_field($order_type) {
+function commerce_order_add_order_items_field(OrderTypeInterface $order_type) {
   $field_definition = BundleFieldDefinition::create('entity_reference')
     ->setTargetEntityTypeId('commerce_order')
     ->setTargetBundle($order_type->id())

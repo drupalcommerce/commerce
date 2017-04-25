@@ -89,7 +89,7 @@ class OrderTypeTest extends OrderBrowserTestBase {
 
     // Try to delete the order type.
     $this->drupalGet('admin/commerce/config/order-types/' . $type->id() . '/delete');
-    $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You can not remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
+    $this->assertSession()->pageTextContains(t('@type is used by 1 order on your site. You cannot remove this order type until you have removed all of the @type orders.', ['@type' => $type->label()]));
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));
 
     // Deleting the order type when its not being referenced by an order.

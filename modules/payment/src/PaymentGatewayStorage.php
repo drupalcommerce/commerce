@@ -8,7 +8,7 @@ use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\user\UserInterface;
 
 /**
- * Defines the payment method storage.
+ * Defines the payment gateway storage.
  */
 class PaymentGatewayStorage extends ConfigEntityStorage implements PaymentGatewayStorageInterface {
 
@@ -31,6 +31,7 @@ class PaymentGatewayStorage extends ConfigEntityStorage implements PaymentGatewa
    */
   public function loadMultipleForOrder(OrderInterface $order) {
     $payment_gateways = $this->loadByProperties(['status' => TRUE]);
+    uasort($payment_gateways, [$this->entityType->getClass(), 'sort']);
     // @todo Invoke the attached conditions to determine eligibility.
     // @todo Fire event.
 

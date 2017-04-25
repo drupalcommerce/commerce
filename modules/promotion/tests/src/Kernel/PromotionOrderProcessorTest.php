@@ -55,6 +55,7 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->user = $this->createUser();
 
@@ -148,7 +149,6 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
       'name' => 'Promotion (with coupon)',
       'order_types' => [$this->order->bundle()],
       'stores' => [$this->store->id()],
-      'status' => TRUE,
       'offer' => [
         'target_plugin_id' => 'commerce_promotion_order_percentage_off',
         'target_plugin_configuration' => [
@@ -166,6 +166,8 @@ class PromotionOrderProcessorTest extends CommerceKernelTestBase {
           ],
         ],
       ],
+      'start_date' => '2017-01-01',
+      'status' => TRUE,
     ]);
     $promotion_with_coupon->save();
 

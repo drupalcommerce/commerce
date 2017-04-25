@@ -10,6 +10,14 @@ use Drupal\Core\Field\FieldItemInterface;
 interface PluginItemInterface extends FieldItemInterface {
 
   /**
+   * Gets the plugin definition.
+   *
+   * @return array
+   *   The plugin definition.
+   */
+  public function getTargetDefinition();
+
+  /**
    * Gets the plugin instance.
    *
    * @param array $contexts
