@@ -1,0 +1,5 @@
+entity.commerce_tax_type.add_form:
+  route_name: entity.commerce_tax_type.add_form
+  title: 'Add tax type'
+  appears_on:
+    - entity.commerce_tax_type.collection

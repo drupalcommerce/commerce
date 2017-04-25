@@ -100,7 +100,7 @@ class ProductTypeTest extends ProductBrowserTestBase {
     // a product of that type. Right now the check is done on the form level.
     $this->drupalGet('admin/commerce/config/product-types/' . $product_type->id() . '/delete');
     $this->assertSession()->pageTextContains(
-      t('@type is used by 1 product on your site. You can not remove this product type until you have removed all of the @type products.', ['@type' => $product_type->label()]),
+      t('@type is used by 1 product on your site. You cannot remove this product type until you have removed all of the @type products.', ['@type' => $product_type->label()]),
       'The product type will not be deleted until all products of that type are deleted.'
     );
     $this->assertSession()->pageTextNotContains(t('This action cannot be undone.'));

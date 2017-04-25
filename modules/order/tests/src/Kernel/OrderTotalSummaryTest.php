@@ -106,57 +106,128 @@ class OrderTotalSummaryTest extends CommerceKernelTestBase {
       'billing_profile' => $profile,
       'store_id' => $this->store->id(),
     ]);
-    $order->save();
 
+    $order->save();
+    $this->order = $this->reloadEntity($order);
+  }
+
+  /**
+   * Tests the order total summary with order adjustments.
+   */
+  public function testWithOrderAdjustments() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    $this->order->addItem($order_item);
+
+    $test_order_adjustments = [];
+    $test_order_adjustments[] = new Adjustment([
+      'type' => 'promotion',
+      'label' => 'Back to school discount',
+      'amount' => new Price('-5.00', 'USD'),
+      'source_id' => '1',
+    ]);
+    $this->order->setData('test_adjustments', $test_order_adjustments);
+    $this->order->save();
+
+    $totals = $this->orderTotalSummary->buildTotals($this->order);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
+    $this->assertEquals(new Price('7.00', 'USD'), $totals['total']);
+
+    $this->assertCount(1, $totals['adjustments']);
+    $first = array_shift($totals['adjustments']);
+    $this->assertEquals('promotion', $first['type']);
+    $this->assertEquals('Back to school discount', $first['label']);
+    $this->assertEquals(new Price('-5', 'USD'), $first['total']);
+    $this->assertEquals(0, $first['weight']);
+  }
+
+  /**
+   * Tests the order total summary with order item adjustments.
+   */
+  public function testWithOrderItemAdjustments() {
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => 1,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item_test_adjustments = [];
+    $order_item_test_adjustments[] = new Adjustment([
+      'type' => 'promotion',
+      'label' => 'Back to school discount',
+      'amount' => new Price('-1.00', 'USD'),
+      'source_id' => '1',
+    ]);
+    $order_item->setData('test_adjustments', $order_item_test_adjustments);
+    $order_item->save();
+    $order_item = $this->reloadEntity($order_item);
+    $this->order->addItem($order_item);
+    $this->order->save();
+
+    $totals = $this->orderTotalSummary->buildTotals($this->order);
+    $this->assertEquals(new Price('12.00', 'USD'), $totals['subtotal']);
+    $this->assertEquals(new Price('11.00', 'USD'), $totals['total']);
+
+    $this->assertCount(1, $totals['adjustments']);
+    $first = array_shift($totals['adjustments']);
+    $this->assertEquals('promotion', $first['type']);
+    $this->assertEquals('Back to school discount', $first['label']);
+    $this->assertEquals(new Price('-1', 'USD'), $first['total']);
+    $this->assertEquals(0, $first['weight']);
+  }
+
+  /**
+   * Tests the order total summary with both order and order item adjustments.
+   */
+  public function testWithAllAdjustments() {
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = OrderItem::create([
       'type' => 'default',
       'quantity' => 2,
       'unit_price' => new Price('12.00', 'USD'),
     ]);
-    $order_item->save();
-
-    $order_item->addAdjustment(new Adjustment([
+    $order_item_test_adjustments = [];
+    $order_item_test_adjustments[] = new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-1.00', 'USD'),
       'source_id' => '1',
-    ]));
-    $order_item->save();
+    ]);
     // This adjustment should be first.
-    $order_item->addAdjustment(new Adjustment([
+    $order_item_test_adjustments[] = new Adjustment([
       'type' => 'test_adjustment_type',
       'label' => '50 cent item fee',
       'amount' => new Price('0.50', 'USD'),
-    ]));
-
+    ]);
+    $order_item->setData('test_adjustments', $order_item_test_adjustments);
     $order_item->save();
     $order_item = $this->reloadEntity($order_item);
-    $order->addItem($order_item);
+    $this->order->addItem($order_item);
 
-    $order->addAdjustment(new Adjustment([
+    $test_order_adjustments = [];
+    $test_order_adjustments[] = new Adjustment([
       'type' => 'promotion',
       'label' => 'Back to school discount',
       'amount' => new Price('-5.00', 'USD'),
       'source_id' => '1',
-    ]));
-    $order->addAdjustment(new Adjustment([
+    ]);
+    $this->order->setData('test_adjustments', $test_order_adjustments);
+
+    // Custom adjustments persist, so we manually add.
+    $this->order->addAdjustment(new Adjustment([
       'type' => 'custom',
       'label' => 'Handling fee',
       'amount' => new Price('10.00', 'USD'),
     ]));
+    $this->order->save();
 
-    $order->setRefreshState(Order::REFRESH_SKIP);
-    $order->save();
-    $this->order = $this->reloadEntity($order);
-  }
-
-  /**
-   * Tests the order total summary.
-   */
-  public function testOrderTotalSummary() {
     $totals = $this->orderTotalSummary->buildTotals($this->order);
-
     $this->assertEquals(new Price('24.00', 'USD'), $totals['subtotal']);
     $this->assertEquals(new Price('28.00', 'USD'), $totals['total']);
 

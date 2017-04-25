@@ -208,4 +208,39 @@ class CartProviderTest extends CommerceKernelTestBase {
     $this->assertNull($cart);
   }
 
+  /**
+   * Tests cart validation.
+   *
+   * @covers ::getCartIds
+   * @covers ::clearCaches
+   */
+  public function testCartValidation() {
+    $this->installCommerceCart();
+    $cart_provider = $this->container->get('commerce_cart.cart_provider');
+
+    // Carts that are no longer carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->cart = FALSE;
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+
+    // Carts assigned to a different user should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->uid = $this->anonymousUser->id();
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+
+    // Canceled carts should not be returned.
+    $cart = $cart_provider->createCart('default', $this->store, $this->authenticatedUser);
+    $cart->state = 'canceled';
+    $cart->save();
+    $cart_provider->clearCaches();
+    $cart = $cart_provider->getCart('default', $this->store, $this->authenticatedUser);
+    $this->assertNull($cart);
+  }
+
 }

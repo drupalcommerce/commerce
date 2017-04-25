@@ -3,7 +3,7 @@
 namespace Drupal\commerce_order;
 
 use Drupal\commerce\Context;
-use Drupal\commerce\TimeInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Resolver\ChainPriceResolverInterface;
@@ -39,7 +39,7 @@ class OrderRefresh implements OrderRefreshInterface {
   /**
    * The time.
    *
-   * @var \Drupal\commerce\TimeInterface
+   * @var \Drupal\Component\Datetime\TimeInterface
    */
   protected $time;
 
@@ -59,7 +59,7 @@ class OrderRefresh implements OrderRefreshInterface {
    *   The chain price resolver.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\commerce\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ChainPriceResolverInterface $chain_price_resolver, AccountInterface $current_user, TimeInterface $time) {
@@ -126,19 +126,16 @@ class OrderRefresh implements OrderRefreshInterface {
    * {@inheritdoc}
    */
   public function refresh(OrderInterface $order) {
-    // Do not remove adjustments added in the user interface.
-    $adjustments = $order->getAdjustments();
-    foreach ($adjustments as $key => $adjustment) {
-      if ($adjustment->getType() != 'custom') {
-        unset($adjustments[$key]);
-      }
+    $current_time = $this->time->getCurrentTime();
+    $order->setChangedTime($current_time);
+    $order->clearAdjustments();
+    // Nothing else can be done while the order is empty.
+    if (!$order->hasItems()) {
+      return;
     }
-    $order->setAdjustments($adjustments);
 
     $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
@@ -152,13 +149,11 @@ class OrderRefresh implements OrderRefreshInterface {
       $processor->process($order);
     }
 
-    $current_time = $this->time->getCurrentTime();
     // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
       $order_item->setChangedTime($current_time);
       $order_item->save();
     }
-    $order->setChangedTime($current_time);
   }
 
 }

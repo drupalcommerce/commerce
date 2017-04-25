@@ -4,7 +4,7 @@ dependencies:
   module:
     - commerce_product
 id: test_multiple_cart_forms
-label: 'Test Multiple Cart Forms'
+label: 'Test Multiple Cart Forms (Rendered products)'
 module: views
 description: ''
 tag: ''

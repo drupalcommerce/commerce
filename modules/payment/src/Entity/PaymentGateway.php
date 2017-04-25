@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  * @ConfigEntityType(
  *   id = "commerce_payment_gateway",
  *   label = @Translation("Payment gateway"),
+ *   label_collection = @Translation("Payment gateways"),
  *   label_singular = @Translation("payment gateway"),
  *   label_plural = @Translation("payment gateways"),
  *   label_count = @PluralTranslation(
