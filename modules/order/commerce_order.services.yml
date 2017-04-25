@@ -16,7 +16,7 @@ services:
 
   commerce_order.order_refresh:
     class: Drupal\commerce_order\OrderRefresh
-    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user', '@commerce.time']
+    arguments: ['@entity_type.manager', '@commerce_price.chain_price_resolver', '@current_user', '@datetime.time']
     tags:
       - { name: service_collector, call: addProcessor, tag: commerce_order.order_processor }
 

@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ConfigEntityType(
  *   id = "commerce_product_attribute",
  *   label = @Translation("Product attribute"),
+ *   label_collection = @Translation("Product attributes"),
  *   label_singular = @Translation("product attribute"),
  *   label_plural = @Translation("product attributes"),
  *   label_count = @PluralTranslation(

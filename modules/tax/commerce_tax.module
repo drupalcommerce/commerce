@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Provides tax functionality.
+ */
+
+use Drupal\commerce_tax\TaxableType;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_tax_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_store') {
+    $fields['prices_include_tax'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Prices are entered with taxes included.'))
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 3,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDefaultValue(FALSE);
+
+    $fields['tax_registrations'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Tax registrations'))
+      ->setDescription(t('The countries where the store is additionally registered to collect taxes.'))
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
+      ->setSetting('allowed_values_function', ['\Drupal\commerce_store\Entity\Store', 'getAvailableCountries'])
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 4,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for 'commerce_store_form'.
+ */
+function commerce_tax_form_commerce_store_form_alter(&$form, FormStateInterface $form_state) {
+  if (isset($form['prices_include_tax']) || isset($form['tax_registrations'])) {
+    $form['tax_settings'] = [
+      '#title' => t('Tax settings'),
+      '#weight' => 99,
+      '#type' => 'details',
+      '#collapsible' => TRUE,
+      '#open' => TRUE,
+    ];
+    $form['prices_include_tax']['#group'] = 'tax_settings';
+    $form['tax_registrations']['#group'] = 'tax_settings';
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'commerce_order_item_type_form'.
+ */
+function commerce_tax_form_commerce_order_item_type_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_item_type */
+  $order_item_type = $form_state->getFormObject()->getEntity();
+
+  $form['commerce_tax'] = [
+    '#type' => 'container',
+    '#weight' => 5,
+  ];
+  $form['commerce_tax']['taxable_type'] = [
+    '#type' => 'select',
+    '#title' => t('Taxable type'),
+    '#options' => TaxableType::getLabels(),
+    '#default_value' => $order_item_type->getThirdPartySetting('commerce_tax', 'taxable_type', TaxableType::getDefault()),
+    '#required' => TRUE,
+  ];
+  $form['actions']['submit']['#submit'][] = 'commerce_tax_order_item_type_form_submit';
+}
+
+/**
+ * Submission handler for commerce_tax_form_commerce_order_item_type_form_alter().
+ */
+function commerce_tax_order_item_type_form_submit($form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_item_type */
+  $order_item_type = $form_state->getFormObject()->getEntity();
+  $settings = $form_state->getValue(['commerce_tax']);
+  $order_item_type->setThirdPartySetting('commerce_tax', 'taxable_type', $settings['taxable_type']);
+  $order_item_type->save();
+}

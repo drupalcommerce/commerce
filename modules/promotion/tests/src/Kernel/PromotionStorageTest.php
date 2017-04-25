@@ -44,7 +44,6 @@ class PromotionStorageTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_promotion');
     $this->installEntitySchema('commerce_promotion_coupon');
     $this->installConfig([
@@ -52,14 +51,15 @@ class PromotionStorageTest extends CommerceKernelTestBase {
       'commerce_order',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
 
     $this->promotionStorage = $this->container->get('entity_type.manager')->getStorage('commerce_promotion');
   }
 
   /**
-   * Tests loadValid().
+   * Tests loadAvailable().
    */
-  public function testLoadValid() {
+  public function testLoadAvailable() {
     $order_type = OrderType::load('default');
 
     // Starts now, enabled. No end time.
@@ -72,6 +72,7 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $promotion1->save());
 
     // Starts now, disabled. No end time.
+    /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion2 */
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
       'order_types' => [$order_type],
@@ -100,58 +101,118 @@ class PromotionStorageTest extends CommerceKernelTestBase {
     $this->assertEquals(SAVED_NEW, $promotion4->save());
 
     // Verify valid promotions load.
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(2, count($valid_promotions));
 
     // Move the 4th promotions start week to a week ago, makes it valid.
     $promotion4->setStartDate(new DrupalDateTime('-1 week'));
     $promotion4->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(3, count($valid_promotions));
 
     // Set promotion 3's end date six months ago, making it invalid.
     $promotion3->setEndDate(new DrupalDateTime('-6 month'));
     $promotion3->save();
 
-    $valid_promotions = $this->promotionStorage->loadValid($order_type, $this->store);
+    $valid_promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
     $this->assertEquals(2, count($valid_promotions));
   }
 
   /**
-   * Tests loading a promotion by a coupon.
+   * Tests that promotions with coupons do not get loaded.
    */
-  public function testLoadByCoupon() {
+  public function testValidWithCoupons() {
     $order_type = OrderType::load('default');
 
-    $coupon_code = $this->randomMachineName();
-    $coupon = Coupon::create([
-      'code' => $coupon_code,
-      'status' => TRUE,
-    ]);
-    $coupon->save();
-
-    // Starts now, enabled. No end time.
     $promotion1 = Promotion::create([
       'name' => 'Promotion 1',
       'order_types' => [$order_type],
       'stores' => [$this->store->id()],
       'status' => TRUE,
-      'coupons' => [$coupon],
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion1->save());
-    // Starts now, enabled. No end time.
+    $promotion1->save();
+
+    /** @var \Drupal\commerce_promotion\Entity\Promotion $promotion2 */
     $promotion2 = Promotion::create([
       'name' => 'Promotion 2',
       'order_types' => [$order_type],
       'stores' => [$this->store->id()],
       'status' => TRUE,
     ]);
-    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $promotion2->save();
+    // Add a coupon to promotion2 and validate it does not load.
+    $coupon = Coupon::create([
+      'code' => $this->randomString(),
+      'status' => TRUE,
+    ]);
+    $coupon->save();
+    $promotion2->get('coupons')->appendItem($coupon);
+    $promotion2->save();
+    $promotion2 = $this->reloadEntity($promotion2);
 
-    // Verify valid promotions load.
-    $valid_promotion = $this->promotionStorage->loadByCoupon($order_type, $this->store, $coupon);
-    $this->assertEquals($promotion1->label(), $valid_promotion->label());
+    $promotion3 = Promotion::create([
+      'name' => 'Promotion 3',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+    ]);
+    $promotion3->save();
+
+    $this->assertEquals(2, count($this->promotionStorage->loadAvailable($order_type, $this->store)));
+  }
+
+  /**
+   * Tests that promotions are loaded by weight.
+   *
+   * @group debug
+   */
+  public function testWeight() {
+    $order_type = OrderType::load('default');
+
+    $promotion1 = Promotion::create([
+      'name' => 'Promotion 1',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 4,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion1->save());
+    $promotion2 = Promotion::create([
+      'name' => 'Promotion 2',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 2,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion2->save());
+    $promotion3 = Promotion::create([
+      'name' => 'Promotion 3',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => -10,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion3->save());
+    $promotion4 = Promotion::create([
+      'name' => 'Promotion 4',
+      'order_types' => [$order_type],
+      'stores' => [$this->store->id()],
+      'status' => TRUE,
+      'weight' => 1,
+    ]);
+    $this->assertEquals(SAVED_NEW, $promotion4->save());
+
+    $promotions = $this->promotionStorage->loadAvailable($order_type, $this->store);
+
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion3->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion4->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion2->label(), $promotion->label());
+    $promotion = array_shift($promotions);
+    $this->assertEquals($promotion1->label(), $promotion->label());
   }
 
 }

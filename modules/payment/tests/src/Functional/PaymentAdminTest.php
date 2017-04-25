@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_payment\Functional;
 
 use Drupal\commerce_payment\Entity\Payment;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Url;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
@@ -68,16 +69,30 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $profile = $this->createEntity('profile', [
+      'type' => 'customer',
+      'address' => [
+        'country_code' => 'US',
+        'postal_code' => '53177',
+        'locality' => 'Milwaukee',
+        'address_line1' => 'Pabst Blue Ribbon Dr',
+        'administrative_area' => 'WI',
+        'given_name' => 'Frederick',
+        'family_name' => 'Pabst',
+      ],
+      'uid' => $this->adminUser->id(),
+    ]);
+
     $this->paymentGateway = $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'example_onsite',
     ]);
-
     $this->paymentMethod = $this->createEntity('commerce_payment_method', [
       'uid' => $this->loggedInUser->id(),
       'type' => 'credit_card',
       'payment_gateway' => 'example',
+      'billing_profile' => $profile,
     ]);
 
     $details = [
@@ -108,14 +123,16 @@ class PaymentAdminTest extends CommerceBrowserTestBase {
       'store_id' => $this->store,
     ]);
 
-    $this->paymentUri = 'admin/commerce/orders/' . $this->order->id() . '/payments';
+    $this->paymentUri = Url::fromRoute('entity.commerce_payment.collection', [
+      'commerce_order' => $this->order->id(),
+    ])->toString();
   }
 
   /**
    * Tests that a Payments tab is visible on the order page.
    */
   public function testPaymentTab() {
-    $this->drupalGet('admin/commerce/orders/' . $this->order->id());
+    $this->drupalGet($this->order->toUrl());
     $this->assertSession()->linkExists('Payments');
     $this->assertSession()->linkByHrefExists($this->paymentUri);
   }
