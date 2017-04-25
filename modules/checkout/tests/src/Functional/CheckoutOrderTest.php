@@ -79,7 +79,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
    */
   public function testGuestOrderCheckout() {
     $this->drupalLogout();
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
@@ -105,7 +105,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->assertSession()->pageTextContains('Your order number is 1. You can view your order on your account page when logged in.');
     $this->assertSession()->pageTextContains('0 items');
     // Test second order.
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
@@ -142,7 +142,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $config->save();
 
     $this->drupalLogout();
-    $this->drupalGet($this->product->toUrl()->toString());
+    $this->drupalGet($this->product->toUrl());
     $this->submitForm([], 'Add to cart');
     $cart_link = $this->getSession()->getPage()->findLink('your cart');
     $cart_link->click();
@@ -255,7 +255,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
       'stores' => [$this->store],
     ]);
     // Adding a new product to the cart resets the checkout step.
-    $this->drupalGet($product2->toUrl()->toString());
+    $this->drupalGet($product2->toUrl());
     $this->submitForm([], 'Add to cart');
     $this->getSession()->getPage()->findLink('your cart')->click();
     $this->submitForm([], 'Checkout');
