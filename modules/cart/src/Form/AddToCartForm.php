@@ -240,6 +240,10 @@ class AddToCartForm extends ContentEntityForm {
     if (count($stores) === 1) {
       $store = reset($stores);
     }
+    elseif (count($stores) === 0) {
+      // Malformed entity.
+      throw new \Exception('The given entity is not assigned to any store.');
+    }
     else {
       $store = $this->storeContext->getStore();
       if (!in_array($store, $stores)) {
