@@ -128,14 +128,7 @@ class OrderRefresh implements OrderRefreshInterface {
   public function refresh(OrderInterface $order) {
     $current_time = $this->time->getCurrentTime();
     $order->setChangedTime($current_time);
-    // Do not remove adjustments added in the user interface.
-    $adjustments = $order->getAdjustments();
-    foreach ($adjustments as $key => $adjustment) {
-      if ($adjustment->getType() != 'custom') {
-        unset($adjustments[$key]);
-      }
-    }
-    $order->setAdjustments($adjustments);
+    $order->clearAdjustments();
     // Nothing else can be done while the order is empty.
     if (!$order->hasItems()) {
       return;
@@ -143,8 +136,6 @@ class OrderRefresh implements OrderRefreshInterface {
 
     $context = new Context($order->getCustomer(), $order->getStore());
     foreach ($order->getItems() as $order_item) {
-      $order_item->setAdjustments([]);
-
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity) {
         $order_item->setTitle($purchased_entity->getOrderItemTitle());
