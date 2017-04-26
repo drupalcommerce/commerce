@@ -6,7 +6,7 @@ use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\commerce_payment\Entity\EntityWithPaymentGatewayInterface;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\RenderElement;
 
 /**
  * Provides a form element for embedding the payment gateway forms.
@@ -25,7 +25,7 @@ use Drupal\Core\Render\Element\FormElement;
  *
  * @RenderElement("commerce_payment_gateway_form")
  */
-class PaymentGatewayForm extends FormElement {
+class PaymentGatewayForm extends RenderElement {
 
   use CommerceElementTrait;
 
