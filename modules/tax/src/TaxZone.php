@@ -109,7 +109,7 @@ class TaxZone {
   }
 
   /**
-   * Checks whether the provided address belongs to the zone.
+   * Checks whether the given address belongs to the zone.
    *
    * @param \CommerceGuys\Addressing\AddressInterface $address
    *   The address.
