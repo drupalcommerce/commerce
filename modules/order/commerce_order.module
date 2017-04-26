@@ -203,7 +203,19 @@ function commerce_order_get_shipping_profile(array $element, FormStateInterface 
     $profile = $storage['pane_shipping_information[shipping_profile]']['profile'];
   } elseif (isset($complete_form['shipping_information']['shipping_profile']['#profile'])) {
     $profile = $complete_form['shipping_information']['shipping_profile']['#profile'];
+  } else {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = \Drupal::routeMatch()->getParameter('commerce_order');
+
+    if ($order instanceof \Drupal\commerce_order\Entity\OrderInterface) {
+      if (!$order->get('shipments')->isEmpty()) {
+        /** @var \Drupal\commerce_shipping\Entity\ShipmentInterface $shipment */
+        $shipment = $order->get('shipments')->entity;
+        $profile = $shipment->getShippingProfile();
+      }
+    }
   }
 
   return $profile;
 }
+
