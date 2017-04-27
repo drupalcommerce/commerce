@@ -9,6 +9,7 @@ use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\commerce_tax\TaxZone;
+use Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\profile\Entity\ProfileInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,6 +28,13 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   protected $rounder;
 
   /**
+   * The chain tax rate resolver.
+   *
+   * @var \Drupal\commerce_tax\ChainTaxRateResolverInterface
+   */
+  protected $chainRateResolver;
+
+  /**
    * Constructs a new LocalTaxTypeBase object.
    *
    * @param array $configuration
@@ -41,11 +49,14 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
+   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   *   The chain tax rate resolver.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder, ChainTaxRateResolverInterface $chain_rate_resolver) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $event_dispatcher);
 
     $this->rounder = $rounder;
+    $this->chainRateResolver = $chain_rate_resolver;
   }
 
   /**
@@ -58,7 +69,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('event_dispatcher'),
-      $container->get('commerce_price.rounder')
+      $container->get('commerce_price.rounder'),
+      $container->get('commerce_tax.chain_tax_rate_resolver')
     );
   }
 
@@ -93,8 +105,8 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
 
       $zones = $this->resolveZones($order_item, $customer_profile);
       foreach ($zones as $zone) {
-        $rate = $this->resolveRate($zone, $order_item, $customer_profile);
-        if (!$rate) {
+        $rate = $this->chainRateResolver->resolve($zone, $order_item, $customer_profile);
+        if (!is_object($rate)) {
           // No applicable rate found.
           continue;
         }

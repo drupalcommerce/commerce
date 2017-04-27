@@ -3,6 +3,7 @@
 namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_price\RounderInterface;
+use Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface;
 use Drupal\commerce_tax\TaxZone;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Component\Utility\Html;
@@ -43,11 +44,13 @@ class Custom extends LocalTaxTypeBase {
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
+   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   *   The chain tax rate resolver.
    * @param \Drupal\Component\Uuid\UuidInterface $uuid_generator
    *   The UUID generator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder, UuidInterface $uuid_generator) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $event_dispatcher, $rounder);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder, ChainTaxRateResolverInterface $chain_rate_resolver, UuidInterface $uuid_generator) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $event_dispatcher, $rounder, $chain_rate_resolver);
 
     $this->uuidGenerator = $uuid_generator;
   }
@@ -63,6 +66,7 @@ class Custom extends LocalTaxTypeBase {
       $container->get('entity_type.manager'),
       $container->get('event_dispatcher'),
       $container->get('commerce_price.rounder'),
+      $container->get('commerce_tax.chain_tax_rate_resolver'),
       $container->get('uuid')
     );
   }

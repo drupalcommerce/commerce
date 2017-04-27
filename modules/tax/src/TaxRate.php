@@ -94,7 +94,7 @@ class TaxRate {
   }
 
   /**
-   * Gets the amount valid for the provided date.
+   * Gets the amount valid for the given date.
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   The date.
@@ -106,7 +106,7 @@ class TaxRate {
     // Default to the current date.
     $date = $date ?: new DrupalDateTime();
     // Amount start/end dates don't include the time, so discard the time
-    // portion of the provided date to make the matching precise.
+    // portion of the given date to make the matching precise.
     $date->setTime(0, 0);
     foreach ($this->amounts as $amount) {
       $start_date = $amount->getStartDate();
