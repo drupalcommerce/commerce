@@ -217,9 +217,6 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    */
   protected function resolveCustomerProfile(OrderItemInterface $order_item) {
     $order = $order_item->getOrder();
-    if (!$order) {
-      return;
-    }
     $store = $order->getStore();
     $prices_include_tax = $store->get('prices_include_tax')->value;
     $customer_profile = $order->getBillingProfile();
@@ -232,6 +229,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
       // better to show the store's default tax than nothing.
       $profile_storage = $this->entityTypeManager->getStorage('profile');
       $customer_profile = $profile_storage->create([
+        'type' => 'customer',
         'uid' => $order->getCustomerId(),
         'address' => $store->getAddress(),
       ]);

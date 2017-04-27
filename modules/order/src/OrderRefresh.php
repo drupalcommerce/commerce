@@ -142,6 +142,10 @@ class OrderRefresh implements OrderRefreshInterface {
         $unit_price = $this->chainPriceResolver->resolve($purchased_entity, $order_item->getQuantity(), $context);
         $order_item->setUnitPrice($unit_price);
       }
+      // If the order refresh is running during order preSave(),
+      // $order_item->getOrder() will point to the original order (or
+      // NULL, in case the order item is new).
+      $order_item->order_id->entity = $order;
     }
 
     // Allow the processors to modify the order and its items.
@@ -151,6 +155,9 @@ class OrderRefresh implements OrderRefreshInterface {
 
     // @todo Evaluate which order items have changed.
     foreach ($order->getItems() as $order_item) {
+      // Remove the order that was set above, to avoid
+      // crashes during the entity save process.
+      $order_item->order_id->entity = NULL;
       $order_item->setChangedTime($current_time);
       $order_item->save();
     }

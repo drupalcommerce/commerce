@@ -54,7 +54,7 @@ commerce_tax.commerce_tax_type.plugin.custom:
             type: label
             label: 'Label'
           amount:
-            type: float
+            type: string
             label: 'Amount'
     territories:
       type: sequence

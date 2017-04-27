@@ -159,37 +159,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   }
 
   /**
-   * Resolves the tax rate for the given tax zone.
-   *
-   * @param \Drupal\commerce_tax\TaxZone $zone
-   *   The tax zone.
-   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
-   *   The order item.
-   * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
-   *   The customer profile. Contains the address and tax number.
-   *
-   * @return \Drupal\commerce_tax\TaxRate|null
-   *   The tax rate, or NULL if none available.
-   */
-  protected function resolveRate(TaxZone $zone, OrderItemInterface $order_item, ProfileInterface $customer_profile) {
-    $rates = $zone->getRates();
-    // Filter out rates with no active amounts.
-    $rates = array_filter($rates, function ($rate) {
-      /** @var \Drupal\commerce_tax\TaxRate $rate */
-      return !empty($rate->getAmount());
-    });
-    // Take the default rate, or fallback to the first rate.
-    $resolved_rate = reset($rates);
-    foreach ($rates as $rate) {
-      if ($rate->isDefault()) {
-        $resolved_rate = $rate;
-        break;
-      }
-    }
-    return $resolved_rate;
-  }
-
-  /**
    * Builds the summary of all available tax rates.
    *
    * @return array
