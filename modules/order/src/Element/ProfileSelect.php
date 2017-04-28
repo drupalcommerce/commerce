@@ -99,6 +99,12 @@ class ProfileSelect extends RenderElement {
       throw new \InvalidArgumentException('The commerce_profile_select #available_countries property must be an array.');
     }
 
+    // Assign a name if needed.
+    if (empty($element['#name'])) {
+      list($name) = explode('--', $element['#id']);
+      $element['#name'] = 'profile-select--' . $name;
+    }
+
     $ajax_wrapper_id = Html::getUniqueId('profile-select-ajax-wrapper');
     $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
