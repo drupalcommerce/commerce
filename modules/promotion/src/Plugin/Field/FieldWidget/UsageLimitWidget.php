@@ -121,7 +121,7 @@ class UsageLimitWidget extends WidgetBase implements ContainerFactoryPluginInter
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $entity_type = $field_definition->getTargetEntityTypeId();
     $field_name = $field_definition->getName();
-    return $entity_type == 'commerce_promotion' && $field_name == 'usage_limit';
+    return in_array($entity_type, ['commerce_promotion', 'commerce_promotion_coupon']) && $field_name == 'usage_limit';
   }
 
 }
