@@ -243,7 +243,7 @@ class ProfileSelect extends RenderElement {
         $element['edit_button'] = [
           '#type' => 'button',
           '#name' => 'pane-' . $element['#name'] . '-edit',
-          '#default_value' => t('Edit'),
+          '#value' => t('Edit'),
           '#limit_validation_errors' => [],
           '#ajax' => [
             'callback' => [$called_class, 'profileAjax'],
@@ -258,7 +258,7 @@ class ProfileSelect extends RenderElement {
         $element['cancel_button'] = [
           '#type' => 'button',
           '#name' => 'pane-' . $element['#name'] . '-cancel',
-          '#default_value' => t('Cancel and select profile'),
+          '#value' => t('Cancel and select profile'),
           '#limit_validation_errors' => [],
           '#ajax' => [
             'callback' => [$called_class, 'profileAjax'],
