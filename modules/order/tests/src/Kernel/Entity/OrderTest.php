@@ -10,7 +10,6 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
-use Drupal\user\UserInterface;
 
 /**
  * Tests the Order entity.
