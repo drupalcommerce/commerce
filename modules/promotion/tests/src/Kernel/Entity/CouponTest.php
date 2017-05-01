@@ -9,8 +9,6 @@ use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_promotion\Entity\Coupon;
 use Drupal\commerce_promotion\Entity\Promotion;
-use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
