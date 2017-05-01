@@ -10,6 +10,7 @@ use Drupal\commerce_price\Exception\CurrencyMismatchException;
 use Drupal\commerce_price\Price;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the Order entity.
@@ -293,6 +294,32 @@ class OrderTest extends CommerceKernelTestBase {
       $currency_mismatch = TRUE;
     }
     $this->assertTrue($currency_mismatch);
+  }
+
+  /**
+   * Tests an an order's email updates with customer.
+   *
+   * @group debug
+   */
+  public function testOrderEmail() {
+    $customer = $this->createUser(['mail' => 'test@example.com']);
+    $order_with_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+      'uid' => $customer,
+    ]);
+    $order_with_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_with_customer->getEmail());
+
+    $order_without_customer = Order::create([
+      'type' => 'default',
+      'state' => 'completed',
+    ]);
+    $order_without_customer->save();
+    $this->assertEquals('', $order_without_customer->getEmail());
+    $order_without_customer->setCustomer($customer);
+    $order_without_customer->save();
+    $this->assertEquals($customer->getEmail(), $order_without_customer->getEmail());
   }
 
 }
