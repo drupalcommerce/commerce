@@ -67,7 +67,6 @@ class OrderItemTest extends CommerceKernelTestBase {
    * @covers ::getTotalPrice
    * @covers ::getData
    * @covers ::setData
-   * @covers ::getTotalAdjustedPrice
    * @covers ::getAdjustedTotalPrice
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
