@@ -59,7 +59,7 @@ class CustomerProfileEvent extends Event {
    * @return $this
    */
   public function setCustomerProfile(ProfileInterface $customer_profile) {
-    $this->customerProfile = $customerProfile;
+    $this->customerProfile = $customer_profile;
     return $this;
   }
 

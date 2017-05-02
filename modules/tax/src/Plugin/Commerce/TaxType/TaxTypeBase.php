@@ -212,7 +212,7 @@ abstract class TaxTypeBase extends PluginBase implements TaxTypeInterface, Conta
    * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
    *   The order item.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface[]|null
+   * @return \Drupal\profile\Entity\ProfileInterface|null
    *   The customer profile, or NULL if not yet known.
    */
   protected function resolveCustomerProfile(OrderItemInterface $order_item) {

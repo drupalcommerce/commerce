@@ -30,7 +30,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   /**
    * The chain tax rate resolver.
    *
-   * @var \Drupal\commerce_tax\ChainTaxRateResolverInterface
+   * @var \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface
    */
   protected $chainRateResolver;
 
@@ -49,7 +49,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
-   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   * @param \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface $chain_rate_resolver
    *   The chain tax rate resolver.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder, ChainTaxRateResolverInterface $chain_rate_resolver) {
