@@ -36,3 +36,15 @@ function commerce_product_post_update_1() {
 
   return $message;
 }
+
+/**
+ * Set the 'published' entity key.
+ */
+function commerce_product_post_update_2() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $definition_update_manager->getEntityType('commerce_product');
+  $keys = $entity_type->getKeys();
+  $keys['published'] = 'status';
+  $entity_type->set('entity_keys', $keys);
+  $definition_update_manager->updateEntityType($entity_type);
+}
