@@ -5,7 +5,6 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_tax\TaxZone;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
 
 /**
@@ -84,7 +83,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'bc',
       'label' => $this->t('British Columbia'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'BC']
+        ['country_code' => 'CA', 'administrative_area' => 'BC'],
       ],
       'rates' => [
         [
@@ -101,7 +100,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'mb',
       'label' => $this->t('Manitoba'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'MB']
+        ['country_code' => 'CA', 'administrative_area' => 'MB'],
       ],
       'rates' => [
         [
@@ -118,7 +117,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'nb',
       'label' => $this->t('New Brunswick'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'NB']
+        ['country_code' => 'CA', 'administrative_area' => 'NB'],
       ],
       'rates' => [
         [
@@ -135,7 +134,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'nl',
       'label' => $this->t('Newfoundland'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'NL']
+        ['country_code' => 'CA', 'administrative_area' => 'NL'],
       ],
       'rates' => [
         [
@@ -152,7 +151,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'ns',
       'label' => $this->t('Nova Scotia'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'NS']
+        ['country_code' => 'CA', 'administrative_area' => 'NS'],
       ],
       'rates' => [
         [
@@ -169,7 +168,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'on',
       'label' => $this->t('Ontario'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'ON']
+        ['country_code' => 'CA', 'administrative_area' => 'ON'],
       ],
       'rates' => [
         [
@@ -186,7 +185,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'pe',
       'label' => $this->t('PEI'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'PE']
+        ['country_code' => 'CA', 'administrative_area' => 'PE'],
       ],
       'rates' => [
         [
@@ -203,7 +202,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       'id' => 'qc',
       'label' => $this->t('Quebec'),
       'territories' => [
-        ['country_code' => 'CA', 'administrative_area' => 'QC']
+        ['country_code' => 'CA', 'administrative_area' => 'QC'],
       ],
       'rates' => [
         [
