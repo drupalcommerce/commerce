@@ -112,23 +112,27 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         }
         $unit_price = $order_item->getUnitPrice();
         $rate_amount = $rate->getAmount()->getAmount();
-        $adjustment_amount = $unit_price->multiply($rate_amount);
+        $tax_amount = $unit_price->multiply($rate_amount);
         if ($prices_include_tax) {
           $divisor = (string) (1 + $rate_amount);
-          $adjustment_amount = $adjustment_amount->divide($divisor);
+          $tax_amount = $tax_amount->divide($divisor);
         }
         if ($this->shouldRound()) {
-          $adjustment_amount = $this->rounder->round($adjustment_amount);
+          $tax_amount = $this->rounder->round($tax_amount);
         }
         if ($prices_include_tax && !$this->isDisplayInclusive()) {
-          $unit_price = $unit_price->subtract($adjustment_amount);
+          $unit_price = $unit_price->subtract($tax_amount);
+          $order_item->setUnitPrice($unit_price);
+        }
+        elseif (!$prices_include_tax && $this->isDisplayInclusive()) {
+          $unit_price = $unit_price->add($tax_amount);
           $order_item->setUnitPrice($unit_price);
         }
 
         $order_item->addAdjustment(new Adjustment([
           'type' => 'tax',
           'label' => $this->getDisplayLabel(),
-          'amount' => $adjustment_amount,
+          'amount' => $tax_amount,
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => $this->isDisplayInclusive(),
         ]));
