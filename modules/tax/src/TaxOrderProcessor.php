@@ -36,7 +36,7 @@ class TaxOrderProcessor implements OrderProcessorInterface {
     /** @var \Drupal\commerce_tax\Entity\TaxTypeInterface[] $tax_types */
     $tax_types = $tax_type_storage->loadMultiple();
     foreach ($tax_types as $tax_type) {
-      if ($tax_type->getPlugin()->applies($order)) {
+      if ($tax_type->status() && $tax_type->getPlugin()->applies($order)) {
         $tax_type->getPlugin()->apply($order);
       }
     }
