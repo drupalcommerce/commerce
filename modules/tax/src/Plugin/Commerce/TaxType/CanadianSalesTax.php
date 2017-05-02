@@ -4,7 +4,6 @@ namespace Drupal\commerce_tax\Plugin\Commerce\TaxType;
 
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\Entity\OrderItemInterface;
-use Drupal\commerce_tax\TaxableType;
 use Drupal\commerce_tax\TaxZone;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\ProfileInterface;
@@ -13,22 +12,11 @@ use Drupal\profile\Entity\ProfileInterface;
  * Provides the Canadian tax type.
  *
  * @CommerceTaxType(
- *   id = "CanadianSalesTax",
+ *   id = "canadian_sales_tax",
  *   label = "Canadian Sales Tax",
  * )
  */
 class CanadianSalesTax extends LocalTaxTypeBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildConfigurationForm($form, $form_state);
-    $form['rates'] = $this->buildRateSummary();
-    $form['rates']['#markup'] = $this->t('The following Canadian tax rates are provided:');
-
-    return $form;
-  }
 
   /**
    * {@inheritdoc}
@@ -54,7 +42,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
     }
     $store_registrations = $store->get('tax_registrations')->getValue();
     $store_registrations = array_column($store_registrations, 'value');
-    if (array_intersect($store_registrations, array('CA'))) {
+    if (array_intersect($store_registrations, ['CA'])) {
       return TRUE;
     }
 
@@ -69,7 +57,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
 
     $zones['ca'] = new TaxZone([
       'id' => 'ca',
-      'label' => $this->t('Canadian Government Sales Tax'),
+      'label' => $this->t('Canadian GST'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'AB'],
         ['country_code' => 'CA', 'administrative_area' => 'BC'],
@@ -94,7 +82,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
 
     $zones['bc'] = new TaxZone([
       'id' => 'bc',
-      'label' => $this->t('British Columbia Provincial Sales Tax'),
+      'label' => $this->t('British Columbia'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'BC']
       ],
@@ -104,14 +92,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('PST'),
           'amounts' => [
             ['amount' => '0.07', 'start_date' => '2013-04-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['mb'] = new TaxZone([
       'id' => 'mb',
-      'label' => $this->t('Manitoba Provincial Sales Tax'),
+      'label' => $this->t('Manitoba'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'MB']
       ],
@@ -121,14 +109,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('PST'),
           'amounts' => [
             ['amount' => '0.08', 'start_date' => '2013-07-01', 'end_date' => '2023-06-30'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['nb'] = new TaxZone([
       'id' => 'nb',
-      'label' => $this->t('New Brunswick Harmonized Sales Tax'),
+      'label' => $this->t('New Brunswick'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'NB']
       ],
@@ -138,14 +126,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2016-07-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['nl'] = new TaxZone([
       'id' => 'nl',
-      'label' => $this->t('Newfoundland Harmonized Sales Tax'),
+      'label' => $this->t('Newfoundland'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'NL']
       ],
@@ -155,14 +143,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2016-07-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['ns'] = new TaxZone([
       'id' => 'ns',
-      'label' => $this->t('Nova Scotia Harmonized Sales Tax'),
+      'label' => $this->t('Nova Scotia'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'NS']
       ],
@@ -172,14 +160,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2010-07-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['on'] = new TaxZone([
       'id' => 'on',
-      'label' => $this->t('Ontario Harmonized Sales Tax'),
+      'label' => $this->t('Ontario'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'ON']
       ],
@@ -189,14 +177,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2010-07-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['pe'] = new TaxZone([
       'id' => 'pe',
-      'label' => $this->t('PEI Harmonized Sales Tax'),
+      'label' => $this->t('PEI'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'PE']
       ],
@@ -206,14 +194,14 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.14', 'start_date' => '2013-04-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     $zones['qc'] = new TaxZone([
       'id' => 'qc',
-      'label' => $this->t('Quebec Sales Tax'),
+      'label' => $this->t('Quebec'),
       'territories' => [
         ['country_code' => 'CA', 'administrative_area' => 'QC']
       ],
@@ -223,9 +211,9 @@ class CanadianSalesTax extends LocalTaxTypeBase {
           'label' => $this->t('QST'),
           'amounts' => [
             ['amount' => '0.09975', 'start_date' => '2013-01-01'],
-          ]
-        ]
-      ]
+          ],
+        ],
+      ],
     ]);
 
     return $zones;
@@ -235,27 +223,18 @@ class CanadianSalesTax extends LocalTaxTypeBase {
    * {@inheritdoc}
    */
   protected function resolveZones(OrderItemInterface $order_item, ProfileInterface $customer_profile) {
-    $zones = $this->getZones();
     $customer_address = $customer_profile->address->first();
+    if ($customer_address->getCountryCode() != 'CA') {
+      return [];
+    }
+
+    $zones = $this->getZones();
     $customer_zones = array_filter($zones, function ($zone) use ($customer_address) {
       /** @var \Drupal\commerce_tax\TaxZone $zone */
       return $zone->match($customer_address);
     });
-    if (empty($customer_zones)) {
-      // The customer is not in Canada.
-      return [];
-    }
-    $order = $order_item->getOrder();
-    $store = $order->getStore();
-    $store_address = $store->getAddress();
-    $store_zones = array_filter($zones, function ($zone) use ($store_address) {
-      /** @var \Drupal\commerce_tax\TaxZone $zone */
-      return $zone->match($store_address);
-    });
 
-    $resolved_zones = $store_zones;
-
-    return $resolved_zones;
+    return $customer_zones;
   }
 
 }
