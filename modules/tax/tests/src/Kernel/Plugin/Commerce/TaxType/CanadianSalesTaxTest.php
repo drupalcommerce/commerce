@@ -13,10 +13,10 @@ use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 use Drupal\profile\Entity\Profile;
 
 /**
- * @coversDefaultClass \Drupal\commerce_tax\Plugin\Commerce\TaxType\EuropeanUnionVat
+ * @coversDefaultClass \Drupal\commerce_tax\Plugin\Commerce\TaxType\CanadianSalesTax
  * @group commerce
  */
-class EuropeanUnionVatTest extends CommerceKernelTestBase {
+class CanadianSalesTaxTest extends CommerceKernelTestBase {
 
   /**
    * The tax type plugin.
@@ -74,7 +74,7 @@ class EuropeanUnionVatTest extends CommerceKernelTestBase {
       '_entity_id' => 'canadian_sales_tax',
       'display_inclusive' => FALSE,
     ];
-    $this->plugin = EuropeanUnionVat::create($this->container, $configuration, 'canadian_sales_tax', ['label' => 'Canadian Sales Tax']);
+    $this->plugin = CanadianSalesTax::create($this->container, $configuration, 'canadian_sales_tax', ['label' => 'Canadian Sales Tax']);
   }
 
   /**
