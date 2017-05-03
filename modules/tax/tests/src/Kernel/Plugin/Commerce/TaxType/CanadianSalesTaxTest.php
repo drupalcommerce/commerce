@@ -88,10 +88,9 @@ class CanadianSalesTaxTest extends CommerceKernelTestBase {
     $this->assertTrue($this->plugin->applies($order));
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
-    $adjustment = reset($adjustments);
     $this->assertCount(2, $adjustments);
-    $this->assertEqual('canadian_sales_tax|ca|gst', $adjustment->getSourceId());
-    $this->assertEqual('canadian_sales_tax|ca|pst', $adjustment->getSourceId());
+    $this->assertEqual('canadian_sales_tax|ca|gst', $adjustments[0]->getSourceId());
+    $this->assertEqual('canadian_sales_tax|bc|pst', $adjustments[1]->getSourceId());
 
     // Alberta customer, GST only.
     $order = $this->buildOrder('CA', 'AB');
@@ -109,7 +108,7 @@ class CanadianSalesTaxTest extends CommerceKernelTestBase {
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertCount(1, $adjustments);
-    $this->assertEqual('canadian_sales_tax|ca|hst', $adjustment->getSourceId());
+    $this->assertEqual('canadian_sales_tax|on|hst', $adjustment->getSourceId());
 
     // US store, California.
     $order = $this->buildOrder('US', 'CA');

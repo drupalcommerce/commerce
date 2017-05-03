@@ -87,7 +87,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'PST',
+          'id' => 'pst',
           'label' => $this->t('PST'),
           'amounts' => [
             ['amount' => '0.07', 'start_date' => '2013-04-01'],
@@ -104,7 +104,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'PST',
+          'id' => 'pst',
           'label' => $this->t('PST'),
           'amounts' => [
             ['amount' => '0.08', 'start_date' => '2013-07-01', 'end_date' => '2023-06-30'],
@@ -121,7 +121,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'HST',
+          'id' => 'hst',
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2016-07-01'],
@@ -138,7 +138,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'HST',
+          'id' => 'hst',
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2016-07-01'],
@@ -155,7 +155,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'HST',
+          'id' => 'hst',
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.15', 'start_date' => '2010-07-01'],
@@ -172,7 +172,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'HST',
+          'id' => 'hst',
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.13', 'start_date' => '2010-07-01'],
@@ -189,7 +189,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'HST',
+          'id' => 'hst',
           'label' => $this->t('HST'),
           'amounts' => [
             ['amount' => '0.14', 'start_date' => '2013-04-01'],
@@ -206,7 +206,7 @@ class CanadianSalesTax extends LocalTaxTypeBase {
       ],
       'rates' => [
         [
-          'id' => 'QST',
+          'id' => 'qst',
           'label' => $this->t('QST'),
           'amounts' => [
             ['amount' => '0.09975', 'start_date' => '2013-01-01'],
