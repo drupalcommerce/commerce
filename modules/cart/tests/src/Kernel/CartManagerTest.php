@@ -117,7 +117,7 @@ class CartManagerTest extends CommerceKernelTestBase {
 
     $order_item1 = $this->cartManager->addEntity($cart, $this->variation1);
     $order_item1 = $this->reloadEntity($order_item1);
-    $this->assertEquals([$order_item1], $cart->getItems());
+    $this->assertNotEmpty($cart->hasItem($order_item1));
     $this->assertEquals(1, $order_item1->getQuantity());
     $this->assertEquals(new Price('1.00', 'USD'), $cart->getTotalPrice());
 
@@ -145,7 +145,7 @@ class CartManagerTest extends CommerceKernelTestBase {
   }
 
   /**
-   * Tests that order items without purchaseable entity do not cause crashes.
+   * Tests that order items without purchasable entities do not cause crashes.
    */
   public function testAddOrderItem() {
     $this->installCommerceCart();

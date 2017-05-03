@@ -30,7 +30,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
   /**
    * The chain tax rate resolver.
    *
-   * @var \Drupal\commerce_tax\ChainTaxRateResolverInterface
+   * @var \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface
    */
   protected $chainRateResolver;
 
@@ -49,7 +49,7 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
    *   The event dispatcher.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   The rounder.
-   * @param \Drupal\commerce_tax\ChainTaxRateResolverInterface $chain_rate_resolver
+   * @param \Drupal\commerce_tax\Resolver\ChainTaxRateResolverInterface $chain_rate_resolver
    *   The chain tax rate resolver.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, RounderInterface $rounder, ChainTaxRateResolverInterface $chain_rate_resolver) {
@@ -112,23 +112,27 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
         }
         $unit_price = $order_item->getUnitPrice();
         $rate_amount = $rate->getAmount()->getAmount();
-        $adjustment_amount = $unit_price->multiply($rate_amount);
+        $tax_amount = $unit_price->multiply($rate_amount);
         if ($prices_include_tax) {
           $divisor = (string) (1 + $rate_amount);
-          $adjustment_amount = $adjustment_amount->divide($divisor);
+          $tax_amount = $tax_amount->divide($divisor);
         }
         if ($this->shouldRound()) {
-          $adjustment_amount = $this->rounder->round($adjustment_amount);
+          $tax_amount = $this->rounder->round($tax_amount);
         }
         if ($prices_include_tax && !$this->isDisplayInclusive()) {
-          $unit_price = $unit_price->subtract($adjustment_amount);
+          $unit_price = $unit_price->subtract($tax_amount);
+          $order_item->setUnitPrice($unit_price);
+        }
+        elseif (!$prices_include_tax && $this->isDisplayInclusive()) {
+          $unit_price = $unit_price->add($tax_amount);
           $order_item->setUnitPrice($unit_price);
         }
 
         $order_item->addAdjustment(new Adjustment([
           'type' => 'tax',
           'label' => $this->getDisplayLabel(),
-          'amount' => $adjustment_amount,
+          'amount' => $tax_amount,
           'source_id' => $this->entityId . '|' . $zone->getId() . '|' . $rate->getId(),
           'included' => $this->isDisplayInclusive(),
         ]));
@@ -156,37 +160,6 @@ abstract class LocalTaxTypeBase extends TaxTypeBase implements LocalTaxTypeInter
       }
     }
     return $resolved_zones;
-  }
-
-  /**
-   * Resolves the tax rate for the given tax zone.
-   *
-   * @param \Drupal\commerce_tax\TaxZone $zone
-   *   The tax zone.
-   * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
-   *   The order item.
-   * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
-   *   The customer profile. Contains the address and tax number.
-   *
-   * @return \Drupal\commerce_tax\TaxRate|null
-   *   The tax rate, or NULL if none available.
-   */
-  protected function resolveRate(TaxZone $zone, OrderItemInterface $order_item, ProfileInterface $customer_profile) {
-    $rates = $zone->getRates();
-    // Filter out rates with no active amounts.
-    $rates = array_filter($rates, function ($rate) {
-      /** @var \Drupal\commerce_tax\TaxRate $rate */
-      return !empty($rate->getAmount());
-    });
-    // Take the default rate, or fallback to the first rate.
-    $resolved_rate = reset($rates);
-    foreach ($rates as $rate) {
-      if ($rate->isDefault()) {
-        $resolved_rate = $rate;
-        break;
-      }
-    }
-    return $resolved_rate;
   }
 
   /**

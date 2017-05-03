@@ -31,11 +31,11 @@ class CustomerProfileEvent extends Event {
    * Constructs a new CustomerProfileEvent.
    *
    * @param \Drupal\profile\Entity\ProfileInterface $customer_profile
-   *   The customer profile.
+   *   The initially selected customer profile.
    * @param \Drupal\commerce_order\Entity\OrderItemInterface $order_item
-   *   The removed order item.
+   *   The order item.
    */
-  public function __construct(ProfileInterface $customer_profile, OrderItemInterface $order_item) {
+  public function __construct(ProfileInterface $customer_profile = NULL, OrderItemInterface $order_item) {
     $this->customerProfile = $customer_profile;
     $this->orderItem = $order_item;
   }
@@ -43,8 +43,8 @@ class CustomerProfileEvent extends Event {
   /**
    * Gets the customer profile.
    *
-   * @return \Drupal\profile\Entity\ProfileInterface
-   *   The customer profile.
+   * @return \Drupal\profile\Entity\ProfileInterface|null
+   *   The customer profile, or NULL if not yet known.
    */
   public function getCustomerProfile() {
     return $this->customerProfile;
@@ -59,7 +59,7 @@ class CustomerProfileEvent extends Event {
    * @return $this
    */
   public function setCustomerProfile(ProfileInterface $customer_profile) {
-    $this->customerProfile = $customerProfile;
+    $this->customerProfile = $customer_profile;
     return $this;
   }
 

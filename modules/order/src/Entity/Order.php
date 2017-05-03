@@ -493,7 +493,6 @@ class Order extends ContentEntityBase implements OrderInterface {
         $this->setCompletedTime(\Drupal::time()->getRequestTime());
       }
     }
-
     // Refresh draft orders on every save.
     if ($this->getState()->value == 'draft' && empty($this->getRefreshState())) {
       $this->setRefreshState(self::REFRESH_ON_SAVE);

@@ -149,7 +149,7 @@ class CustomTest extends CommerceKernelTestBase {
     $this->plugin->apply($order);
     $this->assertCount(1, $order->collectAdjustments());
 
-    // Confirm the adjustment format.
+    // Test non-tax-inclusive prices + display-inclusive taxes.
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals('tax', $adjustment->getType());
@@ -157,29 +157,31 @@ class CustomTest extends CommerceKernelTestBase {
     $this->assertEquals(new Price('2.07', 'USD'), $adjustment->getAmount());
     $this->assertEquals('serbian_vat|default|standard', $adjustment->getSourceId());
     $this->assertTrue($adjustment->isIncluded());
+    $order_items = $order->getItems();
+    $order_item = reset($order_items);
+    $this->assertEquals(new Price('12.40', 'USD'), $order_item->getUnitPrice());
 
-    // Test tax inclusive prices.
-    $store = $order->getStore();
-    $store->set('prices_include_tax', TRUE);
-    $store->save();
-    $order->clearAdjustments();
+    // Test tax-inclusive prices + display-inclusive taxes.
+    $order = $this->buildOrder('RS', 'RS', [], TRUE);
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertTrue($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('10.33', 'USD'), $order_item->getUnitPrice());
 
-    // Test tax inclusive prices + non-display-inclusive taxes.
+    // Test tax-inclusive prices + non-display-inclusive taxes.
     $configuration = $this->plugin->getConfiguration();
     $configuration['display_inclusive'] = FALSE;
     $this->plugin->setConfiguration($configuration);
-    $order->clearAdjustments();
+    $order = $this->buildOrder('RS', 'RS', [], TRUE);
     $this->plugin->apply($order);
     $adjustments = $order->collectAdjustments();
     $adjustment = reset($adjustments);
     $this->assertEquals(new Price('1.72', 'USD'), $adjustment->getAmount());
+    $this->assertFalse($adjustment->isIncluded());
     $order_items = $order->getItems();
     $order_item = reset($order_items);
     $this->assertEquals(new Price('8.61', 'USD'), $order_item->getUnitPrice());
@@ -191,14 +193,14 @@ class CustomTest extends CommerceKernelTestBase {
    * @return \Drupal\commerce_order\Entity\OrderInterface
    *   The order.
    */
-  protected function buildOrder($customer_country, $store_country, array $store_registrations = []) {
+  protected function buildOrder($customer_country, $store_country, array $store_registrations = [], $prices_include_tax = FALSE) {
     $store = Store::create([
       'type' => 'default',
       'label' => 'My store',
       'address' => [
         'country_code' => $store_country,
       ],
-      'prices_include_tax' => FALSE,
+      'prices_include_tax' => $prices_include_tax,
       'tax_registrations' => $store_registrations,
     ]);
     $store->save();
