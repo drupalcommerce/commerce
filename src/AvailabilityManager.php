@@ -32,8 +32,8 @@ class AvailabilityManager implements AvailabilityManagerInterface {
    * {@inheritdoc}
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    $min = .0000001;
-    $max = 9999999;
+    $min = PHP_INT_MIN;
+    $max = PHP_INT_MAX;
 
     $has_opinion = FALSE;
     foreach ($this->checkers as $checker) {
