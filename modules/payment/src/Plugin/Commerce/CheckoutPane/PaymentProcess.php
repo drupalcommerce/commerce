@@ -2,18 +2,14 @@
 
 namespace Drupal\commerce_payment\Plugin\Commerce\CheckoutPane;
 
-use Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGatewayInterface;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OnsitePaymentGatewayInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the payment process pane.
@@ -25,47 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   wrapper_element = "container",
  * )
  */
-class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs a new PaymentProcess object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
-   *   The parent checkout flow.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
-
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow = NULL) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $checkout_flow,
-      $container->get('entity_type.manager')
-    );
-  }
+class PaymentProcess extends CheckoutPaneBase {
 
   /**
    * {@inheritdoc}
@@ -103,7 +59,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         TRUE => $this->t('Authorize and capture'),
         FALSE => $this->t('Authorize only (requires manual capture after checkout)'),
       ],
-      '#default_value' => $this->configuration['capture'],
+      '#default_value' => (int) $this->configuration['capture'],
     ];
 
     return $form;
@@ -119,6 +75,15 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['capture'] = !empty($values['capture']);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isVisible() {
+    // This pane can't be used without the PaymentInformation pane.
+    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
+    return $payment_info_pane->isVisible() && $payment_info_pane->getStepId() != '_disabled';
   }
 
   /**
@@ -142,12 +107,13 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       'payment_gateway' => $payment_gateway->id(),
       'order_id' => $this->order->id(),
     ]);
+    $next_step_id = $this->checkoutFlow->getNextStepId($this->getStepId());
 
     if ($payment_gateway_plugin instanceof OnsitePaymentGatewayInterface) {
       try {
         $payment->payment_method = $this->order->payment_method->entity;
         $payment_gateway_plugin->createPayment($payment, $this->configuration['capture']);
-        $this->checkoutFlow->redirectToStep($this->checkoutFlow->getNextStepId());
+        $this->checkoutFlow->redirectToStep($next_step_id);
       }
       catch (DeclineException $e) {
         $message = $this->t('We encountered an error processing your payment method. Please verify your details and try again.');
@@ -168,6 +134,7 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
         '#default_value' => $payment,
         '#return_url' => $this->buildReturnUrl($this->order),
         '#cancel_url' => $this->buildCancelUrl($this->order),
+        '#capture' => $this->configuration['capture'],
       ];
 
       $complete_form['actions']['next']['#value'] = $this->t('Proceed to @gateway', [
@@ -175,6 +142,9 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
       ]);
 
       return $pane_form;
+    }
+    else {
+      $this->checkoutFlow->redirectToStep($next_step_id);
     }
   }
 
@@ -216,12 +186,8 @@ class PaymentProcess extends CheckoutPaneBase implements ContainerFactoryPluginI
    * @throws \Drupal\Core\Form\EnforcedResponseException
    */
   protected function redirectToPreviousStep() {
-    $previous_step_id = $this->checkoutFlow->getPreviousStepId();
-    foreach ($this->checkoutFlow->getPanes() as $pane) {
-      if ($pane->getId() == 'payment_information') {
-        $previous_step_id = $pane->getStepId();
-      }
-    }
+    $payment_info_pane = $this->checkoutFlow->getPane('payment_information');
+    $previous_step_id = $payment_info_pane->getStepId();
     $this->checkoutFlow->redirectToStep($previous_step_id);
   }
 

@@ -14,9 +14,11 @@ use Drupal\Core\Render\Element\FormElement;
  *   '#type' => 'commerce_price',
  *   '#title' => $this->t('Amount'),
  *   '#default_value' => ['number' => '99.99', 'currency_code' => 'USD'],
+ *   '#allow_negative' => FALSE,
  *   '#size' => 60,
  *   '#maxlength' => 128,
  *   '#required' => TRUE,
+ *   '#available_currencies' => ['USD', 'EUR'],
  * ];
  * @endcode
  *
@@ -30,9 +32,13 @@ class Price extends FormElement {
   public function getInfo() {
     $class = get_class($this);
     return [
+      // List of currencies codes. If empty, all currencies will be available.
+      '#available_currencies' => [],
+
       '#size' => 10,
       '#maxlength' => 128,
       '#default_value' => NULL,
+      '#allow_negative' => FALSE,
       '#attached' => [
         'library' => ['commerce_price/admin'],
       ],
@@ -77,6 +83,11 @@ class Price extends FormElement {
     /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
     $currencies = $currency_storage->loadMultiple();
     $currency_codes = array_keys($currencies);
+    // Keep only available currencies.
+    $available_currencies = $element['#available_currencies'];
+    if (isset($available_currencies) && !empty($available_currencies)) {
+      $currency_codes = array_intersect($currency_codes, $available_currencies);
+    }
     // Stop rendering if there are no currencies available.
     if (empty($currency_codes)) {
       return $element;
@@ -99,6 +110,7 @@ class Price extends FormElement {
       '#min_fraction_digits' => min($fraction_digits),
       // '6' is the field storage maximum.
       '#max_fraction_digits' => 6,
+      '#min' => $element['#allow_negative'] ? NULL : 0,
     ];
     unset($element['#size']);
     unset($element['#maxlength']);

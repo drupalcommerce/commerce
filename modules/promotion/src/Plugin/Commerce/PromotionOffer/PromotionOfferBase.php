@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer;
 
-use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_order\EntityAdjustableInterface;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\Core\Executable\ExecutablePluginBase;
@@ -12,7 +12,7 @@ use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base class for Promotion Offer plugins.
+ * Provides the base class for offers.
  */
 abstract class PromotionOfferBase extends ExecutablePluginBase implements PromotionOfferInterface {
 
@@ -59,28 +59,15 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   /**
    * {@inheritdoc}
    */
-  public function getTargetEntityType() {
-    return $this->pluginDefinition['target_entity_type'];
+  public function getPromotion() {
+    return $this->getContextValue('commerce_promotion');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getTargetEntity() {
-    return $this->getContextValue($this->getTargetEntityType());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function applyAdjustment(EntityAdjustableInterface $entity, Price $amount) {
-    $entity->addAdjustment(new Adjustment([
-      'type' => 'promotion',
-      // @todo Change to label from UI when added in #2770731.
-      'label' => t('Discount'),
-      'amount' => $amount->multiply('-1'),
-      'source_id' => $this->getPluginId(),
-    ]));
+  public function getOrder() {
+    return $this->getContextValue('commerce_order');
   }
 
   /**
@@ -129,6 +116,24 @@ abstract class PromotionOfferBase extends ExecutablePluginBase implements Promot
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration + $this->defaultConfiguration();
     return $this;
+  }
+
+  /**
+   * Applies the promotion offer's adjustment to an adjustable entity.
+   *
+   * @param \Drupal\commerce_order\EntityAdjustableInterface $entity
+   *   The adjustable entity.
+   * @param \Drupal\commerce_price\Price $amount
+   *   The price object.
+   */
+  protected function applyAdjustment(EntityAdjustableInterface $entity, Price $amount) {
+    $entity->addAdjustment(new Adjustment([
+      'type' => 'promotion',
+      // @todo Change to label from UI when added in #2770731.
+      'label' => t('Discount'),
+      'amount' => $amount->multiply('-1'),
+      'source_id' => $this->getPromotion()->id(),
+    ]));
   }
 
 }

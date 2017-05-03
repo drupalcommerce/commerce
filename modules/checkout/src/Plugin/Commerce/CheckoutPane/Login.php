@@ -40,13 +40,6 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
   protected $currentUser;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * The user authentication object.
    *
    * @var \Drupal\user\UserAuthInterface
@@ -71,23 +64,22 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
    *   The plugin implementation definition.
    * @param \Drupal\commerce_checkout\Plugin\Commerce\CheckoutFlow\CheckoutFlowInterface $checkout_flow
    *   The parent checkout flow.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\commerce\CredentialsCheckFloodInterface $credentials_check_flood
    *   The credentials check flood controller.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    * @param \Drupal\user\UserAuthInterface $user_auth
    *   The user authentication object.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, UserAuthInterface $user_auth, RequestStack $request_stack) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CheckoutFlowInterface $checkout_flow, EntityTypeManagerInterface $entity_type_manager, CredentialsCheckFloodInterface $credentials_check_flood, AccountInterface $current_user, UserAuthInterface $user_auth, RequestStack $request_stack) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $checkout_flow, $entity_type_manager);
 
     $this->credentialsCheckFlood = $credentials_check_flood;
     $this->currentUser = $current_user;
-    $this->entityTypeManager = $entity_type_manager;
     $this->userAuth = $user_auth;
     $this->clientIp = $request_stack->getCurrentRequest()->getClientIp();
   }
@@ -101,9 +93,9 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
       $plugin_id,
       $plugin_definition,
       $checkout_flow,
+      $container->get('entity_type.manager'),
       $container->get('commerce.credentials_check_flood'),
       $container->get('current_user'),
-      $container->get('entity_type.manager'),
       $container->get('user.auth'),
       $container->get('request_stack')
     );
@@ -400,7 +392,7 @@ class Login extends CheckoutPaneBase implements CheckoutPaneInterface, Container
 
     $form_state->setRedirect('commerce_checkout.form', [
       'commerce_order' => $this->order->id(),
-      'step' => $this->checkoutFlow->getNextStepId(),
+      'step' => $this->checkoutFlow->getNextStepId($this->getStepId()),
     ]);
   }
 

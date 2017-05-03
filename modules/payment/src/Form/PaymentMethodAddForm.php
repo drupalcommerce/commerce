@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_payment\Form;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -101,15 +102,10 @@ class PaymentMethodAddForm extends FormBase implements ContainerInjectionInterfa
    */
   protected function buildPaymentMethodTypeForm(array $form, FormStateInterface $form_state) {
     $payment_method_types = $form_state->get('payment_gateway')->getPlugin()->getPaymentMethodTypes();
-    $payment_method_type_options = array_map(function ($payment_method_type) {
-      /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeInterface $payment_method_type */
-      return $payment_method_type->getLabel();
-    }, $payment_method_types);
-
     $form['payment_method_type'] = [
       '#type' => 'radios',
       '#title' => $this->t('Payment method type'),
-      '#options' => $payment_method_type_options,
+      '#options' => EntityHelper::extractLabels($payment_method_types),
       '#default_value' => '',
       '#required' => TRUE,
     ];

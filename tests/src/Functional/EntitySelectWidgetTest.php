@@ -2,10 +2,10 @@
 
 namespace Drupal\Tests\commerce\Functional;
 
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\commerce_store\StoreCreationTrait;
 
 /**
  * Tests the Entity select widget.
@@ -14,15 +14,12 @@ use Drupal\commerce_store\StoreCreationTrait;
  */
 class EntitySelectWidgetTest extends CommerceBrowserTestBase {
 
-  use StoreCreationTrait;
-
   /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = [
-    'commerce_store',
     'commerce_product',
   ];
 
@@ -53,7 +50,6 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
   protected function getAdministratorPermissions() {
     return array_merge([
       'administer commerce_product',
-      'administer commerce_store',
     ], parent::getAdministratorPermissions());
   }
 
@@ -81,6 +77,8 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
       'title' => $this->randomMachineName(),
       'variations' => [$variation],
     ]);
+    // Set the first store.
+    $this->stores[] = $this->store;
   }
 
   /**
@@ -88,9 +86,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
    */
   public function testWidget() {
     $form_url = 'product/' . $this->product->id() . '/edit';
-    // Create the first store. Since the field is required, the widget
-    // should be a hidden element.
-    $this->createStores(1);
+    // Since the field is required, the widget should be a hidden element.
     $store_id = $this->stores[0]->id();
     $this->drupalGet($form_url);
     $field = $this->getSession()->getPage()->find('xpath', '//input[@type="hidden" and @name="stores[target_id][value]" and @value="' . $store_id . '"]');
@@ -98,9 +94,7 @@ class EntitySelectWidgetTest extends CommerceBrowserTestBase {
 
     // Create another store. The widget should now be a set of checkboxes.
     $this->createStores(1);
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    $store_ids = EntityHelper::extractIds($this->stores);
     $this->drupalGet($form_url);
     $this->assertNotNull($this->getSession()->getPage()->find('xpath', '//input[@type="checkbox" and starts-with(@name,"stores")]'));
     $this->assertSession()->checkboxNotChecked('edit-stores-target-id-value-1');

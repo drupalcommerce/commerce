@@ -111,10 +111,10 @@ interface CheckoutPaneInterface extends ConfigurablePluginInterface, PluginFormI
    * Important:
    * The review pane shows summaries for both visible and non-visible panes.
    * To skip showing a summary for a non-visible pane, check isVisible()
-   * and return an empty string.
+   * and return an empty array.
    *
-   * @return string
-   *   An HTML summary of the pane values.
+   * @return array
+   *   A render array containing the summary of the pane values.
    */
   public function buildPaneSummary();
 

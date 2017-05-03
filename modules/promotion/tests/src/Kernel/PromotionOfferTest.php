@@ -6,6 +6,8 @@ use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderItemType;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_promotion\Entity\Promotion;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
@@ -40,6 +42,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     'profile',
     'state_machine',
     'commerce_order',
+    'path',
     'commerce_product',
     'commerce_promotion',
   ];
@@ -52,17 +55,19 @@ class PromotionOfferTest extends CommerceKernelTestBase {
 
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
-    $this->installEntitySchema('commerce_order_type');
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_promotion');
+    $this->installEntitySchema('commerce_product_variation');
+    $this->installEntitySchema('commerce_product');
     $this->installConfig([
       'profile',
       'commerce_order',
+      'commerce_product',
       'commerce_promotion',
     ]);
+    $this->installSchema('commerce_promotion', ['commerce_promotion_usage']);
     $this->offerManager = $this->container->get('plugin.manager.commerce_promotion_offer');
 
-    // An order item type that doesn't need a purchasable entity, for simplicity.
     OrderItemType::create([
       'id' => 'test',
       'label' => 'Test',
@@ -75,6 +80,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
       'mail' => 'test@example.com',
       'ip_address' => '127.0.0.1',
       'order_number' => '6',
+      'uid' => $this->createUser(),
       'store_id' => $this->store,
       'order_items' => [],
     ]);
@@ -95,6 +101,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     ]);
     $order_item->save();
     $this->order->addItem($order_item);
+    $this->order->save();
 
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
@@ -116,7 +123,6 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     $this->assertEquals('0.10', $offer_field->target_plugin_configuration['amount']);
 
     $promotion->apply($this->order);
-
     $this->assertEquals(1, count($this->order->getAdjustments()));
     $this->assertEquals(new Price('36.00', 'USD'), $this->order->getTotalPrice());
 
@@ -126,16 +132,33 @@ class PromotionOfferTest extends CommerceKernelTestBase {
    * Tests product percentage off.
    */
   public function testProductPercentageOff() {
-    // Use addOrderItem so the total is calculated.
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => '2',
-      'unit_price' => [
+    $variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => strtolower($this->randomMachineName()),
+      'price' => [
         'number' => '10.00',
         'currency_code' => 'USD',
       ],
     ]);
+    $variation->save();
+    $product = Product::create([
+      'type' => 'default',
+      'title' => 'My product',
+      'variations' => [$variation],
+    ]);
+    $product->save();
+
+    $order_item = OrderItem::create([
+      'type' => 'default',
+      'quantity' => '2',
+      'unit_price' => $variation->getPrice(),
+      'purchased_entity' => $variation->id(),
+    ]);
     $order_item->save();
+    $this->assertEquals($variation->id(), $order_item->getPurchasedEntityId());
+    $this->order->addItem($order_item);
+    $this->order->save();
+    $this->assertCount(1, $this->order->getItems());
 
     // Starts now, enabled. No end time.
     $promotion = Promotion::create([
@@ -147,6 +170,7 @@ class PromotionOfferTest extends CommerceKernelTestBase {
         'target_plugin_id' => 'commerce_promotion_product_percentage_off',
         'target_plugin_configuration' => [
           'amount' => '0.50',
+          'product_id' => $product->id(),
         ],
       ],
     ]);
@@ -155,9 +179,11 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     /** @var \Drupal\commerce\Plugin\Field\FieldType\PluginItem $offer_field */
     $offer_field = $promotion->get('offer')->first();
     $this->assertEquals('0.50', $offer_field->target_plugin_configuration['amount']);
+    $this->assertEquals($product->id(), $offer_field->target_plugin_configuration['product_id']);
 
-    $promotion->apply($order_item);
-    $order_item->save();
+    $this->container->get('commerce_order.order_refresh')->refresh($this->order);
+    $this->order = $this->reloadEntity($this->order);
+    $order_item = $this->reloadEntity($order_item);
 
     $adjustments = $order_item->getAdjustments();
     $this->assertEquals(1, count($adjustments));
@@ -168,64 +194,8 @@ class PromotionOfferTest extends CommerceKernelTestBase {
     // Adjustments don't affect total order item price, but the order's total.
     $this->assertEquals(new Price('20.00', 'USD'), $order_item->getTotalPrice());
 
-    $this->order->addItem($order_item);
-    $this->assertEquals(1, count($this->order->getItems()));
+    $this->order->recalculateTotalPrice();
     $this->assertEquals(new Price('10.00', 'USD'), $this->order->getTotalPrice());
-  }
-
-  /**
-   * Tests offer target entity type.
-   */
-  public function testTargetType() {
-    // Use addOrderItem so the total is calculated.
-    $order_item = OrderItem::create([
-      'type' => 'test',
-      'quantity' => '2',
-      'unit_price' => [
-        'number' => '10.00',
-        'currency_code' => 'USD',
-      ],
-    ]);
-    $order_item->save();
-
-    // Starts now, enabled. No end time.
-    $promotion = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'offer' => [
-        'target_plugin_id' => 'commerce_promotion_order_percentage_off',
-        'target_plugin_configuration' => [
-          'amount' => '0.10',
-        ],
-      ],
-    ]);
-    $promotion->save();
-
-    $result = $promotion->applies($this->order);
-
-    // Promotion target is for the order.
-    $this->assertNotEmpty($result);
-
-    $promotion = Promotion::create([
-      'name' => 'Promotion 1',
-      'order_types' => [$this->order->bundle()],
-      'stores' => [$this->store->id()],
-      'status' => TRUE,
-      'offer' => [
-        'target_plugin_id' => 'commerce_promotion_product_percentage_off',
-        'target_plugin_configuration' => [
-          'amount' => '0.50',
-        ],
-      ],
-    ]);
-    $promotion->save();
-
-    $result = $promotion->applies($this->order);
-
-    // Promotion target is for the order items. This should fail.
-    $this->assertEmpty($result);
   }
 
 }

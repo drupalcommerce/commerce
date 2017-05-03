@@ -20,7 +20,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 class LogTemplateManager extends DefaultPluginManager implements LogTemplateManagerInterface {
 
   /**
-   * The commerce_log_category category manager.
+   * The log category manager.
    *
    * @var \Drupal\commerce_log\LogCategoryManagerInterface
    */
@@ -46,6 +46,8 @@ class LogTemplateManager extends DefaultPluginManager implements LogTemplateMana
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
+   * @param \Drupal\commerce_log\LogCategoryManagerInterface $category_manager
+   *   The log category manager.
    */
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LogCategoryManagerInterface $category_manager) {
     $this->moduleHandler = $module_handler;

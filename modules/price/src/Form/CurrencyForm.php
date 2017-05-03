@@ -94,7 +94,7 @@ class CurrencyForm extends EntityForm {
       '#type' => 'number',
       '#title' => $this->t('Fraction digits'),
       '#description' => $this->t('The number of digits after the decimal sign.'),
-      '#default_value' => $currency->getFractionDigits() ?: 2,
+      '#default_value' => $currency->getFractionDigits(),
       '#min' => 0,
       '#required' => TRUE,
     ];
@@ -105,7 +105,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the currency code.
    */
-  public function validateCurrencyCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateCurrencyCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $currency_code = $element['#value'];
     if (!preg_match('/^[A-Z]{3}$/', $currency_code)) {
@@ -122,7 +122,7 @@ class CurrencyForm extends EntityForm {
   /**
    * Validates the numeric code.
    */
-  public function validateNumericCode(array $element, FormStateInterface &$form_state, array $form) {
+  public function validateNumericCode(array $element, FormStateInterface $form_state, array $form) {
     $currency = $this->getEntity();
     $numeric_code = $element['#value'];
     if ($numeric_code && !preg_match('/^\d{3}$/i', $numeric_code)) {

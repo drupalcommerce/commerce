@@ -17,7 +17,6 @@ class EntityTraitTest extends CommerceBrowserTestBase {
   public static $modules = [
     'field_ui',
     'telephone',
-    'commerce_store',
     'commerce_test',
   ];
 

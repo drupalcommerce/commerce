@@ -34,7 +34,6 @@ class OrderTest extends OrderBrowserTestBase {
 
     $order_exists = (bool) Order::load($order->id());
     $this->assertNotEmpty($order_exists, 'The new order has been created in the database.');
-    $this->assertEquals($order->id(), $order->getOrderNumber(), 'The order number matches the order ID');
   }
 
   /**
@@ -87,8 +86,8 @@ class OrderTest extends OrderBrowserTestBase {
     $transition = $order->getState()->getWorkflow()->getTransition('place');
     $order->getState()->applyTransition($transition);
     $order->save();
-    $this->assertEquals($order->getPlacedTime(), REQUEST_TIME);
-    $this->assertEquals($order->getCompletedTime(), REQUEST_TIME);
+    $this->assertEquals($order->getPlacedTime(), \Drupal::time()->getRequestTime());
+    $this->assertEquals($order->getCompletedTime(), \Drupal::time()->getRequestTime());
   }
 
 }

@@ -88,11 +88,12 @@ class PaymentMethodTest extends CommerceBrowserTestBase {
       'payment_method[payment_details][expiration][month]' => '01',
       'payment_method[payment_details][expiration][year]' => date('Y') + 1,
       'payment_method[payment_details][security_code]' => '111',
-      'payment_method[billing_information][address][0][country_code]' => 'AF',
-      'payment_method[billing_information][address][0][given_name]' => 'FirstName',
-      'payment_method[billing_information][address][0][family_name]' => 'LastName',
-      'payment_method[billing_information][address][0][address_line1]' => 'TestStreet',
-      'payment_method[billing_information][address][0][locality]' => 'TestTown',
+      'payment_method[billing_information][address][0][address][given_name]' => 'Johnny',
+      'payment_method[billing_information][address][0][address][family_name]' => 'Appleseed',
+      'payment_method[billing_information][address][0][address][address_line1]' => '123 New York Drive',
+      'payment_method[billing_information][address][0][address][locality]' => 'New York City',
+      'payment_method[billing_information][address][0][address][administrative_area]' => 'NY',
+      'payment_method[billing_information][address][0][address][postal_code]' => '10001',
     ];
     $this->submitForm($form_values, 'Save');
     $this->assertSession()->addressEquals($this->collectionUrl);

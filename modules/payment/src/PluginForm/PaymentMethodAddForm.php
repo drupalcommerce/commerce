@@ -5,11 +5,24 @@ namespace Drupal\commerce_payment\PluginForm;
 use Drupal\commerce_payment\CreditCard;
 use Drupal\commerce_payment\Exception\DeclineException;
 use Drupal\commerce_payment\Exception\PaymentGatewayException;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\profile\Entity\Profile;
 
 class PaymentMethodAddForm extends PaymentGatewayFormBase {
+
+  /**
+   * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
+   * Constructs a new PaymentMethodAddForm.
+   */
+  public function __construct() {
+    $this->routeMatch = \Drupal::service('current_route_match');
+  }
 
   /**
    * {@inheritdoc}
@@ -39,11 +52,29 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
       $form['payment_details'] = $this->buildPayPalForm($form['payment_details'], $form_state);
     }
 
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $this->entity;
+    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
+    $billing_profile = Profile::create([
+      'type' => 'customer',
+      'uid' => $payment_method->getOwnerId(),
+    ]);
+    if ($order = $this->routeMatch->getParameter('commerce_order')) {
+      $store = $order->getStore();
+    }
+    else {
+      /** @var \Drupal\commerce_store\StoreStorageInterface $store_storage */
+      $store_storage = \Drupal::entityTypeManager()->getStorage('commerce_store');
+      $store = $store_storage->loadDefault();
+    }
+
     $form['billing_information'] = [
       '#parents' => array_merge($form['#parents'], ['billing_information']),
-      '#type' => 'container',
+      '#type' => 'commerce_profile_select',
+      '#default_value' => $billing_profile,
+      '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
+      '#available_countries' => $store ? $store->getBillingCountries() : [],
     ];
-    $form['billing_information'] = $this->buildBillingProfileForm($form['billing_information'], $form_state);
 
     return $form;
   }
@@ -61,7 +92,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     elseif ($payment_method->bundle() == 'paypal') {
       $this->validatePayPalForm($form['payment_details'], $form_state);
     }
-    $this->validateBillingProfileForm($form['billing_information'], $form_state);
   }
 
   /**
@@ -77,7 +107,9 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
     elseif ($payment_method->bundle() == 'paypal') {
       $this->submitPayPalForm($form['payment_details'], $form_state);
     }
-    $this->submitBillingProfileForm($form['billing_information'], $form_state);
+    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
+    $payment_method = $this->entity;
+    $payment_method->setBillingProfile($form['billing_information']['#profile']);
 
     $values = $form_state->getValue($form['#parents']);
     /** @var \Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\SupportsStoredPaymentMethodsInterface $payment_gateway_plugin */
@@ -264,71 +296,6 @@ class PaymentMethodAddForm extends PaymentGatewayFormBase {
   protected function submitPayPalForm(array $element, FormStateInterface $form_state) {
     $values = $form_state->getValue($element['#parents']);
     $this->entity->paypal_mail = $values['paypal_mail'];
-  }
-
-  /**
-   * Builds the billing profile form.
-   *
-   * @param array $element
-   *   The target element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the complete form.
-   *
-   * @return array
-   *   The built billing profile form.
-   */
-  protected function buildBillingProfileForm(array $element, FormStateInterface $form_state) {
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $payment_method = $this->entity;
-
-    /** @var \Drupal\profile\Entity\ProfileInterface $billing_profile */
-    $billing_profile = Profile::create([
-      'type' => 'customer',
-      'uid' => $payment_method->getOwnerId(),
-    ]);
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->buildForm($billing_profile, $element, $form_state);
-    // Remove the details wrapper from the address field.
-    if (!empty($element['address']['widget'][0])) {
-      $element['address']['widget'][0]['#type'] = 'container';
-    }
-    // Store the billing profile for the validate/submit methods.
-    $element['#entity'] = $billing_profile;
-
-    return $element;
-  }
-
-  /**
-   * Validates the billing profile form.
-   *
-   * @param array $element
-   *   The billing profile form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the complete form.
-   */
-  protected function validateBillingProfileForm(array &$element, FormStateInterface $form_state) {
-    $billing_profile = $element['#entity'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->extractFormValues($billing_profile, $element, $form_state);
-    $form_display->validateFormValues($billing_profile, $element, $form_state);
-  }
-
-  /**
-   * Handles the submission of the billing profile form.
-   *
-   * @param array $element
-   *   The billing profile form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the complete form.
-   */
-  protected function submitBillingProfileForm(array $element, FormStateInterface $form_state) {
-    $billing_profile = $element['#entity'];
-    $form_display = EntityFormDisplay::collectRenderDisplay($billing_profile, 'default');
-    $form_display->extractFormValues($billing_profile, $element, $form_state);
-
-    /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $payment_method = $this->entity;
-    $payment_method->setBillingProfile($billing_profile);
   }
 
 }
