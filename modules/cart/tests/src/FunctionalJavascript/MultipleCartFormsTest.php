@@ -10,6 +10,9 @@ use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 /**
  * Tests pages with multiple products rendered with add to cart forms.
  *
+ * @todo The file with the same name exists in the Functional namespace and it
+ * should be decided which one to leave for this kind of test.
+ *
  * @group commerce
  */
 class MultipleCartFormsTest extends CartBrowserTestBase {
