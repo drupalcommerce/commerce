@@ -2,12 +2,11 @@
 
 namespace Drupal\commerce_promotion\Element;
 
-use Drupal\commerce\Element\CommerceElementBase;
+use Drupal\commerce\Element\CommerceElementTrait;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_promotion\Entity\CouponInterface;
-use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\FormElement;
 
 /**
  * Provides a form element for redeeming a coupon.
@@ -28,7 +27,9 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FormElement("commerce_coupon_redemption_form")
  */
-class CouponRedemptionForm extends CommerceElementBase {
+class CouponRedemptionForm extends FormElement {
+
+  use CommerceElementTrait;
 
   /**
    * {@inheritdoc}
@@ -219,51 +220,16 @@ class CouponRedemptionForm extends CommerceElementBase {
         return;
       }
     }
-
-    $order_type_storage = $entity_type_manager->getStorage('commerce_order_type');
-    /** @var \Drupal\commerce_promotion\PromotionStorageInterface $promotion_storage */
-    $promotion_storage = $entity_type_manager->getStorage('commerce_promotion');
-    /** @var \Drupal\commerce_order\Entity\OrderTypeInterface $order_type */
-    $order_type = $order_type_storage->load($order->bundle());
-    $promotion = $promotion_storage->loadByCoupon($order_type, $order->getStore(), $coupon);
-    if (empty($promotion)) {
+    if (!$coupon->available($order)) {
       $form_state->setErrorByName($code_path, t('Coupon is invalid'));
       return;
     }
-    if (!self::couponApplies($order, $promotion, $coupon)) {
+    if (!$coupon->getPromotion()->applies($order)) {
       $form_state->setErrorByName($code_path, t('Coupon is invalid'));
       return;
     }
 
     $form_state->setValueForElement($element, $coupon);
-  }
-
-  /**
-   * Checks whether a coupon applies.
-   *
-   * @param \Drupal\commerce_order\Entity\OrderInterface $order
-   *   The order.
-   * @param \Drupal\commerce_promotion\Entity\PromotionInterface $promotion
-   *   The promotion.
-   * @param \Drupal\commerce_promotion\Entity\CouponInterface $coupon
-   *   The coupon.
-   *
-   * @return bool
-   *   Returns TRUE if the coupon applies, FALSE otherwise.
-   */
-  protected static function couponApplies(OrderInterface $order, PromotionInterface $promotion, CouponInterface $coupon) {
-    if ($promotion->applies($order)) {
-      return TRUE;
-    }
-    else {
-      foreach ($order->getItems() as $orderItem) {
-        if ($promotion->applies($orderItem)) {
-          return TRUE;
-        }
-      }
-    }
-
-    return FALSE;
   }
 
 }

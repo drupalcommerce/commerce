@@ -34,7 +34,7 @@ class LogViewBuilder extends EntityViewBuilder {
       $build_list[$key]['#context'][$source_type] = $entity->getSourceEntity();
 
       $entityType = $this->entityTypeId;
-      $this->moduleHandler()->alter(array($entityType . '_build', 'entity_build'), $build_list[$key], $entity, $view_mode);
+      $this->moduleHandler()->alter([$entityType . '_build', 'entity_build'], $build_list[$key], $entity, $view_mode);
 
       $build_list[$key]['#weight'] = $weight++;
     }

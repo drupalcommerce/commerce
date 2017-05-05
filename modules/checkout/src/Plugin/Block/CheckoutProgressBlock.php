@@ -90,7 +90,8 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
     // Prepare the steps as expected by the template.
     $steps = [];
     $visible_steps = $checkout_flow_plugin->getVisibleSteps();
-    $current_step_id = $this->checkoutOrderManager->getCheckoutStepId($order);
+    $requested_step_id = $this->routeMatch->getParameter('step');
+    $current_step_id = $this->checkoutOrderManager->getCheckoutStepId($order, $requested_step_id);
     $current_step_index = array_search($current_step_id, array_keys($visible_steps));
     $index = 0;
     foreach ($visible_steps as $step_id => $step_definition) {
@@ -103,6 +104,12 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
       else {
         $position = 'next';
       }
+      $index++;
+      // Hide hidden steps until they are reached.
+      if (!empty($step_definition['hidden']) && $position != 'current') {
+        continue;
+      }
+
       // Create breadcrumb style links for active checkout steps.
       if ($index <= $current_step_index && $configuration['display_checkout_progress_breadcrumb_links']) {
         $label = Link::createFromRoute($step_definition['label'], 'commerce_checkout.form', [
@@ -119,7 +126,6 @@ class CheckoutProgressBlock extends BlockBase implements ContainerFactoryPluginI
         'label' => $label,
         'position' => $position,
       ];
-      $index++;
     }
 
     return [
