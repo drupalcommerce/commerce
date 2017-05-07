@@ -315,9 +315,8 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       ->setDescription(t('The number of purchased units.'))
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE)
-      ->setSetting('precision', 12)
-      ->setSetting('scale', 3)
-      ->setSetting('max', '367384.999')
+      ->setSetting('precision', 14)
+      ->setSetting('scale', 4)
       ->setDefaultValue(1)
       ->setDisplayOptions('form', [
         'type' => 'commerce_number',
