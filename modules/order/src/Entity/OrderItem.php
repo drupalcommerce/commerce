@@ -131,18 +131,20 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
     $form_display = entity_get_form_display($this->getEntityTypeId(), $this->bundle(), 'add_to_cart');
     $quantity = $form_display->getComponent('quantity');
     $settings['add_to_cart_quantity_hidden'] = !$quantity;
+
     if ($settings['add_to_cart_quantity_hidden']) {
       $form_display = entity_get_form_display($this->getEntityTypeId(), $this->bundle(), 'default');
       $quantity = $form_display->getComponent('quantity');
     }
-    if (isset($quantity['type']) && $quantity['type'] == 'commerce_number') {
+
+    if (isset($quantity['settings']['step'])) {
       $mode_settings = $form_display->getRenderer('quantity')->getFormDisplayModeSettings();
       foreach ($mode_settings as $key => $value) {
         $settings["#{$key}"] = $value;
       }
     }
     else {
-      // If quantity field is of a 'number' type it almost has no settings, so
+      // If $settings has no 'step' it means that some unknown mode is used, so
       // $form_display->getRenderer('quantity')->getSettings() is useless here.
       // We use $quantity->defaultValuesForm() to get an array with #min, #max,
       // #step, #field_prefix, #field_suffix and #default_value elements.
@@ -150,7 +152,13 @@ class OrderItem extends ContentEntityBase implements OrderItemInterface {
       $form = [];
       $form = $this->get('quantity')->defaultValuesForm($form, $form_state);
       $settings += (array) NestedArray::getValue($form, ['widget', 0, 'value']);
+      // Make prefix/suffix settings accessible through #prefix/#suffix keys.
+      $settings['#prefix'] = isset($settings['#prefix']) ? $settings['#prefix'] : FALSE;
+      $settings['#suffix'] = isset($settings['#suffix']) ? $settings['#suffix'] : FALSE;
+      $settings['#prefix'] = $settings['#prefix'] ? : (isset($settings['#field_prefix']) ? $settings['#field_prefix'] : '');
+      $settings['#suffix'] = $settings['#suffix'] ? : (isset($settings['#field_suffix']) ? $settings['#field_suffix'] : '');
     }
+
     return $settings;
   }
 
