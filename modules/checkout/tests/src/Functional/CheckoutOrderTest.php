@@ -89,7 +89,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
-    $this->getSession()->getPage()->findLink('your cart')->click();
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextNotContains('Order Summary');
     $this->assertCheckoutProgressStep('Login');
@@ -133,7 +134,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
     $this->assertSession()->pageTextContains('1 item');
-    $this->getSession()->getPage()->findLink('your cart')->click();
+    $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertCheckoutProgressStep('Login');
     $this->assertSession()->pageTextNotContains('Order Summary');
@@ -178,7 +179,8 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
-    $this->getSession()->getPage()->findLink('your cart')->click();
+    $cart_link = $this->getSession()->getPage()->findLink('your cart');
+    $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextContains('New Customer');
     $this->submitForm([
@@ -195,7 +197,7 @@ class CheckoutOrderTest extends CommerceBrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet($this->product->toUrl()->toString());
     $this->submitForm([], 'Add to cart');
-    $this->getSession()->getPage()->findLink('your cart')->click();
+    $cart_link->click();
     $this->submitForm([], 'Checkout');
     $this->assertSession()->pageTextContains('New Customer');
 
