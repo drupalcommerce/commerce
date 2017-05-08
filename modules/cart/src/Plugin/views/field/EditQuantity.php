@@ -102,8 +102,8 @@ class EditQuantity extends FieldPluginBase {
         '#max' => isset($attr['#max']) && is_numeric($attr['#max']) ? $attr['#max'] : '9999',
         '#step' => isset($attr['#step']) && is_numeric($attr['#step']) ? $attr['#step'] : '1',
         '#placeholder' => empty($attr['#placeholder']) ? '' : $attr['#placeholder'],
-        '#field_prefix' => empty($attr['#prefix']) ? '' : Markup::create($attr['#prefix']),
-        '#field_suffix' => empty($attr['#suffix']) ? '' : Markup::create($attr['#suffix']),
+        '#field_prefix' => empty($attr['#field_prefix']) ? '' : Markup::create($attr['#field_prefix']),
+        '#field_suffix' => empty($attr['#field_suffix']) ? '' : Markup::create($attr['#field_suffix']),
         // Do not allow to change the default quantity if the quantity widget
         // is hidden on the 'Add to cart' form display.
         // '#disabled' => $attr['add_to_cart_quantity_hidden'],
