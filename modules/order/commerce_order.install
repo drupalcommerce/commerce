@@ -70,7 +70,7 @@ function commerce_order_update_8301() {
         }
       }
 
-      if ($data['content'][$field_name]['type'] !== 'commerce_number') {
+      if (isset($data['content'][$field_name]) && $data['content'][$field_name]['type'] !== 'commerce_number') {
         $data['content'][$field_name]['type'] = 'commerce_number';
         $data['content'][$field_name]['settings'] += [
           'min' => '1',
